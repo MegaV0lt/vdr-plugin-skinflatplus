@@ -1,7 +1,7 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
 
-202X-XX-XX: Version XXX
+2021-02-24: Version 0.6.1
 - [fix] '%' sign not shown in menu weather widget at certian font
 - [update] use std::min & std::max
 - [update] support for vdr 2.3.8 (thanks to nanohcv)
@@ -12,6 +12,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [update] weather widget update_weather.php php7 support (reported by Delekhan)
 - [update] disk usage shown in TB when over 999 GB (MegaV0lt)
 - [update] change to openweathermap api (MegaV0lt)
+- [update] support ImageMagick 7 (thanks to rell and M-Reimer)
 - [add] support for change color key mapping
 - [add] displaychannel show event start time on the left before event title
 
