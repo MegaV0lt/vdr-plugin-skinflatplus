@@ -12,7 +12,7 @@
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=201215
+#VERSION=210426
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -24,8 +24,7 @@ LC_NUMERIC='C'
 
 ### Funktionen ###
 f_log(){
-  echo "$*"
-  logger -t "$SELF_NAME" "$*"
+  [[ -t 1 ]] && { echo "$*" ;} || logger -t "$SELF_NAME" "$*"
 }
 
 f_write_temp(){  # Temperaturwert aufbereiten und schreiben ($1 Temperatur, $2 Ausgabedatei)
@@ -68,11 +67,11 @@ f_get_weather(){
     fi
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.summary" # Beschreibung
     jqdata=$(jq -r .daily[${cnt}].weather[0].id "$WEATHER_JSON")   # Wettersymbol
-    case $jqdata in
-      800) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='clear-night' ;;
-      801) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='partly-cloudy-night' ;;
-      *) ;;
-    esac
+    #case $jqdata in
+    #  800) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='clear-night' ;;
+    #  801) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='partly-cloudy-night' ;;
+    #  *) ;;
+    #esac
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.icon"
     ((cnt++))
   done
