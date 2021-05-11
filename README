@@ -16,7 +16,7 @@ See the file COPYING for more information.
 Anforderungen
 -------------------------------
 - VDR Version >= 1.7.34
-- GraphicsMagick oder ImageMagick zur Anzeige von png/jpg Icons, Kanal Logos and EPG Bilder
+- GraphicsMagick oder ImageMagick zur Anzeige von png/jpg Icons, Kanal-Logos and EPG Bilder
 
 
 Beschreibung
@@ -36,7 +36,7 @@ MegaV0lt
 git clone https://github.com/MegaV0lt/vdr-plugin-skinflatplus.git/
 
 zugegriffen werden.
-Da im git natürlich aktiv entwickelt wird können Fehler nicht ausgeschlossen werden (ich empfehle es nicht für produktiv Systeme)
+Fehler können nicht ausgeschlossen werden ;-) (Läuft aber bei mir stablil)
 
 
 Installation
@@ -45,10 +45,15 @@ Installation wie bei allen VDR Plugins.
     make
     make install
 
+Veraltet:
 Für die Kanallogos empfehle ich die Logos von Copperhead: http://creimer.net/channellogos/
 Ich nutze "nopacity-logos-white"
 Alternativ können auch die Logos von 3PO genutzt werden:
 https://github.com/3PO/Senderlogos
+
+Alternativ eines der beiden Logo-Skripte:
+https://github.com/MegaV0lt/MP_Logos
+https://github.com/MegaV0lt/Picons2VDR
 
 Die Logos müssen im folgenden Ordner zur Verfügung gestellt werden:
     <vdrconfigdir>/plugins/skinflatplus/logos/
@@ -63,7 +68,6 @@ Versteckte Einstellungen sind Einstellungen die in der VDR setup.conf konfigurie
 * MenuItemRecordingClearPercent - Wenn die Einstellung auf 1 gesetzt ist, wird vom Aufnahmetext das Prozentzeichen am Anfang des Strings entfernt.
 * MenuItemRecordingShowFolderDate - Wenn die Einstellung auf 1 gesetzt ist, wird bei einem Ordner von der neuesten Aufzeichnung das Datum angezeigt, Wenn die Einstellung auf 2 gesetzt ist, wird bei einem Ordner von der ältesten Aufzeichnung das Datum angezeigt.
 * MenuItemParseTilde - Wenn die Einstellung auf 1 gesetzt ist, wird beim Menü-Item-Text auf den Buchstaben Tilde '~' geprüft und wenn eine Tilde gefunden wurde, wird die Tilde entfernt und alles was nach der Tilde steht in einer anderen Farbe dargestellt. Dies ist z.B. interessant wenn man epgsearch hat.
-* ChannelBitrateShowCalcInterval - In welchen Intervall soll die Bitrate (Kanalanzeige) aktualisiert werden (default 20)
 
 Widgets
 _______________________________
