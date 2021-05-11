@@ -13,6 +13,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [update] disk usage shown in TB when over 999 GB (MegaV0lt)
 - [update] change to openweathermap api (MegaV0lt)
 - [update] support ImageMagick 7 (thanks to rell and M-Reimer)
+- [add] support for GraphicsMagick
 - [add] support for change color key mapping
 - [add] displaychannel show event start time on the left before event title
 
