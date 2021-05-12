@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflat 0.5.1\n"
+"Project-Id-Version: vdr-skinflat 0.6.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -818,6 +818,9 @@ msgstr "DVB Geräte-Widget: Unbekannte ausblenden"
 
 msgid "Widget DVB devices: don't show not used"
 msgstr "DVB Geräte-Widget: Nicht verw. ausblenden"
+
+msgid "Widget DVB devices: native numbering (0..)"
+msgstr "DVB Geräte-Widget: Interne Nummerierung (0..)"
 
 msgid "Widget timer"
 msgstr "Timer-Widget"
