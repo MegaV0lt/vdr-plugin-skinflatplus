@@ -277,6 +277,7 @@ class cFlatConfig
         int MainMenuWidgetDVBDevicesPosition;
         int MainMenuWidgetDVBDevicesDiscardUnknown;
         int MainMenuWidgetDVBDevicesDiscardNotUsed;
+        int MainMenuWidgetDVBDevicesNativeNumbering;
 
         int MainMenuWidgetActiveTimerShow;
         int MainMenuWidgetActiveTimerPosition;

@@ -89,6 +89,7 @@ cFlatConfig::cFlatConfig(void) {
     MainMenuWidgetDVBDevicesPosition = 2;
     MainMenuWidgetDVBDevicesDiscardUnknown = true;
     MainMenuWidgetDVBDevicesDiscardNotUsed = false;
+    MainMenuWidgetDVBDevicesNativeNumbering = false;  // Display device numbers from 1..x
 
     MainMenuWidgetActiveTimerShow = true;
     MainMenuWidgetActiveTimerPosition = 3;
@@ -366,6 +367,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardUnknown") == 0)  MainMenuWidgetDVBDevicesDiscardUnknown = atoi(Value);
     else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardNotUsed") == 0)  MainMenuWidgetDVBDevicesDiscardNotUsed = atoi(Value);
+    else if (strcmp(Name, "MainMenuWidgetDVBDevicesNativeNumbering") == 0)  MainMenuWidgetDVBDevicesNativeNumbering = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 RecordingDimmOnPause = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            RecordingDimmOnPauseDelay = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           RecordingDimmOnPauseOpaque = atoi(Value);

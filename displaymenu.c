@@ -4695,7 +4695,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
       }
     }
     channelName = strDevice.str().c_str();
-    cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4 instead of 0..3
+    if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
+      cString str = cString::sprintf("%d", i);  // Display Tuners 0..3
+    } else {
+      cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4 
+    }
     int left = marginItem;
     if (numDevices <= 9) {
       contentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
