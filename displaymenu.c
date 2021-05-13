@@ -4695,10 +4695,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
       }
     }
     channelName = strDevice.str().c_str();
+    
+    cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
     if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
-      cString str = cString::sprintf("%d", i);  // Display Tuners 0..3
-    } else {
-      cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4 
+       str = cString::sprintf("%d", i);  // Display Tuners 0..3
     }
     int left = marginItem;
     if (numDevices <= 9) {
