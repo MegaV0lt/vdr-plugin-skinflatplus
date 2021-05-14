@@ -81,7 +81,7 @@ Die Widgets werden auf der rechten Seite des Hauptmenüs angezeigt. In der Höhe
 
 ** DVB Geräte
 
-Zeigt die DVB Geräte an, wer dieses benutzt und auf welchem Kanel das Gerät gerade ist. Über die Plugineinstellungen kann konfiguriert werden ob "unbekannte" und/oder "nicht benutzte" Geräte ausgeblendet werden sollen.
+Zeigt die DVB Geräte an, wer dieses benutzt und auf welchem Kanel das Gerät gerade ist. Über die Plugineinstellungen kann konfiguriert werden ob "unbekannte" und/oder "nicht benutzte" Geräte ausgeblendet werden sollen. Die Nummerierung der Geräte kann entweder wie VDR-Intern mit 0 beginnen oder wahlweise mit 1.
 Leider ist es derzeit nicht möglich 100% herauszufinden wer das Gerät derzeit nutzt. Z.B. gibt es Fälle wie den EPG-Scan welcher nicht erkannt wird.
 
 ** Aktive Timer
