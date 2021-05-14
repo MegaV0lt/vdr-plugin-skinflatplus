@@ -1,5 +1,7 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
+2021-XX-XX: Version X.X.X
+- [add] option for widget dvbdevices to display device numbers userfriendly
 
 2021-02-24: Version 0.6.1
 - [fix] '%' sign not shown in menu weather widget at certian font

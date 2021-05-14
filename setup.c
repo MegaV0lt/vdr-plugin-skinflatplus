@@ -313,6 +313,7 @@ void cFlatSetup::Store(void) {
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("MainMenuWidgetDVBDevicesDiscardUnknown", Config.MainMenuWidgetDVBDevicesDiscardUnknown);
     SetupStore("MainMenuWidgetDVBDevicesDiscardNotUsed", Config.MainMenuWidgetDVBDevicesDiscardNotUsed);
+    SetupStore("MainMenuWidgetDVBDevicesNativeNumbering", Config.MainMenuWidgetDVBDevicesNativeNumbering);
     SetupStore("RecordingDimmOnPause", Config.RecordingDimmOnPause);
     SetupStore("RecordingDimmOnPauseDelay", Config.RecordingDimmOnPauseDelay);
     SetupStore("RecordingDimmOnPauseOpaque", Config.RecordingDimmOnPauseOpaque);
@@ -504,6 +505,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardUnknown") == 0) SetupConfig->MainMenuWidgetDVBDevicesDiscardUnknown = atoi(Value);
     else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardNotUsed") == 0) SetupConfig->MainMenuWidgetDVBDevicesDiscardNotUsed = atoi(Value);
+    else if (strcmp(Name, "MainMenuWidgetDVBDevicesNativeNumbering") == 0) SetupConfig->MainMenuWidgetDVBDevicesNativeNumbering = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 SetupConfig->RecordingDimmOnPause = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            SetupConfig->RecordingDimmOnPauseDelay = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           SetupConfig->RecordingDimmOnPauseOpaque = atoi(Value);
@@ -677,6 +679,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("MainMenuWidgetDVBDevicesDiscardUnknown", SetupConfig->MainMenuWidgetDVBDevicesDiscardUnknown, *Filename);
     Config.Store("MainMenuWidgetDVBDevicesDiscardNotUsed", SetupConfig->MainMenuWidgetDVBDevicesDiscardNotUsed, *Filename);
+    Config.Store("MainMenuWidgetDVBDevicesNativeNumbering", SetupConfig->MainMenuWidgetDVBDevicesNativeNumbering, *Filename);
     Config.Store("RecordingDimmOnPause", SetupConfig->RecordingDimmOnPause, *Filename);
     Config.Store("RecordingDimmOnPauseDelay", SetupConfig->RecordingDimmOnPauseDelay, *Filename);
     Config.Store("RecordingDimmOnPauseOpaque", SetupConfig->RecordingDimmOnPauseOpaque, *Filename);
@@ -1315,6 +1318,7 @@ void cFlatSetupMMWidget::Setup(void) {
             Add(new cMenuEditIntItem(tr("Widget DVB devices: position"), &SetupConfig->MainMenuWidgetDVBDevicesPosition));
             Add(new cMenuEditBoolItem(tr("Widget DVB devices: don't show unknown"), &SetupConfig->MainMenuWidgetDVBDevicesDiscardUnknown));
             Add(new cMenuEditBoolItem(tr("Widget DVB devices: don't show not used"), &SetupConfig->MainMenuWidgetDVBDevicesDiscardNotUsed));
+            Add(new cMenuEditBoolItem(tr("Widget DVB devices: native numbering (0..)"), &SetupConfig->MainMenuWidgetDVBDevicesNativeNumbering));
         }
 
         Add(new cOsdItem(tr("Widget timer"), osUnknown, false));
