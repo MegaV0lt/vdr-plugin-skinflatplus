@@ -169,10 +169,12 @@ void cFlatBaseRender::TopBarCreate(void) {
   // dsyslog("skinflatplus: topBarIconPixmap left: %d top: %d width: %d height:
   // %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   // Config.decorBorderTopBarSize*2, topBarHeight);
-  topBarPixmap->Fill(clrTransparent);
-  topBarIconBGPixmap->Fill(clrTransparent);
-  topBarIconPixmap->Fill(clrTransparent);
-
+  if (topBarPixmap)
+    topBarPixmap->Fill(clrTransparent);
+  if (topBarIconBGPixmap)
+    topBarIconBGPixmap->Fill(clrTransparent);
+  if (topBarIconPixmap)
+    topBarIconPixmap->Fill(clrTransparent);
   if (Config.DiskUsageShow == 3)
     TopBarEnableDiskUsage();
 }
@@ -485,6 +487,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
 }
 // sollte bei jedum "Flush" aufgerufen werden!
 void cFlatBaseRender::TopBarUpdate(void) {
+  if (!topBarPixmap || !topBarIconPixmap || !topBarIconBGPixmap) return;
   cString curDate = DayDateTime();
   int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
   int MenuIconWidth = 0;
@@ -730,7 +733,8 @@ void cFlatBaseRender::ButtonsCreate(void) {
 
   buttonsPixmap = CreatePixmap(1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
-  buttonsPixmap->Fill(clrTransparent);
+  if (buttonsPixmap)
+    buttonsPixmap->Fill(clrTransparent);
   // dsyslog("skinflatplus: buttonsPixmap left: %d top: %d width: %d height:
   // %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
   // Config.decorBorderButtonSize*2, buttonsHeight);
@@ -740,6 +744,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
   int WidthMargin = buttonsWidth - marginItem * 3;
   int buttonWidth = (WidthMargin / 4) - Config.decorBorderButtonSize * 2;
 
+  if (!buttonsPixmap) return;
   buttonsPixmap->Fill(clrTransparent);
   DecorBorderClearByFrom(BorderButton);
 
@@ -896,10 +901,12 @@ void cFlatBaseRender::MessageCreate(void) {
   int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
   messagePixmap = CreatePixmap(
       5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
-  messagePixmap->Fill(clrTransparent);
+  if (messagePixmap)
+    messagePixmap->Fill(clrTransparent);
   messageIconPixmap = CreatePixmap(
       5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
-  messageIconPixmap->Fill(clrTransparent);
+  if (messageIconPixmap)
+    messageIconPixmap->Fill(clrTransparent);
 
   // dsyslog("skinflatplus: messagePixmap left: %d top: %d width: %d height:
   // %d", Config.decorBorderMessageSize, top, osdWidth -
@@ -936,6 +943,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     icon = "message_error";
     break;
   }
+  if (!messagePixmap) return;
   messagePixmap->Fill(Theme.Color(clrMessageBg));
   messageScroller.Clear();
 
@@ -1014,8 +1022,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 }
 
 void cFlatBaseRender::MessageClear(void) {
-  messagePixmap->Fill(clrTransparent);
-  messageIconPixmap->Fill(clrTransparent);
+  if (messagePixmap)
+    messagePixmap->Fill(clrTransparent);
+  if (messageIconPixmap)
+    messageIconPixmap->Fill(clrTransparent);
   DecorBorderClearByFrom(BorderMessage);
   DecorBorderRedrawAll();
   messageScroller.Clear();
@@ -1044,8 +1054,10 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
   progressBarPixmapBg =
       CreatePixmap(2, cRect(Left - progressBarMarginVer, Top - progressBarMarginHor, Width + progressBarMarginVer * 2,
                             progressBarHeight + progressBarMarginHor * 2));
-  progressBarPixmap->Fill(clrTransparent);
-  progressBarPixmapBg->Fill(clrTransparent);
+  if (progressBarPixmap)
+    progressBarPixmap->Fill(clrTransparent);
+  if (progressBarPixmapBg)
+    progressBarPixmapBg->Fill(clrTransparent);
 }
 
 void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
@@ -1056,7 +1068,7 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
       progressBarIsSignal);
 }
 
-void cFlatBaseRender::ProgressBarDrawBgColor(void) { progressBarPixmapBg->Fill(progressBarColorBg); }
+void cFlatBaseRender::ProgressBarDrawBgColor(void) { if (progressBarPixmapBg) progressBarPixmapBg->Fill(progressBarColorBg); }
 
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rect, cRect rectBg, int Current,
                                          int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
@@ -1273,6 +1285,8 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
   int posMark = 0, posMarkLast = 0, posCurrent = 0;
 
   int top = progressBarHeight / 2;
+
+  if (!progressBarPixmap) return;
   if (progressBarPixmapBg)
     progressBarPixmapBg->DrawRectangle(
         cRect(0, progressBarMarginHor + progressBarHeight, progressBarWidth, progressBarMarginHor), progressBarColorBg);
@@ -1627,6 +1641,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
 
   if (!decorPixmap) {
     decorPixmap = CreatePixmap(4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+    if (!decorPixmap) return;
     decorPixmap->Fill(clrTransparent);
   }
 
