@@ -1081,9 +1081,10 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
 
   if (SetBackground) {
-    if (PixmapBg == Pixmap)
+    if (PixmapBg && PixmapBg == Pixmap)
       Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
     else
+      if (PixmapBg)
       Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
   }
   switch (Type) {
@@ -1094,9 +1095,10 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
       sml = 2;
     int big = rect.Height();
 
+    if (Pixmap)
     Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
-    if (Current > 0)
+    if (Pixmap && Current > 0)
       Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big),
                             ColorBarFg);
     break;
