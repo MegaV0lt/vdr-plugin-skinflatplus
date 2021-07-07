@@ -12,3 +12,12 @@ cp update_weather.conf.dist update_weather.conf
 
 Configure your location and others in update_weather.conf.
 Use "https://www.latlong.net" to get latitude & longitude from your location.
+
+INSTALL
+
+To execute the update_weather.sh on system-startup and then every hour do the following steps (yaVDR):
+
+1: ln -s /var/lib/vdr/plugins/skinflatplus/widgets/weather/update_weather.sh /etc/cron.hourly/update_weather
+2: sudo crontab -u vdr -e
+3: Insert the following line: 
+   @reboot  /etc/cron.hourly/update_weather
