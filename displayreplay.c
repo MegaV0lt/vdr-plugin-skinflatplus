@@ -634,8 +634,8 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("169", 999, fontSmlHeight);
     imgLoader.LoadIcon("169w", 999, fontSmlHeight);
     imgLoader.LoadIcon("221", 999, fontSmlHeight);
-    imgLoader.LoadIcon("7680x4320", 999, height);
-    imgLoader.LoadIcon("3840x2160", 999, height);
+    imgLoader.LoadIcon("7680x4320", 999, fontSmlHeight);
+    imgLoader.LoadIcon("3840x2160", 999, fontSmlHeight);
     imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     imgLoader.LoadIcon("1440x1080", 999, fontSmlHeight);
     imgLoader.LoadIcon("1280x720", 999, fontSmlHeight);
@@ -647,7 +647,7 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("480x576", 999, fontSmlHeight);
     imgLoader.LoadIcon("352x576", 999, fontSmlHeight);
     imgLoader.LoadIcon("unknown_res", 999, fontSmlHeight);
-    imgLoader.LoadIcon("uhd", 999, height);
+    imgLoader.LoadIcon("uhd", 999, fontSmlHeight);
     imgLoader.LoadIcon("hd", 999, fontSmlHeight);
     imgLoader.LoadIcon("sd", 999, fontSmlHeight);
 }
