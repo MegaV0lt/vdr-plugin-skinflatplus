@@ -474,29 +474,37 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw(void) {
-    if( modeOnly )
+    if (modeOnly)
         return;
     int left = osdWidth - Config.decorBorderReplaySize*2;
     int imageTop = 0;
     cImage *img = NULL;
 
-    if( screenWidth > 0 ) {
-    if( Config.RecordingResolutionAspectShow ) {         // Show Aspect
-        cString asp = "unknown_asp";                     // ???
+    if (screenWidth > 0) {
+    if (Config.RecordingResolutionAspectShow) {  // Show Aspect
+        cString asp = "unknown_asp";             // ???
         if(Config.RecordingSimpleAspectFormat && screenWidth > 720) {
-            asp = "hd";                                   // No aspect for HD
+            switch (screenWidth) {               // No aspect for HD
+            case 7680:
+            case 3840:
+                asp = "uhd";
+                break;
+            default:
+                asp = "hd";
+                break;
+            }
         } else {
-            if( screenAspect == 4.0/3.0 )
+            if (screenAspect == 4.0/3.0)
                 asp = "43";
-            else if( screenAspect == 16.0/9.0 )
+            else if (screenAspect == 16.0/9.0)
                 asp = "169";
-            else if( screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0 )
+            else if (screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0)
                 asp = "169w";
-            else if( screenAspect == 2.21 )
+            else if (screenAspect == 2.21)
                 asp = "221";
         }
         img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
-        if( img ) {
+        if (img) {
             imageTop = fontHeight + (fontSmlHeight - img->Height())/2;
             left -= img->Width();
             iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
@@ -504,9 +512,15 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         }
     }
 
-    if( Config.RecordingResolutionAspectShow ) {         // Show Resolution
+    if (Config.RecordingResolutionAspectShow) {  // Show Resolution
         cString res = "";
         switch (screenWidth) {
+            case 7680:                        // 7680×4320 (UHD-2 / 8K)
+                res = "7680x4320";
+                break;
+            case 3840:                        // 3840×2160 (UHD-1 / 4K)
+                res = "3840x2160";
+                break;
             case 1920:                        // 1920x1080 (HD1080 Full HDTV)
                 res = "1920x1080";
                 break;
@@ -553,9 +567,13 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 left -= marginItem*2;
             }
         }
-        if( Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
+        if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             cString iconName("");        // Show Format
             switch (screenWidth) {
+                case 7680:
+                case 3840:
+                    iconName = "uhd";
+                    break;
                 case 1920:
                 case 1440:
                 case 1280:
@@ -570,7 +588,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             }
 
             img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
-            if( img ) {
+            if (img) {
                 imageTop = fontHeight + (fontSmlHeight - img->Height())/2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
@@ -616,6 +634,8 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("169", 999, fontSmlHeight);
     imgLoader.LoadIcon("169w", 999, fontSmlHeight);
     imgLoader.LoadIcon("221", 999, fontSmlHeight);
+    imgLoader.LoadIcon("7680x4320", 999, height);
+    imgLoader.LoadIcon("3840x2160", 999, height);
     imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     imgLoader.LoadIcon("1440x1080", 999, fontSmlHeight);
     imgLoader.LoadIcon("1280x720", 999, fontSmlHeight);
@@ -627,6 +647,7 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("480x576", 999, fontSmlHeight);
     imgLoader.LoadIcon("352x576", 999, fontSmlHeight);
     imgLoader.LoadIcon("unknown_res", 999, fontSmlHeight);
+    imgLoader.LoadIcon("uhd", 999, height);
     imgLoader.LoadIcon("hd", 999, fontSmlHeight);
     imgLoader.LoadIcon("sd", 999, fontSmlHeight);
 }
