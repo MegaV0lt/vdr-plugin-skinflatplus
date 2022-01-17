@@ -1,4 +1,4 @@
-flatPlus-MV_Themen erstellt am 30.12.2021 11:48
+flatPlus-MV_Themen erstellt am 17.01.2022 09:10
 Basisthema: flatPlus-MVGreen.theme, Basisicons: MVdefault
 
 => Installationshimnweise am Ende der Datei! <=
@@ -45,7 +45,7 @@ Installationshinweise:
  - Alle MV* Ordner aus dem Ordner icons nach <vdrconfigdir>/plugins/skinflatplus/icons kopieren.
 
 Optional (Pfade evtl. Anpassen!):
- - Schrift(en) aus dem Archiv https://db.tt/QCyK0I8s entpacken und nach
+ - Schrift(en) aus dem Archiv https://www.dropbox.com/s/hikgu3vcf2l890i/Droid-Sans.zip?dl=1 entpacken und nach
    /usr/share/fonts kopieren. Die Schriften enthalten auch die VDR-Symbole.
 
 Empfohlene Einstellungen (setup.conf) im skin-flatplus-Plugin:
