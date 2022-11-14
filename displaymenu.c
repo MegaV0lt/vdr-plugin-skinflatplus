@@ -3214,7 +3214,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       if (recInfo->Aux()) {
         string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
         string channel, searchtimer, pattern;
-
         if (!str_epgsearch.empty()) {
           channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
           searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3222,19 +3221,30 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
         }
 
+        string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
+        string causedby, reason;
+        if (!str_tvscraper.empty()) {
+          causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
+          reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
+        }
+
         string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
         if (!str_vdradmin.empty()) {
           pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
         }
 
-        if ((!channel.empty() && !searchtimer.empty()) || !pattern.empty()) {
-          text << endl << endl << tr("additional information") << ":" << endl;
+        if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) || !pattern.empty()) {
+          text << endl << endl << tr("additional information") << ":";  // Zusatzinfos anzeigen
           if (!channel.empty() && !searchtimer.empty()) {
-            text << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
+            text << endl << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
                  << searchtimer;
           }
+          if (!causedby.empty() && !reason.empty()) {  // TVScraper
+            text << endl << "TVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
+                 << reason;
+          }
           if (!pattern.empty()) {
-            text << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
+            text << endl << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
           }
         }
       }
@@ -3601,7 +3611,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (recInfo->Aux()) {
       string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
       string channel, searchtimer, pattern;
-
       if (!str_epgsearch.empty()) {
         channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
         searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3609,19 +3618,29 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
           searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
       }
 
+      string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
+      string causedby, reason;
+      if (!str_tvscraper.empty()) {
+        causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
+        reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
+      }
+
       string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
       if (!str_vdradmin.empty()) {
         pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
       }
 
-      if ((!channel.empty() && !searchtimer.empty()) || !pattern.empty()) {
-        recAdditional << endl;
-        if (!channel.empty() && !searchtimer.empty()) {
-          recAdditional << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
+      if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) || !pattern.empty()) {
+        if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
+          recAdditional << endl << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
                         << searchtimer;
         }
-        if (!pattern.empty()) {
-          recAdditional << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
+        if (!causedby.empty() && !reason.empty()) {  // TVScraper
+          recAdditional << endl << "TVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
+                        << reason;
+        }
+        if (!pattern.empty()) {  // VDR-Admin
+          recAdditional << endl << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
         }
       }
     }
@@ -4695,7 +4714,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
       }
     }
     channelName = strDevice.str().c_str();
-    
+
     cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
     if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
        str = cString::sprintf("%d", i);  // Display Tuners 0..3

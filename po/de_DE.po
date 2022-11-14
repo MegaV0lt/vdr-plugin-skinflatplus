@@ -132,6 +132,12 @@ msgstr "Kanal"
 msgid "search pattern"
 msgstr "Suchmuster"
 
+msgid "caused by"
+msgstr "Ausgelöst durch"
+
+msgid "reason"
+msgstr "Grund"
+
 msgid "Recording information"
 msgstr "Aufnahme Informationen"
 
