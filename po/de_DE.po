@@ -123,6 +123,9 @@ msgstr "Format"
 msgid "bit rate"
 msgstr "Bitrate"
 
+msgid "TS errors"
+msgstr "TS Fehler"
+
 msgid "additional information"
 msgstr "Zusatzinformationen"
 

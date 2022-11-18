@@ -3150,6 +3150,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
              << fixed << setprecision(2) << (float)recsize / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
              << " MBit/s (Video + Audio)";
       }
+      // From SkinNopacity
+#if APIVERSNUM >= 20505
+      if (recInfo) {
+        if (recInfo->Errors() >= 1)
+          text << tr("TS errors") << ": " << recInfo->Errors() << endl;
+      }
+#endif
       const cComponents *Components = recInfo->Components();
       if (Components) {
         ostringstream audio;
@@ -3248,7 +3255,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           }
         }
       }
-    }
+    }  // if Config.RecordingAdditionalInfoShow
   } else
     text << *EmptyText;
 
@@ -3541,6 +3548,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     << (float)recsize / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
                     << " MBit/s (Video + Audio)";
     }
+    // From SkinNopacity
+#if APIVERSNUM >= 20505
+    if (recInfo) {
+      if (recInfo->Errors() >= 1)
+        recAdditional << endl << tr("TS errors") << ": " << recInfo->Errors();
+    }
+#endif
     const cComponents *Components = recInfo->Components();
     if (Components) {
       ostringstream audio;
@@ -3644,7 +3658,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
       }
     }
-  }
+  }  // if Config.RecordingAdditionalInfoShow
 
   int headIconTop = chHeight - fontHeight - marginItem;
   int headIconLeft = chWidth - fontHeight - marginItem;
