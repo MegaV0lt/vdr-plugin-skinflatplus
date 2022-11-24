@@ -4,6 +4,12 @@ VDR Plugin 'skinflatplus' Revision History
 - [add] option for widget dvbdevices to display device numbers userfriendly
 - [add] display additional information from TVScraper (causedBy and reason)
 - [add] show ts errors in recording info (additional recording info)
+- [add] display recording errors in recordingmenu
+- [add] new symbols for recordings with errorstate:
+          unchecked (recording not tested)
+          no errors (recording has no errors)
+          errors less than 1000 (recorsing with less than 1000 errors)
+          errors from 1000 and up (recorsing with mor than 1000 errors)
 
 2021-02-24: Version 0.6.1
 - [fix] '%' sign not shown in menu weather widget at certian font

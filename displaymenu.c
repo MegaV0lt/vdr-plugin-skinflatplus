@@ -62,22 +62,21 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   menuWidth = osdWidth;
   menuTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
   menuPixmap = osd->CreatePixmap(1, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight );
+  // dsyslog("skinflatplus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   menuIconsBGPixmap = osd->CreatePixmap(2, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth,
-  // scrollBarHeight );
+  // dsyslog("skinflatplus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
   menuIconsPixmap = osd->CreatePixmap(3, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth,
-  // scrollBarHeight );
+  // dsyslog("skinflatplus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  menuIconsOVLPixmap = osd->CreatePixmap(4, cRect(0, menuTop, menuWidth, scrollBarHeight));
+  // dsyslog("skinflatplus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   chLeft = Config.decorBorderMenuContentHeadSize;
   chTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = osd->CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight
-  // );
+  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
   contentHeadIconsPixmap = osd->CreatePixmap(2, cRect(chLeft, chTop, chWidth, chHeight));
 
   scrollbarPixmap = osd->CreatePixmap(
@@ -88,6 +87,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   menuPixmap->Fill(clrTransparent);
   menuIconsPixmap->Fill(clrTransparent);
   menuIconsBGPixmap->Fill(clrTransparent);
+  menuIconsOVLPixmap->Fill(clrTransparent);
   scrollbarPixmap->Fill(clrTransparent);
   contentHeadIconsPixmap->Fill(clrTransparent);
 
@@ -105,6 +105,7 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
   osd->DestroyPixmap(menuPixmap);
   osd->DestroyPixmap(menuIconsPixmap);
   osd->DestroyPixmap(menuIconsBGPixmap);
+  osd->DestroyPixmap(menuIconsOVLPixmap);
   osd->DestroyPixmap(scrollbarPixmap);
   osd->DestroyPixmap(contentHeadPixmap);
   osd->DestroyPixmap(contentHeadIconsPixmap);
@@ -231,6 +232,7 @@ void cFlatDisplayMenu::Clear(void) {
   menuPixmap->Fill(clrTransparent);
   menuIconsPixmap->Fill(clrTransparent);
   menuIconsBGPixmap->Fill(clrTransparent);
+  menuIconsOVLPixmap->Fill(clrTransparent);
   scrollbarPixmap->Fill(clrTransparent);
   contentHeadPixmap->Fill(clrTransparent);
   contentHeadIconsPixmap->Fill(clrTransparent);
@@ -2117,6 +2119,31 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+#if APIVERSNUM >= 20505
+        const cRecordingInfo *recInfo = Recording->Info();
+
+        cString RecErrIcon;
+        if (recInfo->Errors() < 0)          // -1 Untestet recording
+          RecErrIcon= "recording_untested";
+        else if (recInfo->Errors() == 0)    // No errors
+          RecErrIcon = "recording_ok";
+        else if (recInfo->Errors() < 1000)
+          RecErrIcon = "recording_warning";
+        else if (recInfo->Errors() >= 1000)
+          RecErrIcon = "recording_error";
+        else
+          RecErrIcon= "recording_untested"; // Just in case
+
+        cImage *imgRecErr = NULL;
+        if (Current) {
+          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+        }
+        if (imgRecErr == NULL)
+          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+        if (imgRecErr != NULL)
+          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+#endif
         Left += fontHeight + marginItem;
       }
 
@@ -2270,6 +2297,31 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+#if APIVERSNUM >= 20505
+        const cRecordingInfo *recInfo = Recording->Info();
+
+        cString RecErrIcon;
+        if (recInfo->Errors() < 0)          // -1 Untestet recording
+          RecErrIcon= "recording_untested";
+        else if (recInfo->Errors() == 0)    // No errors
+          RecErrIcon = "recording_ok";
+        else if (recInfo->Errors() < 1000)
+          RecErrIcon = "recording_warning";
+        else if (recInfo->Errors() >= 1000)
+          RecErrIcon = "recording_error";
+        else
+          RecErrIcon= "recording_untested"; // Just in case
+
+        cImage *imgRecErr = NULL;
+        if (Current) {
+          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+        }
+        if (imgRecErr == NULL)
+          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+        if (imgRecErr != NULL)
+          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+#endif
         Left += fontHeight + marginItem;
       }
       int ImagesWidth = imgRecNew->Width() + imgRecCut->Width() + marginItem * 2 + scrollBarWidth;

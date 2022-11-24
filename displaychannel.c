@@ -568,7 +568,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // you need oscam min rev 10653
 // you need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    dsyslog("DvbapiInfoDraw");
+    //dsyslog("DvbapiInfoDraw");
     int ChannelSid = CurChannel->Sid();
 
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
@@ -584,28 +584,29 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = 200;
 */
 
-    dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
+    //dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
         return;
     }
+/*
     dsyslog("caid: %d", ecmInfo.caid);
     dsyslog("cardsystem: %s", *ecmInfo.cardsystem);
     dsyslog("reader: %s", *ecmInfo.reader);
     dsyslog("from: %s", *ecmInfo.from);
     dsyslog("protocol: %s", *ecmInfo.protocol);
-
+*/
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0)
         return;
 
-    if (ecmInfo.ecmtime > 9999 )
+    if (ecmInfo.ecmtime > 9999)
         return;
 
     int top = fontHeight*2 + fontSmlHeight*2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize*2) - marginItem*2;
     int left = BitrateRight + marginItem * 2;
-    if (BitrateRight == 0 )
+    if (BitrateRight == 0)
         left = SignalStrengthRight + marginItem * 2;
 
     cFont *dvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize*2) + marginItem);
@@ -618,13 +619,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     cImage *img = NULL;
     cString iconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
     img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
-    if( img ) {
+    if (img) {
         chanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + marginItem;
     } else {
         iconName = "crypt_unknown";
         img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
-        if( img ) {
+        if (img) {
             chanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + marginItem;
         }
