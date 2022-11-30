@@ -259,7 +259,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
   LastTitle = Title;
 
   if (Config.TopBarMenuIconShow) {
-    cString icon = "";
+    cString icon("");
     switch (menuCategory) {
     case mcMain:
       TopBarSetTitle("");
@@ -576,7 +576,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));
-          cString cIconCur;
+          cString cIconCur("");
           cImage *img = NULL;
           if (Current) {
             cIconCur = cString::sprintf("%s_cur", *cIcon);
@@ -676,8 +676,8 @@ std::string cFlatDisplayMenu::items[16] = {"Schedule", "Channels",      "Timers"
 
 std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
   std::string text = skipspace(Text.c_str());
-  std::string menuEntry;
-  std::string menuNumber;
+  std::string menuEntry("");
+  std::string menuNumber("");
   bool found = false;
   bool doBreak = false;
   size_t i = 0;
@@ -789,7 +789,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
   const cEvent *Event = NULL;
 
   bool DrawProgress = true;
-  cString buffer;
+  cString buffer("");
   int y = Index * itemChannelHeight;
 
   if (Current)
@@ -825,15 +825,15 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
 
-  int Left, Top, Width;
-  int LeftName;
+  int Left = 0, Top = 0, Width = 0;
+  int LeftName = 0;
   Left = Config.decorBorderMenuItemSize + marginItem;
   Top = y;
 
   if (Channel->GroupSep())
     DrawProgress = false;
   float progress = 0.0;
-  cString EventTitle = "";
+  cString EventTitle("");
 
 #if VDRVERSNUM >= 20301
   LOCK_CHANNELS_READ;
@@ -1089,14 +1089,14 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 
   bool isEmpty = false;
   // Description
-  ostringstream text;
+  ostringstream text("");
   if (Event) {
     if (!isempty(Event->Description())) {
       text << Event->Description();
     }
 
     if (Config.EpgAdditionalInfoShow) {
-      text << endl;
+      text << "\n";
       // Genre
       bool firstContent = true;
       for (int i = 0; Event->Contents(i); i++) {
@@ -1104,37 +1104,36 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
           if (!firstContent)
             text << ", ";
           else
-            text << endl << tr("Genre") << ": ";
+            text << "\n" << tr("Genre") << ": ";
           text << Event->ContentToString(Event->Contents(i));
           firstContent = false;
         }
       }
       // FSK
       if (Event->ParentalRating()) {
-        text << endl << tr("FSK") << ": ";
-        text << *Event->GetParentalRatingString();
+        text << "\n" << tr("FSK") << ": " << *Event->GetParentalRatingString();
       }
       const cComponents *Components = Event->Components();
       if (Components) {
-        ostringstream audio;
+        ostringstream audio("");
         bool firstAudio = true;
         const char *audio_type = NULL;
-        ostringstream subtitle;
+        ostringstream subtitle("");
         bool firstSubtitle = true;
         for (int i = 0; i < Components->NumComponents(); i++) {
           const tComponent *p = Components->Component(i);
           switch (p->stream) {
           case sc_video_MPEG2:
             if (p->description)
-              text << endl << tr("Video") << ": " << p->description << " (MPEG2)";
+              text << "\n" << tr("Video") << ": " << p->description << " (MPEG2)";
             else
-              text << endl << tr("Video") << ": MPEG2";
+              text << "\n" << tr("Video") << ": MPEG2";
             break;
           case sc_video_H264_AVC:
             if (p->description)
-              text << endl << tr("Video") << ": " << p->description << " (H.264)";
+              text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
             else
-              text << endl << tr("Video") << ": H.264";
+              text << "\n" << tr("Video") << ": H.264";
             break;
 
           case sc_audio_MP2:
@@ -1177,9 +1176,9 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
           }
         }
         if (audio.str().length() > 0)
-          text << endl << tr("Audio") << ": " << audio.str();
+          text << "\n" << tr("Audio") << ": " << audio.str();
         if (subtitle.str().length() > 0)
-          text << endl << tr("Subtitle") << ": " << subtitle.str();
+          text << "\n" << tr("Subtitle") << ": " << subtitle.str();
       }
     }
   } else {
@@ -1204,7 +1203,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
     }
   } else {
-    std::string mediaPath;
+    std::string mediaPath("");
     int mediaWidth = 0;
     int mediaHeight = 0;
     int mediaType = 0;
@@ -1277,7 +1276,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   const cChannel *Channel = Timer->Channel();
   const cEvent *Event = Timer->Event();
 
-  cString buffer;
+  cString buffer("");
   int y = Index * itemTimerHeight;
 
   if (Current)
@@ -1315,7 +1314,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
   cImage *img = NULL;
-  int Left, Top;
+  int Left = 0, Top = 0;
   Left = Config.decorBorderMenuItemSize + marginItem;
   Top = y;
 
@@ -1412,7 +1411,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   }
   Left += imageBGWidth + marginItem * 2;
 
-  cString day, name("");
+  cString day(""), name("");
   if (Timer->WeekDays())
     day = Timer->PrintDay(0, Timer->WeekDays(), false);
   else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
@@ -1574,7 +1573,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     WithDate = true;
 
   cImage *img = NULL;
-  cString buffer;
+  cString buffer("");
   int y = Index * itemEventHeight;
 
   if (Current)
@@ -1694,7 +1693,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     Left += imageBGWidth + marginItem * 2;
     LeftSecond = Left;
 
-    cString channame;
+    cString channame("");
 
     w = menuItemWidth / 10 * 2;
     if (!isScrolling)
@@ -2006,7 +2005,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   if (Config.MenuRecordingView == 0)
     return false;
 
-  cString buffer;
+  cString buffer("");
   cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
 
   if (Level > 0) {
@@ -2104,7 +2103,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   if (imgRecCut == NULL)
     imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
 
-  int Left, Top;
+  int Left = 0, Top = 0;
   Left = Config.decorBorderMenuItemSize + marginItem;
   Top = y;
 
@@ -2120,29 +2119,29 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
 #if APIVERSNUM >= 20505
-        const cRecordingInfo *recInfo = Recording->Info();
+        if (Config.MenuItemRecordingShowRecordingErrors) {
+          const cRecordingInfo *recInfo = Recording->Info();
 
-        cString RecErrIcon;
-        if (recInfo->Errors() < 0)          // -1 Untestet recording
-          RecErrIcon= "recording_untested";
-        else if (recInfo->Errors() == 0)    // No errors
-          RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < 1000)
-          RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= 1000)
-          RecErrIcon = "recording_error";
-        else
-          RecErrIcon= "recording_untested"; // Just in case
+          cString RecErrIcon("recording_untested");
+          if (recInfo->Errors() < 0) {         // -1 Untestet recording
+            // RecErrIcon = "recording_untested";
+          } else if (recInfo->Errors() == 0)    // No errors
+            RecErrIcon = "recording_ok";
+          else if (recInfo->Errors() < 1000)
+            RecErrIcon = "recording_warning";
+          else if (recInfo->Errors() >= 1000)
+            RecErrIcon = "recording_error";
 
-        cImage *imgRecErr = NULL;
-        if (Current) {
-          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
-        }
-        if (imgRecErr == NULL)
-          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
-        if (imgRecErr != NULL)
-          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+          cImage *imgRecErr = NULL;
+          if (Current) {
+            cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+            imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+          }
+          if (imgRecErr == NULL)
+            imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+          if (imgRecErr != NULL)
+            menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+        }  // MenuItemRecordingShowRecordingErrors
 #endif
         Left += fontHeight + marginItem;
       }
@@ -2166,7 +2165,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         int FrameTotal = Recording->NumFrames();
         int FrameResume = Recording->GetResume();
         double FrameSeen = (double)FrameResume / (double)FrameTotal;
-        cString SeenIcon;
+        cString SeenIcon("");
 
         double seenTreshold = Config.MenuItemRecordingSeenTreshold * 100.0;
         // dsyslog("Config.MenuItemRecordingSeenTreshold: %.2f\n", seenTreshold );
@@ -2239,6 +2238,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
       if (imgRecNew)
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecNew);
+
       Left += imgRecNew->Width() + marginItem;
       buffer = cString::sprintf("%d", New);
       menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
@@ -2298,29 +2298,29 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
 #if APIVERSNUM >= 20505
-        const cRecordingInfo *recInfo = Recording->Info();
+        if (Config.MenuItemRecordingShowRecordingErrors) {
+          const cRecordingInfo *recInfo = Recording->Info();
 
-        cString RecErrIcon;
-        if (recInfo->Errors() < 0)          // -1 Untestet recording
-          RecErrIcon= "recording_untested";
-        else if (recInfo->Errors() == 0)    // No errors
-          RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < 1000)
-          RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= 1000)
-          RecErrIcon = "recording_error";
-        else
-          RecErrIcon= "recording_untested"; // Just in case
+          cString RecErrIcon("recording_untested");
+          if (recInfo->Errors() < 0) {         // -1 Untestet recording
+            // RecErrIcon = "recording_untested";
+          } else if (recInfo->Errors() == 0)    // No errors
+            RecErrIcon = "recording_ok";
+          else if (recInfo->Errors() < 1000)
+            RecErrIcon = "recording_warning";
+          else if (recInfo->Errors() >= 1000)
+            RecErrIcon = "recording_error";
 
-        cImage *imgRecErr = NULL;
-        if (Current) {
-          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
-        }
-        if (imgRecErr == NULL)
-          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
-        if (imgRecErr != NULL)
-          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+          cImage *imgRecErr = NULL;
+          if (Current) {
+            cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+            imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+          }
+          if (imgRecErr == NULL)
+            imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+          if (imgRecErr != NULL)
+            menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+        }  // MenuItemRecordingShowRecordingErrors
 #endif
         Left += fontHeight + marginItem;
       }
@@ -2359,7 +2359,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         int FrameTotal = Recording->NumFrames();
         int FrameResume = Recording->GetResume();
         double FrameSeen = (double)FrameResume / (double)FrameTotal;
-        cString SeenIcon;
+        cString SeenIcon("");
 
         if (FrameSeen < 0.1)
           SeenIcon = "recording_seen_0";
@@ -2564,8 +2564,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                   Config.decorBorderMenuContentHeadBg);
 
   // Description
-  ostringstream text, textAdditional;
-  std::string Fsk;
+  ostringstream text(""), textAdditional("");
+  std::string Fsk("");
   std::list<std::string> GenreIcons;
 
   if (!isempty(Event->Description())) {
@@ -2573,7 +2573,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
   }
 
   if (Config.EpgAdditionalInfoShow) {
-    text << endl;
+    text << "\n";
     // Genre
     bool firstContent = true;
     for (int i = 0; Event->Contents(i); i++) {
@@ -2581,7 +2581,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (!firstContent) {
           text << ", ";
         } else {
-          text << endl << tr("Genre") << ": ";
+          text << "\n" << tr("Genre") << ": ";
         }
         text << Event->ContentToString(Event->Contents(i));
         firstContent = false;
@@ -2590,16 +2590,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }
     // FSK
     if (Event->ParentalRating()) {
-      text << endl << tr("FSK") << ": ";
-      text << *Event->GetParentalRatingString();
       Fsk = *Event->GetParentalRatingString();
+      text << "\n" << tr("FSK") << ": " << Fsk;
+
     }
     const cComponents *Components = Event->Components();
     if (Components) {
-      ostringstream audio;
+      ostringstream audio("");
       bool firstAudio = true;
       const char *audio_type = NULL;
-      ostringstream subtitle;
+      ostringstream subtitle("");
       bool firstSubtitle = true;
       for (int i = 0; i < Components->NumComponents(); i++) {
         const tComponent *p = Components->Component(i);
@@ -2658,13 +2658,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
       }
       if (audio.str().length() > 0) {
         if (textAdditional.str().length() > 0)
-          textAdditional << endl;
+          textAdditional << "\n";
         textAdditional << tr("Audio") << ": " << audio.str();
       }
       if (subtitle.str().length() > 0) {
         if (textAdditional.str().length() > 0)
-          textAdditional << endl;
-        textAdditional << endl << tr("Subtitle") << ": " << subtitle.str();
+          textAdditional << "\n";
+        textAdditional << "\n" << tr("Subtitle") << ": " << subtitle.str();
       }
     }
   }
@@ -2715,7 +2715,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
   dsyslog("SetEvent info-text time: %d ms", tick1 - tick0);
 #endif
 
-  std::ostringstream sstrReruns;
+  std::ostringstream sstrReruns("");
   if (Config.EpgRerunsShow) {
     // lent from nopacity
     cPlugin *epgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
@@ -2752,7 +2752,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             sstrReruns << ":  " << r->event->Title();
             // if (!isempty(r->event->ShortText()))
             //    sstrReruns << "~" << r->event->ShortText();
-            sstrReruns << std::endl;
+            sstrReruns << "\n";
           }
           delete list;
         }
@@ -2782,13 +2782,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     int ContentTop = marginItem;
 
-    ostringstream series_info, movie_info;
+    ostringstream series_info(""), movie_info("");
 
     std::vector<std::string> actors_path;
     std::vector<std::string> actors_name;
     std::vector<std::string> actors_role;
 
-    std::string mediaPath;
+    std::string mediaPath("");
     int mediaWidth = 0;
     int mediaHeight = 0;
 
@@ -2831,21 +2831,21 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
           }
           if (series.name.length() > 0)
-            series_info << tr("name: ") << series.name << endl;
+            series_info << tr("name: ") << series.name << "\n";
           if (series.firstAired.length() > 0)
-            series_info << tr("first aired: ") << series.firstAired << endl;
+            series_info << tr("first aired: ") << series.firstAired << "\n";
           if (series.network.length() > 0)
-            series_info << tr("network: ") << series.network << endl;
+            series_info << tr("network: ") << series.network << "\n";
           if (series.genre.length() > 0)
-            series_info << tr("genre: ") << series.genre << endl;
+            series_info << tr("genre: ") << series.genre << "\n";
           if (series.rating > 0)
-            series_info << tr("rating: ") << series.rating << endl;
+            series_info << tr("rating: ") << series.rating << "\n";
           if (series.status.length() > 0)
-            series_info << tr("status: ") << series.status << endl;
+            series_info << tr("status: ") << series.status << "\n";
           if (series.episode.season > 0)
-            series_info << tr("season number: ") << series.episode.season << endl;
+            series_info << tr("season number: ") << series.episode.season << "\n";
           if (series.episode.number > 0)
-            series_info << tr("episode number: ") << series.episode.number << endl;
+            series_info << tr("episode number: ") << series.episode.number << "\n";
         }
       } else if (movieId > 0) {
         cMovie movie;
@@ -2864,19 +2864,19 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
           }
           if (movie.title.length() > 0)
-            movie_info << tr("title: ") << movie.title << endl;
+            movie_info << tr("title: ") << movie.title << "\n";
           if (movie.originalTitle.length() > 0)
-            movie_info << tr("original title: ") << movie.originalTitle << endl;
+            movie_info << tr("original title: ") << movie.originalTitle << "\n";
           if (movie.collectionName.length() > 0)
-            movie_info << tr("collection name: ") << movie.collectionName << endl;
+            movie_info << tr("collection name: ") << movie.collectionName << "\n";
           if (movie.genres.length() > 0)
-            movie_info << tr("genre: ") << movie.genres << endl;
+            movie_info << tr("genre: ") << movie.genres << "\n";
           if (movie.releaseDate.length() > 0)
-            movie_info << tr("release date: ") << movie.releaseDate << endl;
+            movie_info << tr("release date: ") << movie.releaseDate << "\n";
           if (movie.popularity > 0)
-            movie_info << tr("popularity: ") << movie.popularity << endl;
+            movie_info << tr("popularity: ") << movie.popularity << "\n";
           if (movie.voteAverage > 0)
-            movie_info << tr("vote average: ") << movie.voteAverage << endl;
+            movie_info << tr("vote average: ") << movie.voteAverage << "\n";
         }
       }
     }
@@ -3062,13 +3062,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
   cHeight = osdHeight - (topBarHeight + Config.decorBorderTopBarSize * 2 + buttonsHeight +
                          Config.decorBorderButtonSize * 2 + marginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-  ostringstream text;
+  ostringstream text("");
   if (Recording) {
     const cRecordingInfo *recInfo = Recording->Info();
     text.imbue(std::locale(""));
 
     if (!isempty(recInfo->Description()))
-      text << recInfo->Description() << endl << endl;
+      text << recInfo->Description() << "\n\n";
 
     // lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
@@ -3079,7 +3079,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
 #endif
       if (channel)
-        text << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << endl;
+        text << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
 
       const cEvent *Event = recInfo->GetEvent();
       if (Event) {
@@ -3096,11 +3096,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           }
         }
         if (Event->Contents(0))
-          text << endl;
+          text << "\n";
         // FSK
         if (Event->ParentalRating()) {
-          text << tr("FSK") << ": ";
-          text << *Event->GetParentalRatingString() << endl;
+          text << tr("FSK") << ": " << *Event->GetParentalRatingString() << "\n";
         }
       }
 
@@ -3122,7 +3121,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       int i = 0;
       int imax = 999;
       struct stat filebuf;
-      cString filename;
+      cString filename("");
       int rc = 0;
 
       do {
@@ -3178,7 +3177,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         if (hasMarks)
           text << " (" << tr("cutted") << ": " << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())
                << ")";
-        text << endl;
+        text << "\n";
       }
       delete index;
 
@@ -3193,9 +3192,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         else
           text << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
 
-      text << endl
+      text << "\n"
            << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
-           << Recording->Lifetime() << endl;
+           << Recording->Lifetime() << "\n";
 
       if (lastIndex) {
         text << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", " << tr("bit rate") << ": ~ "
@@ -3206,25 +3205,25 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #if APIVERSNUM >= 20505
       if (recInfo) {
         if (recInfo->Errors() >= 1)
-          text << tr("TS errors") << ": " << recInfo->Errors() << endl;
+          text << tr("TS errors") << ": " << recInfo->Errors() << "\n";
       }
 #endif
       const cComponents *Components = recInfo->Components();
       if (Components) {
-        ostringstream audio;
+        ostringstream audio("");
         bool firstAudio = true;
         const char *audio_type = NULL;
-        ostringstream subtitle;
+        ostringstream subtitle("");
         bool firstSubtitle = true;
         for (int i = 0; i < Components->NumComponents(); i++) {
           const tComponent *p = Components->Component(i);
 
           switch (p->stream) {
           case sc_video_MPEG2:
-            text << endl << tr("Video") << ": " << p->description << " (MPEG2)";
+            text << "\n" << tr("Video") << ": " << p->description << " (MPEG2)";
             break;
           case sc_video_H264_AVC:
-            text << endl << tr("Video") << ": " << p->description << " (H.264)";
+            text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
             break;
           case sc_audio_MP2:
           case sc_audio_AC3:
@@ -3266,13 +3265,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           }
         }
         if (audio.str().length() > 0)
-          text << endl << tr("Audio") << ": " << audio.str();
+          text << "\n" << tr("Audio") << ": " << audio.str();
         if (subtitle.str().length() > 0)
-          text << endl << tr("Subtitle") << ": " << subtitle.str();
+          text << "\n" << tr("Subtitle") << ": " << subtitle.str();
       }
       if (recInfo->Aux()) {
         string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
-        string channel, searchtimer, pattern;
+        string channel(""), searchtimer(""), pattern("");
         if (!str_epgsearch.empty()) {
           channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
           searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3281,7 +3280,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
 
         string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
-        string causedby, reason;
+        string causedby(""), reason("");
         if (!str_tvscraper.empty()) {
           causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
           reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
@@ -3293,17 +3292,17 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
 
         if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) || !pattern.empty()) {
-          text << endl << endl << tr("additional information") << ":";  // Zusatzinfos anzeigen
+          text << "\n\n" << tr("additional information") << ":";  // Zusatzinfos anzeigen
           if (!channel.empty() && !searchtimer.empty()) {
-            text << endl << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
+            text << "\nEPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
                  << searchtimer;
           }
           if (!causedby.empty() && !reason.empty()) {  // TVScraper
-            text << endl << "TVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
+            text << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
                  << reason;
           }
           if (!pattern.empty()) {
-            text << endl << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
+            text << "\nVDRadmin-AM: " << tr("search pattern") << ": " << pattern;
           }
         }
       }
@@ -3318,7 +3317,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
   ComplexContent.SetPosition(cRect(cLeft, cTop, cWidth, cHeight));
   ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
-  std::string mediaPath;
+  std::string mediaPath("");
   int mediaWidth = 0;
   int mediaHeight = 0;
   int mediaType = 0;
@@ -3363,7 +3362,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
   }
 
   cString recPath = cString::sprintf("%s", Recording->FileName());
-  cString recImage;
+  cString recImage("");
   if (imgLoader.SearchRecordingPoster(recPath, recImage)) {
     mediaWidth = cWidth / 2 - marginItem * 3;
     mediaHeight = 999;
@@ -3429,8 +3428,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight
-  // );
+  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
 
   contentHeadIconsPixmap->Fill(clrTransparent);
 
@@ -3447,16 +3445,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
   menuItemWidth = cWidth;
 
-  ostringstream text, textAdditional, recAdditional;
+  ostringstream text(""), textAdditional(""), recAdditional("");
   text.imbue(std::locale(""));
   textAdditional.imbue(std::locale(""));
   recAdditional.imbue(std::locale(""));
 
-  std::string Fsk;
+  std::string Fsk("");
   std::list<std::string> GenreIcons;
 
   if (!isempty(recInfo->Description()))
-    text << recInfo->Description() << endl << endl;
+    text << recInfo->Description() << "\n\n";
 
   // lent from skinelchi
   if (Config.RecordingAdditionalInfoShow) {
@@ -3466,14 +3464,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
           LOCK_CHANNELS_READ;
           const cChannel *channel = Channels->GetByChannelID(channelId);
           if (channel)
-            recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << endl;
+            recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
         },
         recInfo->ChannelID());
     channelFuture.get();
 #else
     cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
     if (channel)
-      recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << endl;
+      recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
 #endif
 
     const cEvent *Event = recInfo->GetEvent();
@@ -3493,12 +3491,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
       }
       if (Event->Contents(0))
-        text << endl;
+        text << "\n";
       // FSK
       if (Event->ParentalRating()) {
-        text << tr("FSK") << ": ";
-        text << *Event->GetParentalRatingString() << endl;
         Fsk = *Event->GetParentalRatingString();
+        text << tr("FSK") << ": " << Fsk << "\n";
       }
     }
     cMarks marks;
@@ -3519,7 +3516,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     int i = 0;
     int imax = 999;
     struct stat filebuf;
-    cString filename;
+    cString filename("");
     int rc = 0;
 
     do {
@@ -3575,7 +3572,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       if (hasMarks)
         recAdditional << " (" << tr("cutted") << ": " << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())
                       << ")";
-      recAdditional << endl;
+      recAdditional << "\n";
     }
     delete index;
 
@@ -3590,9 +3587,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       else
         recAdditional << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
 
-    recAdditional << endl
+    recAdditional << "\n"
                   << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
-                  << Recording->Lifetime() << endl;
+                  << Recording->Lifetime() << "\n";
 
     if (lastIndex) {
       recAdditional << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", " << tr("bit rate")
@@ -3604,15 +3601,15 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #if APIVERSNUM >= 20505
     if (recInfo) {
       if (recInfo->Errors() >= 1)
-        recAdditional << endl << tr("TS errors") << ": " << recInfo->Errors();
+        recAdditional << "\n" << tr("TS errors") << ": " << recInfo->Errors();
     }
 #endif
     const cComponents *Components = recInfo->Components();
     if (Components) {
-      ostringstream audio;
+      ostringstream audio("");
       bool firstAudio = true;
       const char *audio_type = NULL;
-      ostringstream subtitle;
+      ostringstream subtitle("");
       bool firstSubtitle = true;
       for (int i = 0; i < Components->NumComponents(); i++) {
         const tComponent *p = Components->Component(i);
@@ -3665,18 +3662,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       }
       if (audio.str().length() > 0) {
         if (textAdditional.str().length() > 0)
-          textAdditional << endl;
+          textAdditional << "\n";
         textAdditional << tr("Audio") << ": " << audio.str();
       }
       if (subtitle.str().length() > 0) {
         if (textAdditional.str().length() > 0)
-          textAdditional << endl;
+          textAdditional << "\n";
         textAdditional << tr("Subtitle") << ": " << subtitle.str();
       }
     }
     if (recInfo->Aux()) {
       string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
-      string channel, searchtimer, pattern;
+      string channel(""), searchtimer(""), pattern("");
       if (!str_epgsearch.empty()) {
         channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
         searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3685,7 +3682,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       }
 
       string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
-      string causedby, reason;
+      string causedby(""), reason("");
       if (!str_tvscraper.empty()) {
         causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
         reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
@@ -3698,15 +3695,15 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
       if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) || !pattern.empty()) {
         if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
-          recAdditional << endl << "EPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
+          recAdditional << "\nEPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
                         << searchtimer;
         }
         if (!causedby.empty() && !reason.empty()) {  // TVScraper
-          recAdditional << endl << "TVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
+          recAdditional << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
                         << reason;
         }
         if (!pattern.empty()) {  // VDR-Admin
-          recAdditional << endl << "VDRadmin-AM: " << tr("search pattern") << ": " << pattern;
+          recAdditional << "\nVDRadmin-AM: " << tr("search pattern") << ": " << pattern;
         }
       }
     }
@@ -3775,13 +3772,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     int ContentTop = marginItem;
 
-    ostringstream series_info, movie_info;
+    ostringstream series_info(""), movie_info("");
 
     std::vector<std::string> actors_path;
     std::vector<std::string> actors_name;
     std::vector<std::string> actors_role;
 
-    std::string mediaPath;
+    std::string mediaPath("");
     int mediaWidth = 0;
     int mediaHeight = 0;
 
@@ -3824,21 +3821,21 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
           }
           if (series.name.length() > 0)
-            series_info << tr("name: ") << series.name << endl;
+            series_info << tr("name: ") << series.name << "\n";
           if (series.firstAired.length() > 0)
-            series_info << tr("first aired: ") << series.firstAired << endl;
+            series_info << tr("first aired: ") << series.firstAired << "\n";
           if (series.network.length() > 0)
-            series_info << tr("network: ") << series.network << endl;
+            series_info << tr("network: ") << series.network << "\n";
           if (series.genre.length() > 0)
-            series_info << tr("genre: ") << series.genre << endl;
+            series_info << tr("genre: ") << series.genre << "\n";
           if (series.rating > 0)
-            series_info << tr("rating: ") << series.rating << endl;
+            series_info << tr("rating: ") << series.rating << "\n";
           if (series.status.length() > 0)
-            series_info << tr("status: ") << series.status << endl;
+            series_info << tr("status: ") << series.status << "\n";
           if (series.episode.season > 0)
-            series_info << tr("season number: ") << series.episode.season << endl;
+            series_info << tr("season number: ") << series.episode.season << "\n";
           if (series.episode.number > 0)
-            series_info << tr("episode number: ") << series.episode.number << endl;
+            series_info << tr("episode number: ") << series.episode.number << "\n";
         }
       } else if (movieId > 0) {
         cMovie movie;
@@ -3857,19 +3854,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
           }
           if (movie.title.length() > 0)
-            movie_info << tr("title: ") << movie.title << endl;
+            movie_info << tr("title: ") << movie.title << "\n";
           if (movie.originalTitle.length() > 0)
-            movie_info << tr("original title: ") << movie.originalTitle << endl;
+            movie_info << tr("original title: ") << movie.originalTitle << "\n";
           if (movie.collectionName.length() > 0)
-            movie_info << tr("collection name: ") << movie.collectionName << endl;
+            movie_info << tr("collection name: ") << movie.collectionName << "\n";
           if (movie.genres.length() > 0)
-            movie_info << tr("genre: ") << movie.genres << endl;
+            movie_info << tr("genre: ") << movie.genres << "\n";
           if (movie.releaseDate.length() > 0)
-            movie_info << tr("release date: ") << movie.releaseDate << endl;
+            movie_info << tr("release date: ") << movie.releaseDate << "\n";
           if (movie.popularity > 0)
-            movie_info << tr("popularity: ") << movie.popularity << endl;
+            movie_info << tr("popularity: ") << movie.popularity << "\n";
           if (movie.voteAverage > 0)
-            movie_info << tr("vote average: ") << movie.voteAverage << endl;
+            movie_info << tr("vote average: ") << movie.voteAverage << "\n";
         }
       }
     }
@@ -3880,7 +3877,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
     cString recPath = cString::sprintf("%s", Recording->FileName());
-    cString recImage;
+    cString recImage("");
     if (imgLoader.SearchRecordingPoster(recPath, recImage)) {
       mediaWidth = cWidth / 2 - marginItem * 2;
       mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
@@ -3975,7 +3972,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
           if (img) {
             ComplexContent.AddImage(img, cRect(x, y, 0, 0));
             std::string name = actors_name[actor];
-            std::stringstream sstrRole;
+            std::stringstream sstrRole("");
             sstrRole << "\"" << actors_role[actor] << "\"";
             std::string role = sstrRole.str();
             ComplexContent.AddText(name.c_str(), false, cRect(x, y + img->Height() + marginItem, actorWidth, 0),
@@ -4171,7 +4168,7 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
 
-  cString sortIcon;
+  cString sortIcon("");
   switch (MenuSortMode) {
   case msmUnknown:
     sortIcon = "SortUnknown";
@@ -4337,7 +4334,7 @@ string cFlatDisplayMenu::xml_substring(string source, const char *str_start, con
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool isFolder) {
   if (!Recording)
     return "";
-  std::string recNamePart;
+  std::string recNamePart("");
   std::string recName = Recording->Name();
   try {
     std::vector<std::string> tokens;
@@ -4736,31 +4733,29 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
       continue;
     }
     actualNumDevices++;
-    std::stringstream strDevice;
+    std::stringstream strDevice("");
 
-    cString channelName;
+    cString channelName("");
 
     const cChannel *channel = device->GetCurrentlyTunedTransponder();
     if (i == deviceLiveTV) {
       strDevice << tr("LiveTV") << " (";
-      cString chanName;
+      cString chanName("");
       if (channel && channel->Number() > 0) {
         chanName = channel->Name();
       } else {
         chanName = tr("Unknown");
       }
-      strDevice << *chanName;
-      strDevice << ")";
+      strDevice << *chanName << ")";
     } else if (recDevices[i]) {
       strDevice << tr("recording") << " (";
-      cString chanName;
+      cString chanName("");
       if (channel && channel->Number() > 0) {
         chanName = channel->Name();
       } else {
         chanName = tr("Unknown");
       }
-      strDevice << *chanName;
-      strDevice << ")";
+      strDevice << *chanName << ")";
     } else {
       if (channel) {
         cString chanName = channel->Name();
@@ -4908,7 +4903,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
           break;
         const cChannel *Channel = (timerRec[i])->Channel();
         // const cEvent *Event = Timer->Event();
-        std::stringstream strTimer;
+        std::stringstream strTimer("");
         if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
             pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
           strTimer << "L";
@@ -4936,7 +4931,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
         const cChannel *Channel = (timerActive[i])->Channel();
         // const cEvent *Event = Timer->Event();
-        std::stringstream strTimer;
+        std::stringstream strTimer("");
         if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
             pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
           strTimer << "L";
@@ -4963,7 +4958,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
           break;
         const cChannel *Channel = (timerRemoteRec[i])->Channel();
         // const cEvent *Event = Timer->Event();
-        std::stringstream strTimer;
+        std::stringstream strTimer("");
         strTimer << "R" << remotecount + 1 << ": ";
         if (Channel)
           strTimer << Channel->Name() << " - ";
@@ -4988,7 +4983,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
         const cChannel *Channel = (timerRemoteActive[i])->Channel();
         // const cEvent *Event = Timer->Event();
-        std::stringstream strTimer;
+        std::stringstream strTimer("");
         strTimer << "R" << remotecount + 1 << ": ";
         if (Channel)
           strTimer << Channel->Name() << " - ";
@@ -5050,7 +5045,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     Recs.pop_back();
     std::string Rec = pairRec.second;
 
-    std::stringstream strRec;
+    std::stringstream strRec("");
     strRec << Rec;
 
     contentWidget.AddText(
@@ -5163,7 +5158,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
           cString itemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, fname.c_str());
           std::ifstream file(*itemFilename, std::ifstream::in);
           if (file.is_open()) {
-            std::string item_content;
+            std::string item_content("");
             std::getline(file, item_content);
 
             if (!strcmp(item.c_str(), "sys_version")) {
@@ -5412,7 +5407,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
   cString itemFilename = cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH);
   std::ifstream file(*itemFilename, std::ifstream::in);
   if (file.is_open()) {
-    std::string cont;
+    std::string cont("");
     std::getline(file, cont);
     updates = atoi(cont.c_str());
     file.close();
@@ -5423,7 +5418,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
   itemFilename = cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH);
   std::ifstream file2(*itemFilename, std::ifstream::in);
   if (file2.is_open()) {
-    std::string cont;
+    std::string cont("");
     std::getline(file2, cont);
     securityUpdates = atoi(cont.c_str());
     file2.close();
@@ -5473,7 +5468,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
 
   int countTemps = 0;
 
-  std::string tempCPU, tempCase, tempMB, tempGPU;
+  std::string tempCPU(""), tempCase(""), tempMB(""), tempGPU("");
   cString itemFilename = cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH);
   std::ifstream file(*itemFilename, std::ifstream::in);
   if (file.is_open()) {
@@ -5487,7 +5482,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
   itemFilename = cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH);
   std::ifstream file2(*itemFilename, std::ifstream::in);
   if (file2.is_open()) {
-    std::string cont;
+    std::string cont("");
     std::getline(file2, tempCase);
     file2.close();
     countTemps++;
@@ -5498,7 +5493,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
   itemFilename = cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH);
   std::ifstream file3(*itemFilename, std::ifstream::in);
   if (file3.is_open()) {
-    std::string cont;
+    std::string cont("");
     std::getline(file3, tempMB);
     file3.close();
     countTemps++;
@@ -5508,7 +5503,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
   itemFilename = cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH);
   std::ifstream file4(*itemFilename, std::ifstream::in);
   if (file4.is_open()) {
-    std::string cont;
+    std::string cont("");
     std::getline(file4, tempGPU);
     file4.close();
     countTemps++;
@@ -5565,7 +5560,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
   int r = system(*execFile);
   r += 0; // prevent Warning for unused variable
 
-  std::string Title;
+  std::string Title("");
   cString itemFilename = cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH);
   std::ifstream file(*itemFilename, std::ifstream::in);
   if (file.is_open()) {
@@ -5585,7 +5580,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
   contentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
   ContentTop += 6;
 
-  std::string Output;
+  std::string Output("");
   itemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
   std::ifstream file2(*itemFilename, std::ifstream::in);
   if (file2.is_open()) {
@@ -5613,7 +5608,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
   cFont *fontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize / 2.0);
 
-  std::string Location;
+  std::string Location("");
   cString locationFilename = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
   std::ifstream file(*locationFilename, std::ifstream::in);
   if (file.is_open()) {
@@ -5623,8 +5618,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     Location = tr("Unknown");
   }
 
-  std::string tempToday = "";
-  cString filename;
+  std::string tempToday("");
+  cString filename("");
   filename = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
   file.open(*filename, std::ifstream::in);
   if (file.is_open()) {
@@ -5646,7 +5641,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
   int left = marginItem;
   for (int index = 0; index < Config.MainMenuWidgetWeatherDays; index++) {
-    std::string icon;
+    std::string icon("");
     cString iconFilename = cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index);
     std::ifstream file(*iconFilename, std::ifstream::in);
     if (file.is_open()) {
@@ -5655,7 +5650,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
       continue;
 
-    std::string summary;
+    std::string summary("");
     cString summaryFilename = cString::sprintf("%s/weather/weather.%d.summary", WIDGETOUTPUTPATH, index);
     std::ifstream file2(*summaryFilename, std::ifstream::in);
     if (file2.is_open()) {
@@ -5664,7 +5659,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
       continue;
 
-    std::string tempMax;
+    std::string tempMax("");
     cString tempMaxFilename = cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index);
     std::ifstream file3(*tempMaxFilename, std::ifstream::in);
     if (file3.is_open()) {
@@ -5673,7 +5668,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
       continue;
 
-    std::string tempMin;
+    std::string tempMin("");
     cString tempMinFilename = cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index);
     std::ifstream file4(*tempMinFilename, std::ifstream::in);
     if (file4.is_open()) {
@@ -5682,9 +5677,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
       continue;
 
-    std::string prec;
+    std::string prec("");
     double p = 0.0;
-    cString precString = "0%";
+    cString precString("0%");
     cString precFilename = cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index);
     std::ifstream file5(*precFilename, std::ifstream::in);
     if (file5.is_open()) {
@@ -5697,7 +5692,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
       continue;
 
-    /* std::string precType;  // Wird nirgends verwendet?
+    /* std::string precType("");  // Wird nirgends verwendet?
     cString precTypeFilename = cString::sprintf("%s/weather/weather.%d.precipitationType", WIDGETOUTPUTPATH, index );
     std::ifstream file6(*precTypeFilename, std::ifstream::in);
     if( file6.is_open() ) {
@@ -5706,7 +5701,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     } else
        continue; */
 
-    cString weekDayName = "";
+    cString weekDayName("");
     time_t t;
     time(&t);
     struct tm *tm = localtime(&t);

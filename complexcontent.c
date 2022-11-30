@@ -135,7 +135,7 @@ int cComplexContent::ContentHeight(bool Full) {
 bool cComplexContent::Scrollable(int height) {
   CalculateDrawPortHeight();
 
-  int total, shown;
+  int total = 0, shown = 0;
   total = ScrollTotal();
   if (height == 0)
     height = Position.Height();

@@ -64,7 +64,7 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
         { NULL }
     };
 
-    int c;
+    int c = 0;
     while ((c = getopt_long(argc, argv, "l:", long_options, NULL)) != -1) {
         switch (c) {
             case 'l':

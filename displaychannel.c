@@ -248,7 +248,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelResolutionAspectShow) {  // Show Resolution
-            cString res = "";
+            cString res("");
 
             switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
@@ -373,7 +373,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         int s = (int)(time(NULL) - Present->StartTime()) / 60;
         int sleft = (Present->Duration() / 60) - s;
 
-        cString seen;
+        cString seen("");
         if (Config.ChannelTimeLeft == 0)
             seen = cString::sprintf("%d-/%d+ %d min", s, sleft, Present->Duration() / 60);
         else if (Config.ChannelTimeLeft == 1)
@@ -470,7 +470,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         ChannelIconsDraw(CurChannel, false);
     }
 
-    std::string mediaPath;
+    std::string mediaPath("");
     int mediaWidth = 0;
     int mediaHeight = 0;
 
@@ -610,7 +610,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
         left = SignalStrengthRight + marginItem * 2;
 
     cFont *dvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize*2) + marginItem);
-    cString dvbapiInfoText;
+    cString dvbapiInfoText("");
 
     dvbapiInfoText = cString::sprintf("DVBAPI: ");
     chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), dvbapiInfoFont, dvbapiInfoFont->Width(dvbapiInfoText) * 2);

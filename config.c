@@ -74,6 +74,7 @@ cFlatConfig::cFlatConfig(void) {
 
     MenuItemRecordingClearPercent = 1;
     MenuItemRecordingShowFolderDate = 1;
+    MenuItemRecordingShowRecordingErrors = true;
     MenuItemParseTilde = 1;
 
     ScrollerEnable = 1;
@@ -696,7 +697,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 }
 
 cString cFlatConfig::DecorDescription(cString File) {
-    cString description;
+    cString description("");
     FILE *f = fopen(File, "r");
     if( f ) {
         int line = 0;

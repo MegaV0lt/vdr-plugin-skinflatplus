@@ -257,11 +257,13 @@ class cFlatConfig
 
         /* hidden configs (only in setup.conf, no osd menu) */
         int MenuItemRecordingClearPercent;
-        int MenuItemRecordingShowFolderDate;    // 0 = disable, 1 = newest recording date, 2 = oldest recording date
+        int MenuItemRecordingShowFolderDate;  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
         int MenuItemParseTilde;
         int ShortRecordingCount;
         int MainMenuWidgetActiveTimerShowRemoteRefreshTime; // in seconds
         /* hidden configs (only in setup.conf, no osd menu) */
+
+        int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons
 
         // Text Scroller
         int ScrollerEnable;

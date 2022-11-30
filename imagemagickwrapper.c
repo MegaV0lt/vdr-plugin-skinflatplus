@@ -15,7 +15,7 @@ cImageMagickWrapper::cImageMagickWrapper() {}
 cImageMagickWrapper::~cImageMagickWrapper() {}
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAspect) {
-    int w, h;
+    int w = 0, h = 0;
 #ifdef IMAGEMAGICK7
     unsigned offset;
 #endif
@@ -80,7 +80,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAsp
 }
 
 cImage cImageMagickWrapper::CreateImageCopy() {
-    int w, h;
+    int w = 0, h = 0;
 #ifdef IMAGEMAGICK7
     unsigned offset;
 #endif

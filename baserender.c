@@ -254,8 +254,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
   int ChartDiskUsage = DiskUsage;
   cString iconName("chart1");
 
-  cString extra1;
-  cString extra2;
+  cString extra1("");
+  cString extra2("");
 
   if (Config.DiskUsageFree == 1) {        // Show in free mode
     ChartDiskUsage = 100 - DiskUsage;     // DiskFreePrecent
@@ -901,12 +901,10 @@ void cFlatBaseRender::MessageCreate(void) {
       5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
   messageIconPixmap->Fill(clrTransparent);
 
-  // dsyslog("skinflatplus: messagePixmap left: %d top: %d width: %d height:
-  // %d", Config.decorBorderMessageSize, top, osdWidth -
-  // Config.decorBorderMessageSize*2, messageHeight); dsyslog("skinflatplus:
-  // messageIconPixmap left: %d top: %d width: %d height: %d",
-  // Config.decorBorderMessageSize, top, osdWidth -
-  // Config.decorBorderMessageSize*2, messageHeight);
+  // dsyslog("skinflatplus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
+  // dsyslog("skinflatplus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
 
   messageScroller.SetOsd(osd);
   messageScroller.SetScrollStep(Config.ScrollerStep);
@@ -917,7 +915,7 @@ void cFlatBaseRender::MessageCreate(void) {
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
   tColor col = Theme.Color(clrMessageStatus);
-  cString icon;
+  cString icon("");
   switch (Type) {
   case mtStatus:
     col = Theme.Color(clrMessageStatus);
@@ -1925,7 +1923,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
   std::string precToday, precTomorrow;
 
   std::ifstream file;
-  cString filename;
+  cString filename("");
 
   filename = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
   file.open(*filename, std::ifstream::in);

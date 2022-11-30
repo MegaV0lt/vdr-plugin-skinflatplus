@@ -72,8 +72,7 @@ char * substr(char * string, int start, int end)
 
 char *GetFilenameWithoutext(char * fullfilename)
 {
-    int i, size;
-    i = size = 0;
+    int i = 0, size = 0;
 
     while(fullfilename[i] != '\0') {
         if(fullfilename[i] == '.') {

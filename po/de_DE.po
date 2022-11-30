@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflat 0.6.1\n"
+"Project-Id-Version: vdr-skinflat 0.6.2\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -124,7 +124,7 @@ msgid "bit rate"
 msgstr "Bitrate"
 
 msgid "TS errors"
-msgstr "TS Fehler"
+msgstr "Aufnahmefehler"
 
 msgid "additional information"
 msgstr "Zusatzinformationen"
@@ -644,6 +644,9 @@ msgstr "Aufnahmen: Aufnahme gesehen Schwellwert"
 
 msgid "Recording menu default value - old folder in days"
 msgstr "Aufnahmen: Vorgabe-Wert alter Ordner in Tagen"
+
+msgid "Recording menu show recerrors icon"
+msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
 msgid "Timer menu show timer count in title"
 msgstr "Timer: Anzahl der Timer in Titelleiste"

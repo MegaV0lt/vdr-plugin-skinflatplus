@@ -74,7 +74,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     recording = Recording;
 
     SetTitle( recInfo->Title() );
-    cString info = "";
+    cString info("");
     if (recInfo->ShortText())
         info = cString::sprintf("%s - %s %s", recInfo->ShortText(), *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
     else
@@ -129,8 +129,8 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         iconsPixmap->Fill(clrTransparent);
         labelPixmap->DrawRectangle(cRect( left - font->Width("33") - marginItem, 0, fontHeight*4 + marginItem*6 + font->Width("33")*2, fontHeight), Theme.Color(clrReplayBg) );
 
-        cString rewind, pause, play, forward;
-        cString speed;
+        cString rewind(""), pause(""), play(""), forward("");
+        cString speed("");
 
         if( Speed == -1 ) {
             if( Play ) {
@@ -263,7 +263,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int i = 0;
         int imax = 999;
         struct stat filebuf;
-        cString filename;
+        cString filename("");
         int rc = 0;
 
         do {
@@ -318,7 +318,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
         delete index;
 
-        std::string mediaPath;
+        std::string mediaPath("");
         int mediaWidth = 0;
         int mediaHeight = 0;
         // TVScraper
@@ -482,7 +482,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
     if (screenWidth > 0) {
     if (Config.RecordingResolutionAspectShow) {  // Show Aspect
-        cString asp = "unknown_asp";             // ???
+        cString asp("unknown_asp");              // ???
         if(Config.RecordingSimpleAspectFormat && screenWidth > 720) {
             switch (screenWidth) {               // No aspect for HD
             case 7680:
@@ -513,7 +513,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
     }
 
     if (Config.RecordingResolutionAspectShow) {  // Show Resolution
-        cString res = "";
+        cString res("");
         switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
                 res = "7680x4320";
