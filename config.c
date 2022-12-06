@@ -75,6 +75,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingClearPercent = 1;
     MenuItemRecordingShowFolderDate = 1;
     MenuItemRecordingShowRecordingErrors = true;
+    MenuItemRecordingShowRecordingErrorsTreshold = 1000;  // Threshold for displaying error instead of warning
     MenuItemParseTilde = 1;
 
     ScrollerEnable = 1;

@@ -217,7 +217,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     if (Resolution && !isRadioChannel && screenWidth > 0) {
         if (Config.ChannelResolutionAspectShow) {      // Show Aspect
-            cString asp = "unknown_asp";               // ???
+            cString asp("unknown_asp");               // ???
             if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
                 switch (screenWidth) {                 // No aspect for HD
                 case 7680:
@@ -443,9 +443,9 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         chanInfoBottomPixmap->DrawText(cPoint(channelWidth - durWidth - marginItem * 2, fontHeight + fontSmlHeight*2), *dur,
                 Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), fontSml, durWidth, 0, taRight);
 
-        if (Config.ChannelShowStartTime) {
+        if (Config.ChannelShowStartTime)
             chanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, fontHeight + fontSmlHeight), *startTime, Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), font);
-        }
+
         if ((epgWidth > channelWidth - left - maxWidth) && Config.ScrollerEnable) {
             scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left, Config.decorBorderChannelSize+channelHeight - heightBottom + fontHeight + fontSmlHeight, channelWidth - left - maxWidth, fontHeight), Theme.Color(clrChannelFontEpgFollow), clrTransparent, font);
         } else {
@@ -466,9 +466,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
     }
 
-    if (Config.ChannelIconsShow && CurChannel) {
+    if (Config.ChannelIconsShow && CurChannel)
         ChannelIconsDraw(CurChannel, false);
-    }
 
     std::string mediaPath("");
     int mediaWidth = 0;
@@ -526,6 +525,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     if( LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality )
         return;
+
     LastSignalStrength = SignalStrength;
     LastSignalQuality = SignalQuality;
 
@@ -551,8 +551,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     top += Config.decorProgressSignalSize + marginItem;
     progressTop = top;
 
-    chanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR",
-        Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), SignalFont);
+    chanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), SignalFont);
     progressLeft = left + SignalFont->Width("STR") + SignalFont->Width(" ") + marginItem;
     //progressWidth = signalWidth - progressLeft - marginItem;
 
@@ -574,6 +573,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi)
         return;
+
     sDVBAPIEcmInfo ecmInfo;
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
@@ -583,13 +583,11 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.reader = "kd";
     ecmInfo.ecmtime = 200;
 */
-
     //dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
-    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
+    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo))
         return;
-    }
 /*
     dsyslog("caid: %d", ecmInfo.caid);
     dsyslog("cardsystem: %s", *ecmInfo.cardsystem);

@@ -648,6 +648,9 @@ msgstr "Aufnahmen: Vorgabe-Wert alter Ordner in Tagen"
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
+msgid "Recording recerrors icon treshold"
+msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"
+
 msgid "Timer menu show timer count in title"
 msgstr "Timer: Anzahl der Timer in Titelleiste"
 

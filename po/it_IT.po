@@ -640,7 +640,10 @@ msgid "Recording menu default value - old folder in days"
 msgstr ""
 
 msgid "Recording menu show recerrors icon"
-msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
+msgstr ""
+
+msgid "Recording recerrors icon treshold"
+msgstr ""
 
 msgid "Timer menu show timer count in title"
 msgstr "Timer: calcola la lunghezza nel titolo"

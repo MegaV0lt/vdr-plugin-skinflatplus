@@ -264,7 +264,7 @@ class cFlatConfig
         /* hidden configs (only in setup.conf, no osd menu) */
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons
-
+        int MenuItemRecordingShowRecordingErrorsTreshold;
         // Text Scroller
         int ScrollerEnable;
         int ScrollerStep;
