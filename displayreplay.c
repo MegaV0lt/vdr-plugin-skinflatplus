@@ -224,28 +224,33 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
 }
 
 void cFlatDisplayReplay::UpdateInfo(void) {
-    if( modeOnly )
+    if (modeOnly)
         return;
-    cString cutted;
+
+    cString cutted("");
     bool iscutted = false;
 
     int fontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
     int fontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
     int topSecs = fontAscender - fontSecsAscender;
 
-    if( Config.TimeSecsScale == 1.0 )
-        labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(current), fontHeight);
+    if (Config.TimeSecsScale == 1.0)
+        labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font,
+                              font->Width(current), fontHeight);
     else {
         std::string cur = *current;
         size_t found = cur.find_last_of(':');
-        if( found != std::string::npos ) {
+        if (found != std::string::npos) {
             std::string hm = cur.substr(0, found);
             std::string secs = cur.substr(found, cur.length() - found);
 
-            labelPixmap->DrawText(cPoint(marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(hm.c_str()), fontHeight);
-            labelPixmap->DrawText(cPoint(marginItem + font->Width(hm.c_str()), topSecs), secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs, fontSecs->Width(secs.c_str()), fontSecs->Height());
+            labelPixmap->DrawText(cPoint(marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  font, font->Width(hm.c_str()), fontHeight);
+            labelPixmap->DrawText(cPoint(marginItem + font->Width(hm.c_str()), topSecs), secs.c_str(), Theme.Color(clrReplayFont),
+                                  Theme.Color(clrReplayBg), fontSecs, fontSecs->Width(secs.c_str()), fontSecs->Height());
         } else {
-            labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(current), fontHeight);
+            labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  font, font->Width(current), fontHeight);
         }
     }
 

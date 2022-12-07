@@ -254,7 +254,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuItemRecordingClearPercent", Config.MenuItemRecordingClearPercent);
     SetupStore("MenuItemRecordingShowFolderDate", Config.MenuItemRecordingShowFolderDate);
     SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrors);
-    SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrorsTreshold);
+    SetupStore("MenuItemRecordingShowRecordingErrorsTreshold", Config.MenuItemRecordingShowRecordingErrorsTreshold);
     SetupStore("MenuItemParseTilde", Config.MenuItemParseTilde);
     SetupStore("TopBarRecConflictsShow", Config.TopBarRecConflictsShow);
     SetupStore("TopBarRecConflictsHigh", Config.TopBarRecConflictsHigh);
@@ -521,7 +521,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingSeenTreshold") == 0)        SetupConfig->MenuItemRecordingSeenTreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)         SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsTreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsTreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrorsTreshold = atoi(Value);
     else if (strcmp(Name, "ChannelShowStartTime") == 0)                 SetupConfig->ChannelShowStartTime = atoi(Value);
     else return false;
 
@@ -697,7 +697,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuItemRecordingSeenTreshold", dtoa(Config.MenuItemRecordingSeenTreshold), *Filename);
     Config.Store("MenuItemRecordingDefaultOldDays", SetupConfig->MenuItemRecordingDefaultOldDays, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrors", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
-    Config.Store("MenuItemRecordingShowRecordingErrorsTreshold", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
+    Config.Store("MenuItemRecordingShowRecordingErrorsTreshold", SetupConfig->MenuItemRecordingShowRecordingErrorsTreshold, *Filename);
     Config.Store("ChannelShowStartTime", SetupConfig->ChannelShowStartTime, *Filename);
 
     cString msg = cString::sprintf("%s %s", tr("saved settings in file:"), *File);
