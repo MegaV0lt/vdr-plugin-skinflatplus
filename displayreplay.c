@@ -243,6 +243,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (found != std::string::npos) {
             std::string hm = cur.substr(0, found);
             std::string secs = cur.substr(found, cur.length() - found);
+            secs.append(1, ' ');  // Ugli fix for extra pixel glitch
 
             labelPixmap->DrawText(cPoint(marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   font, font->Width(hm.c_str()), fontHeight);
