@@ -26,6 +26,8 @@ enum stream_content {
   sc_audio_AC3 = 0x04,
   sc_video_H264_AVC = 0x05,
   sc_audio_HEAAC = 0x06,
+  sc_video_H265_HEVC = 0x09, // stream content 0x09, extension 0x00
+  sc_audio_AC4       = 0x19, // stream content 0x09, extension 0x10
 };
 
 static int CompareTimers(const void *a, const void *b) { return (*(const cTimer **)a)->Compare(**(const cTimer **)b); }
@@ -1128,6 +1130,12 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
               text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
             else
               text << "\n" << tr("Video") << ": H.264";
+            break;
+          case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+            if (p->description)
+              text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
+            else
+              text << "\n" << tr("Video") << ": H.265";
             break;
 
           case sc_audio_MP2:
@@ -2605,7 +2613,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
           else
             textAdditional << tr("Video") << ": H.264";
           break;
-
+        case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+          if (p->description)
+            textAdditional << tr("Video") << ": " << p->description << " (H.265)";
+          else
+            textAdditional << tr("Video") << ": H.265";
+          break;
         case sc_audio_MP2:
         case sc_audio_AC3:
         case sc_audio_HEAAC:
@@ -3214,6 +3227,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           case sc_video_H264_AVC:
             text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
             break;
+          case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+            text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
+            break;
           case sc_audio_MP2:
           case sc_audio_AC3:
           case sc_audio_HEAAC:
@@ -3609,6 +3625,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
           break;
         case sc_video_H264_AVC:
           textAdditional << tr("Video") << ": " << p->description << " (H.264)";
+          break;
+        case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+          //if (p->description)
+            textAdditional << tr("Video") << ": " << p->description << " (H.265)";
+          //else
+          //  textAdditional << "\n" << tr("Video") << ": (H.265)";
           break;
         case sc_audio_MP2:
         case sc_audio_AC3:
