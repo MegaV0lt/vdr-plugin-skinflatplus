@@ -1916,11 +1916,11 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
   cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2.0);
   cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs / 2.5);
 
-  std::string tempToday = "", tempTodaySign = "";
-  std::string iconToday, iconTomorrow;
-  std::string tempMaxToday, tempMaxTomorrow;
-  std::string tempMinToday, tempMinTomorrow;
-  std::string precToday, precTomorrow;
+  std::string tempToday(""), tempTodaySign("");
+  std::string iconToday(""), iconTomorrow("");
+  std::string tempMaxToday(""), tempMaxTomorrow("");
+  std::string tempMinToday(""), tempMinTomorrow("");
+  std::string precToday(""), precTomorrow("");
 
   std::ifstream file;
   cString filename("");

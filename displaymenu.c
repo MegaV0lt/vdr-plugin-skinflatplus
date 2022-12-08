@@ -2098,7 +2098,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
   if (Config.MenuRecordingView == 1) {
     int LeftWidth = Left + fontHeight + imgRecNew->Width() + imgRecCut->Width() + marginItem * 3 +
-                    font->Width("99.99.99  99:99  99:99 ");
+                    font->Width("99.99.99  99:99   99:99 ");
 
     if (Total == 0) {
       if (Current)
@@ -2139,7 +2139,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
       // int Minutes = std::max(0, (Recording->LengthInSeconds() + 30) / 60);
       int Minutes = (Recording->LengthInSeconds() + 30) / 60;
       cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
-      buffer = cString::sprintf("%s  %s  %s ", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
+      buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
                                 *Length);
 
       menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
@@ -2333,7 +2333,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
       int Minutes = (Recording->LengthInSeconds() + 30) / 60;
       cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
-      buffer = cString::sprintf("%s  %s  %s ", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
+      buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
                                 *Length);
 
       menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, fontSml, menuItemWidth - Left - marginItem);
