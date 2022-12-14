@@ -288,7 +288,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 res = "352x576";
                 break;
             default:
-                res = "unknown_res";         // TODO: Add Log line of resolution
+                res = "unknown_res";
                 dsyslog("unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
                 break;
             }

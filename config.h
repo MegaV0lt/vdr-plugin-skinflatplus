@@ -265,6 +265,7 @@ class cFlatConfig
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons
         int MenuItemRecordingShowRecordingErrorsTreshold;
+
         // Text Scroller
         int ScrollerEnable;
         int ScrollerStep;

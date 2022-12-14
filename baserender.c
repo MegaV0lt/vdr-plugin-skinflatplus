@@ -110,9 +110,7 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   if (osd) {
     tArea Area = {0, 0, width, height, 32};
     if (osd->SetAreas(&Area, 1) == oeOk) {
-      dsyslog("skinflatplus: create osd SUCCESS left: %d top: %d width: %d "
-              "height: %d",
-              left, top, width, height);
+      dsyslog("skinflatplus: create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
       return;
     }
   }
@@ -125,14 +123,12 @@ cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const c
   cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(), DrawPort.Height());
 
   if (DrawPort.Width() > maxPixmapSize.Width()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut "
-            "Pixmap to MaxPixmapSize",
+    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
             DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
     SafeDrawPort.SetWidth(maxPixmapSize.Width());
   }
   if (DrawPort.Height() > maxPixmapSize.Height()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut "
-            "Pixmap to MaxPixmapSize",
+    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
             DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
     SafeDrawPort.SetHeight(maxPixmapSize.Height());
   }
@@ -156,19 +152,16 @@ void cFlatBaseRender::TopBarCreate(void) {
 
   topBarPixmap = CreatePixmap(1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarPixmap left: %d top: %d width: %d height: %d",
-  // Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
-  // Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("skinflatplus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconBGPixmap = CreatePixmap(2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                              osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarIconBGPixmap left: %d top: %d width: %d
-  // height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-  // osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("skinflatplus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  //         osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconPixmap = CreatePixmap(3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarIconPixmap left: %d top: %d width: %d height:
-  // %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
-  // Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("skinflatplus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarPixmap->Fill(clrTransparent);
   topBarIconBGPixmap->Fill(clrTransparent);
   topBarIconPixmap->Fill(clrTransparent);
@@ -374,8 +367,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
       if (OccupiedGB < 1000.0) { // Less than 1000 GB
         extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
       } else { // 1000 GB+
-        extra2 =
-            cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60, OccupiedMinutes % 60);
+        extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60, OccupiedMinutes % 60);
       }
     } else { // Short format
       extra1 = cString::sprintf("%d%% %s", DiskUsage, tr("occupied"));
@@ -731,9 +723,8 @@ void cFlatBaseRender::ButtonsCreate(void) {
   buttonsPixmap = CreatePixmap(1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
   buttonsPixmap->Fill(clrTransparent);
-  // dsyslog("skinflatplus: buttonsPixmap left: %d top: %d width: %d height:
-  // %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
-  // Config.decorBorderButtonSize*2, buttonsHeight);
+  // dsyslog("skinflatplus: buttonsPixmap left: %d top: %d width: %d height: %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
+  //         Config.decorBorderButtonSize*2, buttonsHeight);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {

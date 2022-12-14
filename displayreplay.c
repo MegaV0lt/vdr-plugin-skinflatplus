@@ -558,12 +558,10 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 res = "352x576";
                 break;
             default:
-                res = "unknown_res";         // TODO: Log resolution
+                res = "unknown_res";
                 dsyslog("unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
                 break;
             }
-
-            //printf("Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
 
             img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
             if (img) {
