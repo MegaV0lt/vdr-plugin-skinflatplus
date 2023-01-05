@@ -12,7 +12,7 @@
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=210426
+#VERSION=230105
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -37,8 +37,10 @@ f_get_weather(){
   local jqdata jqdata2
 
   # Wetterdaten laden (One Call API)
-  curl --silent --retry 3 --retry-delay 10 --output "$WEATHER_JSON" \
+  curl --silent --retry 5 --retry-delay 15 --output "$WEATHER_JSON" \
     "https://api.openweathermap.org/data/2.5/onecall?lat=${LATITUDE}&lon=${LONGITUDE}&exclude=minutely,hourly,alerts&units=${UNITS}&lang=${L}&appid=${API_KEY}"
+
+  [[ ! -e "$WEATHER_JSON" ]] && { f_log "Download of $WEATHER_JSON failed!" ; exit 1 ;}
 
   # Aktuelle Wetterdaten
   printf '%s\n' "$LOCATION" > "${DATA_DIR}/weather.location"       # Der Ort für die Werte z. B. Berlin
@@ -67,11 +69,6 @@ f_get_weather(){
     fi
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.summary" # Beschreibung
     jqdata=$(jq -r .daily[${cnt}].weather[0].id "$WEATHER_JSON")   # Wettersymbol
-    #case $jqdata in
-    #  800) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='clear-night' ;;
-    #  801) [[ $(jq -r .daily[${cnt}].weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='partly-cloudy-night' ;;
-    #  *) ;;
-    #esac
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.icon"
     ((cnt++))
   done
