@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 OUTPUTFLDR="/tmp/skinflatplus/widgets/command_output"
 mkdir -p ${OUTPUTFLDR}
