@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 OUTPUTFLDR="/tmp/skinflatplus/widgets/system_updatestatus"
 mkdir -p ${OUTPUTFLDR}
