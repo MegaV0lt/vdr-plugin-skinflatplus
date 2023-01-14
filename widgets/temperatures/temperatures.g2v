@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # please update this script to fit your needs
 # this script is call every time the widget will be drawn, so keep it short and fast ;)
