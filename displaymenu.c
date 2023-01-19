@@ -1216,9 +1216,10 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
       pScraper = cPluginManager::GetPlugin("tvscraper");
 
     if (Config.TVScraperEPGInfoShowPoster && pScraper) {
-      ScraperGetPosterBanner call;
+      ScraperGetPosterBannerV2 call;
       call.event = Event;
-      if (pScraper->Service("GetPosterBanner", &call)) {
+	    call.recording = NULL;
+      if (pScraper->Service("GetPosterBannerV2", &call)) {
         if ((call.type == tSeries) && call.banner.path.size() > 0) {
           mediaWidth = cWidth - marginItem * 2;
           mediaHeight = 999;
