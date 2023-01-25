@@ -479,9 +479,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (!pScraper) // if it doesn't exit, try tvscraper
         pScraper = cPluginManager::GetPlugin("tvscraper");
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
-        ScraperGetPosterBanner call;
+        ScraperGetPosterBannerV2 call;
         call.event = Present;
-        if (pScraper->Service("GetPosterBanner", &call)) {
+        call.recording = NULL;
+        if (pScraper->Service("GetPosterBannerV2", &call)) {
             if ((call.type == tSeries) && call.banner.path.size() > 0) {
                 mediaWidth = call.banner.width * Config.TVScraperChanInfoPosterSize*100;
                 mediaHeight = call.banner.height * Config.TVScraperChanInfoPosterSize*100;
