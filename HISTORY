@@ -4,6 +4,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [add] option for treshold to display recordingerroricons in recordingmenu
 - [add] some extra space for number of new recordings in recordingmenu
 - [add] extra info for H.265 Video
+- [update] support for ImageMagick 7 (thanks to kamel5)
 
 2022-11-30: Version 0.6.2
 - [add] option for widget dvbdevices to display device numbers userfriendly
