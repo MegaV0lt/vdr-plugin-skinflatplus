@@ -794,12 +794,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     menuItemScroller.Clear();
 
   int Height = fontHeight;
-  if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)
-    Height = fontHeight + fontSmlHeight + marginItem + Config.decorProgressMenuItemSize;
-
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)
+  if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {
+    Height = fontHeight + fontSmlHeight + marginItem + Config.decorProgressMenuItemSize;
     menuItemWidth *= 0.5;
+  }
 
   if (isScrolling)
     menuItemWidth -= scrollBarWidth;
@@ -1287,12 +1286,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     menuItemScroller.Clear();
 
   int Height = fontHeight;
-  if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3)
-    Height = fontHeight + fontSmlHeight + marginItem;
-
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3)
+  if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {
+    Height = fontHeight + fontSmlHeight + marginItem;
     menuItemWidth *= 0.5;
+  }
 
   if (isScrolling)
     menuItemWidth -= scrollBarWidth;
@@ -1581,12 +1579,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     menuItemScroller.Clear();
 
   int Height = fontHeight;
-  if (Config.MenuEventView == 2 || Config.MenuEventView == 3)
-    Height = fontHeight + fontSmlHeight + marginItem * 2 + Config.decorProgressMenuItemSize / 2;
-
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuEventView == 2 || Config.MenuEventView == 3)
+  if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {
+    Height = fontHeight + fontSmlHeight + marginItem * 2 + Config.decorProgressMenuItemSize / 2;
     menuItemWidth *= 0.6;
+}
 
   if (isScrolling)
     menuItemWidth -= scrollBarWidth;
@@ -2052,12 +2049,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   int y = Index * itemRecordingHeight;
 
   int Height = fontHeight;
-  if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3)
-    Height = fontHeight + fontSmlHeight + marginItem;
-
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3)
+  if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3) {
+    Height = fontHeight + fontSmlHeight + marginItem;
     menuItemWidth *= 0.5;
+  }
 
   if (isScrolling)
     menuItemWidth -= scrollBarWidth;
@@ -2186,7 +2182,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         if (imgRecCut) {
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
         }
-      } 
+      }
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
@@ -2213,7 +2209,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
 #endif
-      
+
       Left += imgRecCut->Width() + marginItem;
 
       if (Current && font->Width(RecName) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
@@ -2377,7 +2373,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
         }
       }
-      
+
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
@@ -2403,8 +2399,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         if (imgRecErr != NULL)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
-#endif      
-      
+#endif
+
       Left += imgRecCut->Width() + marginItem;
 
     } else if (Total > 0) {
