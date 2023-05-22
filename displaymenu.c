@@ -2116,32 +2116,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-#if APIVERSNUM >= 20505
-        if (Config.MenuItemRecordingShowRecordingErrors) {
-          const cRecordingInfo *recInfo = Recording->Info();
-          int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
-
-          cString RecErrIcon("recording_untested");
-          if (recInfo->Errors() < 0) {         // -1 Untestet recording
-            // RecErrIcon = "recording_untested";
-          } else if (recInfo->Errors() == 0)    // No errors
-            RecErrIcon = "recording_ok";
-          else if (recInfo->Errors() < RecErrIconTreshold)
-            RecErrIcon = "recording_warning";
-          else if (recInfo->Errors() >= RecErrIconTreshold)
-            RecErrIcon = "recording_error";
-
-          cImage *imgRecErr = NULL;
-          if (Current) {
-            cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-            imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
-          }
-          if (imgRecErr == NULL)
-            imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
-          if (imgRecErr != NULL)
-            menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
-        }  // MenuItemRecordingShowRecordingErrors
-#endif
         Left += fontHeight + marginItem;
       }
 
@@ -2212,7 +2186,34 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         if (imgRecCut) {
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
         }
-      }
+      } 
+#if APIVERSNUM >= 20505
+      if (Config.MenuItemRecordingShowRecordingErrors) {
+        const cRecordingInfo *recInfo = Recording->Info();
+        int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
+
+        cString RecErrIcon("recording_untested");
+        if (recInfo->Errors() < 0) {         // -1 Untestet recording
+          // RecErrIcon = "recording_untested";
+        } else if (recInfo->Errors() == 0)    // No errors
+          RecErrIcon = "recording_ok";
+        else if (recInfo->Errors() < RecErrIconTreshold)
+          RecErrIcon = "recording_warning";
+        else if (recInfo->Errors() >= RecErrIconTreshold)
+          RecErrIcon = "recording_error";
+
+        cImage *imgRecErr = NULL;
+        if (Current) {
+          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+        }
+        if (imgRecErr == NULL)
+          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+        if (imgRecErr != NULL)
+          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+      }  // MenuItemRecordingShowRecordingErrors
+#endif
+      
       Left += imgRecCut->Width() + marginItem;
 
       if (Current && font->Width(RecName) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
@@ -2296,32 +2297,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-#if APIVERSNUM >= 20505
-        if (Config.MenuItemRecordingShowRecordingErrors) {
-          const cRecordingInfo *recInfo = Recording->Info();
-          int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
-
-          cString RecErrIcon("recording_untested");
-          if (recInfo->Errors() < 0) {         // -1 Untestet recording
-            // RecErrIcon = "recording_untested";
-          } else if (recInfo->Errors() == 0)    // No errors
-            RecErrIcon = "recording_ok";
-          else if (recInfo->Errors() < RecErrIconTreshold)
-            RecErrIcon = "recording_warning";
-          else if (recInfo->Errors() >= RecErrIconTreshold)
-            RecErrIcon = "recording_error";
-
-          cImage *imgRecErr = NULL;
-          if (Current) {
-            cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-            imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
-          }
-          if (imgRecErr == NULL)
-            imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
-          if (imgRecErr != NULL)
-            menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
-        }  // MenuItemRecordingShowRecordingErrors
-#endif
         Left += fontHeight + marginItem;
       }
       int ImagesWidth = imgRecNew->Width() + imgRecCut->Width() + marginItem * 2 + scrollBarWidth;
@@ -2402,6 +2377,34 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
         }
       }
+      
+#if APIVERSNUM >= 20505
+      if (Config.MenuItemRecordingShowRecordingErrors) {
+        const cRecordingInfo *recInfo = Recording->Info();
+        int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
+
+        cString RecErrIcon("recording_untested");
+        if (recInfo->Errors() < 0) {         // -1 Untestet recording
+          // RecErrIcon = "recording_untested";
+        } else if (recInfo->Errors() == 0)    // No errors
+          RecErrIcon = "recording_ok";
+        else if (recInfo->Errors() < RecErrIconTreshold)
+          RecErrIcon = "recording_warning";
+        else if (recInfo->Errors() >= RecErrIconTreshold)
+          RecErrIcon = "recording_error";
+
+        cImage *imgRecErr = NULL;
+        if (Current) {
+          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+        }
+        if (imgRecErr == NULL)
+          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+        if (imgRecErr != NULL)
+          menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+      }  // MenuItemRecordingShowRecordingErrors
+#endif      
+      
       Left += imgRecCut->Width() + marginItem;
 
     } else if (Total > 0) {

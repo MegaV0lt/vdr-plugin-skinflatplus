@@ -1,5 +1,9 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
+
+2023-xx-xx: Version 0.x.x
+- [update] move recordingerroricons to the place where the cutted symbol apears
+
 2023-02-14: Version 0.6.3
 - [fix] workaround for extra pixel glitch in playback-time
 - [add] option for treshold to display recordingerroricons in recordingmenu
@@ -11,7 +15,6 @@ VDR Plugin 'skinflatplus' Revision History
 - [update] support for ImageMagick 7 (thanks to kamel5)
 - [update] use '#!/usr/bin/env bash' in shell scripts
 - [update] update_weather.sh: exit if weather data cold not be loaded
-
 
 2022-11-30: Version 0.6.2
 - [add] option for widget dvbdevices to display device numbers userfriendly
