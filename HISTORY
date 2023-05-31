@@ -3,6 +3,7 @@ VDR Plugin 'skinflatplus' Revision History
 
 2023-xx-xx: Version 0.x.x
 - [update] move recordingerroricons to the place where the cutted symbol apears
+- [update] smaller recodringerroricons
 
 2023-02-14: Version 0.6.3
 - [fix] workaround for extra pixel glitch in playback-time
