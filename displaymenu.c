@@ -2176,13 +2176,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
 #endif
-
-      Left += imgRecNew->Width() + marginItem;
-      if (Recording->IsEdited()) {
-        if (imgRecCut) {
-          menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
-        }
-      }
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
@@ -2209,6 +2202,13 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
 #endif
+
+      Left += imgRecNew->Width() + marginItem;
+      if (Recording->IsEdited()) {
+        if (imgRecCut) {
+          menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
+        }
+      }
 
       Left += imgRecCut->Width() + marginItem;
 
@@ -2366,14 +2366,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
 #endif
-
-      Left += imgRecNew->Width() + marginItem;
-      if (Recording->IsEdited()) {
-        if (imgRecCut) {
-          menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
-        }
-      }
-
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
@@ -2400,6 +2392,13 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
 #endif
+
+      Left += imgRecNew->Width() + marginItem;
+      if (Recording->IsEdited()) {
+        if (imgRecCut) {
+          menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
+        }
+      }
 
       Left += imgRecCut->Width() + marginItem;
 
