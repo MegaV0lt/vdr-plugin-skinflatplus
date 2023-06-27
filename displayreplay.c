@@ -493,11 +493,9 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             switch (screenWidth) {               // No aspect for HD
             case 7680:
             case 3840:
-                asp = "uhd";
-                break;
+                asp = "uhd"; break;
             default:
-                asp = "hd";
-                break;
+                asp = "hd"; break;
             }
         } else {
             if (screenAspect == 4.0/3.0)
@@ -522,41 +520,29 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         cString res("");
         switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
-                res = "7680x4320";
-                break;
+                res = "7680x4320"; break;
             case 3840:                        // 3840×2160 (UHD-1 / 4K)
-                res = "3840x2160";
-                break;
+                res = "3840x2160"; break;
             case 1920:                        // 1920x1080 (HD1080 Full HDTV)
-                res = "1920x1080";
-                break;
+                res = "1920x1080"; break;
             case 1440:                        // 1440x1080 (HD1080 DV)
-                res = "1440x1080";
-                break;
+                res = "1440x1080"; break;
             case 1280:                        // 1280x720 (HD720)
-                res = "1280x720";
-                break;
+                res = "1280x720"; break;
             case 960:                         // 960x720 (HD720 DV)
-                res = "960x720";
-                break;
+                res = "960x720"; break;
             case 704:                         // 704x576 (PAL)
-                res = "704x576";
-                break;
+                res = "704x576"; break;
             case 720:                         // 720x576 (PAL)
-                res = "720x576";
-                break;
+                res = "720x576"; break;
             case 544:                         // 544x576 (PAL)
-                res = "544x576";
-                break;
+                res = "544x576"; break;
             case 528:                         // 528x576 (PAL)
-                res = "528x576";
-                break;
+                res = "528x576"; break;
             case 480:                         // 480x576 (PAL SVCD)
-                res = "480x576";
-                break;
+                res = "480x576"; break;
             case 352:                         // 352x576 (PAL CVD)
-                res = "352x576";
-                break;
+                res = "352x576"; break;
             default:
                 res = "unknown_res";
                 dsyslog("unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
@@ -576,19 +562,15 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             switch (screenWidth) {
                 case 7680:
                 case 3840:
-                    iconName = "uhd";
-                    break;
+                    iconName = "uhd"; break;
                 case 1920:
                 case 1440:
                 case 1280:
-                    iconName = "hd";
-                    break;
+                    iconName = "hd"; break;
                 case 720:
-                    iconName = "sd";
-                    break;
+                    iconName = "sd"; break;
                 default:
-                    iconName = "sd";
-                    break;
+                    iconName = "sd"; break;
             }
 
             img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
