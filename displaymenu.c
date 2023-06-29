@@ -4784,7 +4784,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         strDevice << tr("not used");
       }
     }
-    channelName = strDevice.str().c_str();
+    // channelName = strDevice.str().c_str();  // Try fix Using object that is a temporary. [danglingTemporaryLifetime]
+    auto x = strDevice.str();
+    channelName = x.c_str(); 
 
     cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
     if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
