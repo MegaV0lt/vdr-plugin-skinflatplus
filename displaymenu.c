@@ -635,7 +635,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
       break;
   }
 
-  sDecorBorder ib;
+  sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
@@ -1034,7 +1034,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     }
   }
 
-  sDecorBorder ib;
+  sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
@@ -1519,7 +1519,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     }
   }
 
-  sDecorBorder ib;
+  sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
@@ -1956,7 +1956,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
   }
 
-  sDecorBorder ib;
+  sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
@@ -2468,7 +2468,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     }
   }
 
-  sDecorBorder ib;
+  sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
