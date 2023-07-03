@@ -19,13 +19,13 @@
 
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
-  sc_reserved = 0x00,
-  sc_video_MPEG2 = 0x01,
-  sc_audio_MP2 = 0x02, // MPEG 1 Layer 2 audio
-  sc_subtitle = 0x03,
-  sc_audio_AC3 = 0x04,
-  sc_video_H264_AVC = 0x05,
-  sc_audio_HEAAC = 0x06,
+  sc_reserved        = 0x00,
+  sc_video_MPEG2     = 0x01,
+  sc_audio_MP2       = 0x02, // MPEG 1 Layer 2 audio
+  sc_subtitle        = 0x03,
+  sc_audio_AC3       = 0x04,
+  sc_video_H264_AVC  = 0x05,
+  sc_audio_HEAAC     = 0x06,
   sc_video_H265_HEVC = 0x09, // stream content 0x09, extension 0x00
   sc_audio_AC4       = 0x19, // stream content 0x09, extension 0x10
 };
@@ -84,7 +84,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   scrollbarPixmap = osd->CreatePixmap(
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
   // dsyslog("skinflatplus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
-  // scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize*2 );
+  //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize*2 );
 
   menuPixmap->Fill(clrTransparent);
   menuIconsPixmap->Fill(clrTransparent);
@@ -639,9 +639,9 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
-  ib.Width = menuWidth - Config.decorBorderMenuItemSize * 2;
+  /*ib.Width = menuWidth - Config.decorBorderMenuItemSize * 2;
   if (isScrolling)
-    ib.Width -= scrollBarWidth;
+    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
 
   ib.Width = menuItemWidth;
 
@@ -822,13 +822,14 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
 
-  int Left = 0, Top = 0, Width = 0;
+  int Width = 0;
   int LeftName = 0;
-  Left = Config.decorBorderMenuItemSize + marginItem;
-  Top = y;
+  int Left = Config.decorBorderMenuItemSize + marginItem;
+  int Top = y;
 
   if (Channel->GroupSep())
     DrawProgress = false;
+
   float progress = 0.0;
   cString EventTitle("");
 
@@ -1038,10 +1039,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
-  ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-
+   /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
   if (isScrolling)
-    ib.Width -= scrollBarWidth;
+    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
 
   ib.Width = menuItemWidth;
 
@@ -1316,9 +1316,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
   cImage *img = NULL;
-  int Left = 0, Top = 0;
-  Left = Config.decorBorderMenuItemSize + marginItem;
-  Top = y;
+  int Left = Config.decorBorderMenuItemSize + marginItem;
+  int Top = y;
 
   int imageHeight = fontHeight;
   int imageLeft = Left;
@@ -1523,10 +1522,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
-  ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-
+  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
   if (isScrolling)
-    ib.Width -= scrollBarWidth;
+    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
 
   ib.Width = menuItemWidth;
 
@@ -1609,7 +1607,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
 
-  int Left = 0, Top = 0, LeftSecond = 0;
+  int Left = 0, LeftSecond = 0;
   LeftSecond = Left = Config.decorBorderMenuItemSize + marginItem;
   Top = y;
   int imageTop = Top;
@@ -1960,10 +1958,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
-  ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-
+  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
   if (isScrolling)
-    ib.Width -= scrollBarWidth;
+    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
 
   ib.Width = menuItemWidth;
 
@@ -2097,9 +2094,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   if (imgRecCut == NULL)
     imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
 
-  int Left = 0, Top = 0;
-  Left = Config.decorBorderMenuItemSize + marginItem;
-  Top = y;
+  int Left = Config.decorBorderMenuItemSize + marginItem;
+  int Top = y;
 
   if (Config.MenuRecordingView == 1) {
     int LeftWidth = Left + fontHeight + imgRecNew->Width() + imgRecCut->Width() + marginItem * 3 +
@@ -2472,10 +2468,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
 
-  ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-
+  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
   if (isScrolling)
-    ib.Width -= scrollBarWidth;
+    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
 
   ib.Width = menuItemWidth;
 
@@ -2564,9 +2559,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
   std::string Fsk("");
   std::list<std::string> GenreIcons;
 
-  if (!isempty(Event->Description())) {
+  if (!isempty(Event->Description()))
     text << Event->Description();
-  }
 
   if (Config.EpgAdditionalInfoShow) {
     text << "\n";
@@ -2588,8 +2582,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (Event->ParentalRating()) {
       Fsk = *Event->GetParentalRatingString();
       text << "\n" << tr("FSK") << ": " << Fsk;
-
     }
+
     const cComponents *Components = Event->Components();
     if (Components) {
       ostringstream audio("");
@@ -2746,10 +2740,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #else
             cChannel *channel = Channels.GetByChannelID(r->event->ChannelID(), true, true);
 #endif
-            if (channel) {
-              sstrReruns << ", " << channel->Number() << " -";
-              sstrReruns << " " << channel->ShortName(true);
-            }
+            if (channel)
+              sstrReruns << ", " << channel->Number() << " - " << channel->ShortName(true);
+
             sstrReruns << ":  " << r->event->Title();
             // if (!isempty(r->event->ShortText()))
             //    sstrReruns << "~" << r->event->ShortText();
@@ -3099,9 +3092,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         if (Event->Contents(0))
           text << "\n";
         // FSK
-        if (Event->ParentalRating()) {
+        if (Event->ParentalRating())
           text << tr("FSK") << ": " << *Event->GetParentalRatingString() << "\n";
-        }
       }
 
       cMarks marks;
@@ -4786,7 +4778,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     }
     // channelName = strDevice.str().c_str();  // Try fix Using object that is a temporary. [danglingTemporaryLifetime]
     auto x = strDevice.str();
-    channelName = x.c_str(); 
+    channelName = x.c_str();
 
     cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
     if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
