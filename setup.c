@@ -30,8 +30,8 @@ cFlatSetup::~cFlatSetup() {
 
 void cFlatSetup::Setup(void) {
     Clear();
-    Bordertypes.Clear();
-    Progresstypes.Clear();
+    //Bordertypes.Clear();  // Double .Clear()?
+    //Progresstypes.Clear();
 
     Bordertypes.Clear();
     Bordertypes.Append( strdup(tr("none")) );
