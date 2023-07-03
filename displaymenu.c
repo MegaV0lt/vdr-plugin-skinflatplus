@@ -1609,7 +1609,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
   int Left = 0, LeftSecond = 0;
   LeftSecond = Left = Config.decorBorderMenuItemSize + marginItem;
-  Top = y;
+  int Top = y;
   int imageTop = Top;
   int w = 0;
 
