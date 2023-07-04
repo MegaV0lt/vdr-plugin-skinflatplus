@@ -561,11 +561,6 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
 
-/*
-    ecmInfo.cardsystem = "nagravision";
-    ecmInfo.reader = "kd";
-    ecmInfo.ecmtime = 200;
-*/
     //dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
@@ -591,10 +586,10 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
         left = SignalStrengthRight + marginItem * 2;
 
     cFont *dvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize*2) + marginItem);
-    cString dvbapiInfoText("");
 
-    dvbapiInfoText = cString::sprintf("DVBAPI: ");
-    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), dvbapiInfoFont, dvbapiInfoFont->Width(dvbapiInfoText) * 2);
+    cstring dvbapiInfoText = cString::sprintf("DVBAPI: ");
+    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg),
+                                   dvbapiInfoFont, dvbapiInfoFont->Width(dvbapiInfoText) * 2);
     left += dvbapiInfoFont->Width(dvbapiInfoText) + marginItem;
 
     cImage *img = NULL;
@@ -613,15 +608,15 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     }
 
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
-    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), dvbapiInfoFont, dvbapiInfoFont->Width(dvbapiInfoText) * 2);
+    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg),
+                                   dvbapiInfoFont, dvbapiInfoFont->Width(dvbapiInfoText) * 2);
 }
 
 void cFlatDisplayChannel::Flush(void) {
     if( !doOutput )
         return;
 
-    int Current = 0;
-    int Total = 0;
+    int Current = 0, Total = 0;
     if( present ) {
         time_t t = time(NULL);
         if (t > present->StartTime())

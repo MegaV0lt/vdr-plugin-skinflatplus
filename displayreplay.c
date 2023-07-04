@@ -70,6 +70,7 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if( modeOnly )
         return;
+
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
 
@@ -205,6 +206,7 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 
     if( modeOnly )
         return;
+
     ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
 }
@@ -212,6 +214,7 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
     if( modeOnly )
         return;
+
     current = Current;
     UpdateInfo();
 }
@@ -219,6 +222,7 @@ void cFlatDisplayReplay::SetCurrent(const char *Current) {
 void cFlatDisplayReplay::SetTotal(const char *Total) {
     if( modeOnly )
         return;
+
     total = Total;
     UpdateInfo();
 }
@@ -243,7 +247,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (found != std::string::npos) {
             std::string hm = cur.substr(0, found);
             std::string secs = cur.substr(found, cur.length() - found);
-            secs.append(1, ' ');  // Ugli fix for extra pixel glitch
+            secs.append(1, ' ');  // Ugly fix for extra pixel glitch
 
             labelPixmap->DrawText(cPoint(marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   font, font->Width(hm.c_str()), fontHeight);
@@ -255,7 +259,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
     }
 
-    if( recording ) {
+    if (recording) {
         cMarks marks;
         bool hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) && marks.Count();
         cIndexFile *index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
@@ -284,10 +288,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 filesize[i] = filesize[i-1] + filebuf.st_size;
             else {
                 if (ENOENT != errno) {
-                    esyslog ("skinflatplus: error determining file size of \"%s\" %d (%s)", (const char *)filename, errno, strerror(errno));
+                    esyslog ("skinflatplus: error determining file size of \"%s\" %d (%s)",
+                             (const char *)filename, errno, strerror(errno));
                 }
             }
-        } while( i <= imax && !rc );
+        } while (i <= imax && !rc);
 
         if (hasMarks && index) {
             uint16_t FileNumber;
@@ -310,7 +315,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 cMark *nextmark = marks.Next(mark);
                 mark = nextmark;
             }
-            if( !cutin ) {
+            if (!cutin) {
                 cuttedLength += index->Last() - cutinframe;
                 index->Get(index->Last() - 1, &FileNumber, &FileOffset);
                 recsizecutted += filesize[FileNumber-1] + FileOffset - cutinoffset;
@@ -380,14 +385,14 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     }
 
-    if( iscutted ) {
+    if (iscutted) {
         cImage *imgRecCut = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
         int imgWidth = 0;
-        if( imgRecCut )
+        if (imgRecCut)
             imgWidth = imgRecCut->Width();
 
         int right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(total) - marginItem - imgWidth - font->Width(" ") - font->Width(cutted);
-        if( Config.TimeSecsScale < 1.0 ) {
+        if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
             size_t found = tot.find_last_of(':');
             if( found != std::string::npos ) {
@@ -482,6 +487,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 void cFlatDisplayReplay::ResolutionAspectDraw(void) {
     if (modeOnly)
         return;
+
     int left = osdWidth - Config.decorBorderReplaySize*2;
     int imageTop = 0;
     cImage *img = NULL;

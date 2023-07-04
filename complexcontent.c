@@ -35,24 +35,18 @@ void cComplexContent::Clear(void) {
   }
 }
 
-cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort,
-                                       const cRect &DrawPort) {
+cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) {
   cSize maxPixmapSize = Osd->MaxPixmapSize();
-  cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(),
-                     DrawPort.Height());
+  cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(), DrawPort.Height());
 
   if (DrawPort.Width() > maxPixmapSize.Width()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut "
-            "Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(),
-            maxPixmapSize.Height());
+    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
+            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
     SafeDrawPort.SetWidth(maxPixmapSize.Width());
   }
   if (DrawPort.Height() > maxPixmapSize.Height()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut "
-            "Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(),
-            maxPixmapSize.Height());
+    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
+            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
     SafeDrawPort.SetHeight(maxPixmapSize.Height());
   }
 
@@ -85,10 +79,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   Pixmap = CreatePixmap(1, Position, PositionDraw);
   PixmapImage = CreatePixmap(2, Position, PositionDraw);
-  // dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d
-  // height: %d", Position.Left(), Position.Top(), Position.Width(),
-  // Position.Height() ); dsyslog("skinflatplus: ComplexContentPixmap drawport
-  // left: %d top: %d width: %d height: %d", PositionDraw.Left(),
+  // dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d height: %d", Position.Left(), Position.Top(), Position.Width(),
+  // Position.Height() ); dsyslog("skinflatplus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
   // PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height() );
 
   if (FullFillBackground) {
@@ -146,13 +138,10 @@ bool cComplexContent::Scrollable(int height) {
   return false;
 }
 
-void cComplexContent::AddText(const char *text, bool multiline, cRect position,
-                              tColor colorFg, tColor colorBg, cFont *font,
-                              int textWidth, int textHeight,
-                              int textAlignment) {
+void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
+                              int textWidth, int textHeight, int textAlignment) {
   Contents.push_back(cSimpleContent());
-  Contents.back().SetText(text, multiline, position, colorFg, colorBg, font,
-                          textWidth, textHeight, textAlignment);
+  Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
@@ -160,12 +149,9 @@ void cComplexContent::AddImage(cImage *image, cRect position) {
   Contents.back().SetImage(image, position);
 }
 
-void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
-                                              const char *text, cRect textPos,
-                                              tColor colorFg, tColor colorBg,
-                                              cFont *font, int textWidth,
-                                              int textHeight,
-                                              int textAlignment) {
+void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos,
+                                              tColor colorFg, tColor colorBg, cFont *font, int textWidth,
+                                              int textHeight, int textAlignment) {
   int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
 
   cTextWrapper WrapperFloat;
@@ -180,8 +166,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     FloatedTextPos.SetWidth(TextWidthLeft);
     FloatedTextPos.SetHeight(textPos.Height());
 
-    AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth,
-            textHeight, textAlignment);
+    AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
     cRect ImagePos;
     ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
@@ -223,10 +208,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     SecondTextPos.SetWidth(textPos.Width());
     SecondTextPos.SetHeight(textPos.Height());
 
-    AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font,
-            textWidth, textHeight, textAlignment);
-    AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth,
-            textHeight, textAlignment);
+    AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
     cRect ImagePos;
     ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);

@@ -1938,10 +1938,8 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
 
   int left = marginItem;
 
-  int widthTempToday =
-      std::max(weatherFontSml->Width(tempMaxToday.c_str()), weatherFontSml->Width(tempMinToday.c_str()));
-  int widthTempTomorrow =
-      std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()), weatherFontSml->Width(tempMinTomorrow.c_str()));
+  int widthTempToday = std::max(weatherFontSml->Width(tempMaxToday.c_str()), weatherFontSml->Width(tempMinToday.c_str()));
+  int widthTempTomorrow = std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()), weatherFontSml->Width(tempMinTomorrow.c_str()));
 
   int wTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
   int wWidth = marginItem + weatherFont->Width(tempToday.c_str()) + weatherFontSign->Width(tempTodaySign.c_str()) +
