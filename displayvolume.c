@@ -4,7 +4,7 @@
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
     muted = false;
 
-    labelHeight = fontHeight + marginItem*2;
+    labelHeight = fontHeight + marginItem * 2;
 
     CreateFullOsd();
     TopBarCreate();
@@ -35,21 +35,21 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     int maxlabelWidth = font->Width(maxLabel) + marginItem;
     int left = osdWidth / 2 - maxlabelWidth / 2;
 
-    int DecorTop = osdHeight - 50 - Config.decorProgressVolumeSize - labelHeight - Config.decorBorderVolumeSize*2;
+    int DecorTop = osdHeight - 50 - Config.decorProgressVolumeSize - labelHeight - Config.decorBorderVolumeSize * 2;
 
     labelPixmap->DrawRectangle(cRect(left - marginItem, marginItem, marginItem, fontHeight), Theme.Color(clrVolumeBg));
 
-    DecorBorderClear(left - marginItem, DecorTop, maxlabelWidth + marginItem*4 + fontHeight, fontHeight, Config.decorBorderVolumeSize);
+    DecorBorderClear(left - marginItem, DecorTop, maxlabelWidth + marginItem * 4 + fontHeight, fontHeight, Config.decorBorderVolumeSize);
     DecorBorderClear(left - marginItem, DecorTop, maxlabelWidth + marginItem, fontHeight, Config.decorBorderVolumeSize);
 
     if (Mute) {
         labelPixmap->DrawText(cPoint(left, marginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
             font, maxlabelWidth + marginItem + labelHeight, fontHeight, taLeft);
         cImage *img = imgLoader.LoadIcon("mute", fontHeight, fontHeight);
-        if( img ) {
+        if (img) {
             muteLogoPixmap->DrawImage( cPoint(left + maxlabelWidth + marginItem, marginItem), *img );
         }
-        DecorBorderDraw(left - marginItem, DecorTop, maxlabelWidth + marginItem*4 + fontHeight, fontHeight,
+        DecorBorderDraw(left - marginItem, DecorTop, maxlabelWidth + marginItem * 4 + fontHeight, fontHeight,
             Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg, Config.decorBorderVolumeBg);
     } else {
         labelPixmap->DrawText(cPoint(left, marginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
@@ -63,7 +63,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     int width = (osdWidth / 4 * 3);
     left = osdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
-    DecorBorderDraw(left - marginItem, osdHeight - 50 - Config.decorProgressVolumeSize - marginItem, width + marginItem*2, Config.decorProgressVolumeSize + marginItem*2, Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg), Theme.Color(clrTopBarBg));
+    DecorBorderDraw(left - marginItem, osdHeight - 50 - Config.decorProgressVolumeSize - marginItem, width + marginItem * 2, Config.decorProgressVolumeSize + marginItem * 2, Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg), Theme.Color(clrTopBarBg));
 }
 
 void cFlatDisplayVolume::Flush(void) {

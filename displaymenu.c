@@ -84,7 +84,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   scrollbarPixmap = osd->CreatePixmap(
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
   // dsyslog("skinflatplus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
-  //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize*2 );
+  //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2 );
 
   menuPixmap->Fill(clrTransparent);
   menuIconsPixmap->Fill(clrTransparent);
@@ -4211,7 +4211,7 @@ void cFlatDisplayMenu::Flush(void) {
                                     menuPixmap->ViewPort().Height() - menuItemLastHeight + marginItem),
                               Theme.Color(clrItemSelableBg));
     // menuPixmap->DrawRectangle(cRect(0, menuPixmap->ViewPort().Height() - 5, menuItemWidth +
-    // Config.decorBorderMenuItemSize*2, 5), Theme.Color(clrItemSelableBg));
+    // Config.decorBorderMenuItemSize * 2, 5), Theme.Color(clrItemSelableBg));
     MenuFullOsdIsDrawn = true;
   }
 

@@ -18,25 +18,25 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     screenWidth = lastScreenWidth = -1;
 
     int TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    int TVSTop = topBarHeight + Config.decorBorderTopBarSize*2 + 20 + Config.decorBorderChannelEPGSize;
-    int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize*2;
-    int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize*2;
+    int TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
-    chanEpgImagesPixmap->Fill( clrTransparent );
+    chanEpgImagesPixmap->Fill(clrTransparent);
 
     labelPixmap = CreatePixmap(1, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
-        osdWidth - Config.decorBorderReplaySize*2, labelHeight));
+        osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
     iconsPixmap = CreatePixmap(2, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
-        osdWidth - Config.decorBorderReplaySize*2, labelHeight));
+        osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
 
     ProgressBarCreate(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize - marginItem,
-        osdWidth - Config.decorBorderReplaySize*2, Config.decorProgressReplaySize, marginItem, 0,
+        osdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize, marginItem, 0,
         Config.decorProgressReplayFg, Config.decorProgressReplayBarFg, Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
     labelJump = CreatePixmap(1, cRect(Config.decorBorderReplaySize,
-        osdHeight - labelHeight - Config.decorProgressReplaySize*2 - marginItem*3 - fontHeight - Config.decorBorderReplaySize*2,
-        osdWidth - Config.decorBorderReplaySize*2, fontHeight));
+        osdHeight - labelHeight - Config.decorProgressReplaySize * 2 - marginItem*3 - fontHeight - Config.decorBorderReplaySize * 2,
+        osdWidth - Config.decorBorderReplaySize * 2, fontHeight));
 
     dimmPixmap = CreatePixmap(MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
 
@@ -47,41 +47,41 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 
     fontSecs = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
 
-    if( Config.PlaybackWeatherShow )
+    if (Config.PlaybackWeatherShow)
         DrawWidgetWeather();
 }
 
 cFlatDisplayReplay::~cFlatDisplayReplay() {
-    if( fontSecs != NULL )
+    if (fontSecs != NULL)
         delete fontSecs;
 
-    if( labelPixmap )
+    if (labelPixmap)
         osd->DestroyPixmap(labelPixmap);
-    if( labelJump )
+    if (labelJump)
         osd->DestroyPixmap(labelJump);
-    if( iconsPixmap )
+    if (iconsPixmap)
         osd->DestroyPixmap(iconsPixmap);
-    if( chanEpgImagesPixmap )
+    if (chanEpgImagesPixmap)
         osd->DestroyPixmap(chanEpgImagesPixmap);
-    if( dimmPixmap )
+    if (dimmPixmap)
         osd->DestroyPixmap(dimmPixmap);
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
-    if( modeOnly )
+    if (modeOnly)
         return;
 
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
 
-    SetTitle( recInfo->Title() );
+    SetTitle(recInfo->Title());
     cString info("");
     if (recInfo->ShortText())
         info = cString::sprintf("%s - %s %s", recInfo->ShortText(), *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
     else
         info = cString::sprintf("%s %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
 
-    labelPixmap->DrawText(cPoint(marginItem, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml, osdWidth - Config.decorBorderReplaySize*2);
+    labelPixmap->DrawText(cPoint(marginItem, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml, osdWidth - Config.decorBorderReplaySize * 2);
 }
 
 void cFlatDisplayReplay::SetTitle(const char *Title) {
@@ -91,9 +91,9 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 
 void cFlatDisplayReplay::Action(void) {
     time_t curTime;
-    while( Running() ) {
+    while(Running()) {
         time(&curTime);
-        if( (curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay ) {
+        if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
             for(int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
                 dimmPixmap->Fill(ArgbToColor(alpha, 0, 0, 0));
@@ -108,33 +108,34 @@ void cFlatDisplayReplay::Action(void) {
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     int left = 0;
-    if( Play == false && Config.RecordingDimmOnPause ) {
+    if (Play == false && Config.RecordingDimmOnPause) {
         time(&dimmStartTime);
         Start();
-    } else if( Play == true && Config.RecordingDimmOnPause ) {
+    } else if (Play == true && Config.RecordingDimmOnPause) {
         Cancel(-1);
-        while( Active() )
+        while(Active())
             cCondWait::SleepMs(10);
-        if( dimmActive ) {
+        if (dimmActive) {
             dimmPixmap->Fill(clrTransparent);
             Flush();
         }
     }
-    if( Setup.ShowReplayMode ) {
-        left = osdWidth - Config.decorBorderReplaySize*2 - (fontHeight * 4 + marginItem * 3);
+    if (Setup.ShowReplayMode) {
+        left = osdWidth - Config.decorBorderReplaySize * 2 - (fontHeight * 4 + marginItem * 3);
         left /= 2;
 
-        if( modeOnly )
+        if (modeOnly)
             labelPixmap->Fill(clrTransparent);
 
         iconsPixmap->Fill(clrTransparent);
-        labelPixmap->DrawRectangle(cRect( left - font->Width("33") - marginItem, 0, fontHeight*4 + marginItem*6 + font->Width("33")*2, fontHeight), Theme.Color(clrReplayBg) );
+        labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0, fontHeight*4 + marginItem*6 + font->Width("33") * 2,
+                                   fontHeight), Theme.Color(clrReplayBg));
 
         cString rewind(""), pause(""), play(""), forward("");
         cString speed("");
 
-        if( Speed == -1 ) {
-            if( Play ) {
+        if (Speed == -1) {
+            if (Play ) {
                 rewind = "rewind";
                 pause = "pause";
                 play = "play_sel";
@@ -147,50 +148,52 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             }
         } else {
             speed = cString::sprintf("%d", Speed);
-            if( Forward ) {
+            if (Forward) {
                 rewind = "rewind";
                 pause = "pause";
                 play = "play";
                 forward = "forward_sel";
-                labelPixmap->DrawText(cPoint(left + fontHeight*4 + marginItem*4, 0), speed, Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
+                labelPixmap->DrawText(cPoint(left + fontHeight*4 + marginItem*4, 0), speed, Theme.Color(clrReplayFontSpeed),
+                                      Theme.Color(clrReplayBg), font);
             } else {
                 rewind = "rewind_sel";
                 pause = "pause";
                 play = "play";
                 forward = "forward";
-                labelPixmap->DrawText(cPoint(left - font->Width(speed) - marginItem, 0), speed, Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
+                labelPixmap->DrawText(cPoint(left - font->Width(speed) - marginItem, 0), speed, Theme.Color(clrReplayFontSpeed),
+                                      Theme.Color(clrReplayBg), font);
             }
         }
         cImage *img = imgLoader.LoadIcon(*rewind, fontHeight, fontHeight);
-        if( img )
-            iconsPixmap->DrawImage( cPoint(left, 0), *img );
+        if (img)
+            iconsPixmap->DrawImage(cPoint(left, 0), *img);
 
         img = imgLoader.LoadIcon(*pause, fontHeight, fontHeight);
-        if( img )
-            iconsPixmap->DrawImage( cPoint(left + fontHeight + marginItem, 0), *img );
+        if (img)
+            iconsPixmap->DrawImage(cPoint(left + fontHeight + marginItem, 0), *img);
 
         img = imgLoader.LoadIcon(*play, fontHeight, fontHeight);
-        if( img )
-            iconsPixmap->DrawImage( cPoint(left + fontHeight*2 + marginItem*2, 0), *img );
+        if (img)
+            iconsPixmap->DrawImage(cPoint(left + fontHeight * 2 + marginItem * 2, 0), *img);
 
         img = imgLoader.LoadIcon(*forward, fontHeight, fontHeight);
-        if( img )
-            iconsPixmap->DrawImage( cPoint(left + fontHeight*3 + marginItem*3, 0), *img );
+        if (img)
+            iconsPixmap->DrawImage(cPoint(left + fontHeight*3 + marginItem*3, 0), *img);
 
     }
 
-    if( ProgressShown ) {
+    if (ProgressShown) {
         DecorBorderDraw(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize - marginItem,
-            osdWidth - Config.decorBorderReplaySize*2, labelHeight + Config.decorProgressReplaySize + marginItem,
+            osdWidth - Config.decorBorderReplaySize * 2, labelHeight + Config.decorProgressReplaySize + marginItem,
             Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
     } else {
-        if( modeOnly ) {
+        if (modeOnly) {
             DecorBorderDraw(left - font->Width("33") - marginItem + Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
-                fontHeight*4 + marginItem*6 + font->Width("33")*2, fontHeight,
+                fontHeight*4 + marginItem*6 + font->Width("33") * 2, fontHeight,
                 Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
         } else {
             DecorBorderDraw(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
-                osdWidth - Config.decorBorderReplaySize*2, labelHeight,
+                osdWidth - Config.decorBorderReplaySize * 2, labelHeight,
                 Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
         }
     }
@@ -199,12 +202,12 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 }
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
-    if( dimmActive ) {
+    if (dimmActive) {
         dimmPixmap->Fill(clrTransparent);
         Flush();
     }
 
-    if( modeOnly )
+    if (modeOnly)
         return;
 
     ProgressShown = true;
@@ -212,7 +215,7 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
-    if( modeOnly )
+    if (modeOnly)
         return;
 
     current = Current;
@@ -220,7 +223,7 @@ void cFlatDisplayReplay::SetCurrent(const char *Current) {
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
-    if( modeOnly )
+    if (modeOnly)
         return;
 
     total = Total;
@@ -335,9 +338,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         // TVScraper
         // first try scraper2vdr
         static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-        if( !pScraper ) // if it doesn't exit, try tvscraper
+        if (!pScraper) // if it doesn't exit, try tvscraper
             pScraper = cPluginManager::GetPlugin("tvscraper");
-        if( Config.TVScraperReplayInfoShowPoster && pScraper ) {
+        if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
             call.recording = recording;
             int seriesId = 0;
@@ -349,15 +352,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 episodeId = call.episodeId;
                 movieId = call.movieId;
             }
-            if( seriesId > 0 ) {
+            if (seriesId > 0) {
                 cSeries series;
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
-                    if( series.banners.size() > 0 ) {
+                    if (series.banners.size() > 0) {
                         mediaPath = series.banners[0].path;
-                        mediaWidth = series.banners[0].width * Config.TVScraperReplayInfoPosterSize*100;
-                        mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize*100;
+                        mediaWidth = series.banners[0].width * Config.TVScraperReplayInfoPosterSize * 100;
+                        mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize * 100;
                     }
                 }
             } else if (movieId > 0) {
@@ -365,20 +368,20 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
                     mediaPath = movie.poster.path;
-                    mediaWidth = movie.poster.width * 0.5 * Config.TVScraperReplayInfoPosterSize*100;
-                    mediaHeight = movie.poster.height * 0.5 * Config.TVScraperReplayInfoPosterSize*100;
+                    mediaWidth = movie.poster.width * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
+                    mediaHeight = movie.poster.height * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
                 }
             }
         }
 
         chanEpgImagesPixmap->Fill(clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
-        if( mediaPath.length() > 0 ) {
+        if (mediaPath.length() > 0) {
             cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
-            if( img ) {
+            if (img) {
                 chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-                DecorBorderDraw(20 + Config.decorBorderChannelEPGSize, topBarHeight + Config.decorBorderTopBarSize*2 + 20 + Config.decorBorderChannelEPGSize, img->Width(), img->Height(),
+                DecorBorderDraw(20 + Config.decorBorderChannelEPGSize, topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize, img->Width(), img->Height(),
                     Config.decorBorderChannelEPGSize, Config.decorBorderChannelEPGType, Config.decorBorderChannelEPGFg, Config.decorBorderChannelEPGBg, BorderTVSPoster);
             }
         }
@@ -391,7 +394,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (imgRecCut)
             imgWidth = imgRecCut->Width();
 
-        int right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(total) - marginItem - imgWidth - font->Width(" ") - font->Width(cutted);
+        int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total) - marginItem - imgWidth - font->Width(" ") - font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
             size_t found = tot.find_last_of(':');
@@ -401,13 +404,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                 std::string cutt = *cutted;
                 size_t found2 = cutt.find_last_of(':');
-                if( found2 != std::string::npos ) {
+                if (found2 != std::string::npos) {
                     std::string hm2 = cutt.substr(0, found);
                     std::string secs2 = cutt.substr(found, cutt.length() - found);
 
-                    right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") - font->Width(hm2.c_str()) - fontSecs->Width(secs2.c_str());
+                    right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") - font->Width(hm2.c_str()) - fontSecs->Width(secs2.c_str());
                 } else
-                    right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") - font->Width(cutted);
+                    right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") - font->Width(cutted);
 
                 labelPixmap->DrawText(cPoint(right - marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(hm.c_str()), fontHeight);
                 labelPixmap->DrawText(cPoint(right - marginItem + font->Width(hm.c_str()), topSecs), secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs, fontSecs->Width(secs.c_str()), fontSecs->Height());
@@ -424,15 +427,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             right += font->Width(" ");
         }
 
-        if( imgRecCut ) {
-            iconsPixmap->DrawImage( cPoint(right, 0), *imgRecCut );
-            right += imgRecCut->Width() + marginItem*2;
+        if (imgRecCut) {
+            iconsPixmap->DrawImage(cPoint(right, 0), *imgRecCut);
+            right += imgRecCut->Width() + marginItem * 2;
         }
 
-        if( Config.TimeSecsScale < 1.0 ) {
+        if (Config.TimeSecsScale < 1.0) {
             std::string cutt = *cutted;
             size_t found = cutt.find_last_of(':');
-            if( found != std::string::npos ) {
+            if (found != std::string::npos) {
                 std::string hm = cutt.substr(0, found);
                 std::string secs = cutt.substr(found, cutt.length() - found);
 
@@ -445,15 +448,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), cutted, Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
         }
     } else {
-        int right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(total);
-        if( Config.TimeSecsScale < 1.0 ) {
+        int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total);
+        if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
             size_t found = tot.find_last_of(':');
-            if( found != std::string::npos ) {
+            if (found != std::string::npos) {
                 std::string hm = tot.substr(0, found);
                 std::string secs = tot.substr(found, tot.length() - found);
 
-                right = osdWidth - Config.decorBorderReplaySize*2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str());
+                right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(hm.c_str()) - fontSecs->Width(secs.c_str());
                 labelPixmap->DrawText(cPoint(right - marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(hm.c_str()), fontHeight);
                 labelPixmap->DrawText(cPoint(right - marginItem + font->Width(hm.c_str()), topSecs), secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs, fontSecs->Width(secs.c_str()), fontSecs->Height());
             } else {
@@ -468,18 +471,18 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 void cFlatDisplayReplay::SetJump(const char *Jump) {
     DecorBorderClearByFrom(BorderRecordJump);
 
-    if( !Jump )
-    {
+    if (!Jump) {
         labelJump->Fill(clrTransparent);
         return;
     }
-    int left = osdWidth - Config.decorBorderReplaySize*2 - font->Width(Jump);
+    int left = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(Jump);
     left /= 2;
 
-    labelJump->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(Jump), fontHeight, taCenter);
+    labelJump->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), font, font->Width(Jump),
+                        fontHeight, taCenter);
 
     DecorBorderDraw(left + Config.decorBorderReplaySize,
-    osdHeight - labelHeight - Config.decorProgressReplaySize*2 - marginItem*3 - fontHeight - Config.decorBorderReplaySize*2,
+    osdHeight - labelHeight - Config.decorProgressReplaySize * 2 - marginItem*3 - fontHeight - Config.decorBorderReplaySize * 2,
         font->Width(Jump), fontHeight,
         Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg, BorderRecordJump);
 }
@@ -488,7 +491,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
     if (modeOnly)
         return;
 
-    int left = osdWidth - Config.decorBorderReplaySize*2;
+    int left = osdWidth - Config.decorBorderReplaySize * 2;
     int imageTop = 0;
     cImage *img = NULL;
 
@@ -515,10 +518,10 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         }
         img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
         if (img) {
-            imageTop = fontHeight + (fontSmlHeight - img->Height())/2;
+            imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
             left -= img->Width();
             iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-            left -= marginItem*2;
+            left -= marginItem * 2;
         }
     }
 
@@ -557,10 +560,10 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
             img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
             if (img) {
-                imageTop = fontHeight + (fontSmlHeight - img->Height())/2;
+                imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem*2;
+                left -= marginItem * 2;
             }
         }
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
@@ -581,10 +584,10 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
             img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {
-                imageTop = fontHeight + (fontSmlHeight - img->Height())/2;
+                imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem*2 ;
+                left -= marginItem * 2 ;
             }
         }
     }
@@ -600,7 +603,7 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
 void cFlatDisplayReplay::Flush(void) {
     TopBarUpdate();
 
-    if( Config.RecordingResolutionAspectShow ) {
+    if (Config.RecordingResolutionAspectShow) {
         cDevice::PrimaryDevice()->GetVideoSize(screenWidth, screenHeight, screenAspect);
         if (screenWidth != lastScreenWidth) {
             lastScreenWidth = screenWidth;

@@ -18,7 +18,7 @@
 #include "imageloader.h"
 
 static const char *VERSION        = "0.6.3";
-static const char *DESCRIPTION    = "skin flatplus";
+static const char *DESCRIPTION    = "skin flatPlus";
 
 class cPluginFlat : public cPlugin {
     private:
@@ -37,7 +37,7 @@ class cPluginFlat : public cPlugin {
         virtual void MainThreadHook(void);
         virtual cString Active(void);
         virtual time_t WakeupTime(void);
-        virtual const char *MainMenuEntry(void) {return NULL;}
+        virtual const char *MainMenuEntry(void) { return NULL; }
         virtual cOsdObject *MainMenuAction(void);
         virtual cMenuSetupPage *SetupMenu(void);
         virtual bool SetupParse(const char *Name, const char *Value);
@@ -146,17 +146,17 @@ const char **cPluginFlat::SVDRPHelpPages(void) {
 }
 
 cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode) {
-    if( !strcasecmp(Command, "RLFC")) {
-        if( Option == NULL ) {
+    if (!strcasecmp(Command, "RLFC")) {
+        if (Option == NULL) {
             ReplyCode = 500;
             return "no logo given";
         }
-        if( !strcmp(Option, "") ) {
+        if (!strcmp(Option, "")) {
             ReplyCode = 500;
             return "no logo given";
         }
 
-        if( imgCache.RemoveFromCache( Option ) ) {
+        if (imgCache.RemoveFromCache(Option)) {
             ReplyCode = 900;
             return "successfully remove logo from cache";
         } else {

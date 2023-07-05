@@ -59,7 +59,7 @@ char * substr(char * string, int start, int end)
     char * p = &string[start];
     char * buf = (char*) malloc(strlen(p) + 1);
     char * ptr = buf;
-    if(!buf) return NULL;
+    if (!buf) return NULL;
 
     while(*p != '\0' && start < end) {
         *ptr ++ = *p++;
@@ -75,7 +75,7 @@ char *GetFilenameWithoutext(char * fullfilename)
     int i = 0, size = 0;
 
     while(fullfilename[i] != '\0') {
-        if(fullfilename[i] == '.') {
+        if (fullfilename[i] == '.') {
             size = i;
         }
         i++;
