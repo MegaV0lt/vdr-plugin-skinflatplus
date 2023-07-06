@@ -1,10 +1,13 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
 
-2023-xx-xx: Version 0.x.x
+2023-xx-xx: Version 0.6.x
 - [update] move recordingerroricons to the place where the cutted symbol apears
 - [update] smaller recodringerroricons
 - [update] move recordingerroricons to the place where new videos are marked
+- [update] deactivated some code
+- [fix] deleting object of polymorphic class type ‘cTextScroll’ which has non-virtual destructor might
+          cause undefined behavior [-Wdelete-non-virtual-dtor]
 
 2023-02-14: Version 0.6.3
 - [fix] workaround for extra pixel glitch in playback-time

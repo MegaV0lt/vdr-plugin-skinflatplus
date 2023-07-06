@@ -50,8 +50,8 @@ public:
         ResetX = false;
     }
 
-    ~cTextScroll() {
-        if( Pixmap ) {
+    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
+        if (Pixmap) {
             Osd->DestroyPixmap(Pixmap);
             Pixmap = NULL;
         }

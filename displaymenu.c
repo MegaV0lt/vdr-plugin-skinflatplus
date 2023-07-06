@@ -415,33 +415,33 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     ColorBg = Theme.Color(clrItemCurrentBg);
     ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
 
-    iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
+    /*iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
     iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
     iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_cur", fontHeight, fontHeight);
     iconRec = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
     iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
-    iconNew = imgLoader.LoadIcon("text_new_cur", fontHeight, fontHeight);
+    iconNew = imgLoader.LoadIcon("text_new_cur", fontHeight, fontHeight);*/
   } else {
     if (Selectable) {
       ColorFg = Theme.Color(clrItemSelableFont);
       ColorBg = Theme.Color(clrItemSelableBg);
 
-      iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
+      /*iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
       iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec_sel", fontHeight, fontHeight);
       iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
-      iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);
+      iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);*/
     } else {
       ColorFg = Theme.Color(clrItemFont);
       ColorBg = Theme.Color(clrItemBg);
 
-      iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
+      /*iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
       iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
       iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
-      iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);
+      iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);*/
     }
   }
 
@@ -449,24 +449,24 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     menuItemLastHeight = y + itemHeight;
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, fontHeight), ColorBg);
-  int lh = fontHeight;
-  int xOff = 0;
+  //int lh = fontHeight;
+  //int xOff = 0;
   for (int i = 0; i < MaxTabs; i++) {
     const char *s = GetTabbedText(Text, i);
     if (s) {
       // from skinelchi
-      char buffer[9];
+      /*char buffer[9];
       bool istimer = false;
       bool isnewrecording = false;
       bool hasEventtimer = false;
       bool haspartEventtimer = false;
       bool isRecording = false;
       bool hasVPS = false;
-      bool isRunning = false;
+      bool isRunning = false;*/
 
       int xt = Tab(i);
 
-      if (true) {
+      /*if (true) {
         // check if timer info symbols: " !#>"
         if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
           istimer = true; // update status
@@ -504,10 +504,10 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
           if (s[3] == '*')
             isRunning = true;
         }
-      }
-      xOff = Tab(i) + Config.decorBorderMenuItemSize;
+      } */
+      //xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
-      if (istimer) {
+      /*if (istimer) {
         // timer menu
         switch (s[0]) {
         case '!':
@@ -574,7 +574,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         cRect recBG = cRect(xt + Config.decorBorderMenuItemSize - marginItem, y, colWidth + marginItem * 2, fontHeight);
 
         DrawProgressBarFromText(rec, recBG, s, ColorFg, ColorBarFg, ColorBg);
-      } else {
+      } else {  */
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));
@@ -629,7 +629,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg, font,
                                  menuItemWidth - xt - Config.decorBorderMenuItemSize);
         }
-      }
+      //}
     }
     if (!Tab(i + 1))
       break;
@@ -1287,7 +1287,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
   int Height = fontHeight;
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // 3 = flatPlus short, 4 = flatPlus short + EPG
+  if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus short, flatPlus short + EPG
     Height = fontHeight + fontSmlHeight + marginItem;
     menuItemWidth *= 0.5;
   }
@@ -1474,7 +1474,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         menuPixmap->DrawText(cPoint(Left, Top), File, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
       }
     }
-  } else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // 2 = flatPlus long + EPG, 3 = flatPlus short
+  } else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus long + EPG, flatPlus short
     buffer = cString::sprintf("%s%s%s.  %02d:%02d - %02d:%02d", *name, *name && **name ? " " : "", *day,
                               Timer->Start() / 100, Timer->Start() % 100, Timer->Stop() / 100, Timer->Stop() % 100);
     menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
@@ -1824,6 +1824,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
       menuIconsPixmap->DrawImage(cPoint(Left, imageTop), *img);
     }
   }
+
   Left += imageHeight + marginItem;
   if (Event && Selectable) {
     if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
