@@ -1,6 +1,11 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
 
+2023-xx-xx: Version 0.6.x
+- [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]
+          Thanks to wirbel @ VDR-Portal and FireFly @ VDR-Portal
+- [add] Add font 'Droid Sans' in /contrib
+
 2023-07-10: Version 0.6.4
 - [update] move recordingerroricons to the place where the cutted symbol apears
 - [update] smaller recodringerroricons
