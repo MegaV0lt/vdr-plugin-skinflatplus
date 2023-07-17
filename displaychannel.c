@@ -244,9 +244,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
                 left -= marginItem * 2;
             }
-        }
+        //}
 
-        if (Config.ChannelResolutionAspectShow) {  // Show Resolution
+        //if (Config.ChannelResolutionAspectShow) {  // Show Resolution
             cString res("");
 
             switch (screenWidth) {

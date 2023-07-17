@@ -415,32 +415,32 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     ColorBg = Theme.Color(clrItemCurrentBg);
     ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
 
-    /*iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
-    iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
+    iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
+    //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
     iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_cur", fontHeight, fontHeight);
     iconRec = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
-    iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
+    /*iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
     iconNew = imgLoader.LoadIcon("text_new_cur", fontHeight, fontHeight);*/
   } else {
     if (Selectable) {
       ColorFg = Theme.Color(clrItemSelableFont);
       ColorBg = Theme.Color(clrItemSelableBg);
 
-      /*iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
-      iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
+      iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
+      //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec_sel", fontHeight, fontHeight);
-      iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
+      /*iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
       iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);*/
     } else {
       ColorFg = Theme.Color(clrItemFont);
       ColorBg = Theme.Color(clrItemBg);
 
-      /*iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
-      iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
+      iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
+      //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
-      iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
+      /*iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
       iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);*/
     }
   }
@@ -449,28 +449,28 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     menuItemLastHeight = y + itemHeight;
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, fontHeight), ColorBg);
-  //int lh = fontHeight;
-  //int xOff = 0;
+  int lh = fontHeight;
+  int xOff = 0;
   for (int i = 0; i < MaxTabs; i++) {
     const char *s = GetTabbedText(Text, i);
     if (s) {
       // from skinelchi
-      /*char buffer[9];
+      //char buffer[9];
       bool istimer = false;
-      bool isnewrecording = false;
+      /*bool isnewrecording = false;
       bool hasEventtimer = false;
       bool haspartEventtimer = false;
       bool isRecording = false;
       bool hasVPS = false;
-      bool isRunning = false;*/
+      bool isRunning = false; */
 
       int xt = Tab(i);
 
-      /*if (true) {
-        // check if timer info symbols: " !#>"
+      /*if (true) { */
+        // check for timer info symbols: " !#>" (EPGSearch searchtimer)
         if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
           istimer = true; // update status
-        } else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
+        } /*else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
                     isdigit(*(s + 3)) && isdigit(*(s + 4))) ||
                    (strlen(s) == 5 && s[4] == '*' && s[1] == ':' && isdigit(*s) && isdigit(*(s + 2)) &&
                     isdigit(*(s + 3))) ||
@@ -505,10 +505,10 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             isRunning = true;
         }
       } */
-      //xOff = Tab(i) + Config.decorBorderMenuItemSize;
+      xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
-      /*if (istimer) {
-        // timer menu
+      if (istimer) {
+        // timer menu (EPGsearch searchtimer)
         switch (s[0]) {
         case '!':
           if (iconArrowTurn)
@@ -526,7 +526,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         default:
           break;
         }
-      } else if (isRecording || hasEventtimer || haspartEventtimer || hasVPS || isRunning) {
+      } /*else if (isRecording || hasEventtimer || haspartEventtimer || hasVPS || isRunning) {
         // program schedule menu
         if (isRecording && iconRec)
           menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconRec->Height()) / 2), *iconRec);
@@ -574,7 +574,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         cRect recBG = cRect(xt + Config.decorBorderMenuItemSize - marginItem, y, colWidth + marginItem * 2, fontHeight);
 
         DrawProgressBarFromText(rec, recBG, s, ColorFg, ColorBarFg, ColorBg);
-      } else {  */
+      } else { */
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));
@@ -638,13 +638,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-
-  /*ib.Width = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (isScrolling)
-    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
-
   ib.Width = menuItemWidth;
-
   ib.Height = fontHeight;
   ib.Size = Config.decorBorderMenuItemSize;
   ib.Type = Config.decorBorderMenuItemType;
@@ -1038,13 +1032,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-
-   /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-  if (isScrolling)
-    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
-
   ib.Width = menuItemWidth;
-
   ib.Height = Height;
   ib.Size = Config.decorBorderMenuItemSize;
   ib.Type = Config.decorBorderMenuItemType;
@@ -1324,23 +1312,35 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   int imageTop = Top;
 
   cString TimerIconName("");
-  if (!(Timer->HasFlags(tfActive))) {
+  if (!(Timer->HasFlags(tfActive))) {                      // Inactive timer
     if (Current)
       TimerIconName = "timerInactive_cur";
     else
       TimerIconName = "timerInactive";
 
     ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
-  } else if (Timer->Recording()) {
+  } else if (Timer->Recording()) {                         // Active timer and recording
     TimerIconName = "timerRecording";
     ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
-  } else
+  } else if (Timer->FirstDay()) {                          // Active timer 'FirstDay'
+    TimerIconName = "text_arrowturn";
+    //ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
+  } else                                                   // Active timer
     TimerIconName = "timerActive";
 
   img = imgLoader.LoadIcon(TimerIconName, imageHeight, imageHeight);
   if (img) {
     imageTop = Top + (fontHeight - img->Height()) / 2;
     menuIconsPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
+  }
+
+  // TODO: Make overlay configurable (disable)
+  if (Timer->Remote()) {  // Remote timer
+    img = imgLoader.LoadIcon("timerRemote", imageHeight, imageHeight);
+    if (img) {
+      imageTop = Top + (fontHeight - img->Height()) / 2;
+      menuIconsOVLPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
+    }
   }
   Left += imageHeight + marginItem * 2;
 
@@ -1521,13 +1521,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-
-  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-  if (isScrolling)
-    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
-
   ib.Width = menuItemWidth;
-
   ib.Height = Height;
   ib.Size = Config.decorBorderMenuItemSize;
   ib.Type = Config.decorBorderMenuItemType;
@@ -1963,13 +1957,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-
-  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-  if (isScrolling)
-    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
-
   ib.Width = menuItemWidth;
-
   ib.Height = Height;
   ib.Size = Config.decorBorderMenuItemSize;
   ib.Type = Config.decorBorderMenuItemType;
@@ -2082,21 +2070,19 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
   menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
   cImage *img = NULL;
+
   cImage *imgRecNew = NULL;
-  if (Current)
+  cImage *imgRecNewSml = NULL;
+  cImage *imgRecCut = NULL;
+  if (Current) {
     imgRecNew = imgLoader.LoadIcon("recording_new_cur", fontHeight, fontHeight);
+    imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
+    imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
+  }
   if (imgRecNew == NULL)
     imgRecNew = imgLoader.LoadIcon("recording_new", fontHeight, fontHeight);
-
-  cImage *imgRecNewSml = NULL;
-  if (Current)
-    imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
   if (imgRecNewSml == NULL)
     imgRecNewSml = imgLoader.LoadIcon("recording_new", fontSmlHeight, fontSmlHeight);
-
-  cImage *imgRecCut = NULL;
-  if (Current)
-    imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
   if (imgRecCut == NULL)
     imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
 
@@ -2474,13 +2460,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
   ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-
-  /*ib.Width = menuItemWidth - Config.decorBorderMenuItemSize * 2;
-  if (isScrolling)
-    ib.Width -= scrollBarWidth;*/  // Temporary disabled - See next line
-
   ib.Width = menuItemWidth;
-
   ib.Height = Height;
   ib.Size = Config.decorBorderMenuItemSize;
   ib.Type = Config.decorBorderMenuItemType;

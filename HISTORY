@@ -4,7 +4,10 @@ VDR Plugin 'skinflatplus' Revision History
 2023-xx-xx: Version 0.6.x
 - [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]
           Thanks to wirbel @ VDR-Portal and FireFly @ VDR-Portal
+- [fix] Reenable icons in epgSearch's searchtimer menu
 - [add] Add font 'Droid Sans' in /contrib
+- [add] Add 'eventsview-MV.sql' in /contrib
+- [add] Add overlayicon for remote timer
 
 2023-07-10: Version 0.6.4
 - [update] move recordingerroricons to the place where the cutted symbol apears

@@ -523,9 +523,9 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
             left -= marginItem * 2;
         }
-    }
+    //}
 
-    if (Config.RecordingResolutionAspectShow) {  // Show Resolution
+    //if (Config.RecordingResolutionAspectShow) {  // Show Resolution
         cString res("");
         switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
