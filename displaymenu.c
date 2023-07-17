@@ -376,7 +376,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     TopBarSetMenuIcon(icon);
 
     if ((menuCategory == mcRecording || menuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-        Config.DiskUsageShow == 2 | Config.DiskUsageShow == 3) {
+        Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
       TopBarEnableDiskUsage();
     }
   }
