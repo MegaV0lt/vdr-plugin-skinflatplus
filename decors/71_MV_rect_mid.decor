@@ -1,0 +1,73 @@
+Description = MV rect mid
+# BORDER TYPES
+#   0 = none
+#   1 = rect
+#   2 = round
+#   3 = invert round
+#   4 = rect + alpha blend
+#   5 = round + alpha blend
+#   6 = invert round + alpha blend
+
+# PROGRESS TYPES
+#   0 = small line + big line
+#   1 = big line
+#   2 = big line + outline
+#   3 = small line + big line + dot
+#   4 = big line + dot
+#   5 = big line + outline + dot
+#   6 = small line + dot
+#   7 = outline + dot
+#   8 = small line + big line + alpha blend
+#   9 = big line + alpha blend
+
+# TopBar
+TopBarBorderType = 1
+TopBarBorderSize = 7
+
+# Buttons
+ButtonBorderType = 0
+ButtonBorderSize = 7
+
+# Messages
+MessageBorderType = 0
+MessageBorderSize = 7
+
+# Display Channel
+ChannelBorderType = 1
+ChannelBorderSize = 10
+ChannelEPGBorderType = 1
+ChannelEPGBorderSize = 10
+ChannelProgressType = 0
+ChannelProgressSize = 10
+ChannelSignalProgressType = 2
+ChannelSignalProgressSize = 10
+
+# Display Menu
+MenuItemBorderType = 1
+MenuItemBorderSize = 7
+MenuContentHeadBorderType = 1
+MenuContentHeadBorderSize = 7
+MenuContentBorderType = 1
+MenuContentBorderSize = 10
+MenuItemProgressType = 2
+MenuItemProgressSize = 20
+
+# Display Replay
+ReplayBorderType = 1
+ReplayBorderSize = 10
+ReplayProgressType = 0
+ReplayProgressSize = 25
+
+# Display Tracks
+TrackItemBorderType = 1
+TrackItemBorderSize = 10
+
+# Display Volume
+VolumeBorderType = 1
+VolumeBorderSize = 15
+VolumeProgressType = 0
+VolumeProgressSize = 25
+
+# Scrollbar
+ScrollBarType = 0
+ScrollBarSize = 15

@@ -100,7 +100,7 @@ msgid "Series information"
 msgstr "Serien Informationen"
 
 msgid "Actors"
-msgstr "Schauspieler"
+msgstr "Darsteller"
 
 msgid "Reruns"
 msgstr "Wiederholungen"

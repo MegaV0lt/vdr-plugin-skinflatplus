@@ -237,6 +237,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 else if (screenAspect == 2.21)
                     asp = "221";
             }
+
             img = imgLoader.LoadIcon(*asp, 999, height);
             if (img) {
                 imageTop = top + (height - img->Height()) / 2;
@@ -244,11 +245,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
                 left -= marginItem * 2;
             }
-        //}
 
-        //if (Config.ChannelResolutionAspectShow) {  // Show Resolution
+            // Show Resolution
             cString res("");
-
             switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
                 res = "7680x4320"; break;
@@ -288,6 +287,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= marginItem * 2;
             }
         }
+
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             cString iconName("");      // Show Format
             switch (screenWidth) {

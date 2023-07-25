@@ -8,6 +8,9 @@ VDR Plugin 'skinflatplus' Revision History
 - [add] Add font 'Droid Sans' in /contrib
 - [add] Add 'eventsview-MV.sql' in /contrib
 - [add] Add overlayicon for remote timer
+. [add] New 'MV_rect_mid' and 'MV_rect_big' decor settings
+- [update] Move 'tpmfiles.d' to 'contrib'
+- [update] Change 'Schauspieler' to 'Darsteller'
 
 2023-07-10: Version 0.6.4
 - [update] move recordingerroricons to the place where the cutted symbol apears

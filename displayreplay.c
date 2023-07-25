@@ -516,6 +516,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             else if (screenAspect == 2.21)
                 asp = "221";
         }
+
         img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
         if (img) {
             imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
@@ -523,9 +524,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
             left -= marginItem * 2;
         }
-    //}
 
-    //if (Config.RecordingResolutionAspectShow) {  // Show Resolution
+        // Show Resolution
         cString res("");
         switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
@@ -566,6 +566,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 left -= marginItem * 2;
             }
         }
+
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             cString iconName("");        // Show Format
             switch (screenWidth) {
