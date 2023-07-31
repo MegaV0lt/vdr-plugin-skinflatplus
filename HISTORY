@@ -1,7 +1,7 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
 
-2023-xx-xx: Version 0.6.x
+2023-07-31: Version 0.6.5
 - [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]
           Thanks to wirbel @ VDR-Portal and FireFly @ VDR-Portal
 - [fix] Reenable icons in epgSearch's searchtimer menu
