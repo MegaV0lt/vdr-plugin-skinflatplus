@@ -466,11 +466,11 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
       int xt = Tab(i);
 
-      /*if (true) { */
+      /* if (true) { */
         // check for timer info symbols: " !#>" (EPGSearch searchtimer)
         if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
           istimer = true; // update status
-        } /*else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
+        } /* else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
                     isdigit(*(s + 3)) && isdigit(*(s + 4))) ||
                    (strlen(s) == 5 && s[4] == '*' && s[1] == ':' && isdigit(*s) && isdigit(*(s + 2)) &&
                     isdigit(*(s + 3))) ||
@@ -526,7 +526,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         default:
           break;
         }
-      } /*else if (isRecording || hasEventtimer || haspartEventtimer || hasVPS || isRunning) {
+      } /* else if (isRecording || hasEventtimer || haspartEventtimer || hasVPS || isRunning) {
         // program schedule menu
         if (isRecording && iconRec)
           menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconRec->Height()) / 2), *iconRec);
@@ -574,7 +574,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         cRect recBG = cRect(xt + Config.decorBorderMenuItemSize - marginItem, y, colWidth + marginItem * 2, fontHeight);
 
         DrawProgressBarFromText(rec, recBG, s, ColorFg, ColorBarFg, ColorBg);
-      } else { */
+      } */ else {
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));
@@ -629,11 +629,11 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg, font,
                                  menuItemWidth - xt - Config.decorBorderMenuItemSize);
         }
-      //}
-    }
+      }  // !isTimer
+    }  // if (s)
     if (!Tab(i + 1))
       break;
-  }
+  }  // for
 
   sDecorBorder ib {};
   ib.Left = Config.decorBorderMenuItemSize;
