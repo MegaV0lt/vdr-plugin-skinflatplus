@@ -71,8 +71,34 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (modeOnly)
         return;
 
+    int Left = marginItem;  // Position for shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
+
+    iconsPixmap->Fill(clrTransparent);
+
+#if APIVERSNUM >= 20505
+    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate configoption
+      int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
+
+      cString RecErrIcon("recording_untested_replay");
+      if (recInfo->Errors() < 0) {         // -1 Untestet recording
+        // RecErrIcon = "recording_untested";
+      } else if (recInfo->Errors() == 0)    // No errors
+        RecErrIcon = "recording_ok_replay";
+      else if (recInfo->Errors() < RecErrIconTreshold)
+        RecErrIcon = "recording_warning_replay";
+      else if (recInfo->Errors() >= RecErrIconTreshold)
+        RecErrIcon = "recording_error_replay";
+
+      cImage *imgRecErr = imgLoader.LoadIcon(RecErrIcon, 999, fontSmlHeight);  // Small image
+      if (imgRecErr != NULL) {
+        //imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
+        iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
+      }
+      Left += imgRecErr->Width() + marginItem;  // Add width of icon
+    }  // MenuItemRecordingShowRecordingErrors
+#endif
 
     SetTitle(recInfo->Title());
     cString info("");
@@ -81,7 +107,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     else
         info = cString::sprintf("%s %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
 
-    labelPixmap->DrawText(cPoint(marginItem, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml, osdWidth - Config.decorBorderReplaySize * 2);
+    labelPixmap->DrawText(cPoint(Left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml, osdWidth - Config.decorBorderReplaySize * 2);
 }
 
 void cFlatDisplayReplay::SetTitle(const char *Title) {
@@ -127,7 +153,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (modeOnly)
             labelPixmap->Fill(clrTransparent);
 
-        iconsPixmap->Fill(clrTransparent);
+        //iconsPixmap->Fill(clrTransparent);  // Moved to SetRecording
         labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0, fontHeight*4 + marginItem*6 + font->Width("33") * 2,
                                    fontHeight), Theme.Color(clrReplayBg));
 
@@ -625,6 +651,11 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("pause_sel", fontHeight, fontHeight);
     imgLoader.LoadIcon("forward_sel", fontHeight, fontHeight);
     imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
+
+    imgLoader.LoadIcon("recording_untested_replay", 999, fontSmlHeight);
+    imgLoader.LoadIcon("recording_ok_replay", 999, fontSmlHeight);
+    imgLoader.LoadIcon("recording_warning_replay", 999, fontSmlHeight);
+    imgLoader.LoadIcon("recording_error_replay", 999, fontSmlHeight);
 
     imgLoader.LoadIcon("43", 999, fontSmlHeight);
     imgLoader.LoadIcon("169", 999, fontSmlHeight);
