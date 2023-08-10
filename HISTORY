@@ -6,6 +6,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [fix] increased version to 0.6.5 in code
 - [add] show recordingerroricons in also during replay
 - [remove] delete obsolete genre icons
+- [update] update_weather.sh small tweaks
 
 2023-07-31: Version 0.6.5
 - [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]

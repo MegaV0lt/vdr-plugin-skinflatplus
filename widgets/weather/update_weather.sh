@@ -12,7 +12,7 @@
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=230105
+#VERSION=2300810
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -29,8 +29,9 @@ f_log(){
 
 f_write_temp(){  # Temperaturwert aufbereiten und schreiben ($1 Temperatur, $2 Ausgabedatei)
   local data="$1" file="$2"
-  printf -v data '%.1f' "$data"  # Temperatur mit einer Nachkommastelle
-  printf '%s' "${data/./,}${DEGREE_SIGN}" > "$file"  # Daten schreiben (13,1°C)
+  printf -v data '%.1f' "$data"                  # Temperatur mit einer Nachkommastelle
+  [[ -n "$DEC" ]] && data="${data/./"$DEC"}"     # . durch , ersetzen
+  printf '%s' "${data}${DEGREE_SIGN}" > "$file"  # Daten schreiben (13,1°C)
 }
 
 f_get_weather(){
@@ -46,8 +47,8 @@ f_get_weather(){
   printf '%s\n' "$LOCATION" > "${DATA_DIR}/weather.location"       # Der Ort für die Werte z. B. Berlin
   jqdata=$(jq -r .current.temp "$WEATHER_JSON")                    # Aktuelle Temperatur
   f_write_temp "$jqdata" "${DATA_DIR}/weather.0.temp"
-  jqdata2=$(jq -r .current.weather[0].description "$WEATHER_JSON") # Beschreibung
-  jqdata=$(jq -r .current.weather[0].id "$WEATHER_JSON")           # Wettersymbol
+  jqdata2=$(jq -r .current.weather[0].description "$WEATHER_JSON") # Beschreibung (Aktuell)
+  jqdata=$(jq -r .current.weather[0].id "$WEATHER_JSON")           # Wettersymbol (ID)
   case $jqdata in
     800) [[ $(jq -r .current.weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='clear-night' ;;
     801) [[ $(jq -r .current.weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='partly-cloudy-night' ;;
@@ -65,7 +66,7 @@ f_get_weather(){
       > "${DATA_DIR}/weather.${cnt}.precipitation"                 # Niederschlagswahrscheinlichkeit
     jqdata=$(jq -r .daily[${cnt}].weather[0].description "$WEATHER_JSON")
     if [[ "$cnt" -eq 0 ]] ; then
-      [[ "$jqdata" != "$jqdata2" ]] && jqdata+=" / $jqdata2" # Beschreibung / aktuell
+      [[ "$jqdata" != "$jqdata2" ]] && jqdata+=" / $jqdata2"       # Beschreibung / Aktuell
     fi
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.summary" # Beschreibung
     jqdata=$(jq -r .daily[${cnt}].weather[0].id "$WEATHER_JSON")   # Wettersymbol
@@ -91,7 +92,7 @@ done
 
 # Temp Einheit (standard [°K], metric [°C], imperial [°F])
 case $UNITS in
-  metric)  DEGREE_SIGN='°C' ;;
+  metric)  DEGREE_SIGN='°C' ; DEC=',' ;;
   imperal) DEGREE_SIGN='°F' ;;
   *)       DEGREE_SIGN='°K' ;;
 esac
