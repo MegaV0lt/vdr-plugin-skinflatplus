@@ -79,8 +79,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   Pixmap = CreatePixmap(1, Position, PositionDraw);
   PixmapImage = CreatePixmap(2, Position, PositionDraw);
-    dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
-             Position.Left(), Position.Top(), Position.Width(), Position.Height());
+  //  dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
+  //           Position.Left(), Position.Top(), Position.Width(), Position.Height());
   // dsyslog("skinflatplus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
   //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
