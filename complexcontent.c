@@ -79,18 +79,22 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   Pixmap = CreatePixmap(1, Position, PositionDraw);
   PixmapImage = CreatePixmap(2, Position, PositionDraw);
-  // dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d height: %d", Position.Left(), Position.Top(),
-  //         Position.Width(), Position.Height() );
+  //  dsyslog("skinflatplus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
+  //           Position.Left(), Position.Top(), Position.Width(), Position.Height());
   // dsyslog("skinflatplus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
-  //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height() );
+  //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
-  if (FullFillBackground) {
-    Pixmap->Fill(ColorBg);
-  } else {
-    Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)),
-                          ColorBg);
+  if (Pixmap != NULL) {  // check for nullptr
+    if (FullFillBackground) {
+      Pixmap->Fill(ColorBg);
+    } else {
+      Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
+    }
+  } else {               // Log values and return
+    esyslog("skin flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
+            Position.Left(), Position.Top(), Position.Width(), Position.Height());
+    return;
   }
-
   PixmapImage->Fill(clrTransparent);
 }
 
