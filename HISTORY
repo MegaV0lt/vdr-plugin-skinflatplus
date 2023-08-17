@@ -5,7 +5,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [fix] mixed icon and text in epgsearch searchtimer menü
 - [fix] increased version to 0.6.5 in code
 - [fix] fix nullptr. after restart of vdr and hitting key menu
-          Thanks to MerkusE @ VDR_Portal for reporting
+          Thanks to MarkusE @ VDR_Portal for reporting
 - [add] show recordingerroricons in also during replay
 - [remove] delete obsolete genre icons
 - [update] update_weather.sh small tweaks
