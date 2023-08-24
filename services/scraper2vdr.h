@@ -78,10 +78,22 @@ public:
     const cEvent *event;             // check type for this event
     const cRecording *recording;     // or for this recording
 //out
-    tvType type;                	 //typeSeries or typeMovie
+    tvType type;                	 //tSeries or tMovie or tNone
     int movieId;
     int seriesId;
     int episodeId;
+};
+
+// Data structure for enviromment ("GetEnvironment" call)
+
+class cEnvironment
+{
+  public:
+//in: nothing, no input required
+//out
+    std::string basePath;  // All images are in this path or subdirectories. This was given to the plugin with --dir, or is the default cache directory for the plugin.
+    std::string seriesPath;
+    std::string moviesPath;
 };
 
 // Data structures for full series and episode information
@@ -174,7 +186,7 @@ public:
     const cEvent *event;             // check type for this event
     const cRecording *recording;     // check type for this recording
 //out
-    tvType type;                     //typeSeries or typeMovie
+    tvType type;                     // tSeries or tMovie or tNone
     cTvMedia poster;
     cTvMedia banner;
 };
@@ -201,18 +213,6 @@ public:
 
 // NEW interface, used by live =========================================================
 
-// Data structure for service "GetScraperImageDir"
-class cGetScraperImageDir {
-public:
-//in: nothing, no input required
-//out
-  std::string scraperImageDir;   // this was given to the plugin with --dir, or is the default cache directory for the plugin. It will always end with a '/'
-  bool call(cPlugin *pScraper) {
-    if (!pScraper) return cPluginManager::CallFirstService("GetScraperImageDir", this);
-    else return pScraper->Service("GetScraperImageDir", this);
-  }
-};
-
 // Data structure for service "GetScraperUpdateTimes"
 class cGetScraperUpdateTimes {
 public:
@@ -220,9 +220,9 @@ public:
 //out
   time_t m_EPG_UpdateTime;
   time_t m_recordingsUpdateTime;
-  bool call(cPlugin *pScraper) {
+  cPlugin *call(cPlugin *pScraper = NULL) {
     if (!pScraper) return cPluginManager::CallFirstService("GetScraperUpdateTimes", this);
-    else return pScraper->Service("GetScraperUpdateTimes", this);
+    else return pScraper->Service("GetScraperUpdateTimes", this)?pScraper:NULL;
   }
 };
 
@@ -348,9 +348,9 @@ public:
   cGetScraperVideo(const cEvent *event = NULL, const cRecording *recording = NULL):
     m_event(event), m_recording(recording) { }
 
-  bool call(cPlugin *pScraper) {
+  cPlugin *call(cPlugin *pScraper = NULL) {
     if (!pScraper) return cPluginManager::CallFirstService("GetScraperVideo", this);
-    return pScraper->Service("GetScraperVideo", this);
+    return pScraper->Service("GetScraperVideo", this)?pScraper:NULL;
   }
 //IN: Use constructor to set these values
   const cEvent *m_event;             // must be NULL for recordings ; provide data for this event
