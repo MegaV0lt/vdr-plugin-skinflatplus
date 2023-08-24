@@ -17,7 +17,7 @@
 #include "setup.h"
 #include "imageloader.h"
 
-static const char *VERSION        = "0.6.6";
+static const char *VERSION        = "0.6.7";
 static const char *DESCRIPTION    = "skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -78,9 +78,10 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 }
 
 __attribute__((constructor)) static void init(void) {
-   Magick::InitializeMagick(NULL);
+   //Magick::InitializeMagick(NULL);
+   // Prevents *magick from occupying the segfaults
+   MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
 }
-
 
 bool cPluginFlat::Initialize(void) {
     Config.Init();
@@ -89,10 +90,10 @@ bool cPluginFlat::Initialize(void) {
 
 bool cPluginFlat::Start(void) {
     if (!cOsdProvider::SupportsTrueColor()) {
-        esyslog("skinflatplus: No TrueColor OSD found! Aborting!");
+        esyslog("skin flatPlus: No TrueColor OSD found! Aborting!");
         return false;
     } else
-        dsyslog("skinflatplus: TrueColor OSD found");
+        dsyslog("skin flatPlus: TrueColor OSD found");
 
     imgCache.Create();
     imgCache.PreLoadImage();
@@ -149,19 +150,19 @@ cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &
     if (!strcasecmp(Command, "RLFC")) {
         if (Option == NULL) {
             ReplyCode = 500;
-            return "no logo given";
+            return "No logo given";
         }
         if (!strcmp(Option, "")) {
             ReplyCode = 500;
-            return "no logo given";
+            return "No logo given";
         }
 
         if (imgCache.RemoveFromCache(Option)) {
             ReplyCode = 900;
-            return "successfully remove logo from cache";
+            return "Successfully remove logo from cache";
         } else {
             ReplyCode = 501;
-            return "Failure - logo not found in cache";
+            return "Failure - Logo not found in cache";
         }
     }
     return NULL;

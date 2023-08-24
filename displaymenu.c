@@ -64,26 +64,26 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   menuWidth = osdWidth;
   menuTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
   menuPixmap = osd->CreatePixmap(1, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("skin flatPlus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   menuIconsBGPixmap = osd->CreatePixmap(2, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("skin flatPlus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
   menuIconsPixmap = osd->CreatePixmap(3, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("skin flatPlus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
   menuIconsOVLPixmap = osd->CreatePixmap(4, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skinflatplus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("skin flatPlus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   chLeft = Config.decorBorderMenuContentHeadSize;
   chTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = osd->CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
+  // dsyslog("skin flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
   contentHeadIconsPixmap = osd->CreatePixmap(2, cRect(chLeft, chTop, chWidth, chHeight));
 
   scrollbarPixmap = osd->CreatePixmap(
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
-  // dsyslog("skinflatplus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
+  // dsyslog("skin flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
   //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2 );
 
   menuPixmap->Fill(clrTransparent);
@@ -1328,7 +1328,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   } else                                                   // Active timer
     TimerIconName = "timerActive";
 
-  img = imgLoader.LoadIcon(TimerIconName, imageHeight, imageHeight);
+  img = imgLoader.LoadIcon(*TimerIconName, imageHeight, imageHeight);
   if (img) {
     imageTop = Top + (fontHeight - img->Height()) / 2;
     menuIconsPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
@@ -2156,10 +2156,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         cImage *imgSeen = NULL;
         if (Current) {
           cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
-          imgSeen = imgLoader.LoadIcon(SeenIconCur, fontHeight, fontHeight);
+          imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
         }
         if (imgSeen == NULL)
-          imgSeen = imgLoader.LoadIcon(SeenIcon, fontHeight, fontHeight);
+          imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
         if (imgSeen != NULL)
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
@@ -2182,10 +2182,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         cImage *imgRecErr = NULL;
         if (Current) {
           cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
         if (imgRecErr == NULL)
-          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
         if (imgRecErr != NULL)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
@@ -2347,10 +2347,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         cImage *imgSeen = NULL;
         if (Current) {
           cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
-          imgSeen = imgLoader.LoadIcon(SeenIconCur, fontHeight, fontHeight);
+          imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
         }
         if (imgSeen == NULL)
-          imgSeen = imgLoader.LoadIcon(SeenIcon, fontHeight, fontHeight);
+          imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
         if (imgSeen != NULL)
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
@@ -2373,10 +2373,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         cImage *imgRecErr = NULL;
         if (Current) {
           cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
-          imgRecErr = imgLoader.LoadIcon(RecErrIconCur, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
         if (imgRecErr == NULL)
-          imgRecErr = imgLoader.LoadIcon(RecErrIcon, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
         if (imgRecErr != NULL)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
@@ -2661,7 +2661,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skinflatplus: FSK icon not found: %s", *iconName);
+      isyslog("skin flatPlus: FSK icon not found: %s", *iconName);
       img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
       if (img) {
         contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -2679,7 +2679,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skinflatplus: Genre icon not found: %s", *iconName);
+      isyslog("skin flatPlus: Genre icon not found: %s", *iconName);
       if (!isUnknownDrawn) {
         img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
         if (img) {
@@ -2793,7 +2793,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         episodeId = call.episodeId;
         movieId = call.movieId;
       }
-      if (seriesId > 0) {
+      if (call.type == tSeries) {
         cSeries series;
         series.seriesId = seriesId;
         series.episodeId = episodeId;
@@ -2828,7 +2828,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
           if (series.episode.number > 0)
             series_info << tr("episode number: ") << series.episode.number << "\n";
         }
-      } else if (movieId > 0) {
+      } else if (call.type == tMovie) {
         cMovie movie;
         movie.movieId = movieId;
         if (pScraper->Service("GetMovie", &movie)) {
@@ -3096,32 +3096,31 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       unsigned long long recsizecutted = 0;
       unsigned long long cutinoffset = 0;
       unsigned long long filesize[100000];
+      uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
       filesize[0] = 0;
 
       int i = 0;
-      int imax = 999;
       struct stat filebuf;
       cString filename("");
       int rc = 0;
 
       do {
+        i += 1;
         if (Recording->IsPesRecording())
-          filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), ++i);
-        else {
-          filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), ++i);
-          imax = 99999;
-        }
+          filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
+        else
+          filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
         rc = stat(filename, &filebuf);
         if (rc == 0)
           filesize[i] = filesize[i - 1] + filebuf.st_size;
         else {
           if (ENOENT != errno) {
-            esyslog("skinflatplus: error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
+            esyslog("skin flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
                     strerror(errno));
             recsize = 0;
           }
         }
-      } while (i <= imax && !rc);
+      } while (i <= maxFiles && !rc);
       recsize = filesize[i - 1];
 
       if (hasMarks && index) {
@@ -3321,7 +3320,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       episodeId = call.episodeId;
       movieId = call.movieId;
     }
-    if (seriesId > 0) {
+    if (call.type == tSeries) {
       cSeries series;
       series.seriesId = seriesId;
       series.episodeId = episodeId;
@@ -3332,7 +3331,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         mediaHeight = 999;
         mediaType = 1;
       }
-    } else if (movieId > 0) {
+    } else if (call.type == tMovie) {
       cMovie movie;
       movie.movieId = movieId;
       if (pScraper->Service("GetMovie", &movie)) {
@@ -3411,7 +3410,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skinflatplus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
+  // dsyslog("skin flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
 
   contentHeadIconsPixmap->Fill(clrTransparent);
 
@@ -3494,32 +3493,31 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     unsigned long long recsizecutted = 0;
     unsigned long long cutinoffset = 0;
     unsigned long long filesize[100000];
+    uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
     filesize[0] = 0;
 
     int i = 0;
-    int imax = 999;
     struct stat filebuf;
     cString filename("");
     int rc = 0;
 
     do {
+      i += 1;
       if (Recording->IsPesRecording())
-        filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), ++i);
-      else {
-        filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), ++i);
-        imax = 99999;
-      }
+        filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
+      else
+        filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
       rc = stat(filename, &filebuf);
       if (rc == 0)
         filesize[i] = filesize[i - 1] + filebuf.st_size;
       else {
         if (ENOENT != errno) {
-          esyslog("skinflatplus: error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
+          esyslog("skin flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
                   strerror(errno));
           recsize = 0;
         }
       }
-    } while (i <= imax && !rc);
+    } while (i <= maxFiles && !rc);
     recsize = filesize[i - 1];
 
     if (hasMarks && index) {
@@ -3704,7 +3702,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skinflatplus: FSK icon not found: %s", *iconName);
+      isyslog("skin flatPlus: FSK icon not found: %s", *iconName);
       img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
       if (img) {
         contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -3722,7 +3720,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skinflatplus: Genre icon not found: %s", *iconName);
+      isyslog("skin flatPlus: Genre icon not found: %s", *iconName);
       if (!isUnknownDrawn) {
         img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
         if (img) {
@@ -3788,7 +3786,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         episodeId = call.episodeId;
         movieId = call.movieId;
       }
-      if (seriesId > 0) {
+      if (call.type == tSeries) {
         cSeries series;
         series.seriesId = seriesId;
         series.episodeId = episodeId;
@@ -3823,7 +3821,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
           if (series.episode.number > 0)
             series_info << tr("episode number: ") << series.episode.number << "\n";
         }
-      } else if (movieId > 0) {
+      } else if (call.type == tMovie) {
         cMovie movie;
         movie.movieId = movieId;
         if (pScraper->Service("GetMovie", &movie)) {
@@ -4571,7 +4569,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
     }
     break;
   default:
-    isyslog("skinflatplus: Genre not found: %x", genre);
+    isyslog("skin flatPlus: Genre not found: %x", genre);
   }
   return "";
 }

@@ -110,11 +110,11 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   if (osd) {
     tArea Area = {0, 0, width, height, 32};
     if (osd->SetAreas(&Area, 1) == oeOk) {
-      dsyslog("skinflatplus: create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+      dsyslog("skin flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
       return;
     }
   }
-  esyslog("skinflatplus: create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+  esyslog("skin flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
   return;
 }
 
@@ -152,15 +152,15 @@ void cFlatBaseRender::TopBarCreate(void) {
 
   topBarPixmap = CreatePixmap(1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  // dsyslog("skin flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconBGPixmap = CreatePixmap(2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                              osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  // dsyslog("skin flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
   //         osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconPixmap = CreatePixmap(3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skinflatplus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  // dsyslog("skin flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarPixmap->Fill(clrTransparent);
   topBarIconBGPixmap->Fill(clrTransparent);
@@ -659,7 +659,7 @@ void cFlatBaseRender::ButtonsCreate(void) {
   buttonsPixmap = CreatePixmap(1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
   buttonsPixmap->Fill(clrTransparent);
-  // dsyslog("skinflatplus: buttonsPixmap left: %d top: %d width: %d height: %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
+  // dsyslog("skin flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
   //         Config.decorBorderButtonSize*2, buttonsHeight);
 }
 
@@ -828,9 +828,9 @@ void cFlatBaseRender::MessageCreate(void) {
       5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
   messageIconPixmap->Fill(clrTransparent);
 
-  // dsyslog("skinflatplus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  // dsyslog("skin flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
   //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
-  // dsyslog("skinflatplus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  // dsyslog("skin flatPlus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
   //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
 
   messageScroller.SetOsd(osd);
@@ -864,7 +864,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
   messagePixmap->Fill(Theme.Color(clrMessageBg));
   messageScroller.Clear();
 
-  cImage *img = imgLoader.LoadIcon(icon, fontHeight, fontHeight);
+  cImage *img = imgLoader.LoadIcon(*icon, fontHeight, fontHeight);
   if (img) {
     messageIconPixmap->DrawImage(cPoint(marginItem + 10, marginItem), *img);
   }

@@ -733,7 +733,7 @@ void cFlatSetupGeneral::Setup(void) {
         SetupConfig->DecorIndex = 0;
 
     if( DecorDescriptions.Size() == 0 ) {
-        esyslog("skinflatplus: no decor files found, please check your installation!");
+        esyslog("skin flatPlus: No decor files found, please check your installation!");
         Add(new cOsdItem(tr("no decorfiles found, check install"), osUnknown, false));
     } else
         Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(), &DecorDescriptions[0]));
@@ -745,7 +745,7 @@ void cFlatSetupGeneral::Setup(void) {
 
     ConfigFileSelection = 0;
     if( ConfigFiles.Size() == 0 ) {
-        esyslog("skinflatplus: no config files found, please check your installation!");
+        esyslog("skin flatPlus: No config files found, please check your installation!");
         Add(new cOsdItem(tr("no config-files found, check install"), osUnknown, false));
     } else
         Add(new cMenuEditStraItem(tr("Press ok to load config file"), &ConfigFileSelection, ConfigFiles.Size(), &ConfigFiles[0]));

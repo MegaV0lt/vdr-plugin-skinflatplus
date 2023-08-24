@@ -91,7 +91,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
       else if (recInfo->Errors() >= RecErrIconTreshold)
         RecErrIcon = "recording_error_replay";
 
-      cImage *imgRecErr = imgLoader.LoadIcon(RecErrIcon, 999, fontSmlHeight);  // Small image
+      cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
       if (imgRecErr != NULL) {
         //imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
         iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
@@ -317,7 +317,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 filesize[i] = filesize[i-1] + filebuf.st_size;
             else {
                 if (ENOENT != errno) {
-                    esyslog ("skinflatplus: error determining file size of \"%s\" %d (%s)",
+                    esyslog ("skin flatPlus: Error determining file size of \"%s\" %d (%s)",
                              (const char *)filename, errno, strerror(errno));
                 }
             }
@@ -378,7 +378,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 episodeId = call.episodeId;
                 movieId = call.movieId;
             }
-            if (seriesId > 0) {
+            if (call.type == tSeries) {
                 cSeries series;
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
@@ -389,7 +389,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize * 100;
                     }
                 }
-            } else if (movieId > 0) {
+            } else if (call.type == tMovie) {
                 cMovie movie;
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
