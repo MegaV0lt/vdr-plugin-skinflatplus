@@ -125,16 +125,16 @@ void cFlatSetup::Setup(void) {
 
     // first try scraper2vdr
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if( !pScraper ) // if it doesn't exit, try tvscraper
+    if (!pScraper) // if it doesn't exit, try tvscraper
         pScraper = cPluginManager::GetPlugin("tvscraper");
-    if( pScraper )
+    if (pScraper)
         Add(new cOsdItem(tr("TVScraper / scraper2vdr settings"), osUnknown, true));
     else
         Add(new cOsdItem(tr("TVScraper / scraper2vdr not installed"), osUnknown, false));
 
     Add(new cOsdItem(tr("Main menu widgets settings"), osUnknown, true));
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -338,11 +338,11 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
     cString Filename = cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
 
     FILE *f = fopen(Filename, "r");
-    if( f ) {
+    if (f) {
         int line = 0;
         char *s;
         cReadLine ReadLine;
-        while( (s = ReadLine.Read(f)) != NULL ) {
+        while ((s = ReadLine.Read(f)) != NULL) {
             line++;
             char *p = strchr(s, '#');
             if (p)
@@ -356,13 +356,13 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
                     bool success = SetupParse(n, v);
-                    if( !success )
-                        dsyslog("flatplus: failed to load config: %s with value: %s", n, v);
+                    if (!success)
+                        dsyslog("skin flatPlus: Failed to load config: %s with value: %s", n, v);
                 }
             }
         }
     } else
-        dsyslog("flatplus: failed to load config: file <%s> not found", *Filename);
+        dsyslog("skin flatPlus: Failed to load config: file <%s> not found", *Filename);
     cString msg = cString::sprintf("%s %s %s", tr("configfile"), ConfigFiles[ConfigFileSelection], tr("loaded"));
     Skins.Message(mtInfo, msg);
 }
@@ -540,9 +540,8 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     cString Filename = cString::sprintf("%s/configs/%s", PLUGINRESOURCEPATH, *File);
 
     // if file exist remove it
-    if( access( Filename, F_OK ) != -1 ) {
+    if (access(Filename, F_OK) != -1)
         remove(Filename);
-    }
 
     Config.Store("decorBorderChannelByTheme", SetupConfig->decorBorderChannelByTheme, *Filename);
     Config.Store("decorBorderChannelTypeUser", SetupConfig->decorBorderChannelTypeUser, *Filename);
@@ -720,7 +719,7 @@ cOsdItem *cMenuSetupSubMenu::InfoItem(const char *label, const char *value) {
 }
 
 // General Settings
-cFlatSetupGeneral::cFlatSetupGeneral(cFlatConfig* data)  : cMenuSetupSubMenu(tr("General settings"), data) {
+cFlatSetupGeneral::cFlatSetupGeneral(cFlatConfig* data) : cMenuSetupSubMenu(tr("General settings"), data) {
     Setup();
 }
 
@@ -729,22 +728,22 @@ void cFlatSetupGeneral::Setup(void) {
 
     DecorDescriptions.Clear();
     SetupConfig->DecorDescriptions( DecorDescriptions );
-    if( SetupConfig->DecorIndex < 0 || SetupConfig->DecorIndex > DecorDescriptions.Size() )
+    if (SetupConfig->DecorIndex < 0 || SetupConfig->DecorIndex > DecorDescriptions.Size())
         SetupConfig->DecorIndex = 0;
 
-    if( DecorDescriptions.Size() == 0 ) {
+    if (DecorDescriptions.Size() == 0) {
         esyslog("skin flatPlus: No decor files found, please check your installation!");
         Add(new cOsdItem(tr("no decorfiles found, check install"), osUnknown, false));
     } else
         Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(), &DecorDescriptions[0]));
 
     ConfigFiles.Clear();
-    SetupConfig->GetConfigFiles( ConfigFiles );
-    for(int i = 0; i < ConfigFiles.Size(); i++)
+    SetupConfig->GetConfigFiles(ConfigFiles);
+    for (int i = 0; i < ConfigFiles.Size(); i++)
         dsyslog("ConfigFile: %s", ConfigFiles[i]);
 
     ConfigFileSelection = 0;
-    if( ConfigFiles.Size() == 0 ) {
+    if (ConfigFiles.Size() == 0) {
         esyslog("skin flatPlus: No config files found, please check your installation!");
         Add(new cOsdItem(tr("no config-files found, check install"), osUnknown, false));
     } else
@@ -770,7 +769,7 @@ void cFlatSetupGeneral::Setup(void) {
     Add(new cMenuEditStraItem(tr("Message color position"), &SetupConfig->MessageColorPosition, MessageColorPositions.Size(), &MessageColorPositions[0]));
 
     Add(new cMenuEditBoolItem(tr("Use Textscroller?"), &SetupConfig->ScrollerEnable));
-    if( SetupConfig->ScrollerEnable ) {
+    if (SetupConfig->ScrollerEnable) {
         Add(new cMenuEditIntItem(tr("Scroller step (in pixel)"), &SetupConfig->ScrollerStep));
         Add(new cMenuEditIntItem(tr("Scroller delay (in ms)"), &SetupConfig->ScrollerDelay));
         Add(new cMenuEditStraItem(tr("Scroller type"), &SetupConfig->ScrollerType, ScrollerTypes.Size(), &ScrollerTypes[0]));
@@ -784,7 +783,7 @@ void cFlatSetupGeneral::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("TopBar border by decor-file?"), &SetupConfig->decorBorderTopBarByTheme));
-    if( SetupConfig->decorBorderTopBarByTheme ) {
+    if (SetupConfig->decorBorderTopBarByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("TopBar border type"), Bordertypes[SetupConfig->decorBorderTopBarTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("TopBar border size"), SetupConfig->decorBorderTopBarSizeTheme);
@@ -795,7 +794,7 @@ void cFlatSetupGeneral::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Message border by decor-file?"), &SetupConfig->decorBorderMessageByTheme));
-    if( SetupConfig->decorBorderMessageByTheme ) {
+    if (SetupConfig->decorBorderMessageByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Message border type"), Bordertypes[SetupConfig->decorBorderMessageTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Message border size"), SetupConfig->decorBorderMessageSizeTheme);
@@ -806,7 +805,7 @@ void cFlatSetupGeneral::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Button border by decor-file?"), &SetupConfig->decorBorderButtonByTheme));
-    if( SetupConfig->decorBorderButtonByTheme ) {
+    if (SetupConfig->decorBorderButtonByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Button border type"), Bordertypes[SetupConfig->decorBorderButtonTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Button border size"), SetupConfig->decorBorderButtonSizeTheme);
@@ -819,7 +818,7 @@ void cFlatSetupGeneral::Setup(void) {
     cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), imgCache.getCacheCount(), MAX_IMAGE_CACHE);
     Add(new cOsdItem(ImageCache, osUnknown, true));
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -834,10 +833,10 @@ eOSState cFlatSetupGeneral::ProcessKey(eKeys Key) {
             case kOk:
             {
                 const char* ItemText = Get(Current())->Text();
-                if( strstr(ItemText, tr("Save current settings")) != NULL ) {
+                if (strstr(ItemText, tr("Save current settings")) != NULL) {
                     SaveCurrentSettings();
                     return osUnknown;
-                } else if( strstr(ItemText, tr("Press ok to load config file")) != NULL ) {
+                } else if (strstr(ItemText, tr("Press ok to load config file")) != NULL) {
                     LoadConfigFile();
                     return osBack;
                 } else {
@@ -848,22 +847,21 @@ eOSState cFlatSetupGeneral::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("TopBar border by decor-file?")) != NULL ||
+        if (strstr(ItemText, tr("TopBar border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Message border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Use Textscroller?")) != NULL ||
-            strstr(ItemText, tr("Button border by decor-file?")) != NULL
-        ) {
-            ItemLastSel = Current();
-            Setup();
+            strstr(ItemText, tr("Button border by decor-file?")) != NULL) {
+              ItemLastSel = Current();
+              Setup();
         }
     }
     return state;
 }
 
 // Channel Info Settings
-cFlatSetupChannelInfo::cFlatSetupChannelInfo(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Channelinfo settings"), data) {
+cFlatSetupChannelInfo::cFlatSetupChannelInfo(cFlatConfig* data) : cMenuSetupSubMenu(tr("Channelinfo settings"), data) {
     Setup();
 }
 
@@ -888,7 +886,7 @@ void cFlatSetupChannelInfo::Setup(void) {
     Add(new cMenuEditStraItem(tr("program past/remaining time format"), &SetupConfig->ChannelTimeLeft, ChannelTimeLefts.Size(), &ChannelTimeLefts[0]));
 
     Add(new cMenuEditBoolItem(tr("Channelinfo border by decor-file?"), &SetupConfig->decorBorderChannelByTheme));
-    if( SetupConfig->decorBorderChannelByTheme ) {
+    if (SetupConfig->decorBorderChannelByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Channelinfo border type"), Bordertypes[SetupConfig->decorBorderChannelTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Channelinfo border size"), SetupConfig->decorBorderChannelSizeTheme);
@@ -899,7 +897,7 @@ void cFlatSetupChannelInfo::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Channelinfo EPG border by decor-file?"), &SetupConfig->decorBorderChannelEPGByTheme));
-    if( SetupConfig->decorBorderChannelEPGByTheme ) {
+    if (SetupConfig->decorBorderChannelEPGByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Channelinfo EPG border type"), Bordertypes[SetupConfig->decorBorderChannelEPGTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Channelinfo EPG border size"), SetupConfig->decorBorderChannelEPGSizeTheme);
@@ -910,7 +908,7 @@ void cFlatSetupChannelInfo::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Channelinfo progress by decor-file?"), &SetupConfig->decorProgressChannelByTheme));
-    if( SetupConfig->decorProgressChannelByTheme ) {
+    if (SetupConfig->decorProgressChannelByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Channelinfo progress type"), Progresstypes[SetupConfig->decorProgressChannelTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Channelinfo progress size"), SetupConfig->decorProgressChannelSizeTheme);
@@ -921,7 +919,7 @@ void cFlatSetupChannelInfo::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Signalquality progress by decor-file?"), &SetupConfig->decorProgressSignalByTheme));
-    if( SetupConfig->decorProgressSignalByTheme ) {
+    if (SetupConfig->decorProgressSignalByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Signalquality progress type"), Progresstypes[SetupConfig->decorProgressSignalTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Signalquality progress size"), SetupConfig->decorProgressSignalSizeTheme);
@@ -931,7 +929,7 @@ void cFlatSetupChannelInfo::Setup(void) {
         Add(new cMenuEditIntItem(tr("Signalquality progress size"), &SetupConfig->decorProgressSignalSizeUser));
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -949,13 +947,12 @@ eOSState cFlatSetupChannelInfo::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Channelinfo border by decor-file?")) != NULL ||
+        if (strstr(ItemText, tr("Channelinfo border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Channelinfo EPG border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Channelinfo progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Signalquality progress by decor-file?")) != NULL
-        ) {
+            strstr(ItemText, tr("Signalquality progress by decor-file?")) != NULL) {
             ItemLastSel = Current();
             Setup();
         }
@@ -964,7 +961,7 @@ eOSState cFlatSetupChannelInfo::ProcessKey(eKeys Key) {
 }
 
 // Menu Settings
-cFlatSetupMenu::cFlatSetupMenu(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Menu settings"), data) {
+cFlatSetupMenu::cFlatSetupMenu(cFlatConfig* data) : cMenuSetupSubMenu(tr("Menu settings"), data) {
     Setup();
 }
 
@@ -995,7 +992,7 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditStraItem(tr("Menu recording view"), &SetupConfig->MenuRecordingView, MenuRecordingViews.Size(), &MenuRecordingViews[0]));
 
     Add(new cMenuEditBoolItem(tr("Scrollbar by decor-file?"), &SetupConfig->decorScrollBarByTheme));
-    if( SetupConfig->decorScrollBarByTheme ) {
+    if (SetupConfig->decorScrollBarByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Scrollbar type"), ScrollBarTypes[SetupConfig->decorScrollBarTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Scrollbar size"), SetupConfig->decorScrollBarSizeTheme);
@@ -1006,7 +1003,7 @@ void cFlatSetupMenu::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Menuitem border by decor-file?"), &SetupConfig->decorBorderMenuItemByTheme));
-    if( SetupConfig->decorBorderMenuItemByTheme ) {
+    if (SetupConfig->decorBorderMenuItemByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Menuitem border type"), Bordertypes[SetupConfig->decorBorderMenuItemTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Menuitem border size"), SetupConfig->decorBorderMenuItemSizeTheme);
@@ -1017,7 +1014,7 @@ void cFlatSetupMenu::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Menucont. border by decor-file?"), &SetupConfig->decorBorderMenuContentByTheme));
-    if( SetupConfig->decorBorderMenuContentByTheme ) {
+    if (SetupConfig->decorBorderMenuContentByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Menucont. border type"), Bordertypes[SetupConfig->decorBorderMenuContentTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Menucont. border size"), SetupConfig->decorBorderMenuContentSizeTheme);
@@ -1028,7 +1025,7 @@ void cFlatSetupMenu::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Menucont. head border by decor-file?"), &SetupConfig->decorBorderMenuContentHeadByTheme));
-    if( SetupConfig->decorBorderMenuContentHeadByTheme ) {
+    if (SetupConfig->decorBorderMenuContentHeadByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Menucont. head border type"), Bordertypes[SetupConfig->decorBorderMenuContentHeadTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Menucont. head border size"), SetupConfig->decorBorderMenuContentHeadSizeTheme);
@@ -1039,7 +1036,7 @@ void cFlatSetupMenu::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Menuitem progress by decor-file?"), &SetupConfig->decorProgressMenuItemByTheme));
-    if( SetupConfig->decorProgressMenuItemByTheme ) {
+    if (SetupConfig->decorProgressMenuItemByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Menuitem progress type"), Progresstypes[SetupConfig->decorProgressMenuItemTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Menuitem progress size"), SetupConfig->decorProgressMenuItemSizeTheme);
@@ -1049,7 +1046,7 @@ void cFlatSetupMenu::Setup(void) {
         Add(new cMenuEditIntItem(tr("Menuitem progress size"), &SetupConfig->decorProgressMenuItemSizeUser));
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1067,14 +1064,13 @@ eOSState cFlatSetupMenu::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Menuitem border by decor-file?")) != NULL ||
+        if (strstr(ItemText, tr("Menuitem border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Menucont. border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Menucont. head border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Menuitem progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Scrollbar by decor-file?")) != NULL
-        ) {
+            strstr(ItemText, tr("Scrollbar by decor-file?")) != NULL) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1083,7 +1079,7 @@ eOSState cFlatSetupMenu::ProcessKey(eKeys Key) {
 }
 
 // Replay Settings
-cFlatSetupReplay::cFlatSetupReplay(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Replay settings"), data) {
+cFlatSetupReplay::cFlatSetupReplay(cFlatConfig* data) : cMenuSetupSubMenu(tr("Replay settings"), data) {
     Setup();
 }
 
@@ -1097,7 +1093,7 @@ void cFlatSetupReplay::Setup(void) {
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
 
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
-    if( SetupConfig->RecordingDimmOnPause ) {
+    if (SetupConfig->RecordingDimmOnPause) {
         Add(new cMenuEditIntItem(tr("Dimm on pause delay"), &SetupConfig->RecordingDimmOnPauseDelay));
         Add(new cMenuEditIntItem(tr("Dimm on pause opaque"), &SetupConfig->RecordingDimmOnPauseOpaque));
     } else {
@@ -1107,7 +1103,7 @@ void cFlatSetupReplay::Setup(void) {
         Add(new cOsdItem(size, osUnknown, false));
     }
     Add(new cMenuEditBoolItem(tr("Replay border by decor-file?"), &SetupConfig->decorBorderReplayByTheme));
-    if( SetupConfig->decorBorderReplayByTheme ) {
+    if (SetupConfig->decorBorderReplayByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Replay border type"), Bordertypes[SetupConfig->decorBorderReplayTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Replay border size"), SetupConfig->decorBorderReplaySizeTheme);
@@ -1118,14 +1114,14 @@ void cFlatSetupReplay::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Replay progress by decor-file?"), &SetupConfig->decorProgressReplayByTheme));
-    if( SetupConfig->decorProgressReplayByTheme ) {
+    if (SetupConfig->decorProgressReplayByTheme) {
         cString size = cString::sprintf("%s:\t%d", tr("Replay progress size"), SetupConfig->decorProgressReplaySizeTheme);
         Add(new cOsdItem(size, osUnknown, false));
     } else {
         Add(new cMenuEditIntItem(tr("Replay progress size"), &SetupConfig->decorProgressReplaySizeUser));
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1145,10 +1141,9 @@ eOSState cFlatSetupReplay::ProcessKey(eKeys Key) {
     }
     if( Key == kLeft || Key == kRight ) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Replay border by decor-file?")) != NULL ||
+        if (strstr(ItemText, tr("Replay border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Replay progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Dimm on pause?")) != NULL
-        ) {
+            strstr(ItemText, tr("Dimm on pause?")) != NULL) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1157,7 +1152,7 @@ eOSState cFlatSetupReplay::ProcessKey(eKeys Key) {
 }
 
 // Volume Settings
-cFlatSetupVolume::cFlatSetupVolume(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Volume settings"), data) {
+cFlatSetupVolume::cFlatSetupVolume(cFlatConfig* data) : cMenuSetupSubMenu(tr("Volume settings"), data) {
     Setup();
 }
 
@@ -1165,7 +1160,7 @@ void cFlatSetupVolume::Setup(void) {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Volume border by decor-file?"), &SetupConfig->decorBorderVolumeByTheme));
-    if( SetupConfig->decorBorderVolumeByTheme ) {
+    if (SetupConfig->decorBorderVolumeByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Volume border type"), Bordertypes[SetupConfig->decorBorderVolumeTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Volume border size"), SetupConfig->decorBorderVolumeSizeTheme);
@@ -1176,7 +1171,7 @@ void cFlatSetupVolume::Setup(void) {
     }
 
     Add(new cMenuEditBoolItem(tr("Volume progress by decor-file?"), &SetupConfig->decorProgressVolumeByTheme));
-    if( SetupConfig->decorProgressVolumeByTheme ) {
+    if (SetupConfig->decorProgressVolumeByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Volume progress type"), Progresstypes[SetupConfig->decorProgressVolumeTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Volume progress size"), SetupConfig->decorProgressVolumeSizeTheme);
@@ -1186,7 +1181,7 @@ void cFlatSetupVolume::Setup(void) {
         Add(new cMenuEditIntItem(tr("Volume progress size"), &SetupConfig->decorProgressVolumeSizeUser));
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1204,11 +1199,10 @@ eOSState cFlatSetupVolume::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Volume border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Volume progress by decor-file?")) != NULL
-        ) {
+        if (strstr(ItemText, tr("Volume border by decor-file?")) != NULL ||
+            strstr(ItemText, tr("Volume progress by decor-file?")) != NULL) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1217,7 +1211,7 @@ eOSState cFlatSetupVolume::ProcessKey(eKeys Key) {
 }
 
 // Tracks Settings
-cFlatSetupTracks::cFlatSetupTracks(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Tracks settings"), data) {
+cFlatSetupTracks::cFlatSetupTracks(cFlatConfig* data) : cMenuSetupSubMenu(tr("Tracks settings"), data) {
     Setup();
 }
 
@@ -1225,7 +1219,7 @@ void cFlatSetupTracks::Setup(void) {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Tracks border by decor-file?"), &SetupConfig->decorBorderTrackByTheme));
-    if( SetupConfig->decorBorderTrackByTheme ) {
+    if (SetupConfig->decorBorderTrackByTheme) {
         cString type = cString::sprintf("%s:\t%s", tr("Tracks border type"), Bordertypes[SetupConfig->decorBorderTrackTypeTheme]);
         Add(new cOsdItem(type, osUnknown, false));
         cString size = cString::sprintf("%s:\t%d", tr("Tracks border size"), SetupConfig->decorBorderTrackSizeTheme);
@@ -1235,7 +1229,7 @@ void cFlatSetupTracks::Setup(void) {
         Add(new cMenuEditIntItem(tr("Tracks border size"), &SetupConfig->decorBorderTrackSizeUser));
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1253,10 +1247,9 @@ eOSState cFlatSetupTracks::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Tracks border by decor-file?")) != NULL
-        ) {
+        if (strstr(ItemText, tr("Tracks border by decor-file?")) != NULL) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1265,7 +1258,7 @@ eOSState cFlatSetupTracks::ProcessKey(eKeys Key) {
 }
 
 // TVScraper Settings
-cFlatSetupTvsraper::cFlatSetupTvsraper(cFlatConfig* data)  : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
+cFlatSetupTvsraper::cFlatSetupTvsraper(cFlatConfig* data) : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
     Setup();
 }
 
@@ -1277,11 +1270,11 @@ void cFlatSetupTvsraper::Setup(void) {
     Add(new cMenuEditBoolItem(tr("Replayinfo show poster?"), &SetupConfig->TVScraperReplayInfoShowPoster));
     Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015, 2));
     Add(new cMenuEditBoolItem(tr("EPG info show poster?"), &SetupConfig->TVScraperEPGInfoShowPoster));
-    Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
+    Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("recording info show actors?"), &SetupConfig->TVScraperRecInfoShowActors));
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1303,7 +1296,7 @@ eOSState cFlatSetupTvsraper::ProcessKey(eKeys Key) {
 }
 
 // Main Menu Widgets Settings
-cFlatSetupMMWidget::cFlatSetupMMWidget(cFlatConfig* data)  : cMenuSetupSubMenu(tr("Main menu widgets settings"), data) {
+cFlatSetupMMWidget::cFlatSetupMMWidget(cFlatConfig* data) : cMenuSetupSubMenu(tr("Main menu widgets settings"), data) {
     Setup();
 }
 
@@ -1311,12 +1304,12 @@ void cFlatSetupMMWidget::Setup(void) {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Enable main menu widgets"), &SetupConfig->MainMenuWidgetsEnable));
-    if( SetupConfig->MainMenuWidgetsEnable ) {
+    if (SetupConfig->MainMenuWidgetsEnable) {
         Add(new cMenuEditPrcItem(tr("Main menu item scale"), &SetupConfig->MainMenuItemScale, 0.3, 0.7, 0));
 
         Add(new cOsdItem(tr("Widget weather"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget weather: enable"), &SetupConfig->MainMenuWidgetWeatherShow));
-        if( SetupConfig->MainMenuWidgetWeatherShow ) {
+        if (SetupConfig->MainMenuWidgetWeatherShow) {
             Add(new cMenuEditIntItem(tr("Widget weather: position"), &SetupConfig->MainMenuWidgetWeatherPosition));
             Add(new cMenuEditIntItem(tr("Widget weather: show days"), &SetupConfig->MainMenuWidgetWeatherDays));
             Add(new cMenuEditStraItem(tr("Widget weather: type"), &SetupConfig->MainMenuWidgetWeatherType, WeatherTypes.Size(), &WeatherTypes[0]));
@@ -1324,7 +1317,7 @@ void cFlatSetupMMWidget::Setup(void) {
 
         Add(new cOsdItem(tr("Widget DVB devices"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget DVB devices: enable"), &SetupConfig->MainMenuWidgetDVBDevicesShow));
-        if( SetupConfig->MainMenuWidgetDVBDevicesShow ) {
+        if (SetupConfig->MainMenuWidgetDVBDevicesShow) {
             Add(new cMenuEditIntItem(tr("Widget DVB devices: position"), &SetupConfig->MainMenuWidgetDVBDevicesPosition));
             Add(new cMenuEditBoolItem(tr("Widget DVB devices: don't show unknown"), &SetupConfig->MainMenuWidgetDVBDevicesDiscardUnknown));
             Add(new cMenuEditBoolItem(tr("Widget DVB devices: don't show not used"), &SetupConfig->MainMenuWidgetDVBDevicesDiscardNotUsed));
@@ -1333,7 +1326,7 @@ void cFlatSetupMMWidget::Setup(void) {
 
         Add(new cOsdItem(tr("Widget timer"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget timer: enable"), &SetupConfig->MainMenuWidgetActiveTimerShow));
-        if( SetupConfig->MainMenuWidgetActiveTimerShow ) {
+        if (SetupConfig->MainMenuWidgetActiveTimerShow) {
             Add(new cMenuEditIntItem(tr("Widget timer: position"), &SetupConfig->MainMenuWidgetActiveTimerPosition));
             Add(new cMenuEditBoolItem(tr("Widget timer: show recording timer"), &SetupConfig->MainMenuWidgetActiveTimerShowRecording));
             Add(new cMenuEditBoolItem(tr("Widget timer: show active timer"), &SetupConfig->MainMenuWidgetActiveTimerShowActive));
@@ -1345,45 +1338,45 @@ void cFlatSetupMMWidget::Setup(void) {
 
         Add(new cOsdItem(tr("Widget last recordings"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget last recordings: enable"), &SetupConfig->MainMenuWidgetLastRecShow));
-        if( SetupConfig->MainMenuWidgetLastRecShow ) {
+        if (SetupConfig->MainMenuWidgetLastRecShow) {
             Add(new cMenuEditIntItem(tr("Widget last recordings: position"), &SetupConfig->MainMenuWidgetLastRecPosition));
             Add(new cMenuEditIntItem(tr("Widget last recordings: max show"), &SetupConfig->MainMenuWidgetLastRecMaxCount));
         }
 
         Add(new cOsdItem(tr("Widget timer conflicts"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget timer conflicts: enable"), &SetupConfig->MainMenuWidgetTimerConflictsShow));
-        if( SetupConfig->MainMenuWidgetTimerConflictsShow ) {
+        if (SetupConfig->MainMenuWidgetTimerConflictsShow) {
             Add(new cMenuEditIntItem(tr("Widget timer conflicts: position"), &SetupConfig->MainMenuWidgetTimerConflictsPosition));
             Add(new cMenuEditBoolItem(tr("Widget timer conflicts: hide if empty"), &SetupConfig->MainMenuWidgetTimerConflictsHideEmpty));
         }
 
         Add(new cOsdItem(tr("Widget system information"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget system information: enable"), &SetupConfig->MainMenuWidgetSystemInfoShow));
-        if( SetupConfig->MainMenuWidgetSystemInfoShow ) {
+        if (SetupConfig->MainMenuWidgetSystemInfoShow) {
             Add(new cMenuEditIntItem(tr("Widget system information: position"), &SetupConfig->MainMenuWidgetSystemInfoPosition));
         }
 
         Add(new cOsdItem(tr("Widget system updates"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget system updates: enable"), &SetupConfig->MainMenuWidgetSystemUpdatesShow));
-        if( SetupConfig->MainMenuWidgetSystemUpdatesShow ) {
+        if (SetupConfig->MainMenuWidgetSystemUpdatesShow) {
             Add(new cMenuEditIntItem(tr("Widget system updates: position"), &SetupConfig->MainMenuWidgetSystemUpdatesPosition));
             Add(new cMenuEditBoolItem(tr("Widget system updates: hide if empty"), &SetupConfig->MainMenuWidgetSystemUpdatesHideIfZero));
         }
 
         Add(new cOsdItem(tr("Widget temperatures"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget temperatures: enable"), &SetupConfig->MainMenuWidgetTemperaturesShow));
-        if( SetupConfig->MainMenuWidgetTemperaturesShow ) {
+        if (SetupConfig->MainMenuWidgetTemperaturesShow) {
             Add(new cMenuEditIntItem(tr("Widget temperatures: position"), &SetupConfig->MainMenuWidgetTemperaturesPosition));
         }
 
         Add(new cOsdItem(tr("Widget custom commands"), osUnknown, false));
         Add(new cMenuEditBoolItem(tr("Widget custom commands: enable"), &SetupConfig->MainMenuWidgetCommandShow));
-        if( SetupConfig->MainMenuWidgetCommandShow ) {
+        if (SetupConfig->MainMenuWidgetCommandShow) {
             Add(new cMenuEditIntItem(tr("Widget custom commands: position"), &SetupConfig->MainMenuWidgetCommandPosition));
         }
     }
 
-    if( ItemLastSel >= 0 ) {
+    if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
         ItemLastSel = -1;
     }
@@ -1401,9 +1394,9 @@ eOSState cFlatSetupMMWidget::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if( strstr(ItemText, tr("Enable main menu widgets")) != NULL ||
+        if (strstr(ItemText, tr("Enable main menu widgets")) != NULL ||
             strstr(ItemText, tr("Widget weather: enable")) != NULL ||
             strstr(ItemText, tr("Widget DVB devices: enable")) != NULL ||
             strstr(ItemText, tr("Widget timer: enable")) != NULL ||
@@ -1412,10 +1405,9 @@ eOSState cFlatSetupMMWidget::ProcessKey(eKeys Key) {
             strstr(ItemText, tr("Widget system information: enable")) != NULL ||
             strstr(ItemText, tr("Widget system updates: enable")) != NULL ||
             strstr(ItemText, tr("Widget temperatures: enable")) != NULL ||
-            strstr(ItemText, tr("Widget custom commands: enable")) != NULL
-        ) {
-            ItemLastSel = Current();
-            Setup();
+            strstr(ItemText, tr("Widget custom commands: enable")) != NULL) {
+              ItemLastSel = Current();
+              Setup();
         }
     }
     return state;
