@@ -78,9 +78,9 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 }
 
 __attribute__((constructor)) static void init(void) {
-   //Magick::InitializeMagick(NULL);
-   // Prevents *magick from occupying the segfaults
-   MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
+   Magick::InitializeMagick(NULL);
+   // Prevents *magick from occupying the segfaults (ImageMagick 7+)
+   //MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
 }
 
 bool cPluginFlat::Initialize(void) {
