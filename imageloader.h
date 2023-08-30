@@ -2,7 +2,6 @@
 
 #define X_DISPLAY_MISSING
 
-
 #include <vdr/osd.h>
 #include <vdr/skins.h>
 

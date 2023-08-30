@@ -1,5 +1,4 @@
-#ifndef _ImageScaler_h
-#define _ImageScaler_h
+#pragma once
 
 /*!
  * this class scales images consisting of 4 components (RGBA)
@@ -92,6 +91,3 @@ private:
 	unsigned   m_dst_x;        //! x position of next destination image pixel
 	unsigned   m_dst_y;        //! x position of next destination image line
 };
-
-#endif  // _ImageScaler_h
-

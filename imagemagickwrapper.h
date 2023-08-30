@@ -1,5 +1,4 @@
-#ifndef __NOPACITY_IMAGEMAGICKWRAPPER_H
-#define __NOPACITY_IMAGEMAGICKWRAPPER_H
+#pragma once
 
 #define X_DISPLAY_MISSING
 
@@ -19,5 +18,3 @@ protected:
     cImage CreateImageCopy(void);
     bool LoadImage(const char *fullpath);
 };
-
-#endif

@@ -341,12 +341,12 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         }
         cString newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);
         if (Config.ShortRecordingCount) {
-          if (recNewCount == 0) // 0 neue Aufnahmen
+          if (recNewCount == 0)              // No new recordings
             newTitle = cString::sprintf("%s (%d)", Title, recCount);
-          else if (recNewCount == recCount) // Nur neue Aufnahmen
+          else if (recNewCount == recCount)  // Only new recordings
             newTitle = cString::sprintf("%s (%d*)", Title, recNewCount);
-          else // Anzeige (35*/56)
-            newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);
+          //else  // Display (35*/56)        // Already processed above!
+          //  newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);
         }
         TopBarSetTitle(*newTitle);
       }
