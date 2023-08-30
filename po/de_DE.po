@@ -639,7 +639,7 @@ msgstr "Menü: Zeichne Hintergrund über gesamte Höhe"
 msgid "Recording menu show recording count in title"
 msgstr "Aufnahmen: Anzahl der Aufnahmen in Titelleiste"
 
-msgid "Recording menu recording seen treshold"
+msgid "Recording menu recording seen threshold"
 msgstr "Aufnahmen: Aufnahme gesehen Schwellwert"
 
 msgid "Recording menu default value - old folder in days"
@@ -648,7 +648,7 @@ msgstr "Aufnahmen: Vorgabe-Wert alter Ordner in Tagen"
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
-msgid "Recording recerrors icon treshold"
+msgid "Recording recerrors icon threshold"
 msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"
 
 msgid "Timer menu show timer count in title"

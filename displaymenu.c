@@ -2124,8 +2124,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         double FrameSeen = (double)FrameResume / (double)FrameTotal;
         cString SeenIcon("");
 
-        double seenTreshold = Config.MenuItemRecordingSeenTreshold * 100.0;
-        // dsyslog("Config.MenuItemRecordingSeenTreshold: %.2f\n", seenTreshold );
+        double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+        // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold );
 
         if (FrameSeen < 0.1)
           SeenIcon = "recording_seen_0";
@@ -2150,7 +2150,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         else
           SeenIcon = "recording_seen_10";
 
-        if (FrameSeen >= seenTreshold)
+        if (FrameSeen >= seenThreshold)
           SeenIcon = "recording_seen_10";
 
         cImage *imgSeen = NULL;
@@ -2167,16 +2167,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
-        int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
+        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
         cString RecErrIcon("recording_untested");
         if (recInfo->Errors() < 0) {         // -1 Untestet recording
           // RecErrIcon = "recording_untested";
         } else if (recInfo->Errors() == 0)    // No errors
           RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < RecErrIconTreshold)
+        else if (recInfo->Errors() < RecErrIconThreshold)
           RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= RecErrIconTreshold)
+        else if (recInfo->Errors() >= RecErrIconThreshold)
           RecErrIcon = "recording_error";
 
         cImage *imgRecErr = NULL;
@@ -2358,16 +2358,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
-        int RecErrIconTreshold = Config.MenuItemRecordingShowRecordingErrorsTreshold;
+        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
         cString RecErrIcon("recording_untested");
         if (recInfo->Errors() < 0) {         // -1 Untestet recording
           // RecErrIcon = "recording_untested";
         } else if (recInfo->Errors() == 0)    // No errors
           RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < RecErrIconTreshold)
+        else if (recInfo->Errors() < RecErrIconThreshold)
           RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= RecErrIconTreshold)
+        else if (recInfo->Errors() >= RecErrIconThreshold)
           RecErrIcon = "recording_error";
 
         cImage *imgRecErr = NULL;

@@ -148,5 +148,5 @@ MainMenuWidgetActiveTimerShowRemoteActive = 0
 MainMenuWidgetActiveTimerShowRemoteRecording = 0
 MainMenuWidgetActiveTimerShowRemoteRefreshTime = 1800
 ChannelDvbapiInfoShow = 1
-MenuItemRecordingSeenTreshold = 0.009800
+MenuItemRecordingSeenThreshold = 0.009800
 MenuItemRecordingDefaultOldDays = 10

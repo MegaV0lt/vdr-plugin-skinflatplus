@@ -37,12 +37,12 @@ VDR Plugin 'skinflatplus' Revision History
 
 2023-02-14: Version 0.6.3
 - [fix] workaround for extra pixel glitch in playback-time
-- [add] option for treshold to display recordingerroricons in recordingmenu
+- [add] option for threshold to display recordingerroricons in recordingmenu
 - [add] some extra space for number of new recordings in recordingmenu
 - [add] extra info for H.265 Video
 - [add] optional create temporary directory for the weather widget at systemstart
         - copy the file 'tmpfiles.d/skinflatplus.conf' to /usr/lib/tmpfiles.d/
-- [add] option for treshold to display recordingerroricons in recordingmenu
+- [add] option for threshold to display recordingerroricons in recordingmenu
 - [update] support for ImageMagick 7 (thanks to kamel5)
 - [update] use '#!/usr/bin/env bash' in shell scripts
 - [update] update_weather.sh: exit if weather data cold not be loaded
@@ -99,7 +99,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [add] displaychannel - dvbapi info
     you need oscam min rev 10653 and dvbapi min commit 85da7b2
 - [add] add italian translation (thanks to fiveten_59)
-- [add] option MenuItemRecordingSeenTreshold to set the treshold when a recording will be marked as seen
+- [add] option MenuItemRecordingSeenThreshold to set the threshold when a recording will be marked as seen
 - [add] plex-plugin icon (thanks MegaV0lt)
 - [add] mpv-plugin icon (thanks MegaV0lt)
 - [add] menu recordings - add exclamation mark icon for folders if last recording is older than XX days.

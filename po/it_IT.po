@@ -633,7 +633,7 @@ msgstr "Menü: traccia il background per l'intera altezza"
 msgid "Recording menu show recording count in title"
 msgstr "Menù registrazioni mostra la lunghezza nel titolo"
 
-msgid "Recording menu recording seen treshold"
+msgid "Recording menu recording seen threshold"
 msgstr ""
 
 msgid "Recording menu default value - old folder in days"
@@ -642,7 +642,7 @@ msgstr ""
 msgid "Recording menu show recerrors icon"
 msgstr ""
 
-msgid "Recording recerrors icon treshold"
+msgid "Recording recerrors icon threshold"
 msgstr ""
 
 msgid "Timer menu show timer count in title"

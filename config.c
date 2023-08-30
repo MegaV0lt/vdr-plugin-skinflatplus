@@ -75,7 +75,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingClearPercent = 1;
     MenuItemRecordingShowFolderDate = 1;
     MenuItemRecordingShowRecordingErrors = true;
-    MenuItemRecordingShowRecordingErrorsTreshold = 1000;  // Threshold for displaying error instead of warning
+    MenuItemRecordingShowRecordingErrorsThreshold = 1000;  // Threshold for displaying error instead of warning
     MenuItemParseTilde = 1;
 
     ScrollerEnable = 1;
@@ -130,7 +130,7 @@ cFlatConfig::cFlatConfig(void) {
     MainMenuWidgetWeatherDays = 5;
     MainMenuWidgetWeatherType = 0;
 
-    MenuItemRecordingSeenTreshold = 0.98 / 100.0;
+    MenuItemRecordingSeenThreshold = 0.98 / 100.0;
     MenuItemRecordingDefaultOldDays = -1;
 
     ChannelWeatherShow = 1;
@@ -344,10 +344,10 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenTreshold") == 0)        MenuItemRecordingSeenTreshold = atod(Value);
+    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)        MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsTreshold") == 0)      MenuItemRecordingShowRecordingErrorsTreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   MenuTimerShowCount = atoi(Value);

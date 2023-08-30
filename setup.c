@@ -288,10 +288,10 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuItemParseTilde", Config.MenuItemParseTilde);
     SetupStore("MenuItemRecordingClearPercent", Config.MenuItemRecordingClearPercent);
     SetupStore("MenuItemRecordingDefaultOldDays", Config.MenuItemRecordingDefaultOldDays);
-    SetupStore("MenuItemRecordingSeenTreshold", dtoa(Config.MenuItemRecordingSeenTreshold));
+    SetupStore("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold));
     SetupStore("MenuItemRecordingShowFolderDate", Config.MenuItemRecordingShowFolderDate);
     SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrors);
-    SetupStore("MenuItemRecordingShowRecordingErrorsTreshold", Config.MenuItemRecordingShowRecordingErrorsTreshold);
+    SetupStore("MenuItemRecordingShowRecordingErrorsThreshold", Config.MenuItemRecordingShowRecordingErrorsThreshold);
     SetupStore("MenuRecordingShowCount", Config.MenuRecordingShowCount);
     SetupStore("MenuRecordingView", Config.MenuRecordingView);
     SetupStore("MenuTimerShowCount", Config.MenuTimerShowCount);
@@ -483,10 +483,10 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)         SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenTreshold") == 0)        SetupConfig->MenuItemRecordingSeenTreshold = atod(Value);
+    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)        SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsTreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrorsTreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
@@ -658,10 +658,10 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuItemParseTilde", SetupConfig->MenuItemParseTilde, *Filename);
     Config.Store("MenuItemRecordingClearPercent", SetupConfig->MenuItemRecordingClearPercent, *Filename);
     Config.Store("MenuItemRecordingDefaultOldDays", SetupConfig->MenuItemRecordingDefaultOldDays, *Filename);
-    Config.Store("MenuItemRecordingSeenTreshold", dtoa(Config.MenuItemRecordingSeenTreshold), *Filename);
+    Config.Store("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold), *Filename);
     Config.Store("MenuItemRecordingShowFolderDate", SetupConfig->MenuItemRecordingShowFolderDate, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrors", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
-    Config.Store("MenuItemRecordingShowRecordingErrorsTreshold", dtoa(Config.MenuItemRecordingShowRecordingErrorsTreshold), *Filename);
+    Config.Store("MenuItemRecordingShowRecordingErrorsThreshold", dtoa(Config.MenuItemRecordingShowRecordingErrorsThreshold), *Filename);
     Config.Store("MenuRecordingShowCount", SetupConfig->MenuRecordingShowCount, *Filename);
     Config.Store("MenuRecordingView", SetupConfig->MenuRecordingView, *Filename);
     Config.Store("MenuTimerShowCount", SetupConfig->MenuTimerShowCount, *Filename);
@@ -977,10 +977,10 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditBoolItem(tr("Menu draw background over the entire height"), &SetupConfig->MenuFullOsd));
 
     Add(new cMenuEditBoolItem(tr("Recording menu show recording count in title"), &SetupConfig->MenuRecordingShowCount));
-    Add(new cMenuEditPrcItem(tr("Recording menu recording seen treshold"), &SetupConfig->MenuItemRecordingSeenTreshold, 0.008, 0.01, 2));
+    Add(new cMenuEditPrcItem(tr("Recording menu recording seen threshold"), &SetupConfig->MenuItemRecordingSeenThreshold, 0.008, 0.01, 2));
     Add(new cMenuEditIntItem(tr("Recording menu default value - old folder in days"), &SetupConfig->MenuItemRecordingDefaultOldDays, -1));
     Add(new cMenuEditBoolItem(tr("Recording menu show recerrors icon"), &SetupConfig->MenuItemRecordingShowRecordingErrors));
-    Add(new cMenuEditIntItem(tr("Recording recerrors icon treshold"), &SetupConfig->MenuItemRecordingShowRecordingErrorsTreshold, 1, 999999));
+    Add(new cMenuEditIntItem(tr("Recording recerrors icon threshold"), &SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold, 1, 999999));
 
     Add(new cMenuEditBoolItem(tr("Timer menu show timer count in title"), &SetupConfig->MenuTimerShowCount));
     Add(new cMenuEditBoolItem(tr("Channel menu show channel count in title"), &SetupConfig->MenuChannelShowCount));
