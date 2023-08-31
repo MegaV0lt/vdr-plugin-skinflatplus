@@ -15,7 +15,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     if (Osd && Pixmap)
         Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(Layer, Position, drawPort);
+    Pixmap = CreatePixmap(Osd, Layer, Position, drawPort);
     dsyslog("skin flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
             Position.Left(), Position.Top(), Position.Width(), Position.Height());
     dsyslog("skin flatPlus: TextScrollerPixmap drawPort left: %d top: %d width: %d height: %d",
@@ -24,23 +24,9 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Draw();
 }
 
-cPixmap *cTextScroll::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) {
-    cSize maxPixmapSize = Osd->MaxPixmapSize();
-    cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(), DrawPort.Height());
-
-    if (DrawPort.Width() > maxPixmapSize.Width()) {
-        dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize", DrawPort.Width(),
-                DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height() );
-        SafeDrawPort.SetWidth(maxPixmapSize.Width());
-    }
-    if (DrawPort.Height() > maxPixmapSize.Height()) {
-        dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
-                DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height() );
-        SafeDrawPort.SetHeight(maxPixmapSize.Height());
-    }
-
-    return Osd->CreatePixmap(Layer, ViewPort, SafeDrawPort);
-}
+/*cPixmap *cTextScroll::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) 
+  // Moved to flat.c
+ */
 
 void cTextScroll::UpdateViewPortWidth(int w) {
     cRect viewPort = Pixmap->ViewPort();
@@ -90,12 +76,12 @@ void cTextScroll::DoStep(void) {
     if (!Pixmap)
         return;
 
-    // wait at the beginning for better read
+    // Wait at the beginning for better read
     if (waitSteps > 0) {
         waitSteps--;
         return;
     }
-    // wait after return to the front
+    // Wait after return to the front
     if (ResetX) {
         ResetX = false;
         Pixmap->SetDrawPortPoint(cPoint(0, 0));
@@ -179,7 +165,7 @@ void cTextScrollers::StartScrolling(void) {
 }
 
 void cTextScrollers::Action(void) {
-    // wait 1 second so the osd is finished
+    // Wait 1 second so the osd is finished
     for (int i = 0; i < 100 && Running(); i++ ) {
         cCondWait::SleepMs(10);
     }

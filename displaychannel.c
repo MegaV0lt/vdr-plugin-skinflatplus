@@ -39,7 +39,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     channelHeight = osdHeight - Config.decorBorderChannelSize * 2;
     // von unten noch oben
     // 2*EPG + 2*EPGsml
-    heightBottom = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem; // Top, Buttom, Between
+    heightBottom = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem; // Top, Bottom, Between
     heightImageLogo = heightBottom;
     if (Config.SignalQualityShow)
         heightBottom += std::max(fontSmlHeight, (Config.decorProgressSignalSize * 2) + marginItem) + marginItem;
@@ -49,11 +49,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     int heightTop = fontHeight;
 
     int height = heightBottom;
-    chanInfoBottomPixmap = CreatePixmap(1, cRect(Config.decorBorderChannelSize,
+    chanInfoBottomPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightBottom));
     chanInfoBottomPixmap->Fill(Theme.Color(clrChannelBg));
 
-    chanIconsPixmap = CreatePixmap(2, cRect(Config.decorBorderChannelSize,
+    chanIconsPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize+channelHeight - height, channelWidth, heightBottom));
     chanIconsPixmap->Fill(clrTransparent);
 
@@ -62,14 +62,14 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     TVSHeight = osdHeight - topBarHeight - heightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     chanEpgImagesPixmap->Fill(clrTransparent);
 
-    chanLogoBGPixmap = CreatePixmap(2, cRect(Config.decorBorderChannelSize,
+    chanLogoBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
     chanLogoBGPixmap->Fill(clrTransparent);
 
-    chanLogoPixmap = CreatePixmap(3, cRect(Config.decorBorderChannelSize,
+    chanLogoPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
     chanLogoPixmap->Fill(clrTransparent);
 
@@ -81,7 +81,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ProgressBarDrawBgColor();
 
     height += heightTop;
-    chanInfoTopPixmap = CreatePixmap(1, cRect(Config.decorBorderChannelSize,
+    chanInfoTopPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightTop));
     chanInfoTopPixmap->Fill(clrTransparent);
 
@@ -494,11 +494,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    if( !doOutput )
+    if (!doOutput)
         return;
 
-    // Wenn es einen Text gibt, diesen Anzeigen ansonsten Message ausblenden
-    if( Text )
+    if (Text)
         MessageSet(Type, Text);
     else
         MessageClear();
@@ -509,7 +508,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
     int signalWidth = channelWidth / 2;
 
-    if( LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality )
+    if (LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality)
         return;
 
     LastSignalStrength = SignalStrength;
@@ -644,12 +643,12 @@ void cFlatDisplayChannel::Flush(void) {
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {
-    int height = (fontHeight*2) + (fontSmlHeight*2) + marginItem - marginItem * 2;
+    int height = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem - marginItem * 2;
     imgLoader.LoadIcon("logo_background", height, height);
     int imageBGHeight, imageBGWidth;
     imageBGHeight = imageBGWidth = height;
 
-    cImage *imgBG = imgLoader.LoadIcon("logo_background", height*1.34, height);
+    cImage *imgBG = imgLoader.LoadIcon("logo_background", height * 1.34, height);
     if( imgBG ) {
         imageBGHeight = imgBG->Height();
         imageBGWidth = imgBG->Width();
@@ -658,7 +657,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
     int index = 0;
-    height = ((fontHeight*2) + (fontSmlHeight*2) + marginItem) - marginItem * 2;
+    height = ((fontHeight * 2) + (fontSmlHeight * 2) + marginItem) - marginItem * 2;
     cImage *img = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;

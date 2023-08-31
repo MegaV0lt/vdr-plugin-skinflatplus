@@ -467,7 +467,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
       int xt = Tab(i);
 
       /* if (true) { */
-        // check for timer info symbols: " !#>" (EPGSearch searchtimer)
+        // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
         if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
           istimer = true; // update status
         } /* else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
@@ -508,7 +508,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
       xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
       if (istimer) {
-        // timer menu (EPGsearch searchtimer)
+        // Timer menu (EPGsearch searchtimer)
         switch (s[0]) {
         case '!':
           if (iconArrowTurn)
@@ -678,7 +678,7 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
   for (; i < text.length(); i++) {
     char s = text.at(i);
     if (i == 0) {
-      // if text directly starts with nonnumeric, break
+      // If text directly starts with nonnumeric, break
       if (!(s >= '0' && s <= '9'))
         break;
     }
@@ -705,7 +705,7 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
 }
 
 cString cFlatDisplayMenu::GetIconName(std::string element) {
-  // check for standard menu entries
+  // Check for standard menu entries
   for (int i = 0; i < 16; i++) {
     std::string s = trVDR(items[i].c_str());
     if (s == element) {
@@ -713,7 +713,7 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
       return menuIcon;
     }
   }
-  // check for special main menu entries "stop recording", "stop replay"
+  // Check for special main menu entries "stop recording", "stop replay"
   std::string stopRecording = skipspace(trVDR(" Stop recording "));
   std::string stopReplay = skipspace(trVDR(" Stop replaying"));
   try {
@@ -723,7 +723,7 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
       return "menuIcons/StopReplay";
   } catch (...) {
   }
-  // check for Plugins
+  // Check for plugins
   for (int i = 0;; i++) {
     cPlugin *p = cPluginManager::GetPlugin(i);
     if (p) {
@@ -789,7 +789,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
   int Height = fontHeight;
   menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
-  if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // 3 = flatPlus short, 4 = flatPlus short +EPG
+  if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short +EPG
     Height = fontHeight + fontSmlHeight + marginItem + Config.decorProgressMenuItemSize;
     menuItemWidth *= 0.5;
   }
@@ -906,7 +906,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
   LeftName = Left;
 
-  // event from channel
+  // Event from channel
 #if VDRVERSNUM >= 20301
   LOCK_SCHEDULES_READ;
   const cSchedule *Schedule = Schedules->GetSchedule(Channel);
@@ -918,7 +918,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
   if (Schedule) {
     Event = Schedule->GetPresentEvent();
     if (Event) {
-      // calculate progress bar
+      // Calculate progress bar
       progress = (int)roundf((float)(time(NULL) - Event->StartTime()) / (float)(Event->Duration()) * 100.0);
       if (progress < 0)
         progress = 0.;
@@ -934,7 +934,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
   else
     buffer = cString::sprintf("%s", Channel->Name());
 
-  if (Config.MenuChannelView == 1) {  // 1 = flatPlus long
+  if (Config.MenuChannelView == 1) {  // flatPlus long
     Width = menuItemWidth - LeftName;
     if (Channel->GroupSep()) {
       int lineTop = Top + (fontHeight - 3) / 2;
@@ -955,7 +955,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (isScrolling)
       Width = (menuItemWidth + scrollBarWidth) / 10 * 2;
 
-    if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // 3 = flatPlus short, 4 = flatPlus short + EPG
+    if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
       Width = menuItemWidth - LeftName;
 
     if (Channel->GroupSep()) {
@@ -979,7 +979,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                     Config.decorBorderMenuItemSize;
         int PBLeft = Left;
         int PBWidth = menuItemWidth / 10;
-        if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // 3 = flatPlus short, 4 = flatPlus short + EPG
+        if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short + EPG
           PBTop = Top + fontHeight + fontSmlHeight;
           PBLeft = Left - Width - marginItem;
           PBWidth = menuItemWidth - LeftName - marginItem * 2 - Config.decorBorderMenuItemSize - scrollBarWidth;
@@ -1004,7 +1004,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Left += Width + marginItem;
       }
 
-      if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // 3 = flatPlus short, 4 = flatPlus short + EPG
+      if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short + EPG
         Left = LeftName;
         Top += fontHeight;
 
@@ -1083,7 +1083,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
       // Genre
       bool firstContent = true;
       for (int i = 0; Event->Contents(i); i++) {
-        if (!isempty(Event->ContentToString(Event->Contents(i)))) { // skip empty (user defined) content
+        if (!isempty(Event->ContentToString(Event->Contents(i)))) { // Skip empty (user defined) content
           if (!firstContent)
             text << ", ";
           else
@@ -1118,7 +1118,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             else
               text << "\n" << tr("Video") << ": H.264";
             break;
-          case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+          case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
             if (p->description)
               text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
             else
@@ -1134,7 +1134,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
               audio << ", ";
             switch (p->stream) {
             case sc_audio_MP2:
-              // workaround for wrongfully used stream type X 02 05 for AC3
+              // Workaround for wrongfully used stream type X 02 05 for AC3
               if (p->type == 5)
                 audio_type = "AC3";
               else
@@ -1197,9 +1197,9 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
     int mediaHeight = 0;
     int mediaType = 0;
 
-    // first try scraper2vdr
+    // First try scraper2vdr
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // if it doesn't exit, try tvscraper
+    if (!pScraper) // If it doesn't exit, try tvscraper
       pScraper = cPluginManager::GetPlugin("tvscraper");
 
     if (Config.TVScraperEPGInfoShowPoster && pScraper) {
@@ -1432,7 +1432,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   else
     File = Timer->File();
 
-  if (Config.MenuTimerView == 1) {  // 1 = flatPlus long
+  if (Config.MenuTimerView == 1) {  // flatPlus long
     buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
     menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
     Left += font->Width("XXX 99.  ");
@@ -1544,7 +1544,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
   if (!isScrolling)
     ItemBorderInsertUnique(ib);
 
-  if (Config.MenuTimerView == 3 && Current)  // flarPlus short
+  if (Config.MenuTimerView == 3 && Current)  // flatPlus short
     DrawItemExtraEvent(Event, tr("timer not enabled"));
 
   return true;
@@ -1716,7 +1716,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
       if ((now >= (Event->StartTime() - 2 * 60))) {
         int total = Event->EndTime() - Event->StartTime();
         if (total >= 0) {
-          // calculate progress bar
+          // Calculate progress bar
           double progress = (int)roundf((float)(time(NULL) - Event->StartTime()) / (float)(Event->Duration()) * 100.0);
           if (progress < 0)
             progress = 0.;
@@ -1754,10 +1754,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
   }
 
   if (WithDate && Event && Selectable) {
-    /*if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel)  // flatPlus short, flatPlus short + EPG
-      w = fontSml->Width("XXX 99. ") + marginItem;
-    else
-      w = font->Width("XXX 99. ") + marginItem;*/  // Double if?
 
     struct tm tm_r;
     time_t Day = Event->StartTime();
@@ -1931,7 +1927,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
   } else if (Event) {
     try {
-      // extract date from Separator
+      // Extract date from Separator
       std::string sep = Event->Title();
       if (sep.size() > 12) {
         std::size_t found = sep.find(" -");
@@ -2554,7 +2550,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     // Genre
     bool firstContent = true;
     for (int i = 0; Event->Contents(i); i++) {
-      if (!isempty(Event->ContentToString(Event->Contents(i)))) { // skip empty (user defined) content
+      if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
         if (!firstContent) {
           text << ", ";
         } else {
@@ -2593,7 +2589,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
           else
             textAdditional << tr("Video") << ": H.264";
           break;
-        case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+        case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
           if (p->description)
             textAdditional << tr("Video") << ": " << p->description << " (H.265)";
           else
@@ -2608,7 +2604,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             audio << ", ";
           switch (p->stream) {
           case sc_audio_MP2:
-            // workaround for wrongfully used stream type X 02 05 for AC3
+            // Workaround for wrongfully used stream type X 02 05 for AC3
             if (p->type == 5)
               audio_type = "AC3";
             else
@@ -2699,7 +2695,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
   std::ostringstream sstrReruns("");
   if (Config.EpgRerunsShow) {
-    // lent from nopacity
+    // Lent from nopacity
     cPlugin *epgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
     if (epgSearchPlugin && !isempty(Event->Title())) {
       Epgsearch_searchresults_v1_0 data;
@@ -2777,9 +2773,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     uint32_t tick3 = GetMsTicks();
 #endif
 
-    // first try scraper2vdr
+    // First try scraper2vdr
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // if it doesn't exit, try tvscraper
+    if (!pScraper) // If it doesn't exit, try tvscraper
       pScraper = cPluginManager::GetPlugin("tvscraper");
     if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
       ScraperGetEventType call;
@@ -3051,7 +3047,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     if (!isempty(recInfo->Description()))
       text << recInfo->Description() << "\n\n";
 
-    // lent from skinelchi
+    // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
 #if VDRVERSNUM >= 20301
       LOCK_CHANNELS_READ;
@@ -3067,7 +3063,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         // Genre
         bool firstContent = true;
         for (int i = 0; Event->Contents(i); i++) {
-          if (!isempty(Event->ContentToString(Event->Contents(i)))) { // skip empty (user defined) content
+          if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!firstContent)
               text << ", ";
             else
@@ -3204,7 +3200,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           case sc_video_H264_AVC:
             text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
             break;
-          case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+          case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
             text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
             break;
           case sc_audio_MP2:
@@ -3216,7 +3212,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
               audio << ", ";
             switch (p->stream) {
             case sc_audio_MP2:
-              // workaround for wrongfully used stream type X 02 05 for AC3
+              // Workaround for wrongfully used stream type X 02 05 for AC3
               if (p->type == 5)
                 audio_type = "AC3";
               else
@@ -3274,7 +3270,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
 
         if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) || !pattern.empty()) {
-          text << "\n\n" << tr("additional information") << ":";  // Zusatzinfos anzeigen
+          text << "\n\n" << tr("additional information") << ":";  // Show extrainfos
           if (!channel.empty() && !searchtimer.empty()) {
             text << "\nEPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern") << ": "
                  << searchtimer;
@@ -3304,9 +3300,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
   int mediaHeight = 0;
   int mediaType = 0;
 
-  // first try scraper2vdr
+  // First try scraper2vdr
   static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-  if (!pScraper) // if it doesn't exit, try tvscraper
+  if (!pScraper) // If it doesn't exit, try tvscraper
     pScraper = cPluginManager::GetPlugin("tvscraper");
   if (Config.TVScraperRecInfoShowPoster && pScraper) {
     ScraperGetEventType call;
@@ -3409,7 +3405,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   chTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
-  contentHeadPixmap = CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
+  contentHeadPixmap = CreatePixmap(osd, 1, cRect(chLeft, chTop, chWidth, chHeight));
   // dsyslog("skin flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
 
   contentHeadIconsPixmap->Fill(clrTransparent);
@@ -3438,7 +3434,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   if (!isempty(recInfo->Description()))
     text << recInfo->Description() << "\n\n";
 
-  // lent from skinelchi
+  // Lent from skinelchi
   if (Config.RecordingAdditionalInfoShow) {
 #if VDRVERSNUM >= 20301
     auto channelFuture = std::async(
@@ -3461,7 +3457,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       // Genre
       bool firstContent = true;
       for (int i = 0; Event->Contents(i); i++) {
-        if (!isempty(Event->ContentToString(Event->Contents(i)))) { // skip empty (user defined) content
+        if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
           if (!firstContent) {
             text << ", ";
           } else {
@@ -3602,7 +3598,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         case sc_video_H264_AVC:
           textAdditional << tr("Video") << ": " << p->description << " (H.264)";
           break;
-        case sc_video_H265_HEVC:  //might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
+        case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not available in tComponent
           textAdditional << tr("Video") << ": " << p->description << " (H.265)";
           break;
         case sc_audio_MP2:
@@ -3614,7 +3610,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             audio << ", ";
           switch (p->stream) {
           case sc_audio_MP2:
-            // workaround for wrongfully used stream type X 02 05 for AC3
+            // Workaround for wrongfully used stream type X 02 05 for AC3
             if (p->type == 5)
               audio_type = "AC3";
             else
@@ -3770,9 +3766,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     uint32_t tick2 = GetMsTicks();
 #endif
 
-    // first try scraper2vdr
+    // First try scraper2vdr
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // if it doesn't exit, try tvscraper
+    if (!pScraper) // If it doesn't exit, try tvscraper
       pScraper = cPluginManager::GetPlugin("tvscraper");
     if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
       ScraperGetEventType call;
@@ -4157,7 +4153,7 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
   switch (MenuSortMode) {
   case msmUnknown:
     sortIcon = "SortUnknown";
-    // do not set search icon if it is unknown
+    // Do not set search icon if it is unknown
     return;
     break;
   case msmNumber:
@@ -4174,7 +4170,7 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     break;
   default:
     sortIcon = "SortUnknown";
-    // do not set search icon if it is unknown
+    // Do not set search icon if it is unknown
     return;
   }
 
@@ -4290,12 +4286,12 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
   for (cRecording *rec = Recordings.First(); rec; rec = Recordings.Next(rec)) {
 #endif
     std::string RecFolder2 = GetRecordingName(rec, Level, true).c_str();
-    if (RecFolder == RecFolder2) { // recordings must be in the same folder
+    if (RecFolder == RecFolder2) { // Recordings must be in the same folder
       time_t RecStart2 = rec->Start();
-      if (Config.MenuItemRecordingShowFolderDate == 1) { // newest
+      if (Config.MenuItemRecordingShowFolderDate == 1) { // Newest
         if (RecStart2 > RecStart)
           RecStart = RecStart2;
-      } else if (Config.MenuItemRecordingShowFolderDate == 2) // oldest
+      } else if (Config.MenuItemRecordingShowFolderDate == 2) // Oldest
         if (RecStart2 < RecStart)
           RecStart = RecStart2;
     }
@@ -4304,7 +4300,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
   return RecStart;
 }
 
-// returns the string between start and end or an empty string if not found
+// Returns the string between start and end or an empty string if not found
 string cFlatDisplayMenu::xml_substring(string source, const char *str_start, const char *str_end) {
   size_t start = source.find(str_start);
   size_t end = source.find(str_end);
@@ -4680,7 +4676,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
   contentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
   ContentTop += 6;
 
-  // check device which currently displays live tv
+  // Check device which currently displays live tv
   int deviceLiveTV = -1;
   cDevice *primaryDevice = cDevice::PrimaryDevice();
   if (primaryDevice) {
@@ -4690,7 +4686,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
       deviceLiveTV = primaryDevice->DeviceNumber();
   }
 
-  // check currently recording devices
+  // Check currently recording devices
   bool *recDevices = new bool[numDevices];
   for (int i = 0; i < numDevices; i++)
     recDevices[i] = false;
@@ -4761,8 +4757,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         strDevice << tr("not used");
       }
     }
-    // channelName = strDevice.str().c_str();  // Try fix Using object that is a temporary. [danglingTemporaryLifetime]
-    auto x = strDevice.str();
+    // channelName = strDevice.str().c_str();  
+    auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
     channelName = x.c_str();
 
     cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
@@ -4814,7 +4810,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
   contentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
   ContentTop += 6;
 
-  // check if remotetimers plugin is available
+  // Check if remotetimers plugin is available
   static cPlugin *pRemoteTimers = cPluginManager::GetPlugin("remotetimers");
 
   time_t now;
@@ -4826,7 +4822,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     pRemoteTimers->Service("RemoteTimers::RefreshTimers-v1.0", &errorMsg);
   }
 
-  // look for timers
+  // Look for timers
   cVector<const cTimer *> timerRec;
   cVector<const cTimer *> timerActive;
   cVector<const cTimer *> timerRemoteRec;
@@ -4858,7 +4854,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
       pRemoteTimers && timerRec.Size() + timerActive.Size() < Config.MainMenuWidgetActiveTimerMaxCount) {
     cTimer *remoteTimer = NULL;
     while (pRemoteTimers->Service("RemoteTimers::ForEach-v1.0", &remoteTimer) && remoteTimer != NULL) {
-      remoteTimer->SetEventFromSchedule(Schedules); // make sure the event is current
+      remoteTimer->SetEventFromSchedule(Schedules);  // Make sure the event is current
       if (remoteTimer->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowRemoteRecording)
         timerRemoteRec.Append(remoteTimer);
       if (remoteTimer->HasFlags(tfActive) && !remoteTimer->HasFlags(tfRecording) &&
@@ -4883,7 +4879,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
   } else {
     int count = -1;
     int remotecount = -1;
-    // first recording timer
+    // First recording timer
     if (Config.MainMenuWidgetActiveTimerShowRecording) {
       for (int i = 0; i < timerRec.Size(); i++) {
         count++;
@@ -5117,7 +5113,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
   cString execFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
   int r = system(*execFile);
-  r += 0; // prevent Warning for unused variable
+  r += 0;  // Prevent warning for unused variable
 
   cString configsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
@@ -5145,7 +5141,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                           wWidth - marginItem * 2);
   } else {
     for (unsigned i = 0; i < files.size(); i++) {
-      // check for height
+      // Check for height
       if (ContentTop + marginItem > menuPixmap->ViewPort().Height())
         break;
 
@@ -5464,7 +5460,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
   cString execFile =
       cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
   int r = system(*execFile);
-  r += 0; // prevent Warning for unused variable
+  r += 0;  // Prevent warning for unused variable
 
   int countTemps = 0;
 
@@ -5558,7 +5554,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
   cString execFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
   int r = system(*execFile);
-  r += 0; // prevent Warning for unused variable
+  r += 0;  // Prevent warning for unused variable
 
   std::string Title("");
   cString itemFilename = cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH);
@@ -5792,7 +5788,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 }
 
 void cFlatDisplayMenu::PreLoadImages(void) {
-  // menu icons
+  // Menu icons
   cString Path = cString::sprintf("%s%s/menuIcons", *Config.iconPath, Setup.OSDTheme);
   cReadDir d(Path);
   struct dirent *e;

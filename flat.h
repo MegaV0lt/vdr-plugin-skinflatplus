@@ -223,3 +223,5 @@ static inline uint32_t GetMsTicks(void)
     return (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
 #endif
 }
+
+cPixmap *CreatePixmap(cOsd *osd, int Layer = 0, const cRect &ViewPort = cRect::Null, const cRect &DrawPort = cRect::Null);

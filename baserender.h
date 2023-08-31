@@ -93,7 +93,7 @@ class cFlatBaseRender
         cPixmap *contentPixmap;
         cPixmap *contentEpgImagePixmap;
         int contentLeft, contentTop, contentHeight, contentWidth;
-        int contentDrawPortHeight; // gesamthöhe des Textes
+        int contentDrawPortHeight; // gesamthï¿½he des Textes
         int contentTextHeight;
         bool contentHasScrollbar;
         bool contentShown;
@@ -181,6 +181,4 @@ class cFlatBaseRender
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
         void DrawWidgetWeather(void);
-
-        virtual cPixmap *CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort = cRect::Null);
 };

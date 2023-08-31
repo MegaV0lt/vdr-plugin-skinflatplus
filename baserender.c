@@ -118,23 +118,9 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   return;
 }
 
-cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) {
-  cSize maxPixmapSize = osd->MaxPixmapSize();
-  cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(), DrawPort.Height());
-
-  if (DrawPort.Width() > maxPixmapSize.Width()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
-    SafeDrawPort.SetWidth(maxPixmapSize.Width());
-  }
-  if (DrawPort.Height() > maxPixmapSize.Height()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
-    SafeDrawPort.SetHeight(maxPixmapSize.Height());
-  }
-
-  return osd->CreatePixmap(Layer, ViewPort, SafeDrawPort);
-}
+/* cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) 
+  // Moved to flat.c
+*/
 
 void cFlatBaseRender::TopBarCreate(void) {
   int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
@@ -150,15 +136,15 @@ void cFlatBaseRender::TopBarCreate(void) {
   else
     topBarHeight = topBarFontSmlHeight * 2;
 
-  topBarPixmap = CreatePixmap(1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  topBarPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
   // dsyslog("skin flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
-  topBarIconBGPixmap = CreatePixmap(2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  topBarIconBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                              osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
   // dsyslog("skin flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
   //         osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
-  topBarIconPixmap = CreatePixmap(3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  topBarIconPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
   // dsyslog("skin flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
@@ -411,7 +397,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
   TopBarSetTitleExtra(extra1, extra2);
   TopBarSetExtraIcon(iconName);
 }
-// sollte bei jedum "Flush" aufgerufen werden!
+// Should be calld with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
   cString curDate = DayDateTime();
   int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
@@ -528,7 +514,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
     int numRec = 0;
     if (Config.TopBarRecordingShow) {
-// look for timers
+// Look for timers
 #if VDRVERSNUM >= 20301
       auto recCounterFuture = std::async([&numRec]() {
         LOCK_TIMERS_READ;
@@ -656,11 +642,11 @@ void cFlatBaseRender::ButtonsCreate(void) {
   buttonsWidth = osdWidth;
   buttonsTop = osdHeight - buttonsHeight - Config.decorBorderButtonSize;
 
-  buttonsPixmap = CreatePixmap(1, cRect(Config.decorBorderButtonSize, buttonsTop,
+  buttonsPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
   buttonsPixmap->Fill(clrTransparent);
-  // dsyslog("skin flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", Config.decorBorderButtonSize, buttonsTop, buttonsWidth -
-  //         Config.decorBorderButtonSize*2, buttonsHeight);
+  // dsyslog("skin flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", 
+  //         Config.decorBorderButtonSize, buttonsTop, buttonsWidth - Config.decorBorderButtonSize*2, buttonsHeight);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -821,11 +807,9 @@ void cFlatBaseRender::MessageCreate(void) {
   if (Config.MessageColorPosition == 1)
     messageHeight += 8;
   int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
-  messagePixmap = CreatePixmap(
-      5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
+  messagePixmap = CreatePixmap(osd, 5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
   messagePixmap->Fill(clrTransparent);
-  messageIconPixmap = CreatePixmap(
-      5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
+  messageIconPixmap = CreatePixmap(osd, 5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
   messageIconPixmap->Fill(clrTransparent);
 
   // dsyslog("skin flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
@@ -965,10 +949,11 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 
   progressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-  progressBarPixmap = CreatePixmap(3, cRect(Left, Top, Width, progressBarHeight));
-  progressBarPixmapBg =
-      CreatePixmap(2, cRect(Left - progressBarMarginVer, Top - progressBarMarginHor, Width + progressBarMarginVer * 2,
-                            progressBarHeight + progressBarMarginHor * 2));
+  progressBarPixmap = CreatePixmap(osd, 3, cRect(Left, Top, Width, progressBarHeight));
+  progressBarPixmapBg = CreatePixmap(osd, 2, cRect(Left - progressBarMarginVer, 
+                                                   Top - progressBarMarginHor, 
+                                                   Width + progressBarMarginVer * 2,
+                                                   progressBarHeight + progressBarMarginHor * 2));
   progressBarPixmap->Fill(clrTransparent);
   progressBarPixmapBg->Fill(clrTransparent);
 }
@@ -1551,7 +1536,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
   int BottomDecor = Height + Size;
 
   if (!decorPixmap) {
-    decorPixmap = CreatePixmap(4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+    decorPixmap = CreatePixmap(osd, 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
     decorPixmap->Fill(clrTransparent);
   }
 

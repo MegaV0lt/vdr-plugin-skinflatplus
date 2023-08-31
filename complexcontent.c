@@ -35,23 +35,9 @@ void cComplexContent::Clear(void) {
   }
 }
 
-cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) {
-  cSize maxPixmapSize = Osd->MaxPixmapSize();
-  cRect SafeDrawPort(DrawPort.X(), DrawPort.Y(), DrawPort.Width(), DrawPort.Height());
-
-  if (DrawPort.Width() > maxPixmapSize.Width()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
-    SafeDrawPort.SetWidth(maxPixmapSize.Width());
-  }
-  if (DrawPort.Height() > maxPixmapSize.Height()) {
-    dsyslog("Try to create Pixmap (%d x %d) > MaxPixmapSize (%d x %d)-> cut Pixmap to MaxPixmapSize",
-            DrawPort.Width(), DrawPort.Height(), maxPixmapSize.Width(), maxPixmapSize.Height());
-    SafeDrawPort.SetHeight(maxPixmapSize.Height());
-  }
-
-  return Osd->CreatePixmap(Layer, ViewPort, SafeDrawPort);
-}
+/*cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)
+  // Moved to flat.c
+ */
 
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   CalculateDrawPortHeight();
@@ -77,14 +63,14 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   else
     PositionDraw.SetHeight(DrawPortHeight);
 
-  Pixmap = CreatePixmap(1, Position, PositionDraw);
-  PixmapImage = CreatePixmap(2, Position, PositionDraw);
-  //  dsyslog("skin flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
-  //           Position.Left(), Position.Top(), Position.Width(), Position.Height());
+  Pixmap = CreatePixmap(Osd, 1, Position, PositionDraw);
+  PixmapImage = CreatePixmap(Osd, 2, Position, PositionDraw);
+  // dsyslog("skin flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
+  //         Position.Left(), Position.Top(), Position.Width(), Position.Height());
   // dsyslog("skin flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
   //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
-  if (Pixmap != NULL) {  // check for nullptr
+  if (Pixmap != NULL) {  // Check for nullptr
     if (FullFillBackground) {
       Pixmap->Fill(ColorBg);
     } else {

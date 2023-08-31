@@ -156,7 +156,6 @@ private:
     cOsd *Osd;
 
     void CalculateDrawPortHeight(void);
-    virtual cPixmap *CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort = cRect::Null);
 
 public:
     cComplexContent(void);

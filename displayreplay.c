@@ -22,23 +22,23 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     chanEpgImagesPixmap->Fill(clrTransparent);
 
-    labelPixmap = CreatePixmap(1, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
+    labelPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
         osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
-    iconsPixmap = CreatePixmap(2, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
+    iconsPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorBorderReplaySize,
         osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
 
     ProgressBarCreate(Config.decorBorderReplaySize, osdHeight - labelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize - marginItem,
         osdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize, marginItem, 0,
         Config.decorProgressReplayFg, Config.decorProgressReplayBarFg, Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
-    labelJump = CreatePixmap(1, cRect(Config.decorBorderReplaySize,
+    labelJump = CreatePixmap(osd, 1, cRect(Config.decorBorderReplaySize,
         osdHeight - labelHeight - Config.decorProgressReplaySize * 2 - marginItem*3 - fontHeight - Config.decorBorderReplaySize * 2,
         osdWidth - Config.decorBorderReplaySize * 2, fontHeight));
 
-    dimmPixmap = CreatePixmap(MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
+    dimmPixmap = CreatePixmap(osd, MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
 
     labelPixmap->Fill(Theme.Color(clrReplayBg));
     labelJump->Fill(clrTransparent);
