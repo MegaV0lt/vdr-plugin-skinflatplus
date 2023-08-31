@@ -918,8 +918,5 @@ msgstr "Uso comandi dei widget: abilita"
 msgid "Widget custom commands: position"
 msgstr "Uso comandi dei widget: posizione"
 
-#~ msgid "Show video/audio bitrate"
-#~ msgstr "Mostra Video/Audio Bitrate"
-
 #~ msgid "dvbapi plugin non installed"
 #~ msgstr "dvbapi plugin non installato"

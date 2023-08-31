@@ -26,7 +26,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     LastSignalStrength = -1;
     LastSignalQuality = -1;
 
-    SignalStrengthRight = BitrateRight = 0;
+    SignalStrengthRight = 0;
 
     CreateFullOsd();
     if (!osd)
@@ -584,9 +584,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 
     int top = fontHeight * 2 + fontSmlHeight * 2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2) - marginItem * 2;
-    int left = BitrateRight + marginItem * 2;
-    if (BitrateRight == 0)
-        left = SignalStrengthRight + marginItem * 2;
+    int left = SignalStrengthRight + marginItem * 2;
 
     cFont *dvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + marginItem);
 

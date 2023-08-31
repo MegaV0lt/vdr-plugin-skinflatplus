@@ -98,5 +98,4 @@ DiskUsageShort = 0
 DiskUsageFree = 1
 TopBarFontClockScale = 0.010000
 TimeSecsScale = 0.010000
-ChannelBitrateShow = 0
-ChannelBitrateShowCalcInterval = 20
+

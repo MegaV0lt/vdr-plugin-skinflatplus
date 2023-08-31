@@ -29,7 +29,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int heightBottom, heightImageLogo;
 
         int LastSignalStrength, LastSignalQuality;
-        int SignalStrengthRight, BitrateRight;
+        int SignalStrengthRight;
 
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;
