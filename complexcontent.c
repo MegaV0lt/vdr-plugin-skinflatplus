@@ -35,9 +35,7 @@ void cComplexContent::Clear(void) {
   }
 }
 
-/*cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)
-  // Moved to flat.c
- */
+// cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
 
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   CalculateDrawPortHeight();

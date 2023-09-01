@@ -103,3 +103,10 @@ cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &
     }
     return NULL;
 }
+
+cPlugin *GetScraperPlugin(void) {
+    static cPlugin *pScraper = GetScraperPlugin();
+    if( !pScraper )  // If it doesn't exit, try tvscraper
+        pScraper = cPluginManager::GetPlugin("tvscraper");
+    return pScraper;
+}

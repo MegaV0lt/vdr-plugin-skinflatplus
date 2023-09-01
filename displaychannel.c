@@ -456,11 +456,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int mediaWidth = 0;
     int mediaHeight = 0;
 
-    // TVScraper
-    // first try scraper2vdr
-    static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // if it doesn't exit, try tvscraper
-        pScraper = cPluginManager::GetPlugin("tvscraper");
+    static cPlugin *pScraper = GetScraperPlugin();
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
         ScraperGetPosterBannerV2 call;
         call.event = Present;

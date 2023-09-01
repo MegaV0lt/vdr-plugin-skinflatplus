@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <vdr/plugin.h>
 #include <vdr/skins.h>
 #include <vdr/videodir.h>
 
@@ -225,3 +226,4 @@ static inline uint32_t GetMsTicks(void)
 }
 
 cPixmap *CreatePixmap(cOsd *osd, int Layer = 0, const cRect &ViewPort = cRect::Null, const cRect &DrawPort = cRect::Null);
+cPlugin *GetScraperPlugin(void);

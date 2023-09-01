@@ -24,9 +24,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Draw();
 }
 
-/*cPixmap *cTextScroll::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) 
-  // Moved to flat.c
- */
+// cPixmap *cTextScroll::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
 
 void cTextScroll::UpdateViewPortWidth(int w) {
     cRect viewPort = Pixmap->ViewPort();

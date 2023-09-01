@@ -1197,11 +1197,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
     int mediaHeight = 0;
     int mediaType = 0;
 
-    // First try scraper2vdr
-    static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // If it doesn't exit, try tvscraper
-      pScraper = cPluginManager::GetPlugin("tvscraper");
-
+    static cPlugin *pScraper = GetScraperPlugin();
     if (Config.TVScraperEPGInfoShowPoster && pScraper) {
       ScraperGetPosterBannerV2 call;
       call.event = Event;
@@ -2773,10 +2769,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     uint32_t tick3 = GetMsTicks();
 #endif
 
-    // First try scraper2vdr
-    static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // If it doesn't exit, try tvscraper
-      pScraper = cPluginManager::GetPlugin("tvscraper");
+    static cPlugin *pScraper = GetScraperPlugin();
     if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
       ScraperGetEventType call;
       call.event = Event;
@@ -3300,10 +3293,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
   int mediaHeight = 0;
   int mediaType = 0;
 
-  // First try scraper2vdr
-  static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-  if (!pScraper) // If it doesn't exit, try tvscraper
-    pScraper = cPluginManager::GetPlugin("tvscraper");
+  static cPlugin *pScraper = GetScraperPlugin();
   if (Config.TVScraperRecInfoShowPoster && pScraper) {
     ScraperGetEventType call;
     call.recording = Recording;
@@ -3766,10 +3756,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     uint32_t tick2 = GetMsTicks();
 #endif
 
-    // First try scraper2vdr
-    static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper) // If it doesn't exit, try tvscraper
-      pScraper = cPluginManager::GetPlugin("tvscraper");
+    static cPlugin *pScraper = GetScraperPlugin();
     if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
       ScraperGetEventType call;
       call.recording = Recording;

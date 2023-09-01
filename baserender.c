@@ -118,9 +118,7 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   return;
 }
 
-/* cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort) 
-  // Moved to flat.c
-*/
+// cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
 
 void cFlatBaseRender::TopBarCreate(void) {
   int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));

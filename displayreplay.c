@@ -361,11 +361,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         std::string mediaPath("");
         int mediaWidth = 0;
         int mediaHeight = 0;
-        // TVScraper
-        // first try scraper2vdr
-        static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-        if (!pScraper) // if it doesn't exit, try tvscraper
-            pScraper = cPluginManager::GetPlugin("tvscraper");
+        static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
             call.recording = recording;
