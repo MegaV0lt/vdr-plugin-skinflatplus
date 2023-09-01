@@ -206,11 +206,10 @@ class cFlat : public cSkin {
         virtual cSkinDisplayMessage *DisplayMessage(void);
 };
 
-char * substr(char * string, int start, int end);
+char *substr(char *string, int start, int end);
 char *GetFilenameWithoutext(char * fullfilename);
 
-static inline uint32_t GetMsTicks(void)
-{
+static inline uint32_t GetMsTicks(void) {
 #ifdef CLOCK_MONOTONIC
     struct timespec tspec;
 
@@ -220,7 +219,7 @@ static inline uint32_t GetMsTicks(void)
     struct timeval tval;
 
     if (gettimeofday(&tval, NULL) < 0)
-        eturn 0;
+        return 0;
     return (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
 #endif
 }

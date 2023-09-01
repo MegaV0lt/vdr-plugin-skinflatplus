@@ -25,7 +25,6 @@ cFlatSetup::cFlatSetup(void) {
 }
 
 cFlatSetup::~cFlatSetup() {
-
 }
 
 void cFlatSetup::Setup(void) {

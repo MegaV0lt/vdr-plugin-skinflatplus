@@ -9,9 +9,11 @@
 #endif
 #endif
 
-cImageMagickWrapper::cImageMagickWrapper() {}
+cImageMagickWrapper::cImageMagickWrapper() {
+}
 
-cImageMagickWrapper::~cImageMagickWrapper() {}
+cImageMagickWrapper::~cImageMagickWrapper() {
+}
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAspect) {
     int w = 0, h = 0;

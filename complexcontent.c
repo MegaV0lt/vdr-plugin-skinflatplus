@@ -18,7 +18,8 @@ cComplexContent::cComplexContent(cOsd *osd, int scrollSize) {
   isScrollingActive = true;
 }
 
-cComplexContent::~cComplexContent() {}
+cComplexContent::~cComplexContent() {
+}
 
 void cComplexContent::Clear(void) {
   isShown = false;

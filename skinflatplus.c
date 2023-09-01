@@ -50,8 +50,7 @@ cPluginFlat::cPluginFlat(void) {
     flat = NULL;
 }
 
-cPluginFlat::~cPluginFlat() {
-}
+cPluginFlat::~cPluginFlat() {}
 
 const char *cPluginFlat::CommandLineHelp(void) {
     return "  -l <LOGOPATH>, --logopath=<LOGOPATH>       Set directory where Channel Logos are stored.\n";

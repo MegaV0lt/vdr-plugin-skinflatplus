@@ -15,7 +15,6 @@ cImageCache::cImageCache() {
 }
 
 cImageCache::~cImageCache() {
-
 }
 
 void cImageCache::Create(void) {
