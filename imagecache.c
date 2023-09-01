@@ -45,7 +45,7 @@ bool cImageCache::RemoveFromCache(std::string Name) {
         bname = basename((char *)CacheName[index].c_str());
         if (!strcmp(bname, Name.c_str())) {
             found = true;
-            dsyslog("skin flatPlus: RemoveFromCache - %s", CacheName[index].c_str() );
+            dsyslog("flatPlus: RemoveFromCache - %s", CacheName[index].c_str() );
             CacheImage[index] = NULL;
             CacheName[index] = "";
             CacheWidth[index] = -1;
@@ -73,7 +73,7 @@ void cImageCache::InsertImage(cImage *Image, std::string Name, int Width, int He
 
     InsertIndex++;
     if (InsertIndex >= MAX_IMAGE_CACHE) {
-        isyslog("skin flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE");
+        isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE");
         InsertIndex = 0;
         Overflow = true;
     }
@@ -95,6 +95,6 @@ void cImageCache::PreLoadImage(void) {
     DisplayVolume.PreLoadImages();
 
     uint32_t tick2 = GetMsTicks();
-    dsyslog("skin flatPlus: Imagecache pre load images time: %d ms", tick2 - tick1);
-    dsyslog("skin flatPlus: Imagecache pre loaded images %d / %d", getCacheCount(), MAX_IMAGE_CACHE);
+    dsyslog("flatPlus: Imagecache pre load images time: %d ms", tick2 - tick1);
+    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", getCacheCount(), MAX_IMAGE_CACHE);
 }

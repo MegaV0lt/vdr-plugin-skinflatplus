@@ -393,7 +393,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
 
 void cFlatConfig::ThemeCheckAndInit(void) {
     if( strcmp(Theme.Name(), *ThemeCurrent) != 0 ) {
-        dsyslog("skin flatPlus: Load theme: %s", *ThemeCurrent);
+        dsyslog("flatPlus: Load theme: %s", *ThemeCurrent);
         ThemeCurrent = Theme.Name();
         ThemeInit();
     }
@@ -635,16 +635,16 @@ void cFlatConfig::ThemeInit(void) {
 void cFlatConfig::Init(void) {
     if( !strcmp(logoPath, "") ) {
         logoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
-        dsyslog("skin flatPlus: logoPath: %s", *logoPath);
+        dsyslog("flatPlus: logoPath: %s", *logoPath);
     }
     if( !strcmp(iconPath, "") ) {
         iconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
-        dsyslog("skin flatPlus: iconPath: %s", *iconPath);
+        dsyslog("flatPlus: iconPath: %s", *iconPath);
     }
     if( !strcmp(RecordingOldConfigFile, "") ) {
-        dsyslog("skin flatPlus: PLUGINCONFIGPATH: %s", PLUGINCONFIGPATH);
+        dsyslog("flatPlus: PLUGINCONFIGPATH: %s", PLUGINCONFIGPATH);
         RecordingOldConfigFile = cString::sprintf("%s/recordings_old.cfg", PLUGINCONFIGPATH);
-        dsyslog("skin flatPlus: RecordingOldConfigFile: %s", *RecordingOldConfigFile);
+        dsyslog("flatPlus: RecordingOldConfigFile: %s", *RecordingOldConfigFile);
         RecordingOldLoadConfig();
     }
     ThemeInit();
@@ -750,7 +750,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
 }
 
 void cFlatConfig::DecorLoadFile(cString File) {
-    dsyslog("skin flatPlus: Load decor file: %s", *File);
+    dsyslog("flatPlus: Load decor file: %s", *File);
 
     FILE *f = fopen(File, "r");
     if( f ) {
@@ -847,7 +847,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
 
 
 void cFlatConfig::RecordingOldLoadConfig(void) {
-    dsyslog("skin flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
+    dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
     RecordingOldFolder.clear();
     RecordingOldValue.clear();
 
@@ -870,7 +870,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
                     int value = atoi( v );
-                    dsyslog("skin flatPlus: Recording old config - folder: %s value: %d", n, value);
+                    dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
                     RecordingOldFolder.push_back( n );
                     RecordingOldValue.push_back( value );
                 }

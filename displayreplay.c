@@ -317,7 +317,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 filesize[i] = filesize[i-1] + filebuf.st_size;
             else {
                 if (ENOENT != errno) {
-                    esyslog ("skin flatPlus: Error determining file size of \"%s\" %d (%s)",
+                    esyslog ("flatPlus: Error determining file size of \"%s\" %d (%s)",
                              (const char *)filename, errno, strerror(errno));
                 }
             }

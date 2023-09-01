@@ -110,11 +110,11 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   if (osd) {
     tArea Area = {0, 0, width, height, 32};
     if (osd->SetAreas(&Area, 1) == oeOk) {
-      dsyslog("skin flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+      dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
       return;
     }
   }
-  esyslog("skin flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+  esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
   return;
 }
 
@@ -136,15 +136,15 @@ void cFlatBaseRender::TopBarCreate(void) {
 
   topBarPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skin flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  // dsyslog("flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                              osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skin flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+  // dsyslog("flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
   //         osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("skin flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
+  // dsyslog("flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
   //         Config.decorBorderTopBarSize*2, topBarHeight);
   topBarPixmap->Fill(clrTransparent);
   topBarIconBGPixmap->Fill(clrTransparent);
@@ -643,7 +643,7 @@ void cFlatBaseRender::ButtonsCreate(void) {
   buttonsPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
   buttonsPixmap->Fill(clrTransparent);
-  // dsyslog("skin flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", 
+  // dsyslog("flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", 
   //         Config.decorBorderButtonSize, buttonsTop, buttonsWidth - Config.decorBorderButtonSize*2, buttonsHeight);
 }
 
@@ -810,9 +810,9 @@ void cFlatBaseRender::MessageCreate(void) {
   messageIconPixmap = CreatePixmap(osd, 5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
   messageIconPixmap->Fill(clrTransparent);
 
-  // dsyslog("skin flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  // dsyslog("flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
   //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
-  // dsyslog("skin flatPlus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+  // dsyslog("flatPlus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
   //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
 
   messageScroller.SetOsd(osd);

@@ -64,26 +64,26 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   menuWidth = osdWidth;
   menuTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
   menuPixmap = osd->CreatePixmap(1, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skin flatPlus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("flatPlus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   menuIconsBGPixmap = osd->CreatePixmap(2, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skin flatPlus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("flatPlus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
   menuIconsPixmap = osd->CreatePixmap(3, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skin flatPlus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("flatPlus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
   menuIconsOVLPixmap = osd->CreatePixmap(4, cRect(0, menuTop, menuWidth, scrollBarHeight));
-  // dsyslog("skin flatPlus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
+  // dsyslog("flatPlus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   chLeft = Config.decorBorderMenuContentHeadSize;
   chTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = osd->CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skin flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
+  // dsyslog("flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
   contentHeadIconsPixmap = osd->CreatePixmap(2, cRect(chLeft, chTop, chWidth, chHeight));
 
   scrollbarPixmap = osd->CreatePixmap(
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
-  // dsyslog("skin flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
+  // dsyslog("flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
   //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2 );
 
   menuPixmap->Fill(clrTransparent);
@@ -2653,7 +2653,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skin flatPlus: FSK icon not found: %s", *iconName);
+      isyslog("flatPlus: FSK icon not found: %s", *iconName);
       img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
       if (img) {
         contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -2671,7 +2671,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skin flatPlus: Genre icon not found: %s", *iconName);
+      isyslog("flatPlus: Genre icon not found: %s", *iconName);
       if (!isUnknownDrawn) {
         img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
         if (img) {
@@ -3104,7 +3104,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
           filesize[i] = filesize[i - 1] + filebuf.st_size;
         else {
           if (ENOENT != errno) {
-            esyslog("skin flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
+            esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
                     strerror(errno));
             recsize = 0;
           }
@@ -3396,7 +3396,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
   contentHeadPixmap = CreatePixmap(osd, 1, cRect(chLeft, chTop, chWidth, chHeight));
-  // dsyslog("skin flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
+  // dsyslog("flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
 
   contentHeadIconsPixmap->Fill(clrTransparent);
 
@@ -3498,7 +3498,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         filesize[i] = filesize[i - 1] + filebuf.st_size;
       else {
         if (ENOENT != errno) {
-          esyslog("skin flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
+          esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
                   strerror(errno));
           recsize = 0;
         }
@@ -3688,7 +3688,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skin flatPlus: FSK icon not found: %s", *iconName);
+      isyslog("flatPlus: FSK icon not found: %s", *iconName);
       img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
       if (img) {
         contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -3706,7 +3706,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
       headIconLeft -= fontHeight + marginItem;
     } else {
-      isyslog("skin flatPlus: Genre icon not found: %s", *iconName);
+      isyslog("flatPlus: Genre icon not found: %s", *iconName);
       if (!isUnknownDrawn) {
         img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
         if (img) {
@@ -4552,7 +4552,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
     }
     break;
   default:
-    isyslog("skin flatPlus: Genre not found: %x", genre);
+    isyslog("flatPlus: Genre not found: %x", genre);
   }
   return "";
 }

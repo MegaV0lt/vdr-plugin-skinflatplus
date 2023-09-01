@@ -88,16 +88,16 @@ cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &
         if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
             return pixmap;
         } else {
-            esyslog("skin flatPlus: Could not create pixmap of size %i x %i", DrawPort.Size().Width(), DrawPort.Size().Height());
+            esyslog("flatPlus: Could not create pixmap of size %i x %i", DrawPort.Size().Width(), DrawPort.Size().Height());
             cRect NewDrawPort = DrawPort;
             int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
             int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
             NewDrawPort.SetSize(width, height);
             if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-                esyslog("skin flatPlus: Create pixmap with reduced size %i x %i", width, height);
+                esyslog("flatPlus: Create pixmap with reduced size %i x %i", width, height);
                 return pixmap;
             } else {
-                esyslog("skin flatPlus: Could not create pixmap with reduced size %i x %i", width, height);
+                esyslog("flatPlus: Could not create pixmap with reduced size %i x %i", width, height);
             }
         }
     }
