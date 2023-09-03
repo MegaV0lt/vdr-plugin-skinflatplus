@@ -226,3 +226,6 @@ static inline uint32_t GetMsTicks(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, int Layer = 0, const cRect &ViewPort = cRect::Null, const cRect &DrawPort = cRect::Null);
 cPlugin *GetScraperPlugin(void);
+cString GetSimpleAspectIcon(void);
+cString GetScreenResolutionIcon(void);
+cString GetFormatIcon(void);

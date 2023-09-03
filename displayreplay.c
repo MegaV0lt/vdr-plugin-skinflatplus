@@ -519,7 +519,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
     if (screenWidth > 0) {
     if (Config.RecordingResolutionAspectShow) {  // Show Aspect
-        cString asp("unknown_asp");              // ???
+        /*cString asp("unknown_asp");              // ???
         if(Config.RecordingSimpleAspectFormat && screenWidth > 720) {
             switch (screenWidth) {               // No aspect for HD
             case 7680:
@@ -537,7 +537,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 asp = "169w";
             else if (screenAspect == 2.21)
                 asp = "221";
-        }
+        }*/
+        cString asp = GetSimpleAspectIcon();
 
         img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
         if (img) {
@@ -548,7 +549,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         }
 
         // Show Resolution
-        cString res("");
+        /*cString res("");
         switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
                 res = "7680x4320"; break;
@@ -576,9 +577,10 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 res = "352x576"; break;
             default:
                 res = "unknown_res";
-                dsyslog("unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
+                dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
                 break;
-            }
+            }*/
+            cString res = GetScreenResolutionIcon();
 
             img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
             if (img) {
@@ -590,7 +592,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         }
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
-            cString iconName("");        // Show Format
+            /*cString iconName("");        // Show Format
             switch (screenWidth) {
                 case 7680:
                 case 3840:
@@ -603,7 +605,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                     iconName = "sd"; break;
                 default:
                     iconName = "sd"; break;
-            }
+            }*/
+            cString iconName = GetFormatIcon();
 
             img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {

@@ -218,7 +218,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     if (Resolution && !isRadioChannel && screenWidth > 0) {
         if (Config.ChannelResolutionAspectShow) {      // Show Aspect
-            cString asp("unknown_asp");                // ???
+            /*cString asp("unknown_asp");                // ???
             if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
                 switch (screenWidth) {                 // No aspect for HD
                 case 7680:
@@ -236,7 +236,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                     asp = "169w";
                 else if (screenAspect == 2.21)
                     asp = "221";
-            }
+            }*/
+            cString asp = GetSimpleAspectIcon();
 
             img = imgLoader.LoadIcon(*asp, 999, height);
             if (img) {
@@ -247,7 +248,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             // Show Resolution
-            cString res("");
+            /*cString res("");
             switch (screenWidth) {
             case 7680:                        // 7680×4320 (UHD-2 / 8K)
                 res = "7680x4320"; break;
@@ -277,7 +278,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 res = "unknown_res";
                 dsyslog("unkown resolution Width: %d Height: %d Aspect: %.2f\n", screenWidth, screenHeight, screenAspect);
                 break;
-            }
+            }*/
+            cString res = GetScreenResolutionIcon(void) {
 
             img = imgLoader.LoadIcon(*res, 999, height);
             if (img) {
@@ -289,7 +291,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
-            cString iconName("");      // Show Format
+            /*cString iconName("");      // Show Format
             switch (screenWidth) {
                 case 7680:
                 case 3840:
@@ -302,7 +304,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                     iconName = "sd"; break;
                 default:
                     iconName = "sd"; break;
-            }
+            }*/
+            cString iconName = GetFormatIcon();
 
             img = imgLoader.LoadIcon(*iconName, 999, height);
             if (img) {
