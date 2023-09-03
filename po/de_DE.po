@@ -648,6 +648,9 @@ msgstr "Aufnahmen: Vorgabe-Wert alter Ordner in Tagen"
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
+msgid "Show recerrors icon in playback"
+msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
+
 msgid "Recording recerrors icon threshold"
 msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"
 

@@ -78,7 +78,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     iconsPixmap->Fill(clrTransparent);
 
 #if APIVERSNUM >= 20505
-    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate configoption
+    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
       int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
       cString RecErrIcon("recording_untested_replay");
@@ -97,7 +97,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
       }
       Left += imgRecErr->Width() + marginItem;  // Add width of icon
-    }  // MenuItemRecordingShowRecordingErrors
+    }  // PlaybackShowRecordingErrors
 #endif
 
     SetTitle(recInfo->Title());

@@ -287,6 +287,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold));
     SetupStore("MenuItemRecordingShowFolderDate", Config.MenuItemRecordingShowFolderDate);
     SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrors);
+    SetupStore("PlaybackShowRecordingErrors", Config.PlaybackShowRecordingErrors);
     SetupStore("MenuItemRecordingShowRecordingErrorsThreshold", Config.MenuItemRecordingShowRecordingErrorsThreshold);
     SetupStore("MenuRecordingShowCount", Config.MenuRecordingShowCount);
     SetupStore("MenuRecordingView", Config.MenuRecordingView);
@@ -478,11 +479,12 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)         SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)        SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
+    else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0) SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
@@ -657,6 +659,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold), *Filename);
     Config.Store("MenuItemRecordingShowFolderDate", SetupConfig->MenuItemRecordingShowFolderDate, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrors", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
+    Config.Store("PlaybackShowRecordingErrors", SetupConfig->PlaybackShowRecordingErrors, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrorsThreshold", dtoa(Config.MenuItemRecordingShowRecordingErrorsThreshold), *Filename);
     Config.Store("MenuRecordingShowCount", SetupConfig->MenuRecordingShowCount, *Filename);
     Config.Store("MenuRecordingView", SetupConfig->MenuRecordingView, *Filename);
@@ -976,6 +979,7 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditPrcItem(tr("Recording menu recording seen threshold"), &SetupConfig->MenuItemRecordingSeenThreshold, 0.008, 0.01, 2));
     Add(new cMenuEditIntItem(tr("Recording menu default value - old folder in days"), &SetupConfig->MenuItemRecordingDefaultOldDays, -1));
     Add(new cMenuEditBoolItem(tr("Recording menu show recerrors icon"), &SetupConfig->MenuItemRecordingShowRecordingErrors));
+    Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
     Add(new cMenuEditIntItem(tr("Recording recerrors icon threshold"), &SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold, 1, 999999));
 
     Add(new cMenuEditBoolItem(tr("Timer menu show timer count in title"), &SetupConfig->MenuTimerShowCount));
