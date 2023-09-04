@@ -294,6 +294,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuTimerView", Config.MenuTimerView);
     SetupStore("MessageColorPosition", Config.MessageColorPosition);
     SetupStore("MessageOffset", Config.MessageOffset);
+    SetupStore("PlaybackShowRecordingErrors", Config.PlaybackShowRecordingErrors);
     SetupStore("PlaybackWeatherShow", Config.PlaybackWeatherShow);
     SetupStore("RecordingAdditionalInfoShow", Config.RecordingAdditionalInfoShow);
     SetupStore("RecordingDimmOnPause", Config.RecordingDimmOnPause);
@@ -478,17 +479,18 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)         SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)        SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
+    else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)         SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0) SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
     else if (strcmp(Name, "MenuTimerView") == 0)                        SetupConfig->MenuTimerView = atoi(Value);
     else if (strcmp(Name, "MessageColorPosition") == 0)                 SetupConfig->MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        SetupConfig->MessageOffset = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  SetupConfig->PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          SetupConfig->RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 SetupConfig->RecordingDimmOnPause = atoi(Value);
@@ -664,6 +666,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuTimerView", SetupConfig->MenuTimerView, *Filename);
     Config.Store("MessageColorPosition", SetupConfig->MessageColorPosition, *Filename);
     Config.Store("MessageOffset", SetupConfig->MessageOffset, *Filename);
+    Config.Store("PlaybackShowRecordingErrors", SetupConfig->PlaybackShowRecordingErrors, *Filename);
     Config.Store("PlaybackWeatherShow", SetupConfig->PlaybackWeatherShow, *Filename);
     Config.Store("RecordingAdditionalInfoShow", SetupConfig->RecordingAdditionalInfoShow, *Filename);
     Config.Store("RecordingDimmOnPauseDelay", SetupConfig->RecordingDimmOnPauseDelay, *Filename);
@@ -1087,7 +1090,8 @@ void cFlatSetupReplay::Setup(void) {
     Add(new cMenuEditBoolItem(tr("Simple aspect & format"), &SetupConfig->RecordingSimpleAspectFormat));
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
-
+    Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
+    
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
     if (SetupConfig->RecordingDimmOnPause) {
         Add(new cMenuEditIntItem(tr("Dimm on pause delay"), &SetupConfig->RecordingDimmOnPauseDelay));

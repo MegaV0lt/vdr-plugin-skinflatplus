@@ -1,6 +1,12 @@
 VDR Plugin 'skinflatplus' Revision History
 ---------------------------------------
 
+2023-09-xx: Version 0.6.8
+- [add] Add option to disable recerroricons in replay 
+- [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
+- [update] centralize getting iconnames of format and aspect
+- [update] centralize call of pscraper plugin
+
 2023-08-24: Version 0.6.7
 - [fix] Adaptation to tvscraper commit a4287558
 - [update] Prevents *magick from occupying the segfaults (From SkinNopacity)
@@ -11,7 +17,7 @@ VDR Plugin 'skinflatplus' Revision History
 - [fix] increased version to 0.6.5 in code
 - [fix] fix nullptr. after restart of vdr and hitting key menu
           Thanks to MarkusE @ VDR_Portal for reporting
-- [add] show recordingerroricons in also during replay
+- [add] show recordingerroricons also during replay
 - [remove] delete obsolete genre icons
 - [update] update_weather.sh small tweaks
 

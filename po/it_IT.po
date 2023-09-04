@@ -642,6 +642,9 @@ msgstr ""
 msgid "Recording menu show recerrors icon"
 msgstr ""
 
+msgid "Show recerrors icon in playback"
+msgstr ""
+
 msgid "Recording recerrors icon threshold"
 msgstr ""
 

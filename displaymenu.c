@@ -455,56 +455,13 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     const char *s = GetTabbedText(Text, i);
     if (s) {
       // from skinelchi
-      //char buffer[9];
       bool istimer = false;
-      /*bool isnewrecording = false;
-      bool hasEventtimer = false;
-      bool haspartEventtimer = false;
-      bool isRecording = false;
-      bool hasVPS = false;
-      bool isRunning = false; */
-
       int xt = Tab(i);
 
-      /* if (true) { */
-        // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
-        if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
-          istimer = true; // update status
-        } /* else if ((strlen(s) == 6 && s[5] == '*' && s[2] == ':' && isdigit(*s) && isdigit(*(s + 1)) &&
-                    isdigit(*(s + 3)) && isdigit(*(s + 4))) ||
-                   (strlen(s) == 5 && s[4] == '*' && s[1] == ':' && isdigit(*s) && isdigit(*(s + 2)) &&
-                    isdigit(*(s + 3))) ||
-                   (strlen(s) == 9 && s[8] == '*' && s[5] == '.' && s[2] == '.' && isdigit(*s) && isdigit(*(s + 1)) &&
-                    isdigit(*(s + 3)) && isdigit(*(s + 4)) && isdigit(*(s + 6)) && isdigit(*(s + 7)))) {
-          // check if new recording: "10:10*", "1:10*", "01.01.06*"
-
-          isnewrecording = true;         // update status
-          strncpy(buffer, s, strlen(s)); // make a copy
-          buffer[strlen(s) - 1] = '\0';  // remove the '*' character
-        } else if ((strlen(s) == 3) && (i == 2 || i == 3 || i == 4)) {
-          if (s[0] == 'R')
-            isRecording = true;
-          if (s[0] == 'T')
-            hasEventtimer = true;
-          if (s[0] == 't')
-            haspartEventtimer = true;
-          if (s[1] == 'V')
-            hasVPS = true;
-          if (s[2] == '*')
-            isRunning = true;
-        } else if ((strlen(s) == 4) && (i == 3)) { // epgsearch What's on now default
-          if (s[1] == 'R')
-            isRecording = true;
-          if (s[1] == 'T')
-            hasEventtimer = true;
-          if (s[1] == 't')
-            haspartEventtimer = true;
-          if (s[2] == 'V')
-            hasVPS = true;
-          if (s[3] == '*')
-            isRunning = true;
-        }
-      } */
+      // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
+      if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0]))
+        istimer = true; // update status
+      
       xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
       if (istimer) {
@@ -526,55 +483,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         default:
           break;
         }
-      } /* else if (isRecording || hasEventtimer || haspartEventtimer || hasVPS || isRunning) {
-        // program schedule menu
-        if (isRecording && iconRec)
-          menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconRec->Height()) / 2), *iconRec);
-        else {
-          if (hasEventtimer && iconTimerFull)
-            menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconTimerFull->Height()) / 2), *iconTimerFull);
-          if (haspartEventtimer && iconTimerPartial)
-            menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconTimerPartial->Height()) / 2), *iconTimerPartial);
-        }
-        xOff += iconTimerFull->Width(); // clock is wider than rec
-
-        if (hasVPS && iconVps) {
-          menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconVps->Height()) / 2), *iconVps);
-          xOff += iconVps->Width();
-        }
-
-        if (isRunning)
-          menuPixmap->DrawText(cPoint(xOff, y), "*", ColorFg, ColorBg, font, AvailableTextWidth - xOff);
-
-      } else if (isnewrecording) {
-        // recordings menu
-        menuPixmap->DrawText(cPoint(xOff, y), buffer, ColorFg, ColorBg, font, AvailableTextWidth - xOff);
-
-        // draw symbol "new" centered
-        if (iconNew) {
-          int gap = std::max(0, (Tab(i + 1) - Tab(i) - font->Width(buffer) - iconNew->Width()) / 2);
-          menuIconsPixmap->DrawImage(cPoint(xOff + font->Width(buffer) + gap, y + (lh - iconNew->Height()) / 2),
-                                     *iconNew);
-        }
-      } else if (CheckProgressBar(s)) {
-        int colWidth = Tab(i + 1) - Tab(i);
-
-        tColor ColorFg = Config.decorProgressMenuItemFg;
-        tColor ColorBarFg = Config.decorProgressMenuItemBarFg;
-        tColor ColorBg = Config.decorProgressMenuItemBg;
-        if (Current) {
-          ColorFg = Config.decorProgressMenuItemCurFg;
-          ColorBarFg = Config.decorProgressMenuItemCurBarFg;
-          ColorBg = Config.decorProgressMenuItemCurBg;
-        }
-        cRect rec = cRect(xt + Config.decorBorderMenuItemSize,
-                          y + (itemHeight - Config.MenuItemPadding) / 2 - Config.decorProgressMenuItemSize / 2 -
-                              Config.decorBorderMenuItemSize,
-                          colWidth, Config.decorProgressMenuItemSize);
-        cRect recBG = cRect(xt + Config.decorBorderMenuItemSize - marginItem, y, colWidth + marginItem * 2, fontHeight);
-
-        DrawProgressBarFromText(rec, recBG, s, ColorFg, ColorBarFg, ColorBg);
-      } */ else {
+      } else {
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));

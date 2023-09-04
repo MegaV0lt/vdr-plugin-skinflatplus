@@ -133,6 +133,8 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingSeenThreshold = 0.98 / 100.0;
     MenuItemRecordingDefaultOldDays = -1;
 
+    PlaybackShowRecordingErrors = true;
+
     ChannelWeatherShow = 1;
     PlaybackWeatherShow = 1;
     WeatherFontSize = 0.05;
@@ -344,7 +346,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)        MenuItemRecordingSeenThreshold = atod(Value);
+    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
@@ -354,6 +356,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuTimerView") == 0)                        MenuTimerView = atoi(Value);
     else if (strcmp(Name, "MessageColorPosition") == 0)                 MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        MessageOffset = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          PlaybackShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 RecordingDimmOnPause = atoi(Value);

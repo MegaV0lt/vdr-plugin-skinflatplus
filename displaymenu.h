@@ -91,7 +91,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         string xml_substring(string source, const char* str_start, const char* str_end);
 
         bool isRecordingOld( const cRecording *Recording, int Level );
-        const char* GetGenreIcon(uchar genre);
+        const char *GetGenreIcon(uchar genre);
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
