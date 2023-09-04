@@ -108,7 +108,7 @@ cPlugin *GetScraperPlugin(void) {
     return pScraper;
 }
 
-cString GetSimpleAspectIcon(int screenWidth, float screenAspect) {
+cString GetSimpleAspectIcon(int screenWidth, double screenAspect) {
     cString asp("unknown_asp");                // ???
     if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
         switch (screenWidth) {                 // No aspect for HD
@@ -131,7 +131,7 @@ cString GetSimpleAspectIcon(int screenWidth, float screenAspect) {
     return asp;
 }
 
-cString GetScreenResolutionIcon(int screenWidth, int screenHeight, float screenAspect) {
+cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
     cString res("");
     switch (screenWidth) {
         case 7680:                        // 7680×4320 (UHD-2 / 8K)

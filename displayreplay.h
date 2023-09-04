@@ -19,7 +19,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
 
         int screenWidth, lastScreenWidth;
         int screenHeight;
-        float screenAspect;
+        double screenAspect;
 
         // dimm on pause
         bool dimmActive;

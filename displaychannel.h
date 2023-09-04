@@ -25,7 +25,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
 
         int screenWidth, lastScreenWidth;
         int screenHeight;
-        float screenAspect;
+        double screenAspect;
         int heightBottom, heightImageLogo;
 
         int LastSignalStrength, LastSignalQuality;
