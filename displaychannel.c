@@ -227,7 +227,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= marginItem * 2;
             }
 
-            cString res = GetScreenResolutionIcon(screenWidth, screenHight, screenAspect);  // Show Resolution
+            cString res = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
             img = imgLoader.LoadIcon(*res, 999, height);
             if (img) {
                 imageTop = top + (height - img->Height()) / 2;

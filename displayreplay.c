@@ -528,7 +528,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 left -= marginItem * 2;
             }
 
-            cString res = GetScreenResolutionIcon(screenWidth, screenHight, screenAspect);  // Show Resolution
+            cString res = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
             img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
             if (img) {
                 imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;

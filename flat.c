@@ -131,7 +131,7 @@ cString GetSimpleAspectIcon(int screenWidth, int screenAspect) {
     return asp;
 }
 
-cString GetScreenResolutionIcon(int screenWidth, int screenHight, int screenAspect) {
+cString GetScreenResolutionIcon(int screenWidth, int screenHeight, int screenAspect) {
     cString res("");
     switch (screenWidth) {
         case 7680:                        // 7680×4320 (UHD-2 / 8K)
