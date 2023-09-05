@@ -11,7 +11,7 @@
 using namespace Magick;
 
 class cImageLoader : public cImageMagickWrapper {
-public:
+ public:
     cImageLoader();
     ~cImageLoader();
 
@@ -20,7 +20,7 @@ public:
     cImage* LoadFile(const char *cFile, int width, int height);
     bool FileExits(const std::string& name);
     bool SearchRecordingPoster(cString recPath, cString &found);
-private:
+ private:
     int epgImageWidthLarge, epgImageHeightLarge;
     int epgImageWidth, epgImageHeight;
     cString logoExtension;

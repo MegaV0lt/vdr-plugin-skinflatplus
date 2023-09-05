@@ -22,7 +22,7 @@ using namespace std;
 #endif
 
 class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
-    private:
+ private:
         cPixmap *menuPixmap;
         cPixmap *menuIconsPixmap;
         cPixmap *menuIconsBGPixmap;
@@ -90,7 +90,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         std::string GetRecordingName(const cRecording *Recording, int Level, bool isFolder);
         string xml_substring(string source, const char* str_start, const char* str_end);
 
-        bool isRecordingOld( const cRecording *Recording, int Level );
+        bool isRecordingOld(const cRecording *Recording, int Level);
         const char *GetGenreIcon(uchar genre);
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
@@ -113,7 +113,8 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
-    public:
+
+ public:
 #ifdef DEPRECATED_SKIN_SETITEMEVENT
     using cSkinDisplayMenu::SetItemEvent;
 #endif
@@ -124,7 +125,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         virtual void Clear(void);
 
         virtual void SetMenuCategory(eMenuCategory MenuCategory);
-        //virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
+        // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
 
         virtual void SetTitle(const char *Title);
         virtual void SetButtons(const char *Red, const char *Green = NULL, const char *Yellow = NULL, const char *Blue = NULL);

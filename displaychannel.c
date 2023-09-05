@@ -39,7 +39,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     channelHeight = osdHeight - Config.decorBorderChannelSize * 2;
     // von unten noch oben
     // 2*EPG + 2*EPGsml
-    heightBottom = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem; // Top, Bottom, Between
+    heightBottom = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem;  // Top, Bottom, Between
     heightImageLogo = heightBottom;
     if (Config.SignalQualityShow)
         heightBottom += std::max(fontSmlHeight, (Config.decorProgressSignalSize * 2) + marginItem) + marginItem;
@@ -105,17 +105,17 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
     if (osd) {
         scrollers.Clear();
 
-        if( chanInfoTopPixmap )
+        if (chanInfoTopPixmap)
             osd->DestroyPixmap(chanInfoTopPixmap);
-        if( chanInfoBottomPixmap )
+        if (chanInfoBottomPixmap)
             osd->DestroyPixmap(chanInfoBottomPixmap);
-        if( chanLogoPixmap )
+        if (chanLogoPixmap)
             osd->DestroyPixmap(chanLogoPixmap);
-        if( chanLogoBGPixmap )
+        if (chanLogoBGPixmap)
             osd->DestroyPixmap(chanLogoBGPixmap);
-        if( chanIconsPixmap )
+        if (chanIconsPixmap)
             osd->DestroyPixmap(chanIconsPixmap);
-        if( chanEpgImagesPixmap )
+        if (chanEpgImagesPixmap)
             osd->DestroyPixmap(chanEpgImagesPixmap);
     }
 }
@@ -463,13 +463,13 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
         cRect(progressLeft, progressTop, progressWidth, Config.decorProgressSignalSize), SignalStrength, 100,
         Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg, Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
-    //left = signalWidth / 2 + marginItem;
+    // left = signalWidth / 2 + marginItem;
     top += Config.decorProgressSignalSize + marginItem;
     progressTop = top;
 
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), SignalFont);
     progressLeft = left + SignalFont->Width("STR") + SignalFont->Width(" ") + marginItem;
-    //progressWidth = signalWidth - progressLeft - marginItem;
+    // progressWidth = signalWidth - progressLeft - marginItem;
 
     ProgressBarDrawRaw(chanInfoBottomPixmap, chanInfoBottomPixmap, cRect(progressLeft, progressTop, progressWidth, Config.decorProgressSignalSize),
         cRect(progressLeft, progressTop, progressWidth, Config.decorProgressSignalSize), SignalQuality, 100,
@@ -483,7 +483,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // you need oscam min rev 10653
 // you need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    //dsyslog("DvbapiInfoDraw");
+    // dsyslog("DvbapiInfoDraw");
     int ChannelSid = CurChannel->Sid();
 
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
@@ -494,7 +494,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
 
-    //dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
+    // dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo))
@@ -580,7 +580,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imageBGHeight = imageBGWidth = height;
 
     cImage *imgBG = imgLoader.LoadIcon("logo_background", height * 1.34, height);
-    if( imgBG ) {
+    if (imgBG) {
         imageBGHeight = imgBG->Height();
         imageBGWidth = imgBG->Width();
     }
@@ -592,12 +592,12 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     cImage *img = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
-    for(const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels->Next(Channel) ) {
+    for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels->Next(Channel)) {
 #else
-    for(cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels.Next(Channel) ) {
+    for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels.Next(Channel)) {
 #endif
         img = imgLoader.LoadLogo(Channel->Name(), imageBGWidth - 4, imageBGHeight - 4);
-        if( img )
+        if (img)
             index++;
     }
 

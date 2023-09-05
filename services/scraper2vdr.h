@@ -315,11 +315,11 @@ class cScraperVideo
 // with the following methods you can request the "IDs of the identified object"
     virtual tvType getVideoType() = 0;  // if this is tNone, nothing was identified by scraper. Still, some information (image, duration deviation ...) might be available
     virtual int getDbId() = 0;          // if > 0: TMDB (themoviedb) ID; if < 0: tvdb (thetvdb) ID
-    virtual int getEpisodeNumber() = 0; // return 0 if episode was not identified
+    virtual int getEpisodeNumber() = 0;  // return 0 if episode was not identified
     virtual int getSeasonNumber() = 0;  // return 0 if episode was not identified
 
 // getOverview provides the "most important" attributes
-    virtual bool getOverview(std::string *title, std::string *episodeName, std::string *releaseDate, int *runtime, std::string *imdbId, int *collectionId, std::string *collectionName = NULL) = 0; // return false if no scraper data is available
+    virtual bool getOverview(std::string *title, std::string *episodeName, std::string *releaseDate, int *runtime, std::string *imdbId, int *collectionId, std::string *collectionName = NULL) = 0;  // return false if no scraper data is available
 
 // "single image, or several images"
     virtual cTvMedia getImage(cImageLevels imageLevels = cImageLevels(), cOrientations imageOrientations = cOrientations(), bool fullPath = true) = 0;

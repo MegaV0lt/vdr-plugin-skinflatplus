@@ -7,7 +7,7 @@
 #include "services/dvbapi.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
-    private:
+ private:
         bool doOutput;
         const cEvent *present;
 
@@ -45,7 +45,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);
         void DvbapiInfoDraw(void);
 
-    public:
+ public:
         cFlatDisplayChannel(bool WithInfo);
         virtual ~cFlatDisplayChannel();
         virtual void SetChannel(const cChannel *Channel, int Number);

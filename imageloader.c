@@ -15,7 +15,7 @@ cImageLoader::~cImageLoader() {
 }
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
-    if ((width == 0) || (height==0))
+    if ((width == 0) || (height == 0))
         return NULL;
 
     std::string logoLower = logo;
@@ -157,7 +157,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     return img;
 }
 
-cImage* cImageLoader::LoadFile(const char *cFile, int width, int height ) {
+cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     if ((width == 0) || (height == 0))
         return NULL;
 
@@ -215,7 +215,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height ) {
 
 void cImageLoader::toLowerCase(std::string &str) {
     const int length = str.length();
-    for(int i=0; i < length; ++i) {
+    for (int i = 0; i < length; ++i) {
         str[i] = std::tolower(str[i]);
     }
 }

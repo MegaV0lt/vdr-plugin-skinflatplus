@@ -21,9 +21,9 @@ static const char *VERSION        = "0.6.8";
 static const char *DESCRIPTION    = "flatPlus";
 
 class cPluginFlat : public cPlugin {
-    private:
+ private:
         cFlat *flat;
-    public:
+ public:
         cPluginFlat(void);
         virtual ~cPluginFlat();
         virtual const char *Version(void) { return VERSION; }
@@ -77,9 +77,9 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 }
 
 __attribute__((constructor)) static void init(void) {
-   Magick::InitializeMagick(NULL);
-   // Prevents *magick from occupying the segfaults (ImageMagick 7+)
-   //MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
+    Magick::InitializeMagick(NULL);
+    // Prevents *magick from occupying the segfaults (ImageMagick 7+)
+    // MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
 }
 
 bool cPluginFlat::Initialize(void) {
@@ -167,4 +167,4 @@ cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &
     return NULL;
 }
 
-VDRPLUGINCREATOR(cPluginFlat); // Don't touch this!
+VDRPLUGINCREATOR(cPluginFlat);  // Don't touch this!

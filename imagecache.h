@@ -11,7 +11,7 @@
 // you must double the value for the real amount of pre cached logos
 
 class cImageCache {
-private:
+ private:
     cImage *CacheImage[MAX_IMAGE_CACHE];
     std::string CacheName[MAX_IMAGE_CACHE];
     int CacheWidth[MAX_IMAGE_CACHE];
@@ -19,15 +19,15 @@ private:
 
     int InsertIndex;
     bool Overflow;
-public:
+ public:
     cImageCache();
     ~cImageCache();
 
     void Create(void);
     void Clear(void);
-    bool RemoveFromCache( std::string Name );
+    bool RemoveFromCache(std::string Name);
 
-    int getCacheCount(void) { if(Overflow) return MAX_IMAGE_CACHE; return InsertIndex+1; }
+    int getCacheCount(void) { if (Overflow) return MAX_IMAGE_CACHE; return InsertIndex+1; }
 
     cImage *GetImage(std::string Name, int Width, int Height);
     void InsertImage(cImage *Image, std::string Name, int Width, int Height);

@@ -5,11 +5,10 @@
 #include <string.h>
 #include <vdr/thread.h>
 
-#define WAITDELAY 1000 // In ms
+#define WAITDELAY 1000  // In ms
 
-class cTextScroll
-{
-private:
+class cTextScroll {
+ private:
     cRect Position;
 
     tColor ColorFg, ColorExtraTextFg, ColorBg;
@@ -19,12 +18,12 @@ private:
     cOsd *Osd;
     int Layer;
     int PixelsPerStep;
-    int WAITSTEPS, waitSteps;
+    int WAITSTEPS, waitSteps = 0;
     bool isReserveStep;
     bool ResetX;
     int ScrollType;
 
-public:
+ public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
         Font = NULL;
         Pixmap = NULL;
@@ -61,12 +60,10 @@ public:
     void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep(void);
     void Draw(void);
-
 };
 
-class cTextScrollers : public cThread
-{
-private:
+class cTextScrollers : public cThread {
+ private:
     std::vector<cTextScroll *> Scrollers;
 
     cOsd *Osd;
@@ -75,7 +72,7 @@ private:
     int Layer;
     virtual void Action(void);
     void StartScrolling(void);
-public:
+ public:
     cTextScrollers();
     ~cTextScrollers();
 

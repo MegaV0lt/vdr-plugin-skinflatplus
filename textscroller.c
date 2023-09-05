@@ -24,8 +24,6 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Draw();
 }
 
-// cPixmap *cTextScroll::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
-
 void cTextScroll::UpdateViewPortWidth(int w) {
     cRect viewPort = Pixmap->ViewPort();
     viewPort.SetWidth(viewPort.Width() - w);
@@ -125,7 +123,7 @@ cTextScrollers::~cTextScrollers() {
 
 void cTextScrollers::Clear(void) {
     Cancel(-1);
-    while(Active())
+    while (Active())
         cCondWait::SleepMs(10);
 
     std::vector<cTextScroll *>::iterator it;
@@ -138,7 +136,7 @@ void cTextScrollers::Clear(void) {
 
 void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg) {
     Cancel(-1);
-    while(Active())
+    while (Active())
         cCondWait::SleepMs(10);
 
     Scrollers.push_back(new cTextScroll(Osd, scrollType, scrollStep, (int)((double)WAITDELAY / (double)scrollDelay), Layer));
@@ -164,7 +162,7 @@ void cTextScrollers::StartScrolling(void) {
 
 void cTextScrollers::Action(void) {
     // Wait 1 second so the osd is finished
-    for (int i = 0; i < 100 && Running(); i++ ) {
+    for (int i = 0; i < 100 && Running(); i++) {
         cCondWait::SleepMs(10);
     }
 

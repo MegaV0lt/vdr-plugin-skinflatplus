@@ -26,9 +26,8 @@ struct sDecorBorder {
 
 template<class T> inline T myMax(T a, T b) { return a >= b ? a : b; }
 
-class cFlatBaseRender
-{
-    protected:
+class cFlatBaseRender {
+ protected:
         cOsd *osd;
 
         int osdLeft, osdTop, osdWidth, osdHeight;
@@ -93,7 +92,7 @@ class cFlatBaseRender
         cPixmap *contentPixmap;
         cPixmap *contentEpgImagePixmap;
         int contentLeft, contentTop, contentHeight, contentWidth;
-        int contentDrawPortHeight; // gesamth�he des Textes
+        int contentDrawPortHeight;  // gesamthöhe des Textes
         int contentTextHeight;
         bool contentHasScrollbar;
         bool contentShown;
@@ -110,7 +109,7 @@ class cFlatBaseRender
         cComplexContent weatherWidget;
 
         cPixmap *decorPixmap;
-        std::list<sDecorBorder> Borders; // for clear specific Borders (clear only MenuItems and not TopBar)
+        std::list<sDecorBorder> Borders;  // for clear specific Borders (clear only MenuItems and not TopBar)
 
         void contentDraw(void);
         void contentEventDraw(void);
@@ -133,9 +132,9 @@ class cFlatBaseRender
         void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg, int type);
 
         void TopBarEnableDiskUsage(void);
-        //tColor Multiply(tColor Color, uint8_t Alpha);
+        // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
-    public:
+ public:
         cImageLoader imgLoader;
 
         cFlatBaseRender(void);

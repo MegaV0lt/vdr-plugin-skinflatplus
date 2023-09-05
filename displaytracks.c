@@ -2,7 +2,6 @@
 #include "flat.h"
 
 cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) {
-
     CreateFullOsd();
     TopBarCreate();
 
@@ -84,7 +83,6 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     else
         DecorBorderDraw(left, top, maxItemWidth, fontHeight,
             Config.decorBorderTrackSize, Config.decorBorderTrackType, Config.decorBorderTrackFg, Config.decorBorderTrackBg);
-
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {

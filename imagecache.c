@@ -18,7 +18,7 @@ cImageCache::~cImageCache() {
 }
 
 void cImageCache::Create(void) {
-    for(int i = 0; i < MAX_IMAGE_CACHE; i++) {
+    for (int i = 0; i < MAX_IMAGE_CACHE; i++) {
         CacheImage[i] = NULL;
         CacheName[i] = "";
         CacheWidth[i] = -1;
@@ -29,7 +29,7 @@ void cImageCache::Create(void) {
 }
 
 void cImageCache::Clear(void) {
-    for(int i = 0; i < MAX_IMAGE_CACHE; i++) {
+    for (int i = 0; i < MAX_IMAGE_CACHE; i++) {
         if (CacheImage[i] != NULL)
             delete CacheImage[i];
     }
@@ -39,12 +39,12 @@ void cImageCache::Clear(void) {
 
 bool cImageCache::RemoveFromCache(std::string Name) {
     bool found = false;
-    for(int index = 0; index < MAX_IMAGE_CACHE; index++ ) {
+    for (int index = 0; index < MAX_IMAGE_CACHE; index++) {
         char *bname;
         bname = basename((char *)CacheName[index].c_str());
         if (!strcmp(bname, Name.c_str())) {
             found = true;
-            dsyslog("flatPlus: RemoveFromCache - %s", CacheName[index].c_str() );
+            dsyslog("flatPlus: RemoveFromCache - %s", CacheName[index].c_str());
             CacheImage[index] = NULL;
             CacheName[index] = "";
             CacheWidth[index] = -1;
@@ -55,9 +55,9 @@ bool cImageCache::RemoveFromCache(std::string Name) {
 }
 
 cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
-    //dsyslog("imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
-    for(int index = 0; index < MAX_IMAGE_CACHE; index++ ) {
-        //dsyslog("imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(), CacheWidth[index], CacheHeight[index]);
+    // dsyslog("imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
+    for (int index = 0; index < MAX_IMAGE_CACHE; index++) {
+        // dsyslog("imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(), CacheWidth[index], CacheHeight[index]);
         if (CacheName[index] == Name && CacheWidth[index] == Width && CacheHeight[index] == Height)
             return CacheImage[index];
     }

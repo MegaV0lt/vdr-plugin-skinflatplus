@@ -36,8 +36,6 @@ void cComplexContent::Clear(void) {
   }
 }
 
-// cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
-
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   CalculateDrawPortHeight();
   FullFillBackground = fullFillBackground;
@@ -240,7 +238,7 @@ int cComplexContent::ScrollTotal(void) {
 }
 
 int cComplexContent::ScrollShown(void) {
-  // int shown = ceil( (double)Position.Height() / (double)ScrollSize);
+  // int shown = ceil((double)Position.Height() / (double)ScrollSize);
   int shown = Position.Height() / ScrollSize;
   return shown;
 }

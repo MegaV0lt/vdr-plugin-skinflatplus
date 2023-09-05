@@ -47,7 +47,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
             font, maxlabelWidth + marginItem + labelHeight, fontHeight, taLeft);
         cImage *img = imgLoader.LoadIcon("mute", fontHeight, fontHeight);
         if (img) {
-            muteLogoPixmap->DrawImage( cPoint(left + maxlabelWidth + marginItem, marginItem), *img );
+            muteLogoPixmap->DrawImage(cPoint(left + maxlabelWidth + marginItem, marginItem), *img);
         }
         DecorBorderDraw(left - marginItem, DecorTop, maxlabelWidth + marginItem * 4 + fontHeight, fontHeight,
             Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg, Config.decorBorderVolumeBg);

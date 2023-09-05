@@ -93,7 +93,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
       cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
       if (imgRecErr != NULL) {
-        //imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
+        // imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
         iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
       }
       Left += imgRecErr->Width() + marginItem;  // Add width of icon
@@ -117,11 +117,11 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 
 void cFlatDisplayReplay::Action(void) {
     time_t curTime;
-    while(Running()) {
+    while (Running()) {
         time(&curTime);
         if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
-            for(int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
+            for (int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
                 dimmPixmap->Fill(ArgbToColor(alpha, 0, 0, 0));
                 Flush();
             }
@@ -139,7 +139,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         Start();
     } else if (Play == true && Config.RecordingDimmOnPause) {
         Cancel(-1);
-        while(Active())
+        while (Active())
             cCondWait::SleepMs(10);
         if (dimmActive) {
             dimmPixmap->Fill(clrTransparent);
@@ -153,7 +153,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (modeOnly)
             labelPixmap->Fill(clrTransparent);
 
-        //iconsPixmap->Fill(clrTransparent);  // Moved to SetRecording
+        // iconsPixmap->Fill(clrTransparent);  // Moved to SetRecording
         labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0, fontHeight*4 + marginItem*6 + font->Width("33") * 2,
                                    fontHeight), Theme.Color(clrReplayBg));
 
@@ -161,7 +161,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         cString speed("");
 
         if (Speed == -1) {
-            if (Play ) {
+            if (Play) {
                 rewind = "rewind";
                 pause = "pause";
                 play = "play_sel";
@@ -205,7 +205,6 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         img = imgLoader.LoadIcon(*forward, fontHeight, fontHeight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left + fontHeight*3 + marginItem*3, 0), *img);
-
     }
 
     if (ProgressShown) {
@@ -312,13 +311,12 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 filename = cString::sprintf("%s/%05d.ts", recording->FileName(), ++i);
                 imax = 99999;
             }
-            rc=stat(filename, &filebuf);
+            rc = stat(filename, &filebuf);
             if (rc == 0)
                 filesize[i] = filesize[i-1] + filebuf.st_size;
             else {
                 if (ENOENT != errno) {
-                    esyslog ("flatPlus: Error determining file size of \"%s\" %d (%s)",
-                             (const char *)filename, errno, strerror(errno));
+                    esyslog ("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno, strerror(errno));
                 }
             }
         } while (i <= imax && !rc);
@@ -407,7 +405,6 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     Config.decorBorderChannelEPGSize, Config.decorBorderChannelEPGType, Config.decorBorderChannelEPGFg, Config.decorBorderChannelEPGBg, BorderTVSPoster);
             }
         }
-
     }
 
     if (iscutted) {
@@ -420,7 +417,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
             size_t found = tot.find_last_of(':');
-            if( found != std::string::npos ) {
+            if (found != std::string::npos) {
                 std::string hm = tot.substr(0, found);
                 std::string secs = tot.substr(found, tot.length() - found);
 

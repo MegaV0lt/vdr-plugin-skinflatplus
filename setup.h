@@ -6,93 +6,93 @@
 #include "services/scraper2vdr.h"
 
 class cFlatSetup : public cMenuSetupPage {
-    public:
+ public:
         cFlatSetup(void);
         virtual ~cFlatSetup();
-    private:
+ private:
         cFlatConfig SetupConfig;
 
         int ItemLastSel;
         void Setup(void);
-    protected:
+ protected:
         virtual void Store(void);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cMenuSetupSubMenu : public cOsdMenu {
-    protected:
+ protected:
         cFlatConfig *SetupConfig;
         virtual void Setup(void) = 0;
         cOsdItem *InfoItem(const char *label, const char *value);
         int ItemLastSel;
-    public:
+ public:
         cMenuSetupSubMenu(const char *Title, cFlatConfig *data);
 };
 
 class cFlatSetupGeneral : public cMenuSetupSubMenu {
-    private:
-    protected:
+ private:
+ protected:
         void Setup(void);
         void SaveCurrentSettings(void);
         void LoadConfigFile(void);
         bool SetupParse(const char *Name, const char *Value);
-    public:
+ public:
         cFlatSetupGeneral(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupChannelInfo : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupChannelInfo(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupMenu : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupMenu(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupReplay : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupReplay(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupVolume : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupVolume(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupTracks : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupTracks(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupTvsraper : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupTvsraper(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 
 class cFlatSetupMMWidget : public cMenuSetupSubMenu {
-    protected:
+ protected:
         void Setup(void);
-    public:
+ public:
         cFlatSetupMMWidget(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };

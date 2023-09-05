@@ -21,13 +21,13 @@
 enum stream_content {
   sc_reserved        = 0x00,
   sc_video_MPEG2     = 0x01,
-  sc_audio_MP2       = 0x02, // MPEG 1 Layer 2 audio
+  sc_audio_MP2       = 0x02,  // MPEG 1 Layer 2 audio
   sc_subtitle        = 0x03,
   sc_audio_AC3       = 0x04,
   sc_video_H264_AVC  = 0x05,
   sc_audio_HEAAC     = 0x06,
-  sc_video_H265_HEVC = 0x09, // stream content 0x09, extension 0x00
-  sc_audio_AC4       = 0x19, // stream content 0x09, extension 0x10
+  sc_video_H265_HEVC = 0x09,  // stream content 0x09, extension 0x00
+  sc_audio_AC4       = 0x19,  // stream content 0x09, extension 0x10
 };
 
 static int CompareTimers(const void *a, const void *b) { return (*(const cTimer **)a)->Compare(**(const cTimer **)b); }
@@ -84,7 +84,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   scrollbarPixmap = osd->CreatePixmap(
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
   // dsyslog("flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
-  //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2 );
+  //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2);
 
   menuPixmap->Fill(clrTransparent);
   menuIconsPixmap->Fill(clrTransparent);
@@ -339,21 +339,19 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
               recNewCount++;
           }
         }
-        cString newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);
+        cString newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);  // Display (35*/56)
         if (Config.ShortRecordingCount) {
           if (recNewCount == 0)              // No new recordings
             newTitle = cString::sprintf("%s (%d)", Title, recCount);
           else if (recNewCount == recCount)  // Only new recordings
             newTitle = cString::sprintf("%s (%d*)", Title, recNewCount);
-          //else  // Display (35*/56)        // Already processed above!
-          //  newTitle = cString::sprintf("%s (%d*/%d)", Title, recNewCount, recCount);
         }
         TopBarSetTitle(*newTitle);
       }
       /*
-      if( RecordingsSortMode == rsmName )
+      if(RecordingsSortMode == rsmName)
           TopBarSetMenuIconRight("menuIcons/RecsSortName");
-      else if( RecordingsSortMode == rsmTime )
+      else if(RecordingsSortMode == rsmTime)
           TopBarSetMenuIconRight("menuIcons/RecsSortDate");
       */
       icon = "menuIcons/Recordings";
@@ -416,7 +414,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
 
     iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
-    //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
+    // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
     iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_cur", fontHeight, fontHeight);
     iconRec = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
     /*iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
@@ -427,7 +425,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
       ColorBg = Theme.Color(clrItemSelableBg);
 
       iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
-      //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
+      // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec_sel", fontHeight, fontHeight);
       /*iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
@@ -437,7 +435,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
       ColorBg = Theme.Color(clrItemBg);
 
       iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
-      //iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
+      // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
       iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
       iconRec = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
       /*iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
@@ -460,8 +458,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
       // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
       if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0]))
-        istimer = true; // update status
-      
+        istimer = true;  // update status
+
       xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
       if (istimer) {
@@ -677,6 +675,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
   }
   if (isProgressbar) {
     double progress = (double)now / (double)total;
+    // double progress = static_cast<double>(now / total);
     ProgressBarDrawRaw(menuPixmap, menuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                        Config.decorProgressMenuItemType, true);
   }
@@ -1110,7 +1109,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
     if (Config.TVScraperEPGInfoShowPoster && pScraper) {
       ScraperGetPosterBannerV2 call;
       call.event = Event;
-	    call.recording = NULL;
+      call.recording = NULL;
       if (pScraper->Service("GetPosterBannerV2", &call)) {
         if ((call.type == tSeries) && call.banner.path.size() > 0) {
           mediaWidth = cWidth - marginItem * 2;
@@ -1229,7 +1228,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
   } else if (Timer->FirstDay()) {                          // Active timer 'FirstDay'
     TimerIconName = "text_arrowturn";
-    //ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
+    // ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
   } else                                                   // Active timer
     TimerIconName = "timerActive";
 
@@ -1659,7 +1658,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
   }
 
   if (WithDate && Event && Selectable) {
-
     struct tm tm_r;
     time_t Day = Event->StartTime();
     localtime_r(&Day, &tm_r);
@@ -2026,7 +2024,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         cString SeenIcon("");
 
         double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
-        // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold );
+        // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
 
         if (FrameSeen < 0.1)
           SeenIcon = "recording_seen_0";
@@ -4044,7 +4042,6 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
-
   cString sortIcon("");
   switch (MenuSortMode) {
   case msmUnknown:
@@ -4653,7 +4650,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         strDevice << tr("not used");
       }
     }
-    // channelName = strDevice.str().c_str();  
+    // channelName = strDevice.str().c_str();
     auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
     channelName = x.c_str();
 
@@ -5585,9 +5582,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
       continue;
 
     /* std::string precType("");  // Wird nirgends verwendet?
-    cString precTypeFilename = cString::sprintf("%s/weather/weather.%d.precipitationType", WIDGETOUTPUTPATH, index );
+    cString precTypeFilename = cString::sprintf("%s/weather/weather.%d.precipitationType", WIDGETOUTPUTPATH, index);
     std::ifstream file6(*precTypeFilename, std::ifstream::in);
-    if( file6.is_open() ) {
+    if(file6.is_open()) {
         std::getline(file6, precType);
         file6.close();
     } else
@@ -5601,7 +5598,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     time_t t2 = mktime(tm);
     weekDayName = WeekDayName(t2);
 
-    if (Config.MainMenuWidgetWeatherType == 0) { // short
+    if (Config.MainMenuWidgetWeatherType == 0) {  // short
       if (left + fontHeight * 2 + fontTempSml->Width("-99,9°C") + fontTempSml->Width("XXXX") + marginItem * 6 > wWidth)
         break;
       if (index > 0) {
@@ -5634,7 +5631,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                             cRect(left, ContentTop + (fontHeight / 2 - fontTempSml->Height() / 2), 0, 0),
                             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontTempSml);
       left += fontTempSml->Width(*precString) + marginItem * 2;
-    } else { // long
+    } else {  // long
       if (ContentTop + marginItem > menuPixmap->ViewPort().Height())
         break;
 

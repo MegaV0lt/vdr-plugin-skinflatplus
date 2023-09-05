@@ -118,8 +118,6 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
   return;
 }
 
-// cPixmap *cFlatBaseRender::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
-
 void cFlatBaseRender::TopBarCreate(void) {
   int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
   topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
@@ -136,16 +134,16 @@ void cFlatBaseRender::TopBarCreate(void) {
 
   topBarPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
-  //         Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+  //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                              osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-  //         osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+  //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarIconPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-  // dsyslog("flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize, Config.decorBorderTopBarSize, osdWidth -
-  //         Config.decorBorderTopBarSize*2, topBarHeight);
+  // dsyslog("flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+  //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
   topBarPixmap->Fill(clrTransparent);
   topBarIconBGPixmap->Fill(clrTransparent);
   topBarIconPixmap->Fill(clrTransparent);
@@ -234,20 +232,20 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
   cString extra1("");
   cString extra2("");
 
-  if (Config.DiskUsageFree == 1) {        // Show in free mode
-    ChartDiskUsage = 100 - DiskUsage;     // DiskFreePrecent
-    if (Config.DiskUsageShort == false) { // Long format
+  if (Config.DiskUsageFree == 1) {         // Show in free mode
+    ChartDiskUsage = 100 - DiskUsage;      // DiskFreePrecent
+    if (Config.DiskUsageShort == false) {  // Long format
       extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), ChartDiskUsage, tr("free"));
-      if (FreeGB < 1000.0) { // Less than 1000 GB
+      if (FreeGB < 1000.0) {  // Less than 1000 GB
         extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
-      } else { // 1000 GB+
+      } else {  // 1000 GB+
         extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB / 1024.0, FreeMinutes / 60, FreeMinutes % 60);
       }
-    } else { // Short format
+    } else {  // Short format
       extra1 = cString::sprintf("%d%% %s", ChartDiskUsage, tr("free"));
       extra2 = cString::sprintf("~ %02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
     }
-    switch (ChartDiskUsage) { // Show free space
+    switch (ChartDiskUsage) {  // Show free space
     case 0 ... 2:
       iconName = "chart0b"; break;  // < 2% (chart1b in red)
     case 3 ... 4:
@@ -269,63 +267,63 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     case 26 ... 28:
       iconName = "chart9b"; break;  // 28,125
     case 29 ... 31:
-      iconName = "chart10b"; break; // 31,25
+      iconName = "chart10b"; break;  // 31,25
     case 32 ... 34:
-      iconName = "chart11b"; break; // 34,375
+      iconName = "chart11b"; break;  // 34,375
     case 35 ... 38:
-      iconName = "chart12b"; break; // 37,5
+      iconName = "chart12b"; break;  // 37,5
     case 39 ... 41:
-      iconName = "chart13b"; break; // 40,625
+      iconName = "chart13b"; break;  // 40,625
     case 42 ... 44:
-      iconName = "chart14b"; break; // 43,75
+      iconName = "chart14b"; break;  // 43,75
     case 45 ... 47:
-      iconName = "chart15b"; break; // 46,875
+      iconName = "chart15b"; break;  // 46,875
     case 48 ... 50:
-      iconName = "chart16b"; break; // 50
+      iconName = "chart16b"; break;  // 50
     case 51 ... 53:
-      iconName = "chart17b"; break; // 53,125
+      iconName = "chart17b"; break;  // 53,125
     case 54 ... 56:
-      iconName = "chart18b"; break; // 56,25
+      iconName = "chart18b"; break;  // 56,25
     case 57 ... 59:
-      iconName = "chart19b"; break; // 59,375
+      iconName = "chart19b"; break;  // 59,375
     case 60 ... 63:
-      iconName = "chart20b"; break; // 62,5
+      iconName = "chart20b"; break;  // 62,5
     case 64 ... 66:
-      iconName = "chart21b"; break; // 65,625
+      iconName = "chart21b"; break;  // 65,625
     case 67 ... 69:
-      iconName = "chart22b"; break; // 68,75
+      iconName = "chart22b"; break;  // 68,75
     case 70 ... 72:
-      iconName = "chart23b"; break; // 71,875
+      iconName = "chart23b"; break;  // 71,875
     case 73 ... 75:
-      iconName = "chart24b"; break; // 75
+      iconName = "chart24b"; break;  // 75
     case 76 ... 78:
-      iconName = "chart25b"; break; // 78,125
+      iconName = "chart25b"; break;  // 78,125
     case 79 ... 81:
-      iconName = "chart26b"; break; // 81,25
+      iconName = "chart26b"; break;  // 81,25
     case 82 ... 84:
-      iconName = "chart27b"; break; // 84,375
+      iconName = "chart27b"; break;  // 84,375
     case 85 ... 88:
-      iconName = "chart28b"; break; // 87,5
+      iconName = "chart28b"; break;  // 87,5
     case 89 ... 91:
-      iconName = "chart29b"; break; // 90,625
+      iconName = "chart29b"; break;  // 90,625
     case 92 ... 94:
-      iconName = "chart30b"; break; // 93,75
+      iconName = "chart30b"; break;  // 93,75
     case 95 ... 100:
-      iconName = "chart31b"; break; // 96,875 - 100
+      iconName = "chart31b"; break;  // 96,875 - 100
     }
-  } else {                                // Show in occupied mode
-    if (Config.DiskUsageShort == false) { // Long format
+  } else {                                 // Show in occupied mode
+    if (Config.DiskUsageShort == false) {  // Long format
       extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsage, tr("occupied"));
-      if (OccupiedGB < 1000.0) { // Less than 1000 GB
+      if (OccupiedGB < 1000.0) {  // Less than 1000 GB
         extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
-      } else { // 1000 GB+
+      } else {  // 1000 GB+
         extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60, OccupiedMinutes % 60);
       }
-    } else { // Short format
+    } else {  // Short format
       extra1 = cString::sprintf("%d%% %s", DiskUsage, tr("occupied"));
       extra2 = cString::sprintf("~ %02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
     }
-    switch (ChartDiskUsage) { // show used space
+    switch (ChartDiskUsage) {  // show used space
     case 0 ... 3:
       iconName = "chart1"; break;  // 3,125
     case 4 ... 6:
@@ -345,51 +343,51 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     case 26 ... 28:
       iconName = "chart9"; break;  // 28,125
     case 29 ... 31:
-      iconName = "chart10"; break; // 31,25
+      iconName = "chart10"; break;  // 31,25
     case 32 ... 34:
-      iconName = "chart11"; break; // 34,375
+      iconName = "chart11"; break;  // 34,375
     case 35 ... 38:
-      iconName = "chart12"; break; // 37,5
+      iconName = "chart12"; break;  // 37,5
     case 39 ... 41:
-      iconName = "chart13"; break; // 40,625
+      iconName = "chart13"; break;  // 40,625
     case 42 ... 44:
-      iconName = "chart14"; break; // 43,75
+      iconName = "chart14"; break;  // 43,75
     case 45 ... 47:
-      iconName = "chart15"; break; // 46,875
+      iconName = "chart15"; break;  // 46,875
     case 48 ... 50:
-      iconName = "chart16"; break; // 50
+      iconName = "chart16"; break;  // 50
     case 51 ... 53:
-      iconName = "chart17"; break; // 53,125
+      iconName = "chart17"; break;  // 53,125
     case 54 ... 56:
-      iconName = "chart18"; break; // 56,25
+      iconName = "chart18"; break;  // 56,25
     case 57 ... 59:
-      iconName = "chart19"; break; // 59,375
+      iconName = "chart19"; break;  // 59,375
     case 60 ... 63:
-      iconName = "chart20"; break; // 62,5
+      iconName = "chart20"; break;  // 62,5
     case 64 ... 66:
-      iconName = "chart21"; break; // 65,625
+      iconName = "chart21"; break;  // 65,625
     case 67 ... 69:
-      iconName = "chart22"; break; // 68,75
+      iconName = "chart22"; break;  // 68,75
     case 70 ... 72:
-      iconName = "chart23"; break; // 71,875
+      iconName = "chart23"; break;  // 71,875
     case 73 ... 75:
-      iconName = "chart24"; break; // 75
+      iconName = "chart24"; break;  // 75
     case 76 ... 78:
-      iconName = "chart25"; break; // 78,125
+      iconName = "chart25"; break;  // 78,125
     case 79 ... 81:
-      iconName = "chart26"; break; // 81,25
+      iconName = "chart26"; break;  // 81,25
     case 82 ... 84:
-      iconName = "chart27"; break; // 84,375
+      iconName = "chart27"; break;  // 84,375
     case 85 ... 88:
-      iconName = "chart28"; break; // 87,5
+      iconName = "chart28"; break;  // 87,5
     case 89 ... 91:
-      iconName = "chart29"; break; // 90,625
+      iconName = "chart29"; break;  // 90,625
     case 92 ... 94:
-      iconName = "chart30"; break; // 93,75
+      iconName = "chart30"; break;  // 93,75
     case 95 ... 97:
-      iconName = "chart31"; break; // 96,875
+      iconName = "chart31"; break;  // 96,875
     case 98 ... 100:
-      iconName = "chart32"; break; // > 98% (chart31 in red)
+      iconName = "chart32"; break;  // > 98% (chart31 in red)
     }
   }
   TopBarSetTitleExtra(extra1, extra2);
@@ -643,7 +641,7 @@ void cFlatBaseRender::ButtonsCreate(void) {
   buttonsPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderButtonSize, buttonsTop,
                                         buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
   buttonsPixmap->Fill(clrTransparent);
-  // dsyslog("flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d", 
+  // dsyslog("flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d",
   //         Config.decorBorderButtonSize, buttonsTop, buttonsWidth - Config.decorBorderButtonSize*2, buttonsHeight);
 }
 
@@ -948,8 +946,8 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
   progressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
   progressBarPixmap = CreatePixmap(osd, 3, cRect(Left, Top, Width, progressBarHeight));
-  progressBarPixmapBg = CreatePixmap(osd, 2, cRect(Left - progressBarMarginVer, 
-                                                   Top - progressBarMarginHor, 
+  progressBarPixmapBg = CreatePixmap(osd, 2, cRect(Left - progressBarMarginVer,
+                                                   Top - progressBarMarginHor,
                                                    Width + progressBarMarginVer * 2,
                                                    progressBarHeight + progressBarMarginHor * 2));
   progressBarPixmap->Fill(clrTransparent);
@@ -983,7 +981,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
       Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
   }
   switch (Type) {
-  case 0: // small line + big line
+  case 0:  // small line + big line
   {
     int sml = rect.Height() / 10 * 2;
     if (sml <= 1)
@@ -997,7 +995,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                             ColorBarFg);
     break;
   }
-  case 1: // big line
+  case 1:  // big line
   {
     int big = rect.Height();
 
@@ -1006,7 +1004,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                             ColorBarFg);
     break;
   }
-  case 2: // big line + outline
+  case 2:  // big line + outline
   {
     int big = rect.Height();
     int out = 1;
@@ -1043,7 +1041,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
           Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                       (rect.Width() * percentLeft) - out * 2, big - out * 2),
                                 Theme.Color(clrButtonRed));
-
       } else
         Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                     (rect.Width() * percentLeft) - out * 2, big - out * 2),
@@ -1051,7 +1048,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 3: // small line + big line + dot
+  case 3:  // small line + big line + dot
   {
     int sml = rect.Height() / 10 * 2;
     if (sml <= 1)
@@ -1070,7 +1067,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 4: // big line + dot
+  case 4:  // big line + dot
   {
     int big = rect.Height();
 
@@ -1084,7 +1081,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 5: // big line + outline + dot
+  case 5:  // big line + outline + dot
   {
     int big = rect.Height();
     int out = 1;
@@ -1106,7 +1103,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 6: // small line + dot
+  case 6:  // small line + dot
   {
     int sml = rect.Height() / 10 * 2;
     if (sml <= 1)
@@ -1123,7 +1120,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 7: // outline + dot
+  case 7:  // outline + dot
   {
     int big = rect.Height();
     int out = 1;
@@ -1143,7 +1140,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 8: // small line + big line + alpha blend
+  case 8:  // small line + big line + alpha blend
   {
     int sml = rect.Height() / 10 * 2;
     if (sml <= 1)
@@ -1159,7 +1156,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     break;
   }
-  case 9: // big line + alpha blend
+  case 9:  // big line + alpha blend
   {
     int big = rect.Height();
 
@@ -1228,7 +1225,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     progressBarPixmap->DrawRectangle(cRect(posMark - sml / 2, 0, sml, progressBarHeight), progressBarColorMark);
 
   if (!Start) {
-    // progressBarPixmap->DrawRectangle(cRect( posMarkLast + sml/2, top - big/2,
+    // progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml/2, top - big/2,
     // progressBarWidth - posMarkLast, big), progressBarColorBarFg);
     if (posCurrent > posMarkLast)
       progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml / 2, top - big / 2, posCurrent - posMarkLast, big),
@@ -1539,7 +1536,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
   }
 
   switch (Type) {
-  case 1: // rect
+  case 1:  // rect
     // top
     decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
     // right
@@ -1549,7 +1546,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     // left
     decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), ColorBg);
     break;
-  case 2: // round
+  case 2:  // round
     // top
     decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
     // right
@@ -1568,7 +1565,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     // bottom,right corner
     decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, 4);
     break;
-  case 3: // invert round
+  case 3:  // invert round
     // top
     decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
     // right
@@ -1587,7 +1584,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     // bottom,right corner
     decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
     break;
-  case 4: // rect + alpha blend
+  case 4:  // rect + alpha blend
     // top
     DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
     // bottom
@@ -1604,7 +1601,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     DecorDrawGlowRectBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg);
     DecorDrawGlowRectBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg);
     break;
-  case 5: // round + alpha blend
+  case 5:  // round + alpha blend
     // top
     DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
     // bottom
@@ -1621,7 +1618,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     DecorDrawGlowEllipseBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, 3);
     DecorDrawGlowEllipseBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg, 4);
     break;
-  case 6: // invert round + alpha blend
+  case 6:  // invert round + alpha blend
     // top
     DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
     // bottom
@@ -1743,7 +1740,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
   double Alpha;
 
   for (int i = 0, j = Width; i < Width; i++, j--) {
-    if (VDRVERSNUM < 20002 && j == 1) // in VDR Version < 2.0.2 osd breaks if width & height == 1
+    if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
       continue;
     Alpha = 255 / Width * i;
     tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1756,7 +1753,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
   double Alpha;
 
   for (int i = 0, j = Width; i < Width; i++, j--) {
-    if (VDRVERSNUM < 20002 && j == 1) // in VDR Version < 2.0.2 osd breaks if width & height == 1
+    if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
       continue;
     Alpha = 255 / Width * i;
     tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1769,7 +1766,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
   double Alpha;
 
   for (int i = 0, j = Width; i < Width; i++, j--) {
-    if (VDRVERSNUM < 20002 && j == 1) // in VDR Version < 2.0.2 osd breaks if width & height == 1
+    if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
       continue;
     Alpha = 255 / Width * i;
     tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1782,7 +1779,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
   double Alpha;
 
   for (int i = 0, j = Width; i < Width; i++, j--) {
-    if (VDRVERSNUM < 20002 && j == 1) // in VDR Version < 2.0.2 osd breaks if width & height == 1
+    if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
       continue;
     Alpha = 255 / Width * i;
     tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1799,7 +1796,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
   if (!error) {
     error = FT_New_Face(library, fontFileName, 0, &face);
     if (!error) {
-      if (face->num_fixed_sizes && face->available_sizes) { // fixed font
+      if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
         // TODO what exactly does all this mean?
         Ascender = face->available_sizes->height;
       } else {
@@ -1901,7 +1898,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
   file.open(*filename, std::ifstream::in);
   if (file.is_open()) {
     std::getline(file, precToday);
-    std::replace( precToday.begin(), precToday.end(), '.', ',');
+    std::replace(precToday.begin(), precToday.end(), '.', ',');
     file.close();
     p = atof(precToday.c_str()) * 100.0;
     p = roundUp(p, 10);
@@ -1912,7 +1909,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
   file.open(*filename, std::ifstream::in);
   if (file.is_open()) {
     std::getline(file, precTomorrow);
-    std::replace( precTomorrow.begin(), precTomorrow.end(), '.', ',');
+    std::replace(precTomorrow.begin(), precTomorrow.end(), '.', ',');
     file.close();
     p = atof(precTomorrow.c_str()) * 100.0;
     p = roundUp(p, 10);
@@ -1921,8 +1918,10 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
 
   int left = marginItem;
 
-  int widthTempToday = std::max(weatherFontSml->Width(tempMaxToday.c_str()), weatherFontSml->Width(tempMinToday.c_str()));
-  int widthTempTomorrow = std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()), weatherFontSml->Width(tempMinTomorrow.c_str()));
+  int widthTempToday = std::max(weatherFontSml->Width(tempMaxToday.c_str()),
+                                weatherFontSml->Width(tempMinToday.c_str()));
+  int widthTempTomorrow = std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()),
+                                   weatherFontSml->Width(tempMinTomorrow.c_str()));
 
   int wTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
   int wWidth = marginItem + weatherFont->Width(tempToday.c_str()) + weatherFontSign->Width(tempTodaySign.c_str()) +

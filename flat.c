@@ -60,8 +60,8 @@ char *substr(char *string, int start, int end) {
     if (!buf) return NULL;
 
     while (*p != '\0' && start < end) {
-        *ptr ++ = *p++;
-        start ++;
+        *ptr++ = *p++;
+        start++;
     }
     *ptr++ = '\0';
 
@@ -81,17 +81,18 @@ char *GetFilenameWithoutext(char *fullfilename) {
 }
 
 cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
-      if (osd) {
+    if (osd) {
         if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
             return pixmap;
         } else {
-            esyslog("flatPlus: Could not create pixmap of size %i x %i", DrawPort.Size().Width(), DrawPort.Size().Height());
+            esyslog("flatPlus: Could not create pixmap of size %i x %i",
+                    DrawPort.Size().Width(), DrawPort.Size().Height());
             cRect NewDrawPort = DrawPort;
             int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
             int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
             NewDrawPort.SetSize(width, height);
             if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-                esyslog("flatPlus: Create pixmap with reduced size %i x %i", width, height);
+                esyslog("flatPlus: Created pixmap with reduced size %i x %i", width, height);
                 return pixmap;
             } else {
                 esyslog("flatPlus: Could not create pixmap with reduced size %i x %i", width, height);
@@ -160,7 +161,7 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
             res = "352x576"; break;
         default:
             res = "unknown_res";
-            dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n", 
+            dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
                     screenWidth, screenHeight, screenAspect);
             break;
     }
