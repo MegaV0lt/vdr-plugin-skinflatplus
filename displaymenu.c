@@ -453,16 +453,11 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     const char *s = GetTabbedText(Text, i);
     if (s) {
       // from skinelchi
-      bool istimer = false;
       int xt = Tab(i);
-
-      // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
-      if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0]))
-        istimer = true;  // update status
-
       xOff = Tab(i) + Config.decorBorderMenuItemSize;
 
-      if (istimer) {
+      // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
+      if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
         // Timer menu (EPGsearch searchtimer)
         switch (s[0]) {
         case '!':
@@ -481,7 +476,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         default:
           break;
         }
-      } else {
+      } else {  // Not EPGsearch timermenu
         if ((menuCategory == mcMain || menuCategory == mcSetup) && Config.MenuItemIconsShow) {
           cImageLoader imgLoader;
           cString cIcon = GetIconName(MainMenuText(s));
@@ -536,7 +531,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg, font,
                                  menuItemWidth - xt - Config.decorBorderMenuItemSize);
         }
-      }  // !isTimer
+      }  // Not EPGsearch searchtimer
     }  // if (s)
     if (!Tab(i + 1))
       break;
