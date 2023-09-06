@@ -36,7 +36,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         uint32_t tick2 = GetMsTicks();
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
-    if (img != NULL)
+    if (img)
         return img;
 
     #ifdef DEBUGIMAGELOADTIME
@@ -60,7 +60,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
     img = CreateImage(width, height);
 
-    if (img == NULL)
+    if(!img)
         return NULL;
 
     #ifdef DEBUGIMAGELOADTIME
@@ -94,7 +94,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick2 = GetMsTicks();
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
-    if (img != NULL)
+    if (img)
         return img;
 
     #ifdef DEBUGIMAGELOADTIME
@@ -121,7 +121,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
             uint32_t tick6 = GetMsTicks();
             dsyslog("   search in cache: %d ms", tick6 - tick5);
         #endif
-        if (img != NULL)
+        if (img)
             return img;
 
         #ifdef DEBUGIMAGELOADTIME
@@ -150,7 +150,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick10 = GetMsTicks();
         dsyslog("   scale logo: %d ms", tick10 - tick9);
     #endif
-    if (img == NULL)
+    if(!img)
         return NULL;
 
     imgCache.InsertImage(img, *File, width, height);
@@ -177,7 +177,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         uint32_t tick2 = GetMsTicks();
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
-    if (img != NULL)
+    if (img)
         return img;
 
     #ifdef DEBUGIMAGELOADTIME
@@ -201,7 +201,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     img = CreateImage(width, height);
 
-    if (img == NULL)
+    if(!img)
         return NULL;
 
     #ifdef DEBUGIMAGELOADTIME

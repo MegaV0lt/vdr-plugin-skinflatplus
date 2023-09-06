@@ -52,7 +52,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 }
 
 cFlatDisplayReplay::~cFlatDisplayReplay() {
-    if (fontSecs != NULL)
+    if (fontSecs)
         delete fontSecs;
 
     if (labelPixmap)
@@ -92,7 +92,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         RecErrIcon = "recording_error_replay";
 
       cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
-      if (imgRecErr != NULL) {
+      if (imgRecErr) {
         // imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
         iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
       }

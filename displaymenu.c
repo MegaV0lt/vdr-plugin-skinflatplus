@@ -486,7 +486,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             cIconCur = cString::sprintf("%s_cur", *cIcon);
             img = imgLoader.LoadIcon(*cIconCur, fontHeight - marginItem * 2, fontHeight - marginItem * 2);
           }
-          if (img == NULL)
+          if(!img)
             img = imgLoader.LoadIcon(*cIcon, fontHeight - marginItem * 2, fontHeight - marginItem * 2);
 
           if (img) {
@@ -776,7 +776,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (isRadioChannel) {
       if (Current)
         img = imgLoader.LoadIcon("radio_cur", imageBGWidth - 10, imageBGHeight - 10);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
 
       if (img) {
@@ -796,7 +796,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     } else {
       if (Current)
         img = imgLoader.LoadIcon("tv_cur", imageBGWidth - 10, imageBGHeight - 10);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
       if (img) {
         imageTop = Top + (imageBGHeight - img->Height()) / 2;
@@ -1281,7 +1281,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (isRadioChannel) {
       if (Current)
         img = imgLoader.LoadIcon("radio_cur", imageBGWidth - 10, imageBGHeight - 10);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
 
       if (img) {
@@ -1299,7 +1299,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else {
       if (Current)
         img = imgLoader.LoadIcon("tv_cur", imageBGWidth - 10, imageBGHeight - 10);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
       if (img) {
@@ -1550,7 +1550,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
       if (isRadioChannel) {
         if (Current)
           img = imgLoader.LoadIcon("radio_cur", imageBGWidth - 10, imageBGHeight - 10);
-        if (img == NULL)
+        if(!img)
           img = imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
 
         if (img) {
@@ -1568,7 +1568,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
       } else {
         if (Current)
           img = imgLoader.LoadIcon("tv_cur", imageBGWidth - 10, imageBGHeight - 10);
-        if (img == NULL)
+        if(!img)
           img = imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
         if (img) {
@@ -1693,7 +1693,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     img = NULL;
     if (Current)
       img = imgLoader.LoadIcon("timer_full_cur", imageHeight, imageHeight);
-    if (img == NULL)
+    if(!img)
       img = imgLoader.LoadIcon("timer_full", imageHeight, imageHeight);
 
     if (img) {
@@ -1704,7 +1704,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     img = NULL;
     if (Current)
       img = imgLoader.LoadIcon("timer_partial_cur", imageHeight, imageHeight);
-    if (img == NULL)
+    if(!img)
       img = imgLoader.LoadIcon("timer_partial", imageHeight, imageHeight);
 
     if (img) {
@@ -1719,7 +1719,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
       img = NULL;
       if (Current)
         img = imgLoader.LoadIcon("vps_cur", imageHeight, imageHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("vps", imageHeight, imageHeight);
 
       if (img) {
@@ -1973,11 +1973,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
     imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
   }
-  if (imgRecNew == NULL)
+  if (!imgRecNew)
     imgRecNew = imgLoader.LoadIcon("recording_new", fontHeight, fontHeight);
-  if (imgRecNewSml == NULL)
+  if (!imgRecNewSml)
     imgRecNewSml = imgLoader.LoadIcon("recording_new", fontSmlHeight, fontSmlHeight);
-  if (imgRecCut == NULL)
+  if (!imgRecCut)
     imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
 
   int Left = Config.decorBorderMenuItemSize + marginItem;
@@ -1990,7 +1990,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Total == 0) {
       if (Current)
         img = imgLoader.LoadIcon("recording_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -2052,9 +2052,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
           imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
         }
-        if (imgSeen == NULL)
+        if (!imgSeen)
           imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
-        if (imgSeen != NULL)
+        if (imgSeen)
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
 #endif
@@ -2078,9 +2078,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
           imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
-        if (imgRecErr == NULL)
+        if (!imgRecErr)
           imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
-        if (imgRecErr != NULL)
+        if (imgRecErr)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
 #endif
@@ -2103,7 +2103,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     } else if (Total > 0) {  // Folder
       if (Current)
         img = imgLoader.LoadIcon("folder_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("folder", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -2150,7 +2150,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     } else if (Total == -1) {
       if (Current)
         img = imgLoader.LoadIcon("folder_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("folder", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -2171,7 +2171,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Total == 0) {  // Recording
       if (Current)
         img = imgLoader.LoadIcon("recording_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("recording", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -2243,9 +2243,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
           imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
         }
-        if (imgSeen == NULL)
+        if (!imgSeen)
           imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
-        if (imgSeen != NULL)
+        if (imgSeen)
           menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
       }
 #endif
@@ -2269,9 +2269,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
           cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
           imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
-        if (imgRecErr == NULL)
+        if (!imgRecErr)
           imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
-        if (imgRecErr != NULL)
+        if (imgRecErr)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
 #endif
@@ -2288,7 +2288,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     } else if (Total > 0) {
       if (Current)
         img = imgLoader.LoadIcon("folder_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("folder", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -2333,7 +2333,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     } else if (Total == -1) {
       if (Current)
         img = imgLoader.LoadIcon("folder_cur", fontHeight, fontHeight);
-      if (img == NULL)
+      if(!img)
         img = imgLoader.LoadIcon("folder", fontHeight, fontHeight);
       if (img) {
         menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);

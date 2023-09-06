@@ -63,7 +63,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
   delete font;
   delete fontSml;
   delete fontFixed;
-  if (topBarFontClock != NULL)
+  if (topBarFontClock)
     delete topBarFontClock;
 
   if (osd) {
@@ -317,7 +317,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
       if (OccupiedGB < 1000.0) {  // Less than 1000 GB
         extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
       } else {  // 1000 GB+
-        extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60, OccupiedMinutes % 60);
+        extra2 = cString::sprintf("%.2f TB ~ %02d:%02d",
+                                  OccupiedGB / 1024.0, OccupiedMinutes / 60, OccupiedMinutes % 60);
       }
     } else {  // Short format
       extra1 = cString::sprintf("%d%% %s", DiskUsage, tr("occupied"));
@@ -803,9 +804,17 @@ void cFlatBaseRender::MessageCreate(void) {
   if (Config.MessageColorPosition == 1)
     messageHeight += 8;
   int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
-  messagePixmap = CreatePixmap(osd, 5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
+  messagePixmap = CreatePixmap(osd, 5,
+                               cRect(Config.decorBorderMessageSize,
+                               top,
+                               osdWidth - Config.decorBorderMessageSize * 2,
+                               messageHeight));
   messagePixmap->Fill(clrTransparent);
-  messageIconPixmap = CreatePixmap(osd, 5, cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
+  messageIconPixmap = CreatePixmap(osd, 5,
+                                   cRect(Config.decorBorderMessageSize,
+                                   top,
+                                   osdWidth - Config.decorBorderMessageSize * 2,
+                                   messageHeight));
   messageIconPixmap->Fill(clrTransparent);
 
   // dsyslog("flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
