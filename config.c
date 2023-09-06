@@ -912,7 +912,7 @@ void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
 
 void cFlatConfig::Store(const char *Name, const char *Value, const char *Filename) {
     FILE *f = fopen(Filename, "a");
-    if (f == NULL)
+    if (!f)
         return;
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);

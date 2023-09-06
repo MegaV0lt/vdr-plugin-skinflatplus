@@ -147,7 +147,7 @@ const char **cPluginFlat::SVDRPHelpPages(void) {
 
 cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode) {
     if (!strcasecmp(Command, "RLFC")) {
-        if (Option == NULL) {
+        if (!Option) {
             ReplyCode = 500;
             return "No logo given";
         }

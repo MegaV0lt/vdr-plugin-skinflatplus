@@ -1,7 +1,7 @@
 #include "textscroller.h"
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor colorExtraTextFg) {
-    if (Osd == NULL)
+    if (!Osd)
         return;
 
     Text = text;

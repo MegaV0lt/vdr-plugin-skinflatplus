@@ -25,11 +25,11 @@ void cComplexContent::Clear(void) {
   isShown = false;
   Contents.clear();
   if (Osd) {
-    if (Pixmap != NULL) {
+    if (Pixmap) {
       Osd->DestroyPixmap(Pixmap);
       Pixmap = NULL;
     }
-    if (PixmapImage != NULL) {
+    if (PixmapImage) {
       Osd->DestroyPixmap(PixmapImage);
       PixmapImage = NULL;
     }
@@ -42,11 +42,11 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   if (!Osd)
     return;
-  if (Pixmap != NULL) {
+  if (Pixmap) {
     Osd->DestroyPixmap(Pixmap);
     Pixmap = NULL;
   }
-  if (PixmapImage != NULL) {
+  if (PixmapImage) {
     Osd->DestroyPixmap(PixmapImage);
     PixmapImage = NULL;
   }
@@ -67,7 +67,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
   //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
-  if (Pixmap != NULL) {  // Check for nullptr
+  if (Pixmap) {  // Check for nullptr
     if (FullFillBackground) {
       Pixmap->Fill(ColorBg);
     } else {
