@@ -63,25 +63,25 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
   menuWidth = osdWidth;
   menuTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
-  menuPixmap = osd->CreatePixmap(1, cRect(0, menuTop, menuWidth, scrollBarHeight));
+  menuPixmap = CreatePixmap(osd, 1, cRect(0, menuTop, menuWidth, scrollBarHeight));
   // dsyslog("flatPlus: menuPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
-  menuIconsBGPixmap = osd->CreatePixmap(2, cRect(0, menuTop, menuWidth, scrollBarHeight));
+  menuIconsBGPixmap = CreatePixmap(osd, 2, cRect(0, menuTop, menuWidth, scrollBarHeight));
   // dsyslog("flatPlus: menuIconsBGPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
-  menuIconsPixmap = osd->CreatePixmap(3, cRect(0, menuTop, menuWidth, scrollBarHeight));
+  menuIconsPixmap = CreatePixmap(osd, 3, cRect(0, menuTop, menuWidth, scrollBarHeight));
   // dsyslog("flatPlus: menuIconsPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
-  menuIconsOVLPixmap = osd->CreatePixmap(4, cRect(0, menuTop, menuWidth, scrollBarHeight));
+  menuIconsOVLPixmap = CreatePixmap(osd, 4, cRect(0, menuTop, menuWidth, scrollBarHeight));
   // dsyslog("flatPlus: menuIconsOVLPixmap left: %d top: %d width: %d height: %d", 0, menuTop, menuWidth, scrollBarHeight);
 
   chLeft = Config.decorBorderMenuContentHeadSize;
   chTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
   chWidth = menuWidth - Config.decorBorderMenuContentHeadSize * 2;
   chHeight = fontHeight + fontSmlHeight * 2 + marginItem * 2;
-  contentHeadPixmap = osd->CreatePixmap(1, cRect(chLeft, chTop, chWidth, chHeight));
+  contentHeadPixmap = CreatePixmap(osd, 1, cRect(chLeft, chTop, chWidth, chHeight));
   // dsyslog("flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
-  contentHeadIconsPixmap = osd->CreatePixmap(2, cRect(chLeft, chTop, chWidth, chHeight));
+  contentHeadIconsPixmap = CreatePixmap(osd, 2, cRect(chLeft, chTop, chWidth, chHeight));
 
-  scrollbarPixmap = osd->CreatePixmap(
+  scrollbarPixmap = CreatePixmap(osd, 
       2, cRect(0, scrollBarTop, menuWidth, scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2));
   // dsyslog("flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
   //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2);
