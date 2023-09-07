@@ -57,7 +57,8 @@ bool cImageCache::RemoveFromCache(std::string Name) {
 cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
     // dsyslog("imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (int index = 0; index < MAX_IMAGE_CACHE; index++) {
-        // dsyslog("imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(), CacheWidth[index], CacheHeight[index]);
+        // dsyslog("imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(),
+        // CacheWidth[index], CacheHeight[index]);
         if (CacheName[index] == Name && CacheWidth[index] == Width && CacheHeight[index] == Height)
             return CacheImage[index];
     }

@@ -38,7 +38,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         const int    d          = 2 * dst_size;                       // sample position denominator
         const int    e          = (2 * i + 1) * src_size - dst_size;  // sample position enumerator
         int          offset     =  e / d;                             // truncated sample position
-        const float  sub_offset = ((float) (e - offset * d)) / ((float) d);  // exact sample position is (float) e/d = offset + sub_offset
+        const float sub_offset =
+            ((float)(e - offset * d)) / ((float)d);  // exact sample position is (float) e/d = offset + sub_offset
 
         // calculate filter coefficients
         float  h[4];
@@ -73,7 +74,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         for (int j = 0; j < 4; j++) {
             const float t = norm * h[j];
-            filters[i].m_coeff[(offset+j) & 3] = (int) ((t > 0.0f) ?  (t+0.5f) : (t-0.5f));  // consider ring buffer index permutations
+            filters[i].m_coeff[(offset + j) & 3] =
+                (int)((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // consider ring buffer index permutations
         }
     }
 
@@ -81,7 +83,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     filters[dst_size].m_offset = (unsigned) -1;
 }
 
-void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height, unsigned src_width, unsigned src_height) {
+void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height,
+                                     unsigned src_width, unsigned src_height) {
     m_src_x = 0;
     m_src_y = 0;
     m_dst_x = 0;
@@ -91,7 +94,9 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_dst_stride = dst_stride;
 
     // if image dimensions do not change we can keep the old filter coefficients
-    if ((src_width == m_src_width) && (src_height == m_src_height) && (dst_width == m_dst_width) && (dst_height == m_dst_height)) return;
+    if ((src_width == m_src_width) && (src_height == m_src_height) && (dst_width == m_dst_width) &&
+        (dst_height == m_dst_height))
+        return;
 
     m_dst_width  = dst_width;
     m_dst_height = dst_height;
@@ -100,9 +105,9 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
 
     if (m_memory) free(m_memory);
 
-    const unsigned  hor_filters_size = (m_dst_width  + 1) * sizeof(Filter);  // reserve one extra position for end marker
-    const unsigned  ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
-    const unsigned  buffer_size      = 4 * m_dst_width * sizeof(TmpPixel);
+    const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // reserve one extra position for end marker
+    const unsigned ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
+    const unsigned buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     char *p = (char *) malloc(hor_filters_size + ver_filters_size + buffer_size);
 

@@ -172,7 +172,8 @@ class cComplexContent {
                  int textWidth = 0, int textHeight = 0, int textAlignment = taDefault);
     void AddImage(cImage *image, cRect position);
     void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos, tColor colorFg,
-                                 tColor colorBg, cFont *font, int textWidth = 0, int textHeight = 0, int textAlignment = taDefault);
+                                 tColor colorBg, cFont *font, int textWidth = 0, int textHeight = 0,
+                                 int textAlignment = taDefault);
     void AddRect(cRect position, tColor colorBg);
     bool Scrollable(int height = 0);
      int ScrollTotal(void);

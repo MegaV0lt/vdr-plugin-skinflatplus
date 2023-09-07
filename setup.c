@@ -332,7 +332,8 @@ void cFlatSetup::Store(void) {
 }
 
 void cFlatSetupGeneral::LoadConfigFile(void) {
-    cString Filename = cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
+    cString Filename =
+        cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
 
     FILE *f = fopen(Filename, "r");
     if (f) {
@@ -734,7 +735,8 @@ void cFlatSetupGeneral::Setup(void) {
         esyslog("flatPlus: No decor files found, please check your installation!");
         Add(new cOsdItem(tr("no decorfiles found, check install"), osUnknown, false));
     } else
-        Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(), &DecorDescriptions[0]));
+        Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(),
+                                  &DecorDescriptions[0]));
 
     ConfigFiles.Clear();
     SetupConfig->GetConfigFiles(ConfigFiles);
@@ -746,7 +748,8 @@ void cFlatSetupGeneral::Setup(void) {
         esyslog("flatPlus: No config files found, please check your installation!");
         Add(new cOsdItem(tr("no config-files found, check install"), osUnknown, false));
     } else
-        Add(new cMenuEditStraItem(tr("Press ok to load config file"), &ConfigFileSelection, ConfigFiles.Size(), &ConfigFiles[0]));
+        Add(new cMenuEditStraItem(tr("Press ok to load config file"), &ConfigFileSelection, ConfigFiles.Size(),
+                                  &ConfigFiles[0]));
 
     cString saveSettings = cString::sprintf("%s:\t%s", tr("Save current settings"), tr("press ok to save current settings"));
     Add(new cOsdItem(saveSettings, osUnknown, true));

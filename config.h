@@ -21,6 +21,7 @@ class cFlatConfig {
         cString checkSlashAtEnd(std::string path);
 
         int DecorCurrent;
+
  public:
         cFlatConfig(void);
         ~cFlatConfig(void);
@@ -41,6 +42,7 @@ class cFlatConfig {
 
         void RecordingOldLoadConfig(void);
         int GetRecordingOldValue(std::string folder);
+
  public:
         cString ThemeCurrent;
         cString logoPath;

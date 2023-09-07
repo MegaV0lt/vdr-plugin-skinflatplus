@@ -47,8 +47,8 @@ class cTextScroll {
         ResetX = false;
     }
 
-    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-        if (Pixmap) {
+    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
+        if (Pixmap) {         // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
             Osd->DestroyPixmap(Pixmap);
             Pixmap = NULL;
         }
@@ -57,7 +57,8 @@ class cTextScroll {
     void UpdateViewPortWidth(int w);
     void Reset(void);
 
-    void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg = 0);
+    void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg,
+                 cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep(void);
     void Draw(void);
 };
@@ -82,7 +83,8 @@ class cTextScrollers : public cThread {
     void SetScrollStep(int step) { scrollStep = step; }
     void SetScrollDelay(int delay) { scrollDelay = delay; }
     void SetScrollType(int type) { scrollType = type; }
-    void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg = 0);
+    void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg,
+                     cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive(void) { return Active(); }
 };

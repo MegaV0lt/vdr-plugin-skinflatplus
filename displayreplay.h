@@ -31,6 +31,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         void ResolutionAspectDraw(void);
 
         virtual void Action(void);
+        
  public:
         cFlatDisplayReplay(bool ModeOnly);
         virtual ~cFlatDisplayReplay();

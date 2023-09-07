@@ -1,6 +1,7 @@
 #include "textscroller.h"
 
-void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor colorExtraTextFg) {
+void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
+                          tColor colorExtraTextFg) {
     if (!Osd)
         return;
 
@@ -134,12 +135,14 @@ void cTextScrollers::Clear(void) {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg) {
+void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
+                                 tColor ColorExtraTextFg) {
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
 
-    Scrollers.push_back(new cTextScroll(Osd, scrollType, scrollStep, (int)((double)WAITDELAY / (double)scrollDelay), Layer));
+    Scrollers.push_back(
+        new cTextScroll(Osd, scrollType, scrollStep, (int)((double)WAITDELAY / (double)scrollDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, font, ColorExtraTextFg);
 
     StartScrolling();

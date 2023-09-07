@@ -32,7 +32,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     tracksPixmap = CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     tracksPixmap->Fill(clrTransparent);
 
-    tracksLogoPixmap = CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    tracksLogoPixmap =
+        CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     tracksLogoPixmap->Fill(clrTransparent);
 
     SetItem(Title, -1, false);
@@ -65,9 +66,11 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     }
 
     if (Index == -1)
-        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth, itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
+        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth,
+                               itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
     else
-        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth, itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
+        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth,
+                               itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
 
     int left = osdWidth - maxItemWidth;
     left /= 2;
@@ -75,14 +78,14 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     int top = osdHeight - itemsHeight - marginItem + y;
 
     if (Current)
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight,
-            Config.decorBorderTrackSize, Config.decorBorderTrackType, Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
+        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+                        Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
     else if (Index >= 0)
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight,
-            Config.decorBorderTrackSize, Config.decorBorderTrackType, Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
+        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+                        Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
     else
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight,
-            Config.decorBorderTrackSize, Config.decorBorderTrackType, Config.decorBorderTrackFg, Config.decorBorderTrackBg);
+        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+                        Config.decorBorderTrackFg, Config.decorBorderTrackBg);
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
