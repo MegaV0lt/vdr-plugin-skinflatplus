@@ -77,7 +77,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (modeOnly)
         return;
 
-    int Left = marginItem;  // Position for shorttext/date
+    int left = marginItem;  // Position for shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
 
@@ -91,7 +91,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     else
         info = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
 
-    labelPixmap->DrawText(cPoint(Left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+    labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                           fontSml, osdWidth - Config.decorBorderReplaySize * 2);
 
 #if APIVERSNUM >= 20505
@@ -109,7 +109,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
-            Left += fontSml->Width(info) + marginItem;
+            left += fontSml->Width(info) + marginItem;
             imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(Left, imageTop), *imgRecErr);
         }

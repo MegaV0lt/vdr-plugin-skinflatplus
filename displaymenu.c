@@ -2422,7 +2422,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
   cString startTime = Event->GetTimeString();
   cString endTime = Event->GetEndTimeString();
 
-  cString timeString = cString::sprintf("%s %s - %s", *date, *startTime, *endTime);
+  cString timeString = cString::sprintf("%s  %s - %s", *date, *startTime, *endTime);
 
   cString title = Event->Title();
   cString shortText = Event->ShortText();
