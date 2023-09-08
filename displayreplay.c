@@ -110,7 +110,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
             left += fontSml->Width(info) + marginItem;
-            imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
+            int imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(Left, imageTop), *imgRecErr);
         }
     }  // PlaybackShowRecordingErrors
