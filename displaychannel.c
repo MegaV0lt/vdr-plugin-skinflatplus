@@ -222,7 +222,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     if (Resolution && !isRadioChannel && screenWidth > 0) {
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
-            cString asp = GetSimpleAspectIcon(screenWidth, screenAspect);
+            cString asp = GetAspectIcon(screenWidth, screenAspect);
             img = imgLoader.LoadIcon(*asp, 999, height);
             if (img) {
                 imageTop = top + (height - img->Height()) / 2;

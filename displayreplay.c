@@ -557,7 +557,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
     if (screenWidth > 0) {
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
-            cString asp = GetSimpleAspectIcon(screenWidth, screenAspect);
+            cString asp = GetAspectIcon(screenWidth, screenAspect);
             img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
             if (img) {
                 imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;

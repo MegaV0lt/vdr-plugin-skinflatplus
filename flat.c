@@ -109,7 +109,7 @@ cPlugin *GetScraperPlugin(void) {
     return pScraper;
 }
 
-cString GetSimpleAspectIcon(int screenWidth, double screenAspect) {
+cString GetAspectIcon(int screenWidth, double screenAspect) {
     cString asp("unknown_asp");                // ???
     if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
         switch (screenWidth) {                 // No aspect for HD
