@@ -83,39 +83,38 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     iconsPixmap->Fill(clrTransparent);
 
-#if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
-      int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-      cString RecErrIcon("recording_untested_replay");
-      if (recInfo->Errors() < 0) {         // -1 Untestet recording
-        // RecErrIcon = "recording_untested";
-      } else if (recInfo->Errors() == 0)    // No errors
-        RecErrIcon = "recording_ok_replay";
-      else if (recInfo->Errors() < RecErrIconThreshold)
-        RecErrIcon = "recording_warning_replay";
-      else if (recInfo->Errors() >= RecErrIconThreshold)
-        RecErrIcon = "recording_error_replay";
-
-      cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
-      if (imgRecErr) {
-        // imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
-        iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
-      }
-      Left += imgRecErr->Width() + marginItem;  // Add width of icon
-    }  // PlaybackShowRecordingErrors
-#endif
-
     SetTitle(recInfo->Title());
     cString info("");
     if (recInfo->ShortText())
-        info = cString::sprintf("%s - %s %s", recInfo->ShortText(), *ShortDateString(Recording->Start()),
-                                *TimeString(Recording->Start()));
+        info = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
+                                recInfo->ShortText());
     else
-        info = cString::sprintf("%s %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
+        info = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
 
     labelPixmap->DrawText(cPoint(Left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                           fontSml, osdWidth - Config.decorBorderReplaySize * 2);
+
+#if APIVERSNUM >= 20505
+    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
+        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
+
+        cString RecErrIcon("recording_untested_replay");
+        if (recInfo->Errors() < 0) {        // -1 Untestet recording
+        } else if (recInfo->Errors() == 0)  // No errors
+            RecErrIcon = "recording_ok_replay";
+        else if (recInfo->Errors() < RecErrIconThreshold)
+            RecErrIcon = "recording_warning_replay";
+        else if (recInfo->Errors() >= RecErrIconThreshold)
+            RecErrIcon = "recording_error_replay";
+
+        cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
+        if (imgRecErr) {
+            Left += fontSml->Width(info) + marginItem;
+            imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
+            iconsPixmap->DrawImage(cPoint(Left, imageTop), *imgRecErr);
+        }
+    }  // PlaybackShowRecordingErrors
+#endif
 }
 
 void cFlatDisplayReplay::SetTitle(const char *Title) {
