@@ -207,7 +207,7 @@ class cFlat : public cSkin {
 };
 
 char *substr(char *string, int start, int end);
-char *GetFilenameWithoutext(char * fullfilename);
+char *GetFilenameWithoutext(char *fullfilename);
 
 static inline uint32_t GetMsTicks(void) {
 #ifdef CLOCK_MONOTONIC
@@ -230,3 +230,4 @@ cPlugin *GetScraperPlugin(void);
 cString GetSimpleAspectIcon(int screenWidth, double screenAspect);
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect);
 cString GetFormatIcon(int screenWidth);
+cString GetRecordingerrorIcon(int recInfoErrors);

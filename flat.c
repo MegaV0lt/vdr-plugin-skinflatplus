@@ -189,3 +189,19 @@ cString GetFormatIcon(int screenWidth) {
     }
     return iconName;
 }
+
+cString GetRecordingerrorIcon(int recInfoErrors) {
+    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
+
+    cString RecErrorIcon("");
+    if (recInfoErrors < 0)  // -1 Untestet recording
+        RecErrorIcon = "recording_untested";
+    else if (recInfoErrors == 0)  // No errors
+        RecErrorIcon = "recording_ok";
+    else if (recInfoErrors < RecErrIconThreshold)
+        RecErrorIcon = "recording_warning";
+    else if (recInfoErrors >= RecErrIconThreshold)
+        RecErrorIcon = "recording_error";
+
+    return RecErrorIcon;
+}
