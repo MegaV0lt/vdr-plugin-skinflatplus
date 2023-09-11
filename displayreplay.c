@@ -311,31 +311,30 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         unsigned long long recsizecutted = 0;
         unsigned long long cutinoffset = 0;
         unsigned long long filesize[100000];
+        uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
         int i = 0;
-        int imax = 999;
         struct stat filebuf;
         cString filename("");
         int rc = 0;
 
         do {
+            i += 1;
             if (recording->IsPesRecording())
-                filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), ++i);
-            else {
-                filename = cString::sprintf("%s/%05d.ts", recording->FileName(), ++i);
-                imax = 99999;
-            }
+                filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), i);
+            else
+                filename = cString::sprintf("%s/%05d.ts", recording->FileName(), i);
             rc = stat(filename, &filebuf);
             if (rc == 0)
-                filesize[i] = filesize[i-1] + filebuf.st_size;
+                filesize[i] = filesize[i - 1] + filebuf.st_size;
             else {
                 if (ENOENT != errno) {
                     esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
                             strerror(errno));
                 }
             }
-        } while (i <= imax && !rc);
+        } while (i <= maxFiles && !rc);
 
         if (hasMarks && index) {
             uint16_t FileNumber;
