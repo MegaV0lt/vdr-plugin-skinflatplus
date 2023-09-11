@@ -622,7 +622,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
     int index = 0;
-    height = ((fontHeight * 2) + (fontSmlHeight * 2) + marginItem) - marginItem * 2;
+    // height = ((fontHeight * 2) + (fontSmlHeight * 2) + marginItem) - marginItem * 2;  // Double calculation of height
     cImage *img = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
