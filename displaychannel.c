@@ -475,10 +475,11 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int top = fontHeight*2 + fontSmlHeight*2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize*2) - marginItem;
     int left = marginItem * 2;
+    /* 
     int progressTop = fontHeight*2 + fontSmlHeight*2 + marginItem;
     progressTop += std::max(fontSmlHeight, Config.decorProgressSignalSize) / 2 - Config.decorProgressSignalSize / 2;
-
-    progressTop = top;
+    */
+    int progressTop = top;
 
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "STR",
         Theme.Color(clrChannelSignalFont), Theme.Color(clrChannelBg), SignalFont);
