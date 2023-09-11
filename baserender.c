@@ -229,8 +229,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllGB = FreeGB / (double)((double)(100 - DiskUsage) / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     double AllMinutes = FreeMinutes / (double)((100 - DiskUsage) / 100.0);
-    double OccupiedGB = AllGB - FreeGB;
-    int OccupiedMinutes = AllMinutes - FreeMinutes;
     int ChartDiskUsage = DiskUsage;
     cString iconName("");
 
@@ -349,6 +347,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             break;  // 96,875 - 100
         }
     } else {                                   // Show in occupied mode
+        double OccupiedGB = AllGB - FreeGB;
+        int OccupiedMinutes = AllMinutes - FreeMinutes;
         if (Config.DiskUsageShort == false) {  // Long format
             extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsage, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
