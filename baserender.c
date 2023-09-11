@@ -101,10 +101,12 @@ void cFlatBaseRender::CreateFullOsd(void) {
 }
 
 void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
+    /* Unused variables?
     osdLeft = left;
     osdTop = top;
     osdWidth = width;
     osdHeight = height;
+    */
 
     osd = cOsdProvider::NewOsd(left, top);
     if (osd) {
