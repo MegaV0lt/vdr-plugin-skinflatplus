@@ -5,89 +5,89 @@
  * to an arbitrary size using a 4-tap filter
  */
 class ImageScaler {
-public:
+ public:
+    struct Filter {
+        unsigned  m_offset;
+        short     m_coeff[4];
+    };
 
-	struct Filter {
-		unsigned  m_offset;
-		short     m_coeff[4];
-	};
+    ImageScaler();
+    ~ImageScaler();
 
-	ImageScaler();
-	~ImageScaler();
+    //! set destination image and source image size
+    void SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height,
+                            unsigned src_width, unsigned src_height);
 
-	//! set destination image and source image size
-	void SetImageParameters( unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height, unsigned src_width, unsigned src_height );
+    /*! process one pixel of source image; destination image is written while input is processed
+     * SetImageParameters() must be called first
+     */
+    void PutSourcePixel(unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3) {
+        m_hbuf[ (m_src_x++) & 3 ].Set(c0, c1, c2, c3);
 
-	/*! process one pixel of source image; destination image is written while input is processed
-	 * SetImageParameters() must be called first
-	 */
-	void PutSourcePixel( unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3 ) {
-		m_hbuf[ (m_src_x++) & 3 ].Set( c0, c1, c2, c3 );
+        TmpPixel      *bp = m_buffer + 4 * m_dst_x + (m_src_y & 3);
+        const Filter  *fh;
 
-		TmpPixel      *bp = m_buffer + 4 * m_dst_x + (m_src_y & 3);
-		const Filter  *fh;
+        while ((fh=m_hor_filters + m_dst_x)->m_offset == m_src_x) {
+            *bp = m_hbuf[0] * fh->m_coeff[0] + m_hbuf[1] * fh->m_coeff[1] + m_hbuf[2] * fh->m_coeff[2]
+                  + m_hbuf[3]*fh->m_coeff[3];
+            m_dst_x++;
+            bp += 4;
+        }
 
-		while ( (fh=m_hor_filters+m_dst_x)->m_offset == m_src_x ) {
-			*bp = m_hbuf[0]*fh->m_coeff[0] + m_hbuf[1]*fh->m_coeff[1] + m_hbuf[2]*fh->m_coeff[2] + m_hbuf[3]*fh->m_coeff[3];
-			m_dst_x++;
-			bp += 4;
-		}
+        if (m_src_x == m_src_width) NextSourceLine();
+    }
 
-		if ( m_src_x == m_src_width ) NextSourceLine();
-	}
+ private:
+    //! temporary image pixel class - a 4-element integer vector
+    class TmpPixel {
+     public:
+        TmpPixel() {
+        }
 
-private:
+        TmpPixel(int c0, int c1, int c2, int c3) {
+            Set(c0, c1, c2, c3);
+        }
 
-	//! temporary image pixel class - a 4-element integer vector
-	class TmpPixel {
-	public:
-		TmpPixel() {
-		}
+        void Set(int c0, int c1, int c2, int c3) {
+            m_comp[0] = c0;
+            m_comp[1] = c1;
+            m_comp[2] = c2;
+            m_comp[3] = c3;
+        }
 
-		TmpPixel( int c0, int c1, int c2, int c3 ) {
-			Set(c0,c1,c2,c3);
-		}
+        TmpPixel operator*(int s) const {
+            return TmpPixel(m_comp[0] * s, m_comp[1] * s, m_comp[2] * s, m_comp[3] * s);
+        }
 
-		void Set( int c0, int c1, int c2, int c3 ) {
-			m_comp[0] = c0;
-			m_comp[1] = c1;
-			m_comp[2] = c2;
-			m_comp[3] = c3;
-		}
+        TmpPixel operator+(const TmpPixel &x) const {
+            return TmpPixel(m_comp[0] + x[0], m_comp[1] + x[1], m_comp[2] + x[2], m_comp[3] + x[3]);
+        }
 
-		TmpPixel operator*( int s ) const {
-			return TmpPixel( m_comp[0]*s, m_comp[1]*s, m_comp[2]*s, m_comp[3]*s );
-		}
+        // return component i=[0..3] - No range check!
+        int operator[](unsigned i) const {
+            return m_comp[i];
+        }
 
-		TmpPixel operator+( const TmpPixel &x ) const {
-			return TmpPixel( m_comp[0] + x[0], m_comp[1] + x[1], m_comp[2] + x[2], m_comp[3] + x[3] );
-		}
+     private:
+        int m_comp[4];
+    };
 
-		// return component i=[0..3] - No range check!
-		int operator[](unsigned i) const {
-			return m_comp[i];
-		}
+    //! this is called whenever one input line is processed completely
+    void NextSourceLine();
 
-	private:
-		int  m_comp[4];
-	};
-
-	//! this is called whenever one input line is processed completely
-	void NextSourceLine();
-
-	TmpPixel   m_hbuf[4];      //! ring buffer for 4 input pixels
-	char      *m_memory;       //! buffer container
-	Filter    *m_hor_filters;  //! buffer for horizontal filters (one for each output image column)
-	Filter    *m_ver_filters;  //! buffer for vertical   filters (one for each output image row)
-	TmpPixel  *m_buffer;       //! buffer contains 4 horizontally filtered input lines, multiplexed
-	unsigned  *m_dst_image;    //! pointer to destination image
-	unsigned   m_dst_stride;   //! destination image stride
-	unsigned   m_dst_width;    //! destination image width
-	unsigned   m_dst_height;   //! destination image height
-	unsigned   m_src_width;    //! source image width
-	unsigned   m_src_height;   //! source image height
-	unsigned   m_src_x;        //! x position of next source image pixel
-	unsigned   m_src_y;        //! y position of source image line currently beeing processed
-	unsigned   m_dst_x;        //! x position of next destination image pixel
-	unsigned   m_dst_y;        //! x position of next destination image line
+    TmpPixel   m_hbuf[4];      //! ring buffer for 4 input pixels
+    char      *m_memory;       //! buffer container
+    Filter    *m_hor_filters;  //! buffer for horizontal filters (one for each output image column)
+    Filter    *m_ver_filters;  //! buffer for vertical   filters (one for each output image row)
+    TmpPixel  *m_buffer;       //! buffer contains 4 horizontally filtered input lines, multiplexed
+    unsigned  *m_dst_image;    //! pointer to destination image
+    unsigned   m_dst_stride;   //! destination image stride
+    unsigned   m_dst_width;    //! destination image width
+    unsigned   m_dst_height;   //! destination image height
+    unsigned   m_src_width;    //! source image width
+    unsigned   m_src_height;   //! source image height
+    unsigned   m_src_x;        //! x position of next source image pixel
+    unsigned   m_src_y;        //! y position of source image line currently beeing processed
+    unsigned   m_dst_x;        //! x position of next destination image pixel
+    unsigned   m_dst_y;        //! x position of next destination image line
 };

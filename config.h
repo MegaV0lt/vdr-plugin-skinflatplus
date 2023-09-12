@@ -11,18 +11,18 @@
 #define WIDGETOUTPUTPATH "/tmp/skinflatplus/widgets"
 
 
-bool stringCompare( const std::string &left, const std::string &right );
+bool stringCompare(const std::string &left, const std::string &right);
 bool pairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j);
 bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);
 int roundUp(int numToRound, int multiple);
 
-class cFlatConfig
-{
-    private:
+class cFlatConfig {
+ private:
         cString checkSlashAtEnd(std::string path);
 
         int DecorCurrent;
-    public:
+
+ public:
         cFlatConfig(void);
         ~cFlatConfig(void);
 
@@ -42,8 +42,8 @@ class cFlatConfig
 
         void RecordingOldLoadConfig(void);
         int GetRecordingOldValue(std::string folder);
-    public:
 
+ public:
         cString ThemeCurrent;
         cString logoPath;
         cString iconPath;
@@ -260,7 +260,7 @@ class cFlatConfig
         int MenuItemRecordingShowFolderDate;  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
         int MenuItemParseTilde;
         int ShortRecordingCount;
-        int MainMenuWidgetActiveTimerShowRemoteRefreshTime; // in seconds
+        int MainMenuWidgetActiveTimerShowRemoteRefreshTime;  // in seconds
         /* hidden configs (only in setup.conf, no osd menu) */
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons

@@ -17,9 +17,8 @@ enum eContentImageAlignment {
     CIP_Right
 };
 
-class cSimpleContent
-{
-private:
+class cSimpleContent {
+ private:
     int ContentType;
     cRect Position;
 
@@ -29,14 +28,14 @@ private:
     cImage *Image;
     cFont *Font;
 
-public:
+ public:
     cSimpleContent(void) {
         Image = NULL;
         Font = NULL;
 
         ContentType = CT_None;  // Added to avoid compiler warning
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
-        //tColor ColorFg, ColorBg; // TODO ???
+        // tColor ColorFg, ColorBg;  // TODO ???
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -137,9 +136,8 @@ public:
     }
 };
 
-class cComplexContent
-{
-private:
+class cComplexContent {
+ private:
     std::vector<cSimpleContent> Contents;
 
     cPixmap *Pixmap, *PixmapImage;
@@ -157,7 +155,7 @@ private:
 
     void CalculateDrawPortHeight(void);
 
-public:
+ public:
     cComplexContent(void);
     cComplexContent(cOsd *osd, int scrollSize);
     ~cComplexContent();
@@ -174,7 +172,8 @@ public:
                  int textWidth = 0, int textHeight = 0, int textAlignment = taDefault);
     void AddImage(cImage *image, cRect position);
     void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos, tColor colorFg,
-                                 tColor colorBg, cFont *font, int textWidth = 0, int textHeight = 0, int textAlignment = taDefault);
+                                 tColor colorBg, cFont *font, int textWidth = 0, int textHeight = 0,
+                                 int textAlignment = taDefault);
     void AddRect(cRect position, tColor colorBg);
     bool Scrollable(int height = 0);
      int ScrollTotal(void);
@@ -184,7 +183,7 @@ public:
     double ScrollbarSize(void);
     void SetScrollingActive(bool active) { isScrollingActive = active; }
 
-    int Height(void){ return Position.Height(); }
+    int Height(void) { return Position.Height(); }
     int ContentHeight(bool Full);
 
     int BottomContent(void);

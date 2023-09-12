@@ -4,7 +4,7 @@
 #include "services/scraper2vdr.h"
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
-    private:
+ private:
         cString current, total;
 
         int labelHeight;
@@ -31,7 +31,8 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         void ResolutionAspectDraw(void);
 
         virtual void Action(void);
-    public:
+        
+ public:
         cFlatDisplayReplay(bool ModeOnly);
         virtual ~cFlatDisplayReplay();
         virtual void SetRecording(const cRecording *Recording);

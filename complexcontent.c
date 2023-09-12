@@ -25,18 +25,16 @@ void cComplexContent::Clear(void) {
   isShown = false;
   Contents.clear();
   if (Osd) {
-    if (Pixmap != NULL) {
+    if (Pixmap) {
       Osd->DestroyPixmap(Pixmap);
       Pixmap = NULL;
     }
-    if (PixmapImage != NULL) {
+    if (PixmapImage) {
       Osd->DestroyPixmap(PixmapImage);
       PixmapImage = NULL;
     }
   }
 }
-
-// cPixmap *cComplexContent::CreatePixmap(int Layer, const cRect &ViewPort, const cRect &DrawPort)  // Moved to flat.c
 
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   CalculateDrawPortHeight();
@@ -44,11 +42,11 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   if (!Osd)
     return;
-  if (Pixmap != NULL) {
+  if (Pixmap) {
     Osd->DestroyPixmap(Pixmap);
     Pixmap = NULL;
   }
-  if (PixmapImage != NULL) {
+  if (PixmapImage) {
     Osd->DestroyPixmap(PixmapImage);
     PixmapImage = NULL;
   }
@@ -69,7 +67,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
   //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
-  if (Pixmap != NULL) {  // Check for nullptr
+  if (Pixmap) {  // Check for nullptr
     if (FullFillBackground) {
       Pixmap->Fill(ColorBg);
     } else {
@@ -128,8 +126,8 @@ bool cComplexContent::Scrollable(int height) {
   return false;
 }
 
-void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
-                              int textWidth, int textHeight, int textAlignment) {
+void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
+                              cFont *font, int textWidth, int textHeight, int textAlignment) {
   Contents.push_back(cSimpleContent());
   Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 }
@@ -240,7 +238,7 @@ int cComplexContent::ScrollTotal(void) {
 }
 
 int cComplexContent::ScrollShown(void) {
-  // int shown = ceil( (double)Position.Height() / (double)ScrollSize);
+  // int shown = ceil((double)Position.Height() / (double)ScrollSize);
   int shown = Position.Height() / ScrollSize;
   return shown;
 }

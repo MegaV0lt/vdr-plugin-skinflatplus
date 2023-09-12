@@ -22,7 +22,7 @@ using namespace std;
 #endif
 
 class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
-    private:
+ private:
         cPixmap *menuPixmap;
         cPixmap *menuIconsPixmap;
         cPixmap *menuIconsBGPixmap;
@@ -90,15 +90,17 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         std::string GetRecordingName(const cRecording *Recording, int Level, bool isFolder);
         string xml_substring(string source, const char* str_start, const char* str_end);
 
-        bool isRecordingOld( const cRecording *Recording, int Level );
+        bool isRecordingOld(const cRecording *Recording, int Level);
         const char *GetGenreIcon(uchar genre);
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
-        void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp, bool CanScrollDown, bool isContent = false);
+        void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
+                           bool CanScrollDown, bool isContent = false);
         int ItemsHeight(void);
         bool CheckProgressBar(const char *text);
-        void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg, tColor ColorBarFg, tColor ColorBg);
+        void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
+                                     tColor ColorBarFg, tColor ColorBg);
 
         static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;
         void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
@@ -113,7 +115,8 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
-    public:
+
+ public:
 #ifdef DEPRECATED_SKIN_SETITEMEVENT
     using cSkinDisplayMenu::SetItemEvent;
 #endif
@@ -124,21 +127,27 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         virtual void Clear(void);
 
         virtual void SetMenuCategory(eMenuCategory MenuCategory);
-        //virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
+        // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
 
         virtual void SetTitle(const char *Title);
-        virtual void SetButtons(const char *Red, const char *Green = NULL, const char *Yellow = NULL, const char *Blue = NULL);
+        virtual void SetButtons(const char *Red, const char *Green = NULL,
+                                const char *Yellow = NULL, const char *Blue = NULL);
         virtual void SetMessage(eMessageType Type, const char *Text);
         virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
 
         #if APIVERSNUM >= 20308
-                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable, const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch, bool TimerActive);
+                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
+                                          const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
+                                          bool TimerActive);
         #else
-                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable, const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch);
+                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
+                                          const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch);
         #endif
         virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
-        virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable, bool WithProvider);
-        virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable, int Level, int Total, int New);
+        virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
+                                    bool WithProvider);
+        virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
+                                      int Level, int Total, int New);
 
         virtual void SetMenuSortMode(eMenuSortMode MenuSortMode);
 

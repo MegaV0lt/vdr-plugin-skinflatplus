@@ -102,7 +102,7 @@ cFlatConfig::cFlatConfig(void) {
     MainMenuWidgetActiveTimerShowRemoteActive = false;
     MainMenuWidgetActiveTimerShowRemoteRecording = false;
 
-    MainMenuWidgetActiveTimerShowRemoteRefreshTime = 60 * 30; // every 30 minutes
+    MainMenuWidgetActiveTimerShowRemoteRefreshTime = 60 * 30;  // every 30 minutes
 
     MainMenuWidgetLastRecShow = false;
     MainMenuWidgetLastRecPosition = 4;
@@ -395,7 +395,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
 }
 
 void cFlatConfig::ThemeCheckAndInit(void) {
-    if( strcmp(Theme.Name(), *ThemeCurrent) != 0 ) {
+    if (strcmp(Theme.Name(), *ThemeCurrent) != 0) {
         dsyslog("flatPlus: Load theme: %s", *ThemeCurrent);
         ThemeCurrent = Theme.Name();
         ThemeInit();
@@ -403,11 +403,11 @@ void cFlatConfig::ThemeCheckAndInit(void) {
 }
 
 void cFlatConfig::DecorCheckAndInit(void) {
-    if( DecorCurrent != DecorIndex ) {
+    if (DecorCurrent != DecorIndex) {
         DecorCurrent = DecorIndex;
         DecorLoadCurrent();
     }
-    if( decorBorderChannelByTheme ) {
+    if (decorBorderChannelByTheme) {
         decorBorderChannelType = decorBorderChannelTypeTheme;
         decorBorderChannelSize = decorBorderChannelSizeTheme;
     } else {
@@ -415,7 +415,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderChannelSize = decorBorderChannelSizeUser;
     }
 
-    if( decorBorderChannelEPGByTheme ) {
+    if (decorBorderChannelEPGByTheme) {
         decorBorderChannelEPGType = decorBorderChannelEPGTypeTheme;
         decorBorderChannelEPGSize = decorBorderChannelEPGSizeTheme;
     } else {
@@ -423,7 +423,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderChannelEPGSize = decorBorderChannelEPGSizeUser;
     }
 
-    if( decorBorderTopBarByTheme ) {
+    if (decorBorderTopBarByTheme) {
         decorBorderTopBarType = decorBorderTopBarTypeTheme;
         decorBorderTopBarSize = decorBorderTopBarSizeTheme;
     } else {
@@ -431,7 +431,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderTopBarSize = decorBorderTopBarSizeUser;
     }
 
-    if( decorBorderMessageByTheme ) {
+    if (decorBorderMessageByTheme) {
         decorBorderMessageType = decorBorderMessageTypeTheme;
         decorBorderMessageSize = decorBorderMessageSizeTheme;
     } else {
@@ -439,7 +439,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderMessageSize = decorBorderMessageSizeUser;
     }
 
-    if( decorBorderVolumeByTheme ) {
+    if (decorBorderVolumeByTheme) {
         decorBorderVolumeType = decorBorderVolumeTypeTheme;
         decorBorderVolumeSize = decorBorderVolumeSizeTheme;
     } else {
@@ -447,7 +447,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderVolumeSize = decorBorderVolumeSizeUser;
     }
 
-    if( decorBorderTrackByTheme ) {
+    if (decorBorderTrackByTheme) {
         decorBorderTrackType = decorBorderTrackTypeTheme;
         decorBorderTrackSize = decorBorderTrackSizeTheme;
     } else {
@@ -455,7 +455,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderTrackSize = decorBorderTrackSizeUser;
     }
 
-    if( decorBorderReplayByTheme ) {
+    if (decorBorderReplayByTheme) {
         decorBorderReplayType = decorBorderReplayTypeTheme;
         decorBorderReplaySize = decorBorderReplaySizeTheme;
     } else {
@@ -463,7 +463,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderReplaySize = decorBorderReplaySizeUser;
     }
 
-    if( decorBorderMenuItemByTheme ) {
+    if (decorBorderMenuItemByTheme) {
         decorBorderMenuItemType = decorBorderMenuItemTypeTheme;
         decorBorderMenuItemSize = decorBorderMenuItemSizeTheme;
     } else {
@@ -471,7 +471,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderMenuItemSize = decorBorderMenuItemSizeUser;
     }
 
-    if( decorBorderMenuContentHeadByTheme ) {
+    if (decorBorderMenuContentHeadByTheme) {
         decorBorderMenuContentHeadType = decorBorderMenuContentHeadTypeTheme;
         decorBorderMenuContentHeadSize = decorBorderMenuContentHeadSizeTheme;
     } else {
@@ -479,7 +479,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderMenuContentHeadSize = decorBorderMenuContentHeadSizeUser;
     }
 
-    if( decorBorderMenuContentByTheme ) {
+    if (decorBorderMenuContentByTheme) {
         decorBorderMenuContentType = decorBorderMenuContentTypeTheme;
         decorBorderMenuContentSize = decorBorderMenuContentSizeTheme;
     } else {
@@ -487,7 +487,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderMenuContentSize = decorBorderMenuContentSizeUser;
     }
 
-    if( decorBorderButtonByTheme ) {
+    if (decorBorderButtonByTheme) {
         decorBorderButtonType = decorBorderButtonTypeTheme;
         decorBorderButtonSize = decorBorderButtonSizeTheme;
     } else {
@@ -495,7 +495,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderButtonSize = decorBorderButtonSizeUser;
     }
 
-    if( decorProgressChannelByTheme ) {
+    if (decorProgressChannelByTheme) {
         decorProgressChannelType = decorProgressChannelTypeTheme;
         decorProgressChannelSize = decorProgressChannelSizeTheme;
     } else {
@@ -503,7 +503,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorProgressChannelSize = decorProgressChannelSizeUser;
     }
 
-    if( decorProgressVolumeByTheme ) {
+    if (decorProgressVolumeByTheme) {
         decorProgressVolumeType = decorProgressVolumeTypeTheme;
         decorProgressVolumeSize = decorProgressVolumeSizeTheme;
     } else {
@@ -511,7 +511,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorProgressVolumeSize = decorProgressVolumeSizeUser;
     }
 
-    if( decorProgressMenuItemByTheme ) {
+    if (decorProgressMenuItemByTheme) {
         decorProgressMenuItemType = decorProgressMenuItemTypeTheme;
         decorProgressMenuItemSize = decorProgressMenuItemSizeTheme;
     } else {
@@ -519,7 +519,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorProgressMenuItemSize = decorProgressMenuItemSizeUser;
     }
 
-    if( decorProgressReplayByTheme ) {
+    if (decorProgressReplayByTheme) {
         decorProgressReplayType = decorProgressReplayTypeTheme;
         decorProgressReplaySize = decorProgressReplaySizeTheme;
     } else {
@@ -527,7 +527,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorProgressReplaySize = decorProgressReplaySizeUser;
     }
 
-    if( decorProgressSignalByTheme ) {
+    if (decorProgressSignalByTheme) {
         decorProgressSignalType = decorProgressSignalTypeTheme;
         decorProgressSignalSize = decorProgressSignalSizeTheme;
     } else {
@@ -535,7 +535,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorProgressSignalSize = decorProgressSignalSizeUser;
     }
 
-    if( decorScrollBarByTheme ) {
+    if (decorScrollBarByTheme) {
         decorScrollBarType = decorScrollBarTypeTheme;
         decorScrollBarSize = decorScrollBarSizeTheme;
     } else {
@@ -543,25 +543,25 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorScrollBarSize = decorScrollBarSizeUser;
     }
 
-    if( decorBorderChannelType == 0 )
+    if (decorBorderChannelType == 0)
         decorBorderChannelSize = 0;
-    if( decorBorderTopBarType == 0 )
+    if (decorBorderTopBarType == 0)
         decorBorderTopBarSize = 0;
-    if( decorBorderMessageType == 0 )
+    if (decorBorderMessageType == 0)
         decorBorderMessageSize = 0;
-    if( decorBorderVolumeType == 0 )
+    if (decorBorderVolumeType == 0)
         decorBorderVolumeSize = 0;
-    if( decorBorderTrackType == 0 )
+    if (decorBorderTrackType == 0)
         decorBorderTrackSize = 0;
-    if( decorBorderReplayType == 0 )
+    if (decorBorderReplayType == 0)
         decorBorderReplaySize = 0;
-    if( decorBorderMenuItemType == 0 )
+    if (decorBorderMenuItemType == 0)
         decorBorderMenuItemSize = 0;
-    if( decorBorderMenuContentHeadType == 0 )
+    if (decorBorderMenuContentHeadType == 0)
         decorBorderMenuContentHeadSize = 0;
-    if( decorBorderMenuContentType == 0 )
+    if (decorBorderMenuContentType == 0)
         decorBorderMenuContentSize = 0;
-    if( decorBorderButtonType == 0 )
+    if (decorBorderButtonType == 0)
         decorBorderButtonSize = 0;
 }
 
@@ -636,15 +636,15 @@ void cFlatConfig::ThemeInit(void) {
 }
 
 void cFlatConfig::Init(void) {
-    if( !strcmp(logoPath, "") ) {
+    if (!strcmp(logoPath, "")) {
         logoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: logoPath: %s", *logoPath);
     }
-    if( !strcmp(iconPath, "") ) {
+    if (!strcmp(iconPath, "")) {
         iconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: iconPath: %s", *iconPath);
     }
-    if( !strcmp(RecordingOldConfigFile, "") ) {
+    if (!strcmp(RecordingOldConfigFile, "")) {
         dsyslog("flatPlus: PLUGINCONFIGPATH: %s", PLUGINCONFIGPATH);
         RecordingOldConfigFile = cString::sprintf("%s/recordings_old.cfg", PLUGINCONFIGPATH);
         dsyslog("flatPlus: RecordingOldConfigFile: %s", *RecordingOldConfigFile);
@@ -654,15 +654,15 @@ void cFlatConfig::Init(void) {
     DecorCheckAndInit();
 }
 
-bool stringCompare( const std::string &left, const std::string &right ) {
-   for( std::string::const_iterator lit = left.begin(), rit = right.begin(); lit != left.end() && rit != right.end(); ++lit, ++rit )
-      if( tolower( *lit ) < tolower( *rit ) )
-         return true;
-      else if( tolower( *lit ) > tolower( *rit ) )
-         return false;
-   if( left.size() < right.size() )
-      return true;
-   return false;
+bool stringCompare(const std::string &left, const std::string &right) {
+    for (std::string::const_iterator lit = left.begin(), rit = right.begin(); lit != left.end() && rit != right.end(); ++lit, ++rit)
+        if (tolower(*lit) < tolower(*rit))
+            return true;
+        else if (tolower(*lit) > tolower(*rit))
+            return false;
+    if (left.size() < right.size())
+        return true;
+    return false;
 }
 
 bool pairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j) {
@@ -673,9 +673,8 @@ bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<i
     return i.first > j.first;
 }
 
-int roundUp(int numToRound, int multiple)
-{
-    if(multiple == 0)
+int roundUp(int numToRound, int multiple) {
+    if (multiple == 0)
         return numToRound;
     int remainder = numToRound % multiple;
     if (remainder == 0)
@@ -706,11 +705,11 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 cString cFlatConfig::DecorDescription(cString File) {
     cString description("");
     FILE *f = fopen(File, "r");
-    if( f ) {
+    if (f) {
         int line = 0;
         char *s;
         cReadLine ReadLine;
-        while( (s = ReadLine.Read(f)) != NULL ) {
+        while ((s = ReadLine.Read(f)) != NULL) {
             line++;
             char *p = strchr(s, '#');
             if (p)
@@ -746,9 +745,9 @@ void cFlatConfig::DecorLoadCurrent(void) {
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
-    if( DecorIndex >= 0 && DecorIndex < (int)files.size() ) {
+    if (DecorIndex >= 0 && DecorIndex < (int)files.size()) {
         std::string FileName = files.at(DecorIndex);
-        DecorLoadFile( FileName.c_str() );
+        DecorLoadFile(FileName.c_str());
     }
 }
 
@@ -756,11 +755,11 @@ void cFlatConfig::DecorLoadFile(cString File) {
     dsyslog("flatPlus: Load decor file: %s", *File);
 
     FILE *f = fopen(File, "r");
-    if( f ) {
+    if (f) {
         int line = 0;
         char *s;
         cReadLine ReadLine;
-        while( (s = ReadLine.Read(f)) != NULL ) {
+        while ((s = ReadLine.Read(f)) != NULL) {
             line++;
             char *p = strchr(s, '#');
             if (p)
@@ -773,74 +772,74 @@ void cFlatConfig::DecorLoadFile(cString File) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
-                    int value = atoi( v );
-                    if( strstr(n, "ChannelBorderType") == n ) {
+                    int value = atoi(v);
+                    if (strstr(n, "ChannelBorderType") == n) {
                         decorBorderChannelTypeTheme = value; continue; }
-                    if( strstr(n, "ChannelBorderSize") == n ) {
+                    if (strstr(n, "ChannelBorderSize") == n) {
                         decorBorderChannelSizeTheme = value; continue; }
-                    if( strstr(n, "ChannelEPGBorderType") == n ) {
+                    if (strstr(n, "ChannelEPGBorderType") == n) {
                         decorBorderChannelEPGTypeTheme = value; continue; }
-                    if( strstr(n, "ChannelEPGBorderSize") == n ) {
+                    if (strstr(n, "ChannelEPGBorderSize") == n) {
                         decorBorderChannelEPGSizeTheme = value; continue; }
-                    if( strstr(n, "TopBarBorderType") == n ) {
+                    if (strstr(n, "TopBarBorderType") == n) {
                         decorBorderTopBarTypeTheme = value; continue; }
-                    if( strstr(n, "TopBarBorderSize") == n ) {
+                    if (strstr(n, "TopBarBorderSize") == n) {
                         decorBorderTopBarSizeTheme = value; continue; }
-                    if( strstr(n, "MessageBorderType") == n ) {
+                    if (strstr(n, "MessageBorderType") == n) {
                         decorBorderMessageTypeTheme = value; continue; }
-                    if( strstr(n, "MessageBorderSize") == n ) {
+                    if (strstr(n, "MessageBorderSize") == n) {
                         decorBorderMessageSizeTheme = value; continue; }
-                    if( strstr(n, "VolumeBorderType") == n ) {
+                    if (strstr(n, "VolumeBorderType") == n) {
                         decorBorderVolumeTypeTheme = value; continue; }
-                    if( strstr(n, "VolumeBorderSize") == n ) {
+                    if (strstr(n, "VolumeBorderSize") == n) {
                         decorBorderVolumeSizeTheme = value; continue; }
-                    if( strstr(n, "TrackItemBorderType") == n ) {
+                    if (strstr(n, "TrackItemBorderType") == n) {
                         decorBorderTrackTypeTheme = value; continue; }
-                    if( strstr(n, "TrackItemBorderSize") == n ) {
+                    if (strstr(n, "TrackItemBorderSize") == n) {
                         decorBorderTrackSizeTheme = value; continue; }
-                    if( strstr(n, "ReplayBorderType") == n ) {
+                    if (strstr(n, "ReplayBorderType") == n) {
                         decorBorderReplayTypeTheme = value; continue; }
-                    if( strstr(n, "ReplayBorderSize") == n ) {
+                    if (strstr(n, "ReplayBorderSize") == n) {
                         decorBorderReplaySizeTheme = value; continue; }
-                    if( strstr(n, "MenuItemBorderType") == n ) {
+                    if (strstr(n, "MenuItemBorderType") == n) {
                         decorBorderMenuItemTypeTheme = value; continue; }
-                    if( strstr(n, "MenuItemBorderSize") == n ) {
+                    if (strstr(n, "MenuItemBorderSize") == n) {
                         decorBorderMenuItemSizeTheme = value; continue; }
-                    if( strstr(n, "MenuContentHeadBorderType") == n ) {
+                    if (strstr(n, "MenuContentHeadBorderType") == n) {
                         decorBorderMenuContentHeadTypeTheme = value; continue; }
-                    if( strstr(n, "MenuContentHeadBorderSize") == n ) {
+                    if (strstr(n, "MenuContentHeadBorderSize") == n) {
                         decorBorderMenuContentHeadSizeTheme = value; continue; }
-                    if( strstr(n, "MenuContentBorderType") == n ) {
+                    if (strstr(n, "MenuContentBorderType") == n) {
                         decorBorderMenuContentTypeTheme = value; continue; }
-                    if( strstr(n, "MenuContentBorderSize") == n ) {
+                    if (strstr(n, "MenuContentBorderSize") == n) {
                         decorBorderMenuContentSizeTheme = value; continue; }
-                    if( strstr(n, "ButtonBorderType") == n ) {
+                    if (strstr(n, "ButtonBorderType") == n) {
                         decorBorderButtonTypeTheme = value; continue; }
-                    if( strstr(n, "ButtonBorderSize") == n ) {
+                    if (strstr(n, "ButtonBorderSize") == n) {
                         decorBorderButtonSizeTheme = value; continue; }
-                    if( strstr(n, "ChannelProgressType") == n ) {
+                    if (strstr(n, "ChannelProgressType") == n) {
                         decorProgressChannelTypeTheme = value; continue; }
-                    if( strstr(n, "ChannelProgressSize") == n ) {
+                    if (strstr(n, "ChannelProgressSize") == n) {
                         decorProgressChannelSizeTheme = value; continue; }
-                    if( strstr(n, "VolumeProgressType") == n ) {
+                    if (strstr(n, "VolumeProgressType") == n) {
                         decorProgressVolumeTypeTheme = value; continue; }
-                    if( strstr(n, "VolumeProgressSize") == n ) {
+                    if (strstr(n, "VolumeProgressSize") == n) {
                         decorProgressVolumeSizeTheme = value; continue; }
-                    if( strstr(n, "MenuItemProgressType") == n ) {
+                    if (strstr(n, "MenuItemProgressType") == n) {
                         decorProgressMenuItemTypeTheme = value; continue; }
-                    if( strstr(n, "MenuItemProgressSize") == n ) {
+                    if (strstr(n, "MenuItemProgressSize") == n) {
                         decorProgressMenuItemSizeTheme = value; continue; }
-                    if( strstr(n, "ReplayProgressType") == n ) {
+                    if (strstr(n, "ReplayProgressType") == n) {
                         decorProgressReplayTypeTheme = value; continue; }
-                    if( strstr(n, "ReplayProgressSize") == n ) {
+                    if (strstr(n, "ReplayProgressSize") == n) {
                         decorProgressReplaySizeTheme = value; continue; }
-                    if( strstr(n, "ChannelSignalProgressType") == n ) {
+                    if (strstr(n, "ChannelSignalProgressType") == n) {
                         decorProgressSignalTypeTheme = value; continue; }
-                    if( strstr(n, "ChannelSignalProgressSize") == n ) {
+                    if (strstr(n, "ChannelSignalProgressSize") == n) {
                         decorProgressSignalSizeTheme = value; continue; }
-                    if( strstr(n, "ScrollBarType") == n ) {
+                    if (strstr(n, "ScrollBarType") == n) {
                         decorScrollBarTypeTheme = value; continue; }
-                    if( strstr(n, "ScrollBarSize") == n ) {
+                    if (strstr(n, "ScrollBarSize") == n) {
                         decorScrollBarSizeTheme = value; continue; }
                 }
             }
@@ -855,11 +854,11 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
     RecordingOldValue.clear();
 
     FILE *f = fopen(RecordingOldConfigFile, "r");
-    if( f ) {
+    if (f) {
         int line = 0;
         char *s;
         cReadLine ReadLine;
-        while( (s = ReadLine.Read(f)) != NULL ) {
+        while ((s = ReadLine.Read(f)) != NULL) {
             line++;
             char *p = strchr(s, '#');
             if (p)
@@ -872,10 +871,10 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
-                    int value = atoi( v );
+                    int value = atoi(v);
                     dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
-                    RecordingOldFolder.push_back( n );
-                    RecordingOldValue.push_back( value );
+                    RecordingOldFolder.push_back(n);
+                    RecordingOldValue.push_back(value);
                 }
             }
         }
@@ -884,8 +883,8 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
 int cFlatConfig::GetRecordingOldValue(std::string folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for( unsigned i = 0; i < sz; i++) {
-        if( RecordingOldFolder[i] == folder )
+    for (unsigned i = 0; i < sz; i++) {
+        if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
     return -1;
@@ -913,7 +912,7 @@ void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
 
 void cFlatConfig::Store(const char *Name, const char *Value, const char *Filename) {
     FILE *f = fopen(Filename, "a");
-    if(f == NULL)
+    if (!f)
         return;
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);

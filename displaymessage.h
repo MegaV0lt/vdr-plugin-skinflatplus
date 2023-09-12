@@ -3,8 +3,8 @@
 #include "baserender.h"
 
 class cFlatDisplayMessage : public cFlatBaseRender, public cSkinDisplayMessage {
-    private:
-    public:
+ private:
+ public:
         cFlatDisplayMessage(void);
         virtual ~cFlatDisplayMessage();
         virtual void SetMessage(eMessageType Type, const char *Text);

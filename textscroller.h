@@ -5,11 +5,10 @@
 #include <string.h>
 #include <vdr/thread.h>
 
-#define WAITDELAY 1000 // In ms
+#define WAITDELAY 1000  // In ms
 
-class cTextScroll
-{
-private:
+class cTextScroll {
+ private:
     cRect Position;
 
     tColor ColorFg, ColorExtraTextFg, ColorBg;
@@ -19,12 +18,12 @@ private:
     cOsd *Osd;
     int Layer;
     int PixelsPerStep;
-    int WAITSTEPS, waitSteps;
+    int WAITSTEPS, waitSteps = 0;
     bool isReserveStep;
     bool ResetX;
     int ScrollType;
 
-public:
+ public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
         Font = NULL;
         Pixmap = NULL;
@@ -48,8 +47,8 @@ public:
         ResetX = false;
     }
 
-    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-        if (Pixmap) {
+    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
+        if (Pixmap) {         // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
             Osd->DestroyPixmap(Pixmap);
             Pixmap = NULL;
         }
@@ -58,15 +57,14 @@ public:
     void UpdateViewPortWidth(int w);
     void Reset(void);
 
-    void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg = 0);
+    void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg,
+                 cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep(void);
     void Draw(void);
-
 };
 
-class cTextScrollers : public cThread
-{
-private:
+class cTextScrollers : public cThread {
+ private:
     std::vector<cTextScroll *> Scrollers;
 
     cOsd *Osd;
@@ -75,7 +73,7 @@ private:
     int Layer;
     virtual void Action(void);
     void StartScrolling(void);
-public:
+ public:
     cTextScrollers();
     ~cTextScrollers();
 
@@ -85,7 +83,8 @@ public:
     void SetScrollStep(int step) { scrollStep = step; }
     void SetScrollDelay(int delay) { scrollDelay = delay; }
     void SetScrollType(int type) { scrollType = type; }
-    void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font, tColor ColorExtraTextFg = 0);
+    void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg,
+                     cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive(void) { return Active(); }
 };

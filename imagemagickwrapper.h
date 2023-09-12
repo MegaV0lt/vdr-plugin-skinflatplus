@@ -8,10 +8,10 @@
 using namespace Magick;
 
 class cImageMagickWrapper {
-public:
+ public:
     cImageMagickWrapper();
     ~cImageMagickWrapper();
-protected:
+ protected:
     Image buffer;
     Color Argb2Color(tColor col);
     cImage *CreateImage(int width, int height, bool preserveAspect = true);

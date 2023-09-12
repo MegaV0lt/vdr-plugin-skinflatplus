@@ -26,9 +26,8 @@ struct sDecorBorder {
 
 template<class T> inline T myMax(T a, T b) { return a >= b ? a : b; }
 
-class cFlatBaseRender
-{
-    protected:
+class cFlatBaseRender {
+ protected:
         cOsd *osd;
 
         int osdLeft, osdTop, osdWidth, osdHeight;
@@ -93,7 +92,7 @@ class cFlatBaseRender
         cPixmap *contentPixmap;
         cPixmap *contentEpgImagePixmap;
         int contentLeft, contentTop, contentHeight, contentWidth;
-        int contentDrawPortHeight; // gesamth�he des Textes
+        int contentDrawPortHeight;  // gesamthöhe des Textes
         int contentTextHeight;
         bool contentHasScrollbar;
         bool contentShown;
@@ -110,7 +109,7 @@ class cFlatBaseRender
         cComplexContent weatherWidget;
 
         cPixmap *decorPixmap;
-        std::list<sDecorBorder> Borders; // for clear specific Borders (clear only MenuItems and not TopBar)
+        std::list<sDecorBorder> Borders;  // for clear specific Borders (clear only MenuItems and not TopBar)
 
         void contentDraw(void);
         void contentEventDraw(void);
@@ -127,15 +126,19 @@ class cFlatBaseRender
         void DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
         void DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
 
-        void DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg, int type);
-        void DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg, int type);
-        void DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg, int type);
-        void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg, int type);
+        void DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height,
+                                    tColor ColorBg, int type);
+        void DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height,
+                                    tColor ColorBg, int type);
+        void DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height,
+                                    tColor ColorBg, int type);
+        void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height,
+                                    tColor ColorBg, int type);
 
         void TopBarEnableDiskUsage(void);
-        //tColor Multiply(tColor Color, uint8_t Alpha);
+        // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
-    public:
+ public:
         cImageLoader imgLoader;
 
         cFlatBaseRender(void);
@@ -163,16 +166,22 @@ class cFlatBaseRender
         void MessageSet(eMessageType Type, const char *Text);
         void MessageClear(void);
 
-        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type, bool SetBackground, bool isSignal = false);
-        void ProgressBarCreate(int Left, int Top, int Width, int Height, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type, bool SetBackground = false, bool isSignal = false);
+        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
+                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
+                                int Type, bool SetBackground, bool isSignal = false);
+        void ProgressBarCreate(int Left, int Top, int Width, int Height, int MarginHor, int MarginVer,
+                               tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
+                               bool SetBackground = false, bool isSignal = false);
         void ProgressBarDrawBgColor(void);
         void ProgressBarDraw(int Current, int Total);
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
 
-        void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown, bool CanScrollUp, bool CanScrollDown);
+        void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
+                           int Shown, bool CanScrollUp, bool CanScrollDown);
         int ScrollBarWidth(void);
 
-        void DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg, tColor ColorBg, int From = 0, bool Store = true);
+        void DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type,
+                             tColor ColorFg, tColor ColorBg, int From = 0, bool Store = true);
         void DecorBorderClear(int Left, int Top, int Width, int Height, int Size);
         void DecorBorderClearAll(void);
         void DecorBorderRedrawAll(void);

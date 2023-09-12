@@ -29,91 +29,91 @@ cFlatSetup::~cFlatSetup() {
 
 void cFlatSetup::Setup(void) {
     Clear();
-    //Bordertypes.Clear();  // Double .Clear()?
-    //Progresstypes.Clear();
+    // Bordertypes.Clear();  // Double .Clear()?
+    // Progresstypes.Clear();
 
     Bordertypes.Clear();
-    Bordertypes.Append( strdup(tr("none")) );
-    Bordertypes.Append( strdup(tr("rect")) );
-    Bordertypes.Append( strdup(tr("round")) );
-    Bordertypes.Append( strdup(tr("invert round")) );
-    Bordertypes.Append( strdup(tr("rect + alpha blend")) );
-    Bordertypes.Append( strdup(tr("round + alpha blend")) );
-    Bordertypes.Append( strdup(tr("invert round + alpha blend")) );
+    Bordertypes.Append(strdup(tr("none")));
+    Bordertypes.Append(strdup(tr("rect")));
+    Bordertypes.Append(strdup(tr("round")));
+    Bordertypes.Append(strdup(tr("invert round")));
+    Bordertypes.Append(strdup(tr("rect + alpha blend")));
+    Bordertypes.Append(strdup(tr("round + alpha blend")));
+    Bordertypes.Append(strdup(tr("invert round + alpha blend")));
 
     Progresstypes.Clear();
-    Progresstypes.Append( strdup(tr("small line + big line")) );
-    Progresstypes.Append( strdup(tr("big line")) );
-    Progresstypes.Append( strdup(tr("big line + outline")) );
-    Progresstypes.Append( strdup(tr("small line + big line + dot")) );
-    Progresstypes.Append( strdup(tr("big line + dot")) );
-    Progresstypes.Append( strdup(tr("big line + outline + dot")) );
-    Progresstypes.Append( strdup(tr("small line + dot")) );
-    Progresstypes.Append( strdup(tr("outline + dot")) );
-    Progresstypes.Append( strdup(tr("small line + big line + alpha blend")) );
-    Progresstypes.Append( strdup(tr("big line + alpha blend")) );
+    Progresstypes.Append(strdup(tr("small line + big line")));
+    Progresstypes.Append(strdup(tr("big line")));
+    Progresstypes.Append(strdup(tr("big line + outline")));
+    Progresstypes.Append(strdup(tr("small line + big line + dot")));
+    Progresstypes.Append(strdup(tr("big line + dot")));
+    Progresstypes.Append(strdup(tr("big line + outline + dot")));
+    Progresstypes.Append(strdup(tr("small line + dot")));
+    Progresstypes.Append(strdup(tr("outline + dot")));
+    Progresstypes.Append(strdup(tr("small line + big line + alpha blend")));
+    Progresstypes.Append(strdup(tr("big line + alpha blend")));
 
     DiskUsages.Clear();
-    DiskUsages.Append( strdup(tr("do not show")) );
-    DiskUsages.Append( strdup(tr("timer & recording menu")) );
-    DiskUsages.Append( strdup(tr("always on the menu")) );
-    DiskUsages.Append( strdup(tr("always show")) );
+    DiskUsages.Append(strdup(tr("do not show")));
+    DiskUsages.Append(strdup(tr("timer & recording menu")));
+    DiskUsages.Append(strdup(tr("always on the menu")));
+    DiskUsages.Append(strdup(tr("always show")));
 
     DiskUsageFree.Clear();
-    DiskUsageFree.Append( strdup(tr("occupied")) );
-    DiskUsageFree.Append( strdup(tr("free")) );
+    DiskUsageFree.Append(strdup(tr("occupied")));
+    DiskUsageFree.Append(strdup(tr("free")));
 
     MenuChannelViews.Clear();
-    MenuChannelViews.Append( strdup(tr("VDR default")) );
-    MenuChannelViews.Append( strdup(tr("flatPlus long")) );
-    MenuChannelViews.Append( strdup(tr("flatPlus long + EPG")) );
-    MenuChannelViews.Append( strdup(tr("flatPlus short")) );
-    MenuChannelViews.Append( strdup(tr("flatPlus short + EPG")) );
+    MenuChannelViews.Append(strdup(tr("VDR default")));
+    MenuChannelViews.Append(strdup(tr("flatPlus long")));
+    MenuChannelViews.Append(strdup(tr("flatPlus long + EPG")));
+    MenuChannelViews.Append(strdup(tr("flatPlus short")));
+    MenuChannelViews.Append(strdup(tr("flatPlus short + EPG")));
 
     MenuTimerViews.Clear();
-    MenuTimerViews.Append( strdup(tr("VDR default")) );
-    MenuTimerViews.Append( strdup(tr("flatPlus long")) );
-    MenuTimerViews.Append( strdup(tr("flatPlus short")) );
-    MenuTimerViews.Append( strdup(tr("flatPlus short + EPG")) );
+    MenuTimerViews.Append(strdup(tr("VDR default")));
+    MenuTimerViews.Append(strdup(tr("flatPlus long")));
+    MenuTimerViews.Append(strdup(tr("flatPlus short")));
+    MenuTimerViews.Append(strdup(tr("flatPlus short + EPG")));
 
     MenuEventViews.Clear();
-    MenuEventViews.Append( strdup(tr("VDR default")) );
-    MenuEventViews.Append( strdup(tr("flatPlus long")) );
-    MenuEventViews.Append( strdup(tr("flatPlus short")) );
-    MenuEventViews.Append( strdup(tr("flatPlus short + EPG")) );
+    MenuEventViews.Append(strdup(tr("VDR default")));
+    MenuEventViews.Append(strdup(tr("flatPlus long")));
+    MenuEventViews.Append(strdup(tr("flatPlus short")));
+    MenuEventViews.Append(strdup(tr("flatPlus short + EPG")));
 
     MenuRecordingViews.Clear();
-    MenuRecordingViews.Append( strdup(tr("VDR default")) );
-    MenuRecordingViews.Append( strdup(tr("flatPlus long")) );
-    MenuRecordingViews.Append( strdup(tr("flatPlus short")) );
-    MenuRecordingViews.Append( strdup(tr("flatPlus short + Info")) );
+    MenuRecordingViews.Append(strdup(tr("VDR default")));
+    MenuRecordingViews.Append(strdup(tr("flatPlus long")));
+    MenuRecordingViews.Append(strdup(tr("flatPlus short")));
+    MenuRecordingViews.Append(strdup(tr("flatPlus short + Info")));
 
     MessageColorPositions.Clear();
-    MessageColorPositions.Append( strdup(tr("vertical")) );
-    MessageColorPositions.Append( strdup(tr("hoizontal")) );
+    MessageColorPositions.Append(strdup(tr("vertical")));
+    MessageColorPositions.Append(strdup(tr("hoizontal")));
 
     ScrollerTypes.Clear();
-    ScrollerTypes.Append( strdup( tr("carriage return")) );
-    ScrollerTypes.Append( strdup( tr("left-right-left")) );
+    ScrollerTypes.Append(strdup(tr("carriage return")));
+    ScrollerTypes.Append(strdup(tr("left-right-left")));
 
     ScrollBarTypes.Clear();
-    ScrollBarTypes.Append( strdup( tr("left line + rect bar")) );
-    ScrollBarTypes.Append( strdup( tr("left line + round bar")) );
-    ScrollBarTypes.Append( strdup( tr("middle line + rect bar")) );
-    ScrollBarTypes.Append( strdup( tr("middle line + round bar")) );
-    ScrollBarTypes.Append( strdup( tr("outline + rect bar")) );
-    ScrollBarTypes.Append( strdup( tr("outline + round bar")) );
-    ScrollBarTypes.Append( strdup( tr("rect bar")) );
-    ScrollBarTypes.Append( strdup( tr("round bar")) );
+    ScrollBarTypes.Append(strdup(tr("left line + rect bar")));
+    ScrollBarTypes.Append(strdup(tr("left line + round bar")));
+    ScrollBarTypes.Append(strdup(tr("middle line + rect bar")));
+    ScrollBarTypes.Append(strdup(tr("middle line + round bar")));
+    ScrollBarTypes.Append(strdup(tr("outline + rect bar")));
+    ScrollBarTypes.Append(strdup(tr("outline + round bar")));
+    ScrollBarTypes.Append(strdup(tr("rect bar")));
+    ScrollBarTypes.Append(strdup(tr("round bar")));
 
     ChannelTimeLefts.Clear();
-    ChannelTimeLefts.Append( strdup( tr("past / remaining")) );
-    ChannelTimeLefts.Append( strdup( tr("past")) );
-    ChannelTimeLefts.Append( strdup( tr("remaining")) );
+    ChannelTimeLefts.Append(strdup(tr("past / remaining")));
+    ChannelTimeLefts.Append(strdup(tr("past")));
+    ChannelTimeLefts.Append(strdup(tr("remaining")));
 
     WeatherTypes.Clear();
-    WeatherTypes.Append( strdup( tr("short")) );
-    WeatherTypes.Append( strdup( tr("long")) );
+    WeatherTypes.Append(strdup(tr("short")));
+    WeatherTypes.Append(strdup(tr("long")));
 
     Add(new cOsdItem(tr("General settings"), osUnknown, true));
     Add(new cOsdItem(tr("Channelinfo settings"), osUnknown, true));
@@ -332,7 +332,8 @@ void cFlatSetup::Store(void) {
 }
 
 void cFlatSetupGeneral::LoadConfigFile(void) {
-    cString Filename = cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
+    cString Filename =
+        cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
 
     FILE *f = fopen(Filename, "r");
     if (f) {
@@ -726,7 +727,7 @@ void cFlatSetupGeneral::Setup(void) {
     Clear();
 
     DecorDescriptions.Clear();
-    SetupConfig->DecorDescriptions( DecorDescriptions );
+    SetupConfig->DecorDescriptions(DecorDescriptions);
     if (SetupConfig->DecorIndex < 0 || SetupConfig->DecorIndex > DecorDescriptions.Size())
         SetupConfig->DecorIndex = 0;
 
@@ -734,7 +735,8 @@ void cFlatSetupGeneral::Setup(void) {
         esyslog("flatPlus: No decor files found, please check your installation!");
         Add(new cOsdItem(tr("no decorfiles found, check install"), osUnknown, false));
     } else
-        Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(), &DecorDescriptions[0]));
+        Add(new cMenuEditStraItem(tr("Decorfile"), &SetupConfig->DecorIndex, DecorDescriptions.Size(),
+                                  &DecorDescriptions[0]));
 
     ConfigFiles.Clear();
     SetupConfig->GetConfigFiles(ConfigFiles);
@@ -746,7 +748,8 @@ void cFlatSetupGeneral::Setup(void) {
         esyslog("flatPlus: No config files found, please check your installation!");
         Add(new cOsdItem(tr("no config-files found, check install"), osUnknown, false));
     } else
-        Add(new cMenuEditStraItem(tr("Press ok to load config file"), &ConfigFileSelection, ConfigFiles.Size(), &ConfigFiles[0]));
+        Add(new cMenuEditStraItem(tr("Press ok to load config file"), &ConfigFileSelection, ConfigFiles.Size(),
+                                  &ConfigFiles[0]));
 
     cString saveSettings = cString::sprintf("%s:\t%s", tr("Save current settings"), tr("press ok to save current settings"));
     Add(new cOsdItem(saveSettings, osUnknown, true));
@@ -1091,7 +1094,7 @@ void cFlatSetupReplay::Setup(void) {
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
-    
+
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
     if (SetupConfig->RecordingDimmOnPause) {
         Add(new cMenuEditIntItem(tr("Dimm on pause delay"), &SetupConfig->RecordingDimmOnPauseDelay));
@@ -1139,7 +1142,7 @@ eOSState cFlatSetupReplay::ProcessKey(eKeys Key) {
                 break;
         }
     }
-    if( Key == kLeft || Key == kRight ) {
+    if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
         if (strstr(ItemText, tr("Replay border by decor-file?")) != NULL ||
             strstr(ItemText, tr("Replay progress by decor-file?")) != NULL ||
