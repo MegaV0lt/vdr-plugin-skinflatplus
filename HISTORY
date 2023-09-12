@@ -16,6 +16,12 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Centralize getting iconnames of format and aspect
 - [update] Centralize call of pscraper plugin (From Skinnopacity)
 
+2023-09-xx: Version 0.6.8
+- [add] Add option to disable recerroricons in replay 
+- [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
+- [update] centralize getting iconnames of format and aspect
+- [update] centralize call of pscraper plugin
+
 2023-08-24: Version 0.6.7
 - [fix] Adaptation to tvscraper commit a4287558
 - [update] Prevents *magick from occupying the segfaults (From SkinNopacity)
