@@ -95,7 +95,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                           fontSml, osdWidth - Config.decorBorderReplaySize * 2);
 
 #if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
+    if (Config.PlaybackShowRecordingErrors) {  // Separate config option
         int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
         cString RecErrIcon("recording_untested_replay");

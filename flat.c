@@ -147,10 +147,10 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
             res = "1280x720"; break;
         case 960:                         // 960x720 (HD720 DV)
             res = "960x720"; break;
-        case 704:                         // 704x576 (PAL)
-            res = "704x576"; break;
         case 720:                         // 720x576 (PAL)
             res = "720x576"; break;
+        case 704:                         // 704x576 (PAL)
+            res = "704x576"; break;
         case 544:                         // 544x576 (PAL)
             res = "544x576"; break;
         case 528:                         // 528x576 (PAL)
@@ -173,19 +173,14 @@ cString GetFormatIcon(int screenWidth) {
     switch (screenWidth) {
     case 7680:
     case 3840:
-        iconName = "uhd";
-        break;
+        iconName = "uhd"; break;
     case 1920:
     case 1440:
     case 1280:
-        iconName = "hd";
-        break;
-    case 720:
-        iconName = "sd";
-        break;
+        iconName = "hd"; break;
+    case 720:  // 720 and below is considered sd
     default:
-        iconName = "sd";
-        break;
+        iconName = "sd"; break;
     }
     return iconName;
 }

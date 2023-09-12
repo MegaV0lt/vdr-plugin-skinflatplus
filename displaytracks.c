@@ -96,8 +96,8 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 }
 
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
-    // from vdr 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
-    // from skinnopacity -1 ac3, else stero
+    // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
+    // From skinnopacity: -1 ac3, else stereo
     tracksLogoPixmap->Fill(clrTransparent);
     if (AudioChannel == -1 && img_ac3) {
         int IconLeft = maxItemWidth - img_ac3->Width() - marginItem;

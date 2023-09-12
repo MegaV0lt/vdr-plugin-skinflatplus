@@ -3923,7 +3923,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                               Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
                               menuWidth - marginItem * 2);
 #if APIVERSNUM >= 20505
-    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate configoption
+    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option
       // cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
       // cString RecErrIcon = cString::sprintf("%s_replay", recErrIcon);
       int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
