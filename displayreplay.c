@@ -111,7 +111,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         if (imgRecErr) {
             left += fontSml->Width(info) + marginItem;
             int imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
-            iconsPixmap->DrawImage(cPoint(Left, imageTop), *imgRecErr);
+            iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecErr);
         }
     }  // PlaybackShowRecordingErrors
 #endif

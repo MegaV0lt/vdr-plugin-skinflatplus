@@ -1,11 +1,14 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
-2023-09-xx: Version 0.6.9
+2023-09-12: Version 0.6.9
 - [update] Reformat some code
 - [update] Use CreatePixmap() instead of osd->CreatePixmap()
 - [update] Simplify check for EPGsearch searchtimermenu
 - [update] Add parameter for Get...Icon()
 - [update] Move PlaybackShowRecordingErrors to playback menu
+- [update] Add space between Date and time in status
+- [update] Rearange replay statustext for recordingerror icon at end
+- [add] Add recordingerror icon to recording info header
 
 2023-09-04: Version 0.6.8
 - [add] Add option to disable recerroricons in replay
