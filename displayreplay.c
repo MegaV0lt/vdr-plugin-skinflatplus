@@ -326,9 +326,19 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (recording) {
         cMarks marks;
-        bool hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) &&
-                        marks.Count();
-        cIndexFile *index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
+        /*
+        bool hasMarks =
+            marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
+        cIndexFile *index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+        */
+        // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+        bool hasMarks = false;
+        cIndexFile *index = NULL;
+        if (Recording->NumFrames() > 0) {
+            hasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
+            index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+        }
+
         int cuttedLength = 0;
         long cutinframe = 0;
         unsigned long long recsizecutted = 0;

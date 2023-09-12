@@ -2979,9 +2979,18 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
       }
 
       cMarks marks;
+      /*
       bool hasMarks =
           marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
       cIndexFile *index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+      */
+      // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+      bool hasMarks = false;
+      cIndexFile *index = NULL;
+      if (Recording->NumFrames() > 0) {
+        hasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
+        index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+      }
 
       int lastIndex = 0;
 
@@ -3373,9 +3382,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
       }
     }
     cMarks marks;
+    /*
     bool hasMarks =
         marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
     cIndexFile *index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+    */
+    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+    bool hasMarks = false;
+    cIndexFile *index = NULL;
+    if (Recording->NumFrames() > 0) {
+      hasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
+      index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+    }
 
     int lastIndex = 0;
 
