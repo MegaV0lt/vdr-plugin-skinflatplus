@@ -191,6 +191,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
+    if (!doOutput)
+        return;
+
     if (!Resolution)
         chanIconsPixmap->Fill(clrTransparent);
 
@@ -460,6 +463,9 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
+    if (!doOutput)
+        return;
+
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
     int signalWidth = channelWidth / 2;
@@ -475,7 +481,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int top = fontHeight*2 + fontSmlHeight*2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize*2) - marginItem;
     int left = marginItem * 2;
-    /* 
+    /*
     int progressTop = fontHeight*2 + fontSmlHeight*2 + marginItem;
     progressTop += std::max(fontSmlHeight, Config.decorProgressSignalSize) / 2 - Config.decorProgressSignalSize / 2;
     */
@@ -514,9 +520,10 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // you need oscam min rev 10653
 // you need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    // dsyslog("DvbapiInfoDraw");
-    int ChannelSid = CurChannel->Sid();
+    if (!doOutput)
+        return;
 
+    // dsyslog("DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi)
         return;
@@ -525,6 +532,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
 
+    int ChannelSid = CurChannel->Sid();
     // dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
