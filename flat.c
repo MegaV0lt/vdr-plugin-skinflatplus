@@ -127,12 +127,14 @@ cString GetAspectIcon(int screenWidth, double screenAspect) {
 }
 
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
-    cString res("");
+    cString res("unknown_res");
     switch (screenWidth) {
         case 7680:                        // 7680×4320 (UHD-2 / 8K)
             res = "7680x4320"; break;
         case 3840:                        // 3840×2160 (UHD-1 / 4K)
             res = "3840x2160"; break;
+        // case 2560;                        // 2560x1440 (QHD)
+        //    res = "2560x1440"; break;      // TODO: Is that used somewhere on sat/cable?
         case 1920:                        // 1920x1080 (HD1080 Full HDTV)
             res = "1920x1080"; break;
         case 1440:                        // 1440x1080 (HD1080 DV)
@@ -154,7 +156,6 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
         case 352:                         // 352x576 (PAL CVD)
             res = "352x576"; break;
         default:
-            res = "unknown_res";
             dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
                     screenWidth, screenHeight, screenAspect);
             break;
@@ -163,13 +164,11 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
 }
 
 cString GetFormatIcon(int screenWidth) {
-    cString iconName("");  // Show Format
+    cString iconName("sd");  // 720 and below is considered sd
     if (screenWidth > 1920)
         iconName = "uhd";
     else if (screenWidth > 720)
         iconName = "hd";
-    else
-        iconName = "sd";  // 720 and below is considered sd
 
     return iconName;
 }
