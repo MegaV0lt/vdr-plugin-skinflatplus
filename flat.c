@@ -99,6 +99,7 @@ cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &
             }
         }
     }
+    esyslog("flatPlus: No osd! Could not create pixmap with size %i x %i", width, height);
     return NULL;
 }
 
