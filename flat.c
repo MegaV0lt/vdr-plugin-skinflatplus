@@ -110,15 +110,9 @@ cPlugin *GetScraperPlugin(void) {
 }
 
 cString GetAspectIcon(int screenWidth, double screenAspect) {
-    cString asp("unknown_asp");                // ???
+    cString asp("unknown_asp");                     // ???
     if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
-        switch (screenWidth) {                 // No aspect for HD
-            case 7680:
-            case 3840:
-                asp = "uhd"; break;
-            default:
-                asp = "hd"; break;
-        }
+        asp = (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
     } else {
         if (screenAspect == 4.0/3.0)
             asp = "43";
@@ -170,18 +164,13 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
 
 cString GetFormatIcon(int screenWidth) {
     cString iconName("");  // Show Format
-    switch (screenWidth) {
-    case 7680:
-    case 3840:
-        iconName = "uhd"; break;
-    case 1920:
-    case 1440:
-    case 1280:
-        iconName = "hd"; break;
-    case 720:  // 720 and below is considered sd
-    default:
-        iconName = "sd"; break;
-    }
+    if (screenWidth > 1920)
+        iconName = "uhd";
+    else if (screenWidth > 720)
+        iconName = "hd";
+    else
+        iconName = "sd";  // 720 and below is considered sd
+
     return iconName;
 }
 
