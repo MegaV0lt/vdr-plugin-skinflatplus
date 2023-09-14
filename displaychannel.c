@@ -568,6 +568,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
             chanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + marginItem;
         }
+        dsyslog("Unknown cardsystem: %s (CAID: %s)", *ecmInfo.cardsystem, *ecmInfo.caid);
     }
 
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
