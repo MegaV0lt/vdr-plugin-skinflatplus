@@ -83,29 +83,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     iconsPixmap->Fill(clrTransparent);
 
-#if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
-      int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-      cString RecErrIcon("recording_untested_replay");
-      if (recInfo->Errors() < 0) {         // -1 Untestet recording
-        // RecErrIcon = "recording_untested";
-      } else if (recInfo->Errors() == 0)    // No errors
-        RecErrIcon = "recording_ok_replay";
-      else if (recInfo->Errors() < RecErrIconThreshold)
-        RecErrIcon = "recording_warning_replay";
-      else if (recInfo->Errors() >= RecErrIconThreshold)
-        RecErrIcon = "recording_error_replay";
-
-      cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
-      if (imgRecErr != NULL) {
-        //imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
-        iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
-      }
-      Left += imgRecErr->Width() + marginItem;  // Add width of icon
-    }  // PlaybackShowRecordingErrors
-#endif
-
     SetTitle(recInfo->Title());
     cString info("");
     if (recInfo->ShortText())
@@ -328,15 +305,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         cMarks marks;
         /*
         bool hasMarks =
-            marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
-        cIndexFile *index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+            marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) && marks.Count();
+        cIndexFile *index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
         */
         // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
         bool hasMarks = false;
         cIndexFile *index = NULL;
-        if (Recording->NumFrames() > 0) {
-            hasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) && marks.Count();
-            index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+        if (recording->NumFrames() > 0) {
+            hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) && marks.Count();
+            index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
         }
 
         int cuttedLength = 0;
