@@ -23,7 +23,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
     labelPixmap = CreatePixmap(osd, 1,
                                cRect(Config.decorBorderReplaySize,
@@ -46,10 +46,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 
     dimmPixmap = CreatePixmap(osd, MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
 
-    labelPixmap->Fill(Theme.Color(clrReplayBg));
-    labelJump->Fill(clrTransparent);
-    iconsPixmap->Fill(clrTransparent);
-    dimmPixmap->Fill(clrTransparent);
+    PixmapFill(labelPixmap, Theme.Color(clrReplayBg));
+    PixmapFill(labelJump, clrTransparent);
+    PixmapFill(iconsPixmap, clrTransparent);
+    PixmapFill(dimmPixmap, clrTransparent);
 
     fontSecs = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
 
@@ -81,7 +81,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
 
-    iconsPixmap->Fill(clrTransparent);
+    PixmapFill(iconsPixmap, clrTransparent);
 
     SetTitle(recInfo->Title());
     cString info("");
@@ -129,7 +129,7 @@ void cFlatDisplayReplay::Action(void) {
         if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
             for (int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
-                dimmPixmap->Fill(ArgbToColor(alpha, 0, 0, 0));
+                PixmapFill(dimmPixmap, ArgbToColor(alpha, 0, 0, 0));
                 Flush();
             }
             Cancel(-1);
@@ -149,7 +149,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         while (Active())
             cCondWait::SleepMs(10);
         if (dimmActive) {
-            dimmPixmap->Fill(clrTransparent);
+            PixmapFill(dimmPixmap, clrTransparent);
             Flush();
         }
     }
@@ -158,9 +158,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         left /= 2;
 
         if (modeOnly)
-            labelPixmap->Fill(clrTransparent);
+            PixmapFill(labelPixmap, clrTransparent);
 
-        // iconsPixmap->Fill(clrTransparent);  // Moved to SetRecording
+        // PixmapFill(iconsPixmap, clrTransparent);  // Moved to SetRecording
         labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0,
                                          fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight),
                                    Theme.Color(clrReplayBg));
@@ -241,7 +241,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     if (dimmActive) {
-        dimmPixmap->Fill(clrTransparent);
+        PixmapFill(dimmPixmap, clrTransparent);
         Flush();
     }
 
@@ -419,7 +419,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
         }
 
-        chanEpgImagesPixmap->Fill(clrTransparent);
+        PixmapFill(chanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (mediaPath.length() > 0) {
             cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
@@ -540,7 +540,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     DecorBorderClearByFrom(BorderRecordJump);
 
     if (!Jump) {
-        labelJump->Fill(clrTransparent);
+        PixmapFill(labelJump, clrTransparent);
         return;
     }
     int left = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(Jump);

@@ -51,11 +51,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     int height = heightBottom;
     chanInfoBottomPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightBottom));
-    chanInfoBottomPixmap->Fill(Theme.Color(clrChannelBg));
+    PixmapFill(chanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
     chanIconsPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize+channelHeight - height, channelWidth, heightBottom));
-    chanIconsPixmap->Fill(clrTransparent);
+    PixmapFill(chanIconsPixmap, clrTransparent);
 
     TVSLeft = 20 + Config.decorBorderChannelEPGSize;
     TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
@@ -63,15 +63,15 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     TVSHeight = osdHeight - topBarHeight - heightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
     chanLogoBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
-    chanLogoBGPixmap->Fill(clrTransparent);
+    PixmapFill(chanLogoBGPixmap, clrTransparent);
 
     chanLogoPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
-    chanLogoPixmap->Fill(clrTransparent);
+    PixmapFill(chanLogoPixmap, clrTransparent);
 
     height += Config.decorProgressChannelSize + marginItem * 2;
     ProgressBarCreate(Config.decorBorderChannelSize,
@@ -85,7 +85,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     height += heightTop;
     chanInfoTopPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightTop));
-    chanInfoTopPixmap->Fill(clrTransparent);
+    PixmapFill(chanInfoTopPixmap, clrTransparent);
 
     scrollers.SetOsd(osd);
     scrollers.SetScrollStep(Config.ScrollerStep);
@@ -129,7 +129,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     cString channelNumber("");
     isRecording = false;
-    chanIconsPixmap->Fill(clrTransparent);
+    PixmapFill(chanIconsPixmap, clrTransparent);
     lastScreenWidth = -1;
 
     if (Channel) {
@@ -148,12 +148,12 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     cString channelString = cString::sprintf("%s  %s", *channelNumber, *channelName);
 
-    chanInfoTopPixmap->Fill(Theme.Color(clrChannelBg));
+    PixmapFill(chanInfoTopPixmap, Theme.Color(clrChannelBg));
     chanInfoTopPixmap->DrawText(cPoint(50, 0), channelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), font);
 
-    chanLogoPixmap->Fill(clrTransparent);
-    chanLogoBGPixmap->Fill(clrTransparent);
+    PixmapFill(chanLogoPixmap, clrTransparent);
+    PixmapFill(chanLogoBGPixmap, clrTransparent);
     int imageHeight = heightImageLogo - marginItem * 2;
     int imageBGHeight = imageHeight;
     int imageBGWidth = imageHeight;
@@ -195,7 +195,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         return;
 
     if (!Resolution)
-        chanIconsPixmap->Fill(clrTransparent);
+        PixmapFill(chanIconsPixmap, clrTransparent);
 
     int width = fontSmlHeight;
     int height = fontSmlHeight;
@@ -267,8 +267,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     scrollers.Clear();
 
-    chanInfoBottomPixmap->Fill(Theme.Color(clrChannelBg));
-    chanIconsPixmap->Fill(clrTransparent);
+    PixmapFill(chanInfoBottomPixmap, Theme.Color(clrChannelBg));
+    PixmapFill(chanIconsPixmap, clrTransparent);
 
     bool isRec = false;
     int RecWidth = fontSml->Width("REC");
@@ -436,7 +436,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
     }
 
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (mediaPath.length() > 0) {
         cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);

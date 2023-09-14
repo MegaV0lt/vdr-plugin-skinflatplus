@@ -21,7 +21,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
             Position.Left(), Position.Top(), Position.Width(), Position.Height());
     dsyslog("flatPlus: TextScrollerPixmap drawPort left: %d top: %d width: %d height: %d",
             drawPort.Left(), drawPort.Top(), drawPort.Width(), drawPort.Height());
-    Pixmap->Fill(colorBg);
+    PixmapFill(Pixmap, colorBg);
     Draw();
 }
 

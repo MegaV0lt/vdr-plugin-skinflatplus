@@ -89,12 +89,12 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
   // dsyslog("flatPlus: scrollbarPixmap left: %d top: %d width: %d height: %d", 0, scrollBarTop, menuWidth,
   //         scrollBarHeight + buttonsHeight + Config.decorBorderButtonSize * 2);
 
-  menuPixmap->Fill(clrTransparent);
-  menuIconsPixmap->Fill(clrTransparent);
-  menuIconsBGPixmap->Fill(clrTransparent);
-  menuIconsOVLPixmap->Fill(clrTransparent);
-  scrollbarPixmap->Fill(clrTransparent);
-  contentHeadIconsPixmap->Fill(clrTransparent);
+  PixmapFill(menuPixmap, clrTransparent);
+  PixmapFill(menuIconsPixmap, clrTransparent);
+  PixmapFill(menuIconsBGPixmap, clrTransparent);
+  PixmapFill(menuIconsOVLPixmap, clrTransparent);
+  PixmapFill(scrollbarPixmap, clrTransparent);
+  PixmapFill(contentHeadIconsPixmap, clrTransparent);
 
   menuCategory = mcUndefined;
 
@@ -234,13 +234,13 @@ int cFlatDisplayMenu::ItemsHeight(void) {
 
 void cFlatDisplayMenu::Clear(void) {
   menuItemScroller.Clear();
-  menuPixmap->Fill(clrTransparent);
-  menuIconsPixmap->Fill(clrTransparent);
-  menuIconsBGPixmap->Fill(clrTransparent);
-  menuIconsOVLPixmap->Fill(clrTransparent);
-  scrollbarPixmap->Fill(clrTransparent);
-  contentHeadPixmap->Fill(clrTransparent);
-  contentHeadIconsPixmap->Fill(clrTransparent);
+  PixmapFill(menuPixmap, clrTransparent);
+  PixmapFill(menuIconsPixmap, clrTransparent);
+  PixmapFill(menuIconsBGPixmap, clrTransparent);
+  PixmapFill(menuIconsOVLPixmap, clrTransparent);
+  PixmapFill(scrollbarPixmap, clrTransparent);
+  PixmapFill(contentHeadPixmap, clrTransparent);
+  PixmapFill(contentHeadIconsPixmap, clrTransparent);
   DecorBorderClearByFrom(BorderMenuItem);
   DecorBorderClearByFrom(BorderContent);
   DecorBorderClearByFrom(BorderMMWidget);
@@ -2413,10 +2413,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
   menuItemWidth = cWidth;
 
-  contentHeadPixmap->Fill(clrTransparent);
+  PixmapFill(contentHeadPixmap, clrTransparent);
   contentHeadPixmap->DrawRectangle(cRect(0, 0, menuWidth, fontHeight + fontSmlHeight * 2 + marginItem * 2),
                                    Theme.Color(clrScrollbarBg));
-  contentHeadIconsPixmap->Fill(clrTransparent);
+  PixmapFill(contentHeadIconsPixmap, clrTransparent);
 
   cString date = Event->GetDateString();
   cString startTime = Event->GetTimeString();
@@ -3313,7 +3313,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
   contentHeadPixmap = CreatePixmap(osd, 1, cRect(chLeft, chTop, chWidth, chHeight));
   // dsyslog("flatPlus: contentHeadPixmap left: %d top: %d width: %d height: %d", chLeft, chTop, chWidth, chHeight);
 
-  contentHeadIconsPixmap->Fill(clrTransparent);
+  PixmapFill(contentHeadIconsPixmap, clrTransparent);
 
   cLeft = Config.decorBorderMenuContentSize;
   cTop = chTop + marginItem * 3 + fontHeight + fontSmlHeight * 2 + Config.decorBorderMenuContentSize +
@@ -3920,7 +3920,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
   ComplexContent.Draw();
 
-  contentHeadPixmap->Fill(clrTransparent);
+  PixmapFill(contentHeadPixmap, clrTransparent);
   contentHeadPixmap->DrawRectangle(cRect(0, 0, menuWidth, fontHeight + fontSmlHeight * 2 + marginItem * 2),
                                    Theme.Color(clrScrollbarBg));
 
@@ -4008,7 +4008,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
   ShowText = true;
   ItemBorderClear();
 
-  contentHeadPixmap->Fill(clrTransparent);
+  PixmapFill(contentHeadPixmap, clrTransparent);
 
   int Left = Config.decorBorderMenuContentSize;
   int Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;

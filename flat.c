@@ -104,6 +104,10 @@ cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &
     return NULL;
 }
 
+void PixmapFill(cPixmap *pixmap, tColor Color) {
+    if (pixmap) pixmap->Fill(Color);
+}
+
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
     if (!pScraper)  // If it doesn't exit, try tvscraper

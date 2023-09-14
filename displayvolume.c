@@ -29,8 +29,8 @@ cFlatDisplayVolume::~cFlatDisplayVolume() {
 }
 
 void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
-    labelPixmap->Fill(clrTransparent);
-    muteLogoPixmap->Fill(clrTransparent);
+    PixmapFill(labelPixmap, clrTransparent);
+    PixmapFill(muteLogoPixmap, clrTransparent);
 
     cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
     cString maxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);

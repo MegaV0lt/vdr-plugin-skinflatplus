@@ -69,7 +69,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   if (Pixmap) {  // Check for nullptr
     if (FullFillBackground) {
-      Pixmap->Fill(ColorBg);
+      PixmapFill(Pixmap, ColorBg);
     } else {
       Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
     }
@@ -78,7 +78,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
             Position.Left(), Position.Top(), Position.Width(), Position.Height());
     return;
   }
-  PixmapImage->Fill(clrTransparent);
+  PixmapFill(PixmapImage, clrTransparent);
 }
 
 void cComplexContent::CalculateDrawPortHeight(void) {
