@@ -2065,25 +2065,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
-        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-        cString RecErrIcon("recording_untested");
-        if (recInfo->Errors() < 0) {         // -1 Untestet recording
-          // RecErrIcon = "recording_untested";
-        } else if (recInfo->Errors() == 0)    // No errors
-          RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < RecErrIconThreshold)
-          RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= RecErrIconThreshold)
-          RecErrIcon = "recording_error";
+        cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
 
         cImage *imgRecErr = NULL;
         if (Current) {
-          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          cString RecErrIconCur = cString::sprintf("%s_cur", *recErrIcon);
           imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
         if (!imgRecErr)
-          imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*recErrIcon, fontHeight, fontHeight);
         if (imgRecErr)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
@@ -2256,25 +2246,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
       if (Config.MenuItemRecordingShowRecordingErrors) {
         const cRecordingInfo *recInfo = Recording->Info();
-        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-        cString RecErrIcon("recording_untested");
-        if (recInfo->Errors() < 0) {         // -1 Untestet recording
-          // RecErrIcon = "recording_untested";
-        } else if (recInfo->Errors() == 0)    // No errors
-          RecErrIcon = "recording_ok";
-        else if (recInfo->Errors() < RecErrIconThreshold)
-          RecErrIcon = "recording_warning";
-        else if (recInfo->Errors() >= RecErrIconThreshold)
-          RecErrIcon = "recording_error";
+        cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
 
         cImage *imgRecErr = NULL;
         if (Current) {
-          cString RecErrIconCur = cString::sprintf("%s_cur", *RecErrIcon);
+          cString RecErrIconCur = cString::sprintf("%s_cur", *recErrIcon);
           imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
         }
         if (!imgRecErr)
-          imgRecErr = imgLoader.LoadIcon(*RecErrIcon, fontHeight, fontHeight);
+          imgRecErr = imgLoader.LoadIcon(*recErrIcon, fontHeight, fontHeight);
         if (imgRecErr)
           menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
       }  // MenuItemRecordingShowRecordingErrors
@@ -3942,21 +3922,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                               menuWidth - marginItem * 2);
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option
-      // cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
-      // cString RecErrIcon = cString::sprintf("%s_replay", recErrIcon);
-      int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
+      cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
+      cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
 
-      cString RecErrIcon("recording_untested_replay");
-      if (recInfo->Errors() < 0) {         // -1 Untestet recording
-        // RecErrIcon = "recording_untested";
-      } else if (recInfo->Errors() == 0)    // No errors
-        RecErrIcon = "recording_ok_replay";
-      else if (recInfo->Errors() < RecErrIconThreshold)
-        RecErrIcon = "recording_warning_replay";
-      else if (recInfo->Errors() >= RecErrIconThreshold)
-        RecErrIcon = "recording_error_replay";
-
-cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
+      cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
       if (imgRecErr) {
           int left = fontSml->Width(shortText) + marginItem * 2;
           int imageTop = marginItem + fontSmlHeight + fontHeight;  // fontHeight + (fontSmlHeight - img->Height()) / 2;

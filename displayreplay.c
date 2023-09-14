@@ -96,16 +96,8 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
-        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-        cString RecErrIcon("recording_untested_replay");
-        if (recInfo->Errors() < 0) {        // -1 Untestet recording
-        } else if (recInfo->Errors() == 0)  // No errors
-            RecErrIcon = "recording_ok_replay";
-        else if (recInfo->Errors() < RecErrIconThreshold)
-            RecErrIcon = "recording_warning_replay";
-        else if (recInfo->Errors() >= RecErrIconThreshold)
-            RecErrIcon = "recording_error_replay";
+        cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
+        cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
 
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
