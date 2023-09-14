@@ -224,7 +224,7 @@ static inline uint32_t GetMsTicks(void) {
 #endif
 }
 
-cPixmap *CreatePixmap(cOsd *osd, int Layer = 0, const cRect &ViewPort = cRect::Null,
+cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
 void PixmapFill(cPixmap *pixmap, tColor Color);
 cPlugin *GetScraperPlugin(void);

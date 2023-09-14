@@ -29,11 +29,11 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     left /= 2;
     TopBarSetTitle(Title);
 
-    tracksPixmap = CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     PixmapFill(tracksPixmap, clrTransparent);
 
-    tracksLogoPixmap =
-        CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    tracksLogoPixmap = CreatePixmap(osd, "tracksLogoPixmap", 1,
+                                    cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     PixmapFill(tracksLogoPixmap, clrTransparent);
 
     SetItem(Title, -1, false);

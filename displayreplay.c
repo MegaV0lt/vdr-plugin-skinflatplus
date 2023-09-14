@@ -22,14 +22,14 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
-    labelPixmap = CreatePixmap(osd, 1,
+    labelPixmap = CreatePixmap(osd, "labelPixmap", 1,
                                cRect(Config.decorBorderReplaySize,
                                osdHeight - labelHeight - Config.decorBorderReplaySize,
                                osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
-    iconsPixmap = CreatePixmap(osd, 2,
+    iconsPixmap = CreatePixmap(osd, "iconsPixmap", 2,
                                cRect(Config.decorBorderReplaySize,
                                osdHeight - labelHeight - Config.decorBorderReplaySize,
                                osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
@@ -40,11 +40,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
                        marginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
                        Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
-    labelJump = CreatePixmap(osd, 1, cRect(Config.decorBorderReplaySize,
+    labelJump = CreatePixmap(osd, "labelJump", 1, cRect(Config.decorBorderReplaySize,
         osdHeight - labelHeight - Config.decorProgressReplaySize * 2 - marginItem*3 - fontHeight
          - Config.decorBorderReplaySize * 2, osdWidth - Config.decorBorderReplaySize * 2, fontHeight));
 
-    dimmPixmap = CreatePixmap(osd, MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
+    dimmPixmap = CreatePixmap(osd, "dimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
 
     PixmapFill(labelPixmap, Theme.Color(clrReplayBg));
     PixmapFill(labelJump, clrTransparent);

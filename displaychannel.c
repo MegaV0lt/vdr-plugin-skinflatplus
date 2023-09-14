@@ -49,11 +49,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     int heightTop = fontHeight;
 
     int height = heightBottom;
-    chanInfoBottomPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
+    chanInfoBottomPixmap = CreatePixmap(osd, "chanInfoBottomPixmap", 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightBottom));
     PixmapFill(chanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
-    chanIconsPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
+    chanIconsPixmap = CreatePixmap(osd, "chanIconsPixmap", 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize+channelHeight - height, channelWidth, heightBottom));
     PixmapFill(chanIconsPixmap, clrTransparent);
 
@@ -62,14 +62,14 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     TVSHeight = osdHeight - topBarHeight - heightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
-    chanLogoBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
+    chanLogoBGPixmap = CreatePixmap(osd, "chanLogoBGPixmap", 2, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
     PixmapFill(chanLogoBGPixmap, clrTransparent);
 
-    chanLogoPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderChannelSize,
+    chanLogoPixmap = CreatePixmap(osd, "chanLogoPixmap", 3, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
     PixmapFill(chanLogoPixmap, clrTransparent);
 
@@ -83,7 +83,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ProgressBarDrawBgColor();
 
     height += heightTop;
-    chanInfoTopPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
+    chanInfoTopPixmap = CreatePixmap(osd, "chanInfoTopPixmap", 1, cRect(Config.decorBorderChannelSize,
         Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightTop));
     PixmapFill(chanInfoTopPixmap, clrTransparent);
 
