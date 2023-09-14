@@ -1593,8 +1593,7 @@ void cFlatBaseRender::DecorBorderRedrawAll(void) {
 }
 
 void cFlatBaseRender::DecorBorderClearAll(void) {
-    if (decorPixmap)
-        PixmapFill(decorPixmap, clrTransparent);
+    PixmapFill(decorPixmap, clrTransparent);
 }
 
 void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
