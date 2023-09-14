@@ -232,3 +232,4 @@ cString GetAspectIcon(int screenWidth, double screenAspect);
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect);
 cString GetFormatIcon(int screenWidth);
 cString GetRecordingerrorIcon(int recInfoErrors);
+cString GetRecordingseenIcon(int frameTotal, int frameResume);

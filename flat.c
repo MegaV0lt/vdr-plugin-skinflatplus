@@ -194,3 +194,40 @@ cString GetRecordingerrorIcon(int recInfoErrors) {
 
     return RecErrorIcon;
 }
+
+cString GetRecordingseenIcon(int frameTotal, int frameResume) {
+    int FrameTotal = frameTotal;
+    int FrameResume = frameResume;
+    double FrameSeen = (double)FrameResume / (double)FrameTotal;
+    double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
+
+    cString SeenIcon("");
+    if (FrameSeen < 0.1)
+        SeenIcon = "recording_seen_0";
+    else if (FrameSeen < 0.2)
+        SeenIcon = "recording_seen_1";
+    else if (FrameSeen < 0.3)
+        SeenIcon = "recording_seen_2";
+    else if (FrameSeen < 0.4)
+        SeenIcon = "recording_seen_3";
+    else if (FrameSeen < 0.5)
+        SeenIcon = "recording_seen_4";
+    else if (FrameSeen < 0.6)
+        SeenIcon = "recording_seen_5";
+    else if (FrameSeen < 0.7)
+        SeenIcon = "recording_seen_6";
+    else if (FrameSeen < 0.8)
+        SeenIcon = "recording_seen_7";
+    else if (FrameSeen < 0.9)
+        SeenIcon = "recording_seen_8";
+    else if (FrameSeen < 0.98)
+        SeenIcon = "recording_seen_9";
+    else
+        SeenIcon = "recording_seen_10";
+
+    if (FrameSeen >= seenThreshold)
+        SeenIcon = "recording_seen_10";
+
+    return SeenIcon;
+};

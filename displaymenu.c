@@ -2017,39 +2017,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
       }
 #if APIVERSNUM >= 20108
       else {
-        int FrameTotal = Recording->NumFrames();
-        int FrameResume = Recording->GetResume();
-        double FrameSeen = (double)FrameResume / (double)FrameTotal;
-        cString SeenIcon("");
-
-        double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
-        // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
-
-        if (FrameSeen < 0.1)
-          SeenIcon = "recording_seen_0";
-        else if (FrameSeen < 0.2)
-          SeenIcon = "recording_seen_1";
-        else if (FrameSeen < 0.3)
-          SeenIcon = "recording_seen_2";
-        else if (FrameSeen < 0.4)
-          SeenIcon = "recording_seen_3";
-        else if (FrameSeen < 0.5)
-          SeenIcon = "recording_seen_4";
-        else if (FrameSeen < 0.6)
-          SeenIcon = "recording_seen_5";
-        else if (FrameSeen < 0.7)
-          SeenIcon = "recording_seen_6";
-        else if (FrameSeen < 0.8)
-          SeenIcon = "recording_seen_7";
-        else if (FrameSeen < 0.9)
-          SeenIcon = "recording_seen_8";
-        else if (FrameSeen < 0.98)
-          SeenIcon = "recording_seen_9";
-        else
-          SeenIcon = "recording_seen_10";
-
-        if (FrameSeen >= seenThreshold)
-          SeenIcon = "recording_seen_10";
+        cString SeenIcon = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
         cImage *imgSeen = NULL;
         if (Current) {
@@ -2204,33 +2172,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
       }
 #if APIVERSNUM >= 20108
       else {
-        int FrameTotal = Recording->NumFrames();
-        int FrameResume = Recording->GetResume();
-        double FrameSeen = (double)FrameResume / (double)FrameTotal;
-        cString SeenIcon("");
-
-        if (FrameSeen < 0.1)
-          SeenIcon = "recording_seen_0";
-        else if (FrameSeen < 0.2)
-          SeenIcon = "recording_seen_1";
-        else if (FrameSeen < 0.3)
-          SeenIcon = "recording_seen_2";
-        else if (FrameSeen < 0.4)
-          SeenIcon = "recording_seen_3";
-        else if (FrameSeen < 0.5)
-          SeenIcon = "recording_seen_4";
-        else if (FrameSeen < 0.6)
-          SeenIcon = "recording_seen_5";
-        else if (FrameSeen < 0.7)
-          SeenIcon = "recording_seen_6";
-        else if (FrameSeen < 0.8)
-          SeenIcon = "recording_seen_7";
-        else if (FrameSeen < 0.9)
-          SeenIcon = "recording_seen_8";
-        else if (FrameSeen < 0.98)
-          SeenIcon = "recording_seen_9";
-        else
-          SeenIcon = "recording_seen_10";
+        cString SeenIcon = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
         cImage *imgSeen = NULL;
         if (Current) {
