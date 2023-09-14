@@ -206,20 +206,11 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     int left = channelWidth - width - marginItem * 2;
 
     if (Channel) {
-        if (Channel->Ca()) {
-            img = imgLoader.LoadIcon("crypted", 999, height);
-            if (img) {
-                imageTop = top + (height - img->Height()) / 2;
-                chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem * 2;
-            }
-        } else {
-             img = imgLoader.LoadIcon("uncrypted", 999, height);
-            if (img) {
-                imageTop = top + (height - img->Height()) / 2;
-                chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem * 2;
-            }
+        img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, height);
+        if (img) {
+            imageTop = top + (height - img->Height()) / 2;
+            chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
+            left -= marginItem * 2;
         }
     }
 
