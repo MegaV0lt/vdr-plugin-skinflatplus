@@ -17,7 +17,7 @@
 #include "setup.h"
 #include "imageloader.h"
 
-static const char *VERSION        = "0.6.9";
+static const char *VERSION        = "0.7.0";
 static const char *DESCRIPTION    = "flatPlus";
 
 class cPluginFlat : public cPlugin {
