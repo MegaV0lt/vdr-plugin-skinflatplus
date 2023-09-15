@@ -60,8 +60,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
   else
     PositionDraw.SetHeight(DrawPortHeight);
 
-  Pixmap = CreatePixmap(Osd, 1, Position, PositionDraw);
-  PixmapImage = CreatePixmap(Osd, 2, Position, PositionDraw);
+  Pixmap = CreatePixmap(Osd, "Pixmap", 1, Position, PositionDraw);
+  PixmapImage = CreatePixmap(Osd, "PixmapImage", 2, Position, PositionDraw);
   // dsyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
   //         Position.Left(), Position.Top(), Position.Width(), Position.Height());
   // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
@@ -69,7 +69,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
   if (Pixmap) {  // Check for nullptr
     if (FullFillBackground) {
-      Pixmap->Fill(ColorBg);
+      PixmapFill(Pixmap, ColorBg);
     } else {
       Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
     }
@@ -78,7 +78,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
             Position.Left(), Position.Top(), Position.Width(), Position.Height());
     return;
   }
-  PixmapImage->Fill(clrTransparent);
+  PixmapFill(PixmapImage, clrTransparent);
 }
 
 void cComplexContent::CalculateDrawPortHeight(void) {

@@ -37,8 +37,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     channelWidth = osdWidth - Config.decorBorderChannelSize * 2;
     channelHeight = osdHeight - Config.decorBorderChannelSize * 2;
-    // von unten noch oben
-    // 2*EPG + 2*EPGsml
+    // From bottom to top
+    // 2 * EPG + 2 * EPGsml
     heightBottom = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem;  // Top, Bottom, Between
     heightImageLogo = heightBottom;
     if (Config.SignalQualityShow)
@@ -49,29 +49,37 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     int heightTop = fontHeight;
 
     int height = heightBottom;
-    chanInfoBottomPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
-        Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightBottom));
-    chanInfoBottomPixmap->Fill(Theme.Color(clrChannelBg));
+    chanInfoBottomPixmap =
+        CreatePixmap(osd, "chanInfoBottomPixmap", 1,
+                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
+                           channelWidth, heightBottom));
+    PixmapFill(chanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
-    chanIconsPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
-        Config.decorBorderChannelSize+channelHeight - height, channelWidth, heightBottom));
-    chanIconsPixmap->Fill(clrTransparent);
+    chanIconsPixmap =
+        CreatePixmap(osd, "chanIconsPixmap", 2,
+                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
+                           channelWidth, heightBottom));
+    PixmapFill(chanIconsPixmap, clrTransparent);
 
     TVSLeft = 20 + Config.decorBorderChannelEPGSize;
     TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
     TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     TVSHeight = osdHeight - topBarHeight - heightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
-    chanLogoBGPixmap = CreatePixmap(osd, 2, cRect(Config.decorBorderChannelSize,
-        Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
-    chanLogoBGPixmap->Fill(clrTransparent);
+    chanLogoBGPixmap =
+        CreatePixmap(osd, "chanLogoBGPixmap", 2,
+                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
+                           heightBottom * 2, heightBottom * 2));
+    PixmapFill(chanLogoBGPixmap, clrTransparent);
 
-    chanLogoPixmap = CreatePixmap(osd, 3, cRect(Config.decorBorderChannelSize,
-        Config.decorBorderChannelSize + channelHeight - height, heightBottom * 2, heightBottom * 2));
-    chanLogoPixmap->Fill(clrTransparent);
+    chanLogoPixmap =
+        CreatePixmap(osd, "chanLogoPixmap", 3,
+                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
+                           heightBottom * 2, heightBottom * 2));
+    PixmapFill(chanLogoPixmap, clrTransparent);
 
     height += Config.decorProgressChannelSize + marginItem * 2;
     ProgressBarCreate(Config.decorBorderChannelSize,
@@ -83,9 +91,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ProgressBarDrawBgColor();
 
     height += heightTop;
-    chanInfoTopPixmap = CreatePixmap(osd, 1, cRect(Config.decorBorderChannelSize,
-        Config.decorBorderChannelSize + channelHeight - height, channelWidth, heightTop));
-    chanInfoTopPixmap->Fill(clrTransparent);
+    chanInfoTopPixmap =
+        CreatePixmap(osd, "chanInfoTopPixmap", 1,
+                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
+                           channelWidth, heightTop));
+    PixmapFill(chanInfoTopPixmap, clrTransparent);
 
     scrollers.SetOsd(osd);
     scrollers.SetScrollStep(Config.ScrollerStep);
@@ -95,10 +105,10 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (Config.ChannelWeatherShow)
         DrawWidgetWeather();
 
-    DecorBorderDraw(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
-        channelWidth, heightTop + heightBottom + Config.decorProgressChannelSize + marginItem * 2,
-        Config.decorBorderChannelSize, Config.decorBorderChannelType, Config.decorBorderChannelFg,
-        Config.decorBorderChannelBg);
+    DecorBorderDraw(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height, channelWidth,
+                    heightTop + heightBottom + Config.decorProgressChannelSize + marginItem * 2,
+                    Config.decorBorderChannelSize, Config.decorBorderChannelType, Config.decorBorderChannelFg,
+                    Config.decorBorderChannelBg);
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
@@ -129,7 +139,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     cString channelNumber("");
     isRecording = false;
-    chanIconsPixmap->Fill(clrTransparent);
+    PixmapFill(chanIconsPixmap, clrTransparent);
     lastScreenWidth = -1;
 
     if (Channel) {
@@ -148,12 +158,12 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     cString channelString = cString::sprintf("%s  %s", *channelNumber, *channelName);
 
-    chanInfoTopPixmap->Fill(Theme.Color(clrChannelBg));
+    PixmapFill(chanInfoTopPixmap, Theme.Color(clrChannelBg));
     chanInfoTopPixmap->DrawText(cPoint(50, 0), channelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), font);
 
-    chanLogoPixmap->Fill(clrTransparent);
-    chanLogoBGPixmap->Fill(clrTransparent);
+    PixmapFill(chanLogoPixmap, clrTransparent);
+    PixmapFill(chanLogoBGPixmap, clrTransparent);
     int imageHeight = heightImageLogo - marginItem * 2;
     int imageBGHeight = imageHeight;
     int imageBGWidth = imageHeight;
@@ -171,28 +181,22 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         imageTop = marginItem + (imageBGHeight - img->Height()) / 2;
         imageLeft = marginItem * 2 + (imageBGWidth - img->Width()) / 2;
         chanLogoPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
-    } else if (!isGroup) {  // draw default logo
-        if (isRadioChannel) {
-            img = imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
-            if (img) {
-                imageTop = marginItem + (imageHeight - img->Height()) / 2;
-                imageLeft = marginItem*  2 + (imageBGWidth - img->Width()) / 2;
-                chanLogoPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
-            }
-        } else {
-            img = imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
-            if (img) {
-                imageTop = marginItem + (imageHeight - img->Height()) / 2;
-                imageLeft = marginItem * 2 + (imageBGWidth - img->Width()) / 2;
-                chanLogoPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
-            }
+    } else if (!isGroup) {  // Draw default logo
+        img = imgLoader.LoadIcon((isRadioChannel) ? "radio" : "tv", imageBGWidth - 10, imageBGHeight - 10);
+        if (img) {
+            imageTop = marginItem + (imageHeight - img->Height()) / 2;
+            imageLeft = marginItem * 2 + (imageBGWidth - img->Width()) / 2;
+            chanLogoPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
         }
     }
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
+    if (!doOutput)
+        return;
+
     if (!Resolution)
-        chanIconsPixmap->Fill(clrTransparent);
+        PixmapFill(chanIconsPixmap, clrTransparent);
 
     int width = fontSmlHeight;
     int height = fontSmlHeight;
@@ -203,20 +207,11 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     int left = channelWidth - width - marginItem * 2;
 
     if (Channel) {
-        if (Channel->Ca()) {
-            img = imgLoader.LoadIcon("crypted", 999, height);
-            if (img) {
-                imageTop = top + (height - img->Height()) / 2;
-                chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem * 2;
-            }
-        } else {
-             img = imgLoader.LoadIcon("uncrypted", 999, height);
-            if (img) {
-                imageTop = top + (height - img->Height()) / 2;
-                chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
-                left -= marginItem * 2;
-            }
+        img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, height);
+        if (img) {
+            imageTop = top + (height - img->Height()) / 2;
+            chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
+            left -= marginItem * 2;
         }
     }
 
@@ -264,8 +259,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     scrollers.Clear();
 
-    chanInfoBottomPixmap->Fill(Theme.Color(clrChannelBg));
-    chanIconsPixmap->Fill(clrTransparent);
+    PixmapFill(chanInfoBottomPixmap, Theme.Color(clrChannelBg));
+    PixmapFill(chanIconsPixmap, clrTransparent);
 
     bool isRec = false;
     int RecWidth = fontSml->Width("REC");
@@ -433,7 +428,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
     }
 
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (mediaPath.length() > 0) {
         cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
@@ -453,13 +448,13 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
     if (!doOutput)
         return;
 
-    if (Text)
-        MessageSet(Type, Text);
-    else
-        MessageClear();
+    (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
+    if (!doOutput)
+        return;
+
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
     int signalWidth = channelWidth / 2;
@@ -475,7 +470,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int top = fontHeight*2 + fontSmlHeight*2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize*2) - marginItem;
     int left = marginItem * 2;
-    /* 
+    /*
     int progressTop = fontHeight*2 + fontSmlHeight*2 + marginItem;
     progressTop += std::max(fontSmlHeight, Config.decorProgressSignalSize) / 2 - Config.decorProgressSignalSize / 2;
     */
@@ -511,12 +506,13 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     delete SignalFont;
 }
 
-// you need oscam min rev 10653
-// you need dvbapi min commit 85da7b2
+// You need oscam min rev 10653
+// You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    // dsyslog("DvbapiInfoDraw");
-    int ChannelSid = CurChannel->Sid();
+    if (!doOutput)
+        return;
 
+    // dsyslog("DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi)
         return;
@@ -525,6 +521,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
 
+    int ChannelSid = CurChannel->Sid();
     // dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
@@ -569,6 +566,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
             chanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + marginItem;
         }
+        dsyslog("Unknown cardsystem: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
 
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);

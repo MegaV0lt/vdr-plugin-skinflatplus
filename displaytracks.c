@@ -29,12 +29,12 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     left /= 2;
     TopBarSetTitle(Title);
 
-    tracksPixmap = CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
-    tracksPixmap->Fill(clrTransparent);
+    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    PixmapFill(tracksPixmap, clrTransparent);
 
-    tracksLogoPixmap =
-        CreatePixmap(osd, 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
-    tracksLogoPixmap->Fill(clrTransparent);
+    tracksLogoPixmap = CreatePixmap(osd, "tracksLogoPixmap", 1,
+                                    cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    PixmapFill(tracksLogoPixmap, clrTransparent);
 
     SetItem(Title, -1, false);
 
@@ -98,7 +98,7 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
-    tracksLogoPixmap->Fill(clrTransparent);
+    PixmapFill(tracksLogoPixmap, clrTransparent);
     if (AudioChannel == -1 && img_ac3) {
         int IconLeft = maxItemWidth - img_ac3->Width() - marginItem;
         int IconTop = (fontHeight - img_ac3->Height()) / 2;

@@ -80,26 +80,34 @@ char *GetFilenameWithoutext(char *fullfilename) {
     return substr(fullfilename, 0, size);
 }
 
-cPixmap *CreatePixmap(cOsd *osd, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
+cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     if (osd) {
         if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+            // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+            //        DrawPort.Size().Height());
             return pixmap;
         } else {
-            esyslog("flatPlus: Could not create pixmap of size %i x %i",
-                    DrawPort.Size().Width(), DrawPort.Size().Height());
+            esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i",
+                    *Name, DrawPort.Size().Width(), DrawPort.Size().Height());
             cRect NewDrawPort = DrawPort;
             int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
             int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
             NewDrawPort.SetSize(width, height);
             if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-                esyslog("flatPlus: Created pixmap with reduced size %i x %i", width, height);
+                esyslog("flatPlus: Created pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
                 return pixmap;
             } else {
-                esyslog("flatPlus: Could not create pixmap with reduced size %i x %i", width, height);
+                esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
             }
         }
     }
+    esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+            DrawPort.Size().Height());
     return NULL;
+}
+
+void PixmapFill(cPixmap *pixmap, tColor Color) {
+    if (pixmap) pixmap->Fill(Color);
 }
 
 cPlugin *GetScraperPlugin(void) {
@@ -110,15 +118,9 @@ cPlugin *GetScraperPlugin(void) {
 }
 
 cString GetAspectIcon(int screenWidth, double screenAspect) {
-    cString asp("unknown_asp");                // ???
+    cString asp("unknown_asp");                     // ???
     if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
-        switch (screenWidth) {                 // No aspect for HD
-            case 7680:
-            case 3840:
-                asp = "uhd"; break;
-            default:
-                asp = "hd"; break;
-        }
+        asp = (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
     } else {
         if (screenAspect == 4.0/3.0)
             asp = "43";
@@ -133,12 +135,14 @@ cString GetAspectIcon(int screenWidth, double screenAspect) {
 }
 
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
-    cString res("");
+    cString res("unknown_res");
     switch (screenWidth) {
         case 7680:                        // 7680×4320 (UHD-2 / 8K)
             res = "7680x4320"; break;
         case 3840:                        // 3840×2160 (UHD-1 / 4K)
             res = "3840x2160"; break;
+        // case 2560;                        // 2560x1440 (QHD)
+        //    res = "2560x1440"; break;      // TODO: Is that used somewhere on sat/cable?
         case 1920:                        // 1920x1080 (HD1080 Full HDTV)
             res = "1920x1080"; break;
         case 1440:                        // 1440x1080 (HD1080 DV)
@@ -160,7 +164,6 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
         case 352:                         // 352x576 (PAL CVD)
             res = "352x576"; break;
         default:
-            res = "unknown_res";
             dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
                     screenWidth, screenHeight, screenAspect);
             break;
@@ -169,19 +172,12 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
 }
 
 cString GetFormatIcon(int screenWidth) {
-    cString iconName("");  // Show Format
-    switch (screenWidth) {
-    case 7680:
-    case 3840:
-        iconName = "uhd"; break;
-    case 1920:
-    case 1440:
-    case 1280:
-        iconName = "hd"; break;
-    case 720:  // 720 and below is considered sd
-    default:
-        iconName = "sd"; break;
-    }
+    cString iconName("sd");  // 720 and below is considered sd
+    if (screenWidth > 1920)
+        iconName = "uhd";
+    else if (screenWidth > 720)
+        iconName = "hd";
+
     return iconName;
 }
 
@@ -200,3 +196,40 @@ cString GetRecordingerrorIcon(int recInfoErrors) {
 
     return RecErrorIcon;
 }
+
+cString GetRecordingseenIcon(int frameTotal, int frameResume) {
+    int FrameTotal = frameTotal;
+    int FrameResume = frameResume;
+    double FrameSeen = (double)FrameResume / (double)FrameTotal;
+    double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
+
+    cString SeenIcon("");
+    if (FrameSeen < 0.1)
+        SeenIcon = "recording_seen_0";
+    else if (FrameSeen < 0.2)
+        SeenIcon = "recording_seen_1";
+    else if (FrameSeen < 0.3)
+        SeenIcon = "recording_seen_2";
+    else if (FrameSeen < 0.4)
+        SeenIcon = "recording_seen_3";
+    else if (FrameSeen < 0.5)
+        SeenIcon = "recording_seen_4";
+    else if (FrameSeen < 0.6)
+        SeenIcon = "recording_seen_5";
+    else if (FrameSeen < 0.7)
+        SeenIcon = "recording_seen_6";
+    else if (FrameSeen < 0.8)
+        SeenIcon = "recording_seen_7";
+    else if (FrameSeen < 0.9)
+        SeenIcon = "recording_seen_8";
+    else if (FrameSeen < 0.98)
+        SeenIcon = "recording_seen_9";
+    else
+        SeenIcon = "recording_seen_10";
+
+    if (FrameSeen >= seenThreshold)
+        SeenIcon = "recording_seen_10";
+
+    return SeenIcon;
+};

@@ -6,7 +6,6 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
         return;
 
     Text = text;
-
     Font = font;
     Position = position;
 
@@ -16,12 +15,12 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     if (Osd && Pixmap)
         Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(Osd, Layer, Position, drawPort);
-    dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
-            Position.Left(), Position.Top(), Position.Width(), Position.Height());
-    dsyslog("flatPlus: TextScrollerPixmap drawPort left: %d top: %d width: %d height: %d",
-            drawPort.Left(), drawPort.Top(), drawPort.Width(), drawPort.Height());
-    Pixmap->Fill(colorBg);
+    Pixmap = CreatePixmap(Osd, "Pixmap", Layer, Position, drawPort);
+    // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
+    //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
+    // dsyslog("flatPlus: TextScrollerPixmap drawPort left: %d top: %d width: %d height: %d",
+    //        drawPort.Left(), drawPort.Top(), drawPort.Width(), drawPort.Height());
+    PixmapFill(Pixmap, colorBg);
     Draw();
 }
 

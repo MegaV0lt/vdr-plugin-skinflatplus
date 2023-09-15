@@ -22,14 +22,14 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    chanEpgImagesPixmap = CreatePixmap(osd, 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
-    chanEpgImagesPixmap->Fill(clrTransparent);
+    chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    PixmapFill(chanEpgImagesPixmap, clrTransparent);
 
-    labelPixmap = CreatePixmap(osd, 1,
+    labelPixmap = CreatePixmap(osd, "labelPixmap", 1,
                                cRect(Config.decorBorderReplaySize,
                                osdHeight - labelHeight - Config.decorBorderReplaySize,
                                osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
-    iconsPixmap = CreatePixmap(osd, 2,
+    iconsPixmap = CreatePixmap(osd, "iconsPixmap", 2,
                                cRect(Config.decorBorderReplaySize,
                                osdHeight - labelHeight - Config.decorBorderReplaySize,
                                osdWidth - Config.decorBorderReplaySize * 2, labelHeight));
@@ -40,16 +40,16 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
                        marginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
                        Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
-    labelJump = CreatePixmap(osd, 1, cRect(Config.decorBorderReplaySize,
+    labelJump = CreatePixmap(osd, "labelJump", 1, cRect(Config.decorBorderReplaySize,
         osdHeight - labelHeight - Config.decorProgressReplaySize * 2 - marginItem*3 - fontHeight
          - Config.decorBorderReplaySize * 2, osdWidth - Config.decorBorderReplaySize * 2, fontHeight));
 
-    dimmPixmap = CreatePixmap(osd, MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
+    dimmPixmap = CreatePixmap(osd, "dimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, osdWidth, osdHeight));
 
-    labelPixmap->Fill(Theme.Color(clrReplayBg));
-    labelJump->Fill(clrTransparent);
-    iconsPixmap->Fill(clrTransparent);
-    dimmPixmap->Fill(clrTransparent);
+    PixmapFill(labelPixmap, Theme.Color(clrReplayBg));
+    PixmapFill(labelJump, clrTransparent);
+    PixmapFill(iconsPixmap, clrTransparent);
+    PixmapFill(dimmPixmap, clrTransparent);
 
     fontSecs = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
 
@@ -81,30 +81,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     const cRecordingInfo *recInfo = Recording->Info();
     recording = Recording;
 
-    iconsPixmap->Fill(clrTransparent);
-
-#if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) {  // Separate configoption
-      int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-      cString RecErrIcon("recording_untested_replay");
-      if (recInfo->Errors() < 0) {         // -1 Untestet recording
-        // RecErrIcon = "recording_untested";
-      } else if (recInfo->Errors() == 0)    // No errors
-        RecErrIcon = "recording_ok_replay";
-      else if (recInfo->Errors() < RecErrIconThreshold)
-        RecErrIcon = "recording_warning_replay";
-      else if (recInfo->Errors() >= RecErrIconThreshold)
-        RecErrIcon = "recording_error_replay";
-
-      cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
-      if (imgRecErr != NULL) {
-        //imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
-        iconsPixmap->DrawImage(cPoint(Left, fontHeight), *imgRecErr);
-      }
-      Left += imgRecErr->Width() + marginItem;  // Add width of icon
-    }  // PlaybackShowRecordingErrors
-#endif
+    PixmapFill(iconsPixmap, clrTransparent);
 
     SetTitle(recInfo->Title());
     cString info("");
@@ -119,16 +96,8 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
-        int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-        cString RecErrIcon("recording_untested_replay");
-        if (recInfo->Errors() < 0) {        // -1 Untestet recording
-        } else if (recInfo->Errors() == 0)  // No errors
-            RecErrIcon = "recording_ok_replay";
-        else if (recInfo->Errors() < RecErrIconThreshold)
-            RecErrIcon = "recording_warning_replay";
-        else if (recInfo->Errors() >= RecErrIconThreshold)
-            RecErrIcon = "recording_error_replay";
+        cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
+        cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
 
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
@@ -152,7 +121,7 @@ void cFlatDisplayReplay::Action(void) {
         if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
             for (int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
-                dimmPixmap->Fill(ArgbToColor(alpha, 0, 0, 0));
+                PixmapFill(dimmPixmap, ArgbToColor(alpha, 0, 0, 0));
                 Flush();
             }
             Cancel(-1);
@@ -172,7 +141,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         while (Active())
             cCondWait::SleepMs(10);
         if (dimmActive) {
-            dimmPixmap->Fill(clrTransparent);
+            PixmapFill(dimmPixmap, clrTransparent);
             Flush();
         }
     }
@@ -181,9 +150,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         left /= 2;
 
         if (modeOnly)
-            labelPixmap->Fill(clrTransparent);
+            PixmapFill(labelPixmap, clrTransparent);
 
-        // iconsPixmap->Fill(clrTransparent);  // Moved to SetRecording
+        // PixmapFill(iconsPixmap, clrTransparent);  // Moved to SetRecording
         labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0,
                                          fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight),
                                    Theme.Color(clrReplayBg));
@@ -264,7 +233,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     if (dimmActive) {
-        dimmPixmap->Fill(clrTransparent);
+        PixmapFill(dimmPixmap, clrTransparent);
         Flush();
     }
 
@@ -326,9 +295,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (recording) {
         cMarks marks;
-        bool hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) &&
-                        marks.Count();
-        cIndexFile *index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
+        // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+        bool hasMarks = false;
+        cIndexFile *index = NULL;
+        if (recording->NumFrames() > 0) {
+            hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) &&
+                       marks.Count();
+            index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
+        }
+
         int cuttedLength = 0;
         long cutinframe = 0;
         unsigned long long recsizecutted = 0;
@@ -432,7 +407,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
         }
 
-        chanEpgImagesPixmap->Fill(clrTransparent);
+        PixmapFill(chanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (mediaPath.length() > 0) {
             cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
@@ -553,7 +528,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     DecorBorderClearByFrom(BorderRecordJump);
 
     if (!Jump) {
-        labelJump->Fill(clrTransparent);
+        PixmapFill(labelJump, clrTransparent);
         return;
     }
     int left = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(Jump);
@@ -612,10 +587,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 }
 
 void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
-    if (Text)
-        MessageSet(Type, Text);
-    else
-        MessageClear();
+    (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayReplay::Flush(void) {
