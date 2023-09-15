@@ -1,5 +1,19 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-09-15: Version 0.7.0
+- [fix] Fix wrongly named variables
+- [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+- [add] Add some dooutput checks
+- [add] Add PixmapFill with null check
+- [add] Log unknown cardsystem
+- [update] Simplify GetAspectIcon and GetFormatIcon
+- [update] Add more debug to CreatPixmap
+- [update] Add pixmap names
+- [update] Simplyfy display of crypted/uncrypted
+- [update] Merge ShowRecordingErrors
+- [update] Disable textscroller logging
+- [update] Simplify display of radio/tv and SetMessage
+
 2023-09-12: Version 0.6.9
 - [update] Reformat some code
 - [update] Use CreatePixmap() instead of osd->CreatePixmap()
@@ -17,7 +31,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Centralize call of pscraper plugin (From Skinnopacity)
 
 2023-09-xx: Version 0.6.8
-- [add] Add option to disable recerroricons in replay 
+- [add] Add option to disable recerroricons in replay
 - [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
 - [update] centralize getting iconnames of format and aspect
 - [update] centralize call of pscraper plugin
