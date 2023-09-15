@@ -463,7 +463,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     TopBarSetTitleExtra(extra1, extra2);
     TopBarSetExtraIcon(iconName);
 }
-// Should be calld with every "Flush"!
+// Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
     cString curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
@@ -2093,8 +2093,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), weatherFontSml);
     left += weatherFontSml->Width(precTomorrow.c_str());
 
-    // weatherWidget.AddRect(cRect(left, 0, wWidth - left, fontHeight),
-    // clrTransparent);
+    // weatherWidget.AddRect(cRect(left, 0, wWidth - left, fontHeight), clrTransparent);
 
     weatherWidget.CreatePixmaps(false);
     weatherWidget.Draw();

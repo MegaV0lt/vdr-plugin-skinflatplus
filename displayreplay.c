@@ -295,16 +295,12 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (recording) {
         cMarks marks;
-        /*
-        bool hasMarks =
-            marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) && marks.Count();
-        cIndexFile *index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
-        */
         // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
         bool hasMarks = false;
         cIndexFile *index = NULL;
         if (recording->NumFrames() > 0) {
-            hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) && marks.Count();
+            hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) &&
+                       marks.Count();
             index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
         }
 
@@ -591,10 +587,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 }
 
 void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
-    if (Text)
-        MessageSet(Type, Text);
-    else
-        MessageClear();
+    (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayReplay::Flush(void) {

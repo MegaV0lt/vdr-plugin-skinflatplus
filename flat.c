@@ -83,6 +83,8 @@ char *GetFilenameWithoutext(char *fullfilename) {
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     if (osd) {
         if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+            // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+            //        DrawPort.Size().Height());
             return pixmap;
         } else {
             esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i",
