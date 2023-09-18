@@ -677,7 +677,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
     }
     if (isProgressbar) {
         double progress = (double)now / (double)total;
-        // double progress = static_cast<double>(now / total);
+        // TODO: Convert C-Style casts … double progress = static_cast<double>(now / total);
         ProgressBarDrawRaw(menuPixmap, menuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -4137,10 +4137,8 @@ bool cFlatDisplayMenu::isRecordingOld(const cRecording *Recording, int Level) {
     std::string RecFolder = GetRecordingName(Recording, Level, true).c_str();
 
     int value = Config.GetRecordingOldValue(RecFolder);
-    if (value < 0)
-        value = Config.MenuItemRecordingDefaultOldDays;
-    if (value < 0)
-        return false;
+    if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
+    if (value < 0) return false;
 
     int LastRecTimeFromFolder = GetLastRecTimeFromFolder(Recording, Level);
     time_t now;
@@ -4148,11 +4146,9 @@ bool cFlatDisplayMenu::isRecordingOld(const cRecording *Recording, int Level) {
 
     int diffSecs = now - LastRecTimeFromFolder;
     int days = diffSecs / (60 * 60 * 24);
-
     // dsyslog("RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d", RecFolder.c_str(),
     //         LastRecTimeFromFolder, now, value, diffSecs, days);
-    if (days > value)
-        return true;
+    if (days > value) return true;
 
     return false;
 }
@@ -4171,11 +4167,9 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
         if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
             time_t RecStart2 = rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
-                if (RecStart2 > RecStart)
-                    RecStart = RecStart2;
+                if (RecStart2 > RecStart) RecStart = RecStart2;
             } else if (Config.MenuItemRecordingShowFolderDate == 2)  // Oldest
-                if (RecStart2 < RecStart)
-                    RecStart = RecStart2;
+                if (RecStart2 < RecStart) RecStart = RecStart2;
         }
     }
 
@@ -4497,40 +4491,31 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
 
         if (widget.compare("dvb_devices") == 0) {
             int addHeight = DrawMainMenuWidgetDVBDevices(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("active_timer") == 0) {
             int addHeight = DrawMainMenuWidgetActiveTimers(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("last_recordings") == 0) {
             int addHeight = DrawMainMenuWidgetLastRecordings(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("system_information") == 0) {
             int addHeight = DrawMainMenuWidgetSystemInformation(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("system_updates") == 0) {
             int addHeight = DrawMainMenuWidgetSystemUpdates(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("temperatures") == 0) {
             int addHeight = DrawMainMenuWidgetTemperaturs(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("timer_conflicts") == 0) {
             int addHeight = DrawMainMenuWidgetTimerConflicts(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("custom_command") == 0) {
             int addHeight = DrawMainMenuWidgetCommand(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         } else if (widget.compare("weather") == 0) {
             int addHeight = DrawMainMenuWidgetWeather(wLeft, wWidth, ContentTop);
-            if (addHeight > 0)
-                ContentTop = addHeight + marginItem;
+            if (addHeight > 0) ContentTop = addHeight + marginItem;
         }
     }
 
@@ -4605,20 +4590,18 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         if (i == deviceLiveTV) {
             strDevice << tr("LiveTV") << " (";
             cString chanName("");
-            if (channel && channel->Number() > 0) {
+            if (channel && channel->Number() > 0)
                 chanName = channel->Name();
-            } else {
+            else
                 chanName = tr("Unknown");
-            }
             strDevice << *chanName << ")";
         } else if (recDevices[i]) {
             strDevice << tr("recording") << " (";
             cString chanName("");
-            if (channel && channel->Number() > 0) {
+            if (channel && channel->Number() > 0)
                 chanName = channel->Name();
-            } else {
+            else
                 chanName = tr("Unknown");
-            }
             strDevice << *chanName << ")";
         } else {
             if (channel) {
@@ -4643,9 +4626,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         channelName = x.c_str();
 
         cString str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
-        if (Config.MainMenuWidgetDVBDevicesNativeNumbering) {
+        if (Config.MainMenuWidgetDVBDevicesNativeNumbering)
             str = cString::sprintf("%d", i);  // Display Tuners 0..3
-        }
+
         int left = marginItem;
         if (numDevices <= 9) {
             contentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
@@ -4963,9 +4946,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
             serviceData->relevantConflicts = 0;
             serviceData->totalConflicts = 0;
             p->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
-            if (serviceData->relevantConflicts > 0) {
+            if (serviceData->relevantConflicts > 0)
                 numConflicts = serviceData->relevantConflicts;
-            }
+
             delete serviceData;
         }
     }
@@ -5014,9 +4997,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         std::size_t found = fname.find("_");
         if (found != std::string::npos) {
             std::string num = fname.substr(0, found);
-            if (atoi(num.c_str()) > 0) {
+            if (atoi(num.c_str()) > 0)
                 files.push_back(e->d_name);
-            }
         }
     }
     int Column = 1;

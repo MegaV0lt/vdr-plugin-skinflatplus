@@ -120,7 +120,8 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
 }
 
 void cFlatBaseRender::TopBarCreate(void) {
-    int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
+    // int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
+    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.TopBarFontSize));
     topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     topBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     topBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
@@ -223,19 +224,20 @@ void cFlatBaseRender::TopBarSetMenuLogo(cString icon) {
 
 void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     cVideoDiskUsage::HasChanged(VideoDiskUsageState);
-    int DiskUsage = cVideoDiskUsage::UsedPercent();
+    int DiskUsagePercent = cVideoDiskUsage::UsedPercent();  // Used %
+    double DiskFreePercent = (100 - DiskUsagePercent);      // Free %
     double FreeGB = cVideoDiskUsage::FreeMB() / 1024.0;
-    double AllGB = FreeGB / (double)((double)(100 - DiskUsage) / 100.0);
+    double AllGB = FreeGB / DiskFreePercent / 100.0;
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
-    double AllMinutes = FreeMinutes / (double)((100 - DiskUsage) / 100.0);
-    int ChartDiskUsage = DiskUsage;
+    double AllMinutes = FreeMinutes / DiskFreePercent / 100.0;
+    int ChartDiskUsage = DiskUsagePercent;
     cString iconName("");
 
     cString extra1("");
     cString extra2("");
 
     if (Config.DiskUsageFree == 1) {           // Show in free mode
-        ChartDiskUsage = 100 - DiskUsage;      // DiskFreePrecent
+        ChartDiskUsage = 100 - DiskUsagePercent;      // DiskFreePrecent
         if (Config.DiskUsageShort == false) {  // Long format
             extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), ChartDiskUsage, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
@@ -349,7 +351,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         double OccupiedGB = AllGB - FreeGB;
         int OccupiedMinutes = AllMinutes - FreeMinutes;
         if (Config.DiskUsageShort == false) {  // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsage, tr("occupied"));
+            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
                 extra2 =
                     cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
@@ -358,7 +360,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", DiskUsage, tr("occupied"));
+            extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
             extra2 = cString::sprintf("~ %02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
         switch (ChartDiskUsage) {  // show used space
@@ -1049,7 +1051,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                                          bool SetBackground, bool isSignal) {
     int Middle = rect.Height() / 2;
 
-    double percentLeft = ((double)Current) / (double)Total;
+    double dCurrent = Current, dTotal = Total;  // Eliminate c-style cast
+    double percentLeft = dCurrent / dTotal;
 
     if (PixmapBg && SetBackground)
         PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
@@ -1099,7 +1102,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             if (isSignal) {
-                double perc = 100.0 / (double)Total * (double)Current / 100.0;
+                double perc = 100.0 / dTotal * dCurrent / 100.0;
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * percentLeft) - out * 2, big - out * 2),
@@ -1602,17 +1605,9 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         return;
 
     if (Store) {
-        sDecorBorder f;
-        f.Left = Left;
-        f.Top = Top;
-        f.Width = Width;
-        f.Height = Height;
-        f.Size = Size;
-        f.Type = Type;
-        f.ColorFg = ColorFg;
-        f.ColorBg = ColorBg;
-        f.From = From;
-
+        sDecorBorder f {
+            Left, Top, Width, Height, Size, Type, ColorFg, ColorBg, From
+        };
         Borders.push_back(f);
     }
 
@@ -1790,7 +1785,6 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha;
-
     for (int i = 0; i < Width; i++) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1800,7 +1794,6 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1810,7 +1803,6 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1820,7 +1812,6 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1831,7 +1822,6 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1844,7 +1834,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1857,7 +1846,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1870,7 +1858,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha;
-
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
