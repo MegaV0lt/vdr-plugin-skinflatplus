@@ -2940,11 +2940,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             int lastIndex = 0;
 
             int cuttedLength = 0;
-            long cutinframe = 0;
-            unsigned long long recsize = 0;
-            unsigned long long recsizecutted = 0;
-            unsigned long long cutinoffset = 0;
-            unsigned long long filesize[100000];
+            int32_t cutinframe = 0;
+            uint64_t recsize = 0;
+            uint64_t recsizecutted = 0;
+            uint64_t cutinoffset = 0;
+            uint64_t filesize[100000];
             uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
             filesize[0] = 0;
 
@@ -2979,7 +2979,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 bool cutin = true;
                 cMark *mark = marks.First();
                 while (mark) {
-                    long position = mark->Position();
+                    int32_t position = mark->Position();
                     index->Get(position, &FileNumber, &FileOffset);
                     if (cutin) {
                         cutinframe = position;
@@ -3342,11 +3342,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         int lastIndex = 0;
 
         int cuttedLength = 0;
-        long cutinframe = 0;
-        unsigned long long recsize = 0;
-        unsigned long long recsizecutted = 0;
-        unsigned long long cutinoffset = 0;
-        unsigned long long filesize[100000];
+        int32_t cutinframe = 0;
+        uint64_t recsize = 0;
+        uint64_t recsizecutted = 0;
+        uint64_t cutinoffset = 0;
+        uint64_t filesize[100000];
         uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
@@ -3381,7 +3381,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             bool cutin = true;
             cMark *mark = marks.First();
             while (mark) {
-                long position = mark->Position();
+                int32_t position = mark->Position();
                 index->Get(position, &FileNumber, &FileOffset);
                 if (cutin) {
                     cutinframe = position;

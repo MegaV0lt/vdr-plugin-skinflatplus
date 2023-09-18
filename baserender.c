@@ -236,9 +236,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     cString extra1("");
     cString extra2("");
 
-    if (Config.DiskUsageFree == 1) {           // Show in free mode
-        ChartDiskUsage = 100 - DiskUsagePercent;      // DiskFreePrecent
-        if (Config.DiskUsageShort == false) {  // Long format
+    if (Config.DiskUsageFree == 1) {              // Show in free mode
+        ChartDiskUsage = 100 - DiskUsagePercent;  // DiskFreePrecent
+        if (Config.DiskUsageShort == false) {     // Long format
             extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), ChartDiskUsage, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
@@ -347,7 +347,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             iconName = "chart31b";
             break;  // 96,875 - 100
         }
-    } else {                                   // Show in occupied mode
+    } else {  // Show in occupied mode
         double OccupiedGB = AllGB - FreeGB;
         int OccupiedMinutes = AllMinutes - FreeMinutes;
         if (Config.DiskUsageShort == false) {  // Long format
@@ -485,8 +485,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
         PixmapFill(topBarIconPixmap, clrTransparent);
         PixmapFill(topBarIconBGPixmap, clrTransparent);
 
-        int titleWitdh = topBarFont->Width(topBarTitle);
-
         if (topBarMenuIconSet && Config.TopBarMenuIconShow) {
             int IconLeft = marginItem;
             cImage *img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
@@ -617,11 +615,12 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
         int topBarMenuIconRightWidth = 0;
         int topBarMenuIconRightLeft = 0;
+        int titleWidth = topBarFont->Width(topBarTitle);
         if (topBarMenuIconRightSet) {
             cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
                 topBarMenuIconRightWidth = img->Width() + marginItem * 3;
-                titleWitdh += topBarMenuIconRightWidth;
+                titleWidth += topBarMenuIconRightWidth;
             }
         }
 
@@ -631,14 +630,13 @@ void cFlatBaseRender::TopBarUpdate(void) {
         middleWidth += extraMaxWidth;
         Right -= extraMaxWidth + marginItem;
 
-        if ((titleLeft + titleWitdh) < (TopBarWidth / 2 - middleWidth / 2)) {
+        if ((titleLeft + titleWidth) < (TopBarWidth / 2 - middleWidth / 2)) {
             Right = TopBarWidth / 2 - middleWidth / 2;
-        } else if ((titleLeft + titleWitdh) < Right) {
-            Right = titleLeft + titleWitdh + marginItem;
+        } else if ((titleLeft + titleWidth) < Right) {
+            Right = titleLeft + titleWidth + marginItem;
         }
 
         int titleMaxWidth = Right - titleLeft - marginItem;
-
         if (topBarFont->Width(topBarTitle) + topBarMenuIconRightWidth > titleMaxWidth) {
             topBarMenuIconRightLeft = titleMaxWidth + marginItem * 2;
             titleMaxWidth -= topBarMenuIconRightWidth;
@@ -1081,7 +1079,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 1:  // big line
     {
         int big = rect.Height();
-
         if (Current > 0)
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
@@ -1153,7 +1150,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 4:  // big line + dot
     {
         int big = rect.Height();
-
         if (Current > 0) {
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
@@ -1242,7 +1238,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 9:  // big line + alpha blend
     {
         int big = rect.Height();
-
         if (Current > 0) {
             DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - big / 2, (rect.Width() * percentLeft),
                                  big / 2, ColorBarFg);
@@ -1898,7 +1893,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    int fs = int(round(cOsd::OsdHeight() * Config.WeatherFontSize));
+    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2.0);
     cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs / 2.5);

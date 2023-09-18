@@ -305,10 +305,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         int cuttedLength = 0;
-        long cutinframe = 0;
-        unsigned long long recsizecutted = 0;
-        unsigned long long cutinoffset = 0;
-        unsigned long long filesize[100000];
+        int32_t cutinframe = 0;
+        uint64_t recsizecutted = 0;
+        uint64_t cutinoffset = 0;
+        uint64_t filesize[100000];
         uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
@@ -341,7 +341,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             bool cutin = true;
             cMark *mark = marks.First();
             while (mark) {
-                long position = mark->Position();
+                int32_t position = mark->Position();
                 index->Get(position, &FileNumber, &FileOffset);
                 if (cutin) {
                     cutinframe = position;
