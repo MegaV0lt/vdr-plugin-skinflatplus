@@ -994,7 +994,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
         }
 
         if (Config.EpgAdditionalInfoShow) {
-            text << "\n";
+            text << '\n';
             // Genre
             bool firstContent = true;
             for (int i = 0; Event->Contents(i); i++) {
@@ -1002,14 +1002,14 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                     if (!firstContent)
                         text << ", ";
                     else
-                        text << "\n" << tr("Genre") << ": ";
+                        text << '\n' << tr("Genre") << ": ";
                     text << Event->ContentToString(Event->Contents(i));
                     firstContent = false;
                 }
             }
             // FSK
             if (Event->ParentalRating()) {
-                text << "\n" << tr("FSK") << ": " << *Event->GetParentalRatingString();
+                text << '\n' << tr("FSK") << ": " << *Event->GetParentalRatingString();
             }
             const cComponents *Components = Event->Components();
             if (Components) {
@@ -1023,22 +1023,22 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                     switch (p->stream) {
                     case sc_video_MPEG2:
                         if (p->description)
-                            text << "\n" << tr("Video") << ": " << p->description << " (MPEG2)";
+                            text << '\n' << tr("Video") << ": " << p->description << " (MPEG2)";
                         else
-                            text << "\n" << tr("Video") << ": MPEG2";
+                            text << '\n' << tr("Video") << ": MPEG2";
                         break;
                     case sc_video_H264_AVC:
                         if (p->description)
-                            text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
+                            text << '\n' << tr("Video") << ": " << p->description << " (H.264)";
                         else
-                            text << "\n" << tr("Video") << ": H.264";
+                            text << '\n' << tr("Video") << ": H.264";
                         break;
                     case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                               // not available in tComponent
                         if (p->description)
-                            text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
+                            text << '\n' << tr("Video") << ": " << p->description << " (H.265)";
                         else
-                            text << "\n" << tr("Video") << ": H.265";
+                            text << '\n' << tr("Video") << ": H.265";
                         break;
 
                     case sc_audio_MP2:
@@ -1081,9 +1081,9 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                     }
                 }
                 if (audio.str().length() > 0)
-                    text << "\n" << tr("Audio") << ": " << audio.str();
+                    text << '\n' << tr("Audio") << ": " << audio.str();
                 if (subtitle.str().length() > 0)
-                    text << "\n" << tr("Subtitle") << ": " << subtitle.str();
+                    text << '\n' << tr("Subtitle") << ": " << subtitle.str();
             }
         }
     } else {
@@ -2391,7 +2391,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         text << Event->Description();
 
     if (Config.EpgAdditionalInfoShow) {
-        text << "\n";
+        text << '\n';
         // Genre
         bool firstContent = true;
         for (int i = 0; Event->Contents(i); i++) {
@@ -2399,7 +2399,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 if (!firstContent) {
                     text << ", ";
                 } else {
-                    text << "\n" << tr("Genre") << ": ";
+                    text << '\n' << tr("Genre") << ": ";
                 }
                 text << Event->ContentToString(Event->Contents(i));
                 firstContent = false;
@@ -2409,7 +2409,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // FSK
         if (Event->ParentalRating()) {
             Fsk = *Event->GetParentalRatingString();
-            text << "\n" << tr("FSK") << ": " << Fsk;
+            text << '\n' << tr("FSK") << ": " << Fsk;
         }
 
         const cComponents *Components = Event->Components();
@@ -2482,13 +2482,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
             if (audio.str().length() > 0) {
                 if (textAdditional.str().length() > 0)
-                    textAdditional << "\n";
+                    textAdditional << '\n';
                 textAdditional << tr("Audio") << ": " << audio.str();
             }
             if (subtitle.str().length() > 0) {
                 if (textAdditional.str().length() > 0)
-                    textAdditional << "\n";
-                textAdditional << "\n" << tr("Subtitle") << ": " << subtitle.str();
+                    textAdditional << '\n';
+                textAdditional << '\n' << tr("Subtitle") << ": " << subtitle.str();
             }
         }
     }
@@ -2577,7 +2577,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         sstrReruns << ":  " << r->event->Title();
                         // if (!isempty(r->event->ShortText()))
                         //    sstrReruns << "~" << r->event->ShortText();
-                        sstrReruns << "\n";
+                        sstrReruns << '\n';
                     }
                     delete list;
                 }
@@ -2653,21 +2653,21 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         }
                     }
                     if (series.name.length() > 0)
-                        series_info << tr("name: ") << series.name << "\n";
+                        series_info << tr("name: ") << series.name << '\n';
                     if (series.firstAired.length() > 0)
-                        series_info << tr("first aired: ") << series.firstAired << "\n";
+                        series_info << tr("first aired: ") << series.firstAired << '\n';
                     if (series.network.length() > 0)
-                        series_info << tr("network: ") << series.network << "\n";
+                        series_info << tr("network: ") << series.network << '\n';
                     if (series.genre.length() > 0)
-                        series_info << tr("genre: ") << series.genre << "\n";
+                        series_info << tr("genre: ") << series.genre << '\n';
                     if (series.rating > 0)
-                        series_info << tr("rating: ") << series.rating << "\n";
+                        series_info << tr("rating: ") << series.rating << '\n';
                     if (series.status.length() > 0)
-                        series_info << tr("status: ") << series.status << "\n";
+                        series_info << tr("status: ") << series.status << '\n';
                     if (series.episode.season > 0)
-                        series_info << tr("season number: ") << series.episode.season << "\n";
+                        series_info << tr("season number: ") << series.episode.season << '\n';
                     if (series.episode.number > 0)
-                        series_info << tr("episode number: ") << series.episode.number << "\n";
+                        series_info << tr("episode number: ") << series.episode.number << '\n';
                 }
             } else if (call.type == tMovie) {
                 cMovie movie;
@@ -2686,19 +2686,19 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         }
                     }
                     if (movie.title.length() > 0)
-                        movie_info << tr("title: ") << movie.title << "\n";
+                        movie_info << tr("title: ") << movie.title << '\n';
                     if (movie.originalTitle.length() > 0)
-                        movie_info << tr("original title: ") << movie.originalTitle << "\n";
+                        movie_info << tr("original title: ") << movie.originalTitle << '\n';
                     if (movie.collectionName.length() > 0)
-                        movie_info << tr("collection name: ") << movie.collectionName << "\n";
+                        movie_info << tr("collection name: ") << movie.collectionName << '\n';
                     if (movie.genres.length() > 0)
-                        movie_info << tr("genre: ") << movie.genres << "\n";
+                        movie_info << tr("genre: ") << movie.genres << '\n';
                     if (movie.releaseDate.length() > 0)
-                        movie_info << tr("release date: ") << movie.releaseDate << "\n";
+                        movie_info << tr("release date: ") << movie.releaseDate << '\n';
                     if (movie.popularity > 0)
-                        movie_info << tr("popularity: ") << movie.popularity << "\n";
+                        movie_info << tr("popularity: ") << movie.popularity << '\n';
                     if (movie.voteAverage > 0)
-                        movie_info << tr("vote average: ") << movie.voteAverage << "\n";
+                        movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                 }
             }
         }
@@ -2903,7 +2903,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
 #endif
             if (channel)
-                text << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
+                text << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << '\n';
 
             const cEvent *Event = recInfo->GetEvent();
             if (Event) {
@@ -2920,10 +2920,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     }
                 }
                 if (Event->Contents(0))
-                    text << "\n";
+                    text << '\n';
                 // FSK
                 if (Event->ParentalRating())
-                    text << tr("FSK") << ": " << *Event->GetParentalRatingString() << "\n";
+                    text << tr("FSK") << ": " << *Event->GetParentalRatingString() << '\n';
             }
 
             cMarks marks;
@@ -3005,7 +3005,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 if (hasMarks)
                     text << " (" << tr("cutted") << ": "
                          << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ")";
-                text << "\n";
+                text << '\n';
             }
             delete index;
 
@@ -3020,9 +3020,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 else
                     text << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
 
-            text << "\n"
+            text << '\n'
                  << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
-                 << Recording->Lifetime() << "\n";
+                 << Recording->Lifetime() << '\n';
 
             if (lastIndex) {
                 text << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", " << tr("bit rate")
@@ -3034,7 +3034,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #if APIVERSNUM >= 20505
             if (recInfo) {
                 if (recInfo->Errors() >= 1)
-                    text << tr("TS errors") << ": " << recInfo->Errors() << "\n";
+                    text << tr("TS errors") << ": " << recInfo->Errors() << '\n';
             }
 #endif
             const cComponents *Components = recInfo->Components();
@@ -3049,14 +3049,14 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
                     switch (p->stream) {
                     case sc_video_MPEG2:
-                        text << "\n" << tr("Video") << ": " << p->description << " (MPEG2)";
+                        text << '\n' << tr("Video") << ": " << p->description << " (MPEG2)";
                         break;
                     case sc_video_H264_AVC:
-                        text << "\n" << tr("Video") << ": " << p->description << " (H.264)";
+                        text << '\n' << tr("Video") << ": " << p->description << " (H.264)";
                         break;
                     case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                               // not available in tComponent
-                        text << "\n" << tr("Video") << ": " << p->description << " (H.265)";
+                        text << '\n' << tr("Video") << ": " << p->description << " (H.265)";
                         break;
                     case sc_audio_MP2:
                     case sc_audio_AC3:
@@ -3098,9 +3098,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     }
                 }
                 if (audio.str().length() > 0)
-                    text << "\n" << tr("Audio") << ": " << audio.str();
+                    text << '\n' << tr("Audio") << ": " << audio.str();
                 if (subtitle.str().length() > 0)
-                    text << "\n" << tr("Subtitle") << ": " << subtitle.str();
+                    text << '\n' << tr("Subtitle") << ": " << subtitle.str();
             }
             if (recInfo->Aux()) {
                 string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
@@ -3295,14 +3295,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 LOCK_CHANNELS_READ;
                 const cChannel *channel = Channels->GetByChannelID(channelId);
                 if (channel)
-                    recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
+                    recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << '\n';
             },
             recInfo->ChannelID());
         channelFuture.get();
 #else
         cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
         if (channel)
-            recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << "\n";
+            recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << '\n';
 #endif
 
         const cEvent *Event = recInfo->GetEvent();
@@ -3322,11 +3322,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
             }
             if (Event->Contents(0))
-                text << "\n";
+                text << '\n';
             // FSK
             if (Event->ParentalRating()) {
                 Fsk = *Event->GetParentalRatingString();
-                text << tr("FSK") << ": " << Fsk << "\n";
+                text << tr("FSK") << ": " << Fsk << '\n';
             }
         }
         cMarks marks;
@@ -3407,7 +3407,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             if (hasMarks)
                 recAdditional << " (" << tr("cutted") << ": "
                               << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ")";
-            recAdditional << "\n";
+            recAdditional << '\n';
         }
         delete index;
 
@@ -3422,9 +3422,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             else
                 recAdditional << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
 
-        recAdditional << "\n"
+        recAdditional << '\n'
                       << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
-                      << Recording->Lifetime() << "\n";
+                      << Recording->Lifetime() << '\n';
 
         if (lastIndex) {
             recAdditional << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", "
@@ -3436,7 +3436,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #if APIVERSNUM >= 20505
         if (recInfo) {
             if (recInfo->Errors() >= 1)
-                recAdditional << "\n" << tr("TS errors") << ": " << recInfo->Errors();
+                recAdditional << '\n' << tr("TS errors") << ": " << recInfo->Errors();
         }
 #endif
         const cComponents *Components = recInfo->Components();
@@ -3501,12 +3501,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
             if (audio.str().length() > 0) {
                 if (textAdditional.str().length() > 0)
-                    textAdditional << "\n";
+                    textAdditional << '\n';
                 textAdditional << tr("Audio") << ": " << audio.str();
             }
             if (subtitle.str().length() > 0) {
                 if (textAdditional.str().length() > 0)
-                    textAdditional << "\n";
+                    textAdditional << '\n';
                 textAdditional << tr("Subtitle") << ": " << subtitle.str();
             }
         }
@@ -3658,21 +3658,21 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         }
                     }
                     if (series.name.length() > 0)
-                        series_info << tr("name: ") << series.name << "\n";
+                        series_info << tr("name: ") << series.name << '\n';
                     if (series.firstAired.length() > 0)
-                        series_info << tr("first aired: ") << series.firstAired << "\n";
+                        series_info << tr("first aired: ") << series.firstAired << '\n';
                     if (series.network.length() > 0)
-                        series_info << tr("network: ") << series.network << "\n";
+                        series_info << tr("network: ") << series.network << '\n';
                     if (series.genre.length() > 0)
-                        series_info << tr("genre: ") << series.genre << "\n";
+                        series_info << tr("genre: ") << series.genre << '\n';
                     if (series.rating > 0)
-                        series_info << tr("rating: ") << series.rating << "\n";
+                        series_info << tr("rating: ") << series.rating << '\n';
                     if (series.status.length() > 0)
-                        series_info << tr("status: ") << series.status << "\n";
+                        series_info << tr("status: ") << series.status << '\n';
                     if (series.episode.season > 0)
-                        series_info << tr("season number: ") << series.episode.season << "\n";
+                        series_info << tr("season number: ") << series.episode.season << '\n';
                     if (series.episode.number > 0)
-                        series_info << tr("episode number: ") << series.episode.number << "\n";
+                        series_info << tr("episode number: ") << series.episode.number << '\n';
                 }
             } else if (call.type == tMovie) {
                 cMovie movie;
@@ -3691,19 +3691,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         }
                     }
                     if (movie.title.length() > 0)
-                        movie_info << tr("title: ") << movie.title << "\n";
+                        movie_info << tr("title: ") << movie.title << '\n';
                     if (movie.originalTitle.length() > 0)
-                        movie_info << tr("original title: ") << movie.originalTitle << "\n";
+                        movie_info << tr("original title: ") << movie.originalTitle << '\n';
                     if (movie.collectionName.length() > 0)
-                        movie_info << tr("collection name: ") << movie.collectionName << "\n";
+                        movie_info << tr("collection name: ") << movie.collectionName << '\n';
                     if (movie.genres.length() > 0)
-                        movie_info << tr("genre: ") << movie.genres << "\n";
+                        movie_info << tr("genre: ") << movie.genres << '\n';
                     if (movie.releaseDate.length() > 0)
-                        movie_info << tr("release date: ") << movie.releaseDate << "\n";
+                        movie_info << tr("release date: ") << movie.releaseDate << '\n';
                     if (movie.popularity > 0)
-                        movie_info << tr("popularity: ") << movie.popularity << "\n";
+                        movie_info << tr("popularity: ") << movie.popularity << '\n';
                     if (movie.voteAverage > 0)
-                        movie_info << tr("vote average: ") << movie.voteAverage << "\n";
+                        movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                 }
             }
         }
