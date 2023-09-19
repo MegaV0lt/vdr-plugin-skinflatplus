@@ -1867,16 +1867,16 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
     FT_Face face;
     cString fontFileName = cFont::GetFontFileName(Name);
     int Ascender = CharHeight;
-    int error = FT_Init_FreeType(&library);
-    if (!error) {
-        error = FT_New_Face(library, fontFileName, 0, &face);
-        if (!error) {
+    int rc = FT_Init_FreeType(&library);
+    if (!rc) {
+        rc = FT_New_Face(library, fontFileName, 0, &face);
+        if (!rc) {
             if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
                 // TODO what exactly does all this mean?
                 Ascender = face->available_sizes->height;
             } else {
-                error = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
-                if (!error) {
+                rc = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
+                if (!rc) {
                     Ascender = face->size->metrics.ascender / 64;
                 } else
                     esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", error, *fontFileName);
