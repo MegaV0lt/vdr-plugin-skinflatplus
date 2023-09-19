@@ -3010,16 +3010,18 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             delete index;
 
             if (recsize > MEGABYTE(1023))
-                text << tr("Size") << ": " << fixed << setprecision(2) << (float)recsize / MEGABYTE(1024) << " GB";
+                text << tr("Size") << ": " << fixed << setprecision(2) << static_cast<float>(recsize) / MEGABYTE(1024)
+                     << " GB";
             else
                 text << tr("Size") << ": " << recsize / MEGABYTE(1) << " MB";
-            if (hasMarks)
+
+            if (hasMarks) {
                 if (recsize > MEGABYTE(1023))
                     text << " (" << tr("cutted") << ": " << fixed << setprecision(2)
-                         << (float)recsizecutted / MEGABYTE(1024) << " GB)";
+                         << static_cast<float>(recsizecutted) / MEGABYTE(1024) << " GB)";
                 else
                     text << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
-
+            }
             text << '\n'
                  << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
                  << Recording->Lifetime() << '\n';
@@ -3027,7 +3029,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             if (lastIndex) {
                 text << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", " << tr("bit rate")
                      << ": ~ " << fixed << setprecision(2)
-                     << (float)recsize / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
+                     << static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
                      << " MBit/s (Video + Audio)";
             }
             // From SkinNopacity
@@ -3412,16 +3414,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         delete index;
 
         if (recsize > MEGABYTE(1023))
-            recAdditional << tr("Size") << ": " << fixed << setprecision(2) << (float)recsize / MEGABYTE(1024) << " GB";
+            recAdditional << tr("Size") << ": " << fixed << setprecision(2)
+                          << static_cast<float>(recsize) / MEGABYTE(1024) << " GB";
         else
             recAdditional << tr("Size") << ": " << recsize / MEGABYTE(1) << " MB";
-        if (hasMarks)
+
+        if (hasMarks) {
             if (recsize > MEGABYTE(1023))
                 recAdditional << " (" << tr("cutted") << ": " << fixed << setprecision(2)
-                              << (float)recsizecutted / MEGABYTE(1024) << " GB)";
+                              << static_cast<float>(recsizecutted) / MEGABYTE(1024) << " GB)";
             else
                 recAdditional << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
-
+        }
         recAdditional << '\n'
                       << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
                       << Recording->Lifetime() << '\n';
@@ -3429,7 +3433,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (lastIndex) {
             recAdditional << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", "
                           << tr("bit rate") << ": ~ " << fixed << setprecision(2)
-                          << (float)recsize / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
+                          << static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
                           << " MBit/s (Video + Audio)";
         }
         // From SkinNopacity

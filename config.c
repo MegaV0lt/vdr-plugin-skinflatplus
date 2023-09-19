@@ -389,7 +389,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      WeatherFontSize = atod(Value);
-    else return false;
+    else
+        return false;
 
     return true;
 }
@@ -745,7 +746,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
-    if (DecorIndex >= 0 && DecorIndex < (int)files.size()) {
+    if (DecorIndex >= 0 && DecorIndex < static_cast<int>(files.size())) {
         std::string FileName = files.at(DecorIndex);
         DecorLoadFile(FileName.c_str());
     }

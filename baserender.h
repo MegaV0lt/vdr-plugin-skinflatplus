@@ -138,6 +138,7 @@ class cFlatBaseRender {
         void TopBarEnableDiskUsage(void);
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
+
  public:
         cImageLoader imgLoader;
 

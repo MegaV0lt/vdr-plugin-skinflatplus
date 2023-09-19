@@ -29,7 +29,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     left /= 2;
     TopBarSetTitle(Title);
 
-    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1,
+                                cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     PixmapFill(tracksPixmap, clrTransparent);
 
     tracksLogoPixmap = CreatePixmap(osd, "tracksLogoPixmap", 1,
@@ -54,8 +55,7 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
         ColorBg = Theme.Color(clrTrackItemCurrentBg);
         currentIndex = Index;
-    }
-    else {
+    } else {
         if (Index >= 0) {
             ColorFg = Theme.Color(clrTrackItemSelableFont);
             ColorBg = Theme.Color(clrTrackItemSelableBg);

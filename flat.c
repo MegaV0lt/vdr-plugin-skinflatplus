@@ -198,9 +198,9 @@ cString GetRecordingerrorIcon(int recInfoErrors) {
 }
 
 cString GetRecordingseenIcon(int frameTotal, int frameResume) {
-    int FrameTotal = frameTotal;
-    int FrameResume = frameResume;
-    double FrameSeen = (double)FrameResume / (double)FrameTotal;
+    double FrameTotal = frameTotal;
+    double FrameResume = frameResume;
+    double FrameSeen = FrameResume / FrameTotal;
     double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
     // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
 
@@ -232,4 +232,4 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
         SeenIcon = "recording_seen_10";
 
     return SeenIcon;
-};
+}

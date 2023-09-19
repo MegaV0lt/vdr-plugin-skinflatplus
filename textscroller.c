@@ -140,8 +140,8 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
     while (Active())
         cCondWait::SleepMs(10);
 
-    Scrollers.push_back(
-        new cTextScroll(Osd, scrollType, scrollStep, (int)((double)WAITDELAY / (double)scrollDelay), Layer));
+    double wDelay = WAITDELAY, sDelay = scrollDelay;
+    Scrollers.push_back(new cTextScroll(Osd, scrollType, scrollStep, static_cast<int>(wDelay / sDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, font, ColorExtraTextFg);
 
     StartScrolling();
