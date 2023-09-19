@@ -1743,7 +1743,7 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     if (Height < 0) {
         Height *= -1;
         for (int i = Height, j = 0; i >= 0; i--, j++) {
@@ -1761,7 +1761,7 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     if (Width < 0) {
         Width *= -1;
         for (int i = Width, j = 0; i >= 0; i--, j++) {
@@ -1779,7 +1779,7 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0; i < Width; i++) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1788,7 +1788,7 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1797,7 +1797,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1806,7 +1806,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         Alpha = 255 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
@@ -1816,7 +1816,7 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1828,7 +1828,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1840,7 +1840,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
@@ -1852,7 +1852,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha;
+    double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; i++, j--) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
