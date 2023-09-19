@@ -170,8 +170,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     }
     // detect end of last word
     for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
-         NumChars++)
-      ;
+         NumChars++) { }
     char *FloatedText;
     FloatedText = new char[NumChars + 1];
     memset(FloatedText, '\0', NumChars + 1);
