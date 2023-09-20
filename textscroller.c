@@ -74,7 +74,7 @@ void cTextScroll::DoStep(void) {
 
     // Wait at the beginning for better read
     if (waitSteps > 0) {
-        waitSteps--;
+        --waitSteps;
         return;
     }
     // Wait after return to the front
@@ -164,7 +164,7 @@ void cTextScrollers::StartScrolling(void) {
 
 void cTextScrollers::Action(void) {
     // Wait 1 second so the osd is finished
-    for (int i = 0; i < 100 && Running(); i++) {
+    for (int i = 0; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);
     }
 

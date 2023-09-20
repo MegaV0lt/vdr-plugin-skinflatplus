@@ -696,7 +696,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
-    for (unsigned i = 0; i < files.size(); i++) {
+    for (unsigned i = 0; i < files.size(); ++i) {
         std::string FileName = files.at(i);
         cString Desc = DecorDescription(FileName.c_str());
         Decors.Append(strdup(*Desc));
@@ -711,7 +711,7 @@ cString cFlatConfig::DecorDescription(cString File) {
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
-            line++;
+            ++line;
             char *p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -761,7 +761,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
-            line++;
+            ++line;
             char *p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -860,7 +860,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
-            line++;
+            ++line;
             char *p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -884,7 +884,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
 int cFlatConfig::GetRecordingOldValue(std::string folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (unsigned i = 0; i < sz; i++) {
+    for (unsigned i = 0; i < sz; ++i) {
         if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
@@ -931,7 +931,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
-    for (unsigned i = 0; i < files.size(); i++) {
+    for (unsigned i = 0; i < files.size(); ++i) {
         std::string FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

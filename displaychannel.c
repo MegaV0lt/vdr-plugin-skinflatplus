@@ -632,7 +632,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
 #endif
         img = imgLoader.LoadLogo(Channel->Name(), imageBGWidth - 4, imageBGHeight - 4);
         if (img)
-            index++;
+            ++index;
     }
 
     height = std::max(fontSmlHeight, Config.decorProgressSignalSize);

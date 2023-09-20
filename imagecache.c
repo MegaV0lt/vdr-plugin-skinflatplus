@@ -18,7 +18,7 @@ cImageCache::~cImageCache() {
 }
 
 void cImageCache::Create(void) {
-    for (int i = 0; i < MAX_IMAGE_CACHE; i++) {
+    for (int i = 0; i < MAX_IMAGE_CACHE; ++i) {
         CacheImage[i] = NULL;
         CacheName[i] = "";
         CacheWidth[i] = -1;
@@ -29,7 +29,7 @@ void cImageCache::Create(void) {
 }
 
 void cImageCache::Clear(void) {
-    for (int i = 0; i < MAX_IMAGE_CACHE; i++) {
+    for (int i = 0; i < MAX_IMAGE_CACHE; ++i) {
         if (CacheImage[i] != NULL)
             delete CacheImage[i];
     }
@@ -71,7 +71,7 @@ void cImageCache::InsertImage(cImage *Image, std::string Name, int Width, int He
     CacheWidth[InsertIndex] = Width;
     CacheHeight[InsertIndex] = Height;
 
-    InsertIndex++;
+    ++InsertIndex;
     if (InsertIndex >= MAX_IMAGE_CACHE) {
         isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE");
         InsertIndex = 0;

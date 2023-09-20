@@ -61,7 +61,7 @@ char *substr(char *string, int start, int end) {
 
     while (*p != '\0' && start < end) {
         *ptr++ = *p++;
-        start++;
+        ++start;
     }
     *ptr++ = '\0';
 
@@ -75,7 +75,7 @@ char *GetFilenameWithoutext(char *fullfilename) {
         if (fullfilename[i] == '.') {
             size = i;
         }
-        i++;
+        ++i;
     }
     return substr(fullfilename, 0, size);
 }

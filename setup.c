@@ -341,7 +341,7 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
-            line++;
+            ++line;
             char *p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -741,7 +741,7 @@ void cFlatSetupGeneral::Setup(void) {
 
     ConfigFiles.Clear();
     SetupConfig->GetConfigFiles(ConfigFiles);
-    for (int i = 0; i < ConfigFiles.Size(); i++)
+    for (int i = 0; i < ConfigFiles.Size(); ++i)
         dsyslog("ConfigFile: %s", ConfigFiles[i]);
 
     ConfigFileSelection = 0;
