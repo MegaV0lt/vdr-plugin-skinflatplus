@@ -5589,13 +5589,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         } else
            continue; */
 
-        cString weekDayName("");
-        time_t t;
-        time(&t);
-        struct tm *tm = localtime(&t);
-        tm->tm_mday += index;
-        time_t t2 = mktime(tm);
-        weekDayName = WeekDayName(t2);
+        time_t t = time(NULL);  // Or time(&t)?
+        struct tm tm_r;
+        localtime_r(&t, &tm_r);
+        tm_r.tm_mday += index;
+        time_t t2 = mktime(&tm_r);
+
+        cString weekDayName = WeekDayName(t2);
 
         if (Config.MainMenuWidgetWeatherType == 0) {  // short
             if (left + fontHeight * 2 + fontTempSml->Width("-99,9°C") + fontTempSml->Width("XXXX") + marginItem * 6 >

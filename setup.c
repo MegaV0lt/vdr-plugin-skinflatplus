@@ -531,11 +531,11 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
 }
 
 void cFlatSetupGeneral::SaveCurrentSettings(void) {
-    time_t t;
-    time(&t);
-    tm *tm = localtime(&t);
+    time_t t = time(&t);
+    struct tm tm_r;
+    localtime_r(&t, &tm_r);
     char time[32];
-    strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", tm);
+    strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", &tm_r);
     cString File = time;
     cString Filename = cString::sprintf("%s/configs/%s", PLUGINRESOURCEPATH, *File);
 
