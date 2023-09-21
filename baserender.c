@@ -1049,8 +1049,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                                          bool SetBackground, bool isSignal) {
     int Middle = rect.Height() / 2;
 
-    double dCurrent = Current, dTotal = Total;  // Eliminate c-style cast
-    double percentLeft = dCurrent / dTotal;
+    double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
 
     if (PixmapBg && SetBackground)
         PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
@@ -1099,7 +1098,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             if (isSignal) {
-                double perc = 100.0 / dTotal * dCurrent / 100.0;
+                double perc = 100.0 / Total * Current / 100.0;
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * percentLeft) - out * 2, big - out * 2),
@@ -1402,8 +1401,10 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
     if (!Pixmap)
         return;
 
-    int scrollHeight = std::max(int((Height) * double(Shown) / Total + 0.5), 5);
-    int scrollTop = std::min(int(Top + (Height) * double(Offset) / Total + 0.5), Top + Height - scrollHeight);
+    // int scrollHeight = std::max(int((Height) * double(Shown) / Total + 0.5), 5);
+    int scrollHeight = std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5);
+    // int scrollTop = std::min(int(Top + (Height) * double(Offset) / Total + 0.5), Top + Height - scrollHeight);
+    int scrollTop = std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - scrollHeight);
 
     /* Types
      * 0 = left line + rect bar
