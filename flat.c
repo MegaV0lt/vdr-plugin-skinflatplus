@@ -55,7 +55,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
 
 char *substr(char *string, int start, int end) {
     char *p = &string[start];
-    char *buf = (char*) malloc(strlen(p) + 1);
+    // char *buf = (char*) malloc(strlen(p) + 1);
+    char *buf = reinterpret_cast<char*>(malloc(strlen(p) + 1));
     char *ptr = buf;
     if (!buf) return NULL;
 

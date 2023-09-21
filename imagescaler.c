@@ -75,7 +75,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         for (int j = 0; j < 4; ++j) {
             const float t = norm * h[j];
             filters[i].m_coeff[(offset + j) & 3] =
-                (int)((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // consider ring buffer index permutations
+                static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // consider ring buffer index permutations
         }
     }
 

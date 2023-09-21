@@ -42,6 +42,10 @@ bool cImageCache::RemoveFromCache(std::string Name) {
     for (int index = 0; index < MAX_IMAGE_CACHE; index++) {
         char *bname;
         bname = basename((char *)CacheName[index].c_str());
+        // bname = basename(reinterpret_cast<char *>(CacheName[index].c_str()));
+        // imagecache.c:45:26: error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
+        //   45 |         bname = basename(reinterpret_cast<char *>(CacheName[index].c_str()));
+
         if (!strcmp(bname, Name.c_str())) {
             found = true;
             dsyslog("flatPlus: RemoveFromCache - %s", CacheName[index].c_str());

@@ -828,7 +828,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = (int)roundf((float)(time(NULL) - Event->StartTime()) / (float)(Event->Duration()) * 100.0);
+            progress = static_cast<int>(roundf((static_cast<float>(time(NULL)) - Event->StartTime()) /
+                                               static_cast<float>(Event->Duration()) * 100.0));
             if (progress < 0)
                 progress = 0.;
             else if (progress > 100)
@@ -1627,11 +1628,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 int total = Event->EndTime() - Event->StartTime();
                 if (total >= 0) {
                     // Calculate progress bar
-                    // double progress =
-                    //    (int)roundf((float)(time(NULL) - Event->StartTime()) / (float)(Event->Duration()) * 100.0);
-                    double progress = static_cast<int>(roundf(
-                        (static_cast<float>(time(NULL)) - Event->StartTime()) /
-                        (static_cast<float>(Event->Duration()) * 100.0)));
+                    double progress = static_cast<int>(roundf((static_cast<float>(time(NULL)) - Event->StartTime()) /
+                                                              static_cast<float>(Event->Duration()) * 100.0));
                     if (progress < 0)
                         progress = 0.;
                     else if (progress > 100)
@@ -2551,6 +2549,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             data.useSubTitle = false;
 
             data.query = (char *)strQuery.c_str();
+            // data.query = reinterpret_cast<char *>(strQuery.c_str());
+            // error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
             data.mode = 0;
             data.channelNr = 0;
             data.useTitle = true;
@@ -2901,8 +2901,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #if VDRVERSNUM >= 20301
             LOCK_CHANNELS_READ;
             const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
+            //const cChannel *channel =
+            //    Channels->GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
+            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’ casts away qualifiers
 #else
             cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
+            // cChannel *channel = Channels.GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
 #endif
             if (channel)
                 text << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << '\n';
@@ -3305,6 +3309,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         channelFuture.get();
 #else
         cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
+        // cChannel *channel = Channels.GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
+
         if (channel)
             recAdditional << trVDR("Channel") << ": " << channel->Number() << " - " << channel->Name() << '\n';
 #endif
