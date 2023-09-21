@@ -1880,12 +1880,12 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
                 if (!rc) {
                     Ascender = face->size->metrics.ascender / 64;
                 } else
-                    esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", error, *fontFileName);
+                    esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *fontFileName);
             }
         } else
-            esyslog("ERROR: FreeType: load error %d (font = %s)", error, *fontFileName);
+            esyslog("ERROR: FreeType: load error %d (font = %s)", rc, *fontFileName);
     } else
-        esyslog("ERROR: FreeType: initialization error %d (font = %s)", error, *fontFileName);
+        esyslog("ERROR: FreeType: initialization error %d (font = %s)", rc, *fontFileName);
 
     FT_Done_Face(face);
     FT_Done_FreeType(library);

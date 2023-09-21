@@ -1629,9 +1629,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     // Calculate progress bar
                     // double progress =
                     //    (int)roundf((float)(time(NULL) - Event->StartTime()) / (float)(Event->Duration()) * 100.0);
-                    double progress = static_cast<int>roundf(
+                    double progress = static_cast<int>(roundf(
                         (static_cast<float>(time(NULL)) - Event->StartTime()) /
-                        (static_cast<float>(Event->Duration()) * 100.0));
+                        (static_cast<float>(Event->Duration()) * 100.0)));
                     if (progress < 0)
                         progress = 0.;
                     else if (progress > 100)
