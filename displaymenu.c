@@ -618,8 +618,8 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
     for (int i = 0; i < 16; ++i) {
         std::string s = trVDR(items[i].c_str());
         if (s == element) {
-            cString menuIcon = cString::sprintf("menuIcons/%s", items[i].c_str());
-            return menuIcon;
+            // cString menuIcon = cString::sprintf("menuIcons/%s", items[i].c_str());
+            return cString::sprintf("menuIcons/%s", items[i].c_str());
         }
     }
     // Check for special main menu entries "stop recording", "stop replay"

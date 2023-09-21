@@ -115,8 +115,8 @@ int cComplexContent::ContentHeight(bool Full) {
 bool cComplexContent::Scrollable(int height) {
     CalculateDrawPortHeight();
 
-    int total = 0, shown = 0;
-    total = ScrollTotal();
+    int shown = 0;
+    int total = ScrollTotal();
     if (height == 0)
         height = Position.Height();
     shown = ceil(height * 1.0 / ScrollSize);
@@ -228,24 +228,19 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize(void) {
-    double barSize = Position.Height() * 1.0 / DrawPortHeight;
-    return barSize;
+    return Position.Height() * 1.0 / DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal(void) {
-    int total = ceil(DrawPortHeight * 1.0 / ScrollSize);
-    return total;
+    return ceil(DrawPortHeight * 1.0 / ScrollSize);
 }
 
 int cComplexContent::ScrollShown(void) {
     // int shown = ceil(Position.Height() * 1.0 / ScrollSize);
-    int shown = Position.Height() / ScrollSize;
-    return shown;
+    return Position.Height() / ScrollSize;
 }
 
 int cComplexContent::ScrollOffset(void) {
-    double offset;
-
     int y = Pixmap->DrawPort().Point().Y() * -1;
     if (y + Position.Height() + ScrollSize > DrawPortHeight) {
         if (y == DrawPortHeight - Position.Height()) {
@@ -254,7 +249,7 @@ int cComplexContent::ScrollOffset(void) {
             y = DrawPortHeight - Position.Height() - 1;
         }
     }
-    offset = y * 1.0 / DrawPortHeight;
+    double offset = y * 1.0 / DrawPortHeight;
     return ScrollTotal() * offset;
 }
 
