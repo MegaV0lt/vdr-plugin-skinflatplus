@@ -236,7 +236,7 @@ int cComplexContent::ScrollTotal(void) {
 }
 
 int cComplexContent::ScrollShown(void) {
-    // int shown = ceil(Position.Height() * 1.0 / ScrollSize);
+    // return ceil(Position.Height() * 1.0 / ScrollSize);
     return Position.Height() / ScrollSize;
 }
 

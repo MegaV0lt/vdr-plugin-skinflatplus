@@ -134,7 +134,7 @@ static unsigned shift_clamp(int x) {
 void ImageScaler::NextSourceLine() {
     m_dst_x = 0;
     m_src_x = 0;
-    ++m_src_y;
+    m_src_y++;
 
     while (m_ver_filters[m_dst_y].m_offset == m_src_y) {
         const int        h0  = m_ver_filters[m_dst_y].m_coeff[0];
@@ -151,6 +151,6 @@ void ImageScaler::NextSourceLine() {
                      | (shift_clamp(t[3]) << 24);
         }
 
-        ++m_dst_y;
+        m_dst_y++;
     }
 }

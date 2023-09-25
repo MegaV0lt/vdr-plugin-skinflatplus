@@ -22,7 +22,7 @@ class ImageScaler {
      * SetImageParameters() must be called first
      */
     void PutSourcePixel(unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3) {
-        m_hbuf[ (++m_src_x) & 3 ].Set(c0, c1, c2, c3);
+        m_hbuf[ (m_src_x++) & 3 ].Set(c0, c1, c2, c3);
 
         TmpPixel      *bp = m_buffer + 4 * m_dst_x + (m_src_y & 3);
         const Filter  *fh;
@@ -30,7 +30,7 @@ class ImageScaler {
         while ((fh=m_hor_filters + m_dst_x)->m_offset == m_src_x) {
             *bp = m_hbuf[0] * fh->m_coeff[0] + m_hbuf[1] * fh->m_coeff[1] + m_hbuf[2] * fh->m_coeff[2]
                   + m_hbuf[3]*fh->m_coeff[3];
-            ++m_dst_x;
+            m_dst_x++;
             bp += 4;
         }
 

@@ -1,5 +1,16 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-09-25: Version 0.7.1
+- [add] New symbol 'Applikationen' (MenuOrg)
+- [add] Show if recording is still recording
+         or is replayed in menu and replaystatus
+- [update] Eliminate some c-style casts
+- [update] Replace some long with int32_t, etc.
+- [update] Initialize some vars
+- [update] Use localtime_r instead of localtime
+- [update] Preincrement instead of postincrement
+- [update] Remove some temporary returnvariables
+
 2023-09-15: Version 0.7.0
 - [fix] Fix wrongly named variables
 - [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
