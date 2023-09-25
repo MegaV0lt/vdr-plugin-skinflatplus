@@ -1982,18 +1982,26 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
     cImage *img = NULL;
 
-    cImage *imgRecNew = NULL;
-    cImage *imgRecNewSml = NULL;
+    cImage *imgRecNew = NULL, *imgRecNewSml = NULL;
+    cImage *imgRecRecording = NULL;
+    cImage *imgRecReplay = NULL;
     cImage *imgRecCut = NULL;
     if (Current) {
         imgRecNew = imgLoader.LoadIcon("recording_new_cur", fontHeight, fontHeight);
         imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
+        imgRecRecording = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
+        imgRecReplay = imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
         imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
     }
     if (!imgRecNew)
         imgRecNew = imgLoader.LoadIcon("recording_new", fontHeight, fontHeight);
     if (!imgRecNewSml)
         imgRecNewSml = imgLoader.LoadIcon("recording_new", fontSmlHeight, fontSmlHeight);
+    if (!imgRecRecording)
+        imgRecRecording = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
+    if (!imgRecReplay)
+        imgRecReplay = imgLoader.LoadIcon("play", fontHeight, fontHeight);
+        // imgRecRecReplay = imgLoader.LoadIcon("recording_replay", fontHeight, fontHeight);
     if (!imgRecCut)
         imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
 
@@ -2023,13 +2031,22 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             menuPixmap->DrawText(cPoint(Left, Top), buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
 
             Left += font->Width(buffer);
-            if (Recording->IsNew()) {
-                if (imgRecNew) {
+
+            // TODO: Show it recording is still in progress (ruTimer),
+            //       IsPlayed (ruReplay)
+            int recordingIsInUse = Recording->IsInUse();
+            if ((recordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
+                if (imgRecRecording)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecRecording);
+            } else if ((recordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
+                if (imgRecReplay)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecReplay);
+            } else if (Recording->IsNew()) {
+                if (imgRecNew)
                     menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecNew);
-                }
             }
 #if APIVERSNUM >= 20108
-            else {
+            else /* if (!recordingIsInUse) */ {
                 cString SeenIcon = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 cImage *imgSeen = NULL;
@@ -2062,9 +2079,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += imgRecNew->Width() + marginItem;
             if (Recording->IsEdited()) {
-                if (imgRecCut) {
+                if (imgRecCut)
                     menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecCut);
-                }
             }
 
             Left += imgRecCut->Width() + marginItem;
