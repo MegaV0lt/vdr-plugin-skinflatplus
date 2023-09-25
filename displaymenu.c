@@ -4180,8 +4180,7 @@ bool cFlatDisplayMenu::isRecordingOld(const cRecording *Recording, int Level) {
     if (value < 0) return false;
 
     int LastRecTimeFromFolder = GetLastRecTimeFromFolder(Recording, Level);
-    time_t now;
-    time(&now);
+    time_t now = time(&now);
 
     int diffSecs = now - LastRecTimeFromFolder;
     int days = diffSecs / (60 * 60 * 24);
@@ -4716,8 +4715,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     // Check if remotetimers plugin is available
     static cPlugin *pRemoteTimers = cPluginManager::GetPlugin("remotetimers");
 
-    time_t now;
-    time(&now);
+    time_t now = time(&now);
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && (now - remoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
         remoteTimersLastRefresh = now;

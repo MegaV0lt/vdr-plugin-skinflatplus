@@ -287,7 +287,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             epgWidth += marginItem + RecWidth;
         }
 
-        int s = static_cast<int>(time(NULL)) - Present->StartTime() / 60;
+        // time_t now = time(NULL);
+        int s = static_cast<int>(time(NULL) - Present->StartTime()) / 60;
         int sleft = (Present->Duration() / 60) - s;
 
         cString seen("");
