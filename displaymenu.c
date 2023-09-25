@@ -2036,8 +2036,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += font->Width(buffer);
 
-            // TODO: Show it recording is still in progress (ruTimer),
-            //       IsPlayed (ruReplay)
+            // Show if recording is still in progress (ruTimer), or played (ruReplay)
             int recordingIsInUse = Recording->IsInUse();
             if ((recordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 if (imgRecRecording)
@@ -2165,7 +2164,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      menuItemWidth - Left - marginItem);
             }
         }
-    } else {
+    } else {  // flatPlus short
         if (Total == 0) {  // Recording
             if (Current)
                 img = imgLoader.LoadIcon("recording_cur", fontHeight, fontHeight);
@@ -2202,10 +2201,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Top -= fontHeight;
             Left = menuItemWidth - ImagesWidth;
-            if (Recording->IsNew()) {
-                if (imgRecNew) {
+            // Show if recording is still in progress (ruTimer), or played (ruReplay)
+            int recordingIsInUse = Recording->IsInUse();
+            if ((recordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
+                if (imgRecRecording)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecRecording);
+            } else if ((recordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
+                if (imgRecReplay)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecReplay);
+            } else if (Recording->IsNew()) {
+                if (imgRecNew)
                     menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecNew);
-                }
             }
 #if APIVERSNUM >= 20108
             else {
