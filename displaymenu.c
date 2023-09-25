@@ -544,13 +544,14 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             break;
     }  // for
 
-    sDecorBorder ib{};
-    ib.Left = Config.decorBorderMenuItemSize;
-    ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-    ib.Width = menuItemWidth;
-    ib.Height = fontHeight;
-    ib.Size = Config.decorBorderMenuItemSize;
-    ib.Type = Config.decorBorderMenuItemType;
+    sDecorBorder ib{
+        .Left = Config.decorBorderMenuItemSize,
+        .Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y,
+        .Width = menuItemWidth,
+        .Height = fontHeight,
+        .Size = Config.decorBorderMenuItemSize,
+        .Type = Config.decorBorderMenuItemType
+    };
 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
@@ -944,13 +945,14 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         }
     }
 
-    sDecorBorder ib{};
-    ib.Left = Config.decorBorderMenuItemSize;
-    ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-    ib.Width = menuItemWidth;
-    ib.Height = Height;
-    ib.Size = Config.decorBorderMenuItemSize;
-    ib.Type = Config.decorBorderMenuItemType;
+    sDecorBorder ib{
+        .Left = Config.decorBorderMenuItemSize,
+        .Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y,
+        .Width = menuItemWidth,
+        .Height = Height,
+        .Size = Config.decorBorderMenuItemSize,
+        .Type = Config.decorBorderMenuItemType
+    };
 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
@@ -1430,13 +1432,14 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         }
     }
 
-    sDecorBorder ib{};
-    ib.Left = Config.decorBorderMenuItemSize;
-    ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-    ib.Width = menuItemWidth;
-    ib.Height = Height;
-    ib.Size = Config.decorBorderMenuItemSize;
-    ib.Type = Config.decorBorderMenuItemType;
+    sDecorBorder ib{
+        .Left = Config.decorBorderMenuItemSize,
+        .Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y,
+        .Width = menuItemWidth,
+        .Height = Height,
+        .Size = Config.decorBorderMenuItemSize,
+        .Type = Config.decorBorderMenuItemType
+    };
 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
@@ -1865,13 +1868,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
     }
 
-    sDecorBorder ib{};
-    ib.Left = Config.decorBorderMenuItemSize;
-    ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-    ib.Width = menuItemWidth;
-    ib.Height = Height;
-    ib.Size = Config.decorBorderMenuItemSize;
-    ib.Type = Config.decorBorderMenuItemType;
+    sDecorBorder ib{
+        .Left = Config.decorBorderMenuItemSize,
+        .Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y,
+        .Width = menuItemWidth,
+        .Height = Height,
+        .Size = Config.decorBorderMenuItemSize,
+        .Type = Config.decorBorderMenuItemType
+    };
 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
@@ -2313,13 +2317,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         }
     }
 
-    sDecorBorder ib{};
-    ib.Left = Config.decorBorderMenuItemSize;
-    ib.Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y;
-    ib.Width = menuItemWidth;
-    ib.Height = Height;
-    ib.Size = Config.decorBorderMenuItemSize;
-    ib.Type = Config.decorBorderMenuItemType;
+    sDecorBorder ib{
+        .Left = Config.decorBorderMenuItemSize,
+        .Top = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize + y,
+        .Width = menuItemWidth,
+        .Height = Height,
+        .Size = Config.decorBorderMenuItemSize,
+        .Type = Config.decorBorderMenuItemType
+    };
 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
