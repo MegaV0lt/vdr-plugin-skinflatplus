@@ -77,13 +77,25 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (modeOnly)
         return;
 
-    int left = marginItem;  // Position for shorttext/date
+    int left = marginItem;  // Position for recordingsymbol/shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
-    recording = Recording;
+    // recording = Recording;  // Not used?
 
     PixmapFill(iconsPixmap, clrTransparent);
 
     SetTitle(recInfo->Title());
+
+    // Show if still recording
+    if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
+        cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
+
+        if (imgRecRecording) {
+            int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
+            iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecRecording);
+            left += imgRecRecording->Width() + marginItem;
+        }
+    }
+
     cString info("");
     if (recInfo->ShortText())
         info = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
@@ -305,10 +317,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         int cuttedLength = 0;
-        long cutinframe = 0;
-        unsigned long long recsizecutted = 0;
-        unsigned long long cutinoffset = 0;
-        unsigned long long filesize[100000];
+        int32_t cutinframe = 0;
+        uint64_t recsizecutted = 0;
+        uint64_t cutinoffset = 0;
+        uint64_t filesize[100000];
         uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
@@ -341,7 +353,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             bool cutin = true;
             cMark *mark = marks.First();
             while (mark) {
-                long position = mark->Position();
+                int32_t position = mark->Position();
                 index->Get(position, &FileNumber, &FileOffset);
                 if (cutin) {
                     cutinframe = position;

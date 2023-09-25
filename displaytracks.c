@@ -18,7 +18,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     itemHeight = fontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     currentIndex = -1;
     maxItemWidth = font->Width(Title) + marginItem * 4;
-    for (int i = 0; i < NumTracks; i++)
+    for (int i = 0; i < NumTracks; ++i)
         maxItemWidth = std::max(maxItemWidth, font->Width(Tracks[i]) + marginItem * 2);
 
     int headerWidth = font->Width(Title) + font->Width(" ") + imgWidthMax;
@@ -29,7 +29,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     left /= 2;
     TopBarSetTitle(Title);
 
-    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1, cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
+    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1,
+                                cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
     PixmapFill(tracksPixmap, clrTransparent);
 
     tracksLogoPixmap = CreatePixmap(osd, "tracksLogoPixmap", 1,
@@ -38,7 +39,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 
     SetItem(Title, -1, false);
 
-    for (int i = 0; i < NumTracks; i++)
+    for (int i = 0; i < NumTracks; ++i)
         SetItem(Tracks[i], i, false);
 }
 
@@ -54,8 +55,7 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
         ColorBg = Theme.Color(clrTrackItemCurrentBg);
         currentIndex = Index;
-    }
-    else {
+    } else {
         if (Index >= 0) {
             ColorFg = Theme.Color(clrTrackItemSelableFont);
             ColorBg = Theme.Color(clrTrackItemSelableBg);

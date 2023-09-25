@@ -341,7 +341,7 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
-            line++;
+            ++line;
             char *p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -524,17 +524,18 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
-    else return false;
+    else
+        return false;
 
     return true;
 }
 
 void cFlatSetupGeneral::SaveCurrentSettings(void) {
-    time_t t;
-    time(&t);
-    tm *tm = localtime(&t);
+    time_t t = time(&t);
+    struct tm tm_r;
+    localtime_r(&t, &tm_r);
     char time[32];
-    strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", tm);
+    strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", &tm_r);
     cString File = time;
     cString Filename = cString::sprintf("%s/configs/%s", PLUGINRESOURCEPATH, *File);
 
@@ -740,7 +741,7 @@ void cFlatSetupGeneral::Setup(void) {
 
     ConfigFiles.Clear();
     SetupConfig->GetConfigFiles(ConfigFiles);
-    for (int i = 0; i < ConfigFiles.Size(); i++)
+    for (int i = 0; i < ConfigFiles.Size(); ++i)
         dsyslog("ConfigFile: %s", ConfigFiles[i]);
 
     ConfigFileSelection = 0;

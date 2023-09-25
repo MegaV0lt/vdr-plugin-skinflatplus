@@ -55,13 +55,14 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
 
 char *substr(char *string, int start, int end) {
     char *p = &string[start];
-    char *buf = (char*) malloc(strlen(p) + 1);
+    // char *buf = (char*) malloc(strlen(p) + 1);
+    char *buf = reinterpret_cast<char*>(malloc(strlen(p) + 1));
     char *ptr = buf;
     if (!buf) return NULL;
 
     while (*p != '\0' && start < end) {
         *ptr++ = *p++;
-        start++;
+        ++start;
     }
     *ptr++ = '\0';
 
@@ -75,7 +76,7 @@ char *GetFilenameWithoutext(char *fullfilename) {
         if (fullfilename[i] == '.') {
             size = i;
         }
-        i++;
+        ++i;
     }
     return substr(fullfilename, 0, size);
 }
@@ -198,9 +199,7 @@ cString GetRecordingerrorIcon(int recInfoErrors) {
 }
 
 cString GetRecordingseenIcon(int frameTotal, int frameResume) {
-    int FrameTotal = frameTotal;
-    int FrameResume = frameResume;
-    double FrameSeen = (double)FrameResume / (double)FrameTotal;
+    double FrameSeen = frameResume * 1.0 / frameTotal;
     double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
     // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
 
@@ -232,4 +231,4 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
         SeenIcon = "recording_seen_10";
 
     return SeenIcon;
-};
+}

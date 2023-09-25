@@ -19,6 +19,7 @@ class cImageCache {
 
     int InsertIndex;
     bool Overflow;
+
  public:
     cImageCache();
     ~cImageCache();
@@ -27,7 +28,11 @@ class cImageCache {
     void Clear(void);
     bool RemoveFromCache(std::string Name);
 
-    int getCacheCount(void) { if (Overflow) return MAX_IMAGE_CACHE; return InsertIndex+1; }
+    int getCacheCount(void) {
+      if (Overflow)
+         return MAX_IMAGE_CACHE;
+      return InsertIndex + 1;
+    }
 
     cImage *GetImage(std::string Name, int Width, int Height);
     void InsertImage(cImage *Image, std::string Name, int Width, int Height);

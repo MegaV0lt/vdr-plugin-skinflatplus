@@ -198,18 +198,18 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (!Resolution)
         PixmapFill(chanIconsPixmap, clrTransparent);
 
-    int width = fontSmlHeight;
-    int height = fontSmlHeight;
-    int top = heightBottom - height - marginItem;
+    // int width = fontSmlHeight;
+    // int height = fontSmlHeight;
+    int top = heightBottom - fontSmlHeight - marginItem;
     int imageTop = 0;
     cImage *img = NULL;
 
-    int left = channelWidth - width - marginItem * 2;
+    int left = channelWidth - fontSmlHeight - marginItem * 2;
 
     if (Channel) {
-        img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, height);
+        img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, fontSmlHeight);
         if (img) {
-            imageTop = top + (height - img->Height()) / 2;
+            imageTop = top + (fontSmlHeight - img->Height()) / 2;
             chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
             left -= marginItem * 2;
         }
@@ -218,18 +218,18 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (Resolution && !isRadioChannel && screenWidth > 0) {
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
             cString asp = GetAspectIcon(screenWidth, screenAspect);
-            img = imgLoader.LoadIcon(*asp, 999, height);
+            img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
             if (img) {
-                imageTop = top + (height - img->Height()) / 2;
+                imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
                 left -= marginItem * 2;
             }
 
             cString res = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
-            img = imgLoader.LoadIcon(*res, 999, height);
+            img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
             if (img) {
-                imageTop = top + (height - img->Height()) / 2;
+                imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
                 left -= marginItem * 2;
@@ -238,9 +238,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             cString iconName = GetFormatIcon(screenWidth);  // Show Format
-            img = imgLoader.LoadIcon(*iconName, 999, height);
+            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {
-                imageTop = top + (height - img->Height()) / 2;
+                imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 chanIconsPixmap->DrawImage(cPoint(left, imageTop), *img);
                 left -= marginItem * 2;
@@ -287,7 +287,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             epgWidth += marginItem + RecWidth;
         }
 
-        int s = (int)(time(NULL) - Present->StartTime()) / 60;
+        int s = static_cast<int>(time(NULL) - Present->StartTime()) / 60;
         int sleft = (Present->Duration() / 60) - s;
 
         cString seen("");
@@ -632,7 +632,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
 #endif
         img = imgLoader.LoadLogo(Channel->Name(), imageBGWidth - 4, imageBGHeight - 4);
         if (img)
-            index++;
+            ++index;
     }
 
     height = std::max(fontSmlHeight, Config.decorProgressSignalSize);

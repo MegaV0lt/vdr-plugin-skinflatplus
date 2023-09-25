@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "iosfwd": "c"
+        "iosfwd": "c",
+        "chrono": "c",
+        "cmath": "c"
     }
 }

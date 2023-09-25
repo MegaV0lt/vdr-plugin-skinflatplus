@@ -74,7 +74,7 @@ void cTextScroll::DoStep(void) {
 
     // Wait at the beginning for better read
     if (waitSteps > 0) {
-        waitSteps--;
+        --waitSteps;
         return;
     }
     // Wait after return to the front
@@ -140,8 +140,8 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
     while (Active())
         cCondWait::SleepMs(10);
 
-    Scrollers.push_back(
-        new cTextScroll(Osd, scrollType, scrollStep, (int)((double)WAITDELAY / (double)scrollDelay), Layer));
+    Scrollers.push_back(new cTextScroll(Osd, scrollType, scrollStep,
+        static_cast<int>(WAITDELAY * 1.0 / scrollDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, font, ColorExtraTextFg);
 
     StartScrolling();
@@ -164,7 +164,7 @@ void cTextScrollers::StartScrolling(void) {
 
 void cTextScrollers::Action(void) {
     // Wait 1 second so the osd is finished
-    for (int i = 0; i < 100 && Running(); i++) {
+    for (int i = 0; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);
     }
 

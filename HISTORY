@@ -1,5 +1,16 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-09-25: Version 0.7.1
+- [add] New symbol 'Applikationen' (MenuOrg)
+- [add] Show if recording is still recording
+         or is replayed in menu and replaystatus
+- [update] Eliminate some c-style casts
+- [update] Replace some long with int32_t, etc.
+- [update] Initialize some vars
+- [update] Use localtime_r instead of localtime
+- [update] Preincrement instead of postincrement
+- [update] Remove some temporary returnvariables
+
 2023-09-15: Version 0.7.0
 - [fix] Fix wrongly named variables
 - [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
@@ -29,12 +40,6 @@ VDR Plugin 'skin flatPlus' Revision History
 - [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
 - [update] Centralize getting iconnames of format and aspect
 - [update] Centralize call of pscraper plugin (From Skinnopacity)
-
-2023-09-xx: Version 0.6.8
-- [add] Add option to disable recerroricons in replay
-- [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
-- [update] centralize getting iconnames of format and aspect
-- [update] centralize call of pscraper plugin
 
 2023-08-24: Version 0.6.7
 - [fix] Adaptation to tvscraper commit a4287558

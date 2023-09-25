@@ -124,7 +124,7 @@ class cSimpleContent {
             cTextWrapper Wrapper;
             Wrapper.Set(Text.c_str(), Font, Position.Width());
             int Lines = Wrapper.Lines();
-            for (int i = 0; i < Lines; i++) {
+            for (int i = 0; i < Lines; ++i) {
                 Pixmap->DrawText(cPoint(Position.Left(), Position.Top() + (i * Font->Height())), Wrapper.GetLine(i),
                                  ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
             }
