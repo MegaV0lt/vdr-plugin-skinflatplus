@@ -86,16 +86,15 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(recInfo->Title());
 
     // Show if still recording
-        if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-            cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
+    if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
+        cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
 
-            if (imgRecRecording) {
-                int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
-                iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecRecording);
-                left += imgRecRecording->Width() + marginItem;
-            }
+        if (imgRecRecording) {
+            int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
+            iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecRecording);
+            left += imgRecRecording->Width() + marginItem;
         }
-    // }
+    }
 
     cString info("");
     if (recInfo->ShortText())

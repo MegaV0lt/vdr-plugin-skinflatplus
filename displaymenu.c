@@ -1994,7 +1994,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         imgRecNew = imgLoader.LoadIcon("recording_new_cur", fontHeight, fontHeight);
         imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
         imgRecRecording = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
-        imgRecReplay = imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
+        imgRecReplay = imgLoader.LoadIcon("play", fontHeight, fontHeight);
         imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
     }
     if (!imgRecNew)
@@ -2004,7 +2004,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (!imgRecRecording)
         imgRecRecording = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
     if (!imgRecReplay)
-        imgRecReplay = imgLoader.LoadIcon("play", fontHeight, fontHeight);
+        imgRecReplay = imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
         // imgRecRecReplay = imgLoader.LoadIcon("recording_replay", fontHeight, fontHeight);
     if (!imgRecCut)
         imgRecCut = imgLoader.LoadIcon("recording_cutted", fontHeight, fontHeight);
