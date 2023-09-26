@@ -79,14 +79,14 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     int left = marginItem;  // Position for recordingsymbol/shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
-    // recording = Recording;  // Not used?
+    recording = Recording;
 
     PixmapFill(iconsPixmap, clrTransparent);
 
     SetTitle(recInfo->Title());
 
     // Show if still recording
-    if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
+    if ((recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
 
         if (imgRecRecording) {
@@ -98,10 +98,10 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     cString info("");
     if (recInfo->ShortText())
-        info = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()),
+        info = cString::sprintf("%s  %s - %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()),
                                 recInfo->ShortText());
     else
-        info = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
+        info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
 
     labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                           fontSml, osdWidth - Config.decorBorderReplaySize * 2);

@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-09-26: Version 0.7.2
+- [fix] Fix display of cuttet length in replay
+
 2023-09-25: Version 0.7.1
 - [add] New symbol 'Applikationen' (MenuOrg)
 - [add] Show if recording is still recording
