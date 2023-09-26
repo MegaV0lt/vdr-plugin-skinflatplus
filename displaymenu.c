@@ -416,7 +416,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         iconTimerFull = imgLoader.LoadIcon("text_timer_full_cur", fontHeight, fontHeight);
         // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_cur", fontHeight, fontHeight);
         iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_cur", fontHeight, fontHeight);
-        iconRec = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
+        iconRec = imgLoader.LoadIcon("timerRecording_cur", fontHeight, fontHeight);
         /*iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
         iconNew = imgLoader.LoadIcon("text_new_cur", fontHeight, fontHeight);*/
     } else {
@@ -427,7 +427,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
             // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
             iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
-            iconRec = imgLoader.LoadIcon("text_rec_sel", fontHeight, fontHeight);
+            iconRec = imgLoader.LoadIcon("timerRecording_sel", fontHeight, fontHeight);
             /*iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
             iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);*/
         } else {
@@ -437,7 +437,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
             // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
             iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
-            iconRec = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
+            iconRec = imgLoader.LoadIcon("timerRecording", fontHeight, fontHeight);
             /*iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
             iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);*/
         }
@@ -1993,7 +1993,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         imgRecNew = imgLoader.LoadIcon("recording_new_cur", fontHeight, fontHeight);
         imgRecNewSml = imgLoader.LoadIcon("recording_new_cur", fontSmlHeight, fontSmlHeight);
-        imgRecRecording = imgLoader.LoadIcon("text_rec_cur", fontHeight, fontHeight);
+        imgRecRecording = imgLoader.LoadIcon("timerRecording_cur", fontHeight, fontHeight);
         imgRecReplay = imgLoader.LoadIcon("play", fontHeight, fontHeight);
         imgRecCut = imgLoader.LoadIcon("recording_cutted_cur", fontHeight, fontHeight);
     }
@@ -2002,7 +2002,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (!imgRecNewSml)
         imgRecNewSml = imgLoader.LoadIcon("recording_new", fontSmlHeight, fontSmlHeight);
     if (!imgRecRecording)
-        imgRecRecording = imgLoader.LoadIcon("text_rec", fontHeight, fontHeight);
+        imgRecRecording = imgLoader.LoadIcon("timerRecording", fontHeight, fontHeight);
     if (!imgRecReplay)
         imgRecReplay = imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
         // imgRecRecReplay = imgLoader.LoadIcon("recording_replay", fontHeight, fontHeight);

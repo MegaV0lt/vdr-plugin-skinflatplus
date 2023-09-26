@@ -87,7 +87,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     // Show if still recording
     if ((recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
+        cImage *imgRecRecording = imgLoader.LoadIcon("timerRecording", 999, fontSmlHeight);  // Small image
 
         if (imgRecRecording) {
             int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
