@@ -15,7 +15,7 @@ See the file COPYING for more information.
 
 Anforderungen
 -------------------------------
-- VDR Version >= 1.7.34
+- VDR ab Version 1.7.34
 - GraphicsMagick oder ImageMagick zur Anzeige von png/jpg Icons, Kanal-Logos and EPG Bilder
 
 
@@ -29,10 +29,6 @@ git-Zugriff
 -------------------------------
 Auf das git kann mittels
 
-Original:
-git clone http://projects.vdr-developer.org/git/skin-flatplus.git/
-
-MegaV0lt
 git clone https://github.com/MegaV0lt/vdr-plugin-skinflatplus.git/
 
 zugegriffen werden.
@@ -45,13 +41,8 @@ Installation wie bei allen VDR Plugins.
     make
     make install
 
-Veraltet:
-Für die Kanallogos empfehle ich die Logos von Copperhead: http://creimer.net/channellogos/
-Ich nutze "nopacity-logos-white"
-Alternativ können auch die Logos von 3PO genutzt werden:
-https://github.com/3PO/Senderlogos
-
-Alternativ eines der beiden Logo-Skripte:
+Für die Kanallogos empfehle ich Logos aus einem der Repositories:
+https://github.com/MegaV0lt/Picon.cz2VDR
 https://github.com/MegaV0lt/MP_Logos
 https://github.com/MegaV0lt/Picons2VDR
 
@@ -186,6 +177,10 @@ Mit der default eventsview.sql ist im EPG-Text die Schauspieler, Serien- und Fil
 Ich empfehle diese zu verwenden. Dafür einfach die Datei aus den contrib Ordner nach /etc/epgd/ kopieren und in der epgd.conf folgenden Eintrag verwenden:
 
 EpgView = eventsview-flatplus.sql
+
+Wenn externes EPG verwendet wird, empfehle ich
+
+EpgView = eventsview-MV.sql
 
 
 Themes und Theme spezifische Icons
