@@ -3,7 +3,7 @@
 #
 # update_weather.sh
 #
-# Skript zum laden von Wetterdaten für Skin FlatPluus
+# Skript zum laden von Wetterdaten für Skin FlatPlus
 # Daten werden von openweathermap.org geladen. Dazu wird ein API-Key benötigt,
 # der kostenlos bezogen werden kann (https://openweathermap.org/price)
 #
@@ -12,7 +12,7 @@
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=2300810
+#VERSION=230927
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -24,7 +24,11 @@ LC_NUMERIC='C'
 
 ### Funktionen ###
 f_log(){
-  [[ -t 1 ]] && { echo "$*" ;} || logger -t "$SELF_NAME" "$*"
+  if [[ -t 1 ]] ; then
+    echo "$*"
+  else
+    logger -t "$SELF_NAME" "$*" 2>/dev/null
+  fi
 }
 
 f_write_temp(){  # Temperaturwert aufbereiten und schreiben ($1 Temperatur, $2 Ausgabedatei)
