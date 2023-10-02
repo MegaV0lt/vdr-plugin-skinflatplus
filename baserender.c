@@ -520,7 +520,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
         int titleLeft = MenuIconWidth + marginItem * 2;
 
-        time_t t = time(&t);
+        time_t t = time(NULL);
 
         cString time = TimeString(t);
         cString time2 = cString::sprintf("%s %s", *time, tr("clock"));
