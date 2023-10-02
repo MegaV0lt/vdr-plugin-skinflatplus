@@ -87,7 +87,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     // Show if still recording
     if ((recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        cImage *imgRecRecording = imgLoader.LoadIcon("text_rec", 999, fontSmlHeight);  // Small image
+        cImage *imgRecRecording = imgLoader.LoadIcon("timerRecording", 999, fontSmlHeight);  // Small image
 
         if (imgRecRecording) {
             int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
@@ -103,8 +103,30 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     else
         info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
 
-    labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                          fontSml, osdWidth - Config.decorBorderReplaySize * 2);
+    int infoWidth = fontSml->Width(info);  // Width of shorttext
+    // TODO: Handle very long shorttext. How to get width of aspect and format icons?
+    //  Substract 'left' in case of displayed recording icon
+    //  Substract 'fontSmlHeight' in case of recordingerror icon is displayed later
+    //  Substract width of aspect and format icons (ResolutionAspectDraw()) ???
+    int maxWidth = osdWidth - left - Config.decorBorderReplaySize * 2;
+
+#if APIVERSNUM >= 20505
+    if (Config.PlaybackShowRecordingErrors)
+        maxWidth -= fontSmlHeight;  // Substract width of imgRecErr
+#endif
+
+    cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
+    maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
+    labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
+                          maxWidth);
+
+    if (infoWidth > maxWidth) {  // Add ... if info ist too long
+        dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
+        labelPixmap->DrawText(cPoint(left + maxWidth, fontHeight), "...", Theme.Color(clrReplayFont),
+                              Theme.Color(clrReplayBg), fontSml, fontSml->Width("..."));
+        left += maxWidth + fontSml->Width("...");
+    } else
+        left += infoWidth;
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
@@ -113,7 +135,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
-            left += fontSml->Width(info) + marginItem;
+            left += marginItem;
             int imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecErr);
         }

@@ -520,7 +520,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
         int titleLeft = MenuIconWidth + marginItem * 2;
 
-        time_t t = time(&t);
+        time_t t = time(NULL);
 
         cString time = TimeString(t);
         cString time2 = cString::sprintf("%s %s", *time, tr("clock"));
@@ -1584,7 +1584,7 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
 
 void cFlatBaseRender::DecorBorderRedrawAll(void) {
     std::list<sDecorBorder>::iterator it;
-    for (it = Borders.begin(); it != Borders.end(); it++) {
+    for (it = Borders.begin(); it != Borders.end(); ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size, (*it).Type, (*it).ColorFg,
                         (*it).ColorBg, (*it).From, false);
     }
