@@ -510,7 +510,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         std::string tilde = s;
                         size_t found = tilde.find(" ~ ");
                         size_t found2 = tilde.find("~");
-                        if (found != string::npos) {
+                        if (found != std::string::npos) {
                             std::string first = tilde.substr(0, found);
                             std::string second = tilde.substr(found + 2, tilde.length());
 
@@ -520,7 +520,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.c_str(),
                                                  ColorExtraTextFg, ColorBg, font,
                                                  menuItemWidth - xt - Config.decorBorderMenuItemSize - l);
-                        } else if (found2 != string::npos) {
+                        } else if (found2 != std::string::npos) {
                             std::string first = tilde.substr(0, found2);
                             std::string second = tilde.substr(found2 + 1, tilde.length());
 
@@ -1015,10 +1015,10 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             }
             const cComponents *Components = Event->Components();
             if (Components) {
-                ostringstream audio("");
+                std::ostringstream audio("");
                 bool firstAudio = true;
                 const char *audio_type = NULL;
-                ostringstream subtitle("");
+                std::ostringstream subtitle("");
                 bool firstSubtitle = true;
                 for (int i = 0; i < Components->NumComponents(); ++i) {
                     const tComponent *p = Components->Component(i);
@@ -1361,7 +1361,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 std::string tilde = File;
                 size_t found = tilde.find(" ~ ");
                 size_t found2 = tilde.find("~");
-                if (found != string::npos) {
+                if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
                     std::string second = tilde.substr(found + 2, tilde.length());
 
@@ -1370,7 +1370,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     int l = font->Width(first.c_str());
                     menuPixmap->DrawText(cPoint(Left + l, Top), second.c_str(), ColorExtraTextFg, ColorBg, font,
                                          menuItemWidth - Left - l - marginItem);
-                } else if (found2 != string::npos) {
+                } else if (found2 != std::string::npos) {
                     std::string first = tilde.substr(0, found2);
                     std::string second = tilde.substr(found2 + 1, tilde.length());
 
@@ -1403,7 +1403,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 std::string tilde = File;
                 size_t found = tilde.find(" ~ ");
                 size_t found2 = tilde.find("~");
-                if (found != string::npos) {
+                if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
                     std::string second = tilde.substr(found + 2, tilde.length());
 
@@ -1412,7 +1412,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     int l = fontSml->Width(first.c_str());
                     menuPixmap->DrawText(cPoint(Left + l, Top + fontHeight), second.c_str(), ColorExtraTextFg, ColorBg,
                                          fontSml, menuItemWidth - Left - l - marginItem);
-                } else if (found2 != string::npos) {
+                } else if (found2 != std::string::npos) {
                     std::string first = tilde.substr(0, found2);
                     std::string second = tilde.substr(found2 + 1, tilde.length());
 
@@ -2412,7 +2412,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     */
     // Description
-    ostringstream text(""), textAdditional("");
+    std::ostringstream text(""), textAdditional("");
     std::string Fsk("");
     std::list<std::string> GenreIcons;
 
@@ -2443,10 +2443,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         const cComponents *Components = Event->Components();
         if (Components) {
-            ostringstream audio("");
+            std::ostringstream audio("");
             bool firstAudio = true;
             const char *audio_type = NULL;
-            ostringstream subtitle("");
+            std::ostringstream subtitle("");
             bool firstSubtitle = true;
             for (int i = 0; i < Components->NumComponents(); ++i) {
                 const tComponent *p = Components->Component(i);
@@ -2638,7 +2638,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         int ContentTop = marginItem;
 
-        ostringstream series_info(""), movie_info("");
+        std::ostringstream series_info(""), movie_info("");
 
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
@@ -2957,7 +2957,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     cHeight = osdHeight - (topBarHeight + Config.decorBorderTopBarSize * 2 + buttonsHeight +
                            Config.decorBorderButtonSize * 2 + marginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    ostringstream text("");
+    std::ostringstream text("");
     if (Recording) {
         const cRecordingInfo *recInfo = Recording->Info();
         text.imbue(std::locale(""));
@@ -3116,10 +3116,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
-                ostringstream audio("");
+                std::ostringstream audio("");
                 bool firstAudio = true;
                 const char *audio_type = NULL;
-                ostringstream subtitle("");
+                std::ostringstream subtitle("");
                 bool firstSubtitle = true;
                 for (int i = 0; i < Components->NumComponents(); ++i) {
                     const tComponent *p = Components->Component(i);
@@ -3180,8 +3180,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     text << '\n' << tr("Subtitle") << ": " << subtitle.str();
             }
             if (recInfo->Aux()) {
-                string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
-                string channel(""), searchtimer(""), pattern("");
+                std::string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
+                std::string channel(""), searchtimer(""), pattern("");
                 if (!str_epgsearch.empty()) {
                     channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
                     searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3189,14 +3189,14 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                         searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
                 }
 
-                string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
-                string causedby(""), reason("");
+                std::string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
+                std::string causedby(""), reason("");
                 if (!str_tvscraper.empty()) {
                     causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
                     reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
                 }
 
-                string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+                std::string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
                 if (!str_vdradmin.empty()) {
                     pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
                 }
@@ -3353,7 +3353,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     menuItemWidth = cWidth;
 
-    ostringstream text(""), textAdditional(""), recAdditional("");
+    std::ostringstream text(""), textAdditional(""), recAdditional("");
     text.imbue(std::locale(""));
     textAdditional.imbue(std::locale(""));
     recAdditional.imbue(std::locale(""));
@@ -3522,10 +3522,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
-            ostringstream audio("");
+            std::ostringstream audio("");
             bool firstAudio = true;
             const char *audio_type = NULL;
-            ostringstream subtitle("");
+            std::ostringstream subtitle("");
             bool firstSubtitle = true;
             for (int i = 0; i < Components->NumComponents(); ++i) {
                 const tComponent *p = Components->Component(i);
@@ -3592,8 +3592,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
         if (recInfo->Aux()) {
-            string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
-            string channel(""), searchtimer(""), pattern("");
+            std::string str_epgsearch = xml_substring(recInfo->Aux(), "<epgsearch>", "</epgsearch>");
+            std::string channel(""), searchtimer(""), pattern("");
             if (!str_epgsearch.empty()) {
                 channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
                 searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
@@ -3601,14 +3601,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
             }
 
-            string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
-            string causedby(""), reason("");
+            std::string str_tvscraper = xml_substring(recInfo->Aux(), "<tvscraper>", "</tvscraper>");
+            std::string causedby(""), reason("");
             if (!str_tvscraper.empty()) {
                 causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
                 reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
             }
 
-            string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+            std::string str_vdradmin = xml_substring(recInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
             if (!str_vdradmin.empty()) {
                 pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
             }
@@ -3693,7 +3693,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         int ContentTop = marginItem;
 
-        ostringstream series_info(""), movie_info("");
+        std::ostringstream series_info(""), movie_info("");
 
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
@@ -4280,7 +4280,7 @@ string cFlatDisplayMenu::xml_substring(string source, const char *str_start, con
     size_t start = source.find(str_start);
     size_t end = source.find(str_end);
 
-    if (string::npos != start && string::npos != end) {
+    if (std::string::npos != start && std::string::npos != end) {
         return (source.substr(start + strlen(str_start), end - start - strlen(str_start)));
     }
 
