@@ -127,7 +127,7 @@ void cTextScrollers::Clear(void) {
         cCondWait::SleepMs(10);
 
     std::vector<cTextScroll *>::iterator it;
-    for (it = Scrollers.begin(); it != Scrollers.end(); it++) {
+    for (it = Scrollers.begin(); it != Scrollers.end(); ++it) {
         delete *it;
     }
 
@@ -149,7 +149,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
 
 void cTextScrollers::UpdateViewPortWidth(int w) {
     std::vector<cTextScroll *>::iterator it;
-    for (it = Scrollers.begin(); it != Scrollers.end(); it++) {
+    for (it = Scrollers.begin(); it != Scrollers.end(); ++it) {
         cPixmap::Lock();
         (*it)->UpdateViewPortWidth(w);
         cPixmap::Unlock();
@@ -172,7 +172,7 @@ void cTextScrollers::Action(void) {
         return;
 
     std::vector<cTextScroll *>::iterator it;
-    for (it = Scrollers.begin(); it != Scrollers.end(); it++) {
+    for (it = Scrollers.begin(); it != Scrollers.end(); ++it) {
         if (!Running())
             return;
         cPixmap::Lock();
@@ -185,7 +185,7 @@ void cTextScrollers::Action(void) {
             cCondWait::SleepMs(scrollDelay);
 
         std::vector<cTextScroll *>::iterator it;
-        for (it = Scrollers.begin(); it != Scrollers.end(); it++) {
+        for (it = Scrollers.begin(); it != Scrollers.end(); ++it) {
             if (!Running())
                 return;
             cPixmap::Lock();
