@@ -114,15 +114,19 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (Config.PlaybackShowRecordingErrors)
         maxWidth -= fontSmlHeight;  // Substract width of imgRecErr
 #endif
+
     cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
     labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
                           maxWidth);
+
     if (infoWidth > maxWidth) {  // Add ... if info ist too long
         dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
         labelPixmap->DrawText(cPoint(left + maxWidth, fontHeight), "...", Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), fontSml, fontSml->Width("..."));
-    }
+        left += maxWidth + fontSml->Width("...");
+    } else
+        left += infoWidth;
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
@@ -131,7 +135,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
         cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
         if (imgRecErr) {
-            left += maxWidth + fontSml->Width("...") + marginItem;
+            left += marginItem;
             int imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecErr);
         }
