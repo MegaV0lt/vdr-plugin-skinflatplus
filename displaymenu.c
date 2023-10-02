@@ -3085,14 +3085,14 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             delete index;
 
             if (recsize > MEGABYTE(1023))
-                text << tr("Size") << ": " << fixed << setprecision(2) << static_cast<float>(recsize) / MEGABYTE(1024)
+                text << tr("Size") << ": " << std::fixed << std::setprecision(2) << static_cast<float>(recsize) / MEGABYTE(1024)
                      << " GB";
             else
                 text << tr("Size") << ": " << recsize / MEGABYTE(1) << " MB";
 
             if (hasMarks) {
                 if (recsize > MEGABYTE(1023))
-                    text << " (" << tr("cutted") << ": " << fixed << setprecision(2)
+                    text << " (" << tr("cutted") << ": " << std::fixed << std::setprecision(2)
                          << static_cast<float>(recsizecutted) / MEGABYTE(1024) << " GB)";
                 else
                     text << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
@@ -3103,7 +3103,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
             if (lastIndex) {
                 text << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", " << tr("bit rate")
-                     << ": ~ " << fixed << setprecision(2)
+                     << ": ~ " << std::fixed << std::setprecision(2)
                      << static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
                      << " MBit/s (Video + Audio)";
             }
@@ -3491,14 +3491,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         delete index;
 
         if (recsize > MEGABYTE(1023))
-            recAdditional << tr("Size") << ": " << fixed << setprecision(2)
+            recAdditional << tr("Size") << ": " << std::fixed << std::setprecision(2)
                           << static_cast<float>(recsize) / MEGABYTE(1024) << " GB";
         else
             recAdditional << tr("Size") << ": " << recsize / MEGABYTE(1) << " MB";
 
         if (hasMarks) {
             if (recsize > MEGABYTE(1023))
-                recAdditional << " (" << tr("cutted") << ": " << fixed << setprecision(2)
+                recAdditional << " (" << tr("cutted") << ": " << std::fixed << std::setprecision(2)
                               << static_cast<float>(recsizecutted) / MEGABYTE(1024) << " GB)";
             else
                 recAdditional << " (" << tr("cutted") << ": " << recsizecutted / MEGABYTE(1) << " MB)";
@@ -3509,7 +3509,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         if (lastIndex) {
             recAdditional << tr("format") << ": " << (Recording->IsPesRecording() ? "PES" : "TS") << ", "
-                          << tr("bit rate") << ": ~ " << fixed << setprecision(2)
+                          << tr("bit rate") << ": ~ " << std::fixed << std::setprecision(2)
                           << static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)
                           << " MBit/s (Video + Audio)";
         }
@@ -4276,7 +4276,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 // Returns the string between start and end or an empty string if not found
-string cFlatDisplayMenu::xml_substring(string source, const char *str_start, const char *str_end) {
+std::string cFlatDisplayMenu::xml_substring(std::string source, const char *str_start, const char *str_end) {
     size_t start = source.find(str_start);
     size_t end = source.find(str_end);
 
@@ -4284,7 +4284,7 @@ string cFlatDisplayMenu::xml_substring(string source, const char *str_start, con
         return (source.substr(start + strlen(str_start), end - start - strlen(str_start)));
     }
 
-    return string();
+    return std::string();
 }
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool isFolder) {
