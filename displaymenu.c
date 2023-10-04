@@ -2828,7 +2828,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                         std::string name = actors_name[actor];
-                        std::stringstream sstrRole("");
+                        std::ostringstream sstrRole("");
                         if (actors_role[actor].length() > 0)
                             sstrRole << "\"" << actors_role[actor] << "\"";
                         std::string role = sstrRole.str();
@@ -3890,7 +3890,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                         std::string name = actors_name[actor];
-                        std::stringstream sstrRole("");
+                        std::ostringstream sstrRole("");
                         sstrRole << "\"" << actors_role[actor] << "\"";
                         std::string role = sstrRole.str();
                         ComplexContent.AddText(name.c_str(), false,
@@ -4681,7 +4681,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             continue;
 
         ++actualNumDevices;
-        std::stringstream strDevice("");
+        std::ostringstream strDevice("");
 
         cString channelName("");
 
@@ -4854,7 +4854,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (timerRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                std::stringstream strTimer("");
+                std::ostringstream strTimer("");
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
@@ -4886,7 +4886,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (timerActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                std::stringstream strTimer("");
+                std::ostringstream strTimer("");
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
@@ -4917,7 +4917,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (timerRemoteRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                std::stringstream strTimer("");
+                std::ostringstream strTimer("");
                 strTimer << "R" << remotecount + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
@@ -4945,7 +4945,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (timerRemoteActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                std::stringstream strTimer("");
+                std::ostringstream strTimer("");
                 strTimer << "R" << remotecount + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
@@ -5009,7 +5009,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         Recs.pop_back();
         std::string Rec = pairRec.second;
 
-        std::stringstream strRec("");
+        std::ostringstream strRec("");
         strRec << Rec;
 
         contentWidget.AddText(

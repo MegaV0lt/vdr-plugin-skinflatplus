@@ -2,6 +2,8 @@
     "files.associations": {
         "iosfwd": "c",
         "chrono": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "sstream": "c",
+        "string": "c"
     }
 }
