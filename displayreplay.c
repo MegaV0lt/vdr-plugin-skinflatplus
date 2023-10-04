@@ -352,7 +352,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int rc = 0;
 
         do {
-            i += 1;
+            ++i;
             if (recording->IsPesRecording())
                 filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), i);
             else
