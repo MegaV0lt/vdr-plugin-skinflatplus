@@ -226,10 +226,13 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     cVideoDiskUsage::HasChanged(VideoDiskUsageState);
     int DiskUsagePercent = cVideoDiskUsage::UsedPercent();  // Used %
     double DiskFreePercent = (100 - DiskUsagePercent);      // Free %
-    double FreeGB = cVideoDiskUsage::FreeMB() / 1024.0;
-    double AllGB = FreeGB / DiskFreePercent / 100.0;
+    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
+    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
+    // The constant is calculated during compilation.).
+    double FreeGB = cVideoDiskUsage::FreeMB() * (1.0 / 1024.0);
+    double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
-    double AllMinutes = FreeMinutes / DiskFreePercent / 100.0;
+    double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
     int ChartDiskUsage = DiskUsagePercent;
     cString iconName("");
 
@@ -242,7 +245,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB / 1024.0, FreeMinutes / 60, FreeMinutes % 60);
+                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60, FreeMinutes % 60);
             }
         } else {  // Short format
             extra1 = cString::sprintf("%d%% %s", ChartDiskUsage, tr("free"));
@@ -323,7 +326,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
                 extra2 =
                     cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60,
+                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
@@ -1032,7 +1035,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             if (isSignal) {
-                double perc = 100.0 / Total * Current / 100.0;
+                double perc = 100.0 / Total * Current * (1.0 / 100.0);
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * percentLeft) - out * 2, big - out * 2),
@@ -1681,13 +1684,13 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
         Height *= -1;
         for (int i = Height, j = 0; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
         for (int i = 0; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     }
@@ -1699,13 +1702,13 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
         Width *= -1;
         for (int i = Width, j = 0; i >= 0; --i, ++j) {
             Alpha = 255.0 / Width * j;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } else {
         for (int i = 0; i < Width; ++i) {
             Alpha = 255.0 / Width * i;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     }
@@ -1715,7 +1718,7 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
     }
 }
@@ -1724,7 +1727,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
     }
 }
@@ -1733,7 +1736,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
     }
 }
@@ -1742,7 +1745,7 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
     }
 }
@@ -1754,7 +1757,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
     }
 }
@@ -1766,7 +1769,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
     }
 }
@@ -1778,7 +1781,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
     }
 }
@@ -1790,7 +1793,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);
     }
 }
@@ -1828,8 +1831,8 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 void cFlatBaseRender::DrawWidgetWeather(void) {
     int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
-    cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2.0);
-    cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs / 2.5);
+    cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0/ 2.0));
+    cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
 
     std::string tempToday(""), tempTodaySign("");
     std::string iconToday(""), iconTomorrow("");

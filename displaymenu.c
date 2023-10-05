@@ -470,7 +470,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconRec->Height()) / 2), *iconRec);
                     break;
                 case '>':
-                    if (iconTimerFull)
+                    if (iconTimerFull) [[likely]]
                         menuIconsPixmap->DrawImage(cPoint(xOff, y + (lh - iconTimerFull->Height()) / 2),
                                                    *iconTimerFull);
                     break;
@@ -5585,7 +5585,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + fontHeight + 6 + fontSmlHeight > menuPixmap->ViewPort().Height())
         return -1;
 
-    cFont *fontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize / 2.0);
+    cFont *fontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
 
     std::string Location("");
     cString locationFilename = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
