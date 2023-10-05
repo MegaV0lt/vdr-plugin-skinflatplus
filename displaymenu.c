@@ -2885,7 +2885,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     ComplexContent.Draw();
 
-    // Event: Shorten too long shorttext
     PixmapFill(contentHeadPixmap, clrTransparent);
     contentHeadPixmap->DrawRectangle(cRect(0, 0, menuWidth, fontHeight + fontSmlHeight * 2 + marginItem * 2),
                                      Theme.Color(clrScrollbarBg));
@@ -3981,9 +3980,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         maxWidth -= fontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    // if (shortTextWidth > maxWidth)
-    //    maxWidth -= fontSml->Width("...");
-
     contentHeadPixmap->DrawText(cPoint(left, marginItem), timeString, Theme.Color(clrMenuRecFontInfo),
                                 Theme.Color(clrMenuRecBg), fontSml, menuWidth - marginItem * 2);
     contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight), title, Theme.Color(clrMenuRecFontTitle),
@@ -4745,7 +4741,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                 strDevice << tr("not used");
             }
         }
-        // channelName = strDevice.str().c_str();
+
         auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
         channelName = x.c_str();
 
