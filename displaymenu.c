@@ -2902,21 +2902,35 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     int maxWidth = menuWidth - marginItem - (menuWidth - headIconLeft);  // headIconLeft includes right margin
     int left = marginItem;
 
-    if (shortTextWidth > maxWidth)
-        maxWidth -= fontSml->Width("...");
-
     contentHeadPixmap->DrawText(cPoint(left, marginItem), timeString, Theme.Color(clrMenuEventFontInfo),
                                 Theme.Color(clrMenuEventBg), fontSml, menuWidth - marginItem * 2);
     contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight), title, Theme.Color(clrMenuEventFontTitle),
                                 Theme.Color(clrMenuEventBg), font, menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml, maxWidth);
-
-    if (shortTextWidth > maxWidth) {  // Add ... if info ist too long
-        dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
-        contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
-                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
-                                    fontSml->Width("..."));
+    // contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+    //                            Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml, maxWidth);
+    // Add scroller to long shorttext
+    if (shortTextWidth > maxWidth) {  // Shorttext too long
+        if (Config.ScrollerEnable) {
+            menuItemScroller.AddScroller(
+                shortText,
+                cRect(chLeft + left, chTop + marginItem + fontSmlHeight + fontHeight, maxWidth, fontSmlHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
+        } else {  // Add ... if info ist too long
+            dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
+            int dotsWidth = fontSml->Width("...");
+            maxWidth -= dotsWidth;
+            contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+                                        Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
+                                        maxWidth);
+            contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
+                                        Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
+                                        dotsWidth);
+            // left += maxWidth + dotsWidth;
+        }
+    } else {  // Shorttext fits into maxwidth
+        contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml, maxWidth);
+        // left += shortTextWidth;
     }
 
     DecorBorderDraw(chLeft, chTop, chWidth, chHeight, Config.decorBorderMenuContentHeadSize,
@@ -3967,24 +3981,38 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         maxWidth -= fontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    if (shortTextWidth > maxWidth)
-        maxWidth -= fontSml->Width("...");
+    // if (shortTextWidth > maxWidth)
+    //    maxWidth -= fontSml->Width("...");
 
     contentHeadPixmap->DrawText(cPoint(left, marginItem), timeString, Theme.Color(clrMenuRecFontInfo),
                                 Theme.Color(clrMenuRecBg), fontSml, menuWidth - marginItem * 2);
     contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight), title, Theme.Color(clrMenuRecFontTitle),
                                 Theme.Color(clrMenuRecBg), font, menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
-                                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, maxWidth);
-
-    if (shortTextWidth > maxWidth) {  // Add ... if info ist too long
-        dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
-        contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
-                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
-                                    fontSml->Width("..."));
-        left += maxWidth + fontSml->Width("...");
-    } else
+    // contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+    //                            Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, maxWidth);
+    // Add scroller to long shorttext
+    if (shortTextWidth > maxWidth) {  // Shorttext too long
+        if (Config.ScrollerEnable) {
+            menuItemScroller.AddScroller(
+                shortText,
+                cRect(chLeft + left, chTop + marginItem + fontSmlHeight + fontHeight, maxWidth, fontSmlHeight),
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml);
+            left += maxWidth;
+        } else {  // Add ... if info ist too long
+            dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
+            int dotsWidth = fontSml->Width("...");
+            maxWidth -= dotsWidth;
+            contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, maxWidth);
+            contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
+                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, dotsWidth);
+            left += maxWidth + dotsWidth;
+        }
+    } else {  // Shorttext fits into maxwidth
+        contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), shortText,
+                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, maxWidth);
         left += shortTextWidth;
+    }
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option
