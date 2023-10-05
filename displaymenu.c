@@ -406,8 +406,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg, ColorExtraTextFg;
-    ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
+    tColor ColorFg, ColorBg;
+    tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
@@ -1196,8 +1196,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg, ColorExtraTextFg;
-    ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
+    tColor ColorFg, ColorBg;
+    tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
@@ -1494,8 +1494,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg, ColorExtraTextFg;
-    ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
+    tColor ColorFg, ColorBg;
+    tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
@@ -1963,8 +1963,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg, ColorExtraTextFg;
-    ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
+    tColor ColorFg, ColorBg;
+    tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
