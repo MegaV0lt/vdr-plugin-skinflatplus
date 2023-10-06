@@ -467,7 +467,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int timeWidth = topBarFontClock->Width(*time2) + marginItem * 2;
         int Right = TopBarWidth - timeWidth;
-        topBarPixmap->DrawText(cPoint(Right, fontClockTop), time2, Theme.Color(clrTopBarTimeFont),
+        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *time2, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), topBarFontClock);
 
         cString weekday = WeekDayNameFull(t);
@@ -477,9 +477,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int dateWidth = topBarFontSml->Width(*date);
 
         Right = TopBarWidth - timeWidth - std::max(weekdayWidth, dateWidth) - marginItem;
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), weekday, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), date, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
 
         int middleWidth = 0;

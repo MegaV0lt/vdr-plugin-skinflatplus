@@ -117,7 +117,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
-    labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
+    labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
                           maxWidth);
 
     if (infoWidth > maxWidth) {  // Add ... if info ist too long
@@ -306,7 +306,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     int topSecs = fontAscender - fontSecsAscender;
 
     if (Config.TimeSecsScale == 1.0)
-        labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+        labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               font, font->Width(current), fontHeight);
     else {
         std::string cur = *current;
@@ -322,7 +322,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs,
                                   fontSecs->Width(secs.c_str()), fontSecs->Height());
         } else {
-            labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+            labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   font, font->Width(current), fontHeight);
         }
     }
@@ -524,11 +524,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), fontSecs,
                                       fontSecs->Width(secs.c_str()), fontSecs->Height());
             } else {
-                labelPixmap->DrawText(cPoint(right - marginItem, 0), cutted, Theme.Color(clrMenuItemExtraTextFont),
+                labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
             }
         } else {
-            labelPixmap->DrawText(cPoint(right - marginItem, 0), cutted, Theme.Color(clrMenuItemExtraTextFont),
+            labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                   Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
         }
     } else {
@@ -548,11 +548,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs,
                                       fontSecs->Width(secs.c_str()), fontSecs->Height());
             } else {
-                labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
+                labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
             }
         } else {
-            labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
+            labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
         }
     }

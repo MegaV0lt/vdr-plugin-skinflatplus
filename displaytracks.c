@@ -49,7 +49,7 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 }
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
-    int y = (Index+1) * itemHeight;
+    int y = (Index + 1) * itemHeight;
     tColor ColorFg, ColorBg;
     if (Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
