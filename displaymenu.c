@@ -2289,7 +2289,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 buffer = cString::sprintf("  (%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
                 menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorExtraTextFg, ColorBg, fontSml);
                 if (isRecordingOld(Recording, Level)) {
-                    Left += fontSml->Width(buffer);
+                    Left += fontSml->Width(*buffer);
                     if (Current)
                         img = imgLoader.LoadIcon("recording_old_cur", fontSmlHeight, fontSmlHeight);
                     else
@@ -2896,7 +2896,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString title = Event->Title();
     cString shortText = Event->ShortText();
-    int shortTextWidth = fontSml->Width(shortText);  // Width of shorttext
+    int shortTextWidth = fontSml->Width(*shortText);  // Width of shorttext
     int maxWidth = menuWidth - marginItem - (menuWidth - headIconLeft);  // headIconLeft includes right margin
     int left = marginItem;
 
@@ -3970,7 +3970,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         title = Recording->Name();
 
     cString shortText = recInfo->ShortText();
-    int shortTextWidth = fontSml->Width(shortText);  // Width of shorttext
+    int shortTextWidth = fontSml->Width(*shortText);  // Width of shorttext
     int maxWidth = menuWidth - marginItem - (menuWidth - headIconLeft);  // headIconLeft includes right margin
     int left = marginItem;
 

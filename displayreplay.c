@@ -103,7 +103,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     else
         info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
 
-    int infoWidth = fontSml->Width(info);  // Width of shorttext
+    int infoWidth = fontSml->Width(*info);  // Width of shorttext
     // TODO: Handle very long shorttext. How to get width of aspect and format icons?
     //  Substract 'left' in case of displayed recording icon
     //  Substract 'fontSmlHeight' in case of recordingerror icon is displayed later
@@ -307,7 +307,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (Config.TimeSecsScale == 1.0)
         labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                              font, font->Width(current), fontHeight);
+                              font, font->Width(*current), fontHeight);
     else {
         std::string cur = *current;
         size_t found = cur.find_last_of(':');
@@ -323,7 +323,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   fontSecs->Width(secs.c_str()), fontSecs->Height());
         } else {
             labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                                  font, font->Width(current), fontHeight);
+                                  font, font->Width(*current), fontHeight);
         }
     }
 
