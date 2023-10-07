@@ -3280,7 +3280,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
     cString recPath = cString::sprintf("%s", Recording->FileName());
     cString recImage("");
-    if (imgLoader.SearchRecordingPoster(recPath, recImage)) {
+    if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
         mediaWidth = cWidth / 2 - marginItem * 3;
         mediaHeight = 999;
         mediaType = 2;
@@ -3805,7 +3805,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         cString recPath = cString::sprintf("%s", Recording->FileName());
         cString recImage("");
-        if (imgLoader.SearchRecordingPoster(recPath, recImage)) {
+        if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
             mediaWidth = cWidth / 2 - marginItem * 2;
             mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
             mediaPath = recImage;
