@@ -163,10 +163,10 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
         cRect ImagePos {
-            SetLeft(textPos.Left() + TextWidthLeft + 5);
-            SetTop(textPos.Top());
-            SetWidth(image->Width());
-            SetHeight(image->Height());
+            SetLeft(textPos.Left() + TextWidthLeft + 5),
+            SetTop(textPos.Top()),
+            SetWidth(image->Width()),
+            SetHeight(image->Height())
         }
         AddImage(image, ImagePos);
     } else {
@@ -197,7 +197,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         }
 
         cRect SecondTextPos {
-            SetLeft(textPos.Left());
+            SetLeft(textPos.Left()),
             SetTop(textPos.Top() + FloatLines * ScrollSize),
             SetWidth(textPos.Width()),
             SetHeight(textPos.Height())
