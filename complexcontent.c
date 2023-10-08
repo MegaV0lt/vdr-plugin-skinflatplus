@@ -51,10 +51,11 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
         PixmapImage = NULL;
     }
 
-    cRect PositionDraw;
-    PositionDraw.SetLeft(0);
-    PositionDraw.SetTop(0);
-    PositionDraw.SetWidth(Position.Width());
+    cRect PositionDraw {
+        SetLeft(0),
+        SetTop(0),
+        SetWidth(Position.Width())
+    }
     if (FullFillBackground && DrawPortHeight < Position.Height())
         PositionDraw.SetHeight(Position.Height());
     else
@@ -147,20 +148,26 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     int Lines = WrapperFloat.Lines();
 
     if (Lines < FloatLines) {
-        cRect FloatedTextPos;
+        /* cRect FloatedTextPos;
         FloatedTextPos.SetLeft(textPos.Left());
         FloatedTextPos.SetTop(textPos.Top());
         FloatedTextPos.SetWidth(TextWidthLeft);
         FloatedTextPos.SetHeight(textPos.Height());
-
+        */
+        cRect FloatedTextPos {
+            SetLeft(textPos.Left()),
+            SetTop(textPos.Top()),
+            SetWidth(TextWidthLeft),
+            SetHeight(textPos.Height())
+        }
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
-
+        cRect ImagePos {
+            SetLeft(textPos.Left() + TextWidthLeft + 5);
+            SetTop(textPos.Top());
+            SetWidth(image->Width());
+            SetHeight(image->Height());
+        }
         AddImage(image, ImagePos);
     } else {
         int NumChars = 0;
@@ -182,26 +189,29 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         memset(SecondText, '\0', strlen(text) - NumChars + 2);
         strncpy(SecondText, text + NumChars, strlen(text) - NumChars);
 
-        cRect FloatedTextPos;
-        FloatedTextPos.SetLeft(textPos.Left());
-        FloatedTextPos.SetTop(textPos.Top());
-        FloatedTextPos.SetWidth(TextWidthLeft);
-        FloatedTextPos.SetHeight(textPos.Height());
+        cRect FloatedTextPos {
+            SetLeft(textPos.Left()),
+            SetTop(textPos.Top()),
+            SetWidth(TextWidthLeft),
+            SetHeight(textPos.Height())
+        }
 
-        cRect SecondTextPos;
-        SecondTextPos.SetLeft(textPos.Left());
-        SecondTextPos.SetTop(textPos.Top() + FloatLines * ScrollSize);
-        SecondTextPos.SetWidth(textPos.Width());
-        SecondTextPos.SetHeight(textPos.Height());
+        cRect SecondTextPos {
+            SetLeft(textPos.Left());
+            SetTop(textPos.Top() + FloatLines * ScrollSize),
+            SetWidth(textPos.Width()),
+            SetHeight(textPos.Height())
+        }
 
         AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
         AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
+        cRect ImagePos {
+            SetLeft(textPos.Left() + TextWidthLeft + 5),
+            SetTop(textPos.Top()),
+            SetWidth(image->Width()),
+            SetHeight(image->Height())
+        }
 
         AddImage(image, ImagePos);
 
