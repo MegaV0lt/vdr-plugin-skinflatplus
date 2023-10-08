@@ -2032,7 +2032,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
 
-            Left += font->Width(buffer);
+            Left += font->Width(*buffer);
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             int recordingIsInUse = Recording->IsInUse();
@@ -2133,7 +2133,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 }
             }
 
-            if (Current && font->Width(RecName) > (menuItemWidth - LeftWidth - marginItem) && Config.ScrollerEnable) {
+            if (Current && font->Width(*RecName) > (menuItemWidth - LeftWidth - marginItem) && Config.ScrollerEnable) {
                 menuItemScroller.AddScroller(
                     *RecName, cRect(LeftWidth, Top + menuTop, menuItemWidth - LeftWidth - marginItem, fontHeight),
                     ColorFg, clrTransparent, font);
@@ -2141,7 +2141,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 menuPixmap->DrawText(cPoint(LeftWidth, Top), *RecName, ColorFg, ColorBg, font,
                                      menuItemWidth - LeftWidth - marginItem);
             }
-            LeftWidth += font->Width(RecName) + marginItem * 2;
+            LeftWidth += font->Width(*RecName) + marginItem * 2;
         } else if (Total == -1) {
             if (Current)
                 img = imgLoader.LoadIcon("folder_cur", fontHeight, fontHeight);
@@ -2177,7 +2177,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (isScrolling)
                 ImagesWidth -= scrollBarWidth;
 
-            if (Current && font->Width(RecName) > (menuItemWidth - Left - marginItem - ImagesWidth) &&
+            if (Current && font->Width(*RecName) > (menuItemWidth - Left - marginItem - ImagesWidth) &&
                 Config.ScrollerEnable) {
                 menuItemScroller.AddScroller(
                     *RecName, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem - ImagesWidth, fontHeight),
@@ -2261,7 +2261,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += img->Width() + marginItem;
             }
 
-            if (Current && font->Width(RecName) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+            if (Current && font->Width(*RecName) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                 menuItemScroller.AddScroller(*RecName,
                                              cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                                              ColorFg, clrTransparent, font);
@@ -2395,12 +2395,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString title = Event->Title();
     cString shortText = Event->ShortText();
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem), timeString, Theme.Color(clrMenuEventFontInfo),
+    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem), *timeString, Theme.Color(clrMenuEventFontInfo),
                                 Theme.Color(clrMenuEventBg), fontSml, menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight), title,
+    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight), *title,
                                 Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), font,
                                 menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight + fontHeight), shortText,
+    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight + fontHeight), *shortText,
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                 menuWidth - marginItem * 2);
 

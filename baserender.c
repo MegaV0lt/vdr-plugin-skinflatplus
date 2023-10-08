@@ -841,7 +841,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         col = Theme.Color(clrMessageStatus);
         icon = "message_status";
         break;
-    case mtInfo:
+    case mtInfo: [[likely]]
         col = Theme.Color(clrMessageInfo);
         icon = "message_info";
         break;
