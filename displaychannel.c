@@ -432,7 +432,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (mediaPath.length() > 0) {
         if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
-            if (Config.ChannelWeaterShow) {
+            if (Config.ChannelWeatherShow) {
                 mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
                 mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
             } else {
