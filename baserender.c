@@ -226,15 +226,17 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     cVideoDiskUsage::HasChanged(VideoDiskUsageState);
     int DiskUsagePercent = cVideoDiskUsage::UsedPercent();  // Used %
     double DiskFreePercent = (100 - DiskUsagePercent);      // Free %
-    double FreeGB = cVideoDiskUsage::FreeMB() / 1024.0;
-    double AllGB = FreeGB / DiskFreePercent / 100.0;
+    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
+    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
+    // The constant is calculated during compilation.).
+    double FreeGB = cVideoDiskUsage::FreeMB() * (1.0 / 1024.0);
+    double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
-    double AllMinutes = FreeMinutes / DiskFreePercent / 100.0;
+    double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
     int ChartDiskUsage = DiskUsagePercent;
     cString iconName("");
 
-    cString extra1("");
-    cString extra2("");
+    cString extra1(""), extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
         ChartDiskUsage = 100 - DiskUsagePercent;  // DiskFreePrecent
@@ -243,7 +245,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB / 1024.0, FreeMinutes / 60, FreeMinutes % 60);
+                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60, FreeMinutes % 60);
             }
         } else {  // Short format
             extra1 = cString::sprintf("%d%% %s", ChartDiskUsage, tr("free"));
@@ -251,101 +253,69 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         }
         switch (ChartDiskUsage) {  // Show free space
         case 0 ... 2:
-            iconName = "chart0b";
-            break;  // < 2% (chart1b in red)
+            iconName = "chart0b"; break;  // < 2% (chart1b in red)
         case 3 ... 4:
-            iconName = "chart1b";
-            break;  // 3,125 (4)
+            iconName = "chart1b"; break;  // 3,125 (4)
         case 5 ... 6:
-            iconName = "chart2b";
-            break;  // 6,25
+            iconName = "chart2b"; break;  // 6,25
         case 7 ... 9:
-            iconName = "chart3b";
-            break;  // 9,375
+            iconName = "chart3b"; break;  // 9,375
         case 10 ... 13:
-            iconName = "chart4b";
-            break;  // 12,5
+            iconName = "chart4b"; break;  // 12,5
         case 14 ... 16:
-            iconName = "chart5b";
-            break;  // 15,625
+            iconName = "chart5b"; break;  // 15,625
         case 17 ... 19:
-            iconName = "chart6b";
-            break;  // 18,75
+            iconName = "chart6b"; break;  // 18,75
         case 20 ... 22:
-            iconName = "chart7b";
-            break;  // 21,875
+            iconName = "chart7b"; break;  // 21,875
         case 23 ... 25:
-            iconName = "chart8b";
-            break;  // 25
+            iconName = "chart8b"; break;  // 25
         case 26 ... 28:
-            iconName = "chart9b";
-            break;  // 28,125
+            iconName = "chart9b"; break;  // 28,125
         case 29 ... 31:
-            iconName = "chart10b";
-            break;  // 31,25
+            iconName = "chart10b"; break;  // 31,25
         case 32 ... 34:
-            iconName = "chart11b";
-            break;  // 34,375
+            iconName = "chart11b"; break;  // 34,375
         case 35 ... 38:
-            iconName = "chart12b";
-            break;  // 37,5
+            iconName = "chart12b"; break;  // 37,5
         case 39 ... 41:
-            iconName = "chart13b";
-            break;  // 40,625
+            iconName = "chart13b"; break;  // 40,625
         case 42 ... 44:
-            iconName = "chart14b";
-            break;  // 43,75
+            iconName = "chart14b"; break;  // 43,75
         case 45 ... 47:
-            iconName = "chart15b";
-            break;  // 46,875
+            iconName = "chart15b"; break;  // 46,875
         case 48 ... 50:
-            iconName = "chart16b";
-            break;  // 50
+            iconName = "chart16b"; break;  // 50
         case 51 ... 53:
-            iconName = "chart17b";
-            break;  // 53,125
+            iconName = "chart17b"; break;  // 53,125
         case 54 ... 56:
-            iconName = "chart18b";
-            break;  // 56,25
+            iconName = "chart18b"; break;  // 56,25
         case 57 ... 59:
-            iconName = "chart19b";
-            break;  // 59,375
+            iconName = "chart19b"; break;  // 59,375
         case 60 ... 63:
-            iconName = "chart20b";
-            break;  // 62,5
+            iconName = "chart20b"; break;  // 62,5
         case 64 ... 66:
-            iconName = "chart21b";
-            break;  // 65,625
+            iconName = "chart21b"; break;  // 65,625
         case 67 ... 69:
-            iconName = "chart22b";
-            break;  // 68,75
+            iconName = "chart22b"; break;  // 68,75
         case 70 ... 72:
-            iconName = "chart23b";
-            break;  // 71,875
+            iconName = "chart23b"; break;  // 71,875
         case 73 ... 75:
-            iconName = "chart24b";
-            break;  // 75
+            iconName = "chart24b"; break;  // 75
         case 76 ... 78:
-            iconName = "chart25b";
-            break;  // 78,125
+            iconName = "chart25b"; break;  // 78,125
         case 79 ... 81:
-            iconName = "chart26b";
-            break;  // 81,25
+            iconName = "chart26b"; break;  // 81,25
         case 82 ... 84:
-            iconName = "chart27b";
-            break;  // 84,375
+            iconName = "chart27b"; break;  // 84,375
         case 85 ... 88:
-            iconName = "chart28b";
-            break;  // 87,5
+            iconName = "chart28b"; break;  // 87,5
         case 89 ... 91:
-            iconName = "chart29b";
-            break;  // 90,625
+            iconName = "chart29b"; break;  // 90,625
         case 92 ... 94:
-            iconName = "chart30b";
-            break;  // 93,75
+            iconName = "chart30b"; break;  // 93,75
         case 95 ... 100:
-            iconName = "chart31b";
-            break;  // 96,875 - 100
+            iconName = "chart31b"; break;  // 96,875 - 100
         }
     } else {  // Show in occupied mode
         double OccupiedGB = AllGB - FreeGB;
@@ -356,7 +326,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
                 extra2 =
                     cString::sprintf("%.1f GB ~ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB / 1024.0, OccupiedMinutes / 60,
+                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
@@ -365,101 +335,69 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         }
         switch (ChartDiskUsage) {  // show used space
         case 0 ... 3:
-            iconName = "chart1";
-            break;  // 3,125
+            iconName = "chart1"; break;  // 3,125
         case 4 ... 6:
-            iconName = "chart2";
-            break;  // 6,25
+            iconName = "chart2"; break;  // 6,25
         case 7 ... 9:
-            iconName = "chart3";
-            break;  // 9,375
+            iconName = "chart3"; break;  // 9,375
         case 10 ... 13:
-            iconName = "chart4";
-            break;  // 12,5
+            iconName = "chart4"; break;  // 12,5
         case 14 ... 16:
-            iconName = "chart5";
-            break;  // 15,625
+            iconName = "chart5"; break;  // 15,625
         case 17 ... 19:
-            iconName = "chart6";
-            break;  // 18,75
+            iconName = "chart6"; break;  // 18,75
         case 20 ... 22:
-            iconName = "chart7";
-            break;  // 21,875
+            iconName = "chart7"; break;  // 21,875
         case 23 ... 25:
-            iconName = "chart8";
-            break;  // 25
+            iconName = "chart8"; break;  // 25
         case 26 ... 28:
-            iconName = "chart9";
-            break;  // 28,125
+            iconName = "chart9"; break;  // 28,125
         case 29 ... 31:
-            iconName = "chart10";
-            break;  // 31,25
+            iconName = "chart10"; break;  // 31,25
         case 32 ... 34:
-            iconName = "chart11";
-            break;  // 34,375
+            iconName = "chart11"; break;  // 34,375
         case 35 ... 38:
-            iconName = "chart12";
-            break;  // 37,5
+            iconName = "chart12"; break;  // 37,5
         case 39 ... 41:
-            iconName = "chart13";
-            break;  // 40,625
+            iconName = "chart13"; break;  // 40,625
         case 42 ... 44:
-            iconName = "chart14";
-            break;  // 43,75
+            iconName = "chart14"; break;  // 43,75
         case 45 ... 47:
-            iconName = "chart15";
-            break;  // 46,875
+            iconName = "chart15"; break;  // 46,875
         case 48 ... 50:
-            iconName = "chart16";
-            break;  // 50
+            iconName = "chart16"; break;  // 50
         case 51 ... 53:
-            iconName = "chart17";
-            break;  // 53,125
+            iconName = "chart17"; break;  // 53,125
         case 54 ... 56:
-            iconName = "chart18";
-            break;  // 56,25
+            iconName = "chart18"; break;  // 56,25
         case 57 ... 59:
-            iconName = "chart19";
-            break;  // 59,375
+            iconName = "chart19"; break;  // 59,375
         case 60 ... 63:
-            iconName = "chart20";
-            break;  // 62,5
+            iconName = "chart20"; break;  // 62,5
         case 64 ... 66:
-            iconName = "chart21";
-            break;  // 65,625
+            iconName = "chart21"; break;  // 65,625
         case 67 ... 69:
-            iconName = "chart22";
-            break;  // 68,75
+            iconName = "chart22"; break;  // 68,75
         case 70 ... 72:
-            iconName = "chart23";
-            break;  // 71,875
+            iconName = "chart23"; break;  // 71,875
         case 73 ... 75:
-            iconName = "chart24";
-            break;  // 75
+            iconName = "chart24"; break;  // 75
         case 76 ... 78:
-            iconName = "chart25";
-            break;  // 78,125
+            iconName = "chart25"; break;  // 78,125
         case 79 ... 81:
-            iconName = "chart26";
-            break;  // 81,25
+            iconName = "chart26"; break;  // 81,25
         case 82 ... 84:
-            iconName = "chart27";
-            break;  // 84,375
+            iconName = "chart27"; break;  // 84,375
         case 85 ... 88:
-            iconName = "chart28";
-            break;  // 87,5
+            iconName = "chart28"; break;  // 87,5
         case 89 ... 91:
-            iconName = "chart29";
-            break;  // 90,625
+            iconName = "chart29"; break;  // 90,625
         case 92 ... 94:
-            iconName = "chart30";
-            break;  // 93,75
+            iconName = "chart30"; break;  // 93,75
         case 95 ... 97:
-            iconName = "chart31";
-            break;  // 96,875
+            iconName = "chart31"; break;  // 96,875
         case 98 ... 100:
-            iconName = "chart32";
-            break;  // > 98% (chart31 in red)
+            iconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
     TopBarSetTitleExtra(extra1, extra2);
@@ -529,7 +467,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int timeWidth = topBarFontClock->Width(*time2) + marginItem * 2;
         int Right = TopBarWidth - timeWidth;
-        topBarPixmap->DrawText(cPoint(Right, fontClockTop), time2, Theme.Color(clrTopBarTimeFont),
+        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *time2, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), topBarFontClock);
 
         cString weekday = WeekDayNameFull(t);
@@ -539,9 +477,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int dateWidth = topBarFontSml->Width(*date);
 
         Right = TopBarWidth - timeWidth - std::max(weekdayWidth, dateWidth) - marginItem;
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), weekday, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), date, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
 
         int middleWidth = 0;
@@ -903,7 +841,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         col = Theme.Color(clrMessageStatus);
         icon = "message_status";
         break;
-    case mtInfo:
+    case mtInfo: [[likely]]
         col = Theme.Color(clrMessageInfo);
         icon = "message_info";
         break;
@@ -1097,7 +1035,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             if (isSignal) {
-                double perc = 100.0 / Total * Current / 100.0;
+                double perc = 100.0 / Total * Current * (1.0 / 100.0);
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * percentLeft) - out * 2, big - out * 2),
@@ -1400,9 +1338,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
     if (!Pixmap)
         return;
 
-    // int scrollHeight = std::max(int((Height) * double(Shown) / Total + 0.5), 5);
     int scrollHeight = std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5);
-    // int scrollTop = std::min(int(Top + (Height) * double(Offset) / Total + 0.5), Top + Height - scrollHeight);
     int scrollTop = std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - scrollHeight);
 
     /* Types
@@ -1748,13 +1684,13 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
         Height *= -1;
         for (int i = Height, j = 0; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
         for (int i = 0; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     }
@@ -1766,13 +1702,13 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
         Width *= -1;
         for (int i = Width, j = 0; i >= 0; --i, ++j) {
             Alpha = 255.0 / Width * j;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } else {
         for (int i = 0; i < Width; ++i) {
             Alpha = 255.0 / Width * i;
-            tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     }
@@ -1782,7 +1718,7 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
     }
 }
@@ -1791,7 +1727,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
     }
 }
@@ -1800,7 +1736,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
     }
 }
@@ -1809,7 +1745,7 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
     double Alpha = 0.0;
     for (int i = 0, j = Width; i < Width; ++i, --j) {
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
     }
 }
@@ -1821,7 +1757,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
     }
 }
@@ -1833,7 +1769,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
     }
 }
@@ -1845,7 +1781,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
     }
 }
@@ -1857,7 +1793,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 / 255.0 * Alpha / 100.0);
+        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);
     }
 }
@@ -1895,8 +1831,8 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 void cFlatBaseRender::DrawWidgetWeather(void) {
     int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
-    cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2.0);
-    cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs / 2.5);
+    cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
+    cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
 
     std::string tempToday(""), tempTodaySign("");
     std::string iconToday(""), iconTomorrow("");
@@ -1997,18 +1933,20 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         std::max(weatherFontSml->Width(tempMaxToday.c_str()), weatherFontSml->Width(tempMinToday.c_str()));
     int widthTempTomorrow =
         std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()), weatherFontSml->Width(tempMinTomorrow.c_str()));
+    int weatherFontHeight = weatherFont->Height();  // Used multiple times
+    int weatherFontSmlHeight = weatherFontSml->Height();
 
     int wTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
     int wWidth = marginItem + weatherFont->Width(tempToday.c_str()) + weatherFontSign->Width(tempTodaySign.c_str()) +
-                 marginItem * 2 + weatherFont->Height() + marginItem + widthTempToday + marginItem +
-                 weatherFont->Height() - marginItem * 2 + weatherFontSml->Width(precToday.c_str()) + marginItem * 4 +
-                 weatherFont->Height() + marginItem + widthTempTomorrow + marginItem + weatherFont->Height() -
+                 marginItem * 2 + weatherFontHeight + marginItem + widthTempToday + marginItem +
+                 weatherFontHeight - marginItem * 2 + weatherFontSml->Width(precToday.c_str()) + marginItem * 4 +
+                 weatherFontHeight + marginItem + widthTempTomorrow + marginItem + weatherFontHeight -
                  marginItem * 2 + weatherFontSml->Width(precTomorrow.c_str()) + marginItem * 2;
     int wLeft = osdWidth - wWidth - 20;
 
     weatherWidget.Clear();
     weatherWidget.SetOsd(osd);
-    weatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, weatherFont->Height()));
+    weatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, weatherFontHeight));
     weatherWidget.SetBGColor(Theme.Color(clrItemCurrentBg));
     weatherWidget.SetScrollingActive(false);
 
@@ -2018,60 +1956,60 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
 
     int fontAscender = GetFontAscender(Setup.FontOsd, fs);
     int fontAscender2 = GetFontAscender(Setup.FontOsd, fs / 2.5);
-    int t = (weatherFont->Height() - fontAscender) - (weatherFontSign->Height() - fontAscender2);
+    int t = (weatherFontHeight - fontAscender) - (weatherFontSign->Height() - fontAscender2);
 
     weatherWidget.AddText(tempTodaySign.c_str(), false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), weatherFontSign);
     left += weatherFontSign->Width(tempTodaySign.c_str()) + marginItem * 2;
 
     cString weatherIcon = cString::sprintf("widgets/%s", iconToday.c_str());
-    cImage *img = imgLoader.LoadIcon(*weatherIcon, weatherFont->Height(), weatherFont->Height() - marginItem * 2);
+    cImage *img = imgLoader.LoadIcon(*weatherIcon, weatherFontHeight, weatherFontHeight - marginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFont->Height(), weatherFont->Height()));
-        left += weatherFont->Height() + marginItem;
+        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
+        left += weatherFontHeight + marginItem;
     }
     weatherWidget.AddText(tempMaxToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), weatherFontSml, widthTempToday, weatherFontSml->Height(),
+                          Theme.Color(clrItemCurrentBg), weatherFontSml, widthTempToday, weatherFontSmlHeight,
                           taRight);
-    weatherWidget.AddText(tempMinToday.c_str(), false, cRect(left, 0 + weatherFontSml->Height(), 0, 0),
+    weatherWidget.AddText(tempMinToday.c_str(), false, cRect(left, 0 + weatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), weatherFontSml, widthTempToday,
-                          weatherFontSml->Height(), taRight);
+                          weatherFontSmlHeight, taRight);
     left += widthTempToday + marginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", weatherFont->Height(), weatherFont->Height() - marginItem * 2);
+    img = imgLoader.LoadIcon("widgets/umbrella", weatherFontHeight, weatherFontHeight - marginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFont->Height(), weatherFont->Height()));
-        left += weatherFont->Height() - marginItem * 2;
+        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
+        left += weatherFontHeight - marginItem * 2;
     }
     weatherWidget.AddText(precToday.c_str(), false,
-                          cRect(left, 0 + (weatherFont->Height() / 2 - weatherFontSml->Height() / 2), 0, 0),
+                          cRect(left, 0 + (weatherFontHeight / 2 - weatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), weatherFontSml);
     left += weatherFontSml->Width(precToday.c_str()) + marginItem * 4;
 
-    weatherWidget.AddRect(cRect(left - marginItem * 2, 0, wWidth - left + marginItem * 2, weatherFont->Height()),
+    weatherWidget.AddRect(cRect(left - marginItem * 2, 0, wWidth - left + marginItem * 2, weatherFontHeight),
                           Theme.Color(clrChannelBg));
 
     weatherIcon = cString::sprintf("widgets/%s", iconTomorrow.c_str());
-    img = imgLoader.LoadIcon(*weatherIcon, weatherFont->Height(), weatherFont->Height() - marginItem * 2);
+    img = imgLoader.LoadIcon(*weatherIcon, weatherFontHeight, weatherFontHeight - marginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFont->Height(), weatherFont->Height()));
-        left += weatherFont->Height() + marginItem;
+        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
+        left += weatherFontHeight + marginItem;
     }
     weatherWidget.AddText(tempMaxTomorrow.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), weatherFontSml, widthTempTomorrow, weatherFontSml->Height(),
+                          Theme.Color(clrChannelBg), weatherFontSml, widthTempTomorrow, weatherFontSmlHeight,
                           taRight);
-    weatherWidget.AddText(tempMinTomorrow.c_str(), false, cRect(left, 0 + weatherFontSml->Height(), 0, 0),
+    weatherWidget.AddText(tempMinTomorrow.c_str(), false, cRect(left, 0 + weatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), weatherFontSml, widthTempTomorrow,
-                          weatherFontSml->Height(), taRight);
+                          weatherFontSmlHeight, taRight);
     left += widthTempTomorrow + marginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", weatherFont->Height(), weatherFont->Height() - marginItem * 2);
+    img = imgLoader.LoadIcon("widgets/umbrella", weatherFontHeight, weatherFontHeight - marginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFont->Height(), weatherFont->Height()));
-        left += weatherFont->Height() - marginItem * 2;
+        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
+        left += weatherFontHeight - marginItem * 2;
     }
     weatherWidget.AddText(precTomorrow.c_str(), false,
-                          cRect(left, 0 + (weatherFont->Height() / 2 - weatherFontSml->Height() / 2), 0, 0),
+                          cRect(left, 0 + (weatherFontHeight / 2 - weatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), weatherFontSml);
     left += weatherFontSml->Width(precTomorrow.c_str());
 

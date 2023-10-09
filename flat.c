@@ -176,7 +176,7 @@ cString GetFormatIcon(int screenWidth) {
     cString iconName("sd");  // 720 and below is considered sd
     if (screenWidth > 1920)
         iconName = "uhd";
-    else if (screenWidth > 720)
+    else if (screenWidth > 720) [[likely]]
         iconName = "hd";
 
     return iconName;

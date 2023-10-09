@@ -159,7 +159,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     cString channelString = cString::sprintf("%s  %s", *channelNumber, *channelName);
 
     PixmapFill(chanInfoTopPixmap, Theme.Color(clrChannelBg));
-    chanInfoTopPixmap->DrawText(cPoint(50, 0), channelString, Theme.Color(clrChannelFontTitle),
+    chanInfoTopPixmap->DrawText(cPoint(50, 0), *channelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), font);
 
     PixmapFill(chanLogoPixmap, clrTransparent);
@@ -268,9 +268,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int left = heightBottom * 1.34 + marginItem;
     int StartTimeLeft = left;
 
-    if (Config.ChannelShowStartTime) {
+    if (Config.ChannelShowStartTime)
         left += font->Width("00:00  ");
-    }
 
     if (Present) {
         cString startTime = Present->GetTimeString();
@@ -431,6 +430,17 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (mediaPath.length() > 0) {
+        if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
+            dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
+            if (Config.ChannelWeatherShow) {
+                mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
+                mediaWidth = TVSWidth * 0.5;    // Aspect is preserved in LoadFile()
+            } else {
+                mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
+                mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
+            }
+            dsyslog("flatPlus: Poster/Banner resized to %d x %d", mediaWidth, mediaHeight);
+        }
         cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
         if (img) {
             chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
@@ -548,7 +558,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     cFont *dvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + marginItem);
 
     cString dvbapiInfoText = cString::sprintf("DVBAPI: ");
-    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont),
+    chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
                                    dvbapiInfoFont->Width(dvbapiInfoText) * 2);
     left += dvbapiInfoFont->Width(dvbapiInfoText) + marginItem;
@@ -570,7 +580,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     }
 
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
-    chanInfoBottomPixmap->DrawText(cPoint(left, top), dvbapiInfoText, Theme.Color(clrChannelSignalFont),
+    chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
                                    dvbapiInfoFont->Width(dvbapiInfoText) * 2);
 }

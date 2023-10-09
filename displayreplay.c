@@ -17,10 +17,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 
     screenWidth = lastScreenWidth = -1;
 
-    int TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    int TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
+    /* int */ TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    /* int */ TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    /* int */ TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    /* int */ TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
@@ -103,7 +103,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     else
         info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
 
-    int infoWidth = fontSml->Width(info);  // Width of shorttext
+    int infoWidth = fontSml->Width(*info);  // Width of shorttext
     // TODO: Handle very long shorttext. How to get width of aspect and format icons?
     //  Substract 'left' in case of displayed recording icon
     //  Substract 'fontSmlHeight' in case of recordingerror icon is displayed later
@@ -117,16 +117,29 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
-    labelPixmap->DrawText(cPoint(left, fontHeight), info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
-                          maxWidth);
 
-    if (infoWidth > maxWidth) {  // Add ... if info ist too long
-        dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
-        labelPixmap->DrawText(cPoint(left + maxWidth, fontHeight), "...", Theme.Color(clrReplayFont),
-                              Theme.Color(clrReplayBg), fontSml, fontSml->Width("..."));
-        left += maxWidth + fontSml->Width("...");
-    } else
+    if (infoWidth > maxWidth) {  // Shorttext too long
+        if (Config.ScrollerEnable) {
+            messageScroller.AddScroller(*info,
+                                        cRect(Config.decorBorderReplaySize + left,
+                                              osdHeight - labelHeight - Config.decorBorderReplaySize + fontHeight,
+                                              maxWidth, fontSmlHeight),
+                                        Theme.Color(clrMenuEventFontInfo), clrTransparent, fontSml);
+            left += maxWidth;
+        } else {  // Add ... if info ist too long
+            dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
+            int dotsWidth = fontSml->Width("...");
+            labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  fontSml, maxWidth - dotsWidth);
+            labelPixmap->DrawText(cPoint(left, fontHeight), "...", Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  fontSml, dotsWidth);
+            left += maxWidth + dotsWidth;
+        }
+    } else {  // Shorttext fits into maxwidth
+        labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                              fontSml, infoWidth);
         left += infoWidth;
+    }
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
@@ -306,8 +319,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     int topSecs = fontAscender - fontSecsAscender;
 
     if (Config.TimeSecsScale == 1.0)
-        labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                              font, font->Width(current), fontHeight);
+        labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                              font, font->Width(*current), fontHeight);
     else {
         std::string cur = *current;
         size_t found = cur.find_last_of(':');
@@ -322,8 +335,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs,
                                   fontSecs->Width(secs.c_str()), fontSecs->Height());
         } else {
-            labelPixmap->DrawText(cPoint(marginItem, 0), current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                                  font, font->Width(current), fontHeight);
+            labelPixmap->DrawText(cPoint(marginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  font, font->Width(*current), fontHeight);
         }
     }
 
@@ -352,7 +365,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int rc = 0;
 
         do {
-            i += 1;
+            ++i;
             if (recording->IsPesRecording())
                 filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), i);
             else
@@ -444,6 +457,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         PixmapFill(chanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (mediaPath.length() > 0) {
+            if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
+                dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
+                if (Config.PlaybackWeatherShow) {
+                    mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
+                    mediaWidth = TVSWidth * 0.5;    // Aspect is preserved in LoadFile()
+                } else {
+                    mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
+                    mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
+                }
+                dsyslog("flatPlus: Poster/Banner resized to %d x %d", mediaWidth, mediaHeight);
+            }
             cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
             if (img) {
                 chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
@@ -524,11 +548,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), fontSecs,
                                       fontSecs->Width(secs.c_str()), fontSecs->Height());
             } else {
-                labelPixmap->DrawText(cPoint(right - marginItem, 0), cutted, Theme.Color(clrMenuItemExtraTextFont),
+                labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
             }
         } else {
-            labelPixmap->DrawText(cPoint(right - marginItem, 0), cutted, Theme.Color(clrMenuItemExtraTextFont),
+            labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                   Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
         }
     } else {
@@ -548,11 +572,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs,
                                       fontSecs->Width(secs.c_str()), fontSecs->Height());
             } else {
-                labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
+                labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
             }
         } else {
-            labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
+            labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
         }
     }

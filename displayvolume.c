@@ -34,7 +34,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
     cString maxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
-    int maxlabelWidth = font->Width(maxLabel) + marginItem;
+    int maxlabelWidth = font->Width(*maxLabel) + marginItem;
     int left = osdWidth / 2 - maxlabelWidth / 2;
 
     int DecorTop = osdHeight - 50 - Config.decorProgressVolumeSize - labelHeight - Config.decorBorderVolumeSize * 2;
