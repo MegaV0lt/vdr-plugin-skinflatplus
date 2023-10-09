@@ -17,10 +17,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 
     screenWidth = lastScreenWidth = -1;
 
-    int TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    int TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    int TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    int TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
+    /* int */ TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    /* int */ TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    /* int */ TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    /* int */ TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
@@ -460,11 +460,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
                 dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
                 if (Config.PlaybackWeatherShow) {
-                    mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
-                    mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
-                } else {
                     mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
                     mediaWidth = TVSWidth * 0.5;    // Aspect is preserved in LoadFile()
+                } else {
+                    mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
+                    mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
                 }
                 dsyslog("flatPlus: Poster/Banner resized to %d x %d", mediaWidth, mediaHeight);
             }
