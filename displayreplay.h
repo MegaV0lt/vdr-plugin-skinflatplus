@@ -21,6 +21,9 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         int screenHeight;
         double screenAspect;
 
+        // TVScraper
+        int TVSLeft, TVSTop, TVSWidth, TVSHeight;
+
         // dimm on pause
         bool dimmActive;
         time_t dimmStartTime;
