@@ -1,6 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
 2023-10-02: Version 0.7.3
+- [add] Add scroller to replay status, recording info and event info
+- [update] Resize too big poster/banner in replay status and channel info
+- [update] Some internal optimizations
+
+2023-10-02: Version 0.7.3
 - [Add] Cut very long shorttext in replay, recording- and event info
 - [update] Removed unused icons text_new*
 - [update] Remove unused icon text_timer_partial*
