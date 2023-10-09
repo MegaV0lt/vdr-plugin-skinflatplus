@@ -117,16 +117,29 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
     maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
-    labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSml,
-                          maxWidth);
 
-    if (infoWidth > maxWidth) {  // Add ... if info ist too long
-        dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
-        labelPixmap->DrawText(cPoint(left + maxWidth, fontHeight), "...", Theme.Color(clrReplayFont),
-                              Theme.Color(clrReplayBg), fontSml, fontSml->Width("..."));
-        left += maxWidth + fontSml->Width("...");
-    } else
+    if (infoWidth > maxWidth) {  // Shorttext too long
+        if (Config.ScrollerEnable) {
+            messageScroller.AddScroller(*info,
+                                        cRect(Config.decorBorderReplaySize + left,
+                                              osdHeight - labelHeight - Config.decorBorderReplaySize + fontHeight,
+                                              maxWidth, fontSmlHeight),
+                                        Theme.Color(clrMenuEventFontInfo), clrTransparent, fontSml);
+            left += maxWidth;
+        } else {  // Add ... if info ist too long
+            dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", infoWidth, maxWidth);
+            int dotsWidth = fontSml->Width("...");
+            labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  fontSml, maxWidth - dotsWidth);
+            labelPixmap->DrawText(cPoint(left, fontHeight), "...", Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                                  fontSml, dotsWidth);
+            left += maxWidth + dotsWidth;
+        }
+    } else {  // Shorttext fits into maxwidth
+        labelPixmap->DrawText(cPoint(left, fontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                              fontSml, infoWidth);
         left += infoWidth;
+    }
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option

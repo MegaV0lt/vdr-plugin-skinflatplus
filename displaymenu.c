@@ -2381,34 +2381,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     PixmapFill(contentHeadIconsPixmap, clrTransparent);
 
-    /*
-    // Moved block after fsk and genre icons (After ComplexContentDraw)
-    PixmapFill(contentHeadPixmap, clrTransparent);
-    contentHeadPixmap->DrawRectangle(cRect(0, 0, menuWidth, fontHeight + fontSmlHeight * 2 + marginItem * 2),
-                                     Theme.Color(clrScrollbarBg));
-
-    cString date = Event->GetDateString();
-    cString startTime = Event->GetTimeString();
-    cString endTime = Event->GetEndTimeString();
-
-    cString timeString = cString::sprintf("%s  %s - %s", *date, *startTime, *endTime);
-
-    cString title = Event->Title();
-    cString shortText = Event->ShortText();
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem), *timeString, Theme.Color(clrMenuEventFontInfo),
-                                Theme.Color(clrMenuEventBg), fontSml, menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight), *title,
-                                Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), font,
-                                menuWidth - marginItem * 2);
-    contentHeadPixmap->DrawText(cPoint(marginItem, marginItem + fontSmlHeight + fontHeight), *shortText,
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
-                                menuWidth - marginItem * 2);
-
-    DecorBorderDraw(chLeft, chTop, chWidth, chHeight, Config.decorBorderMenuContentHeadSize,
-                    Config.decorBorderMenuContentHeadType, Config.decorBorderMenuContentHeadFg,
-                    Config.decorBorderMenuContentHeadBg);
-
-    */
     // Description
     std::ostringstream text(""), textAdditional("");
     std::string Fsk("");
@@ -2916,10 +2888,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
             int dotsWidth = fontSml->Width("...");
-            maxWidth -= dotsWidth;
             contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), *shortText,
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
-                                        maxWidth);
+                                        maxWidth - dotsWidth);
             contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                         dotsWidth);
@@ -3996,9 +3967,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Shorttext too long! (%d) Setting maxWidth to %d", shortTextWidth, maxWidth);
             int dotsWidth = fontSml->Width("...");
-            maxWidth -= dotsWidth;
             contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), *shortText,
-                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, maxWidth);
+                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
+                                        maxWidth - dotsWidth);
             contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
                                         Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml, dotsWidth);
             left += maxWidth + dotsWidth;
