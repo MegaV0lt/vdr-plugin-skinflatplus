@@ -24,8 +24,8 @@ cFlatBaseRender::cFlatBaseRender(void) {
     fontFixedHeight = fontFixed->Height();
 
     topBarTitle = "";
-    tobBarTitleExtra1 = "";
-    tobBarTitleExtra2 = "";
+    topBarTitleExtraExtra1 = "";
+    topBarTitleExtraExtra2 = "";
     topBarLastDate = "";
     topBarUpdateTitle = false;
     topBarHeight = 0;
@@ -159,8 +159,8 @@ void cFlatBaseRender::TopBarCreate(void) {
 
 void cFlatBaseRender::TopBarSetTitle(cString title) {
     topBarTitle = title;
-    tobBarTitleExtra1 = "";
-    tobBarTitleExtra2 = "";
+    topBarTitleExtraExtra1 = "";
+    topBarTitleExtraExtra2 = "";
     topBarExtraIcon = "";
     topBarMenuIcon = "";
     topBarUpdateTitle = true;
@@ -180,8 +180,8 @@ void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
 }
 
 void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
-    tobBarTitleExtra1 = extra1;
-    tobBarTitleExtra2 = extra2;
+    topBarTitleExtraExtra1 = extra1;
+    topBarTitleExtraExtra2 = extra2;
     topBarUpdateTitle = true;
 }
 
@@ -552,7 +552,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
         int topBarMenuIconRightWidth = 0;
         int topBarMenuIconRightLeft = 0;
-        int titleWidth = topBarFont->Width(topBarTitle);
+        int titleWidth = topBarFont->Width(*topBarTitle);
         if (topBarMenuIconRightSet) {
             cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
@@ -561,8 +561,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }
 
-        int extra1Width = topBarFontSml->Width(tobBarTitleExtra1);
-        int extra2Width = topBarFontSml->Width(tobBarTitleExtra2);
+        int extra1Width = topBarFontSml->Width(*topBarTitleExtraExtra1);
+        int extra2Width = topBarFontSml->Width(*topBarTitleExtraExtra2);
         int extraMaxWidth = std::max(extra1Width, extra2Width);
         middleWidth += extraMaxWidth;
         Right -= extraMaxWidth + marginItem;
@@ -574,16 +574,16 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         int titleMaxWidth = Right - titleLeft - marginItem;
-        if (topBarFont->Width(topBarTitle) + topBarMenuIconRightWidth > titleMaxWidth) {
+        if (titleWidth + topBarMenuIconRightWidth > titleMaxWidth) {
             topBarMenuIconRightLeft = titleMaxWidth + marginItem * 2;
             titleMaxWidth -= topBarMenuIconRightWidth;
         } else {
-            topBarMenuIconRightLeft = titleLeft + topBarFont->Width(topBarTitle) + marginItem * 2;
+            topBarMenuIconRightLeft = titleLeft + titleWidth + marginItem * 2;
         }
 
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), tobBarTitleExtra1, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *topBarTitleExtraExtra1, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth, 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), tobBarTitleExtra2,
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *topBarTitleExtraExtra2,
                                Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth,
                                0, taRight);
         Right += extraMaxWidth + marginItem;
@@ -629,7 +629,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 topBarIconPixmap->DrawImage(cPoint(topBarMenuIconRightLeft, iconTop), *img);
             }
         }
-        topBarPixmap->DrawText(cPoint(titleLeft, fontTop), topBarTitle, Theme.Color(clrTopBarFont),
+        topBarPixmap->DrawText(cPoint(titleLeft, fontTop), *topBarTitle, Theme.Color(clrTopBarFont),
                                Theme.Color(clrTopBarBg), topBarFont, titleMaxWidth);
 
         DecorBorderDraw(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
