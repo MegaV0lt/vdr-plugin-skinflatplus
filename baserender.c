@@ -1024,14 +1024,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         int out = 1;
-        if (rect.Height() > 10)
+        if (big > 10)
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
 
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             if (isSignal) {
@@ -1100,13 +1100,13 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         int out = 1;
-        if (rect.Height() > 10)
+        if (big > 10)
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
@@ -1143,9 +1143,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             // dot
