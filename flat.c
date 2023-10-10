@@ -107,9 +107,9 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-void PixmapFill(cPixmap *pixmap, tColor Color) {
-    if (pixmap) pixmap->Fill(Color);
-}
+// void PixmapFill(cPixmap *pixmap, tColor Color) {  // See flat.h
+//    if (pixmap) pixmap->Fill(Color);
+// }
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
