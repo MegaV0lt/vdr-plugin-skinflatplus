@@ -204,35 +204,20 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                          fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight),
                                    Theme.Color(clrReplayBg));
 
-        cString rewind(""), pause(""), play(""), forward("");
+        cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
         cString speed("");
 
-        if (Speed == -1) {
-            if (Play) {
-                rewind = "rewind";
-                pause = "pause";
-                play = "play_sel";
-                forward = "forward";
-            } else {
-                rewind = "rewind";
-                pause = "pause_sel";
-                play = "play";
-                forward = "forward";
+        if (Speed == -1) {  // Replay or pause
+            (Play) ? play = "play_sel" : pause = "pause_sel";
             }
         } else {
             speed = cString::sprintf("%d", Speed);
             if (Forward) {
-                rewind = "rewind";
-                pause = "pause";
-                play = "play";
                 forward = "forward_sel";
                 labelPixmap->DrawText(cPoint(left + fontHeight * 4 + marginItem * 4, 0), speed,
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
             } else {
                 rewind = "rewind_sel";
-                pause = "pause";
-                play = "play";
-                forward = "forward";
                 labelPixmap->DrawText(cPoint(left - font->Width(speed) - marginItem, 0), speed,
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
             }
@@ -251,7 +236,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         img = imgLoader.LoadIcon(*forward, fontHeight, fontHeight);
         if (img)
-            iconsPixmap->DrawImage(cPoint(left + fontHeight*3 + marginItem*3, 0), *img);
+            iconsPixmap->DrawImage(cPoint(left + fontHeight * 3 + marginItem * 3, 0), *img);
     }
 
     if (ProgressShown) {
