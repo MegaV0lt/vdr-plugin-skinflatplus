@@ -24,8 +24,8 @@ cFlatBaseRender::cFlatBaseRender(void) {
     fontFixedHeight = fontFixed->Height();
 
     topBarTitle = "";
-    topBarTitleExtraExtra1 = "";
-    topBarTitleExtraExtra2 = "";
+    topBarTitleExtra1 = "";
+    topBarTitleExtra2 = "";
     topBarLastDate = "";
     topBarUpdateTitle = false;
     topBarHeight = 0;
@@ -159,8 +159,8 @@ void cFlatBaseRender::TopBarCreate(void) {
 
 void cFlatBaseRender::TopBarSetTitle(cString title) {
     topBarTitle = title;
-    topBarTitleExtraExtra1 = "";
-    topBarTitleExtraExtra2 = "";
+    topBarTitleExtra1 = "";
+    topBarTitleExtra2 = "";
     topBarExtraIcon = "";
     topBarMenuIcon = "";
     topBarUpdateTitle = true;
@@ -180,8 +180,8 @@ void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
 }
 
 void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
-    topBarTitleExtraExtra1 = extra1;
-    topBarTitleExtraExtra2 = extra2;
+    topBarTitleExtra1 = extra1;
+    topBarTitleExtra2 = extra2;
     topBarUpdateTitle = true;
 }
 
@@ -561,8 +561,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }
 
-        int extra1Width = topBarFontSml->Width(*topBarTitleExtraExtra1);
-        int extra2Width = topBarFontSml->Width(*topBarTitleExtraExtra2);
+        int extra1Width = topBarFontSml->Width(*topBarTitleExtra1);
+        int extra2Width = topBarFontSml->Width(*topBarTitleExtra2);
         int extraMaxWidth = std::max(extra1Width, extra2Width);
         middleWidth += extraMaxWidth;
         Right -= extraMaxWidth + marginItem;
@@ -581,9 +581,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
             topBarMenuIconRightLeft = titleLeft + titleWidth + marginItem * 2;
         }
 
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *topBarTitleExtraExtra1, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *topBarTitleExtra1, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth, 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *topBarTitleExtraExtra2,
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *topBarTitleExtra2,
                                Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth,
                                0, taRight);
         Right += extraMaxWidth + marginItem;

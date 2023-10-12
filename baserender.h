@@ -49,7 +49,7 @@ class cFlatBaseRender {
         int topBarFontHeight, topBarFontSmlHeight, topBarFontClockHeight;
 
         cString topBarTitle;
-        cString topBarTitleExtraExtra1, topBarTitleExtraExtra2;
+        cString topBarTitleExtra1, topBarTitleExtra2;
         cString topBarExtraIcon;
         bool topBarExtraIconSet;
         cString topBarMenuIcon;
