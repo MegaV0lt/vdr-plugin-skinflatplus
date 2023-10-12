@@ -422,7 +422,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {
+                    if (series.banners.size() > 0) {  // TODO: Use random banner?
                         mediaPath = series.banners[0].path;
                         mediaWidth = series.banners[0].width * Config.TVScraperReplayInfoPosterSize * 100;
                         mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize * 100;
@@ -433,8 +433,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
                     mediaPath = movie.poster.path;
-                    mediaWidth = movie.poster.width * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
-                    mediaHeight = movie.poster.height * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
+                    mediaWidth = movie.poster.width /* * 0.5 */ * Config.TVScraperReplayInfoPosterSize * 100;
+                    mediaHeight = movie.poster.height /* * 0.5 */ * Config.TVScraperReplayInfoPosterSize * 100;
                 }
             }
         }
