@@ -135,11 +135,21 @@ msgstr "Kanal"
 msgid "search pattern"
 msgstr "Suchmuster"
 
+# TVScraper
 msgid "caused by"
 msgstr "Ausgelöst durch"
 
 msgid "reason"
 msgstr "Grund"
+
+msgid "improve"
+msgstr "Verbessern"
+
+msgid "collection"
+msgstr "Sammlung"
+
+msgid "TV show, missing episode"
+msgstr "Fehlende Folge"
 
 msgid "Recording information"
 msgstr "Aufnahme Informationen"

@@ -3203,8 +3203,16 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                              << ": " << searchtimer;
                     }
                     if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                        text << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": "
-                             << reason;
+                        text << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": ";
+                        std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
+                        if (reason.compare(imp) == 0)
+                            text << tr("improve");
+                        else if (reason.compare(col) == 0)
+                            text << tr("collection");
+                        else if (reason.compare(tvs) == 0)
+                            text << tr("TV show, missing episode");
+                        else
+                            text << reason;  // To be safe if there are more options
                     }
                     if (!pattern.empty()) {
                         text << "\nVDRadmin-AM: " << tr("search pattern") << ": " << pattern;
@@ -3629,7 +3637,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
                 if (!causedby.empty() && !reason.empty()) {  // TVScraper
                     recAdditional << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason")
-                                  << ": " << reason;
+                                  << ": ";
+                    std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
+                    if (reason.compare(imp) == 0)
+                        recAdditional << tr("improve");
+                    else if (reason.compare(col) == 0)
+                        recAdditional << tr("collection");
+                    else if (reason.compare(tvs) == 0)
+                        recAdditional << tr("TV show, missing episode");
+                    else
+                        recAdditional << reason;  // To be safe if there are more options
                 }
                 if (!pattern.empty()) {  // VDR-Admin
                     recAdditional << "\nVDRadmin-AM: " << tr("search pattern") << ": " << pattern;
