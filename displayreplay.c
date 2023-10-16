@@ -421,7 +421,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {  // TODO: Use random banner?
+                    if (series.banners.size() > 0) {  // Use random banner
                         // Gets 'entropy' from device that generates random numbers itself
                         // to seed a mersenne twister (pseudo) random generator
                         std::mt19937 generator(std::random_device {}());
@@ -435,7 +435,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         mediaPath = series.banners[number].path;
                         mediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
                         mediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
-                        dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
+                        if (series.banners.size() > 1)
+                            dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
                                 number + 1, mediaPath.c_str(), series.banners.size());  // Log result
                     }
                 }
