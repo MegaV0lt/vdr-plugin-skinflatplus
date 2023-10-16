@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
+#include <random>
 
 #include <vdr/plugin.h>
 #include <vdr/skins.h>

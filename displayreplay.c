@@ -205,13 +205,12 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                    Theme.Color(clrReplayBg));
 
         cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
-        cString speed("");
+        // cString speed("");
 
         if (Speed == -1) {  // Replay or pause
             (Play) ? play = "play_sel" : pause = "pause_sel";
-            }
         } else {
-            speed = cString::sprintf("%d", Speed);
+            cString speed = cString::sprintf("%d", Speed);
             if (Forward) {
                 forward = "forward_sel";
                 labelPixmap->DrawText(cPoint(left + fontHeight * 4 + marginItem * 4, 0), speed,
@@ -423,9 +422,21 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
                     if (series.banners.size() > 0) {  // TODO: Use random banner?
-                        mediaPath = series.banners[0].path;
-                        mediaWidth = series.banners[0].width * Config.TVScraperReplayInfoPosterSize * 100;
-                        mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize * 100;
+                        // Gets 'entropy' from device that generates random numbers itself
+                        // to seed a mersenne twister (pseudo) random generator
+                        std::mt19937 generator(std::random_device {}());
+
+                        // Make sure all numbers have an equal chance.
+                        // Range is inclusive (so we need -1 for vector index)
+                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+                        std::size_t number = distribution(generator);
+
+                        mediaPath = series.banners[number].path;
+                        mediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
+                        mediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
+                        dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
+                                number + 1, mediaPath.c_str(), series.banners.size());  // Log result
                     }
                 }
             } else if (call.type == tMovie) {
