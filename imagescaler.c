@@ -34,7 +34,7 @@ static float sincf(float x) {
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
     const float fc = dst_size >= src_size ? 1.0f : ((float) dst_size)/((float) src_size);
 
-    for (int i = 0; i < dst_size; ++i) {
+    for (int i {0}; i < dst_size; ++i) {
         const int    d          = 2 * dst_size;                       // sample position denominator
         const int    e          = (2 * i + 1) * src_size - dst_size;  // sample position enumerator
         int          offset     =  e / d;                             // truncated sample position
@@ -43,7 +43,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         // calculate filter coefficients
         float  h[4];
-        for (int j = 0; j < 4; ++j) {
+        for (int j {0}; j < 4; ++j) {
             const float t = 3.14159265359f * (sub_offset + (1 - j));
             h[j] = sincf(fc * t) * cosf(0.25f * t);  // sinc-lowpass and cos-window
         }
@@ -72,7 +72,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         filters[i].m_offset = offset + 4;  // store offset of first unused pixel
 
-        for (int j = 0; j < 4; ++j) {
+        for (int j {0}; j < 4; ++j) {
             const float t = norm * h[j];
             filters[i].m_coeff[(offset + j) & 3] =
                 static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // consider ring buffer index permutations

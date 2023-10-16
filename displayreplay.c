@@ -167,7 +167,7 @@ void cFlatDisplayReplay::Action(void) {
         time(&curTime);
         if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
-            for (int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
+            for (int alpha {0}; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
                 PixmapFill(dimmPixmap, ArgbToColor(alpha, 0, 0, 0));
                 Flush();
             }
@@ -179,7 +179,7 @@ void cFlatDisplayReplay::Action(void) {
 }
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
-    int left = 0;
+    int left {0};
     if (Play == false && Config.RecordingDimmOnPause) {
         time(&dimmStartTime);
         Start();
@@ -335,18 +335,18 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
         }
 
-        int cuttedLength = 0;
-        int32_t cutinframe = 0;
-        uint64_t recsizecutted = 0;
-        uint64_t cutinoffset = 0;
+        int cuttedLength {0};
+        int32_t cutinframe {0};
+        uint64_t recsizecutted {0};
+        uint64_t cutinoffset {0};
         uint64_t filesize[100000];
         uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
-        int i = 0;
+        int i {0};
         struct stat filebuf;
         cString filename("");
-        int rc = 0;
+        int rc {0};
 
         do {
             ++i;
@@ -401,15 +401,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         delete index;
 
         std::string mediaPath("");
-        int mediaWidth = 0;
-        int mediaHeight = 0;
+        int mediaWidth {0};
+        int mediaHeight {0};
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
             call.recording = recording;
-            int seriesId = 0;
-            int episodeId = 0;
-            int movieId = 0;
+            int seriesId {0};
+            int episodeId {0};
+            int movieId {0};
 
             if (pScraper->Service("GetEventType", &call)) {
                 seriesId = call.seriesId;
@@ -480,7 +480,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (iscutted) {
         cImage *imgRecCut = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
-        int imgWidth = 0;
+        int imgWidth {0};
         if (imgRecCut)
             imgWidth = imgRecCut->Width();
 
@@ -604,7 +604,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         return;
 
     int left = osdWidth - Config.decorBorderReplaySize * 2;
-    int imageTop = 0;
+    int imageTop {0};
     cImage *img = NULL;
 
     if (screenWidth > 0) {

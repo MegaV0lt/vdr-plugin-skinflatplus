@@ -201,7 +201,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     // int width = fontSmlHeight;
     // int height = fontSmlHeight;
     int top = heightBottom - fontSmlHeight - marginItem;
-    int imageTop = 0;
+    int imageTop {0};
     cImage *img = NULL;
 
     int left = channelWidth - fontSmlHeight - marginItem * 2;
@@ -406,8 +406,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         ChannelIconsDraw(CurChannel, false);
 
     std::string mediaPath("");
-    int mediaWidth = 0;
-    int mediaHeight = 0;
+    int mediaWidth {0};
+    int mediaHeight {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
@@ -589,7 +589,7 @@ void cFlatDisplayChannel::Flush(void) {
     if (!doOutput)
         return;
 
-    int Current = 0, Total = 0;
+    int Current {0}, Total {0};
     if (present) {
         time_t t = time(NULL);
         if (t > present->StartTime())
@@ -629,7 +629,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
     imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
-    int index = 0;
+    int index {0};
     // height = ((fontHeight * 2) + (fontSmlHeight * 2) + marginItem) - marginItem * 2;  // Double calculation of height
     cImage *img = NULL;
 #if VDRVERSNUM >= 20301

@@ -16,7 +16,7 @@ cImageMagickWrapper::~cImageMagickWrapper() {
 }
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAspect) {
-    int w = 0, h = 0;
+    int w {0}, h {0};
     w = buffer.columns();
     h = buffer.rows();
     if (width == 0)
@@ -40,8 +40,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAsp
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
-        for (int iy = 0; iy < h; ++iy) {
-            for (int ix = 0; ix < w; ++ix) {
+        for (int iy {0}; iy < h; ++iy) {
+            for (int ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
                 unsigned char r = c.quantumRed() * 255 / QuantumRange;
                 unsigned char g = c.quantumGreen() * 255 / QuantumRange;
@@ -59,8 +59,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAsp
         return image;
     }
 #ifdef IMAGEMAGICK7
-    for (int iy = 0; iy < h; ++iy) {
-        for (int ix = 0; ix < w; ++ix) {
+    for (int iy {0}; iy < h; ++iy) {
+        for (int ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
             unsigned char r = c.quantumRed() * 255 / QuantumRange;
             unsigned char g = c.quantumGreen() * 255 / QuantumRange;
@@ -79,15 +79,15 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAsp
 }
 
 cImage cImageMagickWrapper::CreateImageCopy() {
-    int w = 0, h = 0;
+    int w {0}, h {0};
     w = buffer.columns();
     h = buffer.rows();
     cImage image(cSize(w, h));
 #ifndef IMAGEMAGICK7
     const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #endif
-    for (int iy = 0; iy < h; ++iy) {
-        for (int ix = 0; ix < w; ++ix) {
+    for (int iy {0}; iy < h; ++iy) {
+        for (int ix {0}; ix < w; ++ix) {
 #ifdef IMAGEMAGICK7
             Color c = buffer.pixelColor(ix, iy);
             unsigned char r = c.quantumRed() * 255 / QuantumRange;

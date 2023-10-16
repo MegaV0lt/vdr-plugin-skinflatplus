@@ -707,7 +707,7 @@ cString cFlatConfig::DecorDescription(cString File) {
     cString description("");
     FILE *f = fopen(File, "r");
     if (f) {
-        int line = 0;
+        int line {0};
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
@@ -757,7 +757,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
 
     FILE *f = fopen(File, "r");
     if (f) {
-        int line = 0;
+        int line {0};
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
@@ -856,7 +856,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
     FILE *f = fopen(RecordingOldConfigFile, "r");
     if (f) {
-        int line = 0;
+        int line {0};
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
