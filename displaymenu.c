@@ -733,7 +733,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Channel->GroupSep())
         DrawProgress = false;
 
-    float progress = 0.0;
+    float progress {0.0};
     cString EventTitle("");
 
 #if VDRVERSNUM >= 20301
@@ -5710,7 +5710,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             continue;
 
         std::string prec("");
-        double p = 0.0;
+        double p {0.0};
         cString precString("0%");
         cString precFilename = cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index);
         std::ifstream file5(*precFilename, std::ifstream::in);

@@ -420,8 +420,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 mediaHeight = call.banner.height * Config.TVScraperChanInfoPosterSize * 100;
                 mediaPath = call.banner.path;
             } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                mediaWidth = call.poster.width * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
-                mediaHeight = call.poster.height * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
+                mediaWidth = call.poster.width /* * 0.5 */ * Config.TVScraperChanInfoPosterSize * 100;
+                mediaHeight = call.poster.height /* * 0.5 */ * Config.TVScraperChanInfoPosterSize * 100;
                 mediaPath = call.poster.path;
             }
         }
