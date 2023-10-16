@@ -24,8 +24,8 @@ cFlatBaseRender::cFlatBaseRender(void) {
     fontFixedHeight = fontFixed->Height();
 
     topBarTitle = "";
-    tobBarTitleExtra1 = "";
-    tobBarTitleExtra2 = "";
+    topBarTitleExtra1 = "";
+    topBarTitleExtra2 = "";
     topBarLastDate = "";
     topBarUpdateTitle = false;
     topBarHeight = 0;
@@ -159,8 +159,8 @@ void cFlatBaseRender::TopBarCreate(void) {
 
 void cFlatBaseRender::TopBarSetTitle(cString title) {
     topBarTitle = title;
-    tobBarTitleExtra1 = "";
-    tobBarTitleExtra2 = "";
+    topBarTitleExtra1 = "";
+    topBarTitleExtra2 = "";
     topBarExtraIcon = "";
     topBarMenuIcon = "";
     topBarUpdateTitle = true;
@@ -180,8 +180,8 @@ void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
 }
 
 void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
-    tobBarTitleExtra1 = extra1;
-    tobBarTitleExtra2 = extra2;
+    topBarTitleExtra1 = extra1;
+    topBarTitleExtra2 = extra2;
     topBarUpdateTitle = true;
 }
 
@@ -407,7 +407,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
 void cFlatBaseRender::TopBarUpdate(void) {
     cString curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
-    int MenuIconWidth = 0;
+    int MenuIconWidth {0};
     cImage *imgCon = NULL;
     cImage *imgRec = NULL;
 
@@ -438,7 +438,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
             int IconLeft = marginItem;
             int imageBGHeight = topBarHeight - marginItem * 2;
             int imageBGWidth = imageBGHeight * 1.34;
-            int iconTop = 0;
+            int iconTop {0};
 
             cImage *imgBG = imgLoader.LoadIcon("logo_background", imageBGWidth, imageBGHeight);
             if (imgBG) {
@@ -482,8 +482,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
         topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
 
-        int middleWidth = 0;
-        int numConflicts = 0;
+        int middleWidth {0};
+        int numConflicts {0};
         if (Config.TopBarRecConflictsShow) {
             cPlugin *p = cPluginManager::GetPlugin("epgsearch");
             if (p) {
@@ -515,7 +515,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }
 
-        int numRec = 0;
+        int numRec {0};
         if (Config.TopBarRecordingShow) {
 // Look for timers
 #if VDRVERSNUM >= 20301
@@ -550,9 +550,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 middleWidth += img->Width() + marginItem;
             }
         }
-        int topBarMenuIconRightWidth = 0;
-        int topBarMenuIconRightLeft = 0;
-        int titleWidth = topBarFont->Width(topBarTitle);
+        int topBarMenuIconRightWidth {0};
+        int topBarMenuIconRightLeft {0};
+        int titleWidth = topBarFont->Width(*topBarTitle);
         if (topBarMenuIconRightSet) {
             cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
@@ -561,8 +561,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }
 
-        int extra1Width = topBarFontSml->Width(tobBarTitleExtra1);
-        int extra2Width = topBarFontSml->Width(tobBarTitleExtra2);
+        int extra1Width = topBarFontSml->Width(*topBarTitleExtra1);
+        int extra2Width = topBarFontSml->Width(*topBarTitleExtra2);
         int extraMaxWidth = std::max(extra1Width, extra2Width);
         middleWidth += extraMaxWidth;
         Right -= extraMaxWidth + marginItem;
@@ -574,16 +574,16 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         int titleMaxWidth = Right - titleLeft - marginItem;
-        if (topBarFont->Width(topBarTitle) + topBarMenuIconRightWidth > titleMaxWidth) {
+        if (titleWidth + topBarMenuIconRightWidth > titleMaxWidth) {
             topBarMenuIconRightLeft = titleMaxWidth + marginItem * 2;
             titleMaxWidth -= topBarMenuIconRightWidth;
         } else {
-            topBarMenuIconRightLeft = titleLeft + topBarFont->Width(topBarTitle) + marginItem * 2;
+            topBarMenuIconRightLeft = titleLeft + titleWidth + marginItem * 2;
         }
 
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), tobBarTitleExtra1, Theme.Color(clrTopBarDateFont),
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *topBarTitleExtra1, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth, 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), tobBarTitleExtra2,
+        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *topBarTitleExtra2,
                                Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth,
                                0, taRight);
         Right += extraMaxWidth + marginItem;
@@ -591,7 +591,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         if (topBarExtraIconSet) {
             cImage *img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
             if (img) {
-                int iconTop = 0;
+                int iconTop {0};
                 topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *img);
                 Right += img->Width() + marginItem;
             }
@@ -629,7 +629,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 topBarIconPixmap->DrawImage(cPoint(topBarMenuIconRightLeft, iconTop), *img);
             }
         }
-        topBarPixmap->DrawText(cPoint(titleLeft, fontTop), topBarTitle, Theme.Color(clrTopBarFont),
+        topBarPixmap->DrawText(cPoint(titleLeft, fontTop), *topBarTitle, Theme.Color(clrTopBarFont),
                                Theme.Color(clrTopBarBg), topBarFont, titleMaxWidth);
 
         DecorBorderDraw(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
@@ -662,7 +662,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     buttonsDrawn = false;
 
-    int x = 0;
+    int x {0};
     if (!(!Config.ButtonsShowEmpty && !Red)) {
         switch (Setup.ColorKey0) {
         case 0:
@@ -1023,15 +1023,15 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 2:  // big line + outline
     {
         int big = rect.Height();
-        int out = 1;
-        if (rect.Height() > 10)
+        int out {1};
+        if (big > 10)
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
 
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             if (isSignal) {
@@ -1099,14 +1099,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 5:  // big line + outline + dot
     {
         int big = rect.Height();
-        int out = 1;
-        if (rect.Height() > 10)
+        int out {1};
+        if (big > 10)
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
@@ -1138,14 +1138,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 7:  // outline + dot
     {
         int big = rect.Height();
-        int out = 1;
+        int out {1};
         if (rect.Height() > 10)
             out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + rect.Height() - out, rect.Width(), out), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, rect.Height()), ColorFg);
-        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, rect.Height()), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
+        Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
             // dot
@@ -1189,7 +1189,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
                                            tColor ColorCurrent) {
     progressBarColorMark = Color;
     progressBarColorMarkCurrent = ColorCurrent;
-    int posMark = 0, posMarkLast = 0, posCurrent = 0;
+    int posMark {0}, posMarkLast {0}, posCurrent {0};
 
     int top = progressBarHeight / 2;
     if (progressBarPixmapBg)
@@ -1359,7 +1359,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         switch (Type) {
         default:
         case 0: {
-            int lineWidth = 6;
+            int lineWidth {6};
             if (scrollBarWidth <= 10)
                 lineWidth = 2;
             else if (scrollBarWidth <= 20)
@@ -1373,7 +1373,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 1: {
             int dotHeight = scrollBarWidth / 2;
-            int lineWidth = 6;
+            int lineWidth {6};
             if (scrollBarWidth <= 10)
                 lineWidth = 2;
             else if (scrollBarWidth <= 20)
@@ -1395,7 +1395,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 2: {
             int Middle = Left + scrollBarWidth / 2;
-            int lineWidth = 6;
+            int lineWidth {6};
             if (scrollBarWidth <= 10)
                 lineWidth = 2;
             else if (scrollBarWidth <= 20)
@@ -1409,7 +1409,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 3: {
             int dotHeight = scrollBarWidth / 2;
             int Middle = Left + scrollBarWidth / 2;
-            int lineWidth = 6;
+            int lineWidth {6};
             if (scrollBarWidth <= 10)
                 lineWidth = 2;
             else if (scrollBarWidth <= 20)
@@ -1427,7 +1427,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             break;
         }
         case 4: {
-            int out = 1;
+            int out {1};
             if (scrollBarWidth > 10)
                 out = 2;
             // outline
@@ -1443,7 +1443,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 5: {
             int dotHeight = scrollBarWidth / 2;
-            int out = 1;
+            int out {1};
             if (scrollBarWidth > 10)
                 out = 2;
             // outline
@@ -1679,16 +1679,16 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
+    double Alpha {0.0};
     if (Height < 0) {
         Height *= -1;
-        for (int i = Height, j = 0; i >= 0; --i, ++j) {
+        for (int i = Height, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
             tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
-        for (int i = 0; i < Height; ++i) {
+        for (int i {0}; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
             tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
@@ -1697,16 +1697,16 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
+    double Alpha {0.0};
     if (Width < 0) {
         Width *= -1;
-        for (int i = Width, j = 0; i >= 0; --i, ++j) {
+        for (int i = Width, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Width * j;
             tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } else {
-        for (int i = 0; i < Width; ++i) {
+        for (int i {0}; i < Width; ++i) {
             Alpha = 255.0 / Width * i;
             tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
@@ -1715,8 +1715,8 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
-    for (int i = 0; i < Width; ++i) {
+    double Alpha {0.0};
+    for (int i {0}; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
@@ -1724,8 +1724,8 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
@@ -1733,8 +1733,8 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
@@ -1742,8 +1742,8 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255 / Width * i;
         tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
@@ -1752,8 +1752,8 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
@@ -1764,8 +1764,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
@@ -1776,8 +1776,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
@@ -1788,8 +1788,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    double Alpha = 0.0;
-    for (int i = 0, j = Width; i < Width; ++i, --j) {
+    double Alpha {0.0};
+    for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
@@ -1904,7 +1904,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    double p = 0.0;
+    double p {0.0};
     filename = cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH);
     file.open(*filename, std::ifstream::in);
     if (file.is_open()) {

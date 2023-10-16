@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <string.h>
+#include <random>
 
 #include <vdr/plugin.h>
 #include <vdr/skins.h>
@@ -226,7 +227,9 @@ static inline uint32_t GetMsTicks(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
-void PixmapFill(cPixmap *pixmap, tColor Color);
+inline void PixmapFill(cPixmap *pixmap, tColor Color) {
+    if (pixmap) pixmap->Fill(Color);
+}
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int screenWidth, double screenAspect);
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect);

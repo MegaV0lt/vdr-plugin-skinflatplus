@@ -167,7 +167,7 @@ void cFlatDisplayReplay::Action(void) {
         time(&curTime);
         if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
             dimmActive = true;
-            for (int alpha = 0; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
+            for (int alpha {0}; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
                 PixmapFill(dimmPixmap, ArgbToColor(alpha, 0, 0, 0));
                 Flush();
             }
@@ -179,7 +179,7 @@ void cFlatDisplayReplay::Action(void) {
 }
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
-    int left = 0;
+    int left {0};
     if (Play == false && Config.RecordingDimmOnPause) {
         time(&dimmStartTime);
         Start();
@@ -204,35 +204,19 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                          fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight),
                                    Theme.Color(clrReplayBg));
 
-        cString rewind(""), pause(""), play(""), forward("");
-        cString speed("");
+        cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
+        // cString speed("");
 
-        if (Speed == -1) {
-            if (Play) {
-                rewind = "rewind";
-                pause = "pause";
-                play = "play_sel";
-                forward = "forward";
-            } else {
-                rewind = "rewind";
-                pause = "pause_sel";
-                play = "play";
-                forward = "forward";
-            }
+        if (Speed == -1) {  // Replay or pause
+            (Play) ? play = "play_sel" : pause = "pause_sel";
         } else {
-            speed = cString::sprintf("%d", Speed);
+            cString speed = cString::sprintf("%d", Speed);
             if (Forward) {
-                rewind = "rewind";
-                pause = "pause";
-                play = "play";
                 forward = "forward_sel";
                 labelPixmap->DrawText(cPoint(left + fontHeight * 4 + marginItem * 4, 0), speed,
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
             } else {
                 rewind = "rewind_sel";
-                pause = "pause";
-                play = "play";
-                forward = "forward";
                 labelPixmap->DrawText(cPoint(left - font->Width(speed) - marginItem, 0), speed,
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), font);
             }
@@ -251,7 +235,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         img = imgLoader.LoadIcon(*forward, fontHeight, fontHeight);
         if (img)
-            iconsPixmap->DrawImage(cPoint(left + fontHeight*3 + marginItem*3, 0), *img);
+            iconsPixmap->DrawImage(cPoint(left + fontHeight * 3 + marginItem * 3, 0), *img);
     }
 
     if (ProgressShown) {
@@ -351,18 +335,18 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
         }
 
-        int cuttedLength = 0;
-        int32_t cutinframe = 0;
-        uint64_t recsizecutted = 0;
-        uint64_t cutinoffset = 0;
+        int cuttedLength {0};
+        int32_t cutinframe {0};
+        uint64_t recsizecutted {0};
+        uint64_t cutinoffset {0};
         uint64_t filesize[100000];
         uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
-        int i = 0;
+        int i {0};
         struct stat filebuf;
         cString filename("");
-        int rc = 0;
+        int rc {0};
 
         do {
             ++i;
@@ -417,15 +401,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         delete index;
 
         std::string mediaPath("");
-        int mediaWidth = 0;
-        int mediaHeight = 0;
+        int mediaWidth {0};
+        int mediaHeight {0};
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
             call.recording = recording;
-            int seriesId = 0;
-            int episodeId = 0;
-            int movieId = 0;
+            int seriesId {0};
+            int episodeId {0};
+            int movieId {0};
 
             if (pScraper->Service("GetEventType", &call)) {
                 seriesId = call.seriesId;
@@ -437,10 +421,23 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {
-                        mediaPath = series.banners[0].path;
-                        mediaWidth = series.banners[0].width * Config.TVScraperReplayInfoPosterSize * 100;
-                        mediaHeight = series.banners[0].height * Config.TVScraperReplayInfoPosterSize * 100;
+                    if (series.banners.size() > 0) {  // Use random banner
+                        // Gets 'entropy' from device that generates random numbers itself
+                        // to seed a mersenne twister (pseudo) random generator
+                        std::mt19937 generator(std::random_device {}());
+
+                        // Make sure all numbers have an equal chance.
+                        // Range is inclusive (so we need -1 for vector index)
+                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+                        std::size_t number = distribution(generator);
+
+                        mediaPath = series.banners[number].path;
+                        mediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
+                        mediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
+                        if (series.banners.size() > 1)
+                            dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
+                                number + 1, mediaPath.c_str(), series.banners.size());  // Log result
                     }
                 }
             } else if (call.type == tMovie) {
@@ -448,8 +445,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
                     mediaPath = movie.poster.path;
-                    mediaWidth = movie.poster.width * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
-                    mediaHeight = movie.poster.height * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
+                    mediaWidth = movie.poster.width /* * 0.5 */ * Config.TVScraperReplayInfoPosterSize * 100;
+                    mediaHeight = movie.poster.height /* * 0.5 */ * Config.TVScraperReplayInfoPosterSize * 100;
                 }
             }
         }
@@ -483,7 +480,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (iscutted) {
         cImage *imgRecCut = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
-        int imgWidth = 0;
+        int imgWidth {0};
         if (imgRecCut)
             imgWidth = imgRecCut->Width();
 
@@ -607,7 +604,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         return;
 
     int left = osdWidth - Config.decorBorderReplaySize * 2;
-    int imageTop = 0;
+    int imageTop {0};
     cImage *img = NULL;
 
     if (screenWidth > 0) {

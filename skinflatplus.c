@@ -17,7 +17,7 @@
 #include "setup.h"
 #include "imageloader.h"
 
-static const char *VERSION        = "0.7.4";
+static const char *VERSION        = "0.7.5";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -63,7 +63,7 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
         { NULL }
     };
 
-    int c = 0;
+    int c {0};
     while ((c = getopt_long(argc, argv, "l:", long_options, NULL)) != -1) {
         switch (c) {
             case 'l':
@@ -77,9 +77,12 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 }
 
 __attribute__((constructor)) static void init(void) {
+#ifndef IMAGEMAGICK
+    // From skinnopacity: Prevents *magick from occupying segfaults
+    MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
+#else
     Magick::InitializeMagick(NULL);
-    // Prevents *magick from occupying the segfaults (ImageMagick 7+)
-    // MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
+#endif
 }
 
 bool cPluginFlat::Initialize(void) {

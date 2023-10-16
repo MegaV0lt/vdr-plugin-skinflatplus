@@ -18,7 +18,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     itemHeight = fontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     currentIndex = -1;
     maxItemWidth = font->Width(Title) + marginItem * 4;
-    for (int i = 0; i < NumTracks; ++i)
+    for (int i {0}; i < NumTracks; ++i)
         maxItemWidth = std::max(maxItemWidth, font->Width(Tracks[i]) + marginItem * 2);
 
     int headerWidth = font->Width(Title) + font->Width(" ") + imgWidthMax;
@@ -39,7 +39,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 
     SetItem(Title, -1, false);
 
-    for (int i = 0; i < NumTracks; ++i)
+    for (int i {0}; i < NumTracks; ++i)
         SetItem(Tracks[i], i, false);
 }
 

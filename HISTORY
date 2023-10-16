@@ -1,5 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-10-16: Version 0.7.5
+- [update] Prevents *magick from occupying segfaults
+- [update] Use original postersize in replay and channelinfo
+- [update] Minor changes to de_DE.po
+- [add] Resize too big poster/banner in replay and channelinfo
+- [add] Translate tvscrapers 'reason' in extrarecordinginfo
+- [add] Show random banner. Not working!
+
 2023-10-02: Version 0.7.4
 - [add] Add scroller to replay status, recording info and event info
 - [update] Resize too big poster/banner in replay status and channel info

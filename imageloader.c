@@ -215,7 +215,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
 void cImageLoader::toLowerCase(std::string &str) {
     const int length = str.length();
-    for (int i = 0; i < length; ++i) {
+    for (int i {0}; i < length; ++i) {
         str[i] = std::tolower(str[i]);
     }
 }

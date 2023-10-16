@@ -93,7 +93,7 @@ void cComplexContent::CalculateDrawPortHeight(void) {
 }
 
 int cComplexContent::BottomContent(void) {
-    int bottom = 0;
+    int bottom {0};
     std::vector<cSimpleContent>::iterator it;
     for (it = Contents.begin(); it != Contents.end(); ++it) {
         if ((*it).GetBottom() > bottom)
@@ -163,8 +163,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
         AddImage(image, ImagePos);
     } else {
-        int NumChars = 0;
-        for (int i = 0; i < Lines && i < FloatLines; ++i) {
+        int NumChars {0};
+        for (int i {0}; i < Lines && i < FloatLines; ++i) {
             NumChars += strlen(WrapperFloat.GetLine(i));
         }
         // detect end of last word

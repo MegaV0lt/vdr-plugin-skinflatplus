@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflat 0.6.2\n"
+"Project-Id-Version: vdr-skinflat 0.7.4\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -46,7 +46,7 @@ msgid "timer not enabled"
 msgstr "Timer nicht aktiv"
 
 msgid "no recording info"
-msgstr "keine Aufnahme Informationen"
+msgstr "Keine Aufnahme Informationen"
 
 msgid "name: "
 msgstr "Name: "
@@ -88,7 +88,7 @@ msgid "popularity: "
 msgstr "Beliebtheit: "
 
 msgid "vote average: "
-msgstr "durchsch. Wertung: "
+msgstr "Durchsch. Wertung: "
 
 msgid "Description"
 msgstr "Beschreibung"
@@ -135,11 +135,21 @@ msgstr "Kanal"
 msgid "search pattern"
 msgstr "Suchmuster"
 
+# TVScraper
 msgid "caused by"
 msgstr "Ausgelöst durch"
 
 msgid "reason"
 msgstr "Grund"
+
+msgid "improve"
+msgstr "Verbessern"
+
+msgid "collection"
+msgstr "Sammlung"
+
+msgid "TV show, missing episode"
+msgstr "Fehlende Folge"
 
 msgid "Recording information"
 msgstr "Aufnahme Informationen"
@@ -163,7 +173,7 @@ msgid "Timer"
 msgstr "Timer"
 
 msgid "no active/recording timer"
-msgstr "keine aktiven/aufnehmenden Timer"
+msgstr "Keine aktiven/aufnehmenden Timer"
 
 msgid "Last Recordings"
 msgstr "Letzte Aufnahmen"
@@ -322,16 +332,16 @@ msgid "big line + alpha blend"
 msgstr "Dicke Linie + Transparenz"
 
 msgid "do not show"
-msgstr "nicht anzeigen"
+msgstr "Nicht anzeigen"
 
 msgid "timer & recording menu"
 msgstr "Timer & Aufnahme Menü"
 
 msgid "always on the menu"
-msgstr "immer im Menü"
+msgstr "Immer im Menü"
 
 msgid "always show"
-msgstr "immer anzeigen"
+msgstr "Immer anzeigen"
 
 msgid "VDR default"
 msgstr "VDR Standard"
@@ -358,7 +368,7 @@ msgid "hoizontal"
 msgstr "horizontal"
 
 msgid "carriage return"
-msgstr "carriage return"
+msgstr "Am Ende zurückspringen"
 
 msgid "left-right-left"
 msgstr "links-rechts-links"
@@ -439,19 +449,19 @@ msgid "saved settings in file:"
 msgstr "Einstellungen gespeichert in Datei:"
 
 msgid "no decorfiles found, check install"
-msgstr "keine Dekordateien gefunden, prüfe Installation"
+msgstr "Keine Dekordateien gefunden, prüfe Installation"
 
 msgid "Decorfile"
 msgstr "Dekordatei"
 
 msgid "no config-files found, check install"
-msgstr "keine Konfigdateien gefunden, prüfe Installation"
+msgstr "Keine Konfigdateien gefunden, prüfe Installation"
 
 msgid "Press ok to load config file"
 msgstr "OK drücken um die Konfigdatei zu laden"
 
 msgid "Save current settings"
-msgstr "aktuelle Einstellungen abspeichern"
+msgstr "Aktuelle Einstellungen abspeichern"
 
 msgid "press ok to save current settings"
 msgstr "OK drücken um die Einstellungen zu speichern"
@@ -487,7 +497,7 @@ msgid "TopBar show conflicts"
 msgstr "Titelleiste: Zeige Konflikte"
 
 msgid "TopBar hide clock text"
-msgstr "Titelleiste: Verstecke Uhr Text"
+msgstr "Titelleiste: Uhr Text ausblenden"
 
 msgid "TopBar clock font scale"
 msgstr "Titelleiste: Uhr Skalierung"
@@ -643,7 +653,7 @@ msgid "Recording menu recording seen threshold"
 msgstr "Aufnahmen: Aufnahme gesehen Schwellwert"
 
 msgid "Recording menu default value - old folder in days"
-msgstr "Aufnahmen: Vorgabe-Wert alter Ordner in Tagen"
+msgstr "Aufnahmen: Vorgabewert alter Ordner in Tagen"
 
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
@@ -778,28 +788,28 @@ msgid "TVScraper settings"
 msgstr "TVScraper: Einstellungen"
 
 msgid "Channelinfo show poster?"
-msgstr "Kanalinfo zeige Poster?"
+msgstr "Kanalinfo: Zeige Poster?"
 
 msgid "Channelinfo poster size"
-msgstr "Kanalinfo Poster Größe"
+msgstr "Kanalinfo: Poster Größe"
 
 msgid "Replayinfo show poster?"
-msgstr "Wiedergabeinfo: zeige Poster?"
+msgstr "Wiedergabeinfo: Zeige Poster?"
 
 msgid "Replayinfo poster size"
 msgstr "Wiedergabeinfo: Poster Größe"
 
 msgid "EPG info show poster?"
-msgstr "EPG-Info: zeige Poster?"
+msgstr "EPG-Info: Zeige Poster?"
 
 msgid "recording info show poster?"
-msgstr "Aufnahmeinfo: zeige Poster?"
+msgstr "Aufnahmeinfo: Zeige Poster?"
 
 msgid "EPG info show actors?"
-msgstr "EPG-Info: Zeige Schauspieler?"
+msgstr "EPG-Info: Zeige Darsteller?"
 
 msgid "recording info show actors?"
-msgstr "Aufnahmeinfo: Zeige Schauspieler?"
+msgstr "Aufnahmeinfo: Zeige Darsteller?"
 
 msgid "Enable main menu widgets"
 msgstr "Hauptmenü-Widgets anzeigen"
@@ -865,7 +875,7 @@ msgid "Widget timer: max show"
 msgstr "Timer-Widget: Zeige max."
 
 msgid "Widget timer: hide if empty"
-msgstr "Timer-Widget: Verstecken wenn Leer"
+msgstr "Timer-Widget: Ausblenden wenn Leer"
 
 msgid "Widget last recordings"
 msgstr "Letzte Aufnahmen-Widget"
@@ -889,7 +899,7 @@ msgid "Widget timer conflicts: position"
 msgstr "Timerkonflikte-Widget: Position"
 
 msgid "Widget timer conflicts: hide if empty"
-msgstr "Timerkonflikte-Widget: Verstecken wenn Leer"
+msgstr "Timerkonflikte-Widget: Ausblenden wenn Leer"
 
 msgid "Widget system information"
 msgstr "Systeminformation-Widget"
@@ -910,7 +920,7 @@ msgid "Widget system updates: position"
 msgstr "Systemupdates-Widget: Position"
 
 msgid "Widget system updates: hide if empty"
-msgstr "Systemupdates-Widget: Verstecken wenn Leer"
+msgstr "Systemupdates-Widget: Ausblenden wenn Leer"
 
 msgid "Widget temperatures"
 msgstr "Temperaturen-Widget"
