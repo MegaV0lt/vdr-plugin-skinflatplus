@@ -3203,12 +3203,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     }
                     if (!causedby.empty() && !reason.empty()) {  // TVScraper
                         text << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": ";
-                        std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
                         if (reason == "improve")
                             text << tr("improve");
-                        else if (reason.compare(col) == 0)
+                        else if (reason == "collection")
                             text << tr("collection");
-                        else if (reason.compare(tvs) == 0)
+                        else if (reason == "TV show, missing episode")
                             text << tr("TV show, missing episode");
                         else
                             text << reason;  // To be safe if there are more options
@@ -3637,12 +3636,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 if (!causedby.empty() && !reason.empty()) {  // TVScraper
                     recAdditional << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason")
                                   << ": ";
-                    std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
                     if (reason == "improve")
                         recAdditional << tr("improve");
-                    else if (reason.compare(col) == 0)
+                    else if (reason == "collection")
                         recAdditional << tr("collection");
-                    else if (reason.compare(tvs) == 0)
+                    else if (reason == "TV show, missing episode")
                         recAdditional << tr("TV show, missing episode");
                     else
                         recAdditional << reason;  // To be safe if there are more options
