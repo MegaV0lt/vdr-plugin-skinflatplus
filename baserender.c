@@ -400,8 +400,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             iconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
-    TopBarSetTitleExtra(extra1, extra2);
-    TopBarSetExtraIcon(iconName);
+    TopBarSetTitleExtra(*extra1, *extra2);
+    TopBarSetExtraIcon(*iconName);
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
@@ -1805,7 +1805,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
     int Ascender = CharHeight;
     int rc = FT_Init_FreeType(&library);
     if (!rc) {
-        rc = FT_New_Face(library, fontFileName, 0, &face);
+        rc = FT_New_Face(library, *fontFileName, 0, &face);
         if (!rc) {
             if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
                 // TODO what exactly does all this mean?
