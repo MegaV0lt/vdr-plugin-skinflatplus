@@ -374,7 +374,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         default:
             icon = "";
         }
-        TopBarSetMenuIcon(icon);
+        TopBarSetMenuIcon(*icon);
 
         if ((menuCategory == mcRecording || menuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
             Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
@@ -508,7 +508,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     if (Config.MenuItemParseTilde) {
                         std::string tilde = s;
                         size_t found = tilde.find(" ~ ");
-                        size_t found2 = tilde.find("~");
+                        size_t found2 = tilde.find('~');
                         if (found != std::string::npos) {
                             std::string first = tilde.substr(0, found);
                             std::string second = tilde.substr(found + 2, tilde.length());
@@ -526,7 +526,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
                                                  ColorBg, font, menuItemWidth - xt - Config.decorBorderMenuItemSize);
                             int l = font->Width(first.c_str());
-                            l += font->Width("X");
+                            l += font->Width('X');
                             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.c_str(),
                                                  ColorExtraTextFg, ColorBg, font,
                                                  menuItemWidth - xt - Config.decorBorderMenuItemSize - l);
@@ -598,10 +598,10 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
         if (s >= '0' && s <= '9')
             found = true;
 
-        if (doBreak)
+        if (doBreak || i > 4)
             break;
-        if (i > 4)
-            break;
+        // if (i > 4)
+        //    break;
     }
     if (found) {
         menuNumber = skipspace(text.substr(0, i).c_str());
@@ -690,7 +690,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const cEvent *Event = NULL;
 
     bool DrawProgress = true;
-    cString buffer("");
     int y = Index * itemChannelHeight;
 
     if (Current)
@@ -743,10 +742,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString ws = cString::sprintf("%d", Channels.MaxNumber());
 #endif
     int w = font->Width(ws);
+
+    cString buffer("");
     if (!Channel->GroupSep())
         buffer = cString::sprintf("%d", Channel->Number());
-    else
-        buffer = "";
+    // else
+    //    buffer = "";
     Width = font->Width(buffer);
     if (Width < w)
         Width = w;
@@ -1064,9 +1065,9 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                             break;
                         }
                         if (p->description)
-                            audio << p->description << " (" << audio_type << ", " << p->language << ")";
+                            audio << p->description << " (" << audio_type << ", " << p->language << ')';
                         else
-                            audio << p->language << " (" << audio_type << ")";
+                            audio << p->language << " (" << audio_type << ')';
                         break;
                     case sc_subtitle:
                         if (firstSubtitle)
@@ -1074,7 +1075,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                         else
                             subtitle << ", ";
                         if (p->description)
-                            subtitle << p->description << " (" << p->language << ")";
+                            subtitle << p->description << " (" << p->language << ')';
                         else
                             subtitle << p->language;
                         break;
@@ -1179,7 +1180,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     const cChannel *Channel = Timer->Channel();
     const cEvent *Event = Timer->Event();
 
-    cString buffer("");
     int y = Index * itemTimerHeight;
 
     if (Current)
@@ -1260,7 +1260,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     cString ws = cString::sprintf("%d", Channels.MaxNumber());
 #endif
     int w = font->Width(*ws);
-    buffer = cString::sprintf("%d", Channel->Number());
+    cString buffer = cString::sprintf("%d", Channel->Number());
     int Width = font->Width(*buffer);
     if (Width < w)
         Width = w;
@@ -1358,7 +1358,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 std::string tilde = File;
                 size_t found = tilde.find(" ~ ");
-                size_t found2 = tilde.find("~");
+                size_t found2 = tilde.find('~');
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
                     std::string second = tilde.substr(found + 2, tilde.length());
@@ -1375,7 +1375,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     menuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, font,
                                          menuItemWidth - Left - marginItem);
                     int l = font->Width(first.c_str());
-                    l += font->Width("X");
+                    l += font->Width('X');
                     menuPixmap->DrawText(cPoint(Left + l, Top), second.c_str(), ColorExtraTextFg, ColorBg, font,
                                          menuItemWidth - Left - l - marginItem);
                 } else
@@ -1400,7 +1400,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 std::string tilde = File;
                 size_t found = tilde.find(" ~ ");
-                size_t found2 = tilde.find("~");
+                size_t found2 = tilde.find('~');
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
                     std::string second = tilde.substr(found + 2, tilde.length());
@@ -1417,7 +1417,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     menuPixmap->DrawText(cPoint(Left, Top + fontHeight), first.c_str(), ColorFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
                     int l = fontSml->Width(first.c_str());
-                    l += fontSml->Width("X");
+                    l += fontSml->Width('X');
                     menuPixmap->DrawText(cPoint(Left + l, Top + fontHeight), second.c_str(), ColorExtraTextFg, ColorBg,
                                          fontSml, menuItemWidth - Left - l - marginItem);
                 } else
@@ -1595,12 +1595,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += imageBGWidth + marginItem * 2;
         LeftSecond = Left;
 
-        cString channame("");
-
         w = menuItemWidth / 10 * 2;
         if (!isScrolling)
             w = (menuItemWidth - scrollBarWidth) / 10 * 2;
 
+        cString channame("");
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
             channame = Channel->Name();
             w = font->Width(*channame);
@@ -1757,7 +1756,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     } else {
                         menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
-                        Left += fontSml->Width(Event->Title()) + fontSml->Width("~");
+                        Left += fontSml->Width(Event->Title()) + fontSml->Width('~');
                         cString ShortText = cString::sprintf("%s", Event->ShortText());
                         menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
@@ -1777,7 +1776,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
                                      menuItemWidth - Left - marginItem);
                 if (Event->ShortText()) {
-                    Left += fontSml->Width(Event->Title()) + font->Width("~");
+                    Left += fontSml->Width(Event->Title()) + font->Width('~');
                     cString ShortText = cString::sprintf("%s", Event->ShortText());
                     menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
@@ -1815,7 +1814,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     } else {
                         menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
-                        Left += font->Width(Event->Title()) + font->Width("~");
+                        Left += font->Width(Event->Title()) + font->Width('~');
                         cString ShortText = cString::sprintf("%s", Event->ShortText());
                         menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
@@ -1834,7 +1833,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
                 if (Event->ShortText()) {
-                    Left += font->Width(Event->Title()) + font->Width("~");
+                    Left += font->Width(Event->Title()) + font->Width('~');
                     cString ShortText = cString::sprintf("%s", Event->ShortText());
                     menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, font,
                                          menuItemWidth - Left - marginItem);
@@ -2463,9 +2462,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         break;
                     }
                     if (p->description)
-                        audio << p->description << " (" << audio_type << ", " << p->language << ")";
+                        audio << p->description << " (" << audio_type << ", " << p->language << ')';
                     else
-                        audio << p->language << " (" << audio_type << ")";
+                        audio << p->language << " (" << audio_type << ')';
                     break;
                 case sc_subtitle:
                     if (firstSubtitle)
@@ -2473,7 +2472,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     else
                         subtitle << ", ";
                     if (p->description)
-                        subtitle << p->description << " (" << p->language << ")";
+                        subtitle << p->description << " (" << p->language << ')';
                     else
                         subtitle << p->language;
                     break;
@@ -2577,7 +2576,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
                         sstrReruns << ":  " << r->event->Title();
                         // if (!isempty(r->event->ShortText()))
-                        //    sstrReruns << "~" << r->event->ShortText();
+                        //    sstrReruns << '~' << r->event->ShortText();
                         sstrReruns << '\n';
                     }
                     delete list;
@@ -3028,7 +3027,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
                 else
                     filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
-                rc = stat(filename, &filebuf);
+                rc = stat(*filename, &filebuf);
                 if (rc == 0)
                     filesize[i] = filesize[i - 1] + filebuf.st_size;
                 else {
@@ -3073,7 +3072,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 text << tr("Length") << ": " << *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond());
                 if (hasMarks)
                     text << " (" << tr("cutted") << ": "
-                         << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ")";
+                         << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ')';
                 text << '\n';
             }
             delete index;
@@ -3152,9 +3151,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                             break;
                         }
                         if (p->description)
-                            audio << p->description << " (" << audio_type << ", " << p->language << ")";
+                            audio << p->description << " (" << audio_type << ", " << p->language << ')';
                         else
-                            audio << p->language << " (" << audio_type << ")";
+                            audio << p->language << " (" << audio_type << ')';
                         break;
                     case sc_subtitle:
                         if (firstSubtitle)
@@ -3162,7 +3161,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                         else
                             subtitle << ", ";
                         if (p->description)
-                            subtitle << p->description << " (" << p->language << ")";
+                            subtitle << p->description << " (" << p->language << ')';
                         else
                             subtitle << p->language;
                         break;
@@ -3197,7 +3196,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
                 if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) ||
                     !pattern.empty()) {
-                    text << "\n\n" << tr("additional information") << ":";  // Show extrainfos
+                    text << "\n\n" << tr("additional information") << ':';  // Show extrainfos
                     if (!channel.empty() && !searchtimer.empty()) {
                         text << "\nEPGsearch: " << tr("channel") << ": " << channel << ", " << tr("search pattern")
                              << ": " << searchtimer;
@@ -3205,7 +3204,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     if (!causedby.empty() && !reason.empty()) {  // TVScraper
                         text << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason") << ": ";
                         std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
-                        if (reason.compare(imp) == 0)
+                        if (reason == "improve")
                             text << tr("improve");
                         else if (reason.compare(col) == 0)
                             text << tr("collection");
@@ -3456,7 +3455,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 filename = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
             else
                 filename = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
-            rc = stat(filename, &filebuf);
+            rc = stat(*filename, &filebuf);
             if (rc == 0)
                 filesize[i] = filesize[i - 1] + filebuf.st_size;
             else {
@@ -3501,7 +3500,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             recAdditional << tr("Length") << ": " << *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond());
             if (hasMarks)
                 recAdditional << " (" << tr("cutted") << ": "
-                              << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ")";
+                              << *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond()) << ')';
             recAdditional << '\n';
         }
         delete index;
@@ -3580,9 +3579,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         break;
                     }
                     if (p->description)
-                        audio << p->description << " (" << audio_type << ", " << p->language << ")";
+                        audio << p->description << " (" << audio_type << ", " << p->language << ')';
                     else
-                        audio << p->language << " (" << audio_type << ")";
+                        audio << p->language << " (" << audio_type << ')';
                     break;
                 case sc_subtitle:
                     if (firstSubtitle)
@@ -3590,7 +3589,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     else
                         subtitle << ", ";
                     if (p->description)
-                        subtitle << p->description << " (" << p->language << ")";
+                        subtitle << p->description << " (" << p->language << ')';
                     else
                         subtitle << p->language;
                     break;
@@ -3639,7 +3638,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     recAdditional << "\nTVScraper: " << tr("caused by") << ": " << causedby << ", " << tr("reason")
                                   << ": ";
                     std::string imp("improve"), col("collection"), tvs("TV show, missing episode");
-                    if (reason.compare(imp) == 0)
+                    if (reason == "improve")
                         recAdditional << tr("improve");
                     else if (reason.compare(col) == 0)
                         recAdditional << tr("collection");
@@ -4743,7 +4742,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                 chanName = channel->Name();
             else
                 chanName = tr("Unknown");
-            strDevice << *chanName << ")";
+            strDevice << *chanName << ')';
         } else if (recDevices[i]) {
             strDevice << tr("recording") << " (";
             cString chanName("");
@@ -4751,7 +4750,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                 chanName = channel->Name();
             else
                 chanName = tr("Unknown");
-            strDevice << *chanName << ")";
+            strDevice << *chanName << ')';
         } else {
             if (channel) {
                 cString chanName = channel->Name();
@@ -4762,7 +4761,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                 } else {
                     if (Config.MainMenuWidgetDVBDevicesDiscardUnknown)
                         continue;
-                    strDevice << tr("Unknown") << " (" << *chanName << ")";
+                    strDevice << tr("Unknown") << " (" << *chanName << ')';
                 }
             } else {
                 if (Config.MainMenuWidgetDVBDevicesDiscardNotUsed)
@@ -4908,7 +4907,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
-                    strTimer << "L";
+                    strTimer << 'L';
                 strTimer << count + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
@@ -4940,7 +4939,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     pRemoteTimers && (timerRemoteRec.Size() > 0 || timerRemoteActive.Size() > 0))
-                    strTimer << "L";
+                    strTimer << 'L';
                 strTimer << count + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
@@ -4968,7 +4967,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 const cChannel *Channel = (timerRemoteRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
                 std::ostringstream strTimer("");
-                strTimer << "R" << remotecount + 1 << ": ";
+                strTimer << 'R' << remotecount + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
                 else
@@ -4996,7 +4995,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 const cChannel *Channel = (timerRemoteActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
                 std::ostringstream strTimer("");
-                strTimer << "R" << remotecount + 1 << ": ";
+                strTimer << 'R' << remotecount + 1 << ": ";
                 if (Channel)
                     strTimer << Channel->Name() << " - ";
                 else
@@ -5142,7 +5141,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         std::string fname = e->d_name;
-        std::size_t found = fname.find("_");
+        std::size_t found = fname.find('_');
         if (found != std::string::npos) {
             std::string num = fname.substr(0, found);
             if (atoi(num.c_str()) > 0)
@@ -5164,7 +5163,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                 break;
 
             std::string fname = files[i];
-            std::size_t found = fname.find("_");
+            std::size_t found = fname.find('_');
             if (found != std::string::npos) {
                 std::string num = fname.substr(0, found);
                 if (atoi(num.c_str()) > 0) {
@@ -5748,7 +5747,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             if (index > 0) {
                 contentWidget.AddText("|", false, cRect(left, ContentTop, 0, 0), Theme.Color(clrMenuEventFontInfo),
                                       Theme.Color(clrMenuEventBg), font);
-                left += font->Width("|") + marginItem * 2;
+                left += font->Width('|') + marginItem * 2;
             }
 
             cString weatherIcon = cString::sprintf("widgets/%s", icon.c_str());

@@ -354,7 +354,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), i);
             else
                 filename = cString::sprintf("%s/%05d.ts", recording->FileName(), i);
-            rc = stat(filename, &filebuf);
+            rc = stat(*filename, &filebuf);
             if (rc == 0)
                 filesize[i] = filesize[i - 1] + filebuf.st_size;
             else {
@@ -454,7 +454,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         PixmapFill(chanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (mediaPath.length() > 0) {
-            if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
+            if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
                 dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
                 if (Config.PlaybackWeatherShow) {
                     mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
@@ -485,7 +485,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             imgWidth = imgRecCut->Width();
 
         int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total) - marginItem - imgWidth -
-                    font->Width(" ") - font->Width(cutted);
+                    font->Width(' ') - font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
             size_t found = tot.find_last_of(':');
@@ -500,11 +500,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     std::string secs2 = cutt.substr(found, cutt.length() - found);
 
                     right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(hm.c_str()) -
-                            fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") -
+                            fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(' ') -
                             font->Width(hm2.c_str()) - fontSecs->Width(secs2.c_str());
                 } else
                     right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(hm.c_str()) -
-                            fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(" ") -
+                            fontSecs->Width(secs.c_str()) - marginItem - imgWidth - font->Width(' ') -
                             font->Width(cutted);
 
                 labelPixmap->DrawText(cPoint(right - marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
@@ -513,18 +513,18 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), fontSecs,
                                       fontSecs->Width(secs.c_str()), fontSecs->Height());
                 right += font->Width(hm.c_str()) + fontSecs->Width(secs.c_str());
-                right += font->Width(" ");
+                right += font->Width(' ');
             } else {
                 labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
                 right += font->Width(total);
-                right += font->Width(" ");
+                right += font->Width(' ');
             }
         } else {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
             right += font->Width(total);
-            right += font->Width(" ");
+            right += font->Width(' ');
         }
 
         if (imgRecCut) {

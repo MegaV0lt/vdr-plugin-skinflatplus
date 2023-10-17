@@ -143,11 +143,11 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     lastScreenWidth = -1;
 
     if (Channel) {
-        isRadioChannel = ((!Channel->Vpid())&&(Channel->Apid(0))) ? true : false;
+        isRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         isGroup = Channel->GroupSep();
 
         channelName = Channel->Name();
-        if (!Channel->GroupSep())
+        if (!isGroup)
             channelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
             channelNumber = cString::sprintf("%d-", Number);
@@ -430,7 +430,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (mediaPath.length() > 0) {
-        if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
+        if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
             if (Config.ChannelWeatherShow) {
                 mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
@@ -563,9 +563,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
                                    dvbapiInfoFont->Width(dvbapiInfoText) * 2);
     left += dvbapiInfoFont->Width(dvbapiInfoText) + marginItem;
 
-    cImage *img = NULL;
     cString iconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
+    cImage *img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
     if (img) {
         chanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + marginItem;

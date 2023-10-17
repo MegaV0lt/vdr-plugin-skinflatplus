@@ -45,7 +45,7 @@ void cTextScroll::Draw(void) {
     if (ColorExtraTextFg) {
         std::string tilde = Text;
         size_t found = tilde.find(" ~ ");
-        size_t found2 = tilde.find("~");
+        size_t found2 = tilde.find('~');
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 2, tilde.length());
@@ -59,7 +59,7 @@ void cTextScroll::Draw(void) {
 
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             int l = Font->Width(first.c_str());
-            l += Font->Width("X");
+            l += Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
         } else
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
