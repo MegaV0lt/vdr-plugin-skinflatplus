@@ -101,7 +101,6 @@ void cFlatBaseRender::CreateFullOsd(void) {
 }
 
 void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
-    /* Unused variables? */
     osdLeft = left;
     osdTop = top;
     osdWidth = width;
@@ -444,7 +443,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
             if (imgBG) {
                 imageBGHeight = imgBG->Height();
                 imageBGWidth = imgBG->Width();
-                iconTop = (topBarHeight / 2 - imgBG->Height() / 2);
+                iconTop = (topBarHeight / 2 - imageBGHeight / 2);
                 topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *imgBG);
             }
 
@@ -881,20 +880,12 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string tilde = Text;
-        size_t found = tilde.find(" ~ ");
-        size_t found2 = tilde.find('~');
+        size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 2, tilde.length());
-
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
-                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
-            int l = font->Width(first.c_str());
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
-                                    Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
-        } else if (found2 != std::string::npos) {
-            std::string first = tilde.substr(0, found2);
-            std::string second = tilde.substr(found2 + 1, tilde.length());
+            rtrim(first);   // Trim possible space on right side
+            ltrim(second);  // Trim possible space at begin
 
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
@@ -902,7 +893,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             l += font->Width('X');
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
-        } else {
+        } else {  // ~ not found
             if ((textWidth > maxWidth) && Config.ScrollerEnable)
                 messageScroller.AddScroller(
                     Text,

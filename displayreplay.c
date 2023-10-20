@@ -205,7 +205,6 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                    Theme.Color(clrReplayBg));
 
         cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
-        // cString speed("");
 
         if (Speed == -1) {  // Replay or pause
             (Play) ? play = "play_sel" : pause = "pause_sel";

@@ -198,8 +198,6 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (!Resolution)
         PixmapFill(chanIconsPixmap, clrTransparent);
 
-    // int width = fontSmlHeight;
-    // int height = fontSmlHeight;
     int top = heightBottom - fontSmlHeight - marginItem;
     int imageTop {0};
     cImage *img = NULL;
@@ -467,7 +465,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
-    int signalWidth = channelWidth / 2;
 
     if (LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality)
         return;
@@ -489,6 +486,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     int progressLeft = left + SignalFont->Width("STR ") + marginItem;
+    int signalWidth = channelWidth / 2;
     int progressWidth = signalWidth / 2 - progressLeft - marginItem;
     ProgressBarDrawRaw(chanInfoBottomPixmap, chanInfoBottomPixmap,
                        cRect(progressLeft, top, progressWidth, Config.decorProgressSignalSize),

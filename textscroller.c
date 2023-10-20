@@ -44,26 +44,20 @@ void cTextScroll::Draw(void) {
 
     if (ColorExtraTextFg) {
         std::string tilde = Text;
-        size_t found = tilde.find(" ~ ");
-        size_t found2 = tilde.find('~');
+        size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
-            std::string second = tilde.substr(found + 2, tilde.length());
-
-            Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
-            int l = Font->Width(first.c_str());
-            Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
-        } else if (found2 != std::string::npos) {
-            std::string first = tilde.substr(0, found2);
-            std::string second = tilde.substr(found2 + 1, tilde.length());
+            std::string second = tilde.substr(found + 1, tilde.length());
+            rtrim(first);   // Trim possible space on right side
+            ltrim(second);  // Trim possible space at begin
 
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             int l = Font->Width(first.c_str());
             l += Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
-        } else
+        } else  // ~ not found
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
-    } else {
+    } else {  // No extracolor defined
         Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
     }
 }
