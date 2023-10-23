@@ -407,8 +407,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
     cString curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
-    cImage *imgCon = NULL;
-    cImage *imgRec = NULL;
 
     if (strcmp(curDate, topBarLastDate) || topBarUpdateTitle) {
         topBarUpdateTitle = false;
@@ -422,9 +420,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
         PixmapFill(topBarIconPixmap, clrTransparent);
         PixmapFill(topBarIconBGPixmap, clrTransparent);
 
+        cImage *img = NULL;
         if (topBarMenuIconSet && Config.TopBarMenuIconShow) {
             int IconLeft = marginItem;
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
+            img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
             if (img) {
                 int iconTop = (topBarHeight / 2 - img->Height() / 2);
                 topBarIconPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
@@ -447,7 +446,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *imgBG);
             }
 
-            cImage *img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
+            img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
             if (img) {
                 iconTop += (imageBGHeight - img->Height()) / 2;
                 IconLeft += (imageBGWidth - img->Width()) / 2;
@@ -483,6 +482,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int middleWidth {0};
         int numConflicts {0};
+        cImage *imgCon = NULL;
+        cImage *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
             cPlugin *p = cPluginManager::GetPlugin("epgsearch");
             if (p) {
@@ -543,7 +544,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         if (topBarExtraIconSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
             if (img) {
                 Right -= img->Width() + marginItem;
                 middleWidth += img->Width() + marginItem;
@@ -553,7 +554,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int topBarMenuIconRightLeft {0};
         int titleWidth = topBarFont->Width(*topBarTitle);
         if (topBarMenuIconRightSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
                 topBarMenuIconRightWidth = img->Width() + marginItem * 3;
                 titleWidth += topBarMenuIconRightWidth;
@@ -588,7 +589,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         Right += extraMaxWidth + marginItem;
 
         if (topBarExtraIconSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
             if (img) {
                 int iconTop {0};
                 topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *img);
@@ -622,7 +623,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         if (topBarMenuIconRightSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
                 int iconTop = (topBarHeight / 2 - img->Height() / 2);
                 topBarIconPixmap->DrawImage(cPoint(topBarMenuIconRightLeft, iconTop), *img);
@@ -951,11 +952,12 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 
     progressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    progressBarPixmap = CreatePixmap(osd, "progressBarPixmap", 3, cRect(Left, Top, Width, progressBarHeight));
+    progressBarPixmap =
+        CreatePixmap(osd, "progressBarPixmap", 3, cRect(Left, progressBarTop, progressBarWidth, progressBarHeight));
     progressBarPixmapBg =
         CreatePixmap(osd, "progressBarPixmapBg", 2,
-                     cRect(Left - progressBarMarginVer, Top - progressBarMarginHor, Width + progressBarMarginVer * 2,
-                           progressBarHeight + progressBarMarginHor * 2));
+                     cRect(Left - progressBarMarginVer, progressBarTop - progressBarMarginHor,
+                           progressBarWidth + progressBarMarginVer * 2, progressBarHeight + progressBarMarginHor * 2));
     PixmapFill(progressBarPixmap, clrTransparent);
     PixmapFill(progressBarPixmapBg, clrTransparent);
 }
@@ -980,13 +982,16 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
 
     if (PixmapBg && SetBackground)
-        PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
+        // PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
+        PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
         if (PixmapBg == Pixmap)
-            Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
+            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
+            Pixmap->DrawRectangle(rect, ColorBg);
         else
-            Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
+            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
+            Pixmap->DrawRectangle(rect, clrTransparent);
     }
     switch (Type) {
     case 0:  // small line + big line
