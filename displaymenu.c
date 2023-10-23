@@ -723,7 +723,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Channel->GroupSep())
         DrawProgress = false;
 
-    float progress {0.0};
     cString EventTitle("");
 
 #if VDRVERSNUM >= 20301
@@ -816,16 +815,16 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const cSchedules *schedules = cSchedules::Schedules(schedulesLock);
     const cSchedule *Schedule = schedules->GetSchedule(Channel->GetChannelID());
 #endif
+    float progress {0.0};
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = static_cast<int>(roundf((static_cast<float>(time(NULL)) - Event->StartTime()) /
-                                               static_cast<float>(Event->Duration()) * 100.0));
-            if (progress < 0)
-                progress = 0.;
-            else if (progress > 100)
-                progress = 100;
+            //progress = static_cast<int>(roundf((static_cast<float>(time(NULL)) - Event->StartTime()) /
+            //                                   static_cast<float>(Event->Duration()) * 100.0));
+            progress = roundf((time(NULL) * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
+            if (progress < 0) progress = 0.;
+            else if (progress > 100) progress = 100;
 
             EventTitle = Event->Title();
         }
@@ -1603,12 +1602,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 int total = Event->EndTime() - Event->StartTime();
                 if (total >= 0) {
                     // Calculate progress bar
-                    double progress = static_cast<int>(roundf((static_cast<float>(time(NULL)) - Event->StartTime()) /
-                                                              static_cast<float>(Event->Duration()) * 100.0));
-                    if (progress < 0)
-                        progress = 0.;
-                    else if (progress > 100)
-                        progress = 100;
+                    double progress = roundf((time(NULL) * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
+                    if (progress < 0) progress = 0.;
+                    else if (progress > 100) progress = 100;
+                    
                     int PBTop = y + (itemEventHeight - Config.MenuItemPadding) / 2 -
                                 Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize;
                     int PBLeft = Left;

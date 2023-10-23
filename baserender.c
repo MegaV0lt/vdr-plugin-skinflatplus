@@ -120,7 +120,7 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
 
 void cFlatBaseRender::TopBarCreate(void) {
     // int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
-    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.TopBarFontSize));
+    int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);
     topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     topBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     topBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
