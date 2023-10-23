@@ -688,10 +688,10 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     std::vector<std::string> files;
     Decors.Clear();
 
-    cReadDir d(decorPath);
+    cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(decorPath, e->d_name);
+        cString FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
@@ -738,10 +738,10 @@ void cFlatConfig::DecorLoadCurrent(void) {
     cString decorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
 
-    cReadDir d(decorPath);
+    cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(decorPath, e->d_name);
+        cString FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
@@ -924,7 +924,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     std::vector<std::string> files;
     Files.Clear();
 
-    cReadDir d(configsPath);
+    cReadDir d(*configsPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         files.push_back(e->d_name);

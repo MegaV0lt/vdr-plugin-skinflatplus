@@ -2584,6 +2584,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
         std::vector<std::string> actors_role;
+        actors_path.reserve(64);  // Set capacity to at least 64
+        actors_name.reserve(64);
+        actors_role.reserve(64);
 
         std::string mediaPath("");
         int mediaWidth {0};
@@ -3694,6 +3697,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
         std::vector<std::string> actors_role;
+        actors_path.reserve(64);  // Set capacity to at least 64
+        actors_name.reserve(64);
+        actors_role.reserve(64);
 
         std::string mediaPath("");
         int mediaWidth {0};

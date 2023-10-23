@@ -1962,7 +1962,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     left += weatherFont->Width(tempToday.c_str());
 
     int fontAscender = GetFontAscender(Setup.FontOsd, fs);
-    int fontAscender2 = GetFontAscender(Setup.FontOsd, fs / 2.5);
+    int fontAscender2 = GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5));
     int t = (weatherFontHeight - fontAscender) - (weatherFontSign->Height() - fontAscender2);
 
     weatherWidget.AddText(tempTodaySign.c_str(), false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),

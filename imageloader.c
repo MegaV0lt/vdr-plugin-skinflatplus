@@ -37,7 +37,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
     if (img)
-        return img;
+        return img;  // Image found in imagecache
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick3 = GetMsTicks();
@@ -69,7 +69,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     #endif
 
     imgCache.InsertImage(img, *File, width, height);
-    return img;
+    return img;  // Image loaded from disk
 }
 
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
