@@ -1820,7 +1820,8 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
+    // int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
+    int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
     cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));

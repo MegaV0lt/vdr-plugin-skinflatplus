@@ -43,7 +43,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         uint32_t tick3 = GetMsTicks();
     #endif
 
-    bool success = LoadImage(File);
+    bool success = LoadImage(*File);
 
     if (!success) {
         dsyslog("imageloader LoadLogo: %s could not be loaded", *File);
@@ -101,7 +101,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick3 = GetMsTicks();
     #endif
 
-    bool success = LoadImage(File);
+    bool success = LoadImage(*File);
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick4 = GetMsTicks();
@@ -128,7 +128,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
             uint32_t tick7 = GetMsTicks();
         #endif
 
-        success = LoadImage(File);
+        success = LoadImage(*File);
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick8 = GetMsTicks();
@@ -184,7 +184,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         uint32_t tick3 = GetMsTicks();
     #endif
 
-    bool success = LoadImage(File);
+    bool success = LoadImage(*File);
 
     if (!success) {
         dsyslog("imageloader LoadFile: %s could not be loaded", *File);
