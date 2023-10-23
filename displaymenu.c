@@ -574,9 +574,10 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string menuNumber("");
     bool found = false;
     bool doBreak = false;
+    char s(' ');
     size_t i = 0;
     for (; i < text.length(); ++i) {
-        char s = text.at(i);
+        s = text.at(i);
         if (i == 0) {
             // If text directly starts with nonnumeric, break
             if (!(s >= '0' && s <= '9'))
@@ -591,8 +592,6 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
 
         if (doBreak || i > 4)
             break;
-        // if (i > 4)
-        //    break;
     }
     if (found) {
         menuNumber = skipspace(text.substr(0, i).c_str());
@@ -606,8 +605,9 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
 
 cString cFlatDisplayMenu::GetIconName(std::string element) {
     // Check for standard menu entries
+    std::string s("");
     for (int i {0}; i < 16; ++i) {
-        std::string s = trVDR(items[i].c_str());
+        s = trVDR(items[i].c_str());
         if (s == element) {
             // cString menuIcon = cString::sprintf("menuIcons/%s", items[i].c_str());
             return cString::sprintf("menuIcons/%s", items[i].c_str());
@@ -624,12 +624,13 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
     } catch (...) {
     }
     // Check for plugins
+    std::string plugMainEntry("");
     for (int i {0};; ++i) {
         cPlugin *p = cPluginManager::GetPlugin(i);
         if (p) {
             const char *mainMenuEntry = p->MainMenuEntry();
             if (mainMenuEntry) {
-                std::string plugMainEntry = mainMenuEntry;
+                plugMainEntry = mainMenuEntry;
                 try {
                     if (element.substr(0, plugMainEntry.size()) == plugMainEntry) {
                         return cString::sprintf("pluginIcons/%s", p->Name());
@@ -736,11 +737,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString buffer("");
     if (!Channel->GroupSep())
         buffer = cString::sprintf("%d", Channel->Number());
-    // else
-    //    buffer = "";
-    Width = font->Width(buffer);
-    if (Width < w)
-        Width = w;
+
+    Width = font->Width(*buffer);
+    if (Width < w) Width = w;
 
     menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
     Left += Width + marginItem;
@@ -752,11 +751,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int imageBGWidth = imageHeight * 1.34;
 
     if (!Channel->GroupSep()) {
-        cImage *imgBG = imgLoader.LoadIcon("logo_background", imageHeight * 1.34, imageHeight);
+        cImage *imgBG = imgLoader.LoadIcon("logo_background", imageBGWidth, imageBGHeight);
         if (imgBG) {
             imageBGHeight = imgBG->Height();
             imageBGWidth = imgBG->Width();
-            imageTop = Top + (fontHeight - imgBG->Height()) / 2;
+            imageTop = Top + (fontHeight - imageBGHeight) / 2;
             menuIconsBGPixmap->DrawImage(cPoint(imageLeft, imageTop), *imgBG);
         }
     }
@@ -844,7 +843,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             menuPixmap->DrawText(cPoint(Left + (menuItemWidth / 10 * 2), Top), *groupname, ColorFg, ColorBg, font, 0, 0,
                                  taCenter);
         } else {
-            if (Current && font->Width(buffer) > (Width) && Config.ScrollerEnable) {
+            if (Current && font->Width(*buffer) > (Width) && Config.ScrollerEnable) {
                 menuItemScroller.AddScroller(*buffer, cRect(LeftName, Top + menuTop, Width, fontHeight), ColorFg,
                                              clrTransparent, font);
             } else {
@@ -2465,10 +2464,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     int headIconTop = chHeight - fontHeight - marginItem;
     int headIconLeft = chWidth - fontHeight - marginItem;
-
+    cString iconName("");
+    cImage *img = NULL;
     if (Fsk.length() > 0) {
-        cString iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        cImage *img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= fontHeight + marginItem;
@@ -2484,8 +2484,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
-        cString iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        cImage *img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -3025,9 +3025,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 off_t FileOffset;
 
                 bool cutin = true;
+                int32_t position {0};
                 cMark *mark = marks.First();
                 while (mark) {
-                    int32_t position = mark->Position();
+                    position = mark->Position();
                     index->Get(position, &FileNumber, &FileOffset);
                     if (cutin) {
                         cutinframe = position;
@@ -3450,9 +3451,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             off_t FileOffset;
 
             bool cutin = true;
+            int32_t position {0};
             cMark *mark = marks.First();
             while (mark) {
-                int32_t position = mark->Position();
+                position = mark->Position();
                 index->Get(position, &FileNumber, &FileOffset);
                 if (cutin) {
                     cutinframe = position;
@@ -3631,9 +3633,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     int headIconTop = chHeight - fontHeight - marginItem;
     int headIconLeft = chWidth - fontHeight - marginItem;
+    cString iconName("");
+    cImage *img = NULL;
     if (Fsk.length() > 0) {
-        cString iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        cImage *img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= fontHeight + marginItem;
@@ -3649,8 +3653,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
-        cString iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        cImage *img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -5811,10 +5815,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
     cString Path = cString::sprintf("%s%s/menuIcons", *Config.iconPath, Setup.OSDTheme);
+    cString FileName("");
     cReadDir d(*Path);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
+        FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
         imgLoader.LoadIcon(*FileName, fontHeight - marginItem * 2, fontHeight - marginItem * 2);
     }
 

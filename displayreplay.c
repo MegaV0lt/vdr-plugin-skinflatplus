@@ -342,10 +342,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
-        int i {0};
+        int i {0}, rc {0};
         struct stat filebuf;
         cString filename("");
-        int rc {0};
 
         do {
             ++i;
@@ -369,9 +368,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             off_t FileOffset;
 
             bool cutin = true;
+            int32_t position {0};
             cMark *mark = marks.First();
             while (mark) {
-                int32_t position = mark->Position();
+                position = mark->Position();
                 index->Get(position, &FileNumber, &FileOffset);
                 if (cutin) {
                     cutinframe = position;

@@ -234,7 +234,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
     int ChartDiskUsage = DiskUsagePercent;
     cString iconName("");
-
     cString extra1(""), extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
