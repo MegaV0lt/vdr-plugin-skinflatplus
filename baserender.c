@@ -1676,17 +1676,18 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     if (Height < 0) {
         Height *= -1;
         for (int i = Height, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
         for (int i {0}; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     }
@@ -1694,17 +1695,18 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     if (Width < 0) {
         Width *= -1;
         for (int i = Width, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Width * j;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } else {
         for (int i {0}; i < Width; ++i) {
             Alpha = 255.0 / Width * i;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     }
@@ -1712,36 +1714,40 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
     }
 }
@@ -1749,11 +1755,12 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
     }
 }
@@ -1761,11 +1768,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
     }
 }
@@ -1773,11 +1781,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
     }
 }
@@ -1785,11 +1794,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);
     }
 }
