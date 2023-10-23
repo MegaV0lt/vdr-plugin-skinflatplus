@@ -1605,7 +1605,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     double progress = roundf((time(NULL) * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
                     if (progress < 0) progress = 0.;
                     else if (progress > 100) progress = 100;
-                    
+
                     int PBTop = y + (itemEventHeight - Config.MenuItemPadding) / 2 -
                                 Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize;
                     int PBLeft = Left;
@@ -2766,6 +2766,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             int actorsPerLine {6};
             int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
+            std::string path("");  // Path for actorimage
+            cImage *img = NULL;    // Actor image
+            std::string name("");  // Actor Name
+            std::string role("");  // Actor role
+            std::ostringstream sstrRole("");  // Stringstream for role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
             int picLines = numActors / picsPerLine;
             if (numActors % picsPerLine != 0)
@@ -2778,15 +2783,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 for (int col {0}; col < picsPerLine; ++col) {
                     if (actor == numActors)
                         break;
-                    std::string path = actors_path[actor];
-                    cImage *img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
+                    path = actors_path[actor];
+                    img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
-                        std::string name = actors_name[actor];
-                        std::ostringstream sstrRole("");
-                        if (actors_role[actor].length() > 0)
+                        name = actors_name[actor];
+                        if (actors_role[actor].length() > 0) {
+                            sstrRole.str("");  // Set string to ""
                             sstrRole << "\"" << actors_role[actor] << "\"";
-                        std::string role = sstrRole.str();
+                        }
+                        role = sstrRole.str();
                         ComplexContent.AddText(name.c_str(), false,
                                                cRect(x, y + img->Height() + marginItem, actorWidth, 0),
                                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
@@ -2988,10 +2994,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
             filesize[0] = 0;
 
-            int i {0};
+            int i {0}, rc {0};
             struct stat filebuf;
             cString filename("");
-            int rc {0};
 
             do {
                 ++i;
@@ -3074,10 +3079,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             }
             // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (recInfo) {
-                if (recInfo->Errors() >= 1)
+            if (recInfo && recInfo->Errors() >= 1)
                     text << tr("TS errors") << ": " << recInfo->Errors() << '\n';
-            }
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
@@ -3416,10 +3419,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         uint16_t maxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
         filesize[0] = 0;
 
-        int i {0};
+        int i {0}, rc {0};
         struct stat filebuf;
         cString filename("");
-        int rc {0};
 
         do {
             ++i;
@@ -3502,10 +3504,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-        if (recInfo) {
-            if (recInfo->Errors() >= 1)
+        if (recInfo && recInfo->Errors() >= 1)
                 recAdditional << '\n' << tr("TS errors") << ": " << recInfo->Errors();
-        }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
@@ -3883,6 +3883,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             int actorsPerLine {6};
             int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
+            std::string path("");  // Path for actorimage
+            cImage *img = NULL;    // Actor image
+            std::string name("");  // Actor Name
+            std::string role("");  // Actor role
+            std::ostringstream sstrRole("");  // Stringstream for role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
             int picLines = numActors / picsPerLine;
             if (numActors % picsPerLine != 0)
@@ -3895,14 +3900,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 for (int col {0}; col < picsPerLine; ++col) {
                     if (actor == numActors)
                         break;
-                    std::string path = actors_path[actor];
-                    cImage *img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
+                    path = actors_path[actor];
+                    img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
-                        std::string name = actors_name[actor];
-                        std::ostringstream sstrRole("");
+                        name = actors_name[actor];
+                        sstrRole.str("");  // Set string to ""
                         sstrRole << "\"" << actors_role[actor] << "\"";
-                        std::string role = sstrRole.str();
+                        role = sstrRole.str();
                         ComplexContent.AddText(name.c_str(), false,
                                                cRect(x, y + img->Height() + marginItem, actorWidth, 0),
                                                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
