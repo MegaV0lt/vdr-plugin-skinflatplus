@@ -883,7 +883,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
-            std::string second = tilde.substr(found + 2, tilde.length());
+            std::string second = tilde.substr(found + 1, tilde.length());
             rtrim(first);   // Trim possible space on right side
             ltrim(second);  // Trim possible space at begin
 

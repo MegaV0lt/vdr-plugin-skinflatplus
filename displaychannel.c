@@ -542,10 +542,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     dsyslog("from: %s", *ecmInfo.from);
     dsyslog("protocol: %s", *ecmInfo.protocol);
 */
-    if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0)
-        return;
-
-    if (ecmInfo.ecmtime > 9999)
+    if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0 || ecmInfo.ecmtime > 9999)
         return;
 
     int top = fontHeight * 2 + fontSmlHeight * 2 + marginItem;
@@ -558,8 +555,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     cString dvbapiInfoText = cString::sprintf("DVBAPI: ");
     chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
-                                   dvbapiInfoFont->Width(dvbapiInfoText) * 2);
-    left += dvbapiInfoFont->Width(dvbapiInfoText) + marginItem;
+                                   dvbapiInfoFont->Width(*dvbapiInfoText) * 2);
+    left += dvbapiInfoFont->Width(*dvbapiInfoText) + marginItem;
 
     cString iconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
     cImage *img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
@@ -579,7 +576,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
     chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
-                                   dvbapiInfoFont->Width(dvbapiInfoText) * 2);
+                                   dvbapiInfoFont->Width(*dvbapiInfoText) * 2);
 }
 
 void cFlatDisplayChannel::Flush(void) {
