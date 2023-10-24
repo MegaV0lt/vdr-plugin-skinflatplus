@@ -42,6 +42,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
     if (!Osd)
         return;
+        
     if (Pixmap) {
         Osd->DestroyPixmap(Pixmap);
         Pixmap = NULL;

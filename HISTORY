@@ -1,5 +1,12 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-10-24: Version 0.7.6
+- [update] Reduce code when searching vor ~
+- [update] Remove some static_casts
+- [update] Initialize some vars outside of loop
+- [update] Add reserve to some vectors
+- [update] Some internal optimizations
+
 2023-10-16: Version 0.7.5
 - [update] Prevents *magick from occupying segfaults
 - [update] Use original postersize in replay and channelinfo

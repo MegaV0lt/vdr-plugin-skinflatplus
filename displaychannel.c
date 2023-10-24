@@ -143,11 +143,11 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     lastScreenWidth = -1;
 
     if (Channel) {
-        isRadioChannel = ((!Channel->Vpid())&&(Channel->Apid(0))) ? true : false;
+        isRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         isGroup = Channel->GroupSep();
 
         channelName = Channel->Name();
-        if (!Channel->GroupSep())
+        if (!isGroup)
             channelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
             channelNumber = cString::sprintf("%d-", Number);
@@ -198,8 +198,6 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (!Resolution)
         PixmapFill(chanIconsPixmap, clrTransparent);
 
-    // int width = fontSmlHeight;
-    // int height = fontSmlHeight;
     int top = heightBottom - fontSmlHeight - marginItem;
     int imageTop {0};
     cImage *img = NULL;
@@ -286,7 +284,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             epgWidth += marginItem + RecWidth;
         }
 
-        int s = static_cast<int>(time(NULL) - Present->StartTime()) / 60;
+        int s = /* static_cast<int>*/(time(NULL) - Present->StartTime()) / 60;
         int sleft = (Present->Duration() / 60) - s;
 
         cString seen("");
@@ -430,7 +428,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (mediaPath.length() > 0) {
-        if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poter/banner
+        if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
             if (Config.ChannelWeatherShow) {
                 mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
@@ -467,7 +465,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
-    int signalWidth = channelWidth / 2;
 
     if (LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality)
         return;
@@ -489,6 +486,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     int progressLeft = left + SignalFont->Width("STR ") + marginItem;
+    int signalWidth = channelWidth / 2;
     int progressWidth = signalWidth / 2 - progressLeft - marginItem;
     ProgressBarDrawRaw(chanInfoBottomPixmap, chanInfoBottomPixmap,
                        cRect(progressLeft, top, progressWidth, Config.decorProgressSignalSize),
@@ -544,10 +542,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     dsyslog("from: %s", *ecmInfo.from);
     dsyslog("protocol: %s", *ecmInfo.protocol);
 */
-    if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0)
-        return;
-
-    if (ecmInfo.ecmtime > 9999)
+    if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0 || ecmInfo.ecmtime > 9999)
         return;
 
     int top = fontHeight * 2 + fontSmlHeight * 2 + marginItem;
@@ -560,12 +555,11 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     cString dvbapiInfoText = cString::sprintf("DVBAPI: ");
     chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
-                                   dvbapiInfoFont->Width(dvbapiInfoText) * 2);
-    left += dvbapiInfoFont->Width(dvbapiInfoText) + marginItem;
+                                   dvbapiInfoFont->Width(*dvbapiInfoText) * 2);
+    left += dvbapiInfoFont->Width(*dvbapiInfoText) + marginItem;
 
-    cImage *img = NULL;
     cString iconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
+    cImage *img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
     if (img) {
         chanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + marginItem;
@@ -582,7 +576,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
     chanInfoBottomPixmap->DrawText(cPoint(left, top), *dvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), dvbapiInfoFont,
-                                   dvbapiInfoFont->Width(dvbapiInfoText) * 2);
+                                   dvbapiInfoFont->Width(*dvbapiInfoText) * 2);
 }
 
 void cFlatDisplayChannel::Flush(void) {

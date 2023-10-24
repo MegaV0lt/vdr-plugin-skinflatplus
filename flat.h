@@ -236,3 +236,22 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
 cString GetFormatIcon(int screenWidth);
 cString GetRecordingerrorIcon(int recInfoErrors);
 cString GetRecordingseenIcon(int frameTotal, int frameResume);
+
+// Trim from left
+inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
+    s.erase(0, s.find_first_not_of(t));
+    // return s;  // Only inplace trimming
+}
+
+// Trim from right
+inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {
+    s.erase(s.find_last_not_of(t) + 1);
+    // return s;  // Only inplace trimming
+}
+
+// Trim from left & right
+inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
+    /* return */ // ltrim(rtrim(s, t), t);
+    ltrim(s, t);
+    rtrim(s, t);
+}

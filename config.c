@@ -686,12 +686,13 @@ int roundUp(int numToRound, int multiple) {
 void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     cString decorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
+    files.reserve(64);  // Set to at least 64 entrys
     Decors.Clear();
 
-    cReadDir d(decorPath);
+    cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(decorPath, e->d_name);
+        cString FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
@@ -737,11 +738,12 @@ cString cFlatConfig::DecorDescription(cString File) {
 void cFlatConfig::DecorLoadCurrent(void) {
     cString decorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
+    files.reserve(64);  // Set to at least 64 entrys
 
-    cReadDir d(decorPath);
+    cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(decorPath, e->d_name);
+        cString FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
@@ -922,9 +924,10 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
 void cFlatConfig::GetConfigFiles(cStringList &Files) {
     cString configsPath = cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
     std::vector<std::string> files;
+    files.reserve(64);  // Set to at least 64 entrys
     Files.Clear();
 
-    cReadDir d(configsPath);
+    cReadDir d(*configsPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         files.push_back(e->d_name);

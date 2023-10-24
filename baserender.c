@@ -101,7 +101,6 @@ void cFlatBaseRender::CreateFullOsd(void) {
 }
 
 void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
-    /* Unused variables? */
     osdLeft = left;
     osdTop = top;
     osdWidth = width;
@@ -121,7 +120,7 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
 
 void cFlatBaseRender::TopBarCreate(void) {
     // int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
-    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.TopBarFontSize));
+    int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);
     topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     topBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     topBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
@@ -235,7 +234,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
     int ChartDiskUsage = DiskUsagePercent;
     cString iconName("");
-
     cString extra1(""), extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
@@ -400,16 +398,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             iconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
-    TopBarSetTitleExtra(extra1, extra2);
-    TopBarSetExtraIcon(iconName);
+    TopBarSetTitleExtra(*extra1, *extra2);
+    TopBarSetExtraIcon(*iconName);
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
     cString curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
-    cImage *imgCon = NULL;
-    cImage *imgRec = NULL;
 
     if (strcmp(curDate, topBarLastDate) || topBarUpdateTitle) {
         topBarUpdateTitle = false;
@@ -423,9 +419,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
         PixmapFill(topBarIconPixmap, clrTransparent);
         PixmapFill(topBarIconBGPixmap, clrTransparent);
 
+        cImage *img = NULL;
         if (topBarMenuIconSet && Config.TopBarMenuIconShow) {
             int IconLeft = marginItem;
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
+            img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
             if (img) {
                 int iconTop = (topBarHeight / 2 - img->Height() / 2);
                 topBarIconPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
@@ -444,11 +441,11 @@ void cFlatBaseRender::TopBarUpdate(void) {
             if (imgBG) {
                 imageBGHeight = imgBG->Height();
                 imageBGWidth = imgBG->Width();
-                iconTop = (topBarHeight / 2 - imgBG->Height() / 2);
+                iconTop = (topBarHeight / 2 - imageBGHeight / 2);
                 topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *imgBG);
             }
 
-            cImage *img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
+            img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
             if (img) {
                 iconTop += (imageBGHeight - img->Height()) / 2;
                 IconLeft += (imageBGWidth - img->Width()) / 2;
@@ -484,6 +481,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int middleWidth {0};
         int numConflicts {0};
+        cImage *imgCon = NULL;
+        cImage *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
             cPlugin *p = cPluginManager::GetPlugin("epgsearch");
             if (p) {
@@ -544,7 +543,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         if (topBarExtraIconSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
             if (img) {
                 Right -= img->Width() + marginItem;
                 middleWidth += img->Width() + marginItem;
@@ -554,7 +553,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int topBarMenuIconRightLeft {0};
         int titleWidth = topBarFont->Width(*topBarTitle);
         if (topBarMenuIconRightSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
                 topBarMenuIconRightWidth = img->Width() + marginItem * 3;
                 titleWidth += topBarMenuIconRightWidth;
@@ -589,7 +588,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         Right += extraMaxWidth + marginItem;
 
         if (topBarExtraIconSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
             if (img) {
                 int iconTop {0};
                 topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *img);
@@ -623,7 +622,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         if (topBarMenuIconRightSet) {
-            cImage *img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
             if (img) {
                 int iconTop = (topBarHeight / 2 - img->Height() / 2);
                 topBarIconPixmap->DrawImage(cPoint(topBarMenuIconRightLeft, iconTop), *img);
@@ -881,28 +880,20 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string tilde = Text;
-        size_t found = tilde.find(" ~ ");
-        size_t found2 = tilde.find("~");
+        size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
-            std::string second = tilde.substr(found + 2, tilde.length());
+            std::string second = tilde.substr(found + 1, tilde.length());
+            rtrim(first);   // Trim possible space on right side
+            ltrim(second);  // Trim possible space at begin
 
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
             int l = font->Width(first.c_str());
+            l += font->Width('X');
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
-        } else if (found2 != std::string::npos) {
-            std::string first = tilde.substr(0, found2);
-            std::string second = tilde.substr(found2 + 1, tilde.length());
-
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
-                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
-            int l = font->Width(first.c_str());
-            l += font->Width("X");
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
-                                    Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
-        } else {
+        } else {  // ~ not found
             if ((textWidth > maxWidth) && Config.ScrollerEnable)
                 messageScroller.AddScroller(
                     Text,
@@ -960,11 +951,12 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 
     progressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    progressBarPixmap = CreatePixmap(osd, "progressBarPixmap", 3, cRect(Left, Top, Width, progressBarHeight));
+    progressBarPixmap =
+        CreatePixmap(osd, "progressBarPixmap", 3, cRect(Left, progressBarTop, progressBarWidth, progressBarHeight));
     progressBarPixmapBg =
         CreatePixmap(osd, "progressBarPixmapBg", 2,
-                     cRect(Left - progressBarMarginVer, Top - progressBarMarginHor, Width + progressBarMarginVer * 2,
-                           progressBarHeight + progressBarMarginHor * 2));
+                     cRect(Left - progressBarMarginVer, progressBarTop - progressBarMarginHor,
+                           progressBarWidth + progressBarMarginVer * 2, progressBarHeight + progressBarMarginHor * 2));
     PixmapFill(progressBarPixmap, clrTransparent);
     PixmapFill(progressBarPixmapBg, clrTransparent);
 }
@@ -989,13 +981,16 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
 
     if (PixmapBg && SetBackground)
-        PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
+        // PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
+        PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
         if (PixmapBg == Pixmap)
-            Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
+            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
+            Pixmap->DrawRectangle(rect, ColorBg);
         else
-            Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
+            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
+            Pixmap->DrawRectangle(rect, clrTransparent);
     }
     switch (Type) {
     case 0:  // small line + big line
@@ -1680,17 +1675,18 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     if (Height < 0) {
         Height *= -1;
         for (int i = Height, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
         for (int i {0}; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     }
@@ -1698,17 +1694,18 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     if (Width < 0) {
         Width *= -1;
         for (int i = Width, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Width * j;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } else {
         for (int i {0}; i < Width; ++i) {
             Alpha = 255.0 / Width * i;
-            tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     }
@@ -1716,36 +1713,40 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255.0 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
     }
 }
@@ -1753,11 +1754,12 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
     }
 }
@@ -1765,11 +1767,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
     }
 }
@@ -1777,11 +1780,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
     }
 }
@@ -1789,11 +1793,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     double Alpha {0.0};
+    tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
             continue;
         Alpha = 255 / Width * i;
-        tColor col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+        col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);
     }
 }
@@ -1805,7 +1810,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
     int Ascender = CharHeight;
     int rc = FT_Init_FreeType(&library);
     if (!rc) {
-        rc = FT_New_Face(library, fontFileName, 0, &face);
+        rc = FT_New_Face(library, *fontFileName, 0, &face);
         if (!rc) {
             if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
                 // TODO what exactly does all this mean?
@@ -1829,7 +1834,8 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
+    // int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
+    int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
     cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
@@ -1955,7 +1961,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     left += weatherFont->Width(tempToday.c_str());
 
     int fontAscender = GetFontAscender(Setup.FontOsd, fs);
-    int fontAscender2 = GetFontAscender(Setup.FontOsd, fs / 2.5);
+    int fontAscender2 = GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5));
     int t = (weatherFontHeight - fontAscender) - (weatherFontSign->Height() - fontAscender2);
 
     weatherWidget.AddText(tempTodaySign.c_str(), false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
