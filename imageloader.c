@@ -20,9 +20,9 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
     std::string logoLower = logo;
     toLowerCase(logoLower);
-    cString File = cString::sprintf("%s/%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
+    cString File = cString::sprintf("%s%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
     #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader load logo %s", *File);
+        dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
     #endif
 
     cImage *img;
@@ -79,7 +79,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     cString File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, Setup.OSDTheme, cIcon, *logoExtension);
 
     #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader load icon %s", *File);
+        dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
     #endif
 
     cImage *img;
@@ -111,7 +111,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if (!success) {
         File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, "default", cIcon, *logoExtension);
         #ifdef DEBUGIMAGELOADTIME
-            dsyslog("flatPlus: ImageLoader load icon %s", *File);
+            dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
             uint32_t tick5 = GetMsTicks();
         #endif
 
@@ -163,7 +163,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     cString File = cFile;
     #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader load file %s", *File);
+        dsyslog("flatPlus: ImageLoader LoadFile %s", *File);
     #endif
 
     cImage *img;

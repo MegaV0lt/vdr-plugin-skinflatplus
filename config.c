@@ -907,7 +907,7 @@ void cFlatConfig::SetLogoPath(cString path) {
 cString cFlatConfig::checkSlashAtEnd(std::string path) {
     try {
         if (!(path.at(path.size()-1) == '/'))
-            return cString::sprintf("%s/", path.c_str());
+            return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
     } catch (...) { return cString::sprintf("%s", path.c_str()); }
     return cString::sprintf("%s", path.c_str());
 }
