@@ -78,6 +78,9 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingShowRecordingErrorsThreshold = 1000;  // Threshold for displaying error instead of warning
     MenuItemParseTilde = 1;
 
+    RecordingOldFolder.reserve(64);  // Set to at least 64 entrys
+    RecordingOldValue.reserve(64);
+    
     ScrollerEnable = 1;
     ScrollerStep = 2;
     ScrollerDelay = 40;
