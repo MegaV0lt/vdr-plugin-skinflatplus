@@ -1499,14 +1499,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Channel) {
         if (Current)
             ItemEventLastChannelName = Channel->Name();
-
+    /* Disabled because invalid lock sequence
 #if VDRVERSNUM >= 20301
         LOCK_CHANNELS_READ;
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
 #else
         cString ws = cString::sprintf("%d", Channels.MaxNumber());
 #endif
-        w = font->Width(ws);
+        w = font->Width(ws); */
+        w = font->Width(9999);  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         if (!Channel->GroupSep()) {
             buffer = cString::sprintf("%d", Channel->Number());
             int Width = font->Width(buffer);
