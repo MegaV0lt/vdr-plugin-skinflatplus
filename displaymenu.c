@@ -160,7 +160,7 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool isContent) {
-    // dsyslog("Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
+    // dsyslog("flatPlus: Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
 
     if (Total > 0 && Total > Shown) {
         if (isScrolling == false && ShowEvent == false && ShowRecording == false && ShowText == false) {
@@ -2500,7 +2500,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
 #ifdef DEBUGEPGTIME
     uint32_t tick1 = GetMsTicks();
-    dsyslog("SetEvent info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetEvent info-text time: %d ms", tick1 - tick0);
 #endif
 
     std::ostringstream sstrReruns("");
@@ -2552,7 +2552,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }
 #ifdef DEBUGEPGTIME
     uint32_t tick2 = GetMsTicks();
-    dsyslog("SetEvent reruns time: %d ms", tick2 - tick1);
+    dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
 #endif
 
     bool Scrollable = false;
@@ -2688,7 +2688,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
 #ifdef DEBUGEPGTIME
         uint32_t tick4 = GetMsTicks();
-        dsyslog("SetEvent tvscraper time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
 #endif
 
         if (mediaPath.length() > 0) {
@@ -2749,7 +2749,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
-        dsyslog("SetEvent epg-text time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
 #endif
 
         if (Config.TVScraperEPGInfoShowActors && actors_path.size() > 0) {
@@ -2808,7 +2808,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick6 = GetMsTicks();
-        dsyslog("SetEvent actor time: %d ms", tick6 - tick5);
+        dsyslog("flatPlus: SetEvent actor time: %d ms", tick6 - tick5);
 #endif
 
         if (sstrReruns.str().length() > 0) {
@@ -2909,8 +2909,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
 #ifdef DEBUGEPGTIME
     uint32_t tick7 = GetMsTicks();
-    dsyslog("SetEvent total time: %d ms", tick7 - tick0);
-    // dsyslog("SetEvent time: %d", tick7);
+    dsyslog("flatPlus: SetEvent total time: %d ms", tick7 - tick0);
+    // dsyslog("flatPlus: SetEvent time: %d", tick7);
 #endif
 }
 
@@ -3667,7 +3667,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #ifdef DEBUGEPGTIME
     uint32_t tick1 = GetMsTicks();
-    dsyslog("SetRecording info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
 #endif
 
     bool Scrollable = false;
@@ -3803,7 +3803,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
-        dsyslog("SetRecording tvscraper time: %d ms", tick3 - tick2);
+        dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);
 #endif
 
         cString recPath = cString::sprintf("%s", Recording->FileName());
@@ -3871,7 +3871,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick4 = GetMsTicks();
-        dsyslog("SetRecording epg-text time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
 #endif
 
         if (Config.TVScraperRecInfoShowActors && actors_path.size() > 0) {
@@ -3928,7 +3928,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
-        dsyslog("SetRecording actor time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
 #endif
 
         if (recAdditional.str().length() > 0) {
@@ -4060,7 +4060,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #ifdef DEBUGEPGTIME
     uint32_t tick6 = GetMsTicks();
-    dsyslog("SetRecording total time: %d ms", tick6 - tick0);
+    dsyslog("flatPlus: SetRecording total time: %d ms", tick6 - tick0);
 #endif
 }
 
@@ -4271,9 +4271,10 @@ bool cFlatDisplayMenu::isRecordingOld(const cRecording *Recording, int Level) {
 
     int diffSecs = now - LastRecTimeFromFolder;
     int days = diffSecs / (60 * 60 * 24);
-    // dsyslog("RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d", RecFolder.c_str(),
-    //         LastRecTimeFromFolder, now, value, diffSecs, days);
-    if (days > value) return true;
+    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
+    //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, diffSecs, days);
+    if (days > value)
+        return true;
 
     return false;
 }

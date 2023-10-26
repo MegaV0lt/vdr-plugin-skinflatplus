@@ -742,7 +742,7 @@ void cFlatSetupGeneral::Setup(void) {
     ConfigFiles.Clear();
     SetupConfig->GetConfigFiles(ConfigFiles);
     for (int i {0}; i < ConfigFiles.Size(); ++i)
-        dsyslog("ConfigFile: %s", ConfigFiles[i]);
+        dsyslog("flatPlus: ConfigFile: %s", ConfigFiles[i]);
 
     ConfigFileSelection = 0;
     if (ConfigFiles.Size() == 0) {

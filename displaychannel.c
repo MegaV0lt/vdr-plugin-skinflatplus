@@ -520,7 +520,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     if (!doOutput)
         return;
 
-    // dsyslog("DvbapiInfoDraw");
+    // dsyslog("flatPlus: DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi)
         return;
@@ -530,17 +530,17 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.hops = -1;
 
     int ChannelSid = CurChannel->Sid();
-    // dsyslog("ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
+    // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo))
         return;
 /*
-    dsyslog("caid: %d", ecmInfo.caid);
-    dsyslog("cardsystem: %s", *ecmInfo.cardsystem);
-    dsyslog("reader: %s", *ecmInfo.reader);
-    dsyslog("from: %s", *ecmInfo.from);
-    dsyslog("protocol: %s", *ecmInfo.protocol);
+    dsyslog("flatPlus: caid: %d", ecmInfo.caid);
+    dsyslog("flatPlus: cardsystem: %s", *ecmInfo.cardsystem);
+    dsyslog("flatPlus: reader: %s", *ecmInfo.reader);
+    dsyslog("flatPlus: from: %s", *ecmInfo.from);
+    dsyslog("flatPlus: protocol: %s", *ecmInfo.protocol);
 */
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0 || ecmInfo.ecmtime > 9999)
         return;
@@ -570,7 +570,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
             chanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + marginItem;
         }
-        dsyslog("Unknown cardsystem: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
+        dsyslog("flatPlus: Unknown cardsystem: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
 
     dvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
