@@ -39,8 +39,8 @@ void cImageCache::Clear(void) {
 
 bool cImageCache::RemoveFromCache(std::string Name) {
     bool found = false;
+    char *bname;
     for (int index {0}; index < MAX_IMAGE_CACHE; ++index) {
-        char *bname;
         bname = basename((char *)CacheName[index].c_str());
         // bname = basename(reinterpret_cast<char *>(CacheName[index].c_str()));
         // imagecache.c:45:26: error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers

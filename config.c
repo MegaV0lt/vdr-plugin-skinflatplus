@@ -80,7 +80,6 @@ cFlatConfig::cFlatConfig(void) {
 
     RecordingOldFolder.reserve(64);  // Set to at least 64 entrys
     RecordingOldValue.reserve(64);
-    
     ScrollerEnable = 1;
     ScrollerStep = 2;
     ScrollerDelay = 40;
@@ -692,17 +691,20 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     files.reserve(64);  // Set to at least 64 entrys
     Decors.Clear();
 
+    cString FileName("");
     cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(*decorPath, e->d_name);
+        FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
+    std::string fileName("");
+    cString Desc("");
     for (unsigned i = 0; i < files.size(); ++i) {
-        std::string FileName = files.at(i);
-        cString Desc = DecorDescription(FileName.c_str());
+        fileName = files.at(i);
+        Desc = DecorDescription(fileName.c_str());
         Decors.Append(strdup(*Desc));
     }
 }
@@ -743,17 +745,19 @@ void cFlatConfig::DecorLoadCurrent(void) {
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entrys
 
+    cString FileName("");
     cReadDir d(*decorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        cString FileName = AddDirectory(*decorPath, e->d_name);
+        FileName = AddDirectory(*decorPath, e->d_name);
         files.push_back(*FileName);
     }
 
+    std::string fileName("");
     std::sort(files.begin(), files.end(), stringCompare);
     if (DecorIndex >= 0 && DecorIndex < static_cast<int>(files.size())) {
-        std::string FileName = files.at(DecorIndex);
-        DecorLoadFile(FileName.c_str());
+        fileName = files.at(DecorIndex);
+        DecorLoadFile(fileName.c_str());
     }
 }
 
@@ -762,7 +766,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
 
     FILE *f = fopen(File, "r");
     if (f) {
-        int line {0};
+        int line {0}, value {0};
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
@@ -778,7 +782,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
-                    int value = atoi(v);
+                    value = atoi(v);
                     if (strstr(n, "ChannelBorderType") == n) {
                         decorBorderChannelTypeTheme = value; continue; }
                     if (strstr(n, "ChannelBorderSize") == n) {
@@ -861,7 +865,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
     FILE *f = fopen(RecordingOldConfigFile, "r");
     if (f) {
-        int line {0};
+        int line {0}, value {0};
         char *s;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
@@ -877,7 +881,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
                     v = stripspace(skipspace(v));
-                    int value = atoi(v);
+                    value = atoi(v);
                     dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
                     RecordingOldFolder.push_back(n);
                     RecordingOldValue.push_back(value);
@@ -937,8 +941,9 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
+    std::string FileName("");
     for (unsigned i = 0; i < files.size(); ++i) {
-        std::string FileName = files.at(i);
+        FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }
 }
