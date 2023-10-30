@@ -54,6 +54,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
         bool isScrolling;
+        bool isGroup;
         bool ShowEvent, ShowRecording, ShowText;
 
         cComplexContent ComplexContent;

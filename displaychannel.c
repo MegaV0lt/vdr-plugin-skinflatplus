@@ -200,10 +200,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     int top = heightBottom - fontSmlHeight - marginItem;
     int imageTop {0};
-    cImage *img = NULL;
-
     int left = channelWidth - fontSmlHeight - marginItem * 2;
 
+    cImage *img = NULL;
     if (Channel) {
         img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, fontSmlHeight);
         if (img) {
@@ -284,7 +283,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             epgWidth += marginItem + RecWidth;
         }
 
-        int s = /* static_cast<int>*/(time(NULL) - Present->StartTime()) / 60;
+        int s = (time(NULL) - Present->StartTime()) / 60;
         int sleft = (Present->Duration() / 60) - s;
 
         cString seen("");
@@ -612,8 +611,7 @@ void cFlatDisplayChannel::Flush(void) {
 void cFlatDisplayChannel::PreLoadImages(void) {
     int height = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem - marginItem * 2;
     imgLoader.LoadIcon("logo_background", height, height);
-    int imageBGHeight, imageBGWidth;
-    imageBGHeight = imageBGWidth = height;
+    int imageBGHeight {height}, imageBGWidth {height};
 
     cImage *imgBG = imgLoader.LoadIcon("logo_background", height * 1.34, height);
     if (imgBG) {
@@ -624,7 +622,6 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
     int index {0};
-    // height = ((fontHeight * 2) + (fontSmlHeight * 2) + marginItem) - marginItem * 2;  // Double calculation of height
     cImage *img = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;

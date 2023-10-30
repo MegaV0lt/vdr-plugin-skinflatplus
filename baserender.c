@@ -119,7 +119,6 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
 }
 
 void cFlatBaseRender::TopBarCreate(void) {
-    // int fs = int(round(cOsd::OsdHeight() * Config.TopBarFontSize));
     int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);
     topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     topBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
@@ -481,8 +480,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int middleWidth {0};
         int numConflicts {0};
-        cImage *imgCon = NULL;
-        cImage *imgRec = NULL;
+        cImage *imgCon = NULL, *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
             cPlugin *p = cPluginManager::GetPlugin("epgsearch");
             if (p) {
@@ -833,16 +831,16 @@ void cFlatBaseRender::MessageCreate(void) {
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
-    tColor col = Theme.Color(clrMessageStatus);
-    cString icon("");
+    tColor col = Theme.Color(clrMessageInfo);
+    cString icon("message_info");
     switch (Type) {
     case mtStatus:
         col = Theme.Color(clrMessageStatus);
         icon = "message_status";
         break;
     case mtInfo: [[likely]]
-        col = Theme.Color(clrMessageInfo);
-        icon = "message_info";
+        // col = Theme.Color(clrMessageInfo);  // Already preset
+        // icon = "message_info";
         break;
     case mtWarning:
         col = Theme.Color(clrMessageWarning);
@@ -1834,7 +1832,6 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    // int fs = static_cast<int>(round(cOsd::OsdHeight() * Config.WeatherFontSize));
     int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
     cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));

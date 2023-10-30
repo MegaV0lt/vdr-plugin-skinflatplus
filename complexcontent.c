@@ -247,11 +247,10 @@ int cComplexContent::ScrollShown(void) {
 int cComplexContent::ScrollOffset(void) {
     int y = Pixmap->DrawPort().Point().Y() * -1;
     if (y + Position.Height() + ScrollSize > DrawPortHeight) {
-        if (y == DrawPortHeight - Position.Height()) {
+        if (y == DrawPortHeight - Position.Height())
             y += ScrollSize;
-        } else {
+        else
             y = DrawPortHeight - Position.Height() - 1;
-        }
     }
     double offset = y * 1.0 / DrawPortHeight;
     return ScrollTotal() * offset;
