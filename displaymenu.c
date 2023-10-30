@@ -1516,7 +1516,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
             menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
         }
-        Left += w + marginItem;  // TODO: w or width?
+        Left += w + marginItem;
 
         int imageLeft = Left;
         int imageBGHeight = fontHeight;
@@ -1701,7 +1701,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
 
     Left += imageHeight + marginItem;
-    cString EventTitle = Event->Title();
+    // cString EventTitle = Event->Title();
     if (Event && Selectable) {
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = NULL;
@@ -1717,99 +1717,99 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
         Left += imageHeight + marginItem;
 
-        cString EventShortText = Event->ShortText();
+        // cString EventShortText = Event->ShortText();
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             if (Current) {
-                if (!isempty(*EventShortText)) {
-                    cString t = cString::sprintf("%s~%s", *EventTitle, *EventShortText);
+                if (Event->ShortText()) {
+                    cString t = cString::sprintf("%s~%s", Event->Title(), Event->ShortText());
                     if (fontSml->Width(*t) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
                             *t, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight), ColorFg,
                             clrTransparent, fontSml, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, fontSml,
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
-                        Left += fontSml->Width(*EventTitle) + fontSml->Width('~');
-                        // cString ShortText = cString::sprintf("%s", *EventShortText);
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventShortText, ColorExtraTextFg, ColorBg, fontSml,
+                        Left += fontSml->Width(Event->Title()) + fontSml->Width('~');
+                        // cString ShortText = cString::sprintf("%s", Event->ShortText());
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
                     }
                 } else {
-                    if (fontSml->Width(*EventTitle) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    if (fontSml->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            *EventTitle,
+                            Event->Title(),
                             cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight), ColorFg,
                             clrTransparent, fontSml, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, fontSml,
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
                     }
                 }
             } else {  // Not current
-                menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, fontSml,
+                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
                                      menuItemWidth - Left - marginItem);
                 if (Event->ShortText()) {
-                    Left += fontSml->Width(*EventTitle) + font->Width('~');
+                    Left += fontSml->Width(Event->Title()) + font->Width('~');
                     // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                    menuPixmap->DrawText(cPoint(Left, Top), *EventShortText, ColorExtraTextFg, ColorBg, fontSml,
+                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
                 }
             }
         } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
-            if (Current && font->Width(*EventTitle) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
-                menuItemScroller.AddScroller(*EventTitle,
+            if (Current && font->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                menuItemScroller.AddScroller(Event->Title(),
                                              cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                                              ColorFg, clrTransparent, font);
             } else {
-                menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
             }
-            if (!isempty(*EventShortText)) {
+            if (Event->ShortText()) {
                 Top += fontHeight;
-                if (Current && fontSml->Width(*EventShortText) > (menuItemWidth - Left - marginItem) &&
+                if (Current && fontSml->Width(Event->ShortText()) > (menuItemWidth - Left - marginItem) &&
                     Config.ScrollerEnable) {
                     menuItemScroller.AddScroller(
-                        *EventShortText, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
+                        Event->ShortText(), cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                         ColorExtraTextFg, clrTransparent, fontSml);
                 } else {
-                    menuPixmap->DrawText(cPoint(Left, Top), *EventShortText, ColorExtraTextFg, ColorBg, fontSml,
+                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
                 }
             }
         } else {
             if (Current) {
-                if (!isempty(*EventShortText)) {
-                    cString t = cString::sprintf("%s~%s", *EventTitle, *EventShortText);
+                if (Event->ShortText()) {
+                    cString t = cString::sprintf("%s~%s", Event->Title(), Event->ShortText());
                     if (font->Width(*t) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
                             *t, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight), ColorFg,
                             clrTransparent, font, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
-                        Left += font->Width(*EventTitle) + font->Width('~');
+                        Left += font->Width(Event->Title()) + font->Width('~');
                         // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventShortText, ColorExtraTextFg, ColorBg, font,
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
                     }
                 } else {
-                    if (font->Width(*EventTitle) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    if (font->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            *EventTitle, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
+                            Event->Title(), cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                             ColorFg, clrTransparent, font, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
                     }
                 }
             } else {
-                menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
-                if (!isempty(*EventShortText)) {
-                    Left += font->Width(*EventTitle) + font->Width('~');
+                if (Event->ShortText()) {
+                    Left += font->Width(Event->Title()) + font->Width('~');
                     // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                    menuPixmap->DrawText(cPoint(Left, Top), *EventShortText, ColorExtraTextFg, ColorBg, font,
+                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, font,
                                          menuItemWidth - Left - marginItem);
                 }
             }
@@ -1817,7 +1817,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     } else if (Event) {
         try {
             // Extract date from Separator
-            std::string sep = *EventTitle;
+            std::string sep = Event->Title();
             if (sep.size() > 12) {
                 std::size_t found = sep.find(" -");
                 if (found >= 10) {
@@ -1828,13 +1828,13 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     menuPixmap->DrawText(cPoint(LeftSecond + menuWidth / 10 * 2, Top), *datespace, ColorFg, ColorBg,
                                          font, 0, 0, taCenter);
                 } else
-                    menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                    menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                          menuItemWidth - Left - marginItem);
             } else
-                menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
         } catch (...) {
-            menuPixmap->DrawText(cPoint(Left, Top), *EventTitle, ColorFg, ColorBg, font,
+            menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
                                  menuItemWidth - Left - marginItem);
         }
     }
