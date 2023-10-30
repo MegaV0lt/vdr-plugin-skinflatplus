@@ -17,10 +17,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
 
     screenWidth = lastScreenWidth = -1;
 
-    /* int */ TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    /* int */ TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    /* int */ TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    /* int */ TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
+    TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    TVSHeight = osdHeight - topBarHeight - labelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
     chanEpgImagesPixmap = CreatePixmap(osd, "chanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
@@ -200,8 +200,8 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             PixmapFill(labelPixmap, clrTransparent);
 
         // PixmapFill(iconsPixmap, clrTransparent);  // Moved to SetRecording
-        labelPixmap->DrawRectangle(cRect(left - font->Width("33") - marginItem, 0,
-                                         fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight),
+        labelPixmap->DrawRectangle(cRect(left - font->Width("99") - marginItem, 0,
+                                         fontHeight * 4 + marginItem * 6 + font->Width("99") * 2, fontHeight),
                                    Theme.Color(clrReplayBg));
 
         cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
@@ -245,9 +245,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                         Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
     } else {
         if (modeOnly) {
-            DecorBorderDraw(left - font->Width("33") - marginItem + Config.decorBorderReplaySize,
+            DecorBorderDraw(left - font->Width("99") - marginItem + Config.decorBorderReplaySize,
                             osdHeight - labelHeight - Config.decorBorderReplaySize,
-                            fontHeight * 4 + marginItem * 6 + font->Width("33") * 2, fontHeight,
+                            fontHeight * 4 + marginItem * 6 + font->Width("99") * 2, fontHeight,
                             Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg,
                             Config.decorBorderReplayBg);
         } else {
@@ -309,7 +309,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (found != std::string::npos) {
             std::string hm = cur.substr(0, found);
             std::string secs = cur.substr(found, cur.length() - found);
-            secs.append(1, ' ');  // Ugly fix for extra pixel glitch
+            secs.append(1, ' ');  // Fix for extra pixel glitch
 
             labelPixmap->DrawText(cPoint(marginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(hm.c_str()), fontHeight);

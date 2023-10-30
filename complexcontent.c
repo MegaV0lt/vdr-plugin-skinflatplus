@@ -6,6 +6,7 @@ cComplexContent::cComplexContent() {
     PixmapImage = NULL;
     isShown = false;
     isScrollingActive = true;
+    Contents.reserve(128);  // Set to at least 128 entrys
 }
 
 cComplexContent::cComplexContent(cOsd *osd, int scrollSize) {
@@ -16,6 +17,7 @@ cComplexContent::cComplexContent(cOsd *osd, int scrollSize) {
     PixmapImage = NULL;
     isShown = false;
     isScrollingActive = true;
+    Contents.reserve(128);  // Set to at least 128 entrys
 }
 
 cComplexContent::~cComplexContent() {
@@ -42,7 +44,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
     if (!Osd)
         return;
-        
+
     if (Pixmap) {
         Osd->DestroyPixmap(Pixmap);
         Pixmap = NULL;
@@ -130,6 +132,8 @@ void cComplexContent::AddText(const char *text, bool multiline, cRect position, 
                               cFont *font, int textWidth, int textHeight, int textAlignment) {
     Contents.push_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    if (Contents.size() > 128)
+        dsyslog("flatPlus: Size of vector<cSimpleContent> Contents: %ld", Contents.size());
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
@@ -243,11 +247,10 @@ int cComplexContent::ScrollShown(void) {
 int cComplexContent::ScrollOffset(void) {
     int y = Pixmap->DrawPort().Point().Y() * -1;
     if (y + Position.Height() + ScrollSize > DrawPortHeight) {
-        if (y == DrawPortHeight - Position.Height()) {
+        if (y == DrawPortHeight - Position.Height())
             y += ScrollSize;
-        } else {
+        else
             y = DrawPortHeight - Position.Height() - 1;
-        }
     }
     double offset = y * 1.0 / DrawPortHeight;
     return ScrollTotal() * offset;

@@ -39,8 +39,8 @@ void cImageCache::Clear(void) {
 
 bool cImageCache::RemoveFromCache(std::string Name) {
     bool found = false;
+    char *bname;
     for (int index {0}; index < MAX_IMAGE_CACHE; ++index) {
-        char *bname;
         bname = basename((char *)CacheName[index].c_str());
         // bname = basename(reinterpret_cast<char *>(CacheName[index].c_str()));
         // imagecache.c:45:26: error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
@@ -59,10 +59,10 @@ bool cImageCache::RemoveFromCache(std::string Name) {
 }
 
 cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
-    // dsyslog("imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
+    // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (int index {0}; index < MAX_IMAGE_CACHE; ++index) {
-        // dsyslog("imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(),
-        // CacheWidth[index], CacheHeight[index]);
+        // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[index].c_str(),
+        //          CacheWidth[index], CacheHeight[index]);
         if (CacheName[index] == Name && CacheWidth[index] == Width && CacheHeight[index] == Height)
             return CacheImage[index];
     }

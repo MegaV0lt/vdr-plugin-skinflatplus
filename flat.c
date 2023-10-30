@@ -201,7 +201,7 @@ cString GetRecordingerrorIcon(int recInfoErrors) {
 cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     double FrameSeen = frameResume * 1.0 / frameTotal;
     double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
-    // dsyslog("Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
+    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
 
     cString SeenIcon("");
     if (FrameSeen < 0.1)
