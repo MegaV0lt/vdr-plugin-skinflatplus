@@ -1877,9 +1877,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Config.MenuRecordingView == 0)
         return false;
 
-    cString buffer("");
-    cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
-
     if (Level > 0)
         RecFolder = GetRecordingName(Recording, Level - 1, true).c_str();
     else
@@ -1973,6 +1970,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int Top = y;
 
+    cString buffer("");
+    cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img = NULL;
     if (Config.MenuRecordingView == 1) {  // flatPlus long
         int LeftWidth = Left + fontHeight + imgRecNew->Width() + imgRecCut->Width() + marginItem * 3 +
@@ -2792,6 +2791,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             int x = marginItem;
             int y = ContentTop;
             int actor {0};
+            if (picLines > 10)
+                dsyslog("flatPlus: %d actor images found! First display will propably be slow.",
+                        numActors);  // TODO: Config option
+
             for (int row {0}; row < picLines; ++row) {
                 for (int col {0}; col < picsPerLine; ++col) {
                     if (actor == numActors)
@@ -3909,6 +3912,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             int x = marginItem;
             int y = ContentTop;
             int actor {0};
+            if (picLines > 10)
+                dsyslog("flatPlus: %d actor images found! First display will propably be slow.",
+                        numActors);  // TODO: Config option
+
             for (int row {0}; row < picLines; ++row) {
                 for (int col {0}; col < picsPerLine; ++col) {
                     if (actor == numActors)
