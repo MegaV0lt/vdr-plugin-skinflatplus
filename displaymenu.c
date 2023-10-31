@@ -2598,9 +2598,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
         std::vector<std::string> actors_role;
-        actors_path.reserve(64);  // Set capacity to at least 64
-        actors_name.reserve(64);
-        actors_role.reserve(64);
 
         std::string mediaPath("");
         int mediaWidth {0};
@@ -2647,6 +2644,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperEPGInfoShowActors) {
+                        actors_path.reserve(series.actors.size());  // Set capacity to size of actors
+                        actors_name.reserve(series.actors.size());
+                        actors_role.reserve(series.actors.size());
                         for (unsigned int i {0}; i < series.actors.size(); ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                 actors_path.push_back(series.actors[i].actorThumb.path);
@@ -2680,6 +2680,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperEPGInfoShowActors) {
+                        actors_path.reserve(movie.actors.size());  // Set capacity to size of actors
+                        actors_name.reserve(movie.actors.size());
+                        actors_role.reserve(movie.actors.size());
                         for (unsigned int i {0}; i < movie.actors.size(); ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                 actors_path.push_back(movie.actors[i].actorThumb.path);
@@ -3712,9 +3715,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
         std::vector<std::string> actors_role;
-        actors_path.reserve(64);  // Set capacity to at least 64
-        actors_name.reserve(64);
-        actors_role.reserve(64);
 
         std::string mediaPath("");
         int mediaWidth {0};
@@ -3761,6 +3761,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperRecInfoShowActors) {
+                        actors_path.reserve(series.actors.size());  // Set capacity to size of actors
+                        actors_name.reserve(series.actors.size());
+                        actors_role.reserve(series.actors.size());
                         for (unsigned int i {0}; i < series.actors.size(); ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                 actors_path.push_back(series.actors[i].actorThumb.path);
@@ -3794,6 +3797,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperRecInfoShowActors) {
+                        actors_path.reserve(movie.actors.size());  // Set capacity to size of actors
+                        actors_name.reserve(movie.actors.size());
+                        actors_role.reserve(movie.actors.size());
                         for (unsigned int i {0}; i < movie.actors.size(); ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                 actors_path.push_back(movie.actors[i].actorThumb.path);
@@ -5040,7 +5046,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     ContentTop += 6;
 
     std::vector<std::pair<time_t, std::string>> Recs;
-    Recs.reserve(1000);  // Set to at least 1000 entrys
+    Recs.reserve(512);  // Set to at least 512 entrys
     time_t RecStart {0};
     int Minutes {0};
     cString Length("");
