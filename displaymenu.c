@@ -105,6 +105,9 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     menuItemScroller.SetScrollStep(Config.ScrollerStep);
     menuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     menuItemScroller.SetScrollType(Config.ScrollerType);
+
+    cVideoDiskUsage::HasChanged(
+        VideoDiskUsageState);  // Call to get values for 'DiskUsage' and have it outside of SetItem()
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
@@ -526,7 +529,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         } else  // ~ not found
                             menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg,
                                                  font, menuItemWidth - xt - Config.decorBorderMenuItemSize);
-                    } else  // MenuItemParseTitle disabled
+                    } else  // MenuItemParseTilde disabled
                         menuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg, font,
                                              menuItemWidth - xt - Config.decorBorderMenuItemSize);
                 }
@@ -1487,6 +1490,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int LeftSecond = Left;
     int Top = y;
+    int w = 0;
     int imageTop = Top;
 
     if (!Channel)
