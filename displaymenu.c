@@ -4236,6 +4236,8 @@ void cFlatDisplayMenu::Flush(void) {
             TopBarSetTitleWithoutClear(*newTitle);
         }
     }
+    if (cVideoDiskUsage::HasChanged(VideoDiskUsageState))
+        TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
     osd->Flush();
 }
