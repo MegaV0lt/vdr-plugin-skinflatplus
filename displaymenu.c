@@ -5563,29 +5563,30 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
     } else {
         int Left = marginItem;
         int addLeft = wWidth / (countTemps);
+        cString str("");
         if (strcmp(tempCPU.c_str(), "-1")) {
-            cString str = cString::sprintf("%s: %s", tr("CPU"), tempCPU.c_str());
+            str = cString::sprintf("%s: %s", tr("CPU"), tempCPU.c_str());
             contentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                   wWidth - marginItem * 2);
             Left += addLeft;
         }
         if (strcmp(tempCase.c_str(), "-1")) {
-            cString str = cString::sprintf("%s: %s", tr("PC-Case"), tempCase.c_str());
+            str = cString::sprintf("%s: %s", tr("PC-Case"), tempCase.c_str());
             contentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - marginItem * 2, fontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                   wWidth - marginItem * 2);
             Left += addLeft;
         }
         if (strcmp(tempMB.c_str(), "-1")) {
-            cString str = cString::sprintf("%s: %s", tr("MB"), tempMB.c_str());
+            str = cString::sprintf("%s: %s", tr("MB"), tempMB.c_str());
             contentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - marginItem * 2, fontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                   wWidth - marginItem * 2);
             Left += addLeft;
         }
         if (strcmp(tempGPU.c_str(), "-1")) {
-            cString str = cString::sprintf("%s: %s", tr("GPU"), tempGPU.c_str());
+            str = cString::sprintf("%s: %s", tr("GPU"), tempGPU.c_str());
             contentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - marginItem * 2, fontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                   wWidth - marginItem * 2);
