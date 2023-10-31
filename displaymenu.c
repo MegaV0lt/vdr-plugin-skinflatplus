@@ -4182,29 +4182,21 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
-    cString sortIcon("");
+    cString sortIcon("SortUnknown");
     switch (MenuSortMode) {
     case msmUnknown:
-        sortIcon = "SortUnknown";
-        // Do not set search icon if it is unknown
-        return;
+        return;  // Do not set search icon if it is unknown
         break;
     case msmNumber:
-        sortIcon = "SortNumber";
-        break;
+        sortIcon = "SortNumber"; break;
     case msmName:
-        sortIcon = "SortName";
-        break;
-    case msmTime:
-        sortIcon = "SortDate";
-        break;
+        sortIcon = "SortName"; break;
+    case msmTime: [[likely]]
+        sortIcon = "SortDate"; break;
     case msmProvider:
-        sortIcon = "SortProvider";
-        break;
+        sortIcon = "SortProvider"; break;
     default:
-        sortIcon = "SortUnknown";
-        // Do not set search icon if it is unknown
-        return;
+        return;  // Do not set search icon if it is unknown
     }
 
     TopBarSetMenuIconRight(*sortIcon);
@@ -5759,8 +5751,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         tm_r.tm_mday += index;
         time_t t2 = mktime(&tm_r);
 
-        cString weekDayName = WeekDayName(t2);
-
+        cImage *img = NULL;
         if (Config.MainMenuWidgetWeatherType == 0) {  // short
             if (left + fontHeight * 2 + fontTempSml->Width("-99,9°C") + fontTempSml->Width("XXXX") + marginItem * 6 >
                 wWidth)
@@ -5772,7 +5763,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
 
             cString weatherIcon = cString::sprintf("widgets/%s", icon.c_str());
-            cImage *img = imgLoader.LoadIcon(*weatherIcon, fontHeight, fontHeight - marginItem * 2);
+            img = imgLoader.LoadIcon(*weatherIcon, fontHeight, fontHeight - marginItem * 2);
             if (img) {
                 contentWidget.AddImage(img, cRect(left, ContentTop + marginItem, fontHeight, fontHeight));
                 left += fontHeight + marginItem;
@@ -5801,7 +5792,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 break;
 
             left = marginItem;
-
+            cString weekDayName = WeekDayName(t2);
             cString dayname = cString::sprintf("%s ", *weekDayName);
             contentWidget.AddText(*dayname, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), font,
@@ -5809,7 +5800,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             left += font->Width("XXXX") + marginItem;
 
             cString weatherIcon = cString::sprintf("widgets/%s", icon.c_str());
-            cImage *img = imgLoader.LoadIcon(*weatherIcon, fontHeight, fontHeight - marginItem * 2);
+            img = imgLoader.LoadIcon(*weatherIcon, fontHeight, fontHeight - marginItem * 2);
             if (img) {
                 contentWidget.AddImage(img, cRect(left, ContentTop + marginItem, fontHeight, fontHeight));
                 left += fontHeight + marginItem;
