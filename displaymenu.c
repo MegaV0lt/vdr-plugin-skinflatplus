@@ -1484,11 +1484,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     menuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, menuItemWidth, Height), ColorBg);
 
-    int Left {0}, LeftSecond {0};
-    LeftSecond = Left = Config.decorBorderMenuItemSize + marginItem;
+    int Left = Config.decorBorderMenuItemSize + marginItem;
+    int LeftSecond = Left;
     int Top = y;
     int imageTop = Top;
-    int w {0};
 
     if (!Channel)
         TopBarSetMenuLogo(ItemEventLastChannelName);
@@ -1506,15 +1505,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 #else
         cString ws = cString::sprintf("%d", Channels.MaxNumber());
 #endif
-        w = font->Width(ws); */
-        w = font->Width("999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+        int w = font->Width(ws); */
+        int w = font->Width("999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         isGroup = Channel->GroupSep();
         if (!isGroup) {
             buffer = cString::sprintf("%d", Channel->Number());
-            int Width = font->Width(*buffer);
-            if (Width < w) Width = w;  // Minimal width for channelnumber
+            int Width = font->Width(*buffer);  // w is used here for calculation of width
+            if (Width > w) w = Width;  // Minimal width for channelnumber in Event (epgSearch)
 
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
+            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, w, fontHeight, taRight);
         }
         Left += w + marginItem;
 
