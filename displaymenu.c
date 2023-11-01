@@ -2638,8 +2638,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
                         mediaPath = series.banners[number].path;
                         if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
-                                number + 1, mediaPath.c_str(), series.banners.size());  // Log result
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(series.banners.size()));  // Log result
                     }
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
@@ -3259,8 +3260,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
                     mediaPath = series.banners[number].path;
                     if (series.banners.size() > 1)
-                        dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
-                            number + 1, mediaPath.c_str(), series.banners.size());  // Log result
+                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                static_cast<int>(number + 1), mediaPath.c_str(),
+                                static_cast<int>(series.banners.size()));  // Log result
                 }
                 mediaWidth = cWidth - marginItem * 2;
                 mediaHeight = 999;
@@ -3755,8 +3757,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
                         mediaPath = series.banners[number].path;
                         if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
-                                number + 1, mediaPath.c_str(), series.banners.size());  // Log result
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(series.banners.size()));  // Log result
                     }
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;

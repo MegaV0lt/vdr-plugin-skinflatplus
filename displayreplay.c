@@ -434,8 +434,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         mediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
                         mediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
                         if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %ld (%s) out of %ld available images",
-                                number + 1, mediaPath.c_str(), series.banners.size());  // Log result
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(series.banners.size()));  // Log result
                     }
                 }
             } else if (call.type == tMovie) {
