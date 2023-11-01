@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflat 0.6.2\n"
+"Project-Id-Version: vdr-skinflatplus 0.7.9\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -643,6 +643,9 @@ msgid "Recording menu show recerrors icon"
 msgstr ""
 
 msgid "Show recerrors icon in playback"
+msgstr ""
+
+msgid "Show shorttext with date in playback"
 msgstr ""
 
 msgid "Recording recerrors icon threshold"

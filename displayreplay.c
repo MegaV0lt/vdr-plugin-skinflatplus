@@ -97,17 +97,21 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     }
 
     cString info("");
-    if (recInfo->ShortText())
-        info = cString::sprintf("%s  %s - %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()),
-                                recInfo->ShortText());
-    else
+    if (recInfo->ShortText()) {
+        if (Config.PlaybackShowRecordingDate)  //  Date Time - ShortText
+            info = cString::sprintf("%s  %s - %s", *ShortDateString(recording->Start()),
+                                    *TimeString(recording->Start()), recInfo->ShortText());
+        else
+            info = cString::sprintf("%s", recInfo->ShortText());
+    } else {  // No shorttext
         info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
+    }
 
     int infoWidth = fontSml->Width(*info);  // Width of shorttext
-    // TODO: Handle very long shorttext. How to get width of aspect and format icons?
-    //  Substract 'left' in case of displayed recording icon
-    //  Substract 'fontSmlHeight' in case of recordingerror icon is displayed later
-    //  Substract width of aspect and format icons (ResolutionAspectDraw()) ???
+    // TODO: How to get width of aspect and format icons?
+    //  Done: Substract 'left' in case of displayed recording icon
+    //  Done: Substract 'fontSmlHeight' in case of recordingerror icon is displayed later
+    //  Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
     int maxWidth = osdWidth - left - Config.decorBorderReplaySize * 2;
 
 #if APIVERSNUM >= 20505

@@ -136,6 +136,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingDefaultOldDays = -1;
 
     PlaybackShowRecordingErrors = true;
+    PlaybackShowRecordingDate = true;  // Show date and time with shorttext
 
     ChannelWeatherShow = 1;
     PlaybackWeatherShow = 1;
@@ -359,6 +360,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageColorPosition") == 0)                 MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          PlaybackShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            PlaybackShowRecordingDate = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 RecordingDimmOnPause = atoi(Value);
