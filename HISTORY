@@ -1,7 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-11-01: Version 0.7.9
+- [fix] Add static_cast to log for 32 bit systems
+- [fix] Move cVideoDiskUsage::HasChanged(VideoDiskUsageState)
+         to prevent invalid lock. Thanks to kamel5 @ VDR-Portal
+- [update] Some internal optimizations
+
 2023-10-31: Version 0.7.8
- -[fix] Fix display of channelnumber in eventview (epgSearch)
+ - [fix] Fix display of channelnumber in eventview (epgSearch)
 
 2023-10-30: Version 0.7.7
 - [update] Log when more then 10 Lines of actor images fond
