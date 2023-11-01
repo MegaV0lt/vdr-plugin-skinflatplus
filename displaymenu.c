@@ -1973,7 +1973,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int Top = y;
 
-    cString buffer("");
+    cString buffer(""), iconName("");
     cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img = NULL;
     if (Config.MenuRecordingView == 1) {  // flatPlus long
@@ -2025,33 +2025,33 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20108
             else /* if (!recordingIsInUse) */ {
-                cString SeenIcon = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                iconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
-                cImage *imgSeen = NULL;
+                img = NULL;
                 if (Current) {
-                    cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
-                    imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
+                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
+                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
                 }
-                if (!imgSeen)
-                    imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
-                if (imgSeen)
-                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
+                if (!img)
+                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                if (img)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
 #endif
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *recInfo = Recording->Info();
-                cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
+                iconName = GetRecordingerrorIcon(recInfo->Errors());
 
-                cImage *imgRecErr = NULL;
+                img = NULL;
                 if (Current) {
-                    cString RecErrIconCur = cString::sprintf("%s_cur", *recErrIcon);
-                    imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
+                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
+                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
                 }
-                if (!imgRecErr)
-                    imgRecErr = imgLoader.LoadIcon(*recErrIcon, fontHeight, fontHeight);
-                if (imgRecErr)
-                    menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+                if (!img)
+                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                if (img)
+                    menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *img);
             }  // MenuItemRecordingShowRecordingErrors
 #endif
 
@@ -2199,33 +2199,33 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20108
             else {
-                cString SeenIcon = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                iconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
-                cImage *imgSeen = NULL;
+                img = NULL;
                 if (Current) {
-                    cString SeenIconCur = cString::sprintf("%s_cur", *SeenIcon);
-                    imgSeen = imgLoader.LoadIcon(*SeenIconCur, fontHeight, fontHeight);
+                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
+                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
                 }
-                if (!imgSeen)
-                    imgSeen = imgLoader.LoadIcon(*SeenIcon, fontHeight, fontHeight);
-                if (imgSeen)
-                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgSeen);
+                if (!img)
+                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                if (img)
+                    menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
 #endif
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *recInfo = Recording->Info();
-                cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
+                iconName = GetRecordingerrorIcon(recInfo->Errors());
 
-                cImage *imgRecErr = NULL;
+                img = NULL;
                 if (Current) {
-                    cString RecErrIconCur = cString::sprintf("%s_cur", *recErrIcon);
-                    imgRecErr = imgLoader.LoadIcon(*RecErrIconCur, fontHeight, fontHeight);
+                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
+                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
                 }
-                if (!imgRecErr)
-                    imgRecErr = imgLoader.LoadIcon(*recErrIcon, fontHeight, fontHeight);
-                if (imgRecErr)
-                    menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *imgRecErr);
+                if (!img)
+                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                if (img)
+                    menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *img);
             }  // MenuItemRecordingShowRecordingErrors
 #endif
 

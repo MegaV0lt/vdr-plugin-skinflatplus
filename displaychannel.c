@@ -213,9 +213,10 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     }
 
     if (Resolution && !isRadioChannel && screenWidth > 0) {
+        cString iconName("");
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
-            cString asp = GetAspectIcon(screenWidth, screenAspect);
-            img = imgLoader.LoadIcon(*asp, 999, fontSmlHeight);
+            iconName = GetAspectIcon(screenWidth, screenAspect);
+            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
@@ -223,8 +224,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= marginItem * 2;
             }
 
-            cString res = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
-            img = imgLoader.LoadIcon(*res, 999, fontSmlHeight);
+            iconName = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
+            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
@@ -234,7 +235,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
-            cString iconName = GetFormatIcon(screenWidth);  // Show Format
+            iconName = GetFormatIcon(screenWidth);  // Show Format
             img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;

@@ -25,7 +25,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
     #endif
 
-    cImage *img;
+    cImage *img = NULL;
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick1 = GetMsTicks();
     #endif
@@ -82,7 +82,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
     #endif
 
-    cImage *img;
+    cImage *img = NULL;
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick1 = GetMsTicks();
@@ -108,7 +108,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         dsyslog("   load file from disk: %d ms", tick4 - tick3);
     #endif
 
-    if (!success) {
+    if (!success) {  // Search for logo in default folder
         File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, "default", cIcon, *logoExtension);
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
@@ -150,8 +150,10 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick10 = GetMsTicks();
         dsyslog("   scale logo: %d ms", tick10 - tick9);
     #endif
-        if (!img)
+        if (!img) {
+            dsyslog("flatPlus: ImageLoader LoadIcon: %s 'CreateImage' failed", *File);
             return NULL;
+        }
 
         imgCache.InsertImage(img, *File, width, height);
         return img;
@@ -166,7 +168,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         dsyslog("flatPlus: ImageLoader LoadFile %s", *File);
     #endif
 
-    cImage *img;
+    cImage *img = NULL;
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick1 = GetMsTicks();
     #endif
