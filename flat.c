@@ -119,20 +119,15 @@ cPlugin *GetScraperPlugin(void) {
 }
 
 cString GetAspectIcon(int screenWidth, double screenAspect) {
-    cString asp("unknown_asp");                     // ???
-    if (Config.ChannelSimpleAspectFormat && screenWidth > 720) {
-        asp = (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
-    } else {
-        if (screenAspect == 4.0/3.0)
-            asp = "43";
-        else if (screenAspect == 16.0/9.0)
-            asp = "169";
-        else if (screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0)
-            asp = "169w";
-        else if (screenAspect == 2.21)
-            asp = "221";
-    }
-    return asp;
+    if (Config.ChannelSimpleAspectFormat && screenWidth > 720)
+        return (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
+
+    if (screenAspect == 16.0/9.0) return "169";
+    if (screenAspect == 4.0/3.0) return "43";
+    if (screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0) return "169w";
+    if (screenAspect == 2.21) return "221";
+
+    return "unknown_asp";
 }
 
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
@@ -173,29 +168,21 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
 }
 
 cString GetFormatIcon(int screenWidth) {
-    cString iconName("sd");  // 720 and below is considered sd
-    if (screenWidth > 1920)
-        iconName = "uhd";
-    else if (screenWidth > 720) [[likely]]
-        iconName = "hd";
+    if (screenWidth > 1920) return "uhd";
+    if (screenWidth > 720) [[likely]] return "hd";
 
-    return iconName;
+    return "sd";  // 720 and below is considered sd
 }
 
 cString GetRecordingerrorIcon(int recInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
-    cString RecErrorIcon("");
-    if (recInfoErrors < 0)  // -1 Untestet recording
-        RecErrorIcon = "recording_untested";
-    else if (recInfoErrors == 0)  // No errors
-        RecErrorIcon = "recording_ok";
-    else if (recInfoErrors < RecErrIconThreshold)
-        RecErrorIcon = "recording_warning";
-    else if (recInfoErrors >= RecErrIconThreshold)
-        RecErrorIcon = "recording_error";
+    if (recInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
+    if (recInfoErrors == 0) return "recording_ok";       // No errors
+    if (recInfoErrors < RecErrIconThreshold) return "recording_warning";
+    if (recInfoErrors >= RecErrIconThreshold) return "recording_error";
 
-    return RecErrorIcon;
+    return "";
 }
 
 cString GetRecordingseenIcon(int frameTotal, int frameResume) {
@@ -203,32 +190,18 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
 
-    cString SeenIcon("");
-    if (FrameSeen < 0.1)
-        SeenIcon = "recording_seen_0";
-    else if (FrameSeen < 0.2)
-        SeenIcon = "recording_seen_1";
-    else if (FrameSeen < 0.3)
-        SeenIcon = "recording_seen_2";
-    else if (FrameSeen < 0.4)
-        SeenIcon = "recording_seen_3";
-    else if (FrameSeen < 0.5)
-        SeenIcon = "recording_seen_4";
-    else if (FrameSeen < 0.6)
-        SeenIcon = "recording_seen_5";
-    else if (FrameSeen < 0.7)
-        SeenIcon = "recording_seen_6";
-    else if (FrameSeen < 0.8)
-        SeenIcon = "recording_seen_7";
-    else if (FrameSeen < 0.9)
-        SeenIcon = "recording_seen_8";
-    else if (FrameSeen < 0.98)
-        SeenIcon = "recording_seen_9";
-    else
-        SeenIcon = "recording_seen_10";
+    if (FrameSeen >= seenThreshold) return "recording_seen_10";
 
-    if (FrameSeen >= seenThreshold)
-        SeenIcon = "recording_seen_10";
+    if (FrameSeen < 0.1) return "recording_seen_0";
+    if (FrameSeen < 0.2) return "recording_seen_1";
+    if (FrameSeen < 0.3) return "recording_seen_2";
+    if (FrameSeen < 0.4) return "recording_seen_3";
+    if (FrameSeen < 0.5) return "recording_seen_4";
+    if (FrameSeen < 0.6) return "recording_seen_5";
+    if (FrameSeen < 0.7) return "recording_seen_6";
+    if (FrameSeen < 0.8) return "recording_seen_7";
+    if (FrameSeen < 0.9) return "recording_seen_8";
+    if (FrameSeen < 0.98) return "recording_seen_9";
 
-    return SeenIcon;
+    return "recording_seen_10";
 }

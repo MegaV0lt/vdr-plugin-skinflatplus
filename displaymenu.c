@@ -403,7 +403,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrItemFont);
+    tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
@@ -416,28 +417,23 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         iconRec = imgLoader.LoadIcon("timerRecording_cur", fontHeight, fontHeight);
         /*iconVps = imgLoader.LoadIcon("text_vps_cur", fontHeight, fontHeight);
         iconNew = imgLoader.LoadIcon("text_new_cur", fontHeight, fontHeight);*/
+    } else if (Selectable) {
+        ColorFg = Theme.Color(clrItemSelableFont);
+        ColorBg = Theme.Color(clrItemSelableBg);
+
+        iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
+        // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
+        iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
+        iconRec = imgLoader.LoadIcon("timerRecording_sel", fontHeight, fontHeight);
+        /*iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
+        iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);*/
     } else {
-        if (Selectable) {
-            ColorFg = Theme.Color(clrItemSelableFont);
-            ColorBg = Theme.Color(clrItemSelableBg);
-
-            iconTimerFull = imgLoader.LoadIcon("text_timer_full_sel", fontHeight, fontHeight);
-            // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial_sel", fontHeight, fontHeight);
-            iconArrowTurn = imgLoader.LoadIcon("text_arrowturn_sel", fontHeight, fontHeight);
-            iconRec = imgLoader.LoadIcon("timerRecording_sel", fontHeight, fontHeight);
-            /*iconVps = imgLoader.LoadIcon("text_vps_sel", fontHeight, fontHeight);
-            iconNew = imgLoader.LoadIcon("text_new_sel", fontHeight, fontHeight);*/
-        } else {
-            ColorFg = Theme.Color(clrItemFont);
-            ColorBg = Theme.Color(clrItemBg);
-
-            iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
-            // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
-            iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
-            iconRec = imgLoader.LoadIcon("timerRecording", fontHeight, fontHeight);
-            /*iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
-            iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);*/
-        }
+        iconTimerFull = imgLoader.LoadIcon("text_timer_full", fontHeight, fontHeight);
+        // iconTimerPartial = imgLoader.LoadIcon("text_timer_partial", fontHeight, fontHeight);
+        iconArrowTurn = imgLoader.LoadIcon("text_arrowturn", fontHeight, fontHeight);
+        iconRec = imgLoader.LoadIcon("timerRecording", fontHeight, fontHeight);
+        /*iconVps = imgLoader.LoadIcon("text_vps", fontHeight, fontHeight);
+        iconNew = imgLoader.LoadIcon("text_new", fontHeight, fontHeight);*/
     }
 
     int y = Index * itemHeight;
@@ -672,8 +668,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     const cEvent *Event = NULL;
 
-    bool DrawProgress = true;
-
     if (Current)
         menuItemScroller.Clear();
 
@@ -687,18 +681,14 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrItemFont);
+    tColor ColorBg = Theme.Color(clrItemBg);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
-    } else {
-        if (Selectable) {
-            ColorFg = Theme.Color(clrItemSelableFont);
-            ColorBg = Theme.Color(clrItemSelableBg);
-        } else {
-            ColorFg = Theme.Color(clrItemFont);
-            ColorBg = Theme.Color(clrItemBg);
-        }
+    } else if (Selectable) {
+        ColorFg = Theme.Color(clrItemSelableFont);
+        ColorBg = Theme.Color(clrItemSelableBg);
     }
 
     int y = Index * itemChannelHeight;
@@ -710,6 +700,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Width {0}, LeftName {0};
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int Top = y;
+    bool DrawProgress = true;
 
     isGroup = Channel->GroupSep();  // Also used later
     if (isGroup)
@@ -1170,21 +1161,18 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrItemFont);
+    tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
         ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
-    } else {
-        if (Selectable) {
-            ColorFg = Theme.Color(clrItemSelableFont);
-            ColorBg = Theme.Color(clrItemSelableBg);
-        } else {
-            ColorFg = Theme.Color(clrItemFont);
-            ColorBg = Theme.Color(clrItemBg);
-        }
+    } else if (Selectable) {
+        ColorFg = Theme.Color(clrItemSelableFont);
+        ColorBg = Theme.Color(clrItemSelableBg);
     }
+
     int y = Index * itemTimerHeight;
     if (y + itemTimerHeight > menuItemLastHeight)
         menuItemLastHeight = y + itemTimerHeight;
@@ -1446,20 +1434,16 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrItemFont);
+    tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
         ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
-    } else {
-        if (Selectable) {
-            ColorFg = Theme.Color(clrItemSelableFont);
-            ColorBg = Theme.Color(clrItemSelableBg);
-        } else {
-            ColorFg = Theme.Color(clrItemFont);
-            ColorBg = Theme.Color(clrItemBg);
-        }
+    } else if (Selectable) {
+        ColorFg = Theme.Color(clrItemSelableFont);
+        ColorBg = Theme.Color(clrItemSelableBg);
     }
 
     int y = Index * itemEventHeight;
@@ -1915,20 +1899,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (isScrolling)
         menuItemWidth -= scrollBarWidth;
 
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrItemFont);
+    tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
         ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
-    } else {
-        if (Selectable) {
-            ColorFg = Theme.Color(clrItemSelableFont);
-            ColorBg = Theme.Color(clrItemSelableBg);
-        } else {
-            ColorFg = Theme.Color(clrItemFont);
-            ColorBg = Theme.Color(clrItemBg);
-        }
+    } else if (Selectable) {
+        ColorFg = Theme.Color(clrItemSelableFont);
+        ColorBg = Theme.Color(clrItemSelableBg);
     }
 
     int y = Index * itemRecordingHeight;

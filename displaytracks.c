@@ -50,19 +50,15 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     int y = (Index + 1) * itemHeight;
-    tColor ColorFg, ColorBg;
+    tColor ColorFg = Theme.Color(clrTrackItemFont);
+    tColor ColorBg = Theme.Color(clrTrackItemBg);
     if (Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
         ColorBg = Theme.Color(clrTrackItemCurrentBg);
         currentIndex = Index;
-    } else {
-        if (Index >= 0) {
-            ColorFg = Theme.Color(clrTrackItemSelableFont);
-            ColorBg = Theme.Color(clrTrackItemSelableBg);
-        } else {
-            ColorFg = Theme.Color(clrTrackItemFont);
-            ColorBg = Theme.Color(clrTrackItemBg);
-        }
+    } else if (Index >= 0) {
+        ColorFg = Theme.Color(clrTrackItemSelableFont);
+        ColorBg = Theme.Color(clrTrackItemSelableBg);
     }
 
     if (Index == -1)
