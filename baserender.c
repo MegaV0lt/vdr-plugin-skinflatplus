@@ -63,8 +63,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     delete font;
     delete fontSml;
     delete fontFixed;
-    if (topBarFontClock)
-        delete topBarFontClock;
+    if (topBarFontClock) delete topBarFontClock;
 
     if (osd) {
         messageScroller.Clear();
@@ -184,24 +183,24 @@ void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
 }
 
 void cFlatBaseRender::TopBarSetExtraIcon(cString icon) {
-    if (!strcmp(*icon, ""))
-        return;
+    if (!strcmp(*icon, "")) return;
+
     topBarExtraIcon = icon;
     topBarExtraIconSet = true;
     topBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarSetMenuIcon(cString icon) {
-    if (!strcmp(*icon, ""))
-        return;
+    if (!strcmp(*icon, "")) return;
+
     topBarMenuIcon = icon;
     topBarMenuIconSet = true;
     topBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarSetMenuIconRight(cString icon) {
-    if (!strcmp(*icon, ""))
-        return;
+    if (!strcmp(*icon, "")) return;
+
     topBarMenuIconRight = icon;
     topBarMenuIconRightSet = true;
     topBarUpdateTitle = true;
@@ -213,8 +212,8 @@ void cFlatBaseRender::TopBarClearMenuIconRight(void) {
 }
 
 void cFlatBaseRender::TopBarSetMenuLogo(cString icon) {
-    if (!strcmp(*icon, ""))
-        return;
+    if (!strcmp(*icon, "")) return;
+
     topBarMenuLogo = icon;
     topBarMenuLogoSet = true;
     topBarUpdateTitle = true;
@@ -855,9 +854,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     messageScroller.Clear();
 
     cImage *img = imgLoader.LoadIcon(*icon, fontHeight, fontHeight);
-    if (img) {
+    if (img)
         messageIconPixmap->DrawImage(cPoint(marginItem + 10, marginItem), *img);
-    }
 
     if (Config.MessageColorPosition == 0) {
         messagePixmap->DrawRectangle(cRect(0, 0, 8, messageHeight), col);
@@ -887,8 +885,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
-            int l = font->Width(first.c_str());
-            l += font->Width('X');
+            int l = font->Width(first.c_str()) + font->Width('X');
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
         } else {  // ~ not found
@@ -994,8 +991,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 0:  // small line + big line
     {
         int sml = rect.Height() / 10 * 2;
-        if (sml <= 1)
-            sml = 2;
+        if (sml <= 1) sml = 2;
         int big = rect.Height();
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1017,8 +1013,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         int out {1};
-        if (big > 10)
-            out = 2;
+        if (big > 10) out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1060,8 +1055,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 3:  // small line + big line + dot
     {
         int sml = rect.Height() / 10 * 2;
-        if (sml <= 1)
-            sml = 2;
+        if (sml <= 1) sml = 2;
         int big = rect.Height();
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1093,8 +1087,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         int out {1};
-        if (big > 10)
-            out = 2;
+        if (big > 10) out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1114,8 +1107,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 6:  // small line + dot
     {
         int sml = rect.Height() / 10 * 2;
-        if (sml <= 1)
-            sml = 2;
+        if (sml <= 1) sml = 2;
         int big = rect.Height();
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1132,8 +1124,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         int out {1};
-        if (rect.Height() > 10)
-            out = 2;
+        if (big > 10) out = 2;
         // outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1151,8 +1142,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 8:  // small line + big line + alpha blend
     {
         int sml = rect.Height() / 10 * 2;
-        if (sml <= 1)
-            sml = 2;
+        if (sml <= 1) sml = 2;
         int big = rect.Height() / 2 - sml / 2;
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1193,8 +1183,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     PixmapFill(progressBarPixmap, progressBarColorBg);
 
     int sml = Config.decorProgressReplaySize / 10 * 2;
-    if (sml <= 4)
-        sml = 4;
+    if (sml <= 4) sml = 4;
     int big = Config.decorProgressReplaySize - sml * 2 - 2;
 
     if (!Marks) {
@@ -1259,8 +1248,7 @@ int cFlatBaseRender::ProgressBarMarkPos(int P, int Total) {
 void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posCurrent, bool Start, bool isCurrent) {
     int top = progressBarHeight / 2;
     int sml = Config.decorProgressReplaySize / 10 * 2;
-    if (sml <= 4)
-        sml = 4;
+    if (sml <= 4) sml = 4;
     int big = Config.decorProgressReplaySize - sml * 2 - 2;
 
     int mbig = Config.decorProgressReplaySize * 2;
@@ -1328,8 +1316,7 @@ void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posC
 
 void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
                                     bool CanScrollUp, bool CanScrollDown) {
-    if (!Pixmap)
-        return;
+    if (!Pixmap) return;
 
     int scrollHeight = std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5);
     int scrollTop = std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - scrollHeight);
@@ -1421,8 +1408,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 4: {
             int out {1};
-            if (scrollBarWidth > 10)
-                out = 2;
+            if (scrollBarWidth > 10) out = 2;
             // outline
             Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
@@ -1437,8 +1423,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 5: {
             int dotHeight = scrollBarWidth / 2;
             int out {1};
-            if (scrollBarWidth > 10)
-                out = 2;
+            if (scrollBarWidth > 10) out = 2;
             // outline
             Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
@@ -1525,8 +1510,7 @@ void cFlatBaseRender::DecorBorderClearAll(void) {
 
 void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
                                       tColor ColorBg, int From, bool Store) {
-    if (Size == 0 || Type <= 0)
-        return;
+    if (Size == 0 || Type <= 0) return;
 
     if (Store) {
         sDecorBorder f {

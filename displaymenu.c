@@ -332,7 +332,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                             ++recCount;
                             if (Rec->IsNew())
                                 ++recNewCount;
-                        }  
+                        }
                     }  // for
                 } else {
 #if VDRVERSNUM >= 20301
@@ -571,15 +571,13 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     for (; i < text.length(); ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
-            if (!(s >= '0' && s <= '9'))
-                break;
+            if (!(s >= '0' && s <= '9')) break;
         }
         if (found) {
             if (!(s >= '0' && s <= '9'))
                 doBreak = true;
         }
         if (s >= '0' && s <= '9') found = true;
-
         if (doBreak || i > 4) break;
     }
     if (found) {
@@ -647,8 +645,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
     for (; *p != ']'; ++p) {
         if (*p == ' ' || *p == '|') {
             ++total;
-            if (*p == '|')
-                ++now;
+            if (*p == '|') ++now;
         } else {
             isProgressbar = false;
             break;
@@ -663,13 +660,9 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
 
 bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                       bool WithProvider) {
-    if (Config.MenuChannelView == 0 || !Channel)
-        return false;
+    if (Config.MenuChannelView == 0 || !Channel) return false;
 
-    const cEvent *Event = NULL;
-
-    if (Current)
-        menuItemScroller.Clear();
+    if (Current) menuItemScroller.Clear();
 
     int Height = fontHeight;
     menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
@@ -787,6 +780,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     LeftName = Left;
 
     // Event from channel
+    const cEvent *Event = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
@@ -949,8 +943,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
 void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText) {
     cLeft = menuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + marginItem;
-    if (isScrolling)
-        cLeft += scrollBarWidth;
+    if (isScrolling) cLeft += scrollBarWidth;
+
     cTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
     cWidth = menuWidth - cLeft - Config.decorBorderMenuContentSize;
     cHeight = osdHeight - (topBarHeight + Config.decorBorderTopBarSize * 2 + buttonsHeight +
@@ -1142,8 +1136,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 }
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
-    if (Config.MenuTimerView == 0 || !Timer)
-        return false;
+    if (Config.MenuTimerView == 0 || !Timer) return false;
 
     const cChannel *Channel = Timer->Channel();
     const cEvent *Event = Timer->Event();
@@ -1415,14 +1408,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch) {
 #endif
-    if (Config.MenuEventView == 0)
-        return false;
+    if (Config.MenuEventView == 0) return false;
 
-    if (Config.MenuEventViewAllwaysWithDate)
-        WithDate = true;
+    if (Config.MenuEventViewAllwaysWithDate) WithDate = true;
 
-    if (Current)
-        menuItemScroller.Clear();
+    if (Current) menuItemScroller.Clear();
 
     int Height = fontHeight;
     menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
@@ -1431,8 +1421,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         menuItemWidth *= 0.6;
     }
 
-    if (isScrolling)
-        menuItemWidth -= scrollBarWidth;
+    if (isScrolling) menuItemWidth -= scrollBarWidth;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -1454,8 +1443,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int LeftSecond = Left;
-    int Top = y;
-    int w {0};
+    int Top = y, w {0};
     int imageTop = Top;
 
     if (!Channel)
@@ -1842,8 +1830,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-    if (Config.MenuRecordingView == 0)
-        return false;
+    if (Config.MenuRecordingView == 0) return false;
 
     if (Level > 0)
         RecFolder = GetRecordingName(Recording, Level - 1, true).c_str();
@@ -1886,8 +1873,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         TopBarSetTitleWithoutClear(*newTitle);
     }
 
-    if (Current)
-        menuItemScroller.Clear();
+    if (Current) menuItemScroller.Clear();
 
     int Height = fontHeight;
     menuItemWidth = menuWidth - Config.decorBorderMenuItemSize * 2;
@@ -2108,8 +2094,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 
             int ImagesWidth = imgRecNew->Width() + imgRecCut->Width() + marginItem * 2 + scrollBarWidth;
-            if (isScrolling)
-                ImagesWidth -= scrollBarWidth;
+            if (isScrolling) ImagesWidth -= scrollBarWidth;
 
             if (Current && font->Width(*RecName) > (menuItemWidth - Left - marginItem - ImagesWidth) &&
                 Config.ScrollerEnable) {
@@ -2121,13 +2106,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      menuItemWidth - Left - marginItem - ImagesWidth);
             }
 
-            Top += fontHeight;
-
             int Minutes = (Recording->LengthInSeconds() + 30) / 60;
             cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
             buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
+            Top += fontHeight;
             menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, fontSml,
                                  menuItemWidth - Left - marginItem);
 
@@ -2287,8 +2271,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
 
-    if (!isScrolling)
-        ItemBorderInsertUnique(ib);
+    if (!isScrolling) ItemBorderInsertUnique(ib);
 
     if (Config.MenuRecordingView == 3 && Current)
         DrawItemExtraRecording(Recording, tr("no recording info"));
@@ -2297,8 +2280,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
-    if (!Event)
-        return;
+    if (!Event) return;
 
 #ifdef DEBUGEPGTIME
     uint32_t tick0 = GetMsTicks();
@@ -2898,8 +2880,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
 void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cString EmptyText) {
     cLeft = menuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + marginItem;
-    if (isScrolling)
-        cLeft += scrollBarWidth;
+    if (isScrolling) cLeft += scrollBarWidth;
+
     cTop = topBarHeight + marginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
     cWidth = menuWidth - cLeft - Config.decorBorderMenuContentSize;
     cHeight = osdHeight - (topBarHeight + Config.decorBorderTopBarSize * 2 + buttonsHeight +
@@ -3281,8 +3263,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
-    if (!Recording)
-        return;
+    if (!Recording) return;
 
 #ifdef DEBUGEPGTIME
     uint32_t tick0 = GetMsTicks();
@@ -4045,8 +4026,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
-    if (!Text)
-        return;
+    if (!Text) return;
 
     ShowEvent = false;
     ShowRecording = false;
@@ -4247,8 +4227,7 @@ bool cFlatDisplayMenu::isRecordingOld(const cRecording *Recording, int Level) {
     int days = diffSecs / (60 * 60 * 24);
     // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
     //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, diffSecs, days);
-    if (days > value)
-        return true;
+    if (days > value) return true;
 
     return false;
 }
@@ -4290,8 +4269,7 @@ std::string cFlatDisplayMenu::xml_substring(std::string source, const char *str_
 }
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool isFolder) {
-    if (!Recording)
-        return "";
+    if (!Recording) return "";
 
     std::string recNamePart("");
     std::string recName = Recording->Name();
@@ -4666,8 +4644,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 #else
     for (cTimer *timer = Timers.First(); timer; timer = Timers.Next(timer)) {
 #endif
-        if (!timer->Recording())
-            continue;
+        if (!timer->Recording()) continue;
 
         if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(timer)) {
             const cDevice *recDevice = RecordControl->Device();
@@ -4751,8 +4728,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
         left += fontSmlWidthX * 8;
         auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
-        str = x.c_str();
-        // str = *channelName;
+        str = x.c_str();  // str = *channelName;
         contentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
 
@@ -5826,8 +5802,7 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels.Next(Channel)) {
 #endif
         img = imgLoader.LoadLogo(Channel->Name(), imageBGWidth - 4, imageBGHeight - 4);
-        if (img)
-            ++index;
+        if (img) ++index;
     }
 
     imgLoader.LoadIcon("radio", 999, topBarHeight - marginItem * 2);
