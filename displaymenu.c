@@ -4275,6 +4275,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     std::string recName = Recording->Name();
     try {
         std::vector<std::string> tokens;
+        tokens.reserve(6);  // Set to at least 6 entrys
         std::istringstream f(recName.c_str());
         std::string s("");
         while (std::getline(f, s, FOLDERDELIMCHAR)) {
