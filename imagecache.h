@@ -6,9 +6,8 @@
 
 #define MAX_IMAGE_CACHE     999
 #define LOGO_PRE_CACHE      200
-// note LOGO_PRE_CACHE is used twice
-// one for displaychannel and one for menu
-// you must double the value for the real amount of pre cached logos
+// Note: LOGO_PRE_CACHE is used twice one for displaychannel and one for menu
+// You must double the value for the real amount of pre cached logos
 
 class cImageCache {
  private:
