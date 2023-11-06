@@ -660,7 +660,8 @@ void cFlatConfig::Init(void) {
 }
 
 bool stringCompare(const std::string &left, const std::string &right) {
-    for (std::string::const_iterator lit = left.begin(), rit = right.begin(); lit != left.end() && rit != right.end(); ++lit, ++rit)
+    std::string::const_iterator lit, rit, leftEnd = left.end(), rightEnd = right.end();
+    for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit)
         if (tolower(*lit) < tolower(*rit))
             return true;
         else if (tolower(*lit) > tolower(*rit))

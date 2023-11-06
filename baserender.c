@@ -1486,8 +1486,8 @@ void cFlatBaseRender::DecorBorderClear(int Left, int Top, int Width, int Height,
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    std::list<sDecorBorder>::iterator it;
-    for (it = Borders.begin(); it != Borders.end();) {
+    std::list<sDecorBorder>::iterator it, end = Borders.end();
+    for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
             DecorBorderClear((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size);
             it = Borders.erase(it);
@@ -1497,8 +1497,8 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
 }
 
 void cFlatBaseRender::DecorBorderRedrawAll(void) {
-    std::list<sDecorBorder>::iterator it;
-    for (it = Borders.begin(); it != Borders.end(); ++it) {
+    std::list<sDecorBorder>::iterator it, end = Borders.end();
+    for (it = Borders.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size, (*it).Type, (*it).ColorFg,
                         (*it).ColorBg, (*it).From, false);
     }
