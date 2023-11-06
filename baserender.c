@@ -222,7 +222,7 @@ void cFlatBaseRender::TopBarSetMenuLogo(cString icon) {
 void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     // cVideoDiskUsage::HasChanged(VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     int DiskUsagePercent = cVideoDiskUsage::UsedPercent();  // Used %
-    double DiskFreePercent = (100 - DiskUsagePercent);      // Free %
+    int DiskFreePercent = (100 - DiskUsagePercent);         // Free %
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
     // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
     // The constant is calculated during compilation.).
