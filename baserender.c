@@ -109,7 +109,7 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
     if (osd) {
         tArea Area = {0, 0, width, height, 32};
         if (osd->SetAreas(&Area, 1) == oeOk) {
-            dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+            // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
             return;
         }
     }

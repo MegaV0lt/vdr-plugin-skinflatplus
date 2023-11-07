@@ -671,11 +671,11 @@ bool stringCompare(const std::string &left, const std::string &right) {
     return false;
 }
 
-bool pairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j) {
+bool pairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
     return i.first < j.first;
 }
 
-bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j) {
+bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<int, std::string> &j) {
     return i.first > j.first;
 }
 
@@ -860,7 +860,6 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-
 void cFlatConfig::RecordingOldLoadConfig(void) {
     dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
     RecordingOldFolder.clear();
@@ -908,9 +907,11 @@ void cFlatConfig::SetLogoPath(cString path) {
 
 cString cFlatConfig::checkSlashAtEnd(std::string path) {
     try {
-        if (!(path.at(path.size()-1) == '/'))
+        if (!(path.at(path.size() - 1) == '/'))
             return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
-    } catch (...) { return cString::sprintf("%s", path.c_str()); }
+    } catch (...) {
+        return cString::sprintf("%s", path.c_str());
+    }
     return cString::sprintf("%s", path.c_str());
 }
 
