@@ -129,8 +129,8 @@ void cComplexContent::AddText(const char *text, bool multiline, cRect position, 
                               cFont *font, int textWidth, int textHeight, int textAlignment) {
     Contents.push_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-    if (Contents.size() > 128)
-        dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(), Contents.capacity());
+    // if (Contents.size() > 128)
+    //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(), Contents.capacity());
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
