@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
-2023-11-xx: Version 0.8.0
+2023-11-08: Version 0.8.0
 - [fix] Better display of channelicons (Resolution, ...)
 - [add] Option to show shorttext without date in playback
 - [update] Tweak toLowerCase(). Preloading time of images reduced by ~15%
