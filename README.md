@@ -23,6 +23,8 @@ Beschreibung
 -------------------------------
 Skin flatPlus ist ein schneller, moderner und aktueller Skin für VDR.
 Das Design ist flach und geradlinig (keine glossy oder 3D-Effekte)
+Haupmenü mit aktivierten 'Widgets':
+![grafik](https://github.com/MegaV0lt/vdr-plugin-skinflatplus/assets/2804301/6a938d74-5c32-4d05-a043-21b6a16270ba)
 
 
 git-Zugriff
