@@ -466,7 +466,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
                     mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
                 }
-                dsyslog("flatPlus: Poster/Banner resized to %d x %d", mediaWidth, mediaHeight);
+                dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
             }
             cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
             if (img) {

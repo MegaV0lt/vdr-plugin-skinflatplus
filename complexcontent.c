@@ -76,8 +76,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
             Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
         }
     } else {  // Log values and return
-        esyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d", Position.Left(), Position.Top(),
-                Position.Width(), Position.Height());
+        esyslog("flatPlus: Failed to create ComplexContentPixmap left: %d top: %d width: %d height: %d",
+                Position.Left(), Position.Top(), Position.Width(), Position.Height());
         return;
     }
     PixmapFill(PixmapImage, clrTransparent);
@@ -116,9 +116,9 @@ int cComplexContent::ContentHeight(bool Full) {
 bool cComplexContent::Scrollable(int height) {
     CalculateDrawPortHeight();
 
-    int total = ScrollTotal();
     if (height == 0) height = Position.Height();
 
+    int total = ScrollTotal();
     int shown = ceil(height * 1.0 / ScrollSize);
     if (total > shown) return true;
 
@@ -130,7 +130,8 @@ void cComplexContent::AddText(const char *text, bool multiline, cRect position, 
     Contents.push_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     // if (Contents.size() > 128)
-    //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(), Contents.capacity());
+    //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(),
+    //            Contents.capacity());
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
