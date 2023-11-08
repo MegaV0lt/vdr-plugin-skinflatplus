@@ -1,5 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-11-08: Version 0.8.0
+- [fix] Better display of channelicons (Resolution, ...)
+- [add] Option to show shorttext without date in playback
+- [update] Tweak toLowerCase(). Preloading time of images reduced by ~15%
+            Before: Imagecache pre load images time: 425 ms
+            After: Imagecache pre load images time: 361 ms
+- [update] Some internal optimizations
+
 2023-11-01: Version 0.7.9
 - [fix] Add static_cast to log for 32 bit systems
 - [fix] Move cVideoDiskUsage::HasChanged(VideoDiskUsageState)

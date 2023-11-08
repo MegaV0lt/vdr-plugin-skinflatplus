@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflat 0.7.4\n"
+"Project-Id-Version: vdr-skinflatplus 0.7.9\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -660,6 +660,9 @@ msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
 msgid "Show recerrors icon in playback"
 msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
+
+msgid "Show shorttext with date in playback"
+msgstr "Aufnahmen: Kurztext mit Datum/Zeit anzeigen"
 
 msgid "Recording recerrors icon threshold"
 msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"

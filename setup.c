@@ -295,6 +295,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MessageColorPosition", Config.MessageColorPosition);
     SetupStore("MessageOffset", Config.MessageOffset);
     SetupStore("PlaybackShowRecordingErrors", Config.PlaybackShowRecordingErrors);
+    SetupStore("PlaybackShowRecordingDate", Config.PlaybackShowRecordingDate);
     SetupStore("PlaybackWeatherShow", Config.PlaybackWeatherShow);
     SetupStore("RecordingAdditionalInfoShow", Config.RecordingAdditionalInfoShow);
     SetupStore("RecordingDimmOnPause", Config.RecordingDimmOnPause);
@@ -492,6 +493,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageColorPosition") == 0)                 SetupConfig->MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        SetupConfig->MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            SetupConfig->PlaybackShowRecordingDate = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  SetupConfig->PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          SetupConfig->RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 SetupConfig->RecordingDimmOnPause = atoi(Value);
@@ -669,6 +671,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MessageColorPosition", SetupConfig->MessageColorPosition, *Filename);
     Config.Store("MessageOffset", SetupConfig->MessageOffset, *Filename);
     Config.Store("PlaybackShowRecordingErrors", SetupConfig->PlaybackShowRecordingErrors, *Filename);
+    Config.Store("PlaybackShowRecordingDate", SetupConfig->PlaybackShowRecordingDate, *Filename);
     Config.Store("PlaybackWeatherShow", SetupConfig->PlaybackWeatherShow, *Filename);
     Config.Store("RecordingAdditionalInfoShow", SetupConfig->RecordingAdditionalInfoShow, *Filename);
     Config.Store("RecordingDimmOnPauseDelay", SetupConfig->RecordingDimmOnPauseDelay, *Filename);
@@ -1095,6 +1098,7 @@ void cFlatSetupReplay::Setup(void) {
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
+    Add(new cMenuEditBoolItem(tr("Show shorttext with date in playback"), &SetupConfig->PlaybackShowRecordingDate));
 
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
     if (SetupConfig->RecordingDimmOnPause) {

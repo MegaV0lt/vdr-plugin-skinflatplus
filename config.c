@@ -136,6 +136,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingDefaultOldDays = -1;
 
     PlaybackShowRecordingErrors = true;
+    PlaybackShowRecordingDate = true;  // Show date and time with shorttext
 
     ChannelWeatherShow = 1;
     PlaybackWeatherShow = 1;
@@ -359,6 +360,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageColorPosition") == 0)                 MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          PlaybackShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            PlaybackShowRecordingDate = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 RecordingDimmOnPause = atoi(Value);
@@ -658,7 +660,8 @@ void cFlatConfig::Init(void) {
 }
 
 bool stringCompare(const std::string &left, const std::string &right) {
-    for (std::string::const_iterator lit = left.begin(), rit = right.begin(); lit != left.end() && rit != right.end(); ++lit, ++rit)
+    std::string::const_iterator lit, rit, leftEnd = left.end(), rightEnd = right.end();
+    for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit)
         if (tolower(*lit) < tolower(*rit))
             return true;
         else if (tolower(*lit) > tolower(*rit))
@@ -668,11 +671,11 @@ bool stringCompare(const std::string &left, const std::string &right) {
     return false;
 }
 
-bool pairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j) {
+bool pairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
     return i.first < j.first;
 }
 
-bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j) {
+bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<int, std::string> &j) {
     return i.first > j.first;
 }
 
@@ -857,7 +860,6 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-
 void cFlatConfig::RecordingOldLoadConfig(void) {
     dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
     RecordingOldFolder.clear();
@@ -866,17 +868,16 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
     FILE *f = fopen(RecordingOldConfigFile, "r");
     if (f) {
         int line {0}, value {0};
-        char *s;
+        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
-            char *p = strchr(s, '#');
-            if (p)
-                *p = 0;
+            p = strchr(s, '#');
+            if (p) *p = 0;
             s = stripspace(skipspace(s));
             if (!isempty(s)) {
-                char *n = s;
-                char *v = strchr(s, '=');
+                n = s;
+                v = strchr(s, '=');
                 if (v) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
@@ -887,7 +888,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     RecordingOldValue.push_back(value);
                 }
             }
-        }
+        }  // while
     }
 }
 
@@ -906,9 +907,11 @@ void cFlatConfig::SetLogoPath(cString path) {
 
 cString cFlatConfig::checkSlashAtEnd(std::string path) {
     try {
-        if (!(path.at(path.size()-1) == '/'))
+        if (!(path.at(path.size() - 1) == '/'))
             return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
-    } catch (...) { return cString::sprintf("%s", path.c_str()); }
+    } catch (...) {
+        return cString::sprintf("%s", path.c_str());
+    }
     return cString::sprintf("%s", path.c_str());
 }
 

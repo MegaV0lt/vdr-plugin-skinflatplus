@@ -29,8 +29,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     SignalStrengthRight = 0;
 
     CreateFullOsd();
-    if (!osd)
-        return;
+    if (!osd) return;
 
     TopBarCreate();
     MessageCreate();
@@ -112,8 +111,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     if (osd) {
         scrollers.Clear();
@@ -134,14 +132,13 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
-    cString channelNumber("");
     isRecording = false;
     PixmapFill(chanIconsPixmap, clrTransparent);
     lastScreenWidth = -1;
 
+    cString channelNumber("");
     if (Channel) {
         isRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         isGroup = Channel->GroupSep();
@@ -192,10 +189,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
-    if (!Resolution)
+    // if (!Resolution)
         PixmapFill(chanIconsPixmap, clrTransparent);
 
     int top = heightBottom - fontSmlHeight - marginItem;
@@ -248,8 +244,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     present = Present;
     cString epgShort("");
@@ -453,15 +448,13 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
@@ -517,13 +510,11 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     // dsyslog("flatPlus: DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
-    if (!pDVBApi)
-        return;
+    if (!pDVBApi) return;
 
     sDVBAPIEcmInfo ecmInfo;
     ecmInfo.ecmtime = -1;
@@ -533,8 +524,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
-    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo))
-        return;
+    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
 /*
     dsyslog("flatPlus: caid: %d", ecmInfo.caid);
     dsyslog("flatPlus: cardsystem: %s", *ecmInfo.cardsystem);
@@ -580,8 +570,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 }
 
 void cFlatDisplayChannel::Flush(void) {
-    if (!doOutput)
-        return;
+    if (!doOutput) return;
 
     int Current {0}, Total {0};
     if (present) {
@@ -591,6 +580,7 @@ void cFlatDisplayChannel::Flush(void) {
         Total = present->Duration();
         ProgressBarDraw(Current, Total);
     }
+
     if (Config.SignalQualityShow)
         SignalQualityDraw();
 
@@ -633,8 +623,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
          Channel = Channels.Next(Channel)) {
 #endif
         img = imgLoader.LoadLogo(Channel->Name(), imageBGWidth - 4, imageBGHeight - 4);
-        if (img)
-            ++index;
+        if (img) ++index;
     }
 
     height = std::max(fontSmlHeight, Config.decorProgressSignalSize);
