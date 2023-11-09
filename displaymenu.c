@@ -2583,10 +2583,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperEPGInfoShowActors) {
-                        actors_path.reserve(series.actors.size());  // Set capacity to size of actors
-                        actors_name.reserve(series.actors.size());
-                        actors_role.reserve(series.actors.size());
-                        for (unsigned int i {0}; i < series.actors.size(); ++i) {
+                        int seriesActorsSize = series.actors.size();
+                        actors_path.reserve(seriesActorsSize);  // Set capacity to size of actors
+                        actors_name.reserve(seriesActorsSize);
+                        actors_role.reserve(seriesActorsSize);
+                        for (unsigned int i {0}; i < seriesActorsSize; ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                 actors_path.push_back(series.actors[i].actorThumb.path);
                                 actors_name.push_back(series.actors[i].name);
@@ -2619,10 +2620,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperEPGInfoShowActors) {
-                        actors_path.reserve(movie.actors.size());  // Set capacity to size of actors
-                        actors_name.reserve(movie.actors.size());
-                        actors_role.reserve(movie.actors.size());
-                        for (unsigned int i {0}; i < movie.actors.size(); ++i) {
+                        int moviesActorsSize = movie.actors.size();
+                        actors_path.reserve(moviesActorsSize);  // Set capacity to size of actors
+                        actors_name.reserve(moviesActorsSize);
+                        actors_role.reserve(moviesActorsSize);
+                        for (unsigned int i {0}; i < moviesActorsSize; ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                 actors_path.push_back(movie.actors[i].actorThumb.path);
                                 actors_name.push_back(movie.actors[i].name);
@@ -3695,10 +3697,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     mediaWidth = cWidth / 2 - marginItem * 2;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperRecInfoShowActors) {
-                        actors_path.reserve(series.actors.size());  // Set capacity to size of actors
-                        actors_name.reserve(series.actors.size());
-                        actors_role.reserve(series.actors.size());
-                        for (unsigned int i {0}; i < series.actors.size(); ++i) {
+                        int seriesActorsSize = series.actors.size();
+                        actors_path.reserve(seriesActorsSize);  // Set capacity to size of actors
+                        actors_name.reserve(seriesActorsSize);
+                        actors_role.reserve(seriesActorsSize);
+                        for (unsigned int i {0}; i < seriesActorsSize; ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                 actors_path.push_back(series.actors[i].actorThumb.path);
                                 actors_name.push_back(series.actors[i].name);
@@ -3731,10 +3734,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperRecInfoShowActors) {
-                        actors_path.reserve(movie.actors.size());  // Set capacity to size of actors
-                        actors_name.reserve(movie.actors.size());
-                        actors_role.reserve(movie.actors.size());
-                        for (unsigned int i {0}; i < movie.actors.size(); ++i) {
+                        int moviesActorsSize = movie.actors.size();
+                        actors_path.reserve(moviesActorsSize);  // Set capacity to size of actors
+                        actors_name.reserve(moviesActorsSize);
+                        actors_role.reserve(moviesActorsSize);
+                        for (unsigned int i {0}; i < moviesActorsSize; ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                 actors_path.push_back(movie.actors[i].actorThumb.path);
                                 actors_name.push_back(movie.actors[i].name);
