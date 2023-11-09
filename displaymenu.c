@@ -215,11 +215,11 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 int cFlatDisplayMenu::MaxItems(void) {
     if (menuCategory == mcChannel)
         return scrollBarHeight / itemChannelHeight;
-    else if (menuCategory == mcTimer)
+    if (menuCategory == mcTimer)
         return scrollBarHeight / itemTimerHeight;
-    else if (menuCategory == mcSchedule || menuCategory == mcScheduleNow || menuCategory == mcScheduleNext)
+    if (menuCategory == mcSchedule || menuCategory == mcScheduleNow || menuCategory == mcScheduleNext)
         return scrollBarHeight / itemEventHeight;
-    else if (menuCategory == mcRecording)
+    if (menuCategory == mcRecording)
         return scrollBarHeight / itemRecordingHeight;
 
     return scrollBarHeight / itemHeight;
@@ -228,11 +228,11 @@ int cFlatDisplayMenu::MaxItems(void) {
 int cFlatDisplayMenu::ItemsHeight(void) {
     if (menuCategory == mcChannel)
         return MaxItems() * itemChannelHeight - Config.MenuItemPadding;
-    else if (menuCategory == mcTimer)
+    if (menuCategory == mcTimer)
         return MaxItems() * itemTimerHeight - Config.MenuItemPadding;
-    else if (menuCategory == mcSchedule || menuCategory == mcScheduleNow || menuCategory == mcScheduleNext)
+    if (menuCategory == mcSchedule || menuCategory == mcScheduleNow || menuCategory == mcScheduleNext)
         return MaxItems() * itemEventHeight - Config.MenuItemPadding;
-    else if (menuCategory == mcRecording)
+    if (menuCategory == mcRecording)
         return MaxItems() * itemRecordingHeight - Config.MenuItemPadding;
 
     return MaxItems() * itemHeight - Config.MenuItemPadding;
@@ -566,9 +566,9 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string menuEntry(""), menuNumber("");
     bool found = false;
     bool doBreak = false;
-    char s(' ');
-    size_t i {0};
-    for (; i < text.length(); ++i) {
+    char s = NULL;
+    size_t i {0}, textLength = text.length();
+    for (; i < textlength; ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
             if (!(s >= '0' && s <= '9')) break;
