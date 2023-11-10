@@ -2,8 +2,7 @@
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
-    if (!Osd)
-        return;
+    if (!Osd) return;
 
     Text = text;
     Font = font;
@@ -31,16 +30,14 @@ void cTextScroll::UpdateViewPortWidth(int w) {
 }
 
 void cTextScroll::Reset(void) {
-    if (!Pixmap)
-        return;
+    if (!Pixmap) return;
 
     Pixmap->SetDrawPortPoint(cPoint(0, 0));
     waitSteps = WAITSTEPS;
 }
 
 void cTextScroll::Draw(void) {
-    if (!Pixmap)
-        return;
+    if (!Pixmap) return;
 
     if (ColorExtraTextFg) {
         std::string tilde = Text;
@@ -51,9 +48,9 @@ void cTextScroll::Draw(void) {
             rtrim(first);   // Trim possible space on right side
             ltrim(second);  // Trim possible space at begin
 
-            Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
-            int l = Font->Width(first.c_str());
-            l += Font->Width('X');
+            // Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
+            Pixmap->DrawText(cPoint(0, 0), *(first.c_str()), ColorFg, ColorBg, Font);
+            int l = Font->Width(first.c_str()) + Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
         } else  // ~ not found
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
@@ -63,8 +60,7 @@ void cTextScroll::Draw(void) {
 }
 
 void cTextScroll::DoStep(void) {
-    if (!Pixmap)
-        return;
+    if (!Pixmap) return;
 
     // Wait at the beginning for better read
     if (waitSteps > 0) {
@@ -162,13 +158,12 @@ void cTextScrollers::Action(void) {
         cCondWait::SleepMs(10);
     }
 
-    if (!Running())
-        return;
+    if (!Running()) return;
 
     std::vector<cTextScroll *>::iterator it, end = Scrollers.end();
     for (it = Scrollers.begin(); it != end; ++it) {
-        if (!Running())
-            return;
+        if (!Running()) return;
+
         cPixmap::Lock();
         (*it)->Reset();
         cPixmap::Unlock();
@@ -180,8 +175,8 @@ void cTextScrollers::Action(void) {
 
         std::vector<cTextScroll *>::iterator it, end = Scrollers.end();
         for (it = Scrollers.begin(); it != end; ++it) {
-            if (!Running())
-                return;
+            if (!Running()) return;
+
             cPixmap::Lock();
             (*it)->DoStep();
             cPixmap::Unlock();

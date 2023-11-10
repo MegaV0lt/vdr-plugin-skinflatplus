@@ -82,28 +82,30 @@ char *GetFilenameWithoutext(char *fullfilename) {
 }
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
-    if (osd) {
-        if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
-            // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
-            //        DrawPort.Size().Height());
-            return pixmap;
-        } else {
-            esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i",
-                    *Name, DrawPort.Size().Width(), DrawPort.Size().Height());
-            cRect NewDrawPort = DrawPort;
-            int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
-            int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
-            NewDrawPort.SetSize(width, height);
-            if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-                esyslog("flatPlus: Created pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
-                return pixmap;
-            } else {
-                esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
-            }
-        }
+    if (!osd) {
+        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+                DrawPort.Size().Height());
+        return NULL;
     }
-    esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
-            DrawPort.Size().Height());
+
+    if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+        // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+        //        DrawPort.Size().Height());
+        return pixmap;
+    }
+
+    esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i", *Name,
+            DrawPort.Size().Width(), DrawPort.Size().Height());
+    cRect NewDrawPort = DrawPort;
+    int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
+    int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
+    NewDrawPort.SetSize(width, height);
+    if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
+        esyslog("flatPlus: Created pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
+        return pixmap;
+    }
+
+    esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
     return NULL;
 }
 
