@@ -101,21 +101,24 @@ class cSimpleContent {
     int GetBottom(void) {
         if (ContentType == CT_Text)
             return Position.Top() + Font->Height();
-        else if (ContentType == CT_TextMultiline) {
+
+        if (ContentType == CT_TextMultiline) {
             cTextWrapper Wrapper;
             Wrapper.Set(Text.c_str(), Font, Position.Width());
             return Position.Top() + (Wrapper.Lines() * Font->Height());
-        } else if (ContentType == CT_Image) {
+        }
+
+        if (ContentType == CT_Image)
             return Position.Top() + Image->Height();
-        } else if (ContentType == CT_Rect)
+
+        if (ContentType == CT_Rect)
             return Position.Top() + Position.Height();
 
         return 0;
     }
 
     void Draw(cPixmap *Pixmap) {
-        if (!Pixmap)
-            return;
+        if (!Pixmap) return;
 
         if (ContentType == CT_Text) {
             Pixmap->DrawText(cPoint(Position.Left(), Position.Top()), Text.c_str(), ColorFg, ColorBg, Font,

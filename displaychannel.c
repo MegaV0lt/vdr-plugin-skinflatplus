@@ -271,8 +271,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         cString timeString = cString::sprintf("%s - %s", *startTime, *endTime);
         int timeStringWidth = fontSml->Width(*timeString) + fontSml->Width("  ");
 
-        int epgWidth = font->Width(Present->Title()) + marginItem * 2;
-        int epgShortWidth = fontSml->Width(Present->ShortText()) + marginItem * 2;
+        epg = Present->Title();
+        epgShort = Present->ShortText();
+        int epgWidth = font->Width(*epg) + marginItem * 2;
+        int epgShortWidth = fontSml->Width(*epgShort) + marginItem * 2;
 
         if (Present->HasTimer()) {
             isRec = true;
@@ -291,9 +293,6 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             seen = cString::sprintf("%d+ %d min", sleft, Present->Duration() / 60);
 
         int seenWidth = fontSml->Width(*seen) + fontSml->Width("  ");
-
-        epg = Present->Title();
-        epgShort = Present->ShortText();
         int maxWidth = std::max(timeStringWidth, seenWidth);
 
         chanInfoBottomPixmap->DrawText(cPoint(channelWidth - timeStringWidth - marginItem * 2, 0), *timeString,
@@ -340,8 +339,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         cString timeString = cString::sprintf("%s - %s", *startTime, *endTime);
         int timeStringWidth = fontSml->Width(*timeString) + fontSml->Width("  ");
 
-        int epgWidth = font->Width(Following->Title()) + marginItem * 2;
-        int epgShortWidth = fontSml->Width(Following->ShortText()) + marginItem * 2;
+        epg = Following->Title();
+        epgShort = Following->ShortText();
+        int epgWidth = font->Width(*epg) + marginItem * 2;
+        int epgShortWidth = fontSml->Width(*epgShort) + marginItem * 2;
 
         if (Following->HasTimer()) {
             epgWidth += marginItem + RecWidth;
@@ -350,11 +351,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         cString dur = cString::sprintf("%d min", Following->Duration() / 60);
         int durWidth = fontSml->Width(*dur) + fontSml->Width("  ");
-
         int maxWidth = std::max(timeStringWidth, durWidth);
-
-        epg = Following->Title();
-        epgShort = Following->ShortText();
 
         chanInfoBottomPixmap->DrawText(cPoint(channelWidth - timeStringWidth - marginItem * 2,
                                        fontHeight + fontSmlHeight), *timeString, Theme.Color(clrChannelFontEpgFollow),
@@ -413,8 +410,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 mediaHeight = call.banner.height * Config.TVScraperChanInfoPosterSize * 100;
                 mediaPath = call.banner.path;
             } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                mediaWidth = call.poster.width /* * 0.5 */ * Config.TVScraperChanInfoPosterSize * 100;
-                mediaHeight = call.poster.height /* * 0.5 */ * Config.TVScraperChanInfoPosterSize * 100;
+                mediaWidth = call.poster.width * Config.TVScraperChanInfoPosterSize * 100;
+                mediaHeight = call.poster.height * Config.TVScraperChanInfoPosterSize * 100;
                 mediaPath = call.poster.path;
             }
         }
@@ -425,13 +422,12 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (mediaPath.length() > 0) {
         if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
-            if (Config.ChannelWeatherShow) {
-                mediaHeight = TVSHeight * 0.5;  // Max 50% of pixmap height/width
-                mediaWidth = TVSWidth * 0.5;    // Aspect is preserved in LoadFile()
-            } else {
-                mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height/width
-                mediaWidth = TVSWidth * 0.7;    // Aspect is preserved in LoadFile()
-            }
+            mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height
+            if (Config.ChannelWeatherShow)
+                mediaWidth = TVSWidth * 0.5;  // Max 50% of pixmap width. Aspect is preserved in LoadFile()
+            else
+                mediaWidth = TVSWidth * 0.7;  // Max 70% of pixmap width. Aspect is preserved in LoadFile()
+
             dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
         }
         cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);

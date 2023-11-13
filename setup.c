@@ -339,17 +339,16 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
     FILE *f = fopen(Filename, "r");
     if (f) {
         int line {0};
-        char *s;
+        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
-            char *p = strchr(s, '#');
-            if (p)
-                *p = 0;
+            p = strchr(s, '#');
+            if (p) *p = 0;
             s = stripspace(skipspace(s));
             if (!isempty(s)) {
-                char *n = s;
-                char *v = strchr(s, '=');
+                n = s;
+                v = strchr(s, '=');
                 if (v) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));

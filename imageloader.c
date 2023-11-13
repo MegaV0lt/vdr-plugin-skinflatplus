@@ -1,8 +1,10 @@
 #include "imageloader.h"
-#include <math.h>
-#include <string>
 #include <dirent.h>
+#include <math.h>
+
 #include <iostream>
+#include <string>
+
 #include "flat.h"
 
 using namespace Magick;
