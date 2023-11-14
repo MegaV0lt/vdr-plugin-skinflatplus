@@ -59,7 +59,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + channelHeight - height,
                            channelWidth, heightBottom));
     PixmapFill(chanIconsPixmap, clrTransparent);
-
+    // Area for TVScraper images
     TVSLeft = 20 + Config.decorBorderChannelEPGSize;
     TVSTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
     TVSWidth = osdWidth - 40 - Config.decorBorderChannelEPGSize * 2;

@@ -1551,7 +1551,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         if (Event) {
             int PBWidth = menuItemWidth / 20;
-
             if (!isScrolling)
                 PBWidth = (menuItemWidth - scrollBarWidth) / 20;
 
@@ -1561,7 +1560,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 if (total >= 0) {
                     // Calculate progress bar
                     double progress = roundf((now * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
-                    if (progress < 0) progress = 0.;
+                    if (progress < 0) progress = 0.0;
                     else if (progress > 100) progress = 100;
 
                     int PBTop = y + (itemEventHeight - Config.MenuItemPadding) / 2 -
@@ -1569,8 +1568,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     int PBLeft = Left;
                     int PBHeight = Config.decorProgressMenuItemSize;
 
-                    if ((Config.MenuEventView == 2 ||
-                         Config.MenuEventView == 3)) {  // flatPlus short, flatPlus short + EPG
+                    if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
+                        // flatPlus short, flatPlus short + EPG
                         PBTop = y + fontHeight + fontSmlHeight + marginItem;
                         PBWidth = menuItemWidth - LeftSecond - scrollBarWidth - marginItem * 2;
                         if (isScrolling)
@@ -1604,8 +1603,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
         cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
-        if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) &&
-            Channel) {  // flatPlus short, flatPlus short + EPG
+        if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
+            // flatPlus short, flatPlus short + EPG
             w = fontSml->Width("XXX 99. ") + marginItem;
             menuPixmap->DrawText(cPoint(LeftSecond, Top + fontHeight), *DateString, ColorFg, ColorBg, fontSml, w);
             LeftSecond += w + marginItem;
@@ -1658,7 +1657,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
 
     Left += imageHeight + marginItem;
-    // cString EventTitle = Event->Title();
     if (Event && Selectable) {
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = NULL;
@@ -1674,99 +1672,96 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
         Left += imageHeight + marginItem;
 
-        // cString EventShortText = Event->ShortText();
+        cString Title = cString::sprintf("%s", Event->Title());
+        cString ShortText = Event->ShortText() ? cString::sprintf("%s", Event->ShortText()) : "";
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             if (Current) {
-                if (Event->ShortText()) {
-                    cString t = cString::sprintf("%s~%s", Event->Title(), Event->ShortText());
+                if (!isempty(*ShortText)) {
+                    cString t = cString::sprintf("%s~%s", *Title, *ShortText);
                     if (fontSml->Width(*t) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
                             *t, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight), ColorFg,
                             clrTransparent, fontSml, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
+                        menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
-                        Left += fontSml->Width(Event->Title()) + fontSml->Width('~');
-                        // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
+                        Left += fontSml->Width(*Title) + fontSml->Width('~');
+                        menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
                     }
                 } else {
-                    if (fontSml->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    if (fontSml->Width(*Title) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            Event->Title(),
+                            *Title,
                             cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight), ColorFg,
                             clrTransparent, fontSml, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
+                        menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, fontSml,
                                              menuItemWidth - Left - marginItem);
                     }
                 }
             } else {  // Not current
-                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, fontSml,
+                menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, fontSml,
                                      menuItemWidth - Left - marginItem);
-                if (Event->ShortText()) {
-                    Left += fontSml->Width(Event->Title()) + font->Width('~');
-                    // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
+                if (!isempty(*ShortText)) {
+                    Left += fontSml->Width(*Title) + font->Width('~');
+                    menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
                 }
             }
         } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
-            if (Current && font->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
-                menuItemScroller.AddScroller(Event->Title(),
+            if (Current && font->Width(*Title) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                menuItemScroller.AddScroller(*Title,
                                              cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                                              ColorFg, clrTransparent, font);
             } else {
-                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
+                menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
             }
-            if (Event->ShortText()) {
+            if (!isempty(*ShortText)) {
                 Top += fontHeight;
-                if (Current && fontSml->Width(Event->ShortText()) > (menuItemWidth - Left - marginItem) &&
+                if (Current && fontSml->Width(*ShortText) > (menuItemWidth - Left - marginItem) &&
                     Config.ScrollerEnable) {
                     menuItemScroller.AddScroller(
-                        Event->ShortText(), cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
+                        *ShortText, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                         ColorExtraTextFg, clrTransparent, fontSml);
                 } else {
-                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, fontSml,
+                    menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, fontSml,
                                          menuItemWidth - Left - marginItem);
                 }
             }
         } else {
             if (Current) {
-                if (Event->ShortText()) {
-                    cString t = cString::sprintf("%s~%s", Event->Title(), Event->ShortText());
+                if (!isempty(*ShortText)) {
+                    cString t = cString::sprintf("%s~%s", *Title, *ShortText);
                     if (font->Width(*t) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
                             *t, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight), ColorFg,
                             clrTransparent, font, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
+                        menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
-                        Left += font->Width(Event->Title()) + font->Width('~');
-                        // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, font,
+                        Left += font->Width(*Title) + font->Width('~');
+                        menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
                     }
                 } else {
-                    if (font->Width(Event->Title()) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    if (font->Width(*Title) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            Event->Title(), cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
+                            *Title, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight),
                             ColorFg, clrTransparent, font, ColorExtraTextFg);
                     } else {
-                        menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
+                        menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, font,
                                              menuItemWidth - Left - marginItem);
                     }
                 }
             } else {
-                menuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, font,
+                menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, font,
                                      menuItemWidth - Left - marginItem);
-                if (Event->ShortText()) {
-                    Left += font->Width(Event->Title()) + font->Width('~');
-                    // cString ShortText = cString::sprintf("%s", Event->ShortText());
-                    menuPixmap->DrawText(cPoint(Left, Top), Event->ShortText(), ColorExtraTextFg, ColorBg, font,
+                if (!isempty(*ShortText)) {
+                    Left += font->Width(*Title) + font->Width('~');
+                    menuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, font,
                                          menuItemWidth - Left - marginItem);
                 }
             }
@@ -2544,9 +2539,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         std::ostringstream series_info(""), movie_info("");
 
-        std::vector<std::string> actors_path;
+        /* std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
-        std::vector<std::string> actors_role;
+        std::vector<std::string> actors_role; */
+
+        std::vector<cString> actors_path;
+        std::vector<cString> actors_name;
+        std::vector<cString> actors_role;
 
         std::string mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
@@ -2597,9 +2596,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         actors_role.reserve(seriesActorsSize);
                         for (int i {0}; i < seriesActorsSize; ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
-                                actors_path.push_back(series.actors[i].actorThumb.path);
-                                actors_name.push_back(series.actors[i].name);
-                                actors_role.push_back(series.actors[i].role);
+                                actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
+                                actors_name.emplace_back(series.actors[i].name.c_str());
+                                actors_role.emplace_back(series.actors[i].role.c_str());
                             }
                         }
                     }
@@ -2634,9 +2633,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         actors_role.reserve(moviesActorsSize);
                         for (int i {0}; i < moviesActorsSize; ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
-                                actors_path.push_back(movie.actors[i].actorThumb.path);
-                                actors_name.push_back(movie.actors[i].name);
-                                actors_role.push_back(movie.actors[i].role);
+                                actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                                actors_name.emplace_back(movie.actors[i].name.c_str());
+                                actors_role.emplace_back(movie.actors[i].role.c_str());
                             }
                         }
                     }
@@ -2736,8 +2735,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
             // cImage *img = NULL;    // Actor image
-            std::string name(""), path(""), role("");  // Actor name, path and role
-            std::ostringstream sstrRole("");  // Stringstream for role
+            // std::string name(""), path(""), role("");  // Actor name, path and role
+            cString name(""), path(""), role("");  // Actor name, path and role
+            // std::ostringstream sstrRole("");  // Stringstream for role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
             int picLines = numActors / picsPerLine;
             if (numActors % picsPerLine != 0)
@@ -2755,20 +2755,21 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     if (actor == numActors)
                         break;
                     path = actors_path[actor];
-                    img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
+                    img = imgLoader.LoadFile(*path, actorWidth, 999);
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                         name = actors_name[actor];
-                        if (actors_role[actor].length() > 0) {
-                            sstrRole.str("");  // Set string to ""
-                            sstrRole << "\"" << actors_role[actor] << "\"";
-                        }
-                        role = sstrRole.str();
-                        ComplexContent.AddText(name.c_str(), false,
+                        // if (actors_role[actor].length() > 0) {
+                        /*sstrRole.str("");  // Set string to ""
+                        sstrRole << "\"" << actors_role[actor] << "\"";
+                        role = sstrRole.str();*/
+                        role = cString::sprintf("\"%s\"", *actors_role[actor]);
+                        // }
+                        ComplexContent.AddText(*name, false,
                                                cRect(x, y + img->Height() + marginItem, actorWidth, 0),
                                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                                actorWidth, fontSmlHeight, taCenter);
-                        ComplexContent.AddText(role.c_str(), false,
+                        ComplexContent.AddText(*role, false,
                                                cRect(x, y + img->Height() + marginItem + fontSmlHeight, actorWidth, 0),
                                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                                actorWidth, fontSmlHeight, taCenter);
@@ -3658,9 +3659,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         std::ostringstream series_info(""), movie_info("");
 
-        std::vector<std::string> actors_path;
+        /* std::vector<std::string> actors_path;
         std::vector<std::string> actors_name;
-        std::vector<std::string> actors_role;
+        std::vector<std::string> actors_role; */
+
+        std::vector<cString> actors_path;
+        std::vector<cString> actors_name;
+        std::vector<cString> actors_role;
 
         std::string mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
@@ -3711,9 +3716,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         actors_role.reserve(seriesActorsSize);
                         for (int i {0}; i < seriesActorsSize; ++i) {
                             if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
-                                actors_path.push_back(series.actors[i].actorThumb.path);
-                                actors_name.push_back(series.actors[i].name);
-                                actors_role.push_back(series.actors[i].role);
+                                actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
+                                actors_name.emplace_back(series.actors[i].name.c_str());
+                                actors_role.emplace_back(series.actors[i].role.c_str());
                             }
                         }
                     }
@@ -3748,9 +3753,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         actors_role.reserve(moviesActorsSize);
                         for (int i {0}; i < moviesActorsSize; ++i) {
                             if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
-                                actors_path.push_back(movie.actors[i].actorThumb.path);
-                                actors_name.push_back(movie.actors[i].name);
-                                actors_role.push_back(movie.actors[i].role);
+                                actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                                actors_name.emplace_back(movie.actors[i].name.c_str());
+                                actors_role.emplace_back(movie.actors[i].role.c_str());
                             }
                         }
                     }
@@ -3857,8 +3862,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
             // cImage *img = NULL;    // Actor image
-            std::string name(""), path(""), role("");  // Actor name, path and role
-            std::ostringstream sstrRole("");  // Stringstream for role
+            // std::string name(""), path(""), role("");  // Actor name, path and role
+            cString name(""), path(""), role("");  // Actor name, path and role
+            // std::ostringstream sstrRole("");  // Stringstream for role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
             int picLines = numActors / picsPerLine;
             if (numActors % picsPerLine != 0)
@@ -3876,18 +3882,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     if (actor == numActors)
                         break;
                     path = actors_path[actor];
-                    img = imgLoader.LoadFile(path.c_str(), actorWidth, 999);
+                    img = imgLoader.LoadFile(*path, actorWidth, 999);
                     if (img) {
                         ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                         name = actors_name[actor];
-                        sstrRole.str("");  // Set string to ""
+                        /*sstrRole.str("");  // Set string to ""
                         sstrRole << "\"" << actors_role[actor] << "\"";
-                        role = sstrRole.str();
-                        ComplexContent.AddText(name.c_str(), false,
+                        role = sstrRole.str();*/
+                        role = cString::sprintf("\"%s\"", *actors_role[actor]);
+                        ComplexContent.AddText(*name, false,
                                                cRect(x, y + img->Height() + marginItem, actorWidth, 0),
                                                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
                                                actorWidth, fontSmlHeight, taCenter);
-                        ComplexContent.AddText(role.c_str(), false,
+                        ComplexContent.AddText(*role, false,
                                                cRect(x, y + img->Height() + marginItem + fontSmlHeight, actorWidth, 0),
                                                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), fontSml,
                                                actorWidth, fontSmlHeight, taCenter);

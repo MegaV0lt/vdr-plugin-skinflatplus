@@ -230,88 +230,56 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
-    int ChartDiskUsage = DiskUsagePercent;
+    // int ChartDiskUsage = DiskUsagePercent;  // Use DiskUsagePercent directly
     cString iconName("");
     cString extra1(""), extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
-        ChartDiskUsage = 100 - DiskUsagePercent;  // DiskFreePrecent
+        // ChartDiskUsage = 100 - DiskUsagePercent;  // Use DiskFreePrecent directly
         if (Config.DiskUsageShort == false) {     // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), ChartDiskUsage, tr("free"));
+            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
                 extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60, FreeMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", ChartDiskUsage, tr("free"));
+            extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
             extra2 = cString::sprintf("~ %02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
         }
-        switch (ChartDiskUsage) {  // Show free space
-        case 0 ... 2:
-            iconName = "chart0b"; break;  // < 2% (chart1b in red)
-        case 3 ... 4:
-            iconName = "chart1b"; break;  // 3,125 (4)
-        case 5 ... 6:
-            iconName = "chart2b"; break;  // 6,25
-        case 7 ... 9:
-            iconName = "chart3b"; break;  // 9,375
-        case 10 ... 13:
-            iconName = "chart4b"; break;  // 12,5
-        case 14 ... 16:
-            iconName = "chart5b"; break;  // 15,625
-        case 17 ... 19:
-            iconName = "chart6b"; break;  // 18,75
-        case 20 ... 22:
-            iconName = "chart7b"; break;  // 21,875
-        case 23 ... 25:
-            iconName = "chart8b"; break;  // 25
-        case 26 ... 28:
-            iconName = "chart9b"; break;  // 28,125
-        case 29 ... 31:
-            iconName = "chart10b"; break;  // 31,25
-        case 32 ... 34:
-            iconName = "chart11b"; break;  // 34,375
-        case 35 ... 38:
-            iconName = "chart12b"; break;  // 37,5
-        case 39 ... 41:
-            iconName = "chart13b"; break;  // 40,625
-        case 42 ... 44:
-            iconName = "chart14b"; break;  // 43,75
-        case 45 ... 47:
-            iconName = "chart15b"; break;  // 46,875
-        case 48 ... 50:
-            iconName = "chart16b"; break;  // 50
-        case 51 ... 53:
-            iconName = "chart17b"; break;  // 53,125
-        case 54 ... 56:
-            iconName = "chart18b"; break;  // 56,25
-        case 57 ... 59:
-            iconName = "chart19b"; break;  // 59,375
-        case 60 ... 63:
-            iconName = "chart20b"; break;  // 62,5
-        case 64 ... 66:
-            iconName = "chart21b"; break;  // 65,625
-        case 67 ... 69:
-            iconName = "chart22b"; break;  // 68,75
-        case 70 ... 72:
-            iconName = "chart23b"; break;  // 71,875
-        case 73 ... 75:
-            iconName = "chart24b"; break;  // 75
-        case 76 ... 78:
-            iconName = "chart25b"; break;  // 78,125
-        case 79 ... 81:
-            iconName = "chart26b"; break;  // 81,25
-        case 82 ... 84:
-            iconName = "chart27b"; break;  // 84,375
-        case 85 ... 88:
-            iconName = "chart28b"; break;  // 87,5
-        case 89 ... 91:
-            iconName = "chart29b"; break;  // 90,625
-        case 92 ... 94:
-            iconName = "chart30b"; break;  // 93,75
-        case 95 ... 100:
-            iconName = "chart31b"; break;  // 96,875 - 100
+        switch (DiskFreePercent) {  // Show free space
+        case 0 ... 2: iconName = "chart0b"; break;  // < 2% (chart1b in red)
+        case 3 ... 4: iconName = "chart1b"; break;  // 3,125 (4)
+        case 5 ... 6: iconName = "chart2b"; break;  // 6,25
+        case 7 ... 9: iconName = "chart3b"; break;  // 9,375
+        case 10 ... 13: iconName = "chart4b"; break;  // 12,5
+        case 14 ... 16: iconName = "chart5b"; break;  // 15,625
+        case 17 ... 19: iconName = "chart6b"; break;  // 18,75
+        case 20 ... 22: iconName = "chart7b"; break;  // 21,875
+        case 23 ... 25: iconName = "chart8b"; break;  // 25
+        case 26 ... 28: iconName = "chart9b"; break;  // 28,125
+        case 29 ... 31: iconName = "chart10b"; break;  // 31,25
+        case 32 ... 34: iconName = "chart11b"; break;  // 34,375
+        case 35 ... 38: iconName = "chart12b"; break;  // 37,5
+        case 39 ... 41: iconName = "chart13b"; break;  // 40,625
+        case 42 ... 44: iconName = "chart14b"; break;  // 43,75
+        case 45 ... 47: iconName = "chart15b"; break;  // 46,875
+        case 48 ... 50: iconName = "chart16b"; break;  // 50
+        case 51 ... 53: iconName = "chart17b"; break;  // 53,125
+        case 54 ... 56: iconName = "chart18b"; break;  // 56,25
+        case 57 ... 59: iconName = "chart19b"; break;  // 59,375
+        case 60 ... 63: iconName = "chart20b"; break;  // 62,5
+        case 64 ... 66: iconName = "chart21b"; break;  // 65,625
+        case 67 ... 69: iconName = "chart22b"; break;  // 68,75
+        case 70 ... 72: iconName = "chart23b"; break;  // 71,875
+        case 73 ... 75: iconName = "chart24b"; break;  // 75
+        case 76 ... 78: iconName = "chart25b"; break;  // 78,125
+        case 79 ... 81: iconName = "chart26b"; break;  // 81,25
+        case 82 ... 84: iconName = "chart27b"; break;  // 84,375
+        case 85 ... 88: iconName = "chart28b"; break;  // 87,5
+        case 89 ... 91: iconName = "chart29b"; break;  // 90,625
+        case 92 ... 94: iconName = "chart30b"; break;  // 93,75
+        case 95 ... 100: iconName = "chart31b"; break;  // 96,875 - 100
         }
     } else {  // Show in occupied mode
         double OccupiedGB = AllGB - FreeGB;
@@ -329,71 +297,39 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
             extra2 = cString::sprintf("~ %02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
-        switch (ChartDiskUsage) {  // show used space
-        case 0 ... 3:
-            iconName = "chart1"; break;  // 3,125
-        case 4 ... 6:
-            iconName = "chart2"; break;  // 6,25
-        case 7 ... 9:
-            iconName = "chart3"; break;  // 9,375
-        case 10 ... 13:
-            iconName = "chart4"; break;  // 12,5
-        case 14 ... 16:
-            iconName = "chart5"; break;  // 15,625
-        case 17 ... 19:
-            iconName = "chart6"; break;  // 18,75
-        case 20 ... 22:
-            iconName = "chart7"; break;  // 21,875
-        case 23 ... 25:
-            iconName = "chart8"; break;  // 25
-        case 26 ... 28:
-            iconName = "chart9"; break;  // 28,125
-        case 29 ... 31:
-            iconName = "chart10"; break;  // 31,25
-        case 32 ... 34:
-            iconName = "chart11"; break;  // 34,375
-        case 35 ... 38:
-            iconName = "chart12"; break;  // 37,5
-        case 39 ... 41:
-            iconName = "chart13"; break;  // 40,625
-        case 42 ... 44:
-            iconName = "chart14"; break;  // 43,75
-        case 45 ... 47:
-            iconName = "chart15"; break;  // 46,875
-        case 48 ... 50:
-            iconName = "chart16"; break;  // 50
-        case 51 ... 53:
-            iconName = "chart17"; break;  // 53,125
-        case 54 ... 56:
-            iconName = "chart18"; break;  // 56,25
-        case 57 ... 59:
-            iconName = "chart19"; break;  // 59,375
-        case 60 ... 63:
-            iconName = "chart20"; break;  // 62,5
-        case 64 ... 66:
-            iconName = "chart21"; break;  // 65,625
-        case 67 ... 69:
-            iconName = "chart22"; break;  // 68,75
-        case 70 ... 72:
-            iconName = "chart23"; break;  // 71,875
-        case 73 ... 75:
-            iconName = "chart24"; break;  // 75
-        case 76 ... 78:
-            iconName = "chart25"; break;  // 78,125
-        case 79 ... 81:
-            iconName = "chart26"; break;  // 81,25
-        case 82 ... 84:
-            iconName = "chart27"; break;  // 84,375
-        case 85 ... 88:
-            iconName = "chart28"; break;  // 87,5
-        case 89 ... 91:
-            iconName = "chart29"; break;  // 90,625
-        case 92 ... 94:
-            iconName = "chart30"; break;  // 93,75
-        case 95 ... 97:
-            iconName = "chart31"; break;  // 96,875
-        case 98 ... 100:
-            iconName = "chart32"; break;  // > 98% (chart31 in red)
+        switch (DiskUsagePercent) {  // show used space
+        case 0 ... 3: iconName = "chart1"; break;  // 3,125
+        case 4 ... 6: iconName = "chart2"; break;  // 6,25
+        case 7 ... 9: iconName = "chart3"; break;  // 9,375
+        case 10 ... 13: iconName = "chart4"; break;  // 12,5
+        case 14 ... 16: iconName = "chart5"; break;  // 15,625
+        case 17 ... 19: iconName = "chart6"; break;  // 18,75
+        case 20 ... 22: iconName = "chart7"; break;  // 21,875
+        case 23 ... 25: iconName = "chart8"; break;  // 25
+        case 26 ... 28: iconName = "chart9"; break;  // 28,125
+        case 29 ... 31: iconName = "chart10"; break;  // 31,25
+        case 32 ... 34: iconName = "chart11"; break;  // 34,375
+        case 35 ... 38: iconName = "chart12"; break;  // 37,5
+        case 39 ... 41: iconName = "chart13"; break;  // 40,625
+        case 42 ... 44: iconName = "chart14"; break;  // 43,75
+        case 45 ... 47: iconName = "chart15"; break;  // 46,875
+        case 48 ... 50: iconName = "chart16"; break;  // 50
+        case 51 ... 53: iconName = "chart17"; break;  // 53,125
+        case 54 ... 56: iconName = "chart18"; break;  // 56,25
+        case 57 ... 59: iconName = "chart19"; break;  // 59,375
+        case 60 ... 63: iconName = "chart20"; break;  // 62,5
+        case 64 ... 66: iconName = "chart21"; break;  // 65,625
+        case 67 ... 69: iconName = "chart22"; break;  // 68,75
+        case 70 ... 72: iconName = "chart23"; break;  // 71,875
+        case 73 ... 75: iconName = "chart24"; break;  // 75
+        case 76 ... 78: iconName = "chart25"; break;  // 78,125
+        case 79 ... 81: iconName = "chart26"; break;  // 81,25
+        case 82 ... 84: iconName = "chart27"; break;  // 84,375
+        case 85 ... 88: iconName = "chart28"; break;  // 87,5
+        case 89 ... 91: iconName = "chart29"; break;  // 90,625
+        case 92 ... 94: iconName = "chart30"; break;  // 93,75
+        case 95 ... 97: iconName = "chart31"; break;  // 96,875
+        case 98 ... 100: iconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
     TopBarSetTitleExtra(*extra1, *extra2);
