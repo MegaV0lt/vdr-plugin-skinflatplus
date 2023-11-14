@@ -395,7 +395,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.ChannelIconsShow && CurChannel)
         ChannelIconsDraw(CurChannel, false);
 
-    std::string mediaPath("");
+    cString mediaPath("");
     int mediaWidth {0};
     int mediaHeight {0};
 
@@ -408,18 +408,18 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             if ((call.type == tSeries) && call.banner.path.size() > 0) {
                 mediaWidth = call.banner.width * Config.TVScraperChanInfoPosterSize * 100;
                 mediaHeight = call.banner.height * Config.TVScraperChanInfoPosterSize * 100;
-                mediaPath = call.banner.path;
+                mediaPath = call.banner.path.c_str();
             } else if (call.type == tMovie && call.poster.path.size() > 0) {
                 mediaWidth = call.poster.width * Config.TVScraperChanInfoPosterSize * 100;
                 mediaHeight = call.poster.height * Config.TVScraperChanInfoPosterSize * 100;
-                mediaPath = call.poster.path;
+                mediaPath = call.poster.path.c_str();
             }
         }
     }
 
     PixmapFill(chanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
-    if (mediaPath.length() > 0) {
+    if (!isempty(*mediaPath)) {
         if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
             mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height
@@ -430,7 +430,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
             dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
         }
-        cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+        cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
         if (img) {
             chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 

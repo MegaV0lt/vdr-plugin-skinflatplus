@@ -402,7 +402,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
         delete index;
 
-        std::string mediaPath("");
+        cString mediaPath("");
         int mediaWidth {0};
         int mediaHeight {0};
         static cPlugin *pScraper = GetScraperPlugin();
@@ -434,12 +434,12 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                         std::size_t number = distribution(generator);
 
-                        mediaPath = series.banners[number].path;
+                        mediaPath = series.banners[number].path.c_str();
                         mediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
                         mediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
                         if (series.banners.size() > 1)
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(number + 1), *mediaPath,
                                     static_cast<int>(series.banners.size()));  // Log result
                     }
                 }
@@ -447,7 +447,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 cMovie movie;
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
-                    mediaPath = movie.poster.path;
+                    mediaPath = movie.poster.path.c_str();
                     mediaWidth = movie.poster.width * Config.TVScraperReplayInfoPosterSize * 100;
                     mediaHeight = movie.poster.height * Config.TVScraperReplayInfoPosterSize * 100;
                 }
@@ -456,7 +456,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
         PixmapFill(chanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
-        if (mediaPath.length() > 0) {
+        if (!isempty(*mediaPath)) {
             if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
                 dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
                 mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height
@@ -467,7 +467,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                 dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
             }
-            cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+            cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
                 chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 

@@ -1073,7 +1073,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
         }
     } else {
-        std::string mediaPath("");
+        cString mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
         int mediaType {0};
 
@@ -1086,19 +1086,19 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                 if ((call.type == tSeries) && call.banner.path.size() > 0) {
                     mediaWidth = cWidth - marginItem * 2;
                     mediaHeight = 999;
-                    mediaPath = call.banner.path;
+                    mediaPath = call.banner.path.c_str();
                     mediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = 999;
-                    mediaPath = call.poster.path;
+                    mediaPath = call.poster.path.c_str();
                     mediaType = 2;
                 }
             }
         }
 
-        if (mediaPath.length() > 0) {
-            cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+        if (!isempty(*mediaPath)) {
+            cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img && mediaType == 2) {
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, text.str().c_str(),
@@ -2547,7 +2547,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         std::vector<cString> actors_name;
         std::vector<cString> actors_role;
 
-        std::string mediaPath("");
+        cString mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
 
 #ifdef DEBUGEPGTIME
@@ -2581,10 +2581,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
                         std::size_t number = distribution(generator);
 
-                        mediaPath = series.banners[number].path;
+                        mediaPath = series.banners[number].path.c_str();
                         if (series.banners.size() > 1)
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(number + 1), *mediaPath,
                                     static_cast<int>(series.banners.size()));  // Log result
                     }
                     mediaWidth = cWidth / 2 - marginItem * 2;
@@ -2623,7 +2623,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 cMovie movie;
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
-                    mediaPath = movie.poster.path;
+                    mediaPath = movie.poster.path.c_str();
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperEPGInfoShowActors) {
@@ -2662,8 +2662,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
 #endif
 
-        if (mediaPath.length() > 0) {
-            cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+        if (!isempty(*mediaPath)) {
+            cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
                 ComplexContent.AddText(tr("Description"), false, cRect(marginItem * 10, ContentTop, 0, 0),
                                        Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), font);
@@ -3173,7 +3173,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.SetPosition(cRect(cLeft, cTop, cWidth, cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
-    std::string mediaPath("");
+    cString mediaPath("");
     int mediaWidth {0}, mediaHeight {0};
     int mediaType {0};
 
@@ -3204,10 +3204,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
                     std::size_t number = distribution(generator);
 
-                    mediaPath = series.banners[number].path;
+                    mediaPath = series.banners[number].path.c_str();
                     if (series.banners.size() > 1)
                         dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                static_cast<int>(number + 1), mediaPath.c_str(),
+                                static_cast<int>(number + 1), *mediaPath,
                                 static_cast<int>(series.banners.size()));  // Log result
                 }
                 mediaWidth = cWidth - marginItem * 2;
@@ -3218,7 +3218,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             cMovie movie;
             movie.movieId = movieId;
             if (pScraper->Service("GetMovie", &movie)) {
-                mediaPath = movie.poster.path;
+                mediaPath = movie.poster.path.c_str();
                 mediaWidth = cWidth / 2 - marginItem * 3;
                 mediaHeight = 999;
                 mediaType = 2;
@@ -3235,8 +3235,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         mediaPath = recImage;
     }
 
-    if (mediaPath.length() > 0) {
-        cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+    if (!isempty(*mediaPath)) {
+        cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
         if (img && mediaType == 2) {
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, text.str().c_str(),
@@ -3667,7 +3667,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         std::vector<cString> actors_name;
         std::vector<cString> actors_role;
 
-        std::string mediaPath("");
+        cString mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
 
 #ifdef DEBUGEPGTIME
@@ -3701,10 +3701,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
                         std::size_t number = distribution(generator);
 
-                        mediaPath = series.banners[number].path;
+                        mediaPath = series.banners[number].path.c_str();
                         if (series.banners.size() > 1)
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), mediaPath.c_str(),
+                                    static_cast<int>(number + 1), *mediaPath,
                                     static_cast<int>(series.banners.size()));  // Log result
                     }
                     mediaWidth = cWidth / 2 - marginItem * 2;
@@ -3743,7 +3743,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 cMovie movie;
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
-                    mediaPath = movie.poster.path;
+                    mediaPath = movie.poster.path.c_str();
                     mediaWidth = cWidth / 2 - marginItem * 3;
                     mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                     if (Config.TVScraperRecInfoShowActors) {
@@ -3789,8 +3789,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
             mediaPath = recImage;
         }
-        if (mediaPath.length() > 0) {
-            cImage *img = imgLoader.LoadFile(mediaPath.c_str(), mediaWidth, mediaHeight);
+        if (!isempty(*mediaPath)) {
+            cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
                 ComplexContent.AddText(tr("Description"), false, cRect(marginItem * 10, ContentTop, 0, 0),
                                        Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), font);
