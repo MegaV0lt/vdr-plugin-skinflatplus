@@ -2330,7 +2330,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 }
                 text << Event->ContentToString(Event->Contents(i));
                 firstContent = false;
-                GenreIcons.push_back(GetGenreIcon(Event->Contents(i)));
+                GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
             }
         }
         // FSK
@@ -3353,7 +3353,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
                     text << Event->ContentToString(Event->Contents(i));
                     firstContent = false;
-                    GenreIcons.push_back(GetGenreIcon(Event->Contents(i)));
+                    GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
                 }
             }
             if (Event->Contents(0))
@@ -4209,7 +4209,7 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
         }
     }
 
-    ItemsBorder.push_back(ib);
+    ItemsBorder.emplace_back(ib);
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
@@ -4298,7 +4298,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
         std::istringstream f(recName.c_str());
         std::string s("");
         while (std::getline(f, s, FOLDERDELIMCHAR)) {
-            tokens.push_back(s);
+            tokens.emplace_back(s);
         }
         recNamePart = tokens.at(Level);
     } catch (...) {
@@ -4564,23 +4564,23 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     widgets.reserve(10);  // Set to at leat 10 entrys
 
     if (Config.MainMenuWidgetDVBDevicesShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"));
     if (Config.MainMenuWidgetActiveTimerShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetActiveTimerPosition, "active_timer"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetActiveTimerPosition, "active_timer"));
     if (Config.MainMenuWidgetLastRecShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "last_recordings"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "last_recordings"));
     if (Config.MainMenuWidgetSystemInfoShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetSystemInfoPosition, "system_information"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetSystemInfoPosition, "system_information"));
     if (Config.MainMenuWidgetSystemUpdatesShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetSystemUpdatesPosition, "system_updates"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetSystemUpdatesPosition, "system_updates"));
     if (Config.MainMenuWidgetTemperaturesShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetTemperaturesPosition, "temperatures"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetTemperaturesPosition, "temperatures"));
     if (Config.MainMenuWidgetTimerConflictsShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetTimerConflictsPosition, "timer_conflicts"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetTimerConflictsPosition, "timer_conflicts"));
     if (Config.MainMenuWidgetCommandShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetCommandPosition, "custom_command"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetCommandPosition, "custom_command"));
     if (Config.MainMenuWidgetWeatherShow)
-        widgets.push_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
+        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
 
     std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
     std::string widget("");
@@ -5004,7 +5004,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
         strRec = *(cString::sprintf("%s - %s", *DateTime, rec->Name()));
-        Recs.push_back(std::make_pair(RecStart, strRec));
+        Recs.emplace_back(std::make_pair(RecStart, strRec));
     }
     // Sort by RecStart
     std::sort(Recs.begin(), Recs.end(), pairCompareTimeStringDesc);
@@ -5105,7 +5105,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         if (found != std::string::npos) {
             num = fname.substr(0, found);
             if (atoi(num.c_str()) > 0)
-                files.push_back(e->d_name);
+                files.emplace_back(e->d_name);
         }
     }
     cString str("");

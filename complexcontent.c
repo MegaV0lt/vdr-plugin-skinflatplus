@@ -119,7 +119,7 @@ bool cComplexContent::Scrollable(int height) {
     if (height == 0) height = Position.Height();
 
     int total = ScrollTotal();
-    int shown = ceil(height * 1.0 / ScrollSize);
+    int shown = ceil(height * 1.0f / ScrollSize);
     if (total > shown) return true;
 
     return false;
@@ -127,7 +127,7 @@ bool cComplexContent::Scrollable(int height) {
 
 void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
                               cFont *font, int textWidth, int textHeight, int textAlignment) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     // if (Contents.size() > 128)
     //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(),
@@ -135,7 +135,7 @@ void cComplexContent::AddText(const char *text, bool multiline, cRect position, 
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetImage(image, position);
 }
 
@@ -146,10 +146,10 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
     cTextWrapper WrapperFloat;
     WrapperFloat.Set(text, font, TextWidthLeft);
-    int FloatLines = ceil(image->Height() * 1.0 / ScrollSize);
+    int FloatLines = ceil(image->Height() * 1.0f / ScrollSize);
     int Lines = WrapperFloat.Lines();
 
-    if (Lines < FloatLines) {
+    if (Lines < FloatLines) {  // Text fits on the left side of the image
         cRect FloatedTextPos;
         FloatedTextPos.SetLeft(textPos.Left());
         FloatedTextPos.SetTop(textPos.Top());
@@ -170,7 +170,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
             NumChars += strlen(WrapperFloat.GetLine(i));
         }
-        // detect end of last word
+        // Detect end of last word
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
@@ -214,7 +214,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 }
 
 void cComplexContent::AddRect(cRect position, tColor colorBg) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetRect(position, colorBg);
 }
 
@@ -230,11 +230,11 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize(void) {
-    return Position.Height() * 1.0 / DrawPortHeight;
+    return Position.Height() * 1.0f / DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal(void) {
-    return ceil(DrawPortHeight * 1.0 / ScrollSize);
+    return ceil(DrawPortHeight * 1.0f / ScrollSize);
 }
 
 int cComplexContent::ScrollShown(void) {
@@ -250,7 +250,7 @@ int cComplexContent::ScrollOffset(void) {
         else
             y = DrawPortHeight - Position.Height() - 1;
     }
-    double offset = y * 1.0 / DrawPortHeight;
+    double offset = y * 1.0f / DrawPortHeight;
     return ScrollTotal() * offset;
 }
 

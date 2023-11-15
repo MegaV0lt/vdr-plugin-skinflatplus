@@ -698,7 +698,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         FileName = AddDirectory(*decorPath, e->d_name);
-        files.push_back(*FileName);
+        files.emplace_back(*FileName);
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
@@ -751,7 +751,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         FileName = AddDirectory(*decorPath, e->d_name);
-        files.push_back(*FileName);
+        files.emplace_back(*FileName);
     }
 
     std::string fileName("");
@@ -882,8 +882,8 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     v = stripspace(skipspace(v));
                     value = atoi(v);
                     dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
-                    RecordingOldFolder.push_back(n);
-                    RecordingOldValue.push_back(value);
+                    RecordingOldFolder.emplace_back(n);
+                    RecordingOldValue.emplace_back(value);
                 }
             }
         }  // while
@@ -938,7 +938,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     cReadDir d(*configsPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        files.push_back(e->d_name);
+        files.emplace_back(e->d_name);
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
