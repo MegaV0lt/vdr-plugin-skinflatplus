@@ -124,10 +124,9 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
 // shift range to 0..255 and clamp overflows
 static unsigned shift_clamp(int x) {
     x = (x + (1 << 21)) >> 22;
-    if (x < 0)
-        return 0;
-    if (x > 255)
-        return 255;
+    if (x < 0) return 0;
+    if (x > 255) return 255;
+
     return x;
 }
 

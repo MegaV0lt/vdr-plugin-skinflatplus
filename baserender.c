@@ -1,17 +1,20 @@
-#include "baserender.h"
-#include "flat.h"
-#include "services/epgsearch.h"
-#include <fstream>
-#include <iostream>
-#include <utility>
+#include "./baserender.h"
+
 #include <vdr/menu.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <fstream>
+#include <iostream>
+#include <utility>
+
 #if VDRVERSNUM >= 20301
 #include <future>
 #endif
+
+#include "./flat.h"
+#include "services/epgsearch.h"
 
 cFlatBaseRender::cFlatBaseRender(void) {
     font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
@@ -241,7 +244,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 extra2 = cString::sprintf("%.1f GB ~ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60, FreeMinutes % 60);
+                extra2 = cString::sprintf("%.2f TB ~ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
+                                          FreeMinutes % 60);
             }
         } else {  // Short format
             extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
@@ -371,12 +375,12 @@ void cFlatBaseRender::TopBarUpdate(void) {
             int imageBGWidth = imageBGHeight * 1.34;
             int iconTop {0};
 
-            cImage *imgBG = imgLoader.LoadIcon("logo_background", imageBGWidth, imageBGHeight);
-            if (imgBG) {
-                imageBGHeight = imgBG->Height();
-                imageBGWidth = imgBG->Width();
+            img = imgLoader.LoadIcon("logo_background", imageBGWidth, imageBGHeight);
+            if (img) {
+                imageBGHeight = img->Height();
+                imageBGWidth = img->Width();
                 iconTop = (topBarHeight / 2 - imageBGHeight / 2);
-                topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *imgBG);
+                topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
             }
 
             img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
@@ -773,9 +777,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         col = Theme.Color(clrMessageStatus);
         icon = "message_status";
         break;
-    case mtInfo: [[likely]]
-        // col = Theme.Color(clrMessageInfo);  // Already preset
-        // icon = "message_info";
+    case mtInfo: [[likely]]  // Already preset
         break;
     case mtWarning:
         col = Theme.Color(clrMessageWarning);
@@ -912,19 +914,16 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
 
     if (PixmapBg && SetBackground)
-        // PixmapBg->DrawRectangle(cRect(rectBg.Left(), rectBg.Top(), rectBg.Width(), rectBg.Height()), ColorBg);
         PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
         if (PixmapBg == Pixmap)
-            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), ColorBg);
             Pixmap->DrawRectangle(rect, ColorBg);
         else
-            // Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), rect.Height()), clrTransparent);
             Pixmap->DrawRectangle(rect, clrTransparent);
     }
     switch (Type) {
-    case 0:  // small line + big line
+    case 0:  // Small line + big line
     {
         int sml = rect.Height() / 10 * 2;
         if (sml <= 1) sml = 2;
@@ -950,7 +949,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         int big = rect.Height();
         int out {1};
         if (big > 10) out = 2;
-        // outline
+        // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
 
@@ -988,7 +987,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         }
         break;
     }
-    case 3:  // small line + big line + dot
+    case 3:  // Small line + big line + dot
     {
         int sml = rect.Height() / 10 * 2;
         if (sml <= 1) sml = 2;
@@ -999,7 +998,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
@@ -1012,7 +1011,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
@@ -1024,7 +1023,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         int big = rect.Height();
         int out {1};
         if (big > 10) out = 2;
-        // outline
+        // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
@@ -1033,14 +1032,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
     }
-    case 6:  // small line + dot
+    case 6:  // Small line + dot
     {
         int sml = rect.Height() / 10 * 2;
         if (sml <= 1) sml = 2;
@@ -1049,33 +1048,33 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
         if (Current > 0) {
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
     }
-    case 7:  // outline + dot
+    case 7:  // Outline + dot
     {
         int big = rect.Height();
         int out {1};
         if (big > 10) out = 2;
-        // outline
+        // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), out, big), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
     }
-    case 8:  // small line + big line + alpha blend
+    case 8:  // Small line + big line + alpha blend
     {
         int sml = rect.Height() / 10 * 2;
         if (sml <= 1) sml = 2;
@@ -1151,7 +1150,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         Start = !Start;
     }
 
-    // draw last marker vertical line
+    // Draw last marker vertical line
     if (posCurrent == posMark)
         progressBarPixmap->DrawRectangle(cRect(posMark - sml, 0, sml * 2, progressBarHeight),
                                          progressBarColorMarkCurrent);
@@ -1159,13 +1158,13 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         progressBarPixmap->DrawRectangle(cRect(posMark - sml / 2, 0, sml, progressBarHeight), progressBarColorMark);
 
     if (!Start) {
-        // progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml/2, top - big/2,
-        // progressBarWidth - posMarkLast, big), progressBarColorBarFg);
+        // progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml / 2, top - big / 2,
+        //                                  progressBarWidth - posMarkLast, big), progressBarColorBarFg);
         if (posCurrent > posMarkLast)
             progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml / 2, top - big / 2, posCurrent - posMarkLast, big),
                                              progressBarColorBarCurFg);
     } else {
-        // marker
+        // Marker
         progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posCurrent - posMarkLast, sml),
                                          progressBarColorBarCurFg);
         progressBarPixmap->DrawRectangle(cRect(posCurrent - big / 2, top - big / 2, big, big),
@@ -1191,7 +1190,7 @@ void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posC
     if (Config.decorProgressReplaySize > 15)
         mbig = Config.decorProgressReplaySize;
 
-    // marker vertical line
+    // Marker vertical line
     if (posCurrent == posMark)
         progressBarPixmap->DrawRectangle(cRect(posMark - sml, 0, sml * 2, progressBarHeight),
                                          progressBarColorMarkCurrent);
@@ -1203,24 +1202,24 @@ void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posC
             progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posMark - posMarkLast, sml),
                                              progressBarColorBarCurFg);
         else {
-            // marker
+            // Marker
             progressBarPixmap->DrawRectangle(cRect(posCurrent - big / 2, top - big / 2, big, big),
                                              progressBarColorBarCurFg);
             if (posCurrent > posMarkLast)
                 progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posCurrent - posMarkLast, sml),
                                                  progressBarColorBarCurFg);
         }
-        // marker top
+        // Marker top
         if (isCurrent)
             progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, 0, mbig, sml), progressBarColorMarkCurrent);
         else
             progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, 0, mbig, sml), progressBarColorMark);
     } else {
-        // big line
+        // Big line
         if (posCurrent > posMark) {
             progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - big / 2, posMark - posMarkLast, big),
                                              progressBarColorBarCurFg);
-            // draw last marker top
+            // Draw last marker top
             progressBarPixmap->DrawRectangle(cRect(posMarkLast - mbig / 2, 0, mbig, marginItem / 2),
                                              progressBarColorMark);
         } else {
@@ -1229,12 +1228,12 @@ void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posC
             if (posCurrent > posMarkLast) {
                 progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - big / 2, posCurrent - posMarkLast, big),
                                                  progressBarColorBarCurFg);
-                // draw last marker top
+                // Draw last marker top
                 progressBarPixmap->DrawRectangle(cRect(posMarkLast - mbig / 2, 0, mbig, marginItem / 2),
                                                  progressBarColorMark);
             }
         }
-        // marker bottom
+        // Marker bottom
         if (isCurrent)
             progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, progressBarHeight - sml, mbig, sml),
                                              progressBarColorMarkCurrent);
@@ -1254,8 +1253,9 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
                                     bool CanScrollUp, bool CanScrollDown) {
     if (!Pixmap) return;
 
-    int scrollHeight = std::max(static_cast<int>(Height * 1.0f * Shown / Total + 0.5), 5);
-    int scrollTop = std::min(static_cast<int>(Top * 1.0f + Height * Offset / Total + 0.5), Top + Height - scrollHeight);
+    int scrollHeight = std::max(static_cast<int>(Height * 1.0f * Shown / Total + 0.5f), 5);
+    int scrollTop =
+        std::min(static_cast<int>(Top * 1.0f + Height * Offset / Total + 0.5f), Top + Height - scrollHeight);
 
     /* Types
      * 0 = left line + rect bar
@@ -1300,7 +1300,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             Pixmap->DrawRectangle(cRect(Left + lineWidth, scrollTop + dotHeight, scrollBarWidth - lineWidth,
                                         scrollHeight - dotHeight * 2),
                                   Config.decorScrollBarBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(
                 cRect(Left + lineWidth, scrollTop, scrollBarWidth - lineWidth, scrollBarWidth - lineWidth),
                 Config.decorScrollBarBarFg, 0);
@@ -1336,7 +1336,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             // Bar
             Pixmap->DrawRectangle(cRect(Left, scrollTop + dotHeight, scrollBarWidth, scrollHeight - dotHeight * 2),
                                   Config.decorScrollBarBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(Left, scrollTop, scrollBarWidth, scrollBarWidth), Config.decorScrollBarBarFg, 0);
             Pixmap->DrawEllipse(cRect(Left, scrollTop + scrollHeight - dotHeight * 2, scrollBarWidth, scrollBarWidth),
                                 Config.decorScrollBarBarFg, 0);
@@ -1345,13 +1345,13 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 4: {
             int out {1};
             if (scrollBarWidth > 10) out = 2;
-            // outline
+            // Outline
             Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top, out, Height), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left + scrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
-            // bar
+            // Bar
             Pixmap->DrawRectangle(cRect(Left + out, scrollTop + out, scrollBarWidth - out * 2, scrollHeight - out * 2),
                                   Config.decorScrollBarBarFg);
             break;
@@ -1360,17 +1360,17 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             int dotHeight = scrollBarWidth / 2;
             int out {1};
             if (scrollBarWidth > 10) out = 2;
-            // outline
+            // Outline
             Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top, out, Height), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left + scrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
-            // bar
+            // Bar
             Pixmap->DrawRectangle(cRect(Left + out, scrollTop + dotHeight + out, scrollBarWidth - out * 2,
                                         scrollHeight - dotHeight * 2 - out * 2),
                                   Config.decorScrollBarBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(Left + out, scrollTop + out, scrollBarWidth - out * 2, scrollBarWidth - out * 2),
                                 Config.decorScrollBarBarFg, 0);
             Pixmap->DrawEllipse(cRect(Left + out, scrollTop + scrollHeight - dotHeight * 2 + out,
@@ -1387,7 +1387,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
 
             Pixmap->DrawRectangle(cRect(Left, scrollTop + dotHeight, scrollBarWidth, scrollHeight - dotHeight * 2),
                                   Config.decorScrollBarBarFg);
-            // dot
+            // Dot
             Pixmap->DrawEllipse(cRect(Left, scrollTop, scrollBarWidth, scrollBarWidth), Config.decorScrollBarBarFg, 0);
             Pixmap->DrawEllipse(cRect(Left, scrollTop + scrollHeight - dotHeight * 2, scrollBarWidth, scrollBarWidth),
                                 Config.decorScrollBarBarFg, 0);
@@ -1410,13 +1410,13 @@ void cFlatBaseRender::DecorBorderClear(int Left, int Top, int Width, int Height,
     int BottomDecor = Height + Size;
 
     if (decorPixmap) {
-        // top
+        // Top
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), clrTransparent);
-        // right
+        // Right
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), clrTransparent);
-        // bottom
+        // Bottom
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), clrTransparent);
-        // left
+        // Left
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), clrTransparent);
     }
 }
@@ -1468,62 +1468,62 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
 
     switch (Type) {
     case 1:  // rect
-        // top
+        // Top
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
-        // right
+        // Right
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), ColorBg);
-        // bottom
+        // Bottom
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), ColorBg);
-        // left
+        // Left
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), ColorBg);
         break;
-    case 2:  // round
-        // top
+    case 2:  // Round
+        // Top
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
-        // right
+        // Right
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
-        // bottom
+        // Bottom
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
-        // left
+        // Left
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
 
-        // top,left corner
+        // Top,left corner
         decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, 2);
-        // top,right corner
+        // Top,right corner
         decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, 1);
-        // bottom,left corner
+        // Bottom,left corner
         decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, 3);
-        // bottom,right corner
+        // Bottom,right corner
         decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, 4);
         break;
-    case 3:  // invert round
-        // top
+    case 3:  // Invert round
+        // Top
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
-        // right
+        // Right
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
-        // bottom
+        // Bottom
         decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
-        // left
+        // Left
         decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
 
-        // top,left corner
+        // Top,left corner
         decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, -4);
-        // top,right corner
+        // Top,right corner
         decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, -3);
-        // bottom,left corner
+        // Bottom,left corner
         decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, -1);
-        // bottom,right corner
+        // Bottom,right corner
         decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
         break;
     case 4:  // rect + alpha blend
-        // top
+        // Top
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
-        // bottom
+        // Bottom
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
-        // left
+        // Left
         DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
-        // right
+        // Right
         DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 
@@ -1532,15 +1532,15 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         DecorDrawGlowRectBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg);
         DecorDrawGlowRectBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg);
         break;
-    case 5:  // round + alpha blend
-        // top
+    case 5:  // Round + alpha blend
+        // Top
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
-        // bottom
+        // Bottom
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
-        // left
+        // Left
         DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
-        // right
+        // Right
         DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 
@@ -1549,15 +1549,15 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         DecorDrawGlowEllipseBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, 3);
         DecorDrawGlowEllipseBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg, 4);
         break;
-    case 6:  // invert round + alpha blend
-        // top
+    case 6:  // Invert round + alpha blend
+        // Top
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
-        // bottom
+        // Bottom
         DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
-        // left
+        // Left
         DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
-        // right
+        // Right
         DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 

@@ -74,8 +74,7 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
-    if (modeOnly)
-        return;
+    if (modeOnly) return;
 
     int left = marginItem;  // Position for recordingsymbol/shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
@@ -86,13 +85,14 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(recInfo->Title());
 
     // Show if still recording
+    cImage *img = NULL;
     if ((recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        cImage *imgRecRecording = imgLoader.LoadIcon("timerRecording", 999, fontSmlHeight);  // Small image
+        img = imgLoader.LoadIcon("timerRecording", 999, fontSmlHeight);  // Small image
 
-        if (imgRecRecording) {
-            int imageTop = fontHeight + (fontSmlHeight - imgRecRecording->Height()) / 2;
-            iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecRecording);
-            left += imgRecRecording->Width() + marginItem;
+        if (img) {
+            int imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
+            iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
+            left += img->Width() + marginItem;
         }
     }
 
@@ -119,8 +119,9 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         maxWidth -= fontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    cImage *imgRes = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
-    maxWidth -= imgRes->Width() * 3;  // Substract guessed max. used space of aspect and format icons
+    img = imgLoader.LoadIcon("1920x1080", 999, fontSmlHeight);
+    if (img)
+        maxWidth -= img->Width() * 3;  // Substract guessed max. used space of aspect and format icons
 
     if (infoWidth > maxWidth) {  // Shorttext too long
         if (Config.ScrollerEnable) {
@@ -150,11 +151,11 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         cString recErrIcon = GetRecordingerrorIcon(recInfo->Errors());
         cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
 
-        cImage *imgRecErr = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
-        if (imgRecErr) {
+        img = imgLoader.LoadIcon(*RecErrIcon, 999, fontSmlHeight);  // Small image
+        if (img) {
             left += marginItem;
-            int imageTop = fontHeight + (fontSmlHeight - imgRecErr->Height()) / 2;
-            iconsPixmap->DrawImage(cPoint(left, imageTop), *imgRecErr);
+            int imageTop = fontHeight + (fontSmlHeight - img->Height()) / 2;
+            iconsPixmap->DrawImage(cPoint(left, imageTop), *img);
         }
     }  // PlaybackShowRecordingErrors
 #endif
@@ -326,6 +327,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
     }
 
+    cImage *img = NULL;
     if (recording) {
         cMarks marks;
         // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
@@ -467,7 +469,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                 dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
             }
-            cImage *img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
+            img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
                 chanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -481,10 +483,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     if (iscutted) {
-        cImage *imgRecCut = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
+        img = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
         int imgWidth {0};
-        if (imgRecCut)
-            imgWidth = imgRecCut->Width();
+        if (img)
+            imgWidth = img->Width();
 
         int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total) - marginItem - imgWidth -
                     font->Width(' ') - font->Width(cutted);
@@ -529,9 +531,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             right += font->Width(' ');
         }
 
-        if (imgRecCut) {
-            iconsPixmap->DrawImage(cPoint(right, 0), *imgRecCut);
-            right += imgRecCut->Width() + marginItem * 2;
+        if (img) {  // Draw 'recording_cuttet_extra' icon
+            iconsPixmap->DrawImage(cPoint(right, 0), *img);
+            right += img->Width() + marginItem * 2;
         }
 
         if (Config.TimeSecsScale < 1.0) {

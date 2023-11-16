@@ -166,14 +166,14 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     int imageBGWidth = imageHeight;
     int imageLeft = marginItem * 2;
     int imageTop = marginItem;
-    cImage *imgBG = imgLoader.LoadIcon("logo_background", imageHeight * 1.34, imageHeight);
-    if (imgBG) {
-        imageBGHeight = imgBG->Height();
-        imageBGWidth = imgBG->Width();
-        chanLogoBGPixmap->DrawImage(cPoint(imageLeft, imageTop), *imgBG);
+    cImage *img = imgLoader.LoadIcon("logo_background", imageHeight * 1.34, imageHeight);
+    if (img) {
+        imageBGHeight = img->Height();
+        imageBGWidth = img->Width();
+        chanLogoBGPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
     }
 
-    cImage *img = imgLoader.LoadLogo(*channelName, imageBGWidth - 4, imageBGHeight - 4);
+    img = imgLoader.LoadLogo(*channelName, imageBGWidth - 4, imageBGHeight - 4);
     if (img) {
         imageTop = marginItem + (imageBGHeight - img->Height()) / 2;
         imageLeft = marginItem * 2 + (imageBGWidth - img->Width()) / 2;
@@ -600,16 +600,15 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     imgLoader.LoadIcon("logo_background", height, height);
     int imageBGHeight {height}, imageBGWidth {height};
 
-    cImage *imgBG = imgLoader.LoadIcon("logo_background", height * 1.34, height);
-    if (imgBG) {
-        imageBGHeight = imgBG->Height();
-        imageBGWidth = imgBG->Width();
+    cImage *img = imgLoader.LoadIcon("logo_background", height * 1.34, height);
+    if (img) {
+        imageBGHeight = img->Height();
+        imageBGWidth = img->Width();
     }
     imgLoader.LoadIcon("radio", imageBGWidth - 10, imageBGHeight - 10);
     imgLoader.LoadIcon("tv", imageBGWidth - 10, imageBGHeight - 10);
 
     int index {0};
-    cImage *img = NULL;
 #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;

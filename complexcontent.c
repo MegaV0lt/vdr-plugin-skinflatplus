@@ -129,9 +129,6 @@ void cComplexContent::AddText(const char *text, bool multiline, cRect position, 
                               cFont *font, int textWidth, int textHeight, int textAlignment) {
     Contents.emplace_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-    // if (Contents.size() > 128)
-    //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(),
-    //            Contents.capacity());
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
@@ -149,22 +146,14 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     int FloatLines = ceil(image->Height() * 1.0f / ScrollSize);
     int Lines = WrapperFloat.Lines();
 
+    cRect FloatedTextPos;
+    FloatedTextPos.SetLeft(textPos.Left());
+    FloatedTextPos.SetTop(textPos.Top());
+    FloatedTextPos.SetWidth(TextWidthLeft);
+    FloatedTextPos.SetHeight(textPos.Height());
+
     if (Lines < FloatLines) {  // Text fits on the left side of the image
-        cRect FloatedTextPos;
-        FloatedTextPos.SetLeft(textPos.Left());
-        FloatedTextPos.SetTop(textPos.Top());
-        FloatedTextPos.SetWidth(TextWidthLeft);
-        FloatedTextPos.SetHeight(textPos.Height());
-
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
-
-        AddImage(image, ImagePos);
     } else {
         int NumChars {0};
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
@@ -174,22 +163,14 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
-        char *FloatedText;
-        FloatedText = new char[NumChars + 1];
+        char *FloatedText = new char[NumChars + 1];
         memset(FloatedText, '\0', NumChars + 1);
         strncpy(FloatedText, text, NumChars);
 
         ++NumChars;
-        char *SecondText;
-        SecondText = new char[strlen(text) - NumChars + 2];
+        char *SecondText = new char[strlen(text) - NumChars + 2];
         memset(SecondText, '\0', strlen(text) - NumChars + 2);
         strncpy(SecondText, text + NumChars, strlen(text) - NumChars);
-
-        cRect FloatedTextPos;
-        FloatedTextPos.SetLeft(textPos.Left());
-        FloatedTextPos.SetTop(textPos.Top());
-        FloatedTextPos.SetWidth(TextWidthLeft);
-        FloatedTextPos.SetHeight(textPos.Height());
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());
@@ -200,17 +181,17 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
         AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
-
-        AddImage(image, ImagePos);
-
         delete[] FloatedText;
         delete[] SecondText;
     }
+
+    cRect ImagePos;
+    ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
+    ImagePos.SetTop(textPos.Top());
+    ImagePos.SetWidth(image->Width());
+    ImagePos.SetHeight(image->Height());
+
+    AddImage(image, ImagePos);
 }
 
 void cComplexContent::AddRect(cRect position, tColor colorBg) {

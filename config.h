@@ -255,26 +255,26 @@ class cFlatConfig {
         // 1 = horizontal
         int MessageColorPosition;
 
-        /* hidden configs (only in setup.conf, no osd menu) */
+        /* Hidden configs (only in setup.conf, no osd menu) */
         int MenuItemRecordingClearPercent;
         int MenuItemRecordingShowFolderDate;  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
         int MenuItemParseTilde;
         int ShortRecordingCount;
         int MainMenuWidgetActiveTimerShowRemoteRefreshTime;  // in seconds
-        /* hidden configs (only in setup.conf, no osd menu) */
+        /* Hidden configs (only in setup.conf, no osd menu) */
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons
         int PlaybackShowRecordingErrors;
         int PlaybackShowRecordingDate;
         int MenuItemRecordingShowRecordingErrorsThreshold;
 
-        // Text Scroller
+        // Text scroller
         int ScrollerEnable;
         int ScrollerStep;
         int ScrollerDelay;
         int ScrollerType;
 
-        // mainmenu widgets
+        // Mainmenu widgets
         int MainMenuWidgetsEnable;
         double MainMenuItemScale;
 
