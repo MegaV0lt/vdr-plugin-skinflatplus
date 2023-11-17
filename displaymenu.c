@@ -2509,14 +2509,24 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
 #endif
 
-    bool Scrollable = false;
-    bool FirstRun = true;
+    std::vector<cString> actors_path;
+    std::vector<cString> actors_name;
+    std::vector<cString> actors_role;
 
-    do {
-        if (Scrollable) {
-            FirstRun = false;
-            cWidth -= scrollBarWidth;
-        }
+    std::ostringstream series_info(""), movie_info("");
+    cString mediaPath("");
+
+    int ContentTop = {0};
+    int mediaWidth {0}, mediaHeight {0};
+    int ActorsSize {0}, numActors {0};
+    bool Scrollable = false;
+    bool FirstRun = true, SecondRun = false;
+
+    do {  // Runs up to two times!
+        if (FirstRun)
+            cWidth -= scrollBarWidth;  // Assume that we need scrollbars most of the time
+        else
+            cWidth += scrollBarWidth;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
         ComplexContent.SetOsd(osd);
@@ -2525,129 +2535,120 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.SetScrollSize(fontHeight);
         ComplexContent.SetScrollingActive(true);
 
-        int ContentTop = marginItem;
-
-        std::ostringstream series_info(""), movie_info("");
-
-        std::vector<cString> actors_path;
-        std::vector<cString> actors_name;
-        std::vector<cString> actors_role;
-
-        cString mediaPath("");
-        int mediaWidth {0}, mediaHeight {0};
-
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
 #endif
+        mediaWidth = cWidth / 2 - marginItem * 2;
+        mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+        if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
+            static cPlugin *pScraper = GetScraperPlugin();
+            if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
+                ScraperGetEventType call;
+                call.event = Event;
+                int seriesId{0}, episodeId{0}, movieId{0};
 
-        static cPlugin *pScraper = GetScraperPlugin();
-        if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
-            ScraperGetEventType call;
-            call.event = Event;
-            int seriesId {0}, episodeId {0}, movieId {0};
+                if (pScraper->Service("GetEventType", &call)) {
+                    seriesId = call.seriesId;
+                    episodeId = call.episodeId;
+                    movieId = call.movieId;
+                }
+                if (call.type == tSeries) {
+                    cSeries series;
+                    series.seriesId = seriesId;
+                    series.episodeId = episodeId;
+                    if (pScraper->Service("GetSeries", &series)) {
+                        if (series.banners.size() > 0) {  // Use random banner
+                            // Gets 'entropy' from device that generates random numbers itself
+                            // to seed a mersenne twister (pseudo) random generator
+                            std::mt19937 generator(std::random_device{}());
 
-            if (pScraper->Service("GetEventType", &call)) {
-                seriesId = call.seriesId;
-                episodeId = call.episodeId;
-                movieId = call.movieId;
-            }
-            if (call.type == tSeries) {
-                cSeries series;
-                series.seriesId = seriesId;
-                series.episodeId = episodeId;
-                if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {  // Use random banner
-                        // Gets 'entropy' from device that generates random numbers itself
-                        // to seed a mersenne twister (pseudo) random generator
-                        std::mt19937 generator(std::random_device {}());
+                            // Make sure all numbers have an equal chance.
+                            // Range is inclusive (so we need -1 for vector index)
+                            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                        // Make sure all numbers have an equal chance.
-                        // Range is inclusive (so we need -1 for vector index)
-                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+                            std::size_t number = distribution(generator);
 
-                        std::size_t number = distribution(generator);
-
-                        mediaPath = series.banners[number].path.c_str();
-                        if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), *mediaPath,
-                                    static_cast<int>(series.banners.size()));  // Log result
-                    }
-                    mediaWidth = cWidth / 2 - marginItem * 2;
-                    mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
-                    if (Config.TVScraperEPGInfoShowActors) {
-                        int seriesActorsSize = series.actors.size();
-                        actors_path.reserve(seriesActorsSize);  // Set capacity to size of actors
-                        actors_name.reserve(seriesActorsSize);
-                        actors_role.reserve(seriesActorsSize);
-                        for (int i {0}; i < seriesActorsSize; ++i) {
-                            if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
-                                actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
-                                actors_name.emplace_back(series.actors[i].name.c_str());
-                                actors_role.emplace_back(series.actors[i].role.c_str());
+                            mediaPath = series.banners[number].path.c_str();
+                            if (series.banners.size() > 1)
+                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                        static_cast<int>(number + 1), *mediaPath,
+                                        static_cast<int>(series.banners.size())); // Log result
+                        }
+                        // mediaWidth = cWidth / 2 - marginItem * 2;
+                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+                        if (Config.TVScraperEPGInfoShowActors) {
+                            ActorsSize = series.actors.size();
+                            actors_path.reserve(ActorsSize); // Set capacity to size of actors
+                            actors_name.reserve(ActorsSize);
+                            actors_role.reserve(ActorsSize);
+                            for (int i{0}; i < ActorsSize; ++i) {
+                                if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
+                                    actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
+                                    actors_name.emplace_back(series.actors[i].name.c_str());
+                                    actors_role.emplace_back(series.actors[i].role.c_str());
+                                }
                             }
                         }
+                        if (series.name.length() > 0)
+                            series_info << tr("name: ") << series.name << '\n';
+                        if (series.firstAired.length() > 0)
+                            series_info << tr("first aired: ") << series.firstAired << '\n';
+                        if (series.network.length() > 0)
+                            series_info << tr("network: ") << series.network << '\n';
+                        if (series.genre.length() > 0)
+                            series_info << tr("genre: ") << series.genre << '\n';
+                        if (series.rating > 0)
+                            series_info << tr("rating: ") << series.rating << '\n';
+                        if (series.status.length() > 0)
+                            series_info << tr("status: ") << series.status << '\n';
+                        if (series.episode.season > 0)
+                            series_info << tr("season number: ") << series.episode.season << '\n';
+                        if (series.episode.number > 0)
+                            series_info << tr("episode number: ") << series.episode.number << '\n';
                     }
-                    if (series.name.length() > 0)
-                        series_info << tr("name: ") << series.name << '\n';
-                    if (series.firstAired.length() > 0)
-                        series_info << tr("first aired: ") << series.firstAired << '\n';
-                    if (series.network.length() > 0)
-                        series_info << tr("network: ") << series.network << '\n';
-                    if (series.genre.length() > 0)
-                        series_info << tr("genre: ") << series.genre << '\n';
-                    if (series.rating > 0)
-                        series_info << tr("rating: ") << series.rating << '\n';
-                    if (series.status.length() > 0)
-                        series_info << tr("status: ") << series.status << '\n';
-                    if (series.episode.season > 0)
-                        series_info << tr("season number: ") << series.episode.season << '\n';
-                    if (series.episode.number > 0)
-                        series_info << tr("episode number: ") << series.episode.number << '\n';
-                }
-            } else if (call.type == tMovie) {
-                cMovie movie;
-                movie.movieId = movieId;
-                if (pScraper->Service("GetMovie", &movie)) {
-                    mediaPath = movie.poster.path.c_str();
-                    mediaWidth = cWidth / 2 - marginItem * 3;
-                    mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
-                    if (Config.TVScraperEPGInfoShowActors) {
-                        int moviesActorsSize = movie.actors.size();
-                        actors_path.reserve(moviesActorsSize);  // Set capacity to size of actors
-                        actors_name.reserve(moviesActorsSize);
-                        actors_role.reserve(moviesActorsSize);
-                        for (int i {0}; i < moviesActorsSize; ++i) {
-                            if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
-                                actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
-                                actors_name.emplace_back(movie.actors[i].name.c_str());
-                                actors_role.emplace_back(movie.actors[i].role.c_str());
+                } else if (call.type == tMovie) {
+                    cMovie movie;
+                    movie.movieId = movieId;
+                    if (pScraper->Service("GetMovie", &movie)) {
+                        mediaPath = movie.poster.path.c_str();
+                        // mediaWidth = cWidth / 2 - marginItem * 3;
+                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+                        if (Config.TVScraperEPGInfoShowActors) {
+                            ActorsSize = movie.actors.size();
+                            actors_path.reserve(ActorsSize); // Set capacity to size of actors
+                            actors_name.reserve(ActorsSize);
+                            actors_role.reserve(ActorsSize);
+                            for (int i{0}; i < ActorsSize; ++i) {
+                                if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
+                                    actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                                    actors_name.emplace_back(movie.actors[i].name.c_str());
+                                    actors_role.emplace_back(movie.actors[i].role.c_str());
+                                }
                             }
                         }
+                        if (movie.title.length() > 0)
+                            movie_info << tr("title: ") << movie.title << '\n';
+                        if (movie.originalTitle.length() > 0)
+                            movie_info << tr("original title: ") << movie.originalTitle << '\n';
+                        if (movie.collectionName.length() > 0)
+                            movie_info << tr("collection name: ") << movie.collectionName << '\n';
+                        if (movie.genres.length() > 0)
+                            movie_info << tr("genre: ") << movie.genres << '\n';
+                        if (movie.releaseDate.length() > 0)
+                            movie_info << tr("release date: ") << movie.releaseDate << '\n';
+                        if (movie.popularity > 0)
+                            movie_info << tr("popularity: ") << movie.popularity << '\n';
+                        if (movie.voteAverage > 0)
+                            movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                     }
-                    if (movie.title.length() > 0)
-                        movie_info << tr("title: ") << movie.title << '\n';
-                    if (movie.originalTitle.length() > 0)
-                        movie_info << tr("original title: ") << movie.originalTitle << '\n';
-                    if (movie.collectionName.length() > 0)
-                        movie_info << tr("collection name: ") << movie.collectionName << '\n';
-                    if (movie.genres.length() > 0)
-                        movie_info << tr("genre: ") << movie.genres << '\n';
-                    if (movie.releaseDate.length() > 0)
-                        movie_info << tr("release date: ") << movie.releaseDate << '\n';
-                    if (movie.popularity > 0)
-                        movie_info << tr("popularity: ") << movie.popularity << '\n';
-                    if (movie.voteAverage > 0)
-                        movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                 }
-            }
-        }
-
+            }  // Scraper plugin
+        }  // FirstRun
 #ifdef DEBUGEPGTIME
         uint32_t tick4 = GetMsTicks();
         dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
 #endif
-
+        ContentTop = marginItem;
         if (!isempty(*mediaPath)) {
             img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
@@ -2709,7 +2710,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
 #endif
 
-        if (Config.TVScraperEPGInfoShowActors && actors_path.size() > 0) {
+        numActors = actors_path.size();
+        if (Config.TVScraperEPGInfoShowActors && numActors > 0) {
             ContentTop = ComplexContent.BottomContent() + fontHeight;
             ComplexContent.AddText(tr("Actors"), false, cRect(marginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), font);
@@ -2718,7 +2720,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += 6;
 
             int actor {0}, actorsPerLine {6};
-            int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
             cString name(""), path(""), role("");  // Actor name, path and role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
@@ -2787,7 +2788,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), font);
         }
         Scrollable = ComplexContent.Scrollable(cHeight - marginItem * 2);
-    } while (Scrollable && FirstRun);
+        if (Scrollable || SecondRun) break;  // No need for another run (Scrolling content or second run)
+        if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
+            SecondRun = true;  // Only runs when minimal contents fits in area of description
+            FirstRun = false;
+            dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+        }
+    } while (/*Scrollable &&*/ FirstRun || SecondRun);
 
     if (Config.MenuContentFullSize || Scrollable)
         ComplexContent.CreatePixmaps(true);
@@ -3253,9 +3260,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (!Recording) return;
 
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
     uint32_t tick0 = GetMsTicks();
-#endif
+//#endif
 
     ShowEvent = false;
     ShowRecording = true;
@@ -3611,19 +3618,29 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         GenreIcons.pop_back();
     }
 
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
     uint32_t tick1 = GetMsTicks();
     dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
-#endif
+//#endif
 
+    std::vector<cString> actors_path;
+    std::vector<cString> actors_name;
+    std::vector<cString> actors_role;
+
+    std::ostringstream series_info(""), movie_info("");
+    cString mediaPath("");
+
+    int ContentTop {0};
+    int mediaWidth {0}, mediaHeight {0};
+    int ActorsSize {0}, numActors {0};
     bool Scrollable = false;
-    bool FirstRun = true;
+    bool FirstRun = true, SecondRun = false;
 
-    do {
-        if (Scrollable) {
-            FirstRun = false;
-            cWidth -= scrollBarWidth;
-        }
+    do {  // Runs up to two times!
+        if (FirstRun)
+            cWidth -= scrollBarWidth;  // Assume that we need scrollbars most of the time
+        else
+            cWidth += scrollBarWidth;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
         ComplexContent.SetOsd(osd);
@@ -3632,136 +3649,129 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollSize(fontHeight);
         ComplexContent.SetScrollingActive(true);
 
-        int ContentTop = marginItem;
-
-        std::ostringstream series_info(""), movie_info("");
-
-        std::vector<cString> actors_path;
-        std::vector<cString> actors_name;
-        std::vector<cString> actors_role;
-
-        cString mediaPath("");
-        int mediaWidth {0}, mediaHeight {0};
-
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
         uint32_t tick2 = GetMsTicks();
-#endif
+//#endif
+        mediaWidth = cWidth / 2 - marginItem * 2;
+        mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+        if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
+            static cPlugin *pScraper = GetScraperPlugin();
+            if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
+                ScraperGetEventType call;
+                call.recording = Recording;
+                int seriesId{0}, episodeId{0}, movieId{0};
 
-        static cPlugin *pScraper = GetScraperPlugin();
-        if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
-            ScraperGetEventType call;
-            call.recording = Recording;
-            int seriesId {0}, episodeId {0}, movieId {0};
+                if (pScraper->Service("GetEventType", &call)) {
+                    seriesId = call.seriesId;
+                    episodeId = call.episodeId;
+                    movieId = call.movieId;
+                }
+                if (call.type == tSeries) {
+                    cSeries series;
+                    series.seriesId = seriesId;
+                    series.episodeId = episodeId;
+                    if (pScraper->Service("GetSeries", &series)) {
+                        if (series.banners.size() > 0) {  // Use random banner
+                            // Gets 'entropy' from device that generates random numbers itself
+                            // to seed a mersenne twister (pseudo) random generator
+                            std::mt19937 generator(std::random_device{}());
 
-            if (pScraper->Service("GetEventType", &call)) {
-                seriesId = call.seriesId;
-                episodeId = call.episodeId;
-                movieId = call.movieId;
-            }
-            if (call.type == tSeries) {
-                cSeries series;
-                series.seriesId = seriesId;
-                series.episodeId = episodeId;
-                if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {  // Use random banner
-                        // Gets 'entropy' from device that generates random numbers itself
-                        // to seed a mersenne twister (pseudo) random generator
-                        std::mt19937 generator(std::random_device {}());
+                            // Make sure all numbers have an equal chance.
+                            // Range is inclusive (so we need -1 for vector index)
+                            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                        // Make sure all numbers have an equal chance.
-                        // Range is inclusive (so we need -1 for vector index)
-                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+                            std::size_t number = distribution(generator);
 
-                        std::size_t number = distribution(generator);
-
-                        mediaPath = series.banners[number].path.c_str();
-                        if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), *mediaPath,
-                                    static_cast<int>(series.banners.size()));  // Log result
-                    }
-                    mediaWidth = cWidth / 2 - marginItem * 2;
-                    mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
-                    if (Config.TVScraperRecInfoShowActors) {
-                        int seriesActorsSize = series.actors.size();
-                        actors_path.reserve(seriesActorsSize);  // Set capacity to size of actors
-                        actors_name.reserve(seriesActorsSize);
-                        actors_role.reserve(seriesActorsSize);
-                        for (int i {0}; i < seriesActorsSize; ++i) {
-                            if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
-                                actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
-                                actors_name.emplace_back(series.actors[i].name.c_str());
-                                actors_role.emplace_back(series.actors[i].role.c_str());
+                            mediaPath = series.banners[number].path.c_str();
+                            if (series.banners.size() > 1)
+                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                        static_cast<int>(number + 1), *mediaPath,
+                                        static_cast<int>(series.banners.size()));  // Log result
+                        }
+                        // mediaWidth = cWidth / 2 - marginItem * 2;
+                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+                        if (Config.TVScraperRecInfoShowActors) {
+                            ActorsSize = series.actors.size();
+                            actors_path.reserve(ActorsSize);  // Set capacity to size of actors
+                            actors_name.reserve(ActorsSize);
+                            actors_role.reserve(ActorsSize);
+                            for (int i{0}; i < ActorsSize; ++i) {
+                                if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
+                                    actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
+                                    actors_name.emplace_back(series.actors[i].name.c_str());
+                                    actors_role.emplace_back(series.actors[i].role.c_str());
+                                }
                             }
                         }
+                        if (series.name.length() > 0)
+                            series_info << tr("name: ") << series.name << '\n';
+                        if (series.firstAired.length() > 0)
+                            series_info << tr("first aired: ") << series.firstAired << '\n';
+                        if (series.network.length() > 0)
+                            series_info << tr("network: ") << series.network << '\n';
+                        if (series.genre.length() > 0)
+                            series_info << tr("genre: ") << series.genre << '\n';
+                        if (series.rating > 0)
+                            series_info << tr("rating: ") << series.rating << '\n';
+                        if (series.status.length() > 0)
+                            series_info << tr("status: ") << series.status << '\n';
+                        if (series.episode.season > 0)
+                            series_info << tr("season number: ") << series.episode.season << '\n';
+                        if (series.episode.number > 0)
+                            series_info << tr("episode number: ") << series.episode.number << '\n';
                     }
-                    if (series.name.length() > 0)
-                        series_info << tr("name: ") << series.name << '\n';
-                    if (series.firstAired.length() > 0)
-                        series_info << tr("first aired: ") << series.firstAired << '\n';
-                    if (series.network.length() > 0)
-                        series_info << tr("network: ") << series.network << '\n';
-                    if (series.genre.length() > 0)
-                        series_info << tr("genre: ") << series.genre << '\n';
-                    if (series.rating > 0)
-                        series_info << tr("rating: ") << series.rating << '\n';
-                    if (series.status.length() > 0)
-                        series_info << tr("status: ") << series.status << '\n';
-                    if (series.episode.season > 0)
-                        series_info << tr("season number: ") << series.episode.season << '\n';
-                    if (series.episode.number > 0)
-                        series_info << tr("episode number: ") << series.episode.number << '\n';
-                }
-            } else if (call.type == tMovie) {
-                cMovie movie;
-                movie.movieId = movieId;
-                if (pScraper->Service("GetMovie", &movie)) {
-                    mediaPath = movie.poster.path.c_str();
-                    mediaWidth = cWidth / 2 - marginItem * 3;
-                    mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
-                    if (Config.TVScraperRecInfoShowActors) {
-                        int moviesActorsSize = movie.actors.size();
-                        actors_path.reserve(moviesActorsSize);  // Set capacity to size of actors
-                        actors_name.reserve(moviesActorsSize);
-                        actors_role.reserve(moviesActorsSize);
-                        for (int i {0}; i < moviesActorsSize; ++i) {
-                            if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
-                                actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
-                                actors_name.emplace_back(movie.actors[i].name.c_str());
-                                actors_role.emplace_back(movie.actors[i].role.c_str());
+                } else if (call.type == tMovie) {
+                    cMovie movie;
+                    movie.movieId = movieId;
+                    if (pScraper->Service("GetMovie", &movie)) {
+                        mediaPath = movie.poster.path.c_str();
+                        // mediaWidth = cWidth / 2 - marginItem * /*3*/ 2;
+                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+                        if (Config.TVScraperRecInfoShowActors) {
+                            ActorsSize = movie.actors.size();
+                            actors_path.reserve(ActorsSize);  // Set capacity to size of actors
+                            actors_name.reserve(ActorsSize);
+                            actors_role.reserve(ActorsSize);
+                            for (int i {0}; i < ActorsSize; ++i) {
+                                if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
+                                    actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                                    actors_name.emplace_back(movie.actors[i].name.c_str());
+                                    actors_role.emplace_back(movie.actors[i].role.c_str());
+                                }
                             }
                         }
+                        if (movie.title.length() > 0)
+                            movie_info << tr("title: ") << movie.title << '\n';
+                        if (movie.originalTitle.length() > 0)
+                            movie_info << tr("original title: ") << movie.originalTitle << '\n';
+                        if (movie.collectionName.length() > 0)
+                            movie_info << tr("collection name: ") << movie.collectionName << '\n';
+                        if (movie.genres.length() > 0)
+                            movie_info << tr("genre: ") << movie.genres << '\n';
+                        if (movie.releaseDate.length() > 0)
+                            movie_info << tr("release date: ") << movie.releaseDate << '\n';
+                        if (movie.popularity > 0)
+                            movie_info << tr("popularity: ") << movie.popularity << '\n';
+                        if (movie.voteAverage > 0)
+                            movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                     }
-                    if (movie.title.length() > 0)
-                        movie_info << tr("title: ") << movie.title << '\n';
-                    if (movie.originalTitle.length() > 0)
-                        movie_info << tr("original title: ") << movie.originalTitle << '\n';
-                    if (movie.collectionName.length() > 0)
-                        movie_info << tr("collection name: ") << movie.collectionName << '\n';
-                    if (movie.genres.length() > 0)
-                        movie_info << tr("genre: ") << movie.genres << '\n';
-                    if (movie.releaseDate.length() > 0)
-                        movie_info << tr("release date: ") << movie.releaseDate << '\n';
-                    if (movie.popularity > 0)
-                        movie_info << tr("popularity: ") << movie.popularity << '\n';
-                    if (movie.voteAverage > 0)
-                        movie_info << tr("vote average: ") << movie.voteAverage << '\n';
                 }
-            }
-        }
+            }  // Scraper plugin
 
-#ifdef DEBUGEPGTIME
+            cString recPath = cString::sprintf("%s", Recording->FileName());
+            cString recImage("");
+            if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
+                // mediaWidth = cWidth / 2 - marginItem * 2;
+                // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+                mediaPath = recImage;
+            }
+        }  // FirstRun
+//#ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
         dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);
-#endif
+//#endif
 
-        cString recPath = cString::sprintf("%s", Recording->FileName());
-        cString recImage("");
-        if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
-            mediaWidth = cWidth / 2 - marginItem * 2;
-            mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
-            mediaPath = recImage;
-        }
+        ContentTop = marginItem;
         if (!isempty(*mediaPath)) {
             img = imgLoader.LoadFile(*mediaPath, mediaWidth, mediaHeight);
             if (img) {
@@ -3818,12 +3828,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                    cRect(marginItem, ContentTop, cWidth - marginItem * 2, cHeight - marginItem * 2),
                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), font);
         }
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
         uint32_t tick4 = GetMsTicks();
         dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
-#endif
+//#endif
 
-        if (Config.TVScraperRecInfoShowActors && actors_path.size() > 0) {
+        numActors = actors_path.size();
+        if (Config.TVScraperRecInfoShowActors && numActors > 0) {
             ContentTop = ComplexContent.BottomContent() + fontHeight;
             ComplexContent.AddText(tr("Actors"), false, cRect(marginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), font);
@@ -3832,7 +3843,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
 
             int actor {0}, actorsPerLine {6};
-            int numActors = actors_path.size();
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
             cString name(""), path(""), role("");  // Actor name, path and role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
@@ -3872,10 +3882,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 y = ComplexContent.BottomContent() + fontHeight;
             }
         }
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
         dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
-#endif
+//#endif
 
         if (recAdditional.str().length() > 0) {
             ContentTop = ComplexContent.BottomContent() + fontHeight;
@@ -3902,7 +3912,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
 
         Scrollable = ComplexContent.Scrollable(cHeight - marginItem * 2);
-    } while (Scrollable && FirstRun);
+        if (Scrollable || SecondRun) break;  // No need for another run (Scrolling content or second run)
+        if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
+            SecondRun = true;  // Only runs when minimal contents fits in area of description
+            FirstRun = false;
+            dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+        }
+    } while (/*Scrollable &&*/ FirstRun || SecondRun);
 
     if (Config.MenuContentFullSize || Scrollable)
         ComplexContent.CreatePixmaps(true);
@@ -4004,10 +4020,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         ComplexContent.ContentHeight(false), RecordingBorder.Size, RecordingBorder.Type,
                         RecordingBorder.ColorFg, RecordingBorder.ColorBg, RecordingBorder.From, false);
 
-#ifdef DEBUGEPGTIME
+//#ifdef DEBUGEPGTIME
     uint32_t tick6 = GetMsTicks();
     dsyslog("flatPlus: SetRecording total time: %d ms", tick6 - tick0);
-#endif
+//#endif
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
