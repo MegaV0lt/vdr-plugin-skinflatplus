@@ -454,7 +454,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
-
     if (LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality)
         return;
 

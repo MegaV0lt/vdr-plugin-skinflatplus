@@ -748,6 +748,7 @@ void cFlatBaseRender::MessageCreate(void) {
     messageHeight = fontHeight + marginItem * 2;
     if (Config.MessageColorPosition == 1)
         messageHeight += 8;
+        
     int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
     messagePixmap = CreatePixmap(
         osd, "messagePixmap", 5,
