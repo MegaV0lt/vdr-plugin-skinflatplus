@@ -148,8 +148,7 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
     switch (screenWidth) {
         case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
         case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
-        // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD)
-        // TODO: Is that used somewhere on sat/cable?
+        // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD) Is that used somewhere on sat/cable?
         case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
         case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
         case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
