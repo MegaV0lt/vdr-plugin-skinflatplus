@@ -7,6 +7,7 @@
         "string": "c",
         "string_view": "cpp",
         "streambuf": "c",
-        "array": "c"
+        "array": "c",
+        "*.tcc": "cpp"
     }
 }

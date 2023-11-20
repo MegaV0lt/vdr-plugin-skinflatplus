@@ -255,3 +255,5 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
     ltrim(s, t);
     rtrim(s, t);
 }
+
+void GetComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine = false);

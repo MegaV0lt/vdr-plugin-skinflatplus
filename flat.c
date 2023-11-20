@@ -7,10 +7,23 @@
 #include "displaymenu.h"
 #include "displaymessage.h"
 #include "displayreplay.h"
-#include "displaytracks.h"                   
+#include "displaytracks.h"
 #include "displayvolume.h"
 
-class cFlatConfig Config;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+/* Possible values of the stream content descriptor according to ETSI EN 300 468 */
+enum stream_content {
+    sc_reserved        = 0x00,
+    sc_video_MPEG2     = 0x01,
+    sc_audio_MP2       = 0x02,  // MPEG 1 Layer 2 audio
+    sc_subtitle        = 0x03,
+    sc_audio_AC3       = 0x04,
+    sc_video_H264_AVC  = 0x05,
+    sc_audio_HEAAC     = 0x06,
+    sc_video_H265_HEVC = 0x09,  // stream content 0x09, extension 0x00
+    sc_audio_AC4       = 0x19,  // stream content 0x09, extension 0x10
+};
+
+class cFlatConfig Config;
 class cImageCache imgCache;
 
 cTheme Theme;
@@ -204,4 +217,61 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     if (FrameSeen < 0.98) return "recording_seen_9";
 
     return "recording_seen_10";
+}
+
+void GetComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {
+    cString audio_type("");
+    for (int i {0}; i < Components->NumComponents(); ++i) {
+        const tComponent *p = Components->Component(i);
+        switch (p->stream) {
+        case sc_video_MPEG2:
+            if (NewLine) Text.Append("\n");
+            if (p->description)
+                Text.Append(cString::sprintf("%s: %s (MPEG2)", tr("Video"), p->description));
+            else
+                Text.Append(cString::sprintf("%s: MPEG2", tr("Video")));
+            break;
+        case sc_video_H264_AVC:
+            if (NewLine) Text.Append("\n");
+            if (p->description)
+                Text.Append(cString::sprintf("%s: %s (H.264)", tr("Video"), p->description));
+            else
+                Text.Append(cString::sprintf("%s: H.264", tr("Video")));
+            break;
+        case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
+                                  // not available in tComponent
+            if (NewLine) Text.Append("\n");
+            if (p->description)
+                Text.Append(cString::sprintf("%s: %s (H.265)", tr("Video"), p->description));
+            else
+                Text.Append(cString::sprintf("%s: H.265", tr("Video")));
+            break;
+        case sc_audio_MP2:
+        case sc_audio_AC3:
+        case sc_audio_HEAAC:
+            if (!isempty(*Audio)) Audio.Append(", ");
+            switch (p->stream) {
+            case sc_audio_MP2:
+                if (p->type == 5)  // Workaround for wrongfully used stream type X 02 05 for AC3
+                    audio_type = "AC3";
+                else
+                    audio_type = "MP2";
+                break;
+            case sc_audio_AC3: audio_type = "AC3"; break;
+            case sc_audio_HEAAC: audio_type = "HEAAC"; break;
+            }  // switch p->stream
+            if (p->description)
+                Audio.Append(cString::sprintf("%s (%s)", p->description, p->language));
+            else
+                Audio.Append(cString::sprintf("%s (%s)", p->language, *audio_type));
+            break;
+        case sc_subtitle:
+            if (!isempty(*Subtitle)) Subtitle.Append(", ");
+            if (p->description)
+                Subtitle.Append(cString::sprintf("%s (%s)", p->description, p->language));
+            else
+                Subtitle.Append(p->language);
+            break;
+        }  // switch
+    }  // for
 }
