@@ -2604,7 +2604,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.genre.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
                         if (series.rating > 0)
-                            series_info.Append(cString::sprintf("%s%f\n", tr("rating: "), series.rating));
+                            series_info.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
@@ -2643,9 +2643,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (movie.releaseDate.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
-                            movie_info.Append(cString::sprintf("%s%f\n", tr("popularity: "), movie.popularity));
+                            movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
-                            movie_info.Append(cString::sprintf("%s%f\n", tr("vote average: "), movie.voteAverage));
+                            movie_info.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
                     }
                 }
             }  // Scraper plugin
@@ -3713,7 +3713,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.genre.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
                         if (series.rating > 0)
-                            series_info.Append(cString::sprintf("%s%f\n", tr("rating: "), series.rating));
+                            series_info.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
@@ -3752,9 +3752,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (movie.releaseDate.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
-                            movie_info.Append(cString::sprintf("%s%f\n", tr("popularity: "), movie.popularity));
+                            movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
-                            movie_info.Append(cString::sprintf("%s%f\n", tr("vote average: "), movie.voteAverage));
+                            movie_info.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
                     }
                 }
             }  // Scraper plugin
