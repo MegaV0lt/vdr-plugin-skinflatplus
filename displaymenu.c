@@ -5394,11 +5394,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
     cString Path = cString::sprintf("%s%s/menuIcons", *Config.iconPath, Setup.OSDTheme);
+    std::string fileName("");
     cString FileName("");
     cReadDir d(*Path);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
+        // FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
+        fileName = e->d_name;
+        FileName = cString::sprintf("menuIcons/%s", fileName.substr(0, fileName.find_last_of(".")).c_str());
         imgLoader.LoadIcon(*FileName, fontHeight - marginItem * 2, fontHeight - marginItem * 2);
     }
 

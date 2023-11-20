@@ -163,14 +163,17 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
-        char *FloatedText = new char[NumChars + 1];
+        std::string Text = text;
+        /* char *FloatedText = new char[NumChars + 1];
         memset(FloatedText, '\0', NumChars + 1);
-        strncpy(FloatedText, text, NumChars);
+        strncpy(FloatedText, text, NumChars); */
+        cString FloatedText = cString::sprintf("%s", Text.substr(0, NumChars).c_str());  // From start to NumChars
 
         ++NumChars;
-        char *SecondText = new char[strlen(text) - NumChars + 2];
+        /* char *SecondText = new char[strlen(text) - NumChars + 2];
         memset(SecondText, '\0', strlen(text) - NumChars + 2);
-        strncpy(SecondText, text + NumChars, strlen(text) - NumChars);
+        strncpy(SecondText, text + NumChars, strlen(text) - NumChars); */
+        cString SecondText = cString::sprintf("%s", Text.substr(NumChars).c_str());  // From NumChars to the end
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());
@@ -178,11 +181,11 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         SecondTextPos.SetWidth(textPos.Width());
         SecondTextPos.SetHeight(textPos.Height());
 
-        AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-        AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
-        delete[] FloatedText;
-        delete[] SecondText;
+        // delete[] FloatedText;
+        // delete[] SecondText;
     }
 
     cRect ImagePos;

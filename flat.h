@@ -207,8 +207,8 @@ class cFlat : public cSkin {
         virtual cSkinDisplayMessage *DisplayMessage(void);
 };
 
-char *substr(char *string, int start, int end);
-char *GetFilenameWithoutext(char *fullfilename);
+// char *substr(char *string, int start, int end);
+// char *GetFilenameWithoutext(char *fullfilename);
 
 static inline uint32_t GetMsTicks(void) {
 #ifdef CLOCK_MONOTONIC
