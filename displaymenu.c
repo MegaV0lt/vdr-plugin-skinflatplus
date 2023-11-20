@@ -17,19 +17,6 @@
 #include "flat.h"
 #include "locale"
 
-/* Possible values of the stream content descriptor according to ETSI EN 300 468 */
-/* enum stream_content {
-    sc_reserved        = 0x00,
-    sc_video_MPEG2     = 0x01,
-    sc_audio_MP2       = 0x02,  // MPEG 1 Layer 2 audio
-    sc_subtitle        = 0x03,
-    sc_audio_AC3       = 0x04,
-    sc_video_H264_AVC  = 0x05,
-    sc_audio_HEAAC     = 0x06,
-    sc_video_H265_HEVC = 0x09,  // stream content 0x09, extension 0x00
-    sc_audio_AC4       = 0x19,  // stream content 0x09, extension 0x10
-}; */
-
 static int CompareTimers(const void *a, const void *b) {
     return (*(const cTimer **)a)->Compare(**(const cTimer **)b);
 }
@@ -973,73 +960,6 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             if (Components) {
                 cString Audio(""), Subtitle("");
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
-                /* std::ostringstream audio("");
-                bool firstAudio = true;
-                const char *audio_type = NULL;
-                std::ostringstream subtitle("");
-                bool firstSubtitle = true;
-                for (int i {0}; i < Components->NumComponents(); ++i) {
-                    const tComponent *p = Components->Component(i);
-                    switch (p->stream) {
-                    case sc_video_MPEG2:
-                        if (p->description)
-                            text << '\n' << tr("Video") << ": " << p->description << " (MPEG2)";
-                        else
-                            text << '\n' << tr("Video") << ": MPEG2";
-                        break;
-                    case sc_video_H264_AVC:
-                        if (p->description)
-                            text << '\n' << tr("Video") << ": " << p->description << " (H.264)";
-                        else
-                            text << '\n' << tr("Video") << ": H.264";
-                        break;
-                    case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
-                                              // not available in tComponent
-                        if (p->description)
-                            text << '\n' << tr("Video") << ": " << p->description << " (H.265)";
-                        else
-                            text << '\n' << tr("Video") << ": H.265";
-                        break;
-
-                    case sc_audio_MP2:
-                    case sc_audio_AC3:
-                    case sc_audio_HEAAC:
-                        if (firstAudio)
-                            firstAudio = false;
-                        else
-                            audio << ", ";
-                        switch (p->stream) {
-                        case sc_audio_MP2:
-                            // Workaround for wrongfully used stream type X 02 05 for AC3
-                            if (p->type == 5)
-                                audio_type = "AC3";
-                            else
-                                audio_type = "MP2";
-                            break;
-                        case sc_audio_AC3:
-                            audio_type = "AC3";
-                            break;
-                        case sc_audio_HEAAC:
-                            audio_type = "HEAAC";
-                            break;
-                        }
-                        if (p->description)
-                            audio << p->description << " (" << audio_type << ", " << p->language << ')';
-                        else
-                            audio << p->language << " (" << audio_type << ')';
-                        break;
-                    case sc_subtitle:
-                        if (firstSubtitle)
-                            firstSubtitle = false;
-                        else
-                            subtitle << ", ";
-                        if (p->description)
-                            subtitle << p->description << " (" << p->language << ')';
-                        else
-                            subtitle << p->language;
-                        break;
-                    }
-                } */
 
                 if (!isempty(*Audio))
                     Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
@@ -2337,72 +2257,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (Components) {
             cString Audio(""), Subtitle("");
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
-            /* std::ostringstream audio("");
-            bool firstAudio = true;
-            const char *audio_type = NULL;
-            std::ostringstream subtitle("");
-            bool firstSubtitle = true;
-            for (int i {0}; i < Components->NumComponents(); ++i) {
-                const tComponent *p = Components->Component(i);
-                switch (p->stream) {
-                case sc_video_MPEG2:
-                    if (p->description)
-                        textAdditional << tr("Video") << ": " << p->description << " (MPEG2)";
-                    else
-                        textAdditional << tr("Video") << ": MPEG2";
-                    break;
-                case sc_video_H264_AVC:
-                    if (p->description)
-                        textAdditional << tr("Video") << ": " << p->description << " (H.264)";
-                    else
-                        textAdditional << tr("Video") << ": H.264";
-                    break;
-                case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not
-                                          // available in tComponent
-                    if (p->description)
-                        textAdditional << tr("Video") << ": " << p->description << " (H.265)";
-                    else
-                        textAdditional << tr("Video") << ": H.265";
-                    break;
-                case sc_audio_MP2:
-                case sc_audio_AC3:
-                case sc_audio_HEAAC:
-                    if (firstAudio)
-                        firstAudio = false;
-                    else
-                        audio << ", ";
-                    switch (p->stream) {
-                    case sc_audio_MP2:
-                        // Workaround for wrongfully used stream type X 02 05 for AC3
-                        if (p->type == 5)
-                            audio_type = "AC3";
-                        else
-                            audio_type = "MP2";
-                        break;
-                    case sc_audio_AC3:
-                        audio_type = "AC3";
-                        break;
-                    case sc_audio_HEAAC:
-                        audio_type = "HEAAC";
-                        break;
-                    }
-                    if (p->description)
-                        audio << p->description << " (" << audio_type << ", " << p->language << ')';
-                    else
-                        audio << p->language << " (" << audio_type << ')';
-                    break;
-                case sc_subtitle:
-                    if (firstSubtitle)
-                        firstSubtitle = false;
-                    else
-                        subtitle << ", ";
-                    if (p->description)
-                        subtitle << p->description << " (" << p->language << ')';
-                    else
-                        subtitle << p->language;
-                    break;
-                }
-            } */
+
             if (!isempty(*Audio)) {
                 if (!isempty(*TextAdditional))
                     TextAdditional.Append("\n");
@@ -2730,8 +2585,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             cString name(""), path(""), role("");  // Actor name, path and role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
             int picLines = numActors / picsPerLine + (numActors % picsPerLine != 0);
-            // if (numActors % picsPerLine != 0)
-            //    ++picLines;
             int actorMargin = ((cWidth - marginItem * 2) - actorWidth * actorsPerLine) / (actorsPerLine - 1);
             int x = marginItem;
             int y = ContentTop;
@@ -2798,9 +2651,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+            // dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
         }
-    } while (/*Scrollable &&*/ FirstRun || SecondRun);
+    } while (FirstRun || SecondRun);
 
     if (Config.MenuContentFullSize || Scrollable)
         ComplexContent.CreatePixmaps(true);
@@ -3041,64 +2894,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             if (Components) {
                 cString Audio(""), Subtitle("");
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
-                /* std::ostringstream audio("");
-                bool firstAudio = true;
-                const char *audio_type = NULL;
-                std::ostringstream subtitle("");
-                bool firstSubtitle = true;
-                for (int i {0}; i < Components->NumComponents(); ++i) {
-                    const tComponent *p = Components->Component(i);
 
-                    switch (p->stream) {
-                    case sc_video_MPEG2:
-                        text << '\n' << tr("Video") << ": " << p->description << " (MPEG2)";
-                        break;
-                    case sc_video_H264_AVC:
-                        text << '\n' << tr("Video") << ": " << p->description << " (H.264)";
-                        break;
-                    case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
-                                              // not available in tComponent
-                        text << '\n' << tr("Video") << ": " << p->description << " (H.265)";
-                        break;
-                    case sc_audio_MP2:
-                    case sc_audio_AC3:
-                    case sc_audio_HEAAC:
-                        if (firstAudio)
-                            firstAudio = false;
-                        else
-                            audio << ", ";
-                        switch (p->stream) {
-                        case sc_audio_MP2:
-                            // Workaround for wrongfully used stream type X 02 05 for AC3
-                            if (p->type == 5)
-                                audio_type = "AC3";
-                            else
-                                audio_type = "MP2";
-                            break;
-                        case sc_audio_AC3:
-                            audio_type = "AC3";
-                            break;
-                        case sc_audio_HEAAC:
-                            audio_type = "HEAAC";
-                            break;
-                        }
-                        if (p->description)
-                            audio << p->description << " (" << audio_type << ", " << p->language << ')';
-                        else
-                            audio << p->language << " (" << audio_type << ')';
-                        break;
-                    case sc_subtitle:
-                        if (firstSubtitle)
-                            firstSubtitle = false;
-                        else
-                            subtitle << ", ";
-                        if (p->description)
-                            subtitle << p->description << " (" << p->language << ')';
-                        else
-                            subtitle << p->language;
-                        break;
-                    }
-                } */
                 if (!isempty(*Audio))
                     Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
                 if (!isempty(*Subtitle))
@@ -3461,64 +3257,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (Components) {
             cString Audio(""), Subtitle("");
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
-            /* std::ostringstream audio("");
-            bool firstAudio = true;
-            const char *audio_type = NULL;
-            std::ostringstream subtitle("");
-            bool firstSubtitle = true;
-            for (int i {0}; i < Components->NumComponents(); ++i) {
-                const tComponent *p = Components->Component(i);
 
-                switch (p->stream) {
-                case sc_video_MPEG2:
-                    textAdditional << tr("Video") << ": " << p->description << " (MPEG2)";
-                    break;
-                case sc_video_H264_AVC:
-                    textAdditional << tr("Video") << ": " << p->description << " (H.264)";
-                    break;
-                case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is not
-                                          // available in tComponent
-                    textAdditional << tr("Video") << ": " << p->description << " (H.265)";
-                    break;
-                case sc_audio_MP2:
-                case sc_audio_AC3:
-                case sc_audio_HEAAC:
-                    if (firstAudio)
-                        firstAudio = false;
-                    else
-                        audio << ", ";
-                    switch (p->stream) {
-                    case sc_audio_MP2:
-                        // Workaround for wrongfully used stream type X 02 05 for AC3
-                        if (p->type == 5)
-                            audio_type = "AC3";
-                        else
-                            audio_type = "MP2";
-                        break;
-                    case sc_audio_AC3:
-                        audio_type = "AC3";
-                        break;
-                    case sc_audio_HEAAC:
-                        audio_type = "HEAAC";
-                        break;
-                    }
-                    if (p->description)
-                        audio << p->description << " (" << audio_type << ", " << p->language << ')';
-                    else
-                        audio << p->language << " (" << audio_type << ')';
-                    break;
-                case sc_subtitle:
-                    if (firstSubtitle)
-                        firstSubtitle = false;
-                    else
-                        subtitle << ", ";
-                    if (p->description)
-                        subtitle << p->description << " (" << p->language << ')';
-                    else
-                        subtitle << p->language;
-                    break;
-                }
-            } */
             if (!isempty(*Audio)) {
                 if (!isempty(*TextAdditional))
                     TextAdditional.Append("\n");
@@ -3553,26 +3292,23 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
             }
 
-            // if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) ||
-            //    !pattern.empty()) {
-                if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
-                    RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(), tr("search pattern"), searchtimer.c_str()));
-                }
-                if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                    RecAdditional.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
-                    if (reason == "improve")
-                        RecAdditional.Append(tr("improve"));
-                    else if (reason == "collection")
-                        RecAdditional.Append(tr("collection"));
-                    else if (reason == "TV show, missing episode")
-                        RecAdditional.Append(tr("TV show, missing episode"));
-                    else
-                        RecAdditional.Append(reason.c_str());
-                }
-                if (!pattern.empty()) {  // VDR-Admin
-                    RecAdditional.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
-                }
-            // }
+            if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
+                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(), tr("search pattern"), searchtimer.c_str()));
+            }
+            if (!causedby.empty() && !reason.empty()) {  // TVScraper
+                RecAdditional.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
+                if (reason == "improve")
+                    RecAdditional.Append(tr("improve"));
+                else if (reason == "collection")
+                    RecAdditional.Append(tr("collection"));
+                else if (reason == "TV show, missing episode")
+                    RecAdditional.Append(tr("TV show, missing episode"));
+                else
+                    RecAdditional.Append(reason.c_str());
+            }
+            if (!pattern.empty()) {  // VDR-Admin
+                RecAdditional.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
+            }
         }
     }  // if Config.RecordingAdditionalInfoShow
 
@@ -3629,7 +3365,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     cString mediaPath("");
     cString movie_info(""), series_info("");
-
 
     int ContentTop {0};
     int mediaWidth {0}, mediaHeight {0};
@@ -3847,10 +3582,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             int actorWidth = cWidth / actorsPerLine - marginItem * 4;
             cString name(""), path(""), role("");  // Actor name, path and role
             int picsPerLine = (cWidth - marginItem * 2) / actorWidth;
-            // x = x / y + (x % y != 0);
             int picLines = numActors / picsPerLine + (numActors % picsPerLine != 0);
-            // if (numActors % picsPerLine != 0)
-            //    ++picLines;
             int actorMargin = ((cWidth - marginItem * 2) - actorWidth * actorsPerLine) / (actorsPerLine - 1);
             int x = marginItem;
             int y = ContentTop;
@@ -3887,7 +3619,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
         dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
-//#endif
+#endif
 
         if (!isempty(*RecAdditional)) {
             ContentTop = ComplexContent.BottomContent() + fontHeight;
@@ -3918,9 +3650,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+            // dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
         }
-    } while (/*Scrollable &&*/ FirstRun || SecondRun);
+    } while (FirstRun || SecondRun);
 
     if (Config.MenuContentFullSize || Scrollable)
         ComplexContent.CreatePixmaps(true);
