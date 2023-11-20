@@ -748,7 +748,7 @@ void cFlatBaseRender::MessageCreate(void) {
     messageHeight = fontHeight + marginItem * 2;
     if (Config.MessageColorPosition == 1)
         messageHeight += 8;
-        
+
     int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
     messagePixmap = CreatePixmap(
         osd, "messagePixmap", 5,
@@ -810,8 +810,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         messageScroller.AddScroller(
             Text,
             cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                  osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize, maxWidth,
-                  fontHeight),
+                  osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
+                  maxWidth, fontHeight),
             Theme.Color(clrMessageFont), clrTransparent, font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string tilde = Text;
@@ -832,8 +832,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                 messageScroller.AddScroller(
                     Text,
                     cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                          osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize, maxWidth,
-                          fontHeight),
+                          osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
+                          maxWidth, fontHeight),
                     Theme.Color(clrMessageFont), clrTransparent, font);
             else
                 messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), Text,
@@ -844,8 +844,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             messageScroller.AddScroller(
                 Text,
                 cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                      osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize, maxWidth,
-                      fontHeight),
+                      osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
+                      maxWidth, fontHeight),
                 Theme.Color(clrMessageFont), clrTransparent, font);
         else
             messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), Text, Theme.Color(clrMessageFont),
