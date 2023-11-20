@@ -1,5 +1,5 @@
 /*
- * skinflat.c: A plugin for the Video Disk Recorder
+ * skinflatplus.c: A plugin for the Video Disk Recorder
  *
  * See the README file for copyright information and how to reach the author.
  *
@@ -13,11 +13,11 @@
 #error "VDR-1.7.34 API version or greater is required!"
 #endif
 
-#include "flat.h"
-#include "setup.h"
-#include "imageloader.h"
+#include "./flat.h"
+#include "./setup.h"
+#include "./imageloader.h"
 
-static const char *VERSION        = "0.8.0";
+static const char *VERSION        = "0.8.1";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {

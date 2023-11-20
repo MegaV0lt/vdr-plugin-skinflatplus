@@ -661,13 +661,12 @@ void cFlatConfig::Init(void) {
 
 bool stringCompare(const std::string &left, const std::string &right) {
     std::string::const_iterator lit, rit, leftEnd = left.end(), rightEnd = right.end();
-    for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit)
-        if (tolower(*lit) < tolower(*rit))
-            return true;
-        else if (tolower(*lit) > tolower(*rit))
-            return false;
-    if (left.size() < right.size())
-        return true;
+    for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit) {
+        if (tolower(*lit) < tolower(*rit)) return true;
+        if (tolower(*lit) > tolower(*rit)) return false;
+    }
+    if (left.size() < right.size()) return true;
+
     return false;
 }
 
@@ -680,11 +679,11 @@ bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
 }
 
 int roundUp(int numToRound, int multiple) {
-    if (multiple == 0)
-        return numToRound;
+    if (multiple == 0) return numToRound;
+
     int remainder = numToRound % multiple;
-    if (remainder == 0)
-        return numToRound;
+    if (remainder == 0) return numToRound;
+
     return numToRound + multiple - remainder;
 }
 
@@ -699,7 +698,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         FileName = AddDirectory(*decorPath, e->d_name);
-        files.push_back(*FileName);
+        files.emplace_back(*FileName);
     }
 
     std::sort(files.begin(), files.end(), stringCompare);
@@ -717,17 +716,16 @@ cString cFlatConfig::DecorDescription(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0};
-        char *s;
+        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
-            char *p = strchr(s, '#');
-            if (p)
-                *p = 0;
+            p = strchr(s, '#');
+            if (p) *p = 0;
             s = stripspace(skipspace(s));
             if (!isempty(s)) {
-                char *n = s;
-                char *v = strchr(s, '=');
+                n = s;
+                v = strchr(s, '=');
                 if (v) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
@@ -753,7 +751,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         FileName = AddDirectory(*decorPath, e->d_name);
-        files.push_back(*FileName);
+        files.emplace_back(*FileName);
     }
 
     std::string fileName("");
@@ -770,17 +768,17 @@ void cFlatConfig::DecorLoadFile(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0}, value {0};
-        char *s;
+        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
-            char *p = strchr(s, '#');
+            p = strchr(s, '#');
             if (p)
                 *p = 0;
             s = stripspace(skipspace(s));
             if (!isempty(s)) {
-                char *n = s;
-                char *v = strchr(s, '=');
+                n = s;
+                v = strchr(s, '=');
                 if (v) {
                     *v++ = 0;
                     n = stripspace(skipspace(n));
@@ -884,8 +882,8 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                     v = stripspace(skipspace(v));
                     value = atoi(v);
                     dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
-                    RecordingOldFolder.push_back(n);
-                    RecordingOldValue.push_back(value);
+                    RecordingOldFolder.emplace_back(n);
+                    RecordingOldValue.emplace_back(value);
                 }
             }
         }  // while
@@ -925,8 +923,8 @@ void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
 
 void cFlatConfig::Store(const char *Name, const char *Value, const char *Filename) {
     FILE *f = fopen(Filename, "a");
-    if (!f)
-        return;
+    if (!f) return;
+
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);
 }
@@ -940,7 +938,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     cReadDir d(*configsPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        files.push_back(e->d_name);
+        files.emplace_back(e->d_name);
     }
 
     std::sort(files.begin(), files.end(), stringCompare);

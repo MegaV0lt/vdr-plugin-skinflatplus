@@ -72,11 +72,11 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
 
         // Icons
         cImage *iconTimerFull;
-        cImage *iconTimerPartial;
+        // cImage *iconTimerPartial;
         cImage *iconArrowTurn;
         cImage *iconRec;
-        cImage *iconVps;
-        cImage *iconNew;
+        // cImage *iconVps;
+        // cImage *iconNew;
         // Icons
 
         void ItemBorderInsertUnique(sDecorBorder ib);

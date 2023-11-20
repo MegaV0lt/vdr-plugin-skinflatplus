@@ -18,7 +18,7 @@ class cTextScroll {
     cOsd *Osd;
     int Layer;
     int PixelsPerStep;
-    int WAITSTEPS, waitSteps = 0;
+    int WAITSTEPS, waitSteps {0};
     bool isReserveStep;
     bool ResetX;
     int ScrollType;

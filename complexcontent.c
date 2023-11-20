@@ -76,8 +76,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
             Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
         }
     } else {  // Log values and return
-        esyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d", Position.Left(), Position.Top(),
-                Position.Width(), Position.Height());
+        esyslog("flatPlus: Failed to create ComplexContentPixmap left: %d top: %d width: %d height: %d",
+                Position.Left(), Position.Top(), Position.Width(), Position.Height());
         return;
     }
     PixmapFill(PixmapImage, clrTransparent);
@@ -116,10 +116,10 @@ int cComplexContent::ContentHeight(bool Full) {
 bool cComplexContent::Scrollable(int height) {
     CalculateDrawPortHeight();
 
-    int total = ScrollTotal();
     if (height == 0) height = Position.Height();
 
-    int shown = ceil(height * 1.0 / ScrollSize);
+    int total = ScrollTotal();
+    int shown = ceil(height * 1.0f / ScrollSize);
     if (total > shown) return true;
 
     return false;
@@ -127,14 +127,12 @@ bool cComplexContent::Scrollable(int height) {
 
 void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
                               cFont *font, int textWidth, int textHeight, int textAlignment) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-    // if (Contents.size() > 128)
-    //    dsyslog("flatPlus: Size/Capacity of vector<cSimpleContent> Contents: %ld %ld", Contents.size(), Contents.capacity());
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetImage(image, position);
 }
 
@@ -145,50 +143,34 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
     cTextWrapper WrapperFloat;
     WrapperFloat.Set(text, font, TextWidthLeft);
-    int FloatLines = ceil(image->Height() * 1.0 / ScrollSize);
+    int FloatLines = ceil(image->Height() * 1.0f / ScrollSize);
     int Lines = WrapperFloat.Lines();
 
-    if (Lines < FloatLines) {
-        cRect FloatedTextPos;
-        FloatedTextPos.SetLeft(textPos.Left());
-        FloatedTextPos.SetTop(textPos.Top());
-        FloatedTextPos.SetWidth(TextWidthLeft);
-        FloatedTextPos.SetHeight(textPos.Height());
+    cRect FloatedTextPos;
+    FloatedTextPos.SetLeft(textPos.Left());
+    FloatedTextPos.SetTop(textPos.Top());
+    FloatedTextPos.SetWidth(TextWidthLeft);
+    FloatedTextPos.SetHeight(textPos.Height());
 
+    if (Lines < FloatLines) {  // Text fits on the left side of the image
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
-
-        AddImage(image, ImagePos);
     } else {
         int NumChars {0};
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
             NumChars += strlen(WrapperFloat.GetLine(i));
         }
-        // detect end of last word
+        // Detect end of last word
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
-        char *FloatedText;
-        FloatedText = new char[NumChars + 1];
+        char *FloatedText = new char[NumChars + 1];
         memset(FloatedText, '\0', NumChars + 1);
         strncpy(FloatedText, text, NumChars);
 
         ++NumChars;
-        char *SecondText;
-        SecondText = new char[strlen(text) - NumChars + 2];
+        char *SecondText = new char[strlen(text) - NumChars + 2];
         memset(SecondText, '\0', strlen(text) - NumChars + 2);
         strncpy(SecondText, text + NumChars, strlen(text) - NumChars);
-
-        cRect FloatedTextPos;
-        FloatedTextPos.SetLeft(textPos.Left());
-        FloatedTextPos.SetTop(textPos.Top());
-        FloatedTextPos.SetWidth(TextWidthLeft);
-        FloatedTextPos.SetHeight(textPos.Height());
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());
@@ -199,21 +181,21 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
         AddText(SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 
-        cRect ImagePos;
-        ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-        ImagePos.SetTop(textPos.Top());
-        ImagePos.SetWidth(image->Width());
-        ImagePos.SetHeight(image->Height());
-
-        AddImage(image, ImagePos);
-
         delete[] FloatedText;
         delete[] SecondText;
     }
+
+    cRect ImagePos;
+    ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
+    ImagePos.SetTop(textPos.Top());
+    ImagePos.SetWidth(image->Width());
+    ImagePos.SetHeight(image->Height());
+
+    AddImage(image, ImagePos);
 }
 
 void cComplexContent::AddRect(cRect position, tColor colorBg) {
-    Contents.push_back(cSimpleContent());
+    Contents.emplace_back(cSimpleContent());
     Contents.back().SetRect(position, colorBg);
 }
 
@@ -229,11 +211,11 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize(void) {
-    return Position.Height() * 1.0 / DrawPortHeight;
+    return Position.Height() * 1.0f / DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal(void) {
-    return ceil(DrawPortHeight * 1.0 / ScrollSize);
+    return ceil(DrawPortHeight * 1.0f / ScrollSize);
 }
 
 int cComplexContent::ScrollShown(void) {
@@ -249,7 +231,7 @@ int cComplexContent::ScrollOffset(void) {
         else
             y = DrawPortHeight - Position.Height() - 1;
     }
-    double offset = y * 1.0 / DrawPortHeight;
+    double offset = y * 1.0f / DrawPortHeight;
     return ScrollTotal() * offset;
 }
 

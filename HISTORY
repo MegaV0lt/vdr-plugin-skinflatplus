@@ -1,5 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-11-20: Version 0.8.1
+- [update] Refine logmessages
+- [update] Speed up loading epg info and images
+- [update] Merge InsertComponents()
+- [update] Some internal optimizations
+
 2023-11-08: Version 0.8.0
 - [fix] Better display of channelicons (Resolution, ...)
 - [add] Option to show shorttext without date in playback

@@ -109,7 +109,7 @@ class cFlatBaseRender {
         cComplexContent weatherWidget;
 
         cPixmap *decorPixmap;
-        std::list<sDecorBorder> Borders;  // for clear specific Borders (clear only MenuItems and not TopBar)
+        std::list<sDecorBorder> Borders;  // For clear specific Borders (clear only MenuItems and not TopBar)
 
         void contentDraw(void);
         void contentEventDraw(void);
