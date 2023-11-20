@@ -146,32 +146,20 @@ cString GetAspectIcon(int screenWidth, double screenAspect) {
 cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
     cString res("unknown_res");
     switch (screenWidth) {
-        case 7680:                        // 7680×4320 (UHD-2 / 8K)
-            res = "7680x4320"; break;
-        case 3840:                        // 3840×2160 (UHD-1 / 4K)
-            res = "3840x2160"; break;
-        // case 2560;                        // 2560x1440 (QHD)
-        //    res = "2560x1440"; break;      // TODO: Is that used somewhere on sat/cable?
-        case 1920:                        // 1920x1080 (HD1080 Full HDTV)
-            res = "1920x1080"; break;
-        case 1440:                        // 1440x1080 (HD1080 DV)
-            res = "1440x1080"; break;
-        case 1280:                        // 1280x720 (HD720)
-            res = "1280x720"; break;
-        case 960:                         // 960x720 (HD720 DV)
-            res = "960x720"; break;
-        case 720:                         // 720x576 (PAL)
-            res = "720x576"; break;
-        case 704:                         // 704x576 (PAL)
-            res = "704x576"; break;
-        case 544:                         // 544x576 (PAL)
-            res = "544x576"; break;
-        case 528:                         // 528x576 (PAL)
-            res = "528x576"; break;
-        case 480:                         // 480x576 (PAL SVCD)
-            res = "480x576"; break;
-        case 352:                         // 352x576 (PAL CVD)
-            res = "352x576"; break;
+        case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
+        case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
+        // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD)
+        // TODO: Is that used somewhere on sat/cable?
+        case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
+        case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
+        case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
+        case 960: res = "960x720"; break;     // 960x720 (HD720 DV)
+        case 720: res = "720x576"; break;     // 720x576 (PAL)
+        case 704: res = "704x576"; break;     // 704x576 (PAL)
+        case 544: res = "544x576"; break;     // 544x576 (PAL)
+        case 528: res = "528x576"; break;     // 528x576 (PAL)
+        case 480: res = "480x576"; break;     // 480x576 (PAL SVCD)
+        case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
         default:
             dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
                     screenWidth, screenHeight, screenAspect);
@@ -219,7 +207,7 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     return "recording_seen_10";
 }
 
-void GetComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {
     cString audio_type("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);

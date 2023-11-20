@@ -972,7 +972,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             const cComponents *Components = Event->Components();
             if (Components) {
                 cString Audio(""), Subtitle("");
-                GetComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
+                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
                 /* std::ostringstream audio("");
                 bool firstAudio = true;
                 const char *audio_type = NULL;
@@ -2336,7 +2336,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         const cComponents *Components = Event->Components();
         if (Components) {
             cString Audio(""), Subtitle("");
-            GetComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
+            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
             /* std::ostringstream audio("");
             bool firstAudio = true;
             const char *audio_type = NULL;
@@ -3040,7 +3040,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             const cComponents *Components = recInfo->Components();
             if (Components) {
                 cString Audio(""), Subtitle("");
-                GetComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
+                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
                 /* std::ostringstream audio("");
                 bool firstAudio = true;
                 const char *audio_type = NULL;
@@ -3460,7 +3460,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         const cComponents *Components = recInfo->Components();
         if (Components) {
             cString Audio(""), Subtitle("");
-            GetComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
+            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
             /* std::ostringstream audio("");
             bool firstAudio = true;
             const char *audio_type = NULL;
