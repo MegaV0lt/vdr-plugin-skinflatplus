@@ -233,12 +233,10 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
-    // int ChartDiskUsage = DiskUsagePercent;  // Use DiskUsagePercent directly
     cString iconName("");
     cString extra1(""), extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
-        // ChartDiskUsage = 100 - DiskUsagePercent;  // Use DiskFreePrecent directly
         if (Config.DiskUsageShort == false) {     // Long format
             extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
@@ -394,7 +392,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int titleLeft = MenuIconWidth + marginItem * 2;
 
         time_t t = time(NULL);
-
         cString time = TimeString(t);
         cString time2 = cString::sprintf("%s %s", *time, tr("clock"));
         if (Config.TopBarHideClockText)
