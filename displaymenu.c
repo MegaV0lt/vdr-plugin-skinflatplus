@@ -3265,9 +3265,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (!Recording) return;
 
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
     uint32_t tick0 = GetMsTicks();
-//#endif
+#endif
 
     ShowEvent = false;
     ShowRecording = true;
@@ -3618,10 +3618,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         GenreIcons.pop_back();
     }
 
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
     uint32_t tick1 = GetMsTicks();
     dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
-//#endif
+#endif
 
     std::vector<cString> actors_path;
     std::vector<cString> actors_name;
@@ -3650,9 +3650,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollSize(fontHeight);
         ComplexContent.SetScrollingActive(true);
 
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
         uint32_t tick2 = GetMsTicks();
-//#endif
+#endif
         mediaWidth = cWidth / 2 - marginItem * 2;
         mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
@@ -3767,10 +3767,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 mediaPath = recImage;
             }
         }  // FirstRun
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
         dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);
-//#endif
+#endif
 
         ContentTop = marginItem;
         if (!isempty(*mediaPath)) {
@@ -3829,10 +3829,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                    cRect(marginItem, ContentTop, cWidth - marginItem * 2, cHeight - marginItem * 2),
                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), font);
         }
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
         uint32_t tick4 = GetMsTicks();
         dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
-//#endif
+#endif
 
         numActors = actors_path.size();
         if (Config.TVScraperRecInfoShowActors && numActors > 0) {
@@ -3884,7 +3884,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 y = ComplexContent.BottomContent() + fontHeight;
             }
         }
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
         dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
 //#endif
@@ -4022,10 +4022,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         ComplexContent.ContentHeight(false), RecordingBorder.Size, RecordingBorder.Type,
                         RecordingBorder.ColorFg, RecordingBorder.ColorBg, RecordingBorder.From, false);
 
-//#ifdef DEBUGEPGTIME
+#ifdef DEBUGEPGTIME
     uint32_t tick6 = GetMsTicks();
     dsyslog("flatPlus: SetRecording total time: %d ms", tick6 - tick0);
-//#endif
+#endif
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
