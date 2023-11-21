@@ -631,7 +631,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         }
     }
     if (isProgressbar) {
-        double progress = now * 1.0 / total;
+        double progress = now * 1.0f / total;
         ProgressBarDrawRaw(menuPixmap, menuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -1095,21 +1095,21 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int imageLeft = Left;
     int imageTop = Top;
 
-    cString TimerIconName("");
+    cString iconName("");
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
-        TimerIconName = (Current) ? "timerInactive_cur" : "timerInactive";
+        iconName = (Current) ? "timerInactive_cur" : "timerInactive";
 
         ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
     } else if (Timer->Recording()) {  // Active timer and recording
-        TimerIconName = "timerRecording";
+        iconName = "timerRecording";
         ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else if (Timer->FirstDay()) {  // Active timer 'FirstDay'
-        TimerIconName = "text_arrowturn";
+        iconName = "text_arrowturn";
         // ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else  // Active timer
-        TimerIconName = "timerActive";
+        iconName = "timerActive";
 
-    cImage *img = imgLoader.LoadIcon(*TimerIconName, imageHeight, imageHeight);
+    cImage *img = imgLoader.LoadIcon(*iconName, imageHeight, imageHeight);
     if (img) {
         imageTop = Top + (fontHeight - img->Height()) / 2;
         menuIconsPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
@@ -2271,22 +2271,24 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if components
     }  // EpgAdditionalInfoShow
 
-    int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - marginItem;
+    // int headIconTop = chHeight - fontHeight - marginItem;
+    int headIconTop = chHeight - fontSmlHeight - marginItem;  // Sow bigger image 
+    // int headIconLeft = chWidth - fontHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight + fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + marginItem;
+                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
             }
         }
     }
@@ -2294,18 +2296,18 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
+                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + marginItem;
+                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }
@@ -3312,22 +3314,26 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }  // if Config.RecordingAdditionalInfoShow
 
-    int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - marginItem;
+    // int headIconTop = chHeight - fontHeight - marginItem;
+    int headIconTop = chHeight - fontSmlHeight - marginItem;  // Sow bigger image 
+    // int headIconLeft = chWidth - fontHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight + fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        // img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            // headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + marginItem;
+                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
             }
         }
     }
@@ -3335,18 +3341,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
+                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + marginItem;
+                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }
@@ -4292,7 +4298,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             if (recDevice)
                 recDevices[recDevice->DeviceNumber()] = true;
         }
-    }
+    }  // for cTimer
     int actualNumDevices {0};
     cString ChannelName(""), str(""), strDevice("");
     for (int i {0}; i < numDevices; ++i) {
