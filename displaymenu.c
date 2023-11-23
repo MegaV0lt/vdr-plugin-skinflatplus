@@ -2272,9 +2272,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }  // EpgAdditionalInfoShow
 
     // int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconTop = chHeight - fontSmlHeight - marginItem;  // Sow bigger image 
+    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
     // int headIconLeft = chWidth - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight + fontSmlHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
@@ -3315,9 +3315,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }  // if Config.RecordingAdditionalInfoShow
 
     // int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconTop = chHeight - fontSmlHeight - marginItem;  // Sow bigger image 
+    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
     // int headIconLeft = chWidth - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight + fontSmlHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
