@@ -2900,8 +2900,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             }
             // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (recInfo && recInfo->Errors() >= 1)
-                Text.Append(cString::sprintf("%s: %d\n", tr("TS errors"), recInfo->Errors()));
+            if (recInfo && recInfo->Errors() >= 1) {
+                std::ostringstream RecErrors("");
+                RecErrors.imbue(std::locale(""));  // Set to local locale
+                RecErrors << recInfo->Errors();
+                Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
+            }
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
@@ -3270,8 +3274,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-        if (recInfo && recInfo->Errors() >= 1)
-            RecAdditional.Append(cString::sprintf("\n%s: %d", tr("TS errors"), recInfo->Errors()));
+            if (recInfo && recInfo->Errors() >= 1) {
+                std::ostringstream RecErrors("");
+                RecErrors.imbue(std::locale(""));  // Set to local locale
+                RecErrors << recInfo->Errors();
+                RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
+            }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
