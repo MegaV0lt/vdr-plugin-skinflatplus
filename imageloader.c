@@ -1,11 +1,11 @@
-#include "imageloader.h"
+#include "./imageloader.h"
 #include <dirent.h>
 #include <math.h>
 
 #include <iostream>
 #include <string>
 
-#include "flat.h"
+#include "./flat.h"
 
 using namespace Magick;
 
@@ -17,66 +17,67 @@ cImageLoader::~cImageLoader() {
 }
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
-    if ((width == 0) || (height == 0))
-        return NULL;
+    if ((width == 0) || (height == 0)) return NULL;
 
-    std::string logoLower = logo;
-    toLowerCase(logoLower);
-    cString File = cString::sprintf("%s%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
-    #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
-    #endif
-
+    // Plain logo without converting to lower including '/'
+    cString File = cString::sprintf("%s%s.%s", *Config.logoPath, logo, *logoExtension);
     cImage *img = NULL;
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick1 = GetMsTicks();
-    #endif
+    for (int i {0}; i < 2; ++i) {
+        if (i == 1) {  // Second try (Plain logo not found)
+            std::string logoLower = logo;
+            toLowerCase(logoLower);  // Convert to lowercase (A-Z)
+            File = cString::sprintf("%s%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
+        }
+        #ifdef DEBUGIMAGELOADTIME
+            dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
+            uint32_t tick1 = GetMsTicks();
+        #endif
 
-    img = imgCache.GetImage(*File, width, height);
+        img = imgCache.GetImage(*File, width, height);  // Check if image is in imagecache
 
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick2 = GetMsTicks();
-        dsyslog("   search in cache: %d ms", tick2 - tick1);
-    #endif
-    if (img)
-        return img;  // Image found in imagecache
+        #ifdef DEBUGIMAGELOADTIME
+            uint32_t tick2 = GetMsTicks();
+            dsyslog("   search in cache: %d ms", tick2 - tick1);
+        #endif
 
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick3 = GetMsTicks();
-    #endif
+        if (img) return img;  // Image found in imagecache
 
-    bool success = LoadImage(*File);
+        #ifdef DEBUGIMAGELOADTIME
+            uint32_t tick3 = GetMsTicks();
+        #endif
 
-    if (!success) {
-        dsyslog("flatPlus: ImageLoader LoadLogo: %s could not be loaded", *File);
-        return NULL;
-    }
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("   load file from disk: %d ms", tick4 - tick3);
-    #endif
+        bool success = LoadImage(*File);  // Try to load image from disk
 
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick5 = GetMsTicks();
-    #endif
+        if (!success) {
+            if (i == 1)  // Second try
+                dsyslog("flatPlus: ImageLoader LoadLogo: %s (%s.%s) could not be loaded", *File, logo,
+                        *logoExtension);
+            continue;  // Image not found on disk
+        }
 
-    img = CreateImage(width, height);
+        #ifdef DEBUGIMAGELOADTIME
+            uint32_t tick4 = GetMsTicks();
+            dsyslog("   load file from disk: %d ms", tick4 - tick3);
+            uint32_t tick5 = GetMsTicks();
+        #endif
 
-    if (!img)
-        return NULL;
+        img = CreateImage(width, height);
 
-    #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick6 = GetMsTicks();
-        dsyslog("   scale logo: %d ms", tick6 - tick5);
-    #endif
+        if (!img) continue;
 
-    imgCache.InsertImage(img, *File, width, height);
-    return img;  // Image loaded from disk
+        #ifdef DEBUGIMAGELOADTIME
+            uint32_t tick6 = GetMsTicks();
+            dsyslog("   scale logo: %d ms", tick6 - tick5);
+        #endif
+
+        imgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
+        return img;  // Image loaded from disk
+    }  // for
+    return NULL;  // No image; so return Null
 }
 
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
-    if ((width == 0) || (height == 0))
-        return NULL;
+    if ((width == 0) || (height == 0)) return NULL;
 
     cString File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, Setup.OSDTheme, cIcon, *logoExtension);
 
@@ -96,8 +97,8 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick2 = GetMsTicks();
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
-    if (img)
-        return img;
+
+    if (img) return img;
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick3 = GetMsTicks();
@@ -123,8 +124,8 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
             uint32_t tick6 = GetMsTicks();
             dsyslog("   search in cache: %d ms", tick6 - tick5);
         #endif
-        if (img)
-            return img;
+
+        if (img) return img;
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick7 = GetMsTicks();
@@ -162,8 +163,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 }
 
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
-    if ((width == 0) || (height == 0))
-        return NULL;
+    if ((width == 0) || (height == 0)) return NULL;
 
     cString File = cFile;
     #ifdef DEBUGIMAGELOADTIME
@@ -181,8 +181,8 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         uint32_t tick2 = GetMsTicks();
         dsyslog("   search in cache: %d ms", tick2 - tick1);
     #endif
-    if (img)
-        return img;
+
+    if (img) return img;
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick3 = GetMsTicks();
@@ -205,8 +205,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     img = CreateImage(width, height);
 
-    if (!img)
-        return NULL;
+    if (!img) return NULL;
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick6 = GetMsTicks();
@@ -224,7 +223,7 @@ void cImageLoader::toLowerCase(std::string &str) {
     }
 }
 
-bool cImageLoader::FileExits(const std::string& name) {
+bool cImageLoader::FileExits(const std::string &name) {
     struct stat buffer;
     return (stat (name.c_str(), &buffer) == 0);
 }

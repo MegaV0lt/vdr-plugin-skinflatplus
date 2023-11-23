@@ -2444,7 +2444,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(series.actors[i].name.c_str());
@@ -2481,7 +2481,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(movie.actors[i].name.c_str());
@@ -3437,7 +3437,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(series.actors[i].name.c_str());

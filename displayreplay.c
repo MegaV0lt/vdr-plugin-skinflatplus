@@ -558,7 +558,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                   Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
         }
-    } else {
+    } else {  // Not cutted
         int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total);
         if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
@@ -582,7 +582,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
         }
-    }
+    }  // iscutted
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {
