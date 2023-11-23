@@ -2304,7 +2304,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+                img =
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
                     headIconLeft -= fontHeight + fontSmlHeight + marginItem;
@@ -2455,7 +2456,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.name.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
                         if (series.firstAired.length() > 0)
-                            series_info.Append(cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
+                            series_info.Append(
+                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
                         if (series.network.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
                         if (series.genre.length() > 0)
@@ -2465,9 +2467,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
                         if (series.episode.number > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -2492,13 +2496,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (movie.title.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
                         if (movie.originalTitle.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
                         if (movie.collectionName.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
                         if (movie.genres.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
                         if (movie.releaseDate.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
                             movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
@@ -2704,7 +2711,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     } else {  // Shorttext fits into maxwidth
         contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), *shortText,
-                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml, shortTextWidth);
+                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
+                                    shortTextWidth);
         // left += shortTextWidth;
     }
 
@@ -2758,7 +2766,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
             // const cChannel *channel =
             //    Channels->GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
-            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’ casts away qualifiers
+            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’
+            //         casts away qualifiers
 #else
             cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
 #endif
@@ -2876,11 +2885,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
             if (hasMarks) {
                 if (recsize > MEGABYTE(1023))
-                    Text.Append(cString::sprintf("%s: %.2f GB", tr("cutted"), static_cast<float>(recsizecutted) / MEGABYTE(1024)));
+                    Text.Append(cString::sprintf("%s: %.2f GB", tr("cutted"),
+                                                 static_cast<float>(recsizecutted) / MEGABYTE(1024)));
                 else
                     Text.Append(cString::sprintf(" (%s: %lld MB", tr("cutted"), recsizecutted / MEGABYTE(1)));
             }
-            Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"), Recording->Lifetime()));
+            Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(),
+                                         trVDR("Lifetime"), Recording->Lifetime()));
 
             if (lastIndex) {
                 Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
@@ -2891,6 +2902,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #if APIVERSNUM >= 20505
             if (recInfo && recInfo->Errors() >= 1)
                 Text.Append(cString::sprintf("%s: %d\n", tr("TS errors"), recInfo->Errors()));
+            }
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
@@ -3115,7 +3127,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 LOCK_CHANNELS_READ;
                 const cChannel *channel = Channels->GetByChannelID(channelId);
                 if (channel)
-                    RecAdditional.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
+                    RecAdditional.Append(
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
             },
             recInfo->ChannelID());
         channelFuture.get();
@@ -3124,7 +3137,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         // cChannel *channel = Channels.GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
 
         if (channel)
-            RecAdditional.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
+            RecAdditional.Append(
+                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
 #endif
 
         const cEvent *Event = recInfo->GetEvent();
@@ -3224,21 +3238,25 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         if (index) {
             lastIndex = index->Last();
-            RecAdditional.Append(cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond())));
+            RecAdditional.Append(
+                cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond())));
             if (hasMarks)
-                RecAdditional.Append(cString::sprintf(" (%s: %s)", tr("cutted"), *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())));
+                RecAdditional.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
+                                                      *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())));
             RecAdditional.Append("\n");
         }
         delete index;
 
         if (recsize > MEGABYTE(1023))
-            RecAdditional.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(recsize) / MEGABYTE(1024)));
+            RecAdditional.Append(
+                cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(recsize) / MEGABYTE(1024)));
         else
             RecAdditional.Append(cString::sprintf("%s: %llu MB", tr("Size"), recsize / MEGABYTE(1)));
 
         if (hasMarks) {
             if (recsize > MEGABYTE(1023))
-                RecAdditional.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(recsizecutted) / MEGABYTE(1024)));
+                RecAdditional.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
+                                                      static_cast<float>(recsizecutted) / MEGABYTE(1024)));
             else
                 RecAdditional.Append(cString::sprintf(" (%s: %llu MB", tr("cutted"), recsizecutted / MEGABYTE(1)));
         }
@@ -3247,13 +3265,15 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         if (lastIndex) {
             RecAdditional.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
-                                         (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
-                                         static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+                                                  (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
+                                                  static_cast<float>(recsize) / lastIndex *
+                                                      Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         }
         // From SkinNopacity
 #if APIVERSNUM >= 20505
         if (recInfo && recInfo->Errors() >= 1)
             RecAdditional.Append(cString::sprintf("\n%s: %d", tr("TS errors"), recInfo->Errors()));
+        }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
@@ -3295,10 +3315,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
 
             if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
-                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(), tr("search pattern"), searchtimer.c_str()));
+                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(),
+                                                      tr("search pattern"), searchtimer.c_str()));
             }
             if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                RecAdditional.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
+                RecAdditional.Append(
+                    cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
                 if (reason == "improve")
                     RecAdditional.Append(tr("improve"));
                 else if (reason == "collection")
@@ -3349,7 +3371,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+                img =
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
                     headIconLeft -= fontHeight + fontSmlHeight + marginItem;
@@ -3448,7 +3471,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.name.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
                         if (series.firstAired.length() > 0)
-                            series_info.Append(cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
+                            series_info.Append(
+                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
                         if (series.network.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
                         if (series.genre.length() > 0)
@@ -3458,9 +3482,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
                         if (series.episode.number > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -3485,13 +3511,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (movie.title.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
                         if (movie.originalTitle.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
                         if (movie.collectionName.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
                         if (movie.genres.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
                         if (movie.releaseDate.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
                             movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
@@ -4371,8 +4400,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                               fontSmlWidthX * 7, fontSmlHeight, taLeft);
 
         left += fontSmlWidthX * 8;
-        // auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
-        //str = x.c_str();
         contentWidget.AddText(*strDevice, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
 
