@@ -2902,7 +2902,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 #if APIVERSNUM >= 20505
             if (recInfo && recInfo->Errors() >= 1)
                 Text.Append(cString::sprintf("%s: %d\n", tr("TS errors"), recInfo->Errors()));
-            }
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
@@ -3273,7 +3272,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #if APIVERSNUM >= 20505
         if (recInfo && recInfo->Errors() >= 1)
             RecAdditional.Append(cString::sprintf("\n%s: %d", tr("TS errors"), recInfo->Errors()));
-        }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
