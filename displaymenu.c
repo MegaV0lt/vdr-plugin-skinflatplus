@@ -2951,11 +2951,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                         Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"),
                                     causedby.c_str(), tr("reason")));
                         if (reason == "improve")
-                            Text.Append(cString::sprintf("%s", tr("improve")));
+                            Text.Append(tr("improve"));
                         else if (reason == "collection")
-                            Text.Append(cString::sprintf("%s", tr("collection")));
+                            Text.Append(tr("collection"));
                         else if (reason == "TV show, missing episode")
-                            Text.Append(cString::sprintf("%s", tr("TV show, missing episode")));
+                            Text.Append(tr("TV show, missing episode"));
                         else
                             Text.Append(reason.c_str());  // To be safe if there are more options
                     }
@@ -3274,12 +3274,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (recInfo && recInfo->Errors() >= 1) {
-                std::ostringstream RecErrors("");
-                RecErrors.imbue(std::locale(""));  // Set to local locale
-                RecErrors << recInfo->Errors();
-                RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
-            }
+        if (recInfo && recInfo->Errors() >= 1) {
+            std::ostringstream RecErrors("");
+            RecErrors.imbue(std::locale(""));  // Set to local locale
+            RecErrors << recInfo->Errors();
+            RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
+        }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
