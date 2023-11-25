@@ -461,11 +461,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (!isempty(*mediaPath)) {
             if (mediaHeight > TVSHeight || mediaWidth > TVSWidth) {  // Resize too big poster/banner
                 dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", mediaWidth, mediaHeight);
-                mediaHeight = TVSHeight * 0.7;  // Max 70% of pixmap height
+                mediaHeight = TVSHeight * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;  // Max 70% of pixmap height
                 if (Config.ChannelWeatherShow)
-                    mediaWidth = TVSWidth * 0.5;  // Max 50% of pixmap width. Aspect is preserved in LoadFile()
+                    // Max 50% of pixmap width. Aspect is preserved in LoadFile()
+                    mediaWidth = TVSWidth * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
                 else
-                    mediaWidth = TVSWidth * 0.7;  // Max 70% of pixmap width. Aspect is preserved in LoadFile()
+                    // Max 70% of pixmap width. Aspect is preserved in LoadFile()
+                    mediaWidth = TVSWidth * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;
 
                 dsyslog("flatPlus: Poster/Banner resized to max %d x %d", mediaWidth, mediaHeight);
             }
@@ -556,7 +558,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                   Theme.Color(clrReplayBg), font, font->Width(cutted), fontHeight);
         }
-    } else {
+    } else {  // Not cutted
         int right = osdWidth - Config.decorBorderReplaySize * 2 - font->Width(total);
         if (Config.TimeSecsScale < 1.0) {
             std::string tot = *total;
@@ -580,7 +582,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
         }
-    }
+    }  // iscutted
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {

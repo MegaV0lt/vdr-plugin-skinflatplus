@@ -207,8 +207,8 @@ class cFlat : public cSkin {
         virtual cSkinDisplayMessage *DisplayMessage(void);
 };
 
-char *substr(char *string, int start, int end);
-char *GetFilenameWithoutext(char *fullfilename);
+// char *substr(char *string, int start, int end);
+// char *GetFilenameWithoutext(char *fullfilename);
 
 static inline uint32_t GetMsTicks(void) {
 #ifdef CLOCK_MONOTONIC
@@ -258,3 +258,4 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,
                       cString &Subtitle, bool NewLine = false);
+// void GetRecSize(const cRecording *Recording, uint64_t &recsize);

@@ -18,7 +18,7 @@ class cImageLoader : public cImageMagickWrapper {
     cImage* LoadLogo(const char *logo, int width, int height);
     cImage* LoadIcon(const char *cIcon, int width, int height);
     cImage* LoadFile(const char *cFile, int width, int height);
-    bool FileExits(const std::string& name);
+    bool FileExits(const std::string &name);
     bool SearchRecordingPoster(cString recPath, cString &found);
  private:
     int epgImageWidthLarge, epgImageHeightLarge;

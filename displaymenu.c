@@ -631,7 +631,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         }
     }
     if (isProgressbar) {
-        double progress = now * 1.0 / total;
+        double progress = now * 1.0f / total;
         ProgressBarDrawRaw(menuPixmap, menuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -1095,21 +1095,21 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int imageLeft = Left;
     int imageTop = Top;
 
-    cString TimerIconName("");
+    cString iconName("");
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
-        TimerIconName = (Current) ? "timerInactive_cur" : "timerInactive";
+        iconName = (Current) ? "timerInactive_cur" : "timerInactive";
 
         ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
     } else if (Timer->Recording()) {  // Active timer and recording
-        TimerIconName = "timerRecording";
+        iconName = "timerRecording";
         ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else if (Timer->FirstDay()) {  // Active timer 'FirstDay'
-        TimerIconName = "text_arrowturn";
+        iconName = "text_arrowturn";
         // ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else  // Active timer
-        TimerIconName = "timerActive";
+        iconName = "timerActive";
 
-    cImage *img = imgLoader.LoadIcon(*TimerIconName, imageHeight, imageHeight);
+    cImage *img = imgLoader.LoadIcon(*iconName, imageHeight, imageHeight);
     if (img) {
         imageTop = Top + (fontHeight - img->Height()) / 2;
         menuIconsPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
@@ -2271,22 +2271,24 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if components
     }  // EpgAdditionalInfoShow
 
-    int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - marginItem;
+    // int headIconTop = chHeight - fontHeight - marginItem;
+    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
+    // int headIconLeft = chWidth - fontHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + marginItem;
+                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
             }
         }
     }
@@ -2294,18 +2296,19 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
+                img =
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + marginItem;
+                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }
@@ -2442,7 +2445,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(series.actors[i].name.c_str());
@@ -2453,7 +2456,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.name.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
                         if (series.firstAired.length() > 0)
-                            series_info.Append(cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
+                            series_info.Append(
+                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
                         if (series.network.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
                         if (series.genre.length() > 0)
@@ -2463,9 +2467,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
                         if (series.episode.number > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -2479,7 +2485,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(movie.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(movie.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(movie.actors[i].name.c_str());
@@ -2490,13 +2496,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (movie.title.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
                         if (movie.originalTitle.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
                         if (movie.collectionName.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
                         if (movie.genres.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
                         if (movie.releaseDate.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
                             movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
@@ -2702,7 +2711,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     } else {  // Shorttext fits into maxwidth
         contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), *shortText,
-                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml, shortTextWidth);
+                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
+                                    shortTextWidth);
         // left += shortTextWidth;
     }
 
@@ -2756,7 +2766,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
             // const cChannel *channel =
             //    Channels->GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
-            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’ casts away qualifiers
+            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’
+            //         casts away qualifiers
 #else
             cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)recInfo)->ChannelID());
 #endif
@@ -2874,11 +2885,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
             if (hasMarks) {
                 if (recsize > MEGABYTE(1023))
-                    Text.Append(cString::sprintf("%s: %.2f GB", tr("cutted"), static_cast<float>(recsizecutted) / MEGABYTE(1024)));
+                    Text.Append(cString::sprintf("%s: %.2f GB", tr("cutted"),
+                                                 static_cast<float>(recsizecutted) / MEGABYTE(1024)));
                 else
                     Text.Append(cString::sprintf(" (%s: %lld MB", tr("cutted"), recsizecutted / MEGABYTE(1)));
             }
-            Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"), Recording->Lifetime()));
+            Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(),
+                                         trVDR("Lifetime"), Recording->Lifetime()));
 
             if (lastIndex) {
                 Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
@@ -2887,8 +2900,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             }
             // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (recInfo && recInfo->Errors() >= 1)
-                Text.Append(cString::sprintf("%s: %d\n", tr("TS errors"), recInfo->Errors()));
+            if (recInfo && recInfo->Errors() >= 1) {
+                std::ostringstream RecErrors("");
+                RecErrors.imbue(std::locale(""));  // Set to local locale
+                RecErrors << recInfo->Errors();
+                Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
+            }
 #endif
             const cComponents *Components = recInfo->Components();
             if (Components) {
@@ -2934,11 +2951,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                         Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"),
                                     causedby.c_str(), tr("reason")));
                         if (reason == "improve")
-                            Text.Append(cString::sprintf("%s", tr("improve")));
+                            Text.Append(tr("improve"));
                         else if (reason == "collection")
-                            Text.Append(cString::sprintf("%s", tr("collection")));
+                            Text.Append(tr("collection"));
                         else if (reason == "TV show, missing episode")
-                            Text.Append(cString::sprintf("%s", tr("TV show, missing episode")));
+                            Text.Append(tr("TV show, missing episode"));
                         else
                             Text.Append(reason.c_str());  // To be safe if there are more options
                     }
@@ -3113,7 +3130,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 LOCK_CHANNELS_READ;
                 const cChannel *channel = Channels->GetByChannelID(channelId);
                 if (channel)
-                    RecAdditional.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
+                    RecAdditional.Append(
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
             },
             recInfo->ChannelID());
         channelFuture.get();
@@ -3122,7 +3140,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         // cChannel *channel = Channels.GetByChannelID((reinterpret_cast<cRecordingInfo *>(recInfo))->ChannelID());
 
         if (channel)
-            RecAdditional.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
+            RecAdditional.Append(
+                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
 #endif
 
         const cEvent *Event = recInfo->GetEvent();
@@ -3222,21 +3241,25 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         if (index) {
             lastIndex = index->Last();
-            RecAdditional.Append(cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond())));
+            RecAdditional.Append(
+                cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(lastIndex, false, Recording->FramesPerSecond())));
             if (hasMarks)
-                RecAdditional.Append(cString::sprintf(" (%s: %s)", tr("cutted"), *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())));
+                RecAdditional.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
+                                                      *IndexToHMSF(cuttedLength, false, Recording->FramesPerSecond())));
             RecAdditional.Append("\n");
         }
         delete index;
 
         if (recsize > MEGABYTE(1023))
-            RecAdditional.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(recsize) / MEGABYTE(1024)));
+            RecAdditional.Append(
+                cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(recsize) / MEGABYTE(1024)));
         else
             RecAdditional.Append(cString::sprintf("%s: %llu MB", tr("Size"), recsize / MEGABYTE(1)));
 
         if (hasMarks) {
             if (recsize > MEGABYTE(1023))
-                RecAdditional.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(recsizecutted) / MEGABYTE(1024)));
+                RecAdditional.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
+                                                      static_cast<float>(recsizecutted) / MEGABYTE(1024)));
             else
                 RecAdditional.Append(cString::sprintf(" (%s: %llu MB", tr("cutted"), recsizecutted / MEGABYTE(1)));
         }
@@ -3245,13 +3268,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         if (lastIndex) {
             RecAdditional.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
-                                         (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
-                                         static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+                                                  (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
+                                                  static_cast<float>(recsize) / lastIndex *
+                                                      Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         }
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-        if (recInfo && recInfo->Errors() >= 1)
-            RecAdditional.Append(cString::sprintf("\n%s: %d", tr("TS errors"), recInfo->Errors()));
+        if (recInfo && recInfo->Errors() >= 1) {
+            std::ostringstream RecErrors("");
+            RecErrors.imbue(std::locale(""));  // Set to local locale
+            RecErrors << recInfo->Errors();
+            RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
+        }
 #endif
         const cComponents *Components = recInfo->Components();
         if (Components) {
@@ -3293,10 +3321,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
 
             if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
-                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(), tr("search pattern"), searchtimer.c_str()));
+                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(),
+                                                      tr("search pattern"), searchtimer.c_str()));
             }
             if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                RecAdditional.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
+                RecAdditional.Append(
+                    cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
                 if (reason == "improve")
                     RecAdditional.Append(tr("improve"));
                 else if (reason == "collection")
@@ -3312,22 +3342,26 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }  // if Config.RecordingAdditionalInfoShow
 
-    int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - marginItem;
+    // int headIconTop = chHeight - fontHeight - marginItem;
+    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
+    // int headIconLeft = chWidth - fontHeight - marginItem;
+    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        // img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            // headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight, fontHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + marginItem;
+                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
             }
         }
     }
@@ -3335,18 +3369,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + marginItem;
+            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
-                img = imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight, fontHeight);
+                img =
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + marginItem;
+                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }
@@ -3431,7 +3466,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
                             actors_name.reserve(ActorsSize);
                             actors_role.reserve(ActorsSize);
-                            for (int i{0}; i < ActorsSize; ++i) {
+                            for (int i {0}; i < ActorsSize; ++i) {
                                 if (imgLoader.FileExits(series.actors[i].actorThumb.path)) {
                                     actors_path.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     actors_name.emplace_back(series.actors[i].name.c_str());
@@ -3442,7 +3477,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.name.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
                         if (series.firstAired.length() > 0)
-                            series_info.Append(cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
+                            series_info.Append(
+                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
                         if (series.network.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
                         if (series.genre.length() > 0)
@@ -3452,9 +3488,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.status.length() > 0)
                             series_info.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
                         if (series.episode.season > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
                         if (series.episode.number > 0)
-                            series_info.Append(cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                            series_info.Append(
+                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -3479,13 +3517,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (movie.title.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
                         if (movie.originalTitle.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
                         if (movie.collectionName.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
                         if (movie.genres.length() > 0)
                             movie_info.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
                         if (movie.releaseDate.length() > 0)
-                            movie_info.Append(cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
+                            movie_info.Append(
+                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
                         if (movie.popularity > 0)
                             movie_info.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
                         if (movie.voteAverage > 0)
@@ -4292,7 +4333,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             if (recDevice)
                 recDevices[recDevice->DeviceNumber()] = true;
         }
-    }
+    }  // for cTimer
     int actualNumDevices {0};
     cString ChannelName(""), str(""), strDevice("");
     for (int i {0}; i < numDevices; ++i) {
@@ -4365,8 +4406,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                               fontSmlWidthX * 7, fontSmlHeight, taLeft);
 
         left += fontSmlWidthX * 8;
-        // auto x = strDevice.str();  // Fix Using object that is a temporary. [danglingTemporaryLifetime]
-        //str = x.c_str();
         contentWidget.AddText(*strDevice, false, cRect(left, ContentTop, wWidth - marginItem * 2, fontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml);
 
@@ -5394,11 +5433,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
     cString Path = cString::sprintf("%s%s/menuIcons", *Config.iconPath, Setup.OSDTheme);
+    std::string fileName("");
     cString FileName("");
     cReadDir d(*Path);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
+        // FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
+        fileName = e->d_name;
+        FileName = cString::sprintf("menuIcons/%s", fileName.substr(0, fileName.find_last_of(".")).c_str());
         imgLoader.LoadIcon(*FileName, fontHeight - marginItem * 2, fontHeight - marginItem * 2);
     }
 

@@ -66,7 +66,7 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-char *substr(char *string, int start, int end) {
+/* char *substr(char *string, int start, int end) {
     char *p = &string[start];
     // char *buf = (char*) malloc(strlen(p) + 1);
     char *buf = reinterpret_cast<char*>(malloc(strlen(p) + 1));
@@ -80,9 +80,9 @@ char *substr(char *string, int start, int end) {
     *ptr++ = '\0';
 
     return buf;
-}
+} */
 
-char *GetFilenameWithoutext(char *fullfilename) {
+/* char *GetFilenameWithoutext(char *fullfilename) {
     int i {0}, size {0};
 
     while (fullfilename[i] != '\0') {
@@ -90,7 +90,7 @@ char *GetFilenameWithoutext(char *fullfilename) {
         ++i;
     }
     return substr(fullfilename, 0, size);
-}
+} */
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     if (!osd) {
