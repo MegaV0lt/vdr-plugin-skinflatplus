@@ -465,6 +465,9 @@ msgstr "display utilizzo dell'hardisk"
 msgid "Diskusage free/occupied"
 msgstr "Utilizzo hardisk: libero/occupato"
 
+msgid "EPG FSK/Genre icon size"
+msgstr ""
+
 msgid "OSD vertical margin"
 msgstr "margine OSD verticale"
 

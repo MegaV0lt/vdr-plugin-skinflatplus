@@ -481,6 +481,9 @@ msgstr "Plattenverbrauch: Kurze Anzeige"
 msgid "Diskusage free/occupied"
 msgstr "Plattenverbrauch: frei/belegt"
 
+msgid "EPG FSK/Genre icon size"
+msgstr "EPG FSK/Genre Symbolgröße"
+
 msgid "OSD vertical margin"
 msgstr "OSD vertikaler Rand"
 

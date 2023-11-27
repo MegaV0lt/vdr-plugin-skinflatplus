@@ -234,6 +234,7 @@ void cFlatSetup::Store(void) {
     SetupStore("DiskUsageShow", Config.DiskUsageShow);
     SetupStore("EpgAdditionalInfoShow", Config.EpgAdditionalInfoShow);
     SetupStore("EpgRerunsShow", Config.EpgRerunsShow);
+    SetupStore("EpgFskGenreIconSize", dtoa(Config.EpgFskGenreIconSize));
     SetupStore("MainMenuItemScale", dtoa(Config.MainMenuItemScale));
     SetupStore("MainMenuWidgetActiveTimerHideEmpty", Config.MainMenuWidgetActiveTimerHideEmpty);
     SetupStore("MainMenuWidgetActiveTimerMaxCount", Config.MainMenuWidgetActiveTimerMaxCount);
@@ -431,6 +432,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "DiskUsageShow") == 0)                        SetupConfig->DiskUsageShow = atoi(Value);
     else if (strcmp(Name, "EpgAdditionalInfoShow") == 0)                SetupConfig->EpgAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "EpgRerunsShow") == 0)                        SetupConfig->EpgRerunsShow = atoi(Value);
+    else if (strcmp(Name, "EpgFskGenreIconSize") == 0)                  SetupConfig->EpgFskGenreIconSize = atod(Value);
     else if (strcmp(Name, "MainMenuItemScale") == 0)                    SetupConfig->MainMenuItemScale = atod(Value);
     else if (strcmp(Name, "MainMenuWidgetActiveTimerHideEmpty") == 0)   SetupConfig->MainMenuWidgetActiveTimerHideEmpty = atoi(Value);
     else if (strcmp(Name, "MainMenuWidgetActiveTimerMaxCount") == 0)    SetupConfig->MainMenuWidgetActiveTimerMaxCount = atoi(Value);
@@ -609,6 +611,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("DiskUsageShow", SetupConfig->DiskUsageShow, *Filename);
     Config.Store("EpgAdditionalInfoShow", SetupConfig->EpgAdditionalInfoShow, *Filename);
     Config.Store("EpgRerunsShow", SetupConfig->EpgRerunsShow, *Filename);
+    Config.Store("EpgFskGenreIconSize", dtoa(Config.EpgFskGenreIconSize), *Filename);
     Config.Store("MainMenuItemScale", dtoa(Config.MainMenuItemScale), *Filename);
     Config.Store("MainMenuWidgetActiveTimerHideEmpty", SetupConfig->MainMenuWidgetActiveTimerHideEmpty, *Filename);
     Config.Store("MainMenuWidgetActiveTimerMaxCount", SetupConfig->MainMenuWidgetActiveTimerMaxCount, *Filename);
@@ -760,6 +763,7 @@ void cFlatSetupGeneral::Setup(void) {
     Add(new cMenuEditStraItem(tr("Diskusage show"), &SetupConfig->DiskUsageShow, DiskUsages.Size(), &DiskUsages[0]));
     Add(new cMenuEditBoolItem(tr("Diskusage short display"), &SetupConfig->DiskUsageShort));
     Add(new cMenuEditStraItem(tr("Diskusage free/occupied"), &SetupConfig->DiskUsageFree, DiskUsageFree.Size(), &DiskUsageFree[0]));
+    Add(new cMenuEditPrcItem(tr("EPG FSK/Genre icon size"), &SetupConfig->EpgFskGenreIconSize, 0.001, 0.01, 1));
     Add(new cMenuEditIntItem(tr("OSD vertical margin"), &SetupConfig->marginOsdVer));
     Add(new cMenuEditIntItem(tr("OSD horizontal margin"), &SetupConfig->marginOsdHor));
     Add(new cMenuEditPrcItem(tr("TopBar font size"), &SetupConfig->TopBarFontSize, 0.01, 0.2, 1));

@@ -2271,24 +2271,23 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if components
     }  // EpgAdditionalInfoShow
 
-    // int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
-    // int headIconLeft = chWidth - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
+    double iconHeight = (chHeight - (2 * marginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    int headIconTop = chHeight - iconHeight - marginItem;  // Position for fsk/genre image
+    int headIconLeft = chWidth - iconHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+            headIconLeft -= iconHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+                headIconLeft -= iconHeight + marginItem;
             }
         }
     }
@@ -2296,19 +2295,19 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+            headIconLeft -= iconHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
                 img =
-                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+                    headIconLeft -= iconHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }
@@ -3342,26 +3341,23 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }  // if Config.RecordingAdditionalInfoShow
 
-    // int headIconTop = chHeight - fontHeight - marginItem;
-    int headIconTop = chHeight - fontHeight - fontSmlHeight - marginItem;  // Position for bigger image
-    // int headIconLeft = chWidth - fontHeight - marginItem;
-    int headIconLeft = chWidth - fontHeight - fontSmlHeight - marginItem;
+    double iconHeight = (chHeight - (2 * marginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    int headIconTop = chHeight - iconHeight - marginItem;  // Position for fsk/genre image
+    int headIconLeft = chWidth - iconHeight - marginItem;
     cString iconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        // img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
-        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            // headIconLeft -= fontHeight + marginItem;
-            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+            headIconLeft -= iconHeight + marginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *iconName);
-            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+            img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+                headIconLeft -= iconHeight + marginItem;
             }
         }
     }
@@ -3369,19 +3365,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
         bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-            headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+            headIconLeft -= iconHeight + marginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *iconName);
             if (!isUnknownDrawn) {
                 img =
-                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", fontHeight + fontSmlHeight, fontHeight + fontSmlHeight);
+                    imgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
                 if (img) {
                     contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
-                    headIconLeft -= fontHeight + fontSmlHeight + marginItem;
+                    headIconLeft -= iconHeight + marginItem;
                     isUnknownDrawn = true;
                 }
             }

@@ -41,6 +41,7 @@ cFlatConfig::cFlatConfig(void) {
     RecordingAdditionalInfoShow = true;
     EpgAdditionalInfoShow = true;
     EpgRerunsShow = true;
+    EpgFskGenreIconSize = 0.005;  // Percent of content head heigh
 
     TopBarRecordingShow = true;
     TopBarRecConflictsShow = true;
@@ -301,6 +302,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "DiskUsageShow") == 0)                        DiskUsageShow = atoi(Value);
     else if (strcmp(Name, "EpgAdditionalInfoShow") == 0)                EpgAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "EpgRerunsShow") == 0)                        EpgRerunsShow = atoi(Value);
+    else if (strcmp(Name, "EpgFskGenreIconSize") == 0)                  EpgFskGenreIconSize = atod(Value);
     else if (strcmp(Name, "MainMenuItemScale") == 0)                    MainMenuItemScale = atod(Value);
     else if (strcmp(Name, "MainMenuWidgetActiveTimerHideEmpty") == 0)   MainMenuWidgetActiveTimerHideEmpty = atoi(Value);
     else if (strcmp(Name, "MainMenuWidgetActiveTimerMaxCount") == 0)    MainMenuWidgetActiveTimerMaxCount = atoi(Value);

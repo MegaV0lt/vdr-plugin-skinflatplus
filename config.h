@@ -228,6 +228,7 @@ class cFlatConfig {
         int RecordingDimmOnPauseDelay;
         int RecordingDimmOnPauseOpaque;
 
+        double EpgFskGenreIconSize;
         int EpgRerunsShow;
         int EpgAdditionalInfoShow;
         int TopBarRecordingShow;
