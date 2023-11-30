@@ -1539,10 +1539,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         imageHeight = fontSmlHeight;
         menuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, fontSml);
         Left += fontSml->Width(Event->GetTimeString()) + marginItem;
-    } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
+    /* } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
         menuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, font);
-        Left += font->Width(Event->GetTimeString()) + marginItem;
-    } else if (Event && Selectable) {
+        Left += font->Width(Event->GetTimeString()) + marginItem; */
+    } else if (Event && Selectable) {  // Same as above
         menuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, font);
         Left += font->Width(Event->GetTimeString()) + marginItem;
     }
