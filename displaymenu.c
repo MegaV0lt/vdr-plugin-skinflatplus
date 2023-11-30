@@ -483,7 +483,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
                             std::string first = tilde.substr(0, found);
-                            std::string second = tilde.substr(found + 1, tilde.length());
+                            std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
                             rtrim(first);   // Trim possible space on right side
                             ltrim(second);  // Trim possible space at begin
 
@@ -1232,7 +1232,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1, tilde.length());
+                    std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
                     rtrim(first);   // Trim possible space on right side
                     ltrim(second);  // Trim possible space at begin
 
@@ -1265,7 +1265,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1, tilde.length());
+                    std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
                     rtrim(first);   // Trim possible space on right side
                     ltrim(second);  // Trim possible space at begin
 
