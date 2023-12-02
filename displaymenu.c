@@ -2291,12 +2291,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
         }
     }
+    bool isUnknownDrawn = false;
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
-        bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
@@ -3361,12 +3361,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
     }
+    bool isUnknownDrawn = false;
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
         iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
-        bool isUnknownDrawn = false;
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
