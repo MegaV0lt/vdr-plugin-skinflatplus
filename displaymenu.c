@@ -483,7 +483,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
                             std::string first = tilde.substr(0, found);
-                            std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
+                            std::string second = tilde.substr(found + 1);  // Default end is npos
                             rtrim(first);   // Trim possible space on right side
                             ltrim(second);  // Trim possible space at begin
 
@@ -1232,7 +1232,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
+                    std::string second = tilde.substr(found + 1);  // Default end is npos
                     rtrim(first);   // Trim possible space on right side
                     ltrim(second);  // Trim possible space at begin
 
@@ -1265,7 +1265,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1/*, tilde.length()*/);  // Default end is npos
+                    std::string second = tilde.substr(found + 1);  // Default end is npos
                     rtrim(first);   // Trim possible space on right side
                     ltrim(second);  // Trim possible space at begin
 
@@ -1379,7 +1379,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString ws = cString::sprintf("%d", Channels.MaxNumber());
 #endif
         int w = font->Width(ws); */
-        /* int */ w = font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+        w = font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         isGroup = Channel->GroupSep();
         if (!isGroup) {
             buffer = cString::sprintf("%d", Channel->Number());
@@ -2437,8 +2437,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                         static_cast<int>(number + 1), *mediaPath,
                                         static_cast<int>(series.banners.size()));  // Log result
                         }
-                        // mediaWidth = cWidth / 2 - marginItem * 2;
-                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                         if (Config.TVScraperEPGInfoShowActors) {
                             ActorsSize = series.actors.size();
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
@@ -2477,8 +2475,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     movie.movieId = movieId;
                     if (pScraper->Service("GetMovie", &movie)) {
                         mediaPath = movie.poster.path.c_str();
-                        // mediaWidth = cWidth / 2 - marginItem * 3;
-                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                         if (Config.TVScraperEPGInfoShowActors) {
                             ActorsSize = movie.actors.size();
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
@@ -2706,13 +2702,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             contentHeadPixmap->DrawText(cPoint(left + maxWidth, marginItem + fontSmlHeight + fontHeight), "...",
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                         dotsWidth);
-            // left += maxWidth + dotsWidth;
         }
     } else {  // Shorttext fits into maxwidth
         contentHeadPixmap->DrawText(cPoint(left, marginItem + fontSmlHeight + fontHeight), *shortText,
                                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), fontSml,
                                     shortTextWidth);
-        // left += shortTextWidth;
     }
 
     DecorBorderDraw(chLeft, chTop, chWidth, chHeight, Config.decorBorderMenuContentHeadSize,
@@ -2737,7 +2731,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #ifdef DEBUGEPGTIME
     uint32_t tick7 = GetMsTicks();
     dsyslog("flatPlus: SetEvent total time: %d ms", tick7 - tick0);
-    // dsyslog("flatPlus: SetEvent time: %d", tick7);
 #endif
 }
 
@@ -2975,7 +2968,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
     cString mediaPath("");
-    int mediaWidth {0}, mediaHeight {0};
+    int mediaWidth {0}, mediaHeight {999};
     int mediaType {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
@@ -3012,7 +3005,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                                 static_cast<int>(series.banners.size()));  // Log result
                 }
                 mediaWidth = cWidth - marginItem * 2;
-                mediaHeight = 999;
                 mediaType = 1;
             }
         } else if (call.type == tMovie) {
@@ -3021,7 +3013,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             if (pScraper->Service("GetMovie", &movie)) {
                 mediaPath = movie.poster.path.c_str();
                 mediaWidth = cWidth / 2 - marginItem * 3;
-                mediaHeight = 999;
                 mediaType = 2;
             }
         }
@@ -3031,7 +3022,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     cString recImage("");
     if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
         mediaWidth = cWidth / 2 - marginItem * 3;
-        mediaHeight = 999;
         mediaType = 2;
         mediaPath = recImage;
     }
@@ -3455,8 +3445,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                         static_cast<int>(number + 1), *mediaPath,
                                         static_cast<int>(series.banners.size()));  // Log result
                         }
-                        // mediaWidth = cWidth / 2 - marginItem * 2;
-                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                         if (Config.TVScraperRecInfoShowActors) {
                             ActorsSize = series.actors.size();
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
@@ -3495,8 +3483,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     movie.movieId = movieId;
                     if (pScraper->Service("GetMovie", &movie)) {
                         mediaPath = movie.poster.path.c_str();
-                        // mediaWidth = cWidth / 2 - marginItem * /*3*/ 2;
-                        // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
                         if (Config.TVScraperRecInfoShowActors) {
                             ActorsSize = movie.actors.size();
                             actors_path.reserve(ActorsSize);  // Set capacity to size of actors
@@ -3533,11 +3519,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             cString recPath = cString::sprintf("%s", Recording->FileName());
             cString recImage("");
-            if (imgLoader.SearchRecordingPoster(*recPath, recImage)) {
-                // mediaWidth = cWidth / 2 - marginItem * 2;
-                // mediaHeight = cHeight - marginItem * 2 - fontHeight - 6;
+            if (imgLoader.SearchRecordingPoster(*recPath, recImage))
                 mediaPath = recImage;
-            }
         }  // FirstRun
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();

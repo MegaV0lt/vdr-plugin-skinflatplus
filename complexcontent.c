@@ -164,15 +164,9 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
              ++NumChars) {
         }
         std::string Text = text;
-        /* char *FloatedText = new char[NumChars + 1];
-        memset(FloatedText, '\0', NumChars + 1);
-        strncpy(FloatedText, text, NumChars); */
         cString FloatedText = cString::sprintf("%s", Text.substr(0, NumChars).c_str());  // From start to NumChars
 
         ++NumChars;
-        /* char *SecondText = new char[strlen(text) - NumChars + 2];
-        memset(SecondText, '\0', strlen(text) - NumChars + 2);
-        strncpy(SecondText, text + NumChars, strlen(text) - NumChars); */
         cString SecondText = cString::sprintf("%s", Text.substr(NumChars).c_str());  // From NumChars to the end
 
         cRect SecondTextPos;
@@ -183,9 +177,6 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
         AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
         AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-
-        // delete[] FloatedText;
-        // delete[] SecondText;
     }
 
     cRect ImagePos;

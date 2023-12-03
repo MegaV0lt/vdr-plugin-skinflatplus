@@ -467,12 +467,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int top = fontHeight * 2 + fontSmlHeight * 2 + marginItem;
     top += std::max(fontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2) - marginItem;
     int left = marginItem * 2;
-    /*
-    int progressTop = fontHeight*2 + fontSmlHeight*2 + marginItem;
-    progressTop += std::max(fontSmlHeight, Config.decorProgressSignalSize) / 2 - Config.decorProgressSignalSize / 2;
-    int progressTop = top;  // Allways the same!?
-    */
-
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     int progressLeft = left + SignalFont->Width("STR ") + marginItem;
@@ -486,8 +480,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     // left = signalWidth / 2 + marginItem;
     top += Config.decorProgressSignalSize + marginItem;
-    // progressTop = top;
-
     chanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     progressLeft = left + SignalFont->Width("STR ") + marginItem;
