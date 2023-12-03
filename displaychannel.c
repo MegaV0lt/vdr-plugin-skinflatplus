@@ -282,15 +282,16 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         int s = (time(NULL) - Present->StartTime()) / 60;
-        int sleft = (Present->Duration() / 60) - s;
+        int dur = Present->Duration() / 60;
+        int sleft = dur - s;
 
         cString seen("");
         if (Config.ChannelTimeLeft == 0)
-            seen = cString::sprintf("%d-/%d+ %d min", s, sleft, Present->Duration() / 60);
+            seen = cString::sprintf("%d-/%d+ %d min", s, sleft, dur);
         else if (Config.ChannelTimeLeft == 1)
-            seen = cString::sprintf("%d- %d min", s, Present->Duration() / 60);
+            seen = cString::sprintf("%d- %d min", s, dur);
         else if (Config.ChannelTimeLeft == 2)
-            seen = cString::sprintf("%d+ %d min", sleft, Present->Duration() / 60);
+            seen = cString::sprintf("%d+ %d min", sleft, dur);
 
         int seenWidth = fontSml->Width(*seen) + fontSml->Width("  ");
         int maxWidth = std::max(timeStringWidth, seenWidth);
@@ -396,8 +397,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         ChannelIconsDraw(CurChannel, false);
 
     cString mediaPath("");
-    int mediaWidth {0};
-    int mediaHeight {0};
+    int mediaWidth {0}, mediaHeight {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
@@ -598,8 +598,8 @@ void cFlatDisplayChannel::Flush(void) {
 
 void cFlatDisplayChannel::PreLoadImages(void) {
     int height = (fontHeight * 2) + (fontSmlHeight * 2) + marginItem - marginItem * 2;
-    imgLoader.LoadIcon("logo_background", height, height);
     int imageBGHeight {height}, imageBGWidth {height};
+    imgLoader.LoadIcon("logo_background", height, height);
 
     cImage *img = imgLoader.LoadIcon("logo_background", height * 1.34, height);
     if (img) {

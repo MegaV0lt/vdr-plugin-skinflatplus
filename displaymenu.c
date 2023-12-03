@@ -3831,8 +3831,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
         ComplexContent.SetScrollSize(fontHeight);
     }
 
-    bool Scrollable = false;
-    Scrollable = ComplexContent.Scrollable(Height - marginItem * 2);
+    bool Scrollable = ComplexContent.Scrollable(Height - marginItem * 2);
     if (Scrollable) {
         Width -= scrollBarWidth;
         ComplexContent.Clear();
