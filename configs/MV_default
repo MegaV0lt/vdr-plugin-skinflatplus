@@ -87,6 +87,7 @@ TVScraperChanInfoPosterSize = 0.010000
 TVScraperEPGInfoShowPoster = 1
 TVScraperRecInfoShowPoster = 1
 EpgRerunsShow = 0
+EpgFskGenreIconSize = 0.005000
 TVScraperEPGInfoShowActors = 1
 TVScraperRecInfoShowActors = 1
 MessageColorPosition = 1

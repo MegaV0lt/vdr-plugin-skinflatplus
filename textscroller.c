@@ -44,11 +44,10 @@ void cTextScroll::Draw(void) {
         size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
-            std::string second = tilde.substr(found + 1, tilde.length());
+            std::string second = tilde.substr(found + 1);  // Default end is npos
             rtrim(first);   // Trim possible space on right side
             ltrim(second);  // Trim possible space at begin
 
-            // Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             int l = Font->Width(first.c_str()) + Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);

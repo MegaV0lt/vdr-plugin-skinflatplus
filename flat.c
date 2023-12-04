@@ -66,32 +66,6 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-/* char *substr(char *string, int start, int end) {
-    char *p = &string[start];
-    // char *buf = (char*) malloc(strlen(p) + 1);
-    char *buf = reinterpret_cast<char*>(malloc(strlen(p) + 1));
-    char *ptr = buf;
-    if (!buf) return NULL;
-
-    while (*p != '\0' && start < end) {
-        *ptr++ = *p++;
-        ++start;
-    }
-    *ptr++ = '\0';
-
-    return buf;
-} */
-
-/* char *GetFilenameWithoutext(char *fullfilename) {
-    int i {0}, size {0};
-
-    while (fullfilename[i] != '\0') {
-        if (fullfilename[i] == '.') size = i;
-        ++i;
-    }
-    return substr(fullfilename, 0, size);
-} */
-
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
@@ -120,9 +94,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-// void PixmapFill(cPixmap *pixmap, tColor Color) {  // See flat.h
-//    if (pixmap) pixmap->Fill(Color);
-// }
+// void PixmapFill(cPixmap *pixmap, tColor Color);  // See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");

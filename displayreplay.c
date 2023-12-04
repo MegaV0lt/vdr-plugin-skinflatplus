@@ -271,32 +271,28 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
         Flush();
     }
 
-    if (modeOnly)
-        return;
+    if (modeOnly) return;
 
     ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
-    if (modeOnly)
-        return;
+    if (modeOnly) return;
 
     current = Current;
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
-    if (modeOnly)
-        return;
+    if (modeOnly) return;
 
     total = Total;
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::UpdateInfo(void) {
-    if (modeOnly)
-        return;
+    if (modeOnly) return;
 
     cString cutted("");
     bool iscutted = false;
@@ -405,8 +401,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         delete index;
 
         cString mediaPath("");
-        int mediaWidth {0};
-        int mediaHeight {0};
+        int mediaWidth {0}, mediaHeight {0};
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
@@ -670,8 +665,8 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     imgLoader.LoadIcon("play", fontHeight, fontHeight);
     imgLoader.LoadIcon("forward", fontHeight, fontHeight);
     imgLoader.LoadIcon("rewind_sel", fontHeight, fontHeight);
-    imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
     imgLoader.LoadIcon("pause_sel", fontHeight, fontHeight);
+    imgLoader.LoadIcon("play_sel", fontHeight, fontHeight);
     imgLoader.LoadIcon("forward_sel", fontHeight, fontHeight);
     imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
 
