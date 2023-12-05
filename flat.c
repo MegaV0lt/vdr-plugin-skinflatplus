@@ -10,6 +10,8 @@
 #include "displaytracks.h"
 #include "displayvolume.h"
 
+#include "services/epgsearch.h"
+
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
     sc_reserved        = 0x00,
@@ -233,4 +235,23 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         }  // switch
     }  // for
+}
+
+int GetEpgsearchConflichts(void) {
+    int numConflicts {0};
+    cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
+    if (pEpgSearch) {
+        Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
+        if (serviceData) {
+            serviceData->nextConflict = 0;
+            serviceData->relevantConflicts = 0;
+            serviceData->totalConflicts = 0;
+            pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
+            if (serviceData->relevantConflicts > 0) {
+                numConflicts = serviceData->relevantConflicts;
+            }
+            delete serviceData;
+        }
+    }  // pEpgSearch
+    return numConflicts;
 }

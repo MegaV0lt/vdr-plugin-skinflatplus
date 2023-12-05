@@ -14,7 +14,7 @@
 #endif
 
 #include "./flat.h"
-#include "services/epgsearch.h"
+/* #include "services/epgsearch.h" */
 
 cFlatBaseRender::cFlatBaseRender(void) {
     font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
@@ -418,7 +418,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int numConflicts {0};
         cImage *imgCon = NULL, *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
-            cPlugin *p = cPluginManager::GetPlugin("epgsearch");
+            /* cPlugin *p = cPluginManager::GetPlugin("epgsearch");
             if (p) {
                 Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
                 if (serviceData) {
@@ -431,7 +431,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
                     }
                     delete serviceData;
                 }
-            }
+            } */
+            numConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
             if (numConflicts) {
                 if (numConflicts < Config.TopBarRecConflictsHigh)
                     imgCon = imgLoader.LoadIcon("topbar_timerconflict_low", topBarFontHeight - marginItem * 2,
