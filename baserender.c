@@ -339,7 +339,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
-    cString curDate = DayDateTime();
+    cString buffer(""), curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
 
@@ -393,13 +393,13 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         time_t t = time(NULL);
         cString time = TimeString(t);
-        cString time2 = cString::sprintf("%s %s", *time, tr("clock"));
+        buffer = cString::sprintf("%s %s", *time, tr("clock"));
         if (Config.TopBarHideClockText)
-            time2 = cString::sprintf("%s", *time);
+            buffer = cString::sprintf("%s", *time);
 
-        int timeWidth = topBarFontClock->Width(*time2) + marginItem * 2;
+        int timeWidth = topBarFontClock->Width(*buffer) + marginItem * 2;
         int Right = TopBarWidth - timeWidth;
-        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *time2, Theme.Color(clrTopBarTimeFont),
+        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), topBarFontClock);
 
         cString weekday = WeekDayNameFull(t);
@@ -414,8 +414,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
 
-        int middleWidth {0};
-        int numConflicts {0};
+        int middleWidth {0}, numConflicts {0};
         cImage *imgCon = NULL, *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
             /* cPlugin *p = cPluginManager::GetPlugin("epgsearch");
@@ -442,12 +441,12 @@ void cFlatBaseRender::TopBarUpdate(void) {
                                                 topBarFontHeight - marginItem * 2);
 
                 if (imgCon) {
-                    cString Con = cString::sprintf("%d", numConflicts);
-                    Right -= imgCon->Width() + topBarFontSml->Width(*Con) + marginItem;
-                    middleWidth += imgCon->Width() + topBarFontSml->Width(*Con) + marginItem;
+                    buffer = cString::sprintf("%d", numConflicts);
+                    Right -= imgCon->Width() + topBarFontSml->Width(*buffer) + marginItem;
+                    middleWidth += imgCon->Width() + topBarFontSml->Width(*buffer) + marginItem;
                 }
             }
-        }
+        }  // Config.TopBarRecConflictsShow
 
         int numRec {0};
         if (Config.TopBarRecordingShow) {
@@ -470,12 +469,12 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 imgRec = imgLoader.LoadIcon("topbar_timer", topBarFontHeight - marginItem * 2,
                                             topBarFontHeight - marginItem * 2);
                 if (imgRec) {
-                    cString Rec = cString::sprintf("%d", numRec);
-                    Right -= imgRec->Width() + topBarFontSml->Width(*Rec) + marginItem;
-                    middleWidth += imgRec->Width() + topBarFontSml->Width(*Rec) + marginItem;
+                    buffer = cString::sprintf("%d", numRec);
+                    Right -= imgRec->Width() + topBarFontSml->Width(*buffer) + marginItem;
+                    middleWidth += imgRec->Width() + topBarFontSml->Width(*buffer) + marginItem;
                 }
             }
-        }
+        }  // Config.TopBarRecordingShow
 
         if (topBarExtraIconSet) {
             img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
@@ -535,10 +534,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
             int iconTop = (topBarFontHeight - imgRec->Height()) / 2;
             topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgRec);
             Right += imgRec->Width();
-            cString RecNum = cString::sprintf("%d", numRec);
-            topBarPixmap->DrawText(cPoint(Right, fontSmlTop), RecNum, Theme.Color(clrTopBarRecordingActiveFg),
+            buffer = cString::sprintf("%d", numRec);
+            topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarRecordingActiveFg),
                                    Theme.Color(clrTopBarRecordingActiveBg), topBarFontSml);
-            Right += topBarFontSml->Width(*RecNum) + marginItem;
+            Right += topBarFontSml->Width(*buffer) + marginItem;
         }
 
         if (numConflicts && imgCon) {
@@ -546,14 +545,14 @@ void cFlatBaseRender::TopBarUpdate(void) {
             topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgCon);
             Right += imgCon->Width();
 
-            cString ConNum = cString::sprintf("%d", numConflicts);
+            buffer = cString::sprintf("%d", numConflicts);
             if (numConflicts < Config.TopBarRecConflictsHigh)
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), ConNum, Theme.Color(clrTopBarConflictLowFg),
+                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarConflictLowFg),
                                        Theme.Color(clrTopBarConflictLowBg), topBarFontSml);
             else
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), ConNum, Theme.Color(clrTopBarConflictHighFg),
+                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarConflictHighFg),
                                        Theme.Color(clrTopBarConflictHighBg), topBarFontSml);
-            Right += topBarFontSml->Width(*ConNum) + marginItem;
+            Right += topBarFontSml->Width(*buffer) + marginItem;
         }
 
         if (topBarMenuIconRightSet) {
@@ -772,15 +771,15 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     tColor col = Theme.Color(clrMessageInfo);
     cString icon("message_info");
     switch (Type) {
-    case mtStatus:
-        col = Theme.Color(clrMessageStatus);
-        icon = "message_status";
-        break;
-    case mtInfo: [[likely]]  // Already preset
+    case mtInfo: // Already preset
         break;
     case mtWarning:
         col = Theme.Color(clrMessageWarning);
         icon = "message_warning";
+        break;
+    case mtStatus:
+        col = Theme.Color(clrMessageStatus);
+        icon = "message_status";
         break;
     case mtError:
         col = Theme.Color(clrMessageError);
@@ -909,8 +908,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                                          int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
                                          bool SetBackground, bool isSignal) {
     int Middle = rect.Height() / 2;
-
-    double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
+    double percentLeft = Current * 1.0 / Total;
 
     if (PixmapBg && SetBackground)
         PixmapBg->DrawRectangle(rectBg, ColorBg);
@@ -1729,7 +1727,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
     if (!rc) {
         rc = FT_New_Face(library, *fontFileName, 0, &face);
         if (!rc) {
-            if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
+            if (face->num_fixed_sizes && face->available_sizes) {  // Fixed font
                 // TODO what exactly does all this mean?
                 Ascender = face->available_sizes->height;
             } else {
