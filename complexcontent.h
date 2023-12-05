@@ -148,11 +148,11 @@ class cComplexContent {
 
     tColor ColorBg;
 
-    bool FullFillBackground;
-    int DrawPortHeight;
-    int ScrollSize;
-    bool isShown;
-    bool isScrollingActive;
+    bool g_FullFillBackground;  // g_* for global variables
+    int g_DrawPortHeight;
+    int g_ScrollSize;
+    bool g_IsShown;
+    bool g_IsScrollingActive;
 
     cOsd *Osd;
 
@@ -165,7 +165,7 @@ class cComplexContent {
 
     void SetOsd(cOsd *osd) { Osd = osd; }
     void SetPosition(cRect position) { Position = position; }
-    void SetScrollSize(int scrollSize) { ScrollSize = scrollSize; }
+    void SetScrollSize(int scrollSize) { g_ScrollSize = scrollSize; }
     void SetBGColor(tColor colorBg) { ColorBg = colorBg; }
     void CreatePixmaps(bool fullFillBackground);
 
@@ -184,7 +184,7 @@ class cComplexContent {
      int ScrollShown(void);
     bool Scroll(bool Up, bool Page);
     double ScrollbarSize(void);
-    void SetScrollingActive(bool active) { isScrollingActive = active; }
+    void SetScrollingActive(bool active) { g_IsScrollingActive = active; }
 
     int Height(void) { return Position.Height(); }
     int ContentHeight(bool Full);
@@ -193,6 +193,6 @@ class cComplexContent {
 
     int Top(void) { return Position.Top(); }
     void Draw();
-    bool IsShown(void) { return isShown; }
-    bool IsScrollingActive(void) { return isScrollingActive; }
+    bool IsShown(void) { return g_IsShown; }
+    bool IsScrollingActive(void) { return g_IsScrollingActive; }
 };

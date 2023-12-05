@@ -1,14 +1,14 @@
 #pragma once
 
 #include <vdr/status.h>
-#include "baserender.h"
-#include "flat.h"
+#include "./baserender.h"
+#include "./flat.h"
 #include "services/scraper2vdr.h"
 #include "services/dvbapi.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  private:
-        bool doOutput;
+        bool g_DoOutput;
         const cEvent *present;
 
         int channelWidth, channelHeight;

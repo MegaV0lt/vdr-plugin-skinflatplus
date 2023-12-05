@@ -1,16 +1,16 @@
 #include <vdr/osd.h>
 #include <vdr/menu.h>
+#include <memory>
 
-#include "flat.h"
+#include "./flat.h"
 
-#include "displaychannel.h"
-#include "displaymenu.h"
-#include "displaymessage.h"
-#include "displayreplay.h"
-#include "displaytracks.h"
-#include "displayvolume.h"
+#include "./displaychannel.h"
+#include "./displaymenu.h"
+#include "./displaymessage.h"
+#include "./displayreplay.h"
+#include "./displaytracks.h"
+#include "./displayvolume.h"
 
-#include "services/epgsearch.h"
 
 #include "services/epgsearch.h"
 
@@ -31,9 +31,9 @@ class cFlatConfig Config;
 class cImageCache imgCache;
 
 cTheme Theme;
-static bool menuActive = false;
-bool firstDisplay = true;
-time_t remoteTimersLastRefresh = 0;
+static bool g_MenuActive = false;
+bool g_FirstDisplay = true;
+time_t g_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
     displayMenu = NULL;
@@ -50,10 +50,24 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
 cSkinDisplayMenu *cFlat::DisplayMenu(void) {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
     displayMenu = menu;
-    menuActive = true;
+    g_MenuActive = true;
     return menu;
 }
+/*
+// shared_ptr ist der bequemere Smart Pointer, vllt ist std::unique_ptr die bessere Alternative
+std::shared_ptr<cSkinDisplayChannel> cFlat::DisplayChannel(bool WithInfo) {
+    return std::make_shared<cFlatDisplayChannel>(WithInfo);
+}
 
+std::shared_ptr<cOsdItem> cMenuSetupSubMenu::InfoItem(const char *label, const char *value) {
+    // was ist wenn, min. einer der beiden Parameter nullptr ist?
+    std::shared_ptr<cOsdItem> retval = std::make_shared<cOsdItem>(cString::sprintf("%s: %s", label, value));
+    retval->SetSelectable(false);
+    g_MenuActive = true;
+    displayMenu = retval;
+    return retval;
+}
+*/
 cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) {
     return new cFlatDisplayReplay(ModeOnly);
 }
@@ -98,7 +112,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-// void PixmapFill(cPixmap *pixmap, tColor Color);  // See flat.h
+// void inline PixmapFill(cPixmap *pixmap, tColor Color);  // See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
@@ -182,7 +196,7 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     return "recording_seen_10";
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {  // NOLINT
     cString audio_type("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);

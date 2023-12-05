@@ -2,12 +2,12 @@
 #include "flat.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
-    if (firstDisplay) {
-        firstDisplay = false;
-        doOutput = false;
+    if (g_FirstDisplay) {
+        g_FirstDisplay = false;
+        g_DoOutput = false;
         return;
     } else
-        doOutput = true;
+        g_DoOutput = true;
 
     present = NULL;
     channelName = "";
@@ -111,7 +111,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     if (osd) {
         scrollers.Clear();
@@ -132,7 +132,7 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     isRecording = false;
     PixmapFill(chanIconsPixmap, clrTransparent);
@@ -189,7 +189,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     // if (!Resolution)
         PixmapFill(chanIconsPixmap, clrTransparent);
@@ -244,7 +244,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     present = Present;
     cString epgShort("");
@@ -446,13 +446,13 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
@@ -499,7 +499,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     // dsyslog("flatPlus: DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
@@ -559,7 +559,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 }
 
 void cFlatDisplayChannel::Flush(void) {
-    if (!doOutput) return;
+    if (!g_DoOutput) return;
 
     int Current {0}, Total {0};
     if (present) {

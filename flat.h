@@ -17,9 +17,9 @@
 
 extern class cFlatConfig Config;
 extern class cImageCache imgCache;
-extern bool firstDisplay;
+extern bool g_FirstDisplay;
 
-extern time_t remoteTimersLastRefresh;
+extern time_t g_RemoteTimersLastRefresh;
 
 class cFlatDisplayMenu;
 extern cTheme Theme;
@@ -234,27 +234,22 @@ cString GetFormatIcon(int screenWidth);
 cString GetRecordingerrorIcon(int recInfoErrors);
 cString GetRecordingseenIcon(int frameTotal, int frameResume);
 
-// Trim from left
 inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
-    s.erase(0, s.find_first_not_of(t));
+    s.erase(0, s.find_first_not_of(t));  // Trim from left
     // return s;  // Only inplace trimming
 }
 
-// Trim from right
 inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {
-    s.erase(s.find_last_not_of(t) + 1);
+    s.erase(s.find_last_not_of(t) + 1);  // Trim from right
     // return s;  // Only inplace trimming
 }
 
-// Trim from left & right
 inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
-    /* return */ // ltrim(rtrim(s, t), t);
-    ltrim(s, t);
+    ltrim(s, t);  // Trim from left & right
     rtrim(s, t);
+    /* return */  // ltrim(rtrim(s, t), t);
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,
                       cString &Subtitle, bool NewLine = false);
-// void GetRecSize(const cRecording *Recording, uint64_t &recsize);
-
 int GetEpgsearchConflichts(void);

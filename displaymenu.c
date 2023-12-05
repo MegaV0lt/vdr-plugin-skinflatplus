@@ -4404,8 +4404,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     time_t now = time(NULL);
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
-        pRemoteTimers && (now - remoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
-        remoteTimersLastRefresh = now;
+        pRemoteTimers && (now - g_RemoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
+        g_RemoteTimersLastRefresh = now;
         cString errorMsg("");
         pRemoteTimers->Service("RemoteTimers::RefreshTimers-v1.0", &errorMsg);
     }
