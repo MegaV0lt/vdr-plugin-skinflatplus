@@ -256,3 +256,5 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,
                       cString &Subtitle, bool NewLine = false);
 // void GetRecSize(const cRecording *Recording, uint64_t &recsize);
+
+int GetEpgsearchConflichts(void);

@@ -4677,7 +4677,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     ContentTop += 6;
 
     int numConflicts {0};
-    cPlugin *p = cPluginManager::GetPlugin("epgsearch");
+    /* cPlugin *p = cPluginManager::GetPlugin("epgsearch");
     if (p) {
         Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
         if (serviceData) {
@@ -4690,7 +4690,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
 
             delete serviceData;
         }
-    }
+    } */
+    numConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
     if (numConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty) {
         return 0;
     } else if (numConflicts == 0) {
