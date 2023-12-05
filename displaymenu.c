@@ -518,14 +518,12 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
-        if (Selectable) {
-            ib.ColorFg = Config.decorBorderMenuItemSelFg;
-            ib.ColorBg = Config.decorBorderMenuItemSelBg;
-        } else {
-            ib.ColorFg = Config.decorBorderMenuItemFg;
-            ib.ColorBg = Config.decorBorderMenuItemBg;
-        }
+        ib.ColorFg = Config.decorBorderMenuItemFg;
+        ib.ColorBg = Config.decorBorderMenuItemBg;
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
@@ -901,14 +899,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
-        if (Selectable) {
-            ib.ColorFg = Config.decorBorderMenuItemSelFg;
-            ib.ColorBg = Config.decorBorderMenuItemSelBg;
-        } else {
-            ib.ColorFg = Config.decorBorderMenuItemFg;
-            ib.ColorBg = Config.decorBorderMenuItemBg;
-        }
+        ib.ColorFg = Config.decorBorderMenuItemFg;
+        ib.ColorBg = Config.decorBorderMenuItemBg;
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
@@ -1296,14 +1292,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
-        if (Selectable) {
-            ib.ColorFg = Config.decorBorderMenuItemSelFg;
-            ib.ColorBg = Config.decorBorderMenuItemSelBg;
-        } else {
-            ib.ColorFg = Config.decorBorderMenuItemFg;
-            ib.ColorBg = Config.decorBorderMenuItemBg;
-        }
+        ib.ColorFg = Config.decorBorderMenuItemFg;
+        ib.ColorBg = Config.decorBorderMenuItemBg;
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
@@ -1718,14 +1712,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
-        if (Selectable) {
-            ib.ColorFg = Config.decorBorderMenuItemSelFg;
-            ib.ColorBg = Config.decorBorderMenuItemSelBg;
-        } else {
-            ib.ColorFg = Config.decorBorderMenuItemFg;
-            ib.ColorBg = Config.decorBorderMenuItemBg;
-        }
+        ib.ColorFg = Config.decorBorderMenuItemFg;
+        ib.ColorBg = Config.decorBorderMenuItemBg;
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
@@ -2176,14 +2168,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
-        if (Selectable) {
-            ib.ColorFg = Config.decorBorderMenuItemSelFg;
-            ib.ColorBg = Config.decorBorderMenuItemSelBg;
-        } else {
-            ib.ColorFg = Config.decorBorderMenuItemFg;
-            ib.ColorBg = Config.decorBorderMenuItemBg;
-        }
+        ib.ColorFg = Config.decorBorderMenuItemFg;
+        ib.ColorBg = Config.decorBorderMenuItemBg;
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
