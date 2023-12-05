@@ -12,6 +12,8 @@
 
 #include "services/epgsearch.h"
 
+#include "services/epgsearch.h"
+
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
     sc_reserved        = 0x00,
