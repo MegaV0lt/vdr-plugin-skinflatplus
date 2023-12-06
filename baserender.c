@@ -179,9 +179,9 @@ void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
-    topBarTitleExtra1 = extra1;
-    topBarTitleExtra2 = extra2;
+void cFlatBaseRender::TopBarSetTitleExtra(cString Extra1, cString Extra2) {
+    topBarTitleExtra1 = Extra1;
+    topBarTitleExtra2 = Extra2;
     topBarUpdateTitle = true;
 }
 
@@ -234,20 +234,20 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
     cString IconName("");
-    cString extra1(""), extra2("");
+    cString Extra1(""), Extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
         if (Config.DiskUsageShort == false) {     // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
+            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
+                Extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
                                           FreeMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
-            extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
+            Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
+            Extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
         }
         switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
@@ -287,17 +287,17 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         double OccupiedGB = AllGB - FreeGB;
         int OccupiedMinutes = AllMinutes - FreeMinutes;
         if (Config.DiskUsageShort == false) {  // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                extra2 =
+                Extra2 =
                     cString::sprintf("%.1f GB ~%02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-            extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
+            Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+            Extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
         switch (DiskUsagePercent) {  // show used space
         case 0 ... 3: IconName = "chart1"; break;  // 3,125
@@ -334,7 +334,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         case 98 ... 100: IconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
-    TopBarSetTitleExtra(*extra1, *extra2);
+    TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
 }
 // Should be called with every "Flush"!
@@ -494,9 +494,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }
 
-        int extra1Width = topBarFontSml->Width(*topBarTitleExtra1);
-        int extra2Width = topBarFontSml->Width(*topBarTitleExtra2);
-        int extraMaxWidth = std::max(extra1Width, extra2Width);
+        int Extra1Width = topBarFontSml->Width(*topBarTitleExtra1);
+        int Extra2Width = topBarFontSml->Width(*topBarTitleExtra2);
+        int extraMaxWidth = std::max(Extra1Width, Extra2Width);
         middleWidth += extraMaxWidth;
         Right -= extraMaxWidth + marginItem;
 
