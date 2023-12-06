@@ -685,15 +685,15 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 #endif
     int w = font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     int w = font->Width("9999");  // At least four digits in channellist because of different sortmodes
-    cString buffer("");
+    cString Buffer("");
     if (!isGroup) {
-        buffer = cString::sprintf("%d", Channel->Number());
-        Width = font->Width(*buffer);
+        Buffer = cString::sprintf("%d", Channel->Number());
+        Width = font->Width(*Buffer);
     }
 
     if (Width < w) Width = w;  // Minimal width for channelnumber
 
-    menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
+    menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
     Left += Width + marginItem;
 
     int imageHeight = fontHeight;
@@ -783,24 +783,24 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     }
 
     if (WithProvider)
-        buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
+        Buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
     else
-        buffer = cString::sprintf("%s", Channel->Name());
+        Buffer = cString::sprintf("%s", Channel->Name());
 
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = menuItemWidth - LeftName;
         if (isGroup) {
             int lineTop = Top + (fontHeight - 3) / 2;
             menuPixmap->DrawRectangle(cRect(Left, lineTop, menuItemWidth - Left, 3), ColorFg);
-            cString groupname = cString::sprintf(" %s ", *buffer);
+            cString groupname = cString::sprintf(" %s ", *Buffer);
             menuPixmap->DrawText(cPoint(Left + (menuItemWidth / 10 * 2), Top), *groupname, ColorFg, ColorBg, font, 0, 0,
                                  taCenter);
         } else {
-            if (Current && font->Width(*buffer) > (Width) && Config.ScrollerEnable) {
-                menuItemScroller.AddScroller(*buffer, cRect(LeftName, Top + menuTop, Width, fontHeight), ColorFg,
+            if (Current && font->Width(*Buffer) > (Width) && Config.ScrollerEnable) {
+                menuItemScroller.AddScroller(*Buffer, cRect(LeftName, Top + menuTop, Width, fontHeight), ColorFg,
                                              clrTransparent, font);
             } else {
-                menuPixmap->DrawText(cPoint(LeftName, Top), *buffer, ColorFg, ColorBg, font, Width);
+                menuPixmap->DrawText(cPoint(LeftName, Top), *Buffer, ColorFg, ColorBg, font, Width);
             }
         }
     } else {  // flatPlus short
@@ -814,15 +814,15 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         if (isGroup) {
             int lineTop = Top + (fontHeight - 3) / 2;
             menuPixmap->DrawRectangle(cRect(Left, lineTop, menuItemWidth - Left, 3), ColorFg);
-            cString groupname = cString::sprintf(" %s ", *buffer);
+            cString groupname = cString::sprintf(" %s ", *Buffer);
             menuPixmap->DrawText(cPoint(Left + (menuItemWidth / 10 * 2), Top), *groupname, ColorFg, ColorBg, font, 0, 0,
                                  taCenter);
         } else {
-            if (Current && font->Width(*buffer) > (Width) && Config.ScrollerEnable) {
-                menuItemScroller.AddScroller(*buffer, cRect(LeftName, Top + menuTop, Width, fontHeight), ColorFg,
+            if (Current && font->Width(*Buffer) > (Width) && Config.ScrollerEnable) {
+                menuItemScroller.AddScroller(*Buffer, cRect(LeftName, Top + menuTop, Width, fontHeight), ColorFg,
                                              clrTransparent, font);
             } else {
-                menuPixmap->DrawText(cPoint(LeftName, Top), *buffer, ColorFg, ColorBg, font, Width);
+                menuPixmap->DrawText(cPoint(LeftName, Top), *Buffer, ColorFg, ColorBg, font, Width);
             }
 
             Left += Width + marginItem;
@@ -1130,11 +1130,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 #endif
     int w = font->Width(ws); */
     int w = font->Width("999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-    cString buffer = cString::sprintf("%d", Channel->Number());
-    int Width = font->Width(*buffer);
+    cString Buffer = cString::sprintf("%d", Channel->Number());
+    int Width = font->Width(*Buffer);
     if (Width < w) Width = w;  // Minimal width for channelnumber
 
-    menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
+    menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, Width, fontHeight, taRight);
     Left += Width + marginItem;
 
     imageLeft = Left;
@@ -1199,9 +1199,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         struct tm tm_r;
         time_t Day = Timer->Day();
         localtime_r(&Day, &tm_r);
-        char buffer[16];
-        strftime(buffer, sizeof(buffer), "%Y%m%d", &tm_r);
-        day = buffer;
+        char Buffer[16];
+        strftime(Buffer, sizeof(Buffer), "%Y%m%d", &tm_r);
+        day = Buffer;
     }
     const char *File = Setup.FoldersInTimerMenu ? NULL : strrchr(Timer->File(), FOLDERDELIMCHAR);
     if (File && strcmp(File + 1, TIMERMACRO_TITLE) && strcmp(File + 1, TIMERMACRO_EPISODE))
@@ -1210,12 +1210,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         File = Timer->File();
 
     if (Config.MenuTimerView == 1) {  // flatPlus long
-        buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
-        menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
+        Buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
+        menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
         Left += font->Width("XXX 99.  ");
-        buffer = cString::sprintf("%02d:%02d - %02d:%02d", Timer->Start() / 100, Timer->Start() % 100,
+        Buffer = cString::sprintf("%02d:%02d - %02d:%02d", Timer->Start() / 100, Timer->Start() % 100,
                                   Timer->Stop() / 100, Timer->Stop() % 100);
-        menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
+        menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
         Left += font->Width("99:99 - 99:99  ");
 
         if (Current && font->Width(File) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
@@ -1246,9 +1246,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             }
         }
     } else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus long + EPG, flatPlus short
-        buffer = cString::sprintf("%s%s%s.  %02d:%02d - %02d:%02d", *name, *name && **name ? " " : "", *day,
+        Buffer = cString::sprintf("%s%s%s.  %02d:%02d - %02d:%02d", *name, *name && **name ? " " : "", *day,
                                   Timer->Start() / 100, Timer->Start() % 100, Timer->Stop() / 100, Timer->Stop() % 100);
-        menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
+        menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
 
         if (Current && fontSml->Width(File) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
             menuItemScroller.AddScroller(File,
@@ -1359,7 +1359,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (!Channel)
         TopBarSetMenuLogo(ItemEventLastChannelName);
 
-    cString buffer("");
+    cString Buffer("");
     cImage *img = NULL;
     if (Channel) {
         if (Current)
@@ -1376,11 +1376,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         w = font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         isGroup = Channel->GroupSep();
         if (!isGroup) {
-            buffer = cString::sprintf("%d", Channel->Number());
-            int Width = font->Width(*buffer);  // w is used here for calculation of width
+            Buffer = cString::sprintf("%d", Channel->Number());
+            int Width = font->Width(*Buffer);  // w is used here for calculation of width
             if (Width > w) w = Width;  // Minimal width for channelnumber in Event (epgSearch)
 
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, w, fontHeight, taRight);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, w, fontHeight, taRight);
         }
         Left += w + marginItem;
 
@@ -1587,10 +1587,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             // flatPlus short, flatPlus short + EPG
             if (Current) {
                 if (!isempty(*ShortText)) {
-                    buffer = cString::sprintf("%s~%s", *Title, *ShortText);
-                    if (fontSml->Width(*buffer) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    Buffer = cString::sprintf("%s~%s", *Title, *ShortText);
+                    if (fontSml->Width(*Buffer) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            *buffer, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight),
+                            *Buffer, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontSmlHeight),
                             ColorFg, clrTransparent, fontSml, ColorExtraTextFg);
                     } else {
                         menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, fontSml,
@@ -1643,10 +1643,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         } else {
             if (Current) {
                 if (!isempty(*ShortText)) {
-                    buffer = cString::sprintf("%s~%s", *Title, *ShortText);
-                    if (font->Width(*buffer) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
+                    Buffer = cString::sprintf("%s~%s", *Title, *ShortText);
+                    if (font->Width(*Buffer) > (menuItemWidth - Left - marginItem) && Config.ScrollerEnable) {
                         menuItemScroller.AddScroller(
-                            *buffer, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight), ColorFg,
+                            *Buffer, cRect(Left, Top + menuTop, menuItemWidth - Left - marginItem, fontHeight), ColorFg,
                             clrTransparent, font, ColorExtraTextFg);
                     } else {
                         menuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, font,
@@ -1822,7 +1822,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int Top = y;
 
-    cString buffer(""), IconName("");
+    cString Buffer(""), IconName("");
     cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img = NULL;
     if (Config.MenuRecordingView == 1) {  // flatPlus long
@@ -1841,12 +1841,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             int Minutes = (Recording->LengthInSeconds() + 30) / 60;
             cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
-            buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
+            Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
 
-            Left += font->Width(*buffer);
+            Left += font->Width(*Buffer);
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             int recordingIsInUse = Recording->IsInUse();
@@ -1928,8 +1928,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += img->Width() + marginItem;
             }
 
-            buffer = cString::sprintf("%d  ", Total);
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, font->Width("  999"), fontHeight,
+            Buffer = cString::sprintf("%d  ", Total);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, font->Width("  999"), fontHeight,
                                  taLeft);
             Left += font->Width("  999 ");
 
@@ -1937,13 +1937,13 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecNew);
 
             Left += imgRecNew->Width() + marginItem;
-            buffer = cString::sprintf("%d", New);
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
+            Buffer = cString::sprintf("%d", New);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, font, menuItemWidth - Left - marginItem);
             Left += font->Width(" 999 ");
             if (Config.MenuItemRecordingShowFolderDate != 0) {
-                buffer = cString::sprintf("(%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
-                menuPixmap->DrawText(cPoint(LeftWidth - font->Width(buffer) - fontHeight * 2 - marginItem * 2, Top),
-                                     *buffer, ColorExtraTextFg, ColorBg, font);
+                Buffer = cString::sprintf("(%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+                menuPixmap->DrawText(cPoint(LeftWidth - font->Width(Buffer) - fontHeight * 2 - marginItem * 2, Top),
+                                     *Buffer, ColorExtraTextFg, ColorBg, font);
                 if (isRecordingOld(Recording, Level)) {
                     Left = LeftWidth - fontHeight * 2 - marginItem * 2;
                     img = NULL;
@@ -2015,11 +2015,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             int Minutes = (Recording->LengthInSeconds() + 30) / 60;
             cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
-            buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
+            Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
             Top += fontHeight;
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, fontSml,
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, fontSml,
                                  menuItemWidth - Left - marginItem);
 
             Top -= fontHeight;
@@ -2106,8 +2106,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 
             Top += fontHeight;
-            buffer = cString::sprintf("  %d", Total);
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, fontSml, fontSml->Width("  9999"),
+            Buffer = cString::sprintf("  %d", Total);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, fontSml, fontSml->Width("  9999"),
                                  fontSmlHeight, taRight);
             Left += fontSml->Width("  9999 ");
 
@@ -2115,16 +2115,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 menuIconsPixmap->DrawImage(cPoint(Left, Top), *imgRecNewSml);
 
             Left += imgRecNewSml->Width() + marginItem;
-            buffer = cString::sprintf("%d", New);
-            menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorFg, ColorBg, fontSml,
+            Buffer = cString::sprintf("%d", New);
+            menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, fontSml,
                                  menuItemWidth - Left - marginItem);
             Left += fontSml->Width(" 999 ");
 
             if (Config.MenuItemRecordingShowFolderDate != 0) {
-                buffer = cString::sprintf("  (%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
-                menuPixmap->DrawText(cPoint(Left, Top), *buffer, ColorExtraTextFg, ColorBg, fontSml);
+                Buffer = cString::sprintf("  (%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+                menuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, fontSml);
                 if (isRecordingOld(Recording, Level)) {
-                    Left += fontSml->Width(*buffer);
+                    Left += fontSml->Width(*Buffer);
                     img = NULL;
                     if (Current)
                         img = imgLoader.LoadIcon("recording_old_cur", fontSmlHeight, fontSmlHeight);

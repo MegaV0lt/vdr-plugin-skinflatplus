@@ -339,7 +339,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
-    cString buffer(""), curDate = DayDateTime();
+    cString Buffer(""), curDate = DayDateTime();
     int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
 
@@ -393,13 +393,13 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         time_t t = time(NULL);
         cString time = TimeString(t);
-        buffer = cString::sprintf("%s %s", *time, tr("clock"));
+        Buffer = cString::sprintf("%s %s", *time, tr("clock"));
         if (Config.TopBarHideClockText)
-            buffer = cString::sprintf("%s", *time);
+            Buffer = cString::sprintf("%s", *time);
 
-        int timeWidth = topBarFontClock->Width(*buffer) + marginItem * 2;
+        int timeWidth = topBarFontClock->Width(*Buffer) + marginItem * 2;
         int Right = TopBarWidth - timeWidth;
-        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *buffer, Theme.Color(clrTopBarTimeFont),
+        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), topBarFontClock);
 
         cString weekday = WeekDayNameFull(t);
@@ -441,9 +441,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
                                                 topBarFontHeight - marginItem * 2);
 
                 if (imgCon) {
-                    buffer = cString::sprintf("%d", numConflicts);
-                    Right -= imgCon->Width() + topBarFontSml->Width(*buffer) + marginItem;
-                    middleWidth += imgCon->Width() + topBarFontSml->Width(*buffer) + marginItem;
+                    Buffer = cString::sprintf("%d", numConflicts);
+                    Right -= imgCon->Width() + topBarFontSml->Width(*Buffer) + marginItem;
+                    middleWidth += imgCon->Width() + topBarFontSml->Width(*Buffer) + marginItem;
                 }
             }
         }  // Config.TopBarRecConflictsShow
@@ -469,9 +469,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 imgRec = imgLoader.LoadIcon("topbar_timer", topBarFontHeight - marginItem * 2,
                                             topBarFontHeight - marginItem * 2);
                 if (imgRec) {
-                    buffer = cString::sprintf("%d", numRec);
-                    Right -= imgRec->Width() + topBarFontSml->Width(*buffer) + marginItem;
-                    middleWidth += imgRec->Width() + topBarFontSml->Width(*buffer) + marginItem;
+                    Buffer = cString::sprintf("%d", numRec);
+                    Right -= imgRec->Width() + topBarFontSml->Width(*Buffer) + marginItem;
+                    middleWidth += imgRec->Width() + topBarFontSml->Width(*Buffer) + marginItem;
                 }
             }
         }  // Config.TopBarRecordingShow
@@ -534,10 +534,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
             int iconTop = (topBarFontHeight - imgRec->Height()) / 2;
             topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgRec);
             Right += imgRec->Width();
-            buffer = cString::sprintf("%d", numRec);
-            topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarRecordingActiveFg),
+            Buffer = cString::sprintf("%d", numRec);
+            topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *Buffer, Theme.Color(clrTopBarRecordingActiveFg),
                                    Theme.Color(clrTopBarRecordingActiveBg), topBarFontSml);
-            Right += topBarFontSml->Width(*buffer) + marginItem;
+            Right += topBarFontSml->Width(*Buffer) + marginItem;
         }
 
         if (numConflicts && imgCon) {
@@ -545,14 +545,14 @@ void cFlatBaseRender::TopBarUpdate(void) {
             topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgCon);
             Right += imgCon->Width();
 
-            buffer = cString::sprintf("%d", numConflicts);
+            Buffer = cString::sprintf("%d", numConflicts);
             if (numConflicts < Config.TopBarRecConflictsHigh)
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarConflictLowFg),
+                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *Buffer, Theme.Color(clrTopBarConflictLowFg),
                                        Theme.Color(clrTopBarConflictLowBg), topBarFontSml);
             else
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *buffer, Theme.Color(clrTopBarConflictHighFg),
+                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *Buffer, Theme.Color(clrTopBarConflictHighFg),
                                        Theme.Color(clrTopBarConflictHighBg), topBarFontSml);
-            Right += topBarFontSml->Width(*buffer) + marginItem;
+            Right += topBarFontSml->Width(*Buffer) + marginItem;
         }
 
         if (topBarMenuIconRightSet) {

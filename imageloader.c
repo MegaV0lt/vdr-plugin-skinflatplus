@@ -224,8 +224,8 @@ void cImageLoader::toLowerCase(std::string &str) {
 }
 
 bool cImageLoader::FileExits(const std::string &name) {
-    struct stat buffer;
-    return (stat (name.c_str(), &buffer) == 0);
+    struct stat Buffer;
+    return (stat (name.c_str(), &Buffer) == 0);
 }
 
 bool cImageLoader::SearchRecordingPoster(cString recPath, cString &found) {
