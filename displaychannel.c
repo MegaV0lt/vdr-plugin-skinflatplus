@@ -209,10 +209,10 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     }
 
     if (Resolution && !isRadioChannel && screenWidth > 0) {
-        cString iconName("");
+        cString IconName("");
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
-            iconName = GetAspectIcon(screenWidth, screenAspect);
-            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
+            IconName = GetAspectIcon(screenWidth, screenAspect);
+            img = imgLoader.LoadIcon(*IconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
@@ -220,8 +220,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= marginItem * 2;
             }
 
-            iconName = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
-            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
+            IconName = GetScreenResolutionIcon(screenWidth, screenHeight, screenAspect);  // Show Resolution
+            img = imgLoader.LoadIcon(*IconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
@@ -231,8 +231,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
-            iconName = GetFormatIcon(screenWidth);  // Show Format
-            img = imgLoader.LoadIcon(*iconName, 999, fontSmlHeight);
+            IconName = GetFormatIcon(screenWidth);  // Show Format
+            img = imgLoader.LoadIcon(*IconName, 999, fontSmlHeight);
             if (img) {
                 imageTop = top + (fontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
@@ -537,14 +537,14 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
                                    dvbapiInfoFont->Width(*dvbapiInfoText) * 2);
     left += dvbapiInfoFont->Width(*dvbapiInfoText) + marginItem;
 
-    cString iconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
+    cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
+    cImage *img = imgLoader.LoadIcon(*IconName, 999, dvbapiInfoFont->Height());
     if (img) {
         chanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + marginItem;
     } else {
-        iconName = "crypt_unknown";
-        img = imgLoader.LoadIcon(*iconName, 999, dvbapiInfoFont->Height());
+        IconName = "crypt_unknown";
+        img = imgLoader.LoadIcon(*IconName, 999, dvbapiInfoFont->Height());
         if (img) {
             chanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + marginItem;

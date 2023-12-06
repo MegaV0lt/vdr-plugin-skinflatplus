@@ -1091,21 +1091,21 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int imageLeft = Left;
     int imageTop = Top;
 
-    cString iconName("");
+    cString IconName("");
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
-        iconName = (Current) ? "timerInactive_cur" : "timerInactive";
+        IconName = (Current) ? "timerInactive_cur" : "timerInactive";
 
         ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
     } else if (Timer->Recording()) {  // Active timer and recording
-        iconName = "timerRecording";
+        IconName = "timerRecording";
         ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else if (Timer->FirstDay()) {  // Active timer 'FirstDay'
-        iconName = "text_arrowturn";
+        IconName = "text_arrowturn";
         // ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
     } else  // Active timer
-        iconName = "timerActive";
+        IconName = "timerActive";
 
-    cImage *img = imgLoader.LoadIcon(*iconName, imageHeight, imageHeight);
+    cImage *img = imgLoader.LoadIcon(*IconName, imageHeight, imageHeight);
     if (img) {
         imageTop = Top + (fontHeight - img->Height()) / 2;
         menuIconsPixmap->DrawImage(cPoint(imageLeft, imageTop), *img);
@@ -1822,7 +1822,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Left = Config.decorBorderMenuItemSize + marginItem;
     int Top = y;
 
-    cString buffer(""), iconName("");
+    cString buffer(""), IconName("");
     cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img = NULL;
     if (Config.MenuRecordingView == 1) {  // flatPlus long
@@ -1873,15 +1873,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20108
             else /* if (!recordingIsInUse) */ {
-                iconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = NULL;
                 if (Current) {
-                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
-                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
+                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    img = imgLoader.LoadIcon(*IconNameCur, fontHeight, fontHeight);
                 }
                 if (!img)
-                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                    img = imgLoader.LoadIcon(*IconName, fontHeight, fontHeight);
                 if (img)
                     menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
@@ -1889,15 +1889,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *recInfo = Recording->Info();
-                iconName = GetRecordingerrorIcon(recInfo->Errors());
+                IconName = GetRecordingerrorIcon(recInfo->Errors());
 
                 img = NULL;
                 if (Current) {
-                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
-                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
+                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    img = imgLoader.LoadIcon(*IconNameCur, fontHeight, fontHeight);
                 }
                 if (!img)
-                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                    img = imgLoader.LoadIcon(*IconName, fontHeight, fontHeight);
                 if (img)
                     menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *img);
             }  // MenuItemRecordingShowRecordingErrors
@@ -2049,15 +2049,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20108
             else {
-                iconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = NULL;
                 if (Current) {
-                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
-                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
+                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    img = imgLoader.LoadIcon(*IconNameCur, fontHeight, fontHeight);
                 }
                 if (!img)
-                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                    img = imgLoader.LoadIcon(*IconName, fontHeight, fontHeight);
                 if (img)
                     menuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
@@ -2065,15 +2065,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *recInfo = Recording->Info();
-                iconName = GetRecordingerrorIcon(recInfo->Errors());
+                IconName = GetRecordingerrorIcon(recInfo->Errors());
 
                 img = NULL;
                 if (Current) {
-                    cString iconNameCur = cString::sprintf("%s_cur", *iconName);
-                    img = imgLoader.LoadIcon(*iconNameCur, fontHeight, fontHeight);
+                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    img = imgLoader.LoadIcon(*IconNameCur, fontHeight, fontHeight);
                 }
                 if (!img)
-                    img = imgLoader.LoadIcon(*iconName, fontHeight, fontHeight);
+                    img = imgLoader.LoadIcon(*IconName, fontHeight, fontHeight);
                 if (img)
                     menuIconsOVLPixmap->DrawImage(cPoint(Left, Top), *img);
             }  // MenuItemRecordingShowRecordingErrors
@@ -2264,16 +2264,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     double iconHeight = (chHeight - (2 * marginItem)) * Config.EpgFskGenreIconSize * 100.0f;
     int headIconTop = chHeight - iconHeight - marginItem;  // Position for fsk/genre image
     int headIconLeft = chWidth - iconHeight - marginItem;
-    cString iconName("");
+    cString IconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
-        iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
+        IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+        img = imgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
         } else {
-            isyslog("flatPlus: FSK icon not found: %s", *iconName);
+            isyslog("flatPlus: FSK icon not found: %s", *IconName);
             img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -2285,13 +2285,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
-        iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
+        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+        img = imgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
         } else {
-            isyslog("flatPlus: Genre icon not found: %s", *iconName);
+            isyslog("flatPlus: Genre icon not found: %s", *IconName);
             if (!isUnknownDrawn) {
                 img =
                     imgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
@@ -3324,16 +3324,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     double iconHeight = (chHeight - (2 * marginItem)) * Config.EpgFskGenreIconSize * 100.0f;
     int headIconTop = chHeight - iconHeight - marginItem;  // Position for fsk/genre image
     int headIconLeft = chWidth - iconHeight - marginItem;
-    cString iconName("");
+    cString IconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
-        iconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
+        IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+        img = imgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
         } else {
-            isyslog("flatPlus: FSK icon not found: %s", *iconName);
+            isyslog("flatPlus: FSK icon not found: %s", *IconName);
             img = imgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
             if (img) {
                 contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
@@ -3345,13 +3345,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
-        iconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = imgLoader.LoadIcon(*iconName, iconHeight, iconHeight);
+        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+        img = imgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
         if (img) {
             contentHeadIconsPixmap->DrawImage(cPoint(headIconLeft, headIconTop), *img);
             headIconLeft -= iconHeight + marginItem;
         } else {
-            isyslog("flatPlus: Genre icon not found: %s", *iconName);
+            isyslog("flatPlus: Genre icon not found: %s", *IconName);
             if (!isUnknownDrawn) {
                 img =
                     imgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
