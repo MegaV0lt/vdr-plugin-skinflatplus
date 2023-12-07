@@ -228,11 +228,11 @@ inline void PixmapFill(cPixmap *pixmap, tColor Color) {
     if (pixmap) pixmap->Fill(Color);
 }
 cPlugin *GetScraperPlugin(void);
-cString GetAspectIcon(int screenWidth, double screenAspect);
-cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect);
-cString GetFormatIcon(int screenWidth);
-cString GetRecordingerrorIcon(int recInfoErrors);
-cString GetRecordingseenIcon(int frameTotal, int frameResume);
+cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
+cString GetFormatIcon(int ScreenWidth);
+cString GetRecordingerrorIcon(int RecInfoErrors);
+cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
 inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
     s.erase(0, s.find_first_not_of(t));  // Trim from left

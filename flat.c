@@ -1,6 +1,6 @@
 #include <vdr/osd.h>
 #include <vdr/menu.h>
-#include <memory>
+// #include <memory>
 
 #include "./flat.h"
 
@@ -121,21 +121,21 @@ cPlugin *GetScraperPlugin(void) {
     return pScraper;
 }
 
-cString GetAspectIcon(int screenWidth, double screenAspect) {
-    if (Config.ChannelSimpleAspectFormat && screenWidth > 720)
-        return (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
+cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
+    if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
+        return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    if (screenAspect == 16.0/9.0) return "169";
-    if (screenAspect == 4.0/3.0) return "43";
-    if (screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0) return "169w";
-    if (screenAspect == 2.21) return "221";
+    if (ScreenAspect == 16.0/9.0) return "169";
+    if (ScreenAspect == 4.0/3.0) return "43";
+    if (ScreenAspect == 20.0/11.0 || ScreenAspect == 15.0/11.0) return "169w";
+    if (ScreenAspect == 2.21) return "221";
 
     return "unknown_asp";
 }
 
-cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect) {
     cString res("unknown_res");
-    switch (screenWidth) {
+    switch (ScreenWidth) {
         case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
         case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
         // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD) Is that used somewhere on sat/cable?
@@ -151,36 +151,36 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
         case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
         default:
             dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
-                    screenWidth, screenHeight, screenAspect);
+                    ScreenWidth, ScreenHeight, ScreenAspect);
             break;
     }
     return res;
 }
 
-cString GetFormatIcon(int screenWidth) {
-    if (screenWidth > 1920) return "uhd";
-    if (screenWidth > 720) [[likely]] return "hd";
+cString GetFormatIcon(int ScreenWidth) {
+    if (ScreenWidth > 1920) return "uhd";
+    if (ScreenWidth > 720) [[likely]] return "hd";
 
     return "sd";  // 720 and below is considered sd
 }
 
-cString GetRecordingerrorIcon(int recInfoErrors) {
+cString GetRecordingerrorIcon(int RecInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
-    if (recInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
-    if (recInfoErrors == 0) return "recording_ok";       // No errors
-    if (recInfoErrors < RecErrIconThreshold) return "recording_warning";
-    if (recInfoErrors >= RecErrIconThreshold) return "recording_error";
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
+    if (RecInfoErrors == 0) return "recording_ok";       // No errors
+    if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
+    if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
 
     return "";
 }
 
-cString GetRecordingseenIcon(int frameTotal, int frameResume) {
-    double FrameSeen = frameResume * 1.0 / frameTotal;
-    double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
-    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
+cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
+    double FrameSeen = FrameResume * 1.0 / FrameTotal;
+    double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
-    if (FrameSeen >= seenThreshold) return "recording_seen_10";
+    if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
     if (FrameSeen < 0.1) return "recording_seen_0";
     if (FrameSeen < 0.2) return "recording_seen_1";
@@ -254,20 +254,17 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 int GetEpgsearchConflichts(void) {
-    int numConflicts {0};
+    int NumConflicts {0};
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
-        Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
-        if (serviceData) {
-            serviceData->nextConflict = 0;
-            serviceData->relevantConflicts = 0;
-            serviceData->totalConflicts = 0;
-            pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
-            if (serviceData->relevantConflicts > 0) {
-                numConflicts = serviceData->relevantConflicts;
-            }
-            delete serviceData;
+        Epgsearch_lastconflictinfo_v1_0 ServiceData;
+        ServiceData.nextConflict = 0;
+        ServiceData.relevantConflicts = 0;
+        ServiceData.totalConflicts = 0;
+        pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
+        if (ServiceData.relevantConflicts > 0) {
+            NumConflicts = ServiceData.relevantConflicts;
         }
     }  // pEpgSearch
-    return numConflicts;
+    return NumConflicts;
 }
