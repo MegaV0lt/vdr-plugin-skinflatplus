@@ -15,7 +15,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         cPixmap *dimmPixmap;
 
         cFont *fontSecs;
-        const cRecording *recording;
+        const cRecording *g_Recording;
 
         int screenWidth, lastScreenWidth;
         int screenHeight;
@@ -24,9 +24,9 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;
 
-        // dimm on pause
-        bool dimmActive;
-        time_t dimmStartTime;
+        // Dimm on pause
+        bool g_DimmActive;
+        time_t g_DimmStartTime;
 
         bool ProgressShown;
         bool g_ModeOnly;

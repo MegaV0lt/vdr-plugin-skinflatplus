@@ -5,10 +5,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     labelHeight = fontHeight + fontSmlHeight;
     current = "";
     total = "";
-    recording = NULL;
+    g_Recording = NULL;
 
     g_ModeOnly = ModeOnly;
-    dimmActive = false;
+    g_DimmActive = false;
 
     ProgressShown = false;
     CreateFullOsd();
@@ -78,7 +78,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     int left = marginItem;  // Position for recordingsymbol/shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
-    recording = Recording;
+    g_Recording = Recording;
 
     PixmapFill(iconsPixmap, clrTransparent);
 
@@ -86,7 +86,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     // Show if still recording
     cImage *img = NULL;
-    if ((recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
+    if ((g_Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = imgLoader.LoadIcon("timerRecording", 999, fontSmlHeight);  // Small image
 
         if (img) {
@@ -99,12 +99,12 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     cString info("");
     if (recInfo->ShortText()) {
         if (Config.PlaybackShowRecordingDate)  //  Date Time - ShortText
-            info = cString::sprintf("%s  %s - %s", *ShortDateString(recording->Start()),
-                                    *TimeString(recording->Start()), recInfo->ShortText());
+            info = cString::sprintf("%s  %s - %s", *ShortDateString(g_Recording->Start()),
+                                    *TimeString(g_Recording->Start()), recInfo->ShortText());
         else
             info = cString::sprintf("%s", recInfo->ShortText());
     } else {  // No shorttext
-        info = cString::sprintf("%s  %s", *ShortDateString(recording->Start()), *TimeString(recording->Start()));
+        info = cString::sprintf("%s  %s", *ShortDateString(g_Recording->Start()), *TimeString(g_Recording->Start()));
     }
 
     int infoWidth = fontSml->Width(*info);  // Width of shorttext
@@ -170,8 +170,8 @@ void cFlatDisplayReplay::Action(void) {
     time_t curTime;
     while (Running()) {
         time(&curTime);
-        if ((curTime - dimmStartTime) > Config.RecordingDimmOnPauseDelay) {
-            dimmActive = true;
+        if ((curTime - g_DimmStartTime) > Config.RecordingDimmOnPauseDelay) {
+            g_DimmActive = true;
             for (int alpha {0}; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha+=2) {
                 PixmapFill(dimmPixmap, ArgbToColor(alpha, 0, 0, 0));
                 Flush();
@@ -186,13 +186,13 @@ void cFlatDisplayReplay::Action(void) {
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     int left {0};
     if (Play == false && Config.RecordingDimmOnPause) {
-        time(&dimmStartTime);
+        time(&g_DimmStartTime);
         Start();
     } else if (Play == true && Config.RecordingDimmOnPause) {
         Cancel(-1);
         while (Active())
             cCondWait::SleepMs(10);
-        if (dimmActive) {
+        if (g_DimmActive) {
             PixmapFill(dimmPixmap, clrTransparent);
             Flush();
         }
@@ -266,7 +266,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 }
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
-    if (dimmActive) {
+    if (g_DimmActive) {
         PixmapFill(dimmPixmap, clrTransparent);
         Flush();
     }
@@ -324,89 +324,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     cImage *img = NULL;
-    if (recording) {
-        /* cMarks marks;
-        // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
-        bool hasMarks = false;
-        cIndexFile *index = NULL;
-        if (recording->NumFrames() > 0) {
-            hasMarks = marks.Load(recording->FileName(), recording->FramesPerSecond(), recording->IsPesRecording()) &&
-                       marks.Count();
-            index = new cIndexFile(recording->FileName(), false, recording->IsPesRecording());
-        }
-
-        int cuttedLength {0};
-        int32_t cutinframe {0};
-        uint64_t recsizecutted {0};
-        uint64_t cutinoffset {0};
-        uint64_t filesize[100000];
-        uint16_t maxFiles = (recording->IsPesRecording()) ? 999 : 65535;
-        filesize[0] = 0;
-
-        int i {0}, rc {0};
-        struct stat filebuf;
-        cString filename("");
-
-        do {
-            ++i;
-            if (recording->IsPesRecording())
-                filename = cString::sprintf("%s/%03d.vdr", recording->FileName(), i);
-            else
-                filename = cString::sprintf("%s/%05d.ts", recording->FileName(), i);
-            rc = stat(*filename, &filebuf);
-            if (rc == 0)
-                filesize[i] = filesize[i - 1] + filebuf.st_size;
-            else {
-                if (ENOENT != errno) {
-                    esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)filename, errno,
-                            strerror(errno));
-                }
-            }
-        } while (i <= maxFiles && !rc);
-
-        if (hasMarks && index) {
-            uint16_t FileNumber;
-            off_t FileOffset;
-
-            bool cutin = true;
-            int32_t position {0};
-            cMark *mark = marks.First();
-            while (mark) {
-                position = mark->Position();
-                index->Get(position, &FileNumber, &FileOffset);
-                if (cutin) {
-                    cutinframe = position;
-                    cutin = false;
-                    cutinoffset = filesize[FileNumber-1] + FileOffset;
-                } else {
-                    cuttedLength += position - cutinframe;
-                    cutin = true;
-                    recsizecutted += filesize[FileNumber-1] + FileOffset - cutinoffset;
-                }
-                cMark *nextmark = marks.Next(mark);
-                mark = nextmark;
-            }
-            if (!cutin) {
-                cuttedLength += index->Last() - cutinframe;
-                index->Get(index->Last() - 1, &FileNumber, &FileOffset);
-                recsizecutted += filesize[FileNumber-1] + FileOffset - cutinoffset;
-            }
-        }
-        if (index) {
-            if (hasMarks) {
-                cutted = IndexToHMSF(cuttedLength, false, recording->FramesPerSecond());
-                IsCutted = true;
-            }
-        }
-        delete index; */
-        IsCutted = GetCuttedLengthMarks(recording, Dummy, cutted, false);
+    if (g_Recording) {
+        IsCutted = GetCuttedLengthMarks(g_Recording, Dummy, cutted, false);  // Process marks and get cutted time
 
         cString mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
-            call.recording = recording;
+            call.recording = g_Recording;
             int seriesId {0};
             int episodeId {0};
             int movieId {0};
