@@ -417,20 +417,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int middleWidth {0}, numConflicts {0};
         cImage *imgCon = NULL, *imgRec = NULL;
         if (Config.TopBarRecConflictsShow) {
-            /* cPlugin *p = cPluginManager::GetPlugin("epgsearch");
-            if (p) {
-                Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
-                if (serviceData) {
-                    serviceData->nextConflict = 0;
-                    serviceData->relevantConflicts = 0;
-                    serviceData->totalConflicts = 0;
-                    p->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
-                    if (serviceData->relevantConflicts > 0) {
-                        numConflicts = serviceData->relevantConflicts;
-                    }
-                    delete serviceData;
-                }
-            } */
             numConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
             if (numConflicts) {
                 if (numConflicts < Config.TopBarRecConflictsHigh)

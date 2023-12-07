@@ -229,10 +229,8 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             if (!isempty(*Audio)) Audio.Append(", ");
             switch (p->stream) {
             case sc_audio_MP2:
-                if (p->type == 5)  // Workaround for wrongfully used stream type X 02 05 for AC3
-                    audio_type = "AC3";
-                else
-                    audio_type = "MP2";
+                // Workaround for wrongfully used stream type X 02 05 for AC3
+                audio_type = (p->type == 5) ? "AC3" : "MP2";
                 break;
             case sc_audio_AC3: audio_type = "AC3"; break;
             case sc_audio_HEAAC: audio_type = "HEAAC"; break;
@@ -267,4 +265,120 @@ int GetEpgsearchConflichts(void) {
         }
     }  // pEpgSearch
     return NumConflicts;
+}
+
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
+    cMarks marks;
+    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+    bool IsCutted = false, HasMarks = false;
+    cIndexFile *index = NULL;
+    if (Recording->NumFrames() > 0) {
+        HasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
+                   marks.Count();
+        index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+        // cIndexFile *index(Recording->FileName(), false, Recording->IsPesRecording());
+    }
+
+    // For AddText
+    int LastIndex {0};
+    uint64_t RecSize {0};
+
+    int CuttedLength {0};
+    int32_t CutinFrame {0};
+    uint64_t RecSizeCutted {0}, CutinOffset {0};
+    uint64_t FileSize[100000];
+    uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
+    FileSize[0] = 0;
+
+    int i {0}, rc {0};
+    struct stat filebuf;
+    cString FileName("");
+
+    do {
+        ++i;
+        if (Recording->IsPesRecording())
+            FileName = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
+        else
+            FileName = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
+        rc = stat(*FileName, &filebuf);
+        if (rc == 0)
+            FileSize[i] = FileSize[i - 1] + filebuf.st_size;
+        else {
+            if (ENOENT != errno) {
+                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)FileName, errno,
+                        strerror(errno));
+                if (AddText) RecSize = 0;
+            }
+        }
+    } while (i <= MaxFiles && !rc);
+    if (AddText) RecSize = FileSize[i - 1];
+
+    if (HasMarks && index) {
+        uint16_t FileNumber;
+        off_t FileOffset;
+
+        bool cutin = true;
+        int32_t position {0};
+        cMark *mark = marks.First();
+        while (mark) {
+            position = mark->Position();
+            index->Get(position, &FileNumber, &FileOffset);
+            if (cutin) {
+                CutinFrame = position;
+                cutin = false;
+                CutinOffset = FileSize[FileNumber - 1] + FileOffset;
+            } else {
+                CuttedLength += position - CutinFrame;
+                cutin = true;
+                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutinOffset;
+            }
+            cMark *NextMark = marks.Next(mark);
+            mark = NextMark;
+        }
+        if (!cutin) {
+            CuttedLength += index->Last() - CutinFrame;
+            index->Get(index->Last() - 1, &FileNumber, &FileOffset);
+            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutinOffset;
+        }
+    }
+    if (index) {
+        if (AddText) {
+            LastIndex = index->Last();
+            Text.Append(
+                cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, Recording->FramesPerSecond())));
+            if (HasMarks)
+                Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
+                                             *IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond())));
+            Text.Append("\n");
+        } else if (HasMarks) {
+            Cutted = IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond());
+            IsCutted = true;
+        }
+    }
+    delete index;
+
+    if (AddText) {
+        if (RecSize > MEGABYTE(1023))
+            Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
+        else
+            Text.Append(cString::sprintf("%s: %lld MB", tr("Size"), RecSize / MEGABYTE(1)));
+
+        if (HasMarks) {
+            if (RecSize > MEGABYTE(1023))
+                Text.Append(
+                    cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+            else
+                Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+        }
+        Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
+                                     Recording->Lifetime()));
+
+        if (LastIndex) {
+            Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
+                                         (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
+                                         static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 /
+                                             MEGABYTE(1)));
+        }
+    }  // AddText
+    return IsCutted;
 }

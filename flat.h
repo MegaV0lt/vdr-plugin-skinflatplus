@@ -234,22 +234,23 @@ cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingerrorIcon(int RecInfoErrors);
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
-inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
+inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     s.erase(0, s.find_first_not_of(t));  // Trim from left
     // return s;  // Only inplace trimming
 }
 
-inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {
+inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     s.erase(s.find_last_not_of(t) + 1);  // Trim from right
     // return s;  // Only inplace trimming
 }
 
-inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
+inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     ltrim(s, t);  // Trim from left & right
     rtrim(s, t);
     /* return */  // ltrim(rtrim(s, t), t);
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,
-                      cString &Subtitle, bool NewLine = false);
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT
+                      cString &Subtitle, bool NewLine = false);                      // NOLINT
 int GetEpgsearchConflichts(void);
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &cutted, bool AddText);  // NOLINT

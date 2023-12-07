@@ -7,7 +7,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     total = "";
     recording = NULL;
 
-    modeOnly = ModeOnly;
+    g_ModeOnly = ModeOnly;
     dimmActive = false;
 
     ProgressShown = false;
@@ -74,7 +74,7 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
     int left = marginItem;  // Position for recordingsymbol/shorttext/date
     const cRecordingInfo *recInfo = Recording->Info();
@@ -201,7 +201,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         left = osdWidth - Config.decorBorderReplaySize * 2 - (fontHeight * 4 + marginItem * 3);
         left /= 2;
 
-        if (modeOnly)
+        if (g_ModeOnly)
             PixmapFill(labelPixmap, clrTransparent);
 
         // PixmapFill(iconsPixmap, clrTransparent);  // Moved to SetRecording
@@ -249,7 +249,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                         labelHeight + Config.decorProgressReplaySize + marginItem, Config.decorBorderReplaySize,
                         Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
     } else {
-        if (modeOnly) {
+        if (g_ModeOnly) {
             DecorBorderDraw(left - font->Width("99") - marginItem + Config.decorBorderReplaySize,
                             osdHeight - labelHeight - Config.decorBorderReplaySize,
                             fontHeight * 4 + marginItem * 6 + font->Width("99") * 2, fontHeight,
@@ -271,31 +271,31 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
         Flush();
     }
 
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
     ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
     current = Current;
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
     total = Total;
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::UpdateInfo(void) {
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
-    cString cutted("");
-    bool iscutted = false;
+    cString cutted(""), Dummy("");
+    bool IsCutted = false;
 
     int fontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
     int fontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
@@ -325,7 +325,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     cImage *img = NULL;
     if (recording) {
-        cMarks marks;
+        /* cMarks marks;
         // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
         bool hasMarks = false;
         cIndexFile *index = NULL;
@@ -395,10 +395,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (index) {
             if (hasMarks) {
                 cutted = IndexToHMSF(cuttedLength, false, recording->FramesPerSecond());
-                iscutted = true;
+                IsCutted = true;
             }
         }
-        delete index;
+        delete index; */
+        IsCutted = GetCuttedLengthMarks(recording, Dummy, cutted, false);
 
         cString mediaPath("");
         int mediaWidth {0}, mediaHeight {0};
@@ -479,7 +480,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
     }
 
-    if (iscutted) {
+    if (IsCutted) {
         img = imgLoader.LoadIcon("recording_cutted_extra", fontHeight, fontHeight);
         int imgWidth {0};
         if (img)
@@ -577,7 +578,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             labelPixmap->DrawText(cPoint(right - marginItem, 0), *total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), font, font->Width(total), fontHeight);
         }
-    }  // iscutted
+    }  // IsCutted
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {
@@ -601,7 +602,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw(void) {
-    if (modeOnly) return;
+    if (g_ModeOnly) return;
 
     if (screenWidth > 0) {
         int left = osdWidth - Config.decorBorderReplaySize * 2;

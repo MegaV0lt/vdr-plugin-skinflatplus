@@ -29,7 +29,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         time_t dimmStartTime;
 
         bool ProgressShown;
-        bool modeOnly;
+        bool g_ModeOnly;
         void UpdateInfo(void);
         void ResolutionAspectDraw(void);
 

@@ -2733,7 +2733,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     cHeight = osdHeight - (topBarHeight + Config.decorBorderTopBarSize * 2 + buttonsHeight +
                            Config.decorBorderButtonSize * 2 + marginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    cString Text("");
+    cString Dummy(""), Text("");
     if (Recording) {
         const cRecordingInfo *recInfo = Recording->Info();
         // Text.imbue(std::locale(""));
@@ -2777,7 +2777,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
-            cMarks marks;
+            /* cMarks marks;
             // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
             bool hasMarks = false;
             cIndexFile *index = NULL;
@@ -2879,7 +2879,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
                             (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
                             static_cast<float>(recsize) / lastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
-            }
+            } */
+            GetCuttedLengthMarks(Recording, Text, Dummy, true);
+
             // From SkinNopacity
 #if APIVERSNUM >= 20505
             if (recInfo && recInfo->Errors() >= 1) {
@@ -3090,7 +3092,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     menuItemWidth = cWidth;
 
-    cString RecAdditional(""), Text(""), TextAdditional("");
+    cString Dummy(""), RecAdditional(""), Text(""), TextAdditional("");
     // Text.imbue(std::locale(""));
     // TextAdditional.imbue(std::locale(""));
     // RecAdditional.imbue(std::locale(""));
@@ -3147,7 +3149,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), Fsk.c_str()));
             }
         }
-        cMarks marks;
+        /* cMarks marks;
         // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
         bool hasMarks = false;
         cIndexFile *index = NULL;
@@ -3250,7 +3252,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                                   (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
                                                   static_cast<float>(recsize) / lastIndex *
                                                       Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
-        }
+        } */
+        GetCuttedLengthMarks(Recording, RecAdditional, Dummy, true);
+
         // From SkinNopacity
 #if APIVERSNUM >= 20505
         if (recInfo && recInfo->Errors() >= 1) {
@@ -4667,20 +4671,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     ContentTop += 6;
 
     int numConflicts {0};
-    /* cPlugin *p = cPluginManager::GetPlugin("epgsearch");
-    if (p) {
-        Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
-        if (serviceData) {
-            serviceData->nextConflict = 0;
-            serviceData->relevantConflicts = 0;
-            serviceData->totalConflicts = 0;
-            p->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
-            if (serviceData->relevantConflicts > 0)
-                numConflicts = serviceData->relevantConflicts;
-
-            delete serviceData;
-        }
-    } */
     numConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
     if (numConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty) {
         return 0;
