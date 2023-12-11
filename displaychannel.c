@@ -36,8 +36,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     g_ChannelWidth = g_OsdWidth - Config.decorBorderChannelSize * 2;
     g_ChannelHeight = g_OsdHeight - Config.decorBorderChannelSize * 2;
-    // From bottom to top
-    // 2 * EPG + 2 * EPGsml
+    // From bottom to top (2 * EPG + 2 * EPGsml)
     HeightBottom = (g_FontHight * 2) + (g_FontSmlHight * 2) + g_MarginItem;  // Top, Bottom, Between
     HeightImageLogo = HeightBottom;
     if (Config.SignalQualityShow)
@@ -96,10 +95,10 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                            g_ChannelWidth, HeightTop));
     PixmapFill(ChanInfoTopPixmap, clrTransparent);
 
-    scrollers.SetOsd(osd);
-    scrollers.SetScrollStep(Config.ScrollerStep);
-    scrollers.SetScrollDelay(Config.ScrollerDelay);
-    scrollers.SetScrollType(Config.ScrollerType);
+    Scrollers.SetOsd(osd);
+    Scrollers.SetScrollStep(Config.ScrollerStep);
+    Scrollers.SetScrollDelay(Config.ScrollerDelay);
+    Scrollers.SetScrollType(Config.ScrollerType);
 
     if (Config.ChannelWeatherShow)
         DrawWidgetWeather();
@@ -114,7 +113,7 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
     if (!g_DoOutput) return;
 
     if (osd) {
-        scrollers.Clear();
+        Scrollers.Clear();
 
         if (ChanInfoTopPixmap)
             osd->DestroyPixmap(ChanInfoTopPixmap);
@@ -138,22 +137,22 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanIconsPixmap, clrTransparent);
     LastScreenWidth = -1;
 
-    cString channelNumber("");
+    cString ChannelNumber("");
     if (Channel) {
         IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         IsGroup = Channel->GroupSep();
 
         g_ChannelName = Channel->Name();
         if (!IsGroup)
-            channelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
+            ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
-            channelNumber = cString::sprintf("%d-", Number);
+            ChannelNumber = cString::sprintf("%d-", Number);
 
         CurChannel = Channel;
     } else
         g_ChannelName = ChannelString(NULL, 0);
 
-    cString channelString = cString::sprintf("%s  %s", *channelNumber, *g_ChannelName);
+    cString channelString = cString::sprintf("%s  %s", *ChannelNumber, *g_ChannelName);
 
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
     ChanInfoTopPixmap->DrawText(cPoint(50, 0), *channelString, Theme.Color(clrChannelFontTitle),
@@ -250,7 +249,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     cString EpgShort("");
     cString epg("");
 
-    scrollers.Clear();
+    Scrollers.Clear();
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -307,7 +306,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         if ((EpgWidth > g_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
-            scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
+            Scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
                                               Config.decorBorderChannelSize+g_ChannelHeight - HeightBottom,
                                               g_ChannelWidth - left - MaxWidth,
                                               g_FontHight), Theme.Color(clrChannelFontEpg), clrTransparent, g_Font);
@@ -317,7 +316,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         if ((EpgShortWidth > g_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
-            scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
+            Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
                                   Config.decorBorderChannelSize+g_ChannelHeight - HeightBottom + g_FontHight,
                                   g_ChannelWidth - left - MaxWidth,
                                   g_FontSmlHight), Theme.Color(clrChannelFontEpg), clrTransparent, g_FontSml);
@@ -366,7 +365,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                                            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), g_Font);
 
         if ((EpgWidth > g_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
-            scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
+            Scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
                                   Config.decorBorderChannelSize + g_ChannelHeight - HeightBottom + g_FontHight
                                    + g_FontSmlHight, g_ChannelWidth - left - MaxWidth, g_FontHight),
                                    Theme.Color(clrChannelFontEpgFollow), clrTransparent, g_Font);
@@ -376,7 +375,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         if ((EpgShortWidth > g_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
-            scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
+            Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
                 Config.decorBorderChannelSize+g_ChannelHeight - HeightBottom + g_FontHight*2 + g_FontSmlHight,
                 g_ChannelWidth - left - MaxWidth, g_FontSmlHight), Theme.Color(clrChannelFontEpgFollow),
                 clrTransparent, g_FontSml);
