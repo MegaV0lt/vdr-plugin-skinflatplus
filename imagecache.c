@@ -89,8 +89,8 @@ void cImageCache::PreLoadImage(void) {
     cFlatDisplayChannel DisplayChannel(false);
     DisplayChannel.PreLoadImages();
 
-    cFlatDisplayMenu DisplayMenu;
-    DisplayMenu.PreLoadImages();
+    cFlatDisplayMenu Display_Menu;
+    Display_Menu.PreLoadImages();
 
     cFlatDisplayReplay DisplayReplay(false);
     DisplayReplay.PreLoadImages();

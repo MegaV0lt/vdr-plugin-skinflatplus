@@ -7,19 +7,19 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
  private:
         cString current, total;
 
-        int labelHeight;
-        cPixmap *labelPixmap;
+        int g_LabelHeight;
+        cPixmap *LabelPixmap;
         cPixmap *labelJump;
         cPixmap *iconsPixmap;
-        cPixmap *chanEpgImagesPixmap;
+        cPixmap *ChanEpgImagesPixmap;
         cPixmap *dimmPixmap;
 
-        cFont *fontSecs;
+        cFont *g_FontSecs;
         const cRecording *g_Recording;
 
-        int screenWidth, lastScreenWidth;
-        int screenHeight;
-        double screenAspect;
+        int ScreenWidth, LastScreenWidth;
+        int ScreenHeight;
+        double ScreenAspect;
 
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;

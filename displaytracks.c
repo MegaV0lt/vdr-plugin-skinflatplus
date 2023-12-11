@@ -5,37 +5,37 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     CreateFullOsd();
     TopBarCreate();
 
-    img_ac3 = imgLoader.LoadIcon("tracks_ac3", 999, fontHeight);
-    img_stereo = imgLoader.LoadIcon("tracks_stereo", 999, fontHeight);
+    img_ac3 = imgLoader.LoadIcon("tracks_ac3", 999, g_FontHight);
+    img_stereo = imgLoader.LoadIcon("tracks_stereo", 999, g_FontHight);
 
-    ac3Width = stereoWidth = 0;
+    Ac3Width = StereoWidth = 0;
     if (img_ac3)
-        ac3Width = img_ac3->Width();
+        Ac3Width = img_ac3->Width();
     if (img_stereo)
-        stereoWidth = img_stereo->Width();
+        StereoWidth = img_stereo->Width();
 
-    int imgWidthMax = std::max(ac3Width, stereoWidth);
-    itemHeight = fontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
-    currentIndex = -1;
-    maxItemWidth = font->Width(Title) + marginItem * 4;
+    int imgWidthMax = std::max(Ac3Width, StereoWidth);
+    ItemHeight = g_FontHight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
+    CurrentIndex = -1;
+    MaxItemWidth = g_Font->Width(Title) + g_MarginItem * 4;
     for (int i {0}; i < NumTracks; ++i)
-        maxItemWidth = std::max(maxItemWidth, font->Width(Tracks[i]) + marginItem * 2);
+        MaxItemWidth = std::max(MaxItemWidth, g_Font->Width(Tracks[i]) + g_MarginItem * 2);
 
-    int headerWidth = font->Width(Title) + font->Width(' ') + imgWidthMax;
-    maxItemWidth = std::max(maxItemWidth, headerWidth);
+    int headerWidth = g_Font->Width(Title) + g_Font->Width(' ') + imgWidthMax;
+    MaxItemWidth = std::max(MaxItemWidth, headerWidth);
 
-    itemsHeight = (NumTracks + 1) * itemHeight;
-    int left = osdWidth - maxItemWidth;
+    ItemsHeight = (NumTracks + 1) * ItemHeight;
+    int left = g_OsdWidth - MaxItemWidth;
     left /= 2;
     TopBarSetTitle(Title);
 
-    tracksPixmap = CreatePixmap(osd, "tracksPixmap", 1,
-                                cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
-    PixmapFill(tracksPixmap, clrTransparent);
+    TracksPixmap = CreatePixmap(osd, "TracksPixmap", 1,
+                                cRect(left, g_OsdHeight - ItemsHeight - g_MarginItem, MaxItemWidth, ItemsHeight));
+    PixmapFill(TracksPixmap, clrTransparent);
 
-    tracksLogoPixmap = CreatePixmap(osd, "tracksLogoPixmap", 1,
-                                    cRect(left, osdHeight - itemsHeight - marginItem, maxItemWidth, itemsHeight));
-    PixmapFill(tracksLogoPixmap, clrTransparent);
+    TracksLogoPixmap = CreatePixmap(osd, "TracksLogoPixmap", 1,
+                                    cRect(left, g_OsdHeight - ItemsHeight - g_MarginItem, MaxItemWidth, ItemsHeight));
+    PixmapFill(TracksLogoPixmap, clrTransparent);
 
     SetItem(Title, -1, false);
 
@@ -44,49 +44,49 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 }
 
 cFlatDisplayTracks::~cFlatDisplayTracks() {
-    osd->DestroyPixmap(tracksPixmap);
-    osd->DestroyPixmap(tracksLogoPixmap);
+    osd->DestroyPixmap(TracksPixmap);
+    osd->DestroyPixmap(TracksLogoPixmap);
 }
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
-    int y = (Index + 1) * itemHeight;
+    int y = (Index + 1) * ItemHeight;
     tColor ColorFg = Theme.Color(clrTrackItemFont);
     tColor ColorBg = Theme.Color(clrTrackItemBg);
     if (Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
         ColorBg = Theme.Color(clrTrackItemCurrentBg);
-        currentIndex = Index;
+        CurrentIndex = Index;
     } else if (Index >= 0) {
         ColorFg = Theme.Color(clrTrackItemSelableFont);
         ColorBg = Theme.Color(clrTrackItemSelableBg);
     }
 
     if (Index == -1)
-        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth,
-                               itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
+        TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, g_Font, MaxItemWidth,
+                               ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
     else
-        tracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, font, maxItemWidth,
-                               itemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
+        TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, g_Font, MaxItemWidth,
+                               ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
 
-    int left = osdWidth - maxItemWidth;
+    int left = g_OsdWidth - MaxItemWidth;
     left /= 2;
 
-    int top = osdHeight - itemsHeight - marginItem + y;
+    int top = g_OsdHeight - ItemsHeight - g_MarginItem + y;
 
     if (Current)
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, g_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
     else if (Index >= 0)
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, g_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
     else
-        DecorBorderDraw(left, top, maxItemWidth, fontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, g_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackFg, Config.decorBorderTrackBg);
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
-    if (currentIndex >= 0)
-        SetItem(Tracks[currentIndex], currentIndex, false);
+    if (CurrentIndex >= 0)
+        SetItem(Tracks[CurrentIndex], CurrentIndex, false);
 
     SetItem(Tracks[Index], Index, true);
 }
@@ -94,15 +94,15 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
-    PixmapFill(tracksLogoPixmap, clrTransparent);
+    PixmapFill(TracksLogoPixmap, clrTransparent);
     if (AudioChannel == -1 && img_ac3) {
-        int IconLeft = maxItemWidth - img_ac3->Width() - marginItem;
-        int IconTop = (fontHeight - img_ac3->Height()) / 2;
-        tracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_ac3);
+        int IconLeft = MaxItemWidth - img_ac3->Width() - g_MarginItem;
+        int IconTop = (g_FontHight - img_ac3->Height()) / 2;
+        TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_ac3);
     } else if (img_stereo) {
-        int IconLeft = maxItemWidth - img_stereo->Width() - marginItem;
-        int IconTop = (fontHeight - img_stereo->Height()) / 2;
-        tracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_stereo);
+        int IconLeft = MaxItemWidth - img_stereo->Width() - g_MarginItem;
+        int IconTop = (g_FontHight - img_stereo->Height()) / 2;
+        TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_stereo);
     }
     return;
 }

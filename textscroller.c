@@ -9,7 +9,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Position = position;
 
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
-    cRect drawPort(0, 0, font->Width(Text.c_str()), Position.Height());
+    cRect drawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
 
     if (Osd && Pixmap)
         Osd->DestroyPixmap(Pixmap);
@@ -45,8 +45,8 @@ void cTextScroll::Draw(void) {
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 1);  // Default end is npos
-            rtrim(first);   // Trim possible space on right side
-            ltrim(second);  // Trim possible space at begin
+            RightTrim(first);  // Trim possible space on right side
+            LeftTrim(second);  // Trim possible space at begin
 
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             int l = Font->Width(first.c_str()) + Font->Width('X');
@@ -123,7 +123,7 @@ void cTextScrollers::Clear(void) {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
+void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *g_Font,
                                  tColor ColorExtraTextFg) {
     Cancel(-1);
     while (Active())
@@ -131,7 +131,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
 
     Scrollers.emplace_back(new cTextScroll(Osd, scrollType, scrollStep,
         static_cast<int>(WAITDELAY * 1.0f / scrollDelay), Layer));
-    Scrollers.back()->SetText(text, position, colorFg, colorBg, font, ColorExtraTextFg);
+    Scrollers.back()->SetText(text, position, colorFg, colorBg, g_Font, ColorExtraTextFg);
 
     StartScrolling();
 }

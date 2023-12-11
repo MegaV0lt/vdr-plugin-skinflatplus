@@ -11,10 +11,10 @@
 #define WIDGETOUTPUTPATH "/tmp/skinflatplus/widgets"
 
 
-bool stringCompare(const std::string &left, const std::string &right);
-bool pairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j);
+bool StringCompare(const std::string &left, const std::string &right);
+bool PairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j);
 bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);
-int roundUp(int numToRound, int multiple);
+int RoundUp(int NumToRound, int multiple);
 
 class cFlatConfig {
  private:
@@ -45,8 +45,8 @@ class cFlatConfig {
 
  public:
         cString ThemeCurrent;
-        cString logoPath;
-        cString iconPath;
+        cString LogoPath;
+        cString IconPath;
         cString RecordingOldConfigFile;
 
         std::vector<std::string> RecordingOldFolder;

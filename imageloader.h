@@ -23,7 +23,7 @@ class cImageLoader : public cImageMagickWrapper {
  private:
     int epgImageWidthLarge, epgImageHeightLarge;
     int epgImageWidth, epgImageHeight;
-    cString logoExtension;
+    cString LogoExtension;
 
-    void toLowerCase(std::string &str);
+    void ToLowerCase(std::string &str);
 };

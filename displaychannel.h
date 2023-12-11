@@ -11,22 +11,22 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         bool g_DoOutput;
         const cEvent *present;
 
-        int channelWidth, channelHeight;
+        int g_ChannelWidth, g_ChannelHeight;
 
-        cString channelName;
+        cString g_ChannelName;
         const cChannel *CurChannel;
 
-        cPixmap *chanInfoTopPixmap;
-        cPixmap *chanInfoBottomPixmap;
-        cPixmap *chanLogoPixmap;
-        cPixmap *chanLogoBGPixmap;
-        cPixmap *chanIconsPixmap;
-        cPixmap *chanEpgImagesPixmap;
+        cPixmap *ChanInfoTopPixmap;
+        cPixmap *ChanInfoBottomPixmap;
+        cPixmap *ChanLogoPixmap;
+        cPixmap *ChanLogoBGPixmap;
+        cPixmap *ChanIconsPixmap;
+        cPixmap *ChanEpgImagesPixmap;
 
-        int screenWidth, lastScreenWidth;
-        int screenHeight;
-        double screenAspect;
-        int heightBottom, heightImageLogo;
+        int ScreenWidth, LastScreenWidth;
+        int ScreenHeight;
+        double ScreenAspect;
+        int HeightBottom, HeightImageLogo;
 
         int LastSignalStrength, LastSignalQuality;
         int SignalStrengthRight;
@@ -37,9 +37,9 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         // TextScroller
         cTextScrollers scrollers;
 
-        bool isRecording;
-        bool isRadioChannel;
-        bool isGroup;
+        bool IsRecording;
+        bool IsRadioChannel;
+        bool IsGroup;
 
         void SignalQualityDraw(void);
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);

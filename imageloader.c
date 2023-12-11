@@ -10,7 +10,7 @@
 using namespace Magick;
 
 cImageLoader::cImageLoader() {
-    logoExtension = "png";
+    LogoExtension = "png";
 }
 
 cImageLoader::~cImageLoader() {
@@ -20,20 +20,20 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if ((width == 0) || (height == 0)) return NULL;
 
     // Plain logo without converting to lower including '/'
-    cString File = cString::sprintf("%s%s.%s", *Config.logoPath, logo, *logoExtension);
+    cString File = cString::sprintf("%s%s.%s", *Config.LogoPath, logo, *LogoExtension);
     cImage *img = NULL;
     for (int i {0}; i < 2; ++i) {
         if (i == 1) {  // Second try (Plain logo not found)
-            std::string logoLower = logo;
-            toLowerCase(logoLower);  // Convert to lowercase (A-Z)
-            File = cString::sprintf("%s%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
+            std::string LogoLower = logo;
+            ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
+            File = cString::sprintf("%s%s.%s", *Config.LogoPath, LogoLower.c_str(), *LogoExtension);
         }
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
             uint32_t tick1 = GetMsTicks();
         #endif
 
-        img = imgCache.GetImage(*File, width, height);  // Check if image is in imagecache
+        img = ImgCache.GetImage(*File, width, height);  // Check if image is in imagecache
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick2 = GetMsTicks();
@@ -51,7 +51,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         if (!success) {
             if (i == 1)  // Second try
                 dsyslog("flatPlus: ImageLoader LoadLogo: %s (%s.%s) could not be loaded", *File, logo,
-                        *logoExtension);
+                        *LogoExtension);
             continue;  // Image not found on disk
         }
 
@@ -70,7 +70,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             dsyslog("   scale logo: %d ms", tick6 - tick5);
         #endif
 
-        imgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
+        ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
         return img;  // Image loaded from disk
     }  // for
     return NULL;  // No image; so return Null
@@ -79,7 +79,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if ((width == 0) || (height == 0)) return NULL;
 
-    cString File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, Setup.OSDTheme, cIcon, *logoExtension);
+    cString File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *LogoExtension);
 
     #ifdef DEBUGIMAGELOADTIME
         dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
@@ -91,7 +91,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         uint32_t tick1 = GetMsTicks();
     #endif
 
-    img = imgCache.GetImage(*File, width, height);
+    img = ImgCache.GetImage(*File, width, height);
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick2 = GetMsTicks();
@@ -112,13 +112,13 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     #endif
 
     if (!success) {  // Search for logo in default folder
-        File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, "default", cIcon, *logoExtension);
+        File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, "default", cIcon, *LogoExtension);
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
             uint32_t tick5 = GetMsTicks();
         #endif
 
-        img = imgCache.GetImage(*File, width, height);
+        img = ImgCache.GetImage(*File, width, height);
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick6 = GetMsTicks();
@@ -158,7 +158,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
             return NULL;
         }
 
-        imgCache.InsertImage(img, *File, width, height);
+        ImgCache.InsertImage(img, *File, width, height);
         return img;
 }
 
@@ -175,7 +175,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         uint32_t tick1 = GetMsTicks();
     #endif
 
-    img = imgCache.GetImage(*File, width, height);
+    img = ImgCache.GetImage(*File, width, height);
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick2 = GetMsTicks();
@@ -212,11 +212,11 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         dsyslog("   scale logo: %d ms", tick6 - tick5);
     #endif
 
-    imgCache.InsertImage(img, *File, width, height);
+    ImgCache.InsertImage(img, *File, width, height);
     return img;
 }
 
-void cImageLoader::toLowerCase(std::string &str) {
+void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
         if (ch >= 'A' && ch <= 'Z')
             ch += 32;  // Or: ch ^= 1 << 5;

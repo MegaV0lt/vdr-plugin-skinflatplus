@@ -97,15 +97,15 @@ bool cPluginFlat::Start(void) {
     } else
         dsyslog("flatPlus: TrueColor OSD found");
 
-    imgCache.Create();
-    imgCache.PreLoadImage();
+    ImgCache.Create();
+    ImgCache.PreLoadImage();
 
     flat = new cFlat;
     return flat;
 }
 
 void cPluginFlat::Stop(void) {
-    imgCache.Clear();
+    ImgCache.Clear();
 }
 
 void cPluginFlat::Housekeeping(void) {
@@ -159,7 +159,7 @@ cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &
             return "No logo given";
         }
 
-        if (imgCache.RemoveFromCache(Option)) {
+        if (ImgCache.RemoveFromCache(Option)) {
             ReplyCode = 900;
             return "Successfully remove logo from cache";
         } else {

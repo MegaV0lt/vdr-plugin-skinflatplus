@@ -126,9 +126,9 @@ bool cComplexContent::Scrollable(int height) {
 }
 
 void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
-                              cFont *font, int textWidth, int textHeight, int textAlignment) {
+                              cFont *g_Font, int textWidth, int textHeight, int textAlignment) {
     Contents.emplace_back(cSimpleContent());
-    Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    Contents.back().SetText(text, multiline, position, colorFg, colorBg, g_Font, textWidth, textHeight, textAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
@@ -137,12 +137,12 @@ void cComplexContent::AddImage(cImage *image, cRect position) {
 }
 
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos,
-                                              tColor colorFg, tColor colorBg, cFont *font, int textWidth,
+                                              tColor colorFg, tColor colorBg, cFont *g_Font, int textWidth,
                                               int textHeight, int textAlignment) {
     int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
 
     cTextWrapper WrapperFloat;
-    WrapperFloat.Set(text, font, TextWidthLeft);
+    WrapperFloat.Set(text, g_Font, TextWidthLeft);
     int FloatLines = ceil(image->Height() * 1.0f / g_ScrollSize);
     int Lines = WrapperFloat.Lines();
 
@@ -153,7 +153,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     FloatedTextPos.SetHeight(textPos.Height());
 
     if (Lines < FloatLines) {  // Text fits on the left side of the image
-        AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+        AddText(text, true, FloatedTextPos, colorFg, colorBg, g_Font, textWidth, textHeight, textAlignment);
     } else {
         int NumChars {0};
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
@@ -175,8 +175,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         SecondTextPos.SetWidth(textPos.Width());
         SecondTextPos.SetHeight(textPos.Height());
 
-        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, g_Font, textWidth, textHeight, textAlignment);
+        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, g_Font, textWidth, textHeight, textAlignment);
     }
 
     cRect ImagePos;
@@ -230,25 +230,25 @@ int cComplexContent::ScrollOffset(void) {
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {
-    int aktHeight = Pixmap->DrawPort().Point().Y();
-    int totalHeight = Pixmap->DrawPort().Height();
-    int screenHeight = Pixmap->ViewPort().Height();
-    int lineHeight = g_ScrollSize;
+    int AktHeight = Pixmap->DrawPort().Point().Y();
+    int TotalHeight = Pixmap->DrawPort().Height();
+    int ScreenHeight = Pixmap->ViewPort().Height();
+    int LineHeight = g_ScrollSize;
 
     bool scrolled = false;
     if (Up) {
         if (Page) {
-            int newY = aktHeight + screenHeight;
-            if (newY > 0) newY = 0;
+            int NewY = AktHeight + ScreenHeight;
+            if (NewY > 0) NewY = 0;
 
-            Pixmap->SetDrawPortPoint(cPoint(0, newY));
-            PixmapImage->SetDrawPortPoint(cPoint(0, newY));
+            Pixmap->SetDrawPortPoint(cPoint(0, NewY));
+            PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
             scrolled = true;
         } else {
-            if (aktHeight < 0) {
-                if (aktHeight + lineHeight < 0) {
-                    Pixmap->SetDrawPortPoint(cPoint(0, aktHeight + lineHeight));
-                    PixmapImage->SetDrawPortPoint(cPoint(0, aktHeight + lineHeight));
+            if (AktHeight < 0) {
+                if (AktHeight + LineHeight < 0) {
+                    Pixmap->SetDrawPortPoint(cPoint(0, AktHeight + LineHeight));
+                    PixmapImage->SetDrawPortPoint(cPoint(0, AktHeight + LineHeight));
                 } else {
                     Pixmap->SetDrawPortPoint(cPoint(0, 0));
                     PixmapImage->SetDrawPortPoint(cPoint(0, 0));
@@ -258,22 +258,22 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
         }
     } else {  // Down
         if (Page) {
-            int newY = aktHeight - screenHeight;
-            if ((-1) * newY > totalHeight - screenHeight)
-                newY = (-1) * (totalHeight - screenHeight);
-            Pixmap->SetDrawPortPoint(cPoint(0, newY));
-            PixmapImage->SetDrawPortPoint(cPoint(0, newY));
+            int NewY = AktHeight - ScreenHeight;
+            if ((-1) * NewY > TotalHeight - ScreenHeight)
+                NewY = (-1) * (TotalHeight - ScreenHeight);
+            Pixmap->SetDrawPortPoint(cPoint(0, NewY));
+            PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
             scrolled = true;
         } else {
-            if (totalHeight - ((-1) * aktHeight + lineHeight) > screenHeight) {
-                Pixmap->SetDrawPortPoint(cPoint(0, aktHeight - lineHeight));
-                PixmapImage->SetDrawPortPoint(cPoint(0, aktHeight - lineHeight));
+            if (TotalHeight - ((-1) * AktHeight + LineHeight) > ScreenHeight) {
+                Pixmap->SetDrawPortPoint(cPoint(0, AktHeight - LineHeight));
+                PixmapImage->SetDrawPortPoint(cPoint(0, AktHeight - LineHeight));
             } else {
-                int newY = aktHeight - screenHeight;
-                if ((-1) * newY > totalHeight - screenHeight)
-                    newY = (-1) * (totalHeight - screenHeight);
-                Pixmap->SetDrawPortPoint(cPoint(0, newY));
-                PixmapImage->SetDrawPortPoint(cPoint(0, newY));
+                int NewY = AktHeight - ScreenHeight;
+                if ((-1) * NewY > TotalHeight - ScreenHeight)
+                    NewY = (-1) * (TotalHeight - ScreenHeight);
+                Pixmap->SetDrawPortPoint(cPoint(0, NewY));
+                PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
             }
             scrolled = true;
         }

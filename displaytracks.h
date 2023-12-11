@@ -4,16 +4,16 @@
 
 class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
  private:
-        cPixmap *tracksPixmap;
-        cPixmap *tracksLogoPixmap;
+        cPixmap *TracksPixmap;
+        cPixmap *TracksLogoPixmap;
 
         cImage *img_ac3;
         cImage *img_stereo;
-        int ac3Width, stereoWidth;
+        int Ac3Width, StereoWidth;
 
-        int itemHeight, itemsHeight;
-        int maxItemWidth;
-        int currentIndex;
+        int ItemHeight, ItemsHeight;
+        int MaxItemWidth;
+        int CurrentIndex;
 
         void SetItem(const char *Text, int Index, bool Current);
  public:

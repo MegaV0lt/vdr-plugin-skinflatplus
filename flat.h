@@ -16,7 +16,7 @@
 #include "imagecache.h"
 
 extern class cFlatConfig Config;
-extern class cImageCache imgCache;
+extern class cImageCache ImgCache;
 extern bool g_FirstDisplay;
 
 extern time_t g_RemoteTimersLastRefresh;
@@ -195,7 +195,7 @@ THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
  private:
-        cFlatDisplayMenu *displayMenu;
+        cFlatDisplayMenu *Display_Menu;
  public:
         cFlat(void);
         virtual const char *Description(void);
@@ -234,20 +234,20 @@ cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingerrorIcon(int RecInfoErrors);
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
-inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
+inline void LeftTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     s.erase(0, s.find_first_not_of(t));  // Trim from left
     // return s;  // Only inplace trimming
 }
 
-inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
+inline void RightTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     s.erase(s.find_last_not_of(t) + 1);  // Trim from right
     // return s;  // Only inplace trimming
 }
 
 inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    ltrim(s, t);  // Trim from left & right
-    rtrim(s, t);
-    /* return */  // ltrim(rtrim(s, t), t);
+    LeftTrim(s, t);  // Trim from left & right
+    RightTrim(s, t);
+    /* return */  // LeftTrim(RightTrim(s, t), t);
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT

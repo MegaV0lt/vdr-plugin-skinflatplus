@@ -28,7 +28,7 @@ enum stream_content {
 };
 
 class cFlatConfig Config;
-class cImageCache imgCache;
+class cImageCache ImgCache;
 
 cTheme Theme;
 static bool g_MenuActive = false;
@@ -36,7 +36,7 @@ bool g_FirstDisplay = true;
 time_t g_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
-    displayMenu = NULL;
+    Display_Menu = NULL;
 }
 
 const char *cFlat::Description(void) {
@@ -49,7 +49,7 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
 
 cSkinDisplayMenu *cFlat::DisplayMenu(void) {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
-    displayMenu = menu;
+    Display_Menu = menu;
     g_MenuActive = true;
     return menu;
 }
@@ -64,7 +64,7 @@ std::shared_ptr<cOsdItem> cMenuSetupSubMenu::InfoItem(const char *label, const c
     std::shared_ptr<cOsdItem> retval = std::make_shared<cOsdItem>(cString::sprintf("%s: %s", label, value));
     retval->SetSelectable(false);
     g_MenuActive = true;
-    displayMenu = retval;
+    Display_Menu = retval;
     return retval;
 }
 */
@@ -270,7 +270,7 @@ int GetEpgsearchConflichts(void) {
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     cMarks marks;
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
-    bool IsCutted = false, HasMarks = false;
+    bool HasMarks = false;
     cIndexFile *index = NULL;
     if (Recording->NumFrames() > 0) {
         HasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
@@ -279,19 +279,12 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         // cIndexFile *index(Recording->FileName(), false, Recording->IsPesRecording());
     }
 
-    // For AddText
-    int LastIndex {0};
-    uint64_t RecSize {0};
-
-    int CuttedLength {0};
-    int32_t CutinFrame {0};
-    uint64_t RecSizeCutted {0}, CutinOffset {0};
+    bool IsCutted = false;
     uint64_t FileSize[100000];
-    uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
     FileSize[0] = 0;
-
+    uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
     int i {0}, rc {0};
-    struct stat filebuf;
+    struct stat FileBuf;
     cString FileName("");
 
     do {
@@ -300,64 +293,65 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             FileName = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
         else
             FileName = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
-        rc = stat(*FileName, &filebuf);
+        rc = stat(*FileName, &FileBuf);
         if (rc == 0)
-            FileSize[i] = FileSize[i - 1] + filebuf.st_size;
+            FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
         else {
             if (ENOENT != errno) {
                 esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)FileName, errno,
                         strerror(errno));
-                if (AddText) RecSize = 0;
             }
         }
     } while (i <= MaxFiles && !rc);
-    if (AddText) RecSize = FileSize[i - 1];
 
+    int CuttedLength {0};
+    uint64_t RecSizeCutted {0};
     if (HasMarks && index) {
         uint16_t FileNumber;
         off_t FileOffset;
-
-        bool cutin = true;
-        int32_t position {0};
+        bool CutIn = true;
+        int32_t CutInFrame {0}, position {0};
+        uint64_t CutInOffset {0};
         cMark *mark = marks.First();
         while (mark) {
             position = mark->Position();
             index->Get(position, &FileNumber, &FileOffset);
-            if (cutin) {
-                CutinFrame = position;
-                cutin = false;
-                CutinOffset = FileSize[FileNumber - 1] + FileOffset;
+            if (CutIn) {
+                CutInFrame = position;
+                CutIn = false;
+                CutInOffset = FileSize[FileNumber - 1] + FileOffset;
             } else {
-                CuttedLength += position - CutinFrame;
-                cutin = true;
-                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutinOffset;
+                CuttedLength += position - CutInFrame;
+                CutIn = true;
+                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
             }
             cMark *NextMark = marks.Next(mark);
             mark = NextMark;
         }
-        if (!cutin) {
-            CuttedLength += index->Last() - CutinFrame;
+        if (!CutIn) {
+            CuttedLength += index->Last() - CutInFrame;
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
-            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutinOffset;
+            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
+        Cutted = IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond());
+        IsCutted = true;
     }
-    if (index) {
-        if (AddText) {
-            LastIndex = index->Last();
-            Text.Append(
-                cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, Recording->FramesPerSecond())));
-            if (HasMarks)
-                Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
-                                             *IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond())));
-            Text.Append("\n");
-        } else if (HasMarks) {
-            Cutted = IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond());
-            IsCutted = true;
-        }
+
+    int LastIndex {0};
+    if (AddText && index) {
+        LastIndex = index->Last();
+        Text.Append(
+            cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, Recording->FramesPerSecond())));
+        if (HasMarks)
+            Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
+                                         *IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond())));
+        Text.Append("\n");
     }
     delete index;
 
+    uint64_t RecSize {0};
     if (AddText) {
+        /* if (!rc) */ RecSize = FileSize[i - 1];  // 0 when error opening file
         if (RecSize > MEGABYTE(1023))
             Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
         else

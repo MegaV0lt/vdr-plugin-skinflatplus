@@ -1,6 +1,6 @@
 #pragma once
 
-#include "baserender.h"
+#include "./baserender.h"
 
 class cFlatDisplayMessage : public cFlatBaseRender, public cSkinDisplayMessage {
  private:

@@ -23,47 +23,47 @@
 
 class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
  private:
-        cPixmap *menuPixmap;
-        cPixmap *menuIconsPixmap;
-        cPixmap *menuIconsBGPixmap;
-        cPixmap *menuIconsOVLPixmap;
+        cPixmap *MenuPixmap;
+        cPixmap *MenuIconsPixmap;
+        cPixmap *MenuIconsBgPixmap;
+        cPixmap *MenuIconsOvlPixmap;
 
-        int menuTop, menuWidth;
-        int menuItemWidth;
-        int menuItemLastHeight;
+        int MenuTop, MenuWidth;
+        int MenuItemWidth;
+        int MenuItemLastHeight;
         bool MenuFullOsdIsDrawn;
 
-        eMenuCategory menuCategory;
-        int VideoDiskUsageState;
+        eMenuCategory g_MenuCategory;
+        int g_VideoDiskUsageState;
 
         int LastTimerCount, LastTimerActiveCount;
         cString LastTitle;
 
         int chLeft, chTop, chWidth, chHeight;
-        cPixmap *contentHeadPixmap;
-        cPixmap *contentHeadIconsPixmap;
+        cPixmap *ContentHeadPixmap;
+        cPixmap *ContentHeadIconsPixmap;
 
         int cLeft, cTop, cWidth, cHeight;
 
-        cPixmap *scrollbarPixmap;
-        int scrollBarTop, scrollBarWidth, scrollBarHeight;
+        cPixmap *ScrollbarPixmap;
+        int g_ScrollBarTop, g_ScrollBarWidth, g_ScrollBarHeight;
 
-        int itemHeight, itemChannelHeight, itemTimerHeight, itemEventHeight, itemRecordingHeight;
+        int ItemHeight, ItemChannelHeight, ItemTimerHeight, ItemEventHeight, ItemRecordingHeight;
 
         std::list<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool isScrolling;
-        bool isGroup;
+        bool IsScrolling;
+        bool IsGroup;
         bool ShowEvent, ShowRecording, ShowText;
 
         cComplexContent ComplexContent;
 
         // Content for Widgets
-        cComplexContent contentWidget;
+        cComplexContent ContentWidget;
 
         // TextScroller
-        cTextScrollers menuItemScroller;
+        cTextScrollers MenuItemScroller;
 
         cString ItemEventLastChannelName;
 
@@ -71,10 +71,10 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int LastItemRecordingLevel;
 
         // Icons
-        cImage *iconTimerFull;
-        // cImage *iconTimerPartial;
-        cImage *iconArrowTurn;
-        cImage *iconRec;
+        cImage *IconTimerFull;
+        // cImage *IconTimerPartial;
+        cImage *IconArrowTurn;
+        cImage *IconRec;
         // cImage *iconVps;
         // cImage *iconNew;
         // Icons
@@ -88,16 +88,16 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         std::string MainMenuText(std::string Text);
         cString GetIconName(std::string element);
 
-        std::string GetRecordingName(const cRecording *Recording, int Level, bool isFolder);
+        std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         std::string xml_substring(std::string source, const char* str_start, const char* str_end);
 
-        bool isRecordingOld(const cRecording *Recording, int Level);
+        bool IsRecordingOld(const cRecording *Recording, int Level);
         const char *GetGenreIcon(uchar genre);
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
         void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
-                           bool CanScrollDown, bool isContent = false);
+                           bool CanScrollDown, bool IsContent = false);
         int ItemsHeight(void);
         bool CheckProgressBar(const char *text);
         void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
