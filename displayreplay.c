@@ -148,8 +148,8 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
-        cString recErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
-        cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
+        cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
+        cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, g_FontSmlHight);  // Small image
         if (img) {

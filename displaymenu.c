@@ -1,7 +1,4 @@
-#include "displaymenu.h"
-#include "services/epgsearch.h"
-#include "services/remotetimers.h"
-#include "services/scraper2vdr.h"
+#include "./displaymenu.h"
 #include <fstream>
 #include <iostream>
 #include <utility>
@@ -10,11 +7,15 @@
 #include <future>
 #endif
 
+#include "./services/epgsearch.h"
+#include "./services/remotetimers.h"
+#include "./services/scraper2vdr.h"
+
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
 #endif
 
-#include "flat.h"
+#include "./flat.h"
 #include "locale"
 
 static int CompareTimers(const void *a, const void *b) {
@@ -542,20 +543,20 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string text = skipspace(Text.c_str());
     std::string MenuEntry(""), MenuNumber("");
     bool found = false;
-    bool doBreak = false;
+    bool DoBreak = false;
     char s(' ');
-    size_t i {0}, textLength = text.length();
-    for (; i < textLength; ++i) {
+    size_t i {0}, TextLength = text.length();
+    for (; i < TextLength; ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
             if (!(s >= '0' && s <= '9')) break;
         }
         if (found) {
             if (!(s >= '0' && s <= '9'))
-                doBreak = true;
+                DoBreak = true;
         }
         if (s >= '0' && s <= '9') found = true;
-        if (doBreak || i > 4) break;
+        if (DoBreak || i > 4) break;
     }
     if (found) {
         MenuNumber = skipspace(text.substr(0, i).c_str());
@@ -764,9 +765,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
 #else
-    cSchedulesLock schedulesLock;
-    const cSchedules *schedules = cSchedules::Schedules(schedulesLock);
-    const cSchedule *Schedule = schedules->GetSchedule(Channel->GetChannelID());
+    cSchedulesLock SchedulesLock;
+    const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
+    const cSchedule *Schedule = Schedules->GetSchedule(Channel->GetChannelID());
 #endif
     float progress {0.0};
     cString EventTitle("");
@@ -1849,8 +1850,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += g_Font->Width(*Buffer);
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            int recordingIsInUse = Recording->IsInUse();
-            if ((recordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
+            int RecordingIsInUse = Recording->IsInUse();
+            if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 img = NULL;
                 if (Current)
                     img = ImgLoader.LoadIcon("timerRecording_cur", g_FontHight, g_FontHight);
@@ -1858,7 +1859,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     img = ImgLoader.LoadIcon("timerRecording", g_FontHight, g_FontHight);
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if ((recordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
+            } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
                 img = NULL;
                 if (Current)
                     img = ImgLoader.LoadIcon("play", g_FontHight, g_FontHight);
@@ -1872,7 +1873,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
             }
 #if APIVERSNUM >= 20108
-            else /* if (!recordingIsInUse) */ {
+            else /* if (!RecordingIsInUse) */ {
                 IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = NULL;
@@ -2025,8 +2026,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Top -= g_FontHight;
             Left = MenuItemWidth - ImagesWidth;
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            int recordingIsInUse = Recording->IsInUse();
-            if ((recordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
+            int RecordingIsInUse = Recording->IsInUse();
+            if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 img = NULL;
                 if (Current)
                     img = ImgLoader.LoadIcon("timerRecording_cur", g_FontHight, g_FontHight);
@@ -2034,7 +2035,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     img = ImgLoader.LoadIcon("timerRecording", g_FontHight, g_FontHight);
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if ((recordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
+            } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
                 img = NULL;
                 if (Current)
                     img = ImgLoader.LoadIcon("play", g_FontHight, g_FontHight);
@@ -2261,44 +2262,44 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if components
     }  // EpgAdditionalInfoShow
 
-    double iconHeight = (chHeight - (2 * g_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = chHeight - iconHeight - g_MarginItem;  // Position for fsk/genre image
-    int HeadIconLeft = chWidth - iconHeight - g_MarginItem;
+    double IconHeight = (chHeight - (2 * g_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    int HeadIconTop = chHeight - IconHeight - g_MarginItem;  // Position for fsk/genre image
+    int HeadIconLeft = chWidth - IconHeight - g_MarginItem;
     cString IconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = ImgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= iconHeight + g_MarginItem;
+            HeadIconLeft -= IconHeight + g_MarginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *IconName);
-            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
+            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
             if (img) {
                 ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                HeadIconLeft -= iconHeight + g_MarginItem;
+                HeadIconLeft -= IconHeight + g_MarginItem;
             }
         }
     }
-    bool isUnknownDrawn = false;
+    bool IsUnknownDrawn = false;
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = ImgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= iconHeight + g_MarginItem;
+            HeadIconLeft -= IconHeight + g_MarginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *IconName);
-            if (!isUnknownDrawn) {
+            if (!IsUnknownDrawn) {
                 img =
-                    ImgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
+                    ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
                 if (img) {
                     ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                    HeadIconLeft -= iconHeight + g_MarginItem;
-                    isUnknownDrawn = true;
+                    HeadIconLeft -= IconHeight + g_MarginItem;
+                    IsUnknownDrawn = true;
                 }
             }
         }
@@ -2313,21 +2314,21 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString Reruns("");
     if (Config.EpgRerunsShow) {
         // Lent from nopacity
-        cPlugin *epgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
-        if (epgSearchPlugin && !isempty(Event->Title())) {
+        cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
+        if (pEpgSearchPlugin && !isempty(Event->Title())) {
             Epgsearch_searchresults_v1_0 data;
-            std::string strQuery = Event->Title();
+            std::string StrQuery = Event->Title();
             data.useSubTitle = false;
 
-            data.query = (char *)strQuery.c_str();
-            // data.query = reinterpret_cast<char *>(strQuery.c_str());
+            data.query = (char *)StrQuery.c_str();
+            // data.query = reinterpret_cast<char *>(StrQuery.c_str());
             // error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
             data.mode = 0;
             data.channelNr = 0;
             data.useTitle = true;
             data.useDescription = false;
 
-            if (epgSearchPlugin->Service("Epgsearch-searchresults-v1.0", &data)) {
+            if (pEpgSearchPlugin->Service("Epgsearch-searchresults-v1.0", &data)) {
                 cList<Epgsearch_searchresults_v1_0::cServiceSearchResult> *list = data.pResultList;
                 if (list && (list->Count() > 1)) {
                     int i {0};
@@ -2351,9 +2352,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         // if (!isempty(r->event->ShortText()))
                         //    Reruns.Append(cString::sprintf("~%s", r->event->ShortText()));
                         Reruns.Append("\n");
-                    }
+                    }  // for
                     delete list;
-                }
+                }  // if list
             }
         }
     }
@@ -2908,11 +2909,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     }
 
     cString RecPath = cString::sprintf("%s", Recording->FileName());
-    cString recImage("");
-    if (ImgLoader.SearchRecordingPoster(*RecPath, recImage)) {
+    cString RecImage("");
+    if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
         MediaWidth = cWidth / 2 - g_MarginItem * 3;
         MediaType = 2;
-        MediaPath = recImage;
+        MediaPath = RecImage;
     }
 
     if (!isempty(*MediaPath)) {
@@ -3119,44 +3120,44 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }  // if Config.RecordingAdditionalInfoShow
 
-    double iconHeight = (chHeight - (2 * g_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = chHeight - iconHeight - g_MarginItem;  // Position for fsk/genre image
-    int HeadIconLeft = chWidth - iconHeight - g_MarginItem;
+    double IconHeight = (chHeight - (2 * g_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    int HeadIconTop = chHeight - IconHeight - g_MarginItem;  // Position for fsk/genre image
+    int HeadIconLeft = chWidth - IconHeight - g_MarginItem;
     cString IconName("");
     cImage *img = NULL;
     if (Fsk.length() > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
-        img = ImgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= iconHeight + g_MarginItem;
+            HeadIconLeft -= IconHeight + g_MarginItem;
         } else {
             isyslog("flatPlus: FSK icon not found: %s", *IconName);
-            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", iconHeight, iconHeight);
+            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
             if (img) {
                 ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                HeadIconLeft -= iconHeight + g_MarginItem;
+                HeadIconLeft -= IconHeight + g_MarginItem;
             }
         }
     }
-    bool isUnknownDrawn = false;
+    bool IsUnknownDrawn = false;
     while (!GenreIcons.empty()) {
         GenreIcons.sort();
         GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = ImgLoader.LoadIcon(*IconName, iconHeight, iconHeight);
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= iconHeight + g_MarginItem;
+            HeadIconLeft -= IconHeight + g_MarginItem;
         } else {
             isyslog("flatPlus: Genre icon not found: %s", *IconName);
-            if (!isUnknownDrawn) {
+            if (!IsUnknownDrawn) {
                 img =
-                    ImgLoader.LoadIcon("EPGInfo/Genre/unknown", iconHeight, iconHeight);
+                    ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
                 if (img) {
                     ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                    HeadIconLeft -= iconHeight + g_MarginItem;
-                    isUnknownDrawn = true;
+                    HeadIconLeft -= IconHeight + g_MarginItem;
+                    IsUnknownDrawn = true;
                 }
             }
         }
@@ -3306,9 +3307,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }  // Scraper plugin
 
             cString RecPath = cString::sprintf("%s", Recording->FileName());
-            cString recImage("");
-            if (ImgLoader.SearchRecordingPoster(*RecPath, recImage))
-                MediaPath = recImage;
+            cString RecImage("");
+            if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
+                MediaPath = RecImage;
         }  // FirstRun
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
@@ -3521,8 +3522,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option
-        cString recErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
-        cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
+        cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
+        cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, g_FontSmlHight);  // Small image
         if (img) {
