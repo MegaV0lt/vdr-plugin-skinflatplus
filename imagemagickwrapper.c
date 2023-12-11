@@ -15,7 +15,7 @@ cImageMagickWrapper::cImageMagickWrapper() {
 cImageMagickWrapper::~cImageMagickWrapper() {
 }
 
-cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAspect) {
+cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {
     int w {0}, h {0};
     w = buffer.columns();
     h = buffer.rows();
@@ -23,7 +23,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool preserveAsp
         width = w;
     if (height == 0)
         height = h;
-    if (preserveAspect) {
+    if (PreserveAspect) {
         unsigned scale_w = 1000 * width / w;
         unsigned scale_h = 1000 * height / h;
         if (scale_w > scale_h)

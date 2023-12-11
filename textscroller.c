@@ -9,31 +9,31 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Position = position;
 
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
-    cRect drawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
+    cRect DrawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
 
     if (Osd && Pixmap)
         Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(Osd, "Pixmap", Layer, Position, drawPort);
+    Pixmap = CreatePixmap(Osd, "Pixmap", Layer, Position, DrawPort);
     // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
     //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
-    // dsyslog("flatPlus: TextScrollerPixmap drawPort left: %d top: %d width: %d height: %d",
-    //        drawPort.Left(), drawPort.Top(), drawPort.Width(), drawPort.Height());
+    // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
+    //        DrawPort.Left(), DrawPort.Top(), DrawPort.Width(), DrawPort.Height());
     PixmapFill(Pixmap, colorBg);
     Draw();
 }
 
 void cTextScroll::UpdateViewPortWidth(int w) {
-    cRect viewPort = Pixmap->ViewPort();
-    viewPort.SetWidth(viewPort.Width() - w);
-    Pixmap->SetViewPort(viewPort);
+    cRect ViewPort = Pixmap->ViewPort();
+    ViewPort.SetWidth(ViewPort.Width() - w);
+    Pixmap->SetViewPort(ViewPort);
 }
 
 void cTextScroll::Reset(void) {
     if (!Pixmap) return;
 
     Pixmap->SetDrawPortPoint(cPoint(0, 0));
-    waitSteps = WAITSTEPS;
+    WaitSteps = WAITSTEPS;
 }
 
 void cTextScroll::Draw(void) {
@@ -62,45 +62,45 @@ void cTextScroll::DoStep(void) {
     if (!Pixmap) return;
 
     // Wait at the beginning for better read
-    if (waitSteps > 0) {
-        --waitSteps;
+    if (WaitSteps > 0) {
+        --WaitSteps;
         return;
     }
     // Wait after return to the front
     if (ResetX) {
         ResetX = false;
         Pixmap->SetDrawPortPoint(cPoint(0, 0));
-        waitSteps = WAITSTEPS;
+        WaitSteps = WAITSTEPS;
         return;
     }
 
-    int drawPortX = Pixmap->DrawPort().X();
+    int DrawPortX = Pixmap->DrawPort().X();
 
-    if (isReserveStep)
-        drawPortX += PixelsPerStep;
+    if (IsReserveStep)
+        DrawPortX += PixelsPerStep;
     else
-        drawPortX -= PixelsPerStep;
+        DrawPortX -= PixelsPerStep;
 
     int maxX = Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width();
     maxX *= -1;
 
     if (ScrollType == 0) {
-        if (drawPortX <= maxX) {
-            drawPortX += PixelsPerStep;
+        if (DrawPortX <= maxX) {
+            DrawPortX += PixelsPerStep;
             ResetX = true;
-            waitSteps = WAITSTEPS;
+            WaitSteps = WAITSTEPS;
         }
     } else if (ScrollType == 1) {
-        if (drawPortX <= maxX) {
-            isReserveStep = true;
-            waitSteps = WAITSTEPS;
-        } else if (drawPortX > 0) {
-            isReserveStep = false;
-            waitSteps = WAITSTEPS;
+        if (DrawPortX <= maxX) {
+            IsReserveStep = true;
+            WaitSteps = WAITSTEPS;
+        } else if (DrawPortX > 0) {
+            IsReserveStep = false;
+            WaitSteps = WAITSTEPS;
         }
     }
 
-    Pixmap->SetDrawPortPoint(cPoint(drawPortX, 0));
+    Pixmap->SetDrawPortPoint(cPoint(DrawPortX, 0));
 }
 
 cTextScrollers::cTextScrollers() {
@@ -129,8 +129,8 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
     while (Active())
         cCondWait::SleepMs(10);
 
-    Scrollers.emplace_back(new cTextScroll(Osd, scrollType, scrollStep,
-        static_cast<int>(WAITDELAY * 1.0f / scrollDelay), Layer));
+    Scrollers.emplace_back(new cTextScroll(Osd, ScrollType, ScrollStep,
+        static_cast<int>(WAITDELAY * 1.0f / ScrollDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, g_Font, ColorExtraTextFg);
 
     StartScrolling();
@@ -170,7 +170,7 @@ void cTextScrollers::Action(void) {
 
     while (Running()) {
         if (Running())
-            cCondWait::SleepMs(scrollDelay);
+            cCondWait::SleepMs(ScrollDelay);
 
         std::vector<cTextScroll *>::iterator it, end = Scrollers.end();
         for (it = Scrollers.begin(); it != end; ++it) {

@@ -9,9 +9,9 @@ cComplexContent::cComplexContent() {
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
-cComplexContent::cComplexContent(cOsd *osd, int scrollSize) {
+cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
     Osd = osd;
-    g_ScrollSize = scrollSize;
+    g_ScrollSize = ScrollSize;
 
     Pixmap = NULL;
     PixmapImage = NULL;

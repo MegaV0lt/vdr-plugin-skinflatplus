@@ -160,12 +160,12 @@ class cComplexContent {
 
  public:
     cComplexContent(void);
-    cComplexContent(cOsd *osd, int scrollSize);
+    cComplexContent(cOsd *osd, int ScrollSize);
     ~cComplexContent();
 
     void SetOsd(cOsd *osd) { Osd = osd; }
     void SetPosition(cRect position) { Position = position; }
-    void SetScrollSize(int scrollSize) { g_ScrollSize = scrollSize; }
+    void SetScrollSize(int ScrollSize) { g_ScrollSize = ScrollSize; }
     void SetBGColor(tColor colorBg) { ColorBg = colorBg; }
     void CreatePixmaps(bool fullFillBackground);
 
