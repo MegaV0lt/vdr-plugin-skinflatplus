@@ -228,22 +228,22 @@ bool cImageLoader::FileExits(const std::string &name) {
     return (stat (name.c_str(), &Buffer) == 0);
 }
 
-bool cImageLoader::SearchRecordingPoster(cString recPath, cString &found) {
-    cString manualPoster = cString::sprintf("%s/cover_vdr.jpg", *recPath);
+bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {
+    cString manualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
     if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *recPath);
+        dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
         found = manualPoster;
         return true;
     }
-    manualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *recPath);
+    manualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *RecPath);
     if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *recPath);
+        dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
         found = manualPoster;
         return true;
     }
-    manualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *recPath);
+    manualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *RecPath);
     if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *recPath);
+        dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
         found = manualPoster;
         return true;
     }

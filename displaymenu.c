@@ -2907,9 +2907,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
     }
 
-    cString recPath = cString::sprintf("%s", Recording->FileName());
+    cString RecPath = cString::sprintf("%s", Recording->FileName());
     cString recImage("");
-    if (ImgLoader.SearchRecordingPoster(*recPath, recImage)) {
+    if (ImgLoader.SearchRecordingPoster(*RecPath, recImage)) {
         MediaWidth = cWidth / 2 - g_MarginItem * 3;
         MediaType = 2;
         MediaPath = recImage;
@@ -3305,9 +3305,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
             }  // Scraper plugin
 
-            cString recPath = cString::sprintf("%s", Recording->FileName());
+            cString RecPath = cString::sprintf("%s", Recording->FileName());
             cString recImage("");
-            if (ImgLoader.SearchRecordingPoster(*recPath, recImage))
+            if (ImgLoader.SearchRecordingPoster(*RecPath, recImage))
                 MediaPath = recImage;
         }  // FirstRun
 #ifdef DEBUGEPGTIME
