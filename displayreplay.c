@@ -87,7 +87,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     // Show if still recording
     cImage *img = NULL;
     if ((g_Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        img = imgLoader.LoadIcon("timerRecording", 999, g_FontSmlHight);  // Small image
+        img = ImgLoader.LoadIcon("timerRecording", 999, g_FontSmlHight);  // Small image
 
         if (img) {
             int ImageTop = g_FontHight + (g_FontSmlHight - img->Height()) / 2;
@@ -119,7 +119,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         MaxWidth -= g_FontSmlHight;  // Substract width of imgRecErr
 #endif
 
-    img = imgLoader.LoadIcon("1920x1080", 999, g_FontSmlHight);
+    img = ImgLoader.LoadIcon("1920x1080", 999, g_FontSmlHight);
     if (img)
         MaxWidth -= img->Width() * 3;  // Substract guessed max. used space of aspect and format icons
 
@@ -151,7 +151,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         cString recErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
         cString RecErrIcon = cString::sprintf("%s_replay", *recErrIcon);
 
-        img = imgLoader.LoadIcon(*RecErrIcon, 999, g_FontSmlHight);  // Small image
+        img = ImgLoader.LoadIcon(*RecErrIcon, 999, g_FontSmlHight);  // Small image
         if (img) {
             left += g_MarginItem;
             int ImageTop = g_FontHight + (g_FontSmlHight - img->Height()) / 2;
@@ -224,19 +224,19 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), g_Font);
             }
         }
-        cImage *img = imgLoader.LoadIcon(*rewind, g_FontHight, g_FontHight);
+        cImage *img = ImgLoader.LoadIcon(*rewind, g_FontHight, g_FontHight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left, 0), *img);
 
-        img = imgLoader.LoadIcon(*pause, g_FontHight, g_FontHight);
+        img = ImgLoader.LoadIcon(*pause, g_FontHight, g_FontHight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left + g_FontHight + g_MarginItem, 0), *img);
 
-        img = imgLoader.LoadIcon(*play, g_FontHight, g_FontHight);
+        img = ImgLoader.LoadIcon(*play, g_FontHight, g_FontHight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left + g_FontHight * 2 + g_MarginItem * 2, 0), *img);
 
-        img = imgLoader.LoadIcon(*forward, g_FontHight, g_FontHight);
+        img = ImgLoader.LoadIcon(*forward, g_FontHight, g_FontHight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left + g_FontHight * 3 + g_MarginItem * 3, 0), *img);
     }
@@ -393,7 +393,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                 dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
             }
-            img = imgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -407,7 +407,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     if (IsCutted) {
-        img = imgLoader.LoadIcon("recording_cutted_extra", g_FontHight, g_FontHight);
+        img = ImgLoader.LoadIcon("recording_cutted_extra", g_FontHight, g_FontHight);
         int imgWidth {0};
         if (img)
             imgWidth = img->Width();
@@ -537,7 +537,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         cString IconName("");
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(ScreenWidth, ScreenAspect);
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = g_FontHight + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -546,7 +546,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             }
 
             IconName = GetScreenResolutionIcon(ScreenWidth, ScreenHeight, ScreenAspect);  // Show Resolution
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = g_FontHight + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -557,7 +557,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             IconName = GetFormatIcon(ScreenWidth);  // Show Format
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = g_FontHight + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -587,39 +587,39 @@ void cFlatDisplayReplay::Flush(void) {
 }
 
 void cFlatDisplayReplay::PreLoadImages(void) {
-    imgLoader.LoadIcon("rewind", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("pause", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("play", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("forward", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("rewind_sel", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("pause_sel", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("play_sel", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("forward_sel", g_FontHight, g_FontHight);
-    imgLoader.LoadIcon("recording_cutted_extra", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("rewind", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("pause", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("play", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("forward", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("rewind_sel", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("pause_sel", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("play_sel", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("forward_sel", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("recording_cutted_extra", g_FontHight, g_FontHight);
 
-    imgLoader.LoadIcon("recording_untested_replay", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("recording_ok_replay", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("recording_warning_replay", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("recording_error_replay", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("recording_untested_replay", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("recording_ok_replay", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("recording_warning_replay", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("recording_error_replay", 999, g_FontSmlHight);
 
-    imgLoader.LoadIcon("43", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("169", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("169w", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("221", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("7680x4320", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("3840x2160", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("1920x1080", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("1440x1080", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("1280x720", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("960x720", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("704x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("720x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("544x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("528x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("480x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("352x576", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("unknown_res", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("uhd", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("hd", 999, g_FontSmlHight);
-    imgLoader.LoadIcon("sd", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("43", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("169", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("169w", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("221", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("7680x4320", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("3840x2160", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("1920x1080", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("1440x1080", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("1280x720", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("960x720", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("704x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("720x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("544x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("528x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("480x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("352x576", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("unknown_res", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("uhd", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("hd", 999, g_FontSmlHight);
+    ImgLoader.LoadIcon("sd", 999, g_FontSmlHight);
 }

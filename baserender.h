@@ -140,7 +140,7 @@ class cFlatBaseRender {
         tColor SetAlpha(tColor Color, double am);
 
  public:
-        cImageLoader imgLoader;
+        cImageLoader ImgLoader;
 
         cFlatBaseRender(void);
         ~cFlatBaseRender(void);

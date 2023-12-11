@@ -357,7 +357,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         cImage *img = NULL;
         if (g_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
             int IconLeft = g_MarginItem;
-            img = imgLoader.LoadIcon(*g_TopBarMenuIcon, 999, g_TopBarHeight - g_MarginItem * 2);
+            img = ImgLoader.LoadIcon(*g_TopBarMenuIcon, 999, g_TopBarHeight - g_MarginItem * 2);
             if (img) {
                 int IconTop = (g_TopBarHeight / 2 - img->Height() / 2);
                 TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
@@ -372,7 +372,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
             int ImageBGWidth = ImageBGHeight * 1.34;
             int IconTop {0};
 
-            img = imgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
+            img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
             if (img) {
                 ImageBGHeight = img->Height();
                 ImageBGWidth = img->Width();
@@ -380,7 +380,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
             }
 
-            img = imgLoader.LoadLogo(*g_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
+            img = ImgLoader.LoadLogo(*g_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
             if (img) {
                 IconTop += (ImageBGHeight - img->Height()) / 2;
                 IconLeft += (ImageBGWidth - img->Width()) / 2;
@@ -419,10 +419,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
             NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
-                    ImgCon = imgLoader.LoadIcon("topbar_timerconflict_low", g_TopBarFontHeight - g_MarginItem * 2,
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", g_TopBarFontHeight - g_MarginItem * 2,
                                                 g_TopBarFontHeight - g_MarginItem * 2);
                 else
-                    ImgCon = imgLoader.LoadIcon("topbar_timerconflict_high", g_TopBarFontHeight - g_MarginItem * 2,
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", g_TopBarFontHeight - g_MarginItem * 2,
                                                 g_TopBarFontHeight - g_MarginItem * 2);
 
                 if (ImgCon) {
@@ -451,7 +451,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                     ++NumRec;
 #endif
             if (NumRec) {
-                ImgRec = imgLoader.LoadIcon("topbar_timer", g_TopBarFontHeight - g_MarginItem * 2,
+                ImgRec = ImgLoader.LoadIcon("topbar_timer", g_TopBarFontHeight - g_MarginItem * 2,
                                             g_TopBarFontHeight - g_MarginItem * 2);
                 if (ImgRec) {
                     Buffer = cString::sprintf("%d", NumRec);
@@ -462,7 +462,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }  // Config.TopBarRecordingShow
 
         if (g_TopBarExtraIconSet) {
-            img = imgLoader.LoadIcon(*g_TopBarExtraIcon, 999, g_TopBarHeight);
+            img = ImgLoader.LoadIcon(*g_TopBarExtraIcon, 999, g_TopBarHeight);
             if (img) {
                 Right -= img->Width() + g_MarginItem;
                 MiddleWidth += img->Width() + g_MarginItem;
@@ -472,7 +472,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int TopBarMenuIconRightLeft {0};
         int TitleWidth = g_TopBarFont->Width(*g_TopBarTitle);
         if (g_TopBarMenuIconRightSet) {
-            img = imgLoader.LoadIcon(*g_TopBarMenuIconRight, 999, g_TopBarHeight);
+            img = ImgLoader.LoadIcon(*g_TopBarMenuIconRight, 999, g_TopBarHeight);
             if (img) {
                 TopBarMenuIconRightWidth = img->Width() + g_MarginItem * 3;
                 TitleWidth += TopBarMenuIconRightWidth;
@@ -507,7 +507,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         Right += ExtraMaxWidth + g_MarginItem;
 
         if (g_TopBarExtraIconSet) {
-            img = imgLoader.LoadIcon(*g_TopBarExtraIcon, 999, g_TopBarHeight);
+            img = ImgLoader.LoadIcon(*g_TopBarExtraIcon, 999, g_TopBarHeight);
             if (img) {
                 int IconTop {0};
                 TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *img);
@@ -541,7 +541,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
 
         if (g_TopBarMenuIconRightSet) {
-            img = imgLoader.LoadIcon(*g_TopBarMenuIconRight, 999, g_TopBarHeight);
+            img = ImgLoader.LoadIcon(*g_TopBarMenuIconRight, 999, g_TopBarHeight);
             if (img) {
                 int IconTop = (g_TopBarHeight / 2 - img->Height() / 2);
                 TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, IconTop), *img);
@@ -774,7 +774,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img = imgLoader.LoadIcon(*Icon, g_FontHight, g_FontHight);
+    cImage *img = ImgLoader.LoadIcon(*Icon, g_FontHight, g_FontHight);
     if (img)
         MessageIconPixmap->DrawImage(cPoint(g_MarginItem + 10, g_MarginItem), *img);
 
@@ -1868,7 +1868,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     left += WeatherFontSign->Width(TempTodaySign.c_str()) + g_MarginItem * 2;
 
     cString WeatherIcon = cString::sprintf("widgets/%s", IconToday.c_str());
-    cImage *img = imgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + g_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + g_MarginItem;
@@ -1881,7 +1881,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
                           WeatherFontSmlHeight, taRight);
     left += WidthTempToday + g_MarginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
+    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + g_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - g_MarginItem * 2;
@@ -1895,7 +1895,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
                           Theme.Color(clrChannelBg));
 
     WeatherIcon = cString::sprintf("widgets/%s", IconTomorrow.c_str());
-    img = imgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
+    img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + g_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + g_MarginItem;
@@ -1908,7 +1908,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
                           WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + g_MarginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
+    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - g_MarginItem * 2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + g_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - g_MarginItem * 2;

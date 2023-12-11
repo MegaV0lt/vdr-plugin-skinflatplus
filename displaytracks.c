@@ -5,8 +5,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     CreateFullOsd();
     TopBarCreate();
 
-    img_ac3 = imgLoader.LoadIcon("tracks_ac3", 999, g_FontHight);
-    img_stereo = imgLoader.LoadIcon("tracks_stereo", 999, g_FontHight);
+    img_ac3 = ImgLoader.LoadIcon("tracks_ac3", 999, g_FontHight);
+    img_stereo = ImgLoader.LoadIcon("tracks_stereo", 999, g_FontHight);
 
     Ac3Width = StereoWidth = 0;
     if (img_ac3)

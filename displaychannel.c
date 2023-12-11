@@ -152,10 +152,10 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     } else
         g_ChannelName = ChannelString(NULL, 0);
 
-    cString channelString = cString::sprintf("%s  %s", *ChannelNumber, *g_ChannelName);
+    cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *g_ChannelName);
 
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
-    ChanInfoTopPixmap->DrawText(cPoint(50, 0), *channelString, Theme.Color(clrChannelFontTitle),
+    ChanInfoTopPixmap->DrawText(cPoint(50, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), g_Font);
 
     PixmapFill(ChanLogoPixmap, clrTransparent);
@@ -165,20 +165,20 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     int ImageBgWidth = ImageHeight;
     int ImageLeft = g_MarginItem * 2;
     int ImageTop = g_MarginItem;
-    cImage *img = imgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
+    cImage *img = ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
         ChanLogoBGPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
-    img = imgLoader.LoadLogo(*g_ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
+    img = ImgLoader.LoadLogo(*g_ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
     if (img) {
         ImageTop = g_MarginItem + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = g_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
         ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     } else if (!IsGroup) {  // Draw default logo
-        img = imgLoader.LoadIcon((IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
+        img = ImgLoader.LoadIcon((IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
         if (img) {
             ImageTop = g_MarginItem + (ImageHeight - img->Height()) / 2;
             ImageLeft = g_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
@@ -199,7 +199,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     cImage *img = NULL;
     if (Channel) {
-        img = imgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, g_FontSmlHight);
+        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, g_FontSmlHight);
         if (img) {
             ImageTop = top + (g_FontSmlHight - img->Height()) / 2;
             ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -211,7 +211,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         cString IconName("");
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(ScreenWidth, ScreenAspect);
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = top + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -220,7 +220,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             IconName = GetScreenResolutionIcon(ScreenWidth, ScreenHeight, ScreenAspect);  // Show Resolution
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = top + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -231,7 +231,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = GetFormatIcon(ScreenWidth);  // Show Format
-            img = imgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, g_FontSmlHight);
             if (img) {
                 ImageTop = top + (g_FontSmlHight - img->Height()) / 2;
                 left -= img->Width();
@@ -431,7 +431,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
             dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
         }
-        cImage *img = imgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
         if (img) {
             ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -537,13 +537,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + g_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img = imgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height());
+    cImage *img = ImgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height());
     if (img) {
         ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + g_MarginItem;
     } else {
         IconName = "crypt_unknown";
-        img = imgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height());
+        img = ImgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height());
         if (img) {
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + g_MarginItem;
@@ -590,15 +590,15 @@ void cFlatDisplayChannel::Flush(void) {
 void cFlatDisplayChannel::PreLoadImages(void) {
     int height = (g_FontHight * 2) + (g_FontSmlHight * 2) + g_MarginItem - g_MarginItem * 2;
     int ImageBgHeight {height}, ImageBgWidth {height};
-    imgLoader.LoadIcon("logo_background", height, height);
+    ImgLoader.LoadIcon("logo_background", height, height);
 
-    cImage *img = imgLoader.LoadIcon("logo_background", height * 1.34, height);
+    cImage *img = ImgLoader.LoadIcon("logo_background", height * 1.34, height);
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
     }
-    imgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-    imgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
 #if VDRVERSNUM >= 20301
@@ -609,32 +609,32 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels.Next(Channel)) {
 #endif
-        img = imgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         if (img) ++index;
     }
 
     height = std::max(g_FontSmlHight, Config.decorProgressSignalSize);
-    imgLoader.LoadIcon("crypted", 999, height);
-    imgLoader.LoadIcon("uncrypted", 999, height);
-    imgLoader.LoadIcon("unknown_asp", 999, height);
-    imgLoader.LoadIcon("43", 999, height);
-    imgLoader.LoadIcon("169", 999, height);
-    imgLoader.LoadIcon("169w", 999, height);
-    imgLoader.LoadIcon("221", 999, height);
-    imgLoader.LoadIcon("7680x4320", 999, height);
-    imgLoader.LoadIcon("3840x2160", 999, height);
-    imgLoader.LoadIcon("1920x1080", 999, height);
-    imgLoader.LoadIcon("1440x1080", 999, height);
-    imgLoader.LoadIcon("1280x720", 999, height);
-    imgLoader.LoadIcon("960x720", 999, height);
-    imgLoader.LoadIcon("704x576", 999, height);
-    imgLoader.LoadIcon("720x576", 999, height);
-    imgLoader.LoadIcon("544x576", 999, height);
-    imgLoader.LoadIcon("528x576", 999, height);
-    imgLoader.LoadIcon("480x576", 999, height);
-    imgLoader.LoadIcon("352x576", 999, height);
-    imgLoader.LoadIcon("unknown_res", 999, height);
-    imgLoader.LoadIcon("uhd", 999, height);
-    imgLoader.LoadIcon("hd", 999, height);
-    imgLoader.LoadIcon("sd", 999, height);
+    ImgLoader.LoadIcon("crypted", 999, height);
+    ImgLoader.LoadIcon("uncrypted", 999, height);
+    ImgLoader.LoadIcon("unknown_asp", 999, height);
+    ImgLoader.LoadIcon("43", 999, height);
+    ImgLoader.LoadIcon("169", 999, height);
+    ImgLoader.LoadIcon("169w", 999, height);
+    ImgLoader.LoadIcon("221", 999, height);
+    ImgLoader.LoadIcon("7680x4320", 999, height);
+    ImgLoader.LoadIcon("3840x2160", 999, height);
+    ImgLoader.LoadIcon("1920x1080", 999, height);
+    ImgLoader.LoadIcon("1440x1080", 999, height);
+    ImgLoader.LoadIcon("1280x720", 999, height);
+    ImgLoader.LoadIcon("960x720", 999, height);
+    ImgLoader.LoadIcon("704x576", 999, height);
+    ImgLoader.LoadIcon("720x576", 999, height);
+    ImgLoader.LoadIcon("544x576", 999, height);
+    ImgLoader.LoadIcon("528x576", 999, height);
+    ImgLoader.LoadIcon("480x576", 999, height);
+    ImgLoader.LoadIcon("352x576", 999, height);
+    ImgLoader.LoadIcon("unknown_res", 999, height);
+    ImgLoader.LoadIcon("uhd", 999, height);
+    ImgLoader.LoadIcon("hd", 999, height);
+    ImgLoader.LoadIcon("sd", 999, height);
 }
