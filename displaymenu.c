@@ -4268,7 +4268,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
             cString StrTimer("");
-            for (int i {0}; i < TimerRec.Size(); ++i) {
+            int TimerRecSize = TimerRec.Size();
+            for (int i {0}; i < TimerRecSize; ++i) {
                 ++count;
                 if (ContentTop + g_MarginItem > MenuPixmap->ViewPort().Height())
                     break;
@@ -4301,7 +4302,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }
         if (Config.MainMenuWidgetActiveTimerShowActive) {
             cString StrTimer("");
-            for (int i {0}; i < TimerActive.Size(); ++i) {
+            int TimerActiveSize = TimerActive.Size();
+            for (int i {0}; i < TimerActiveSize; ++i) {
                 ++count;
                 if (ContentTop + g_MarginItem > MenuPixmap->ViewPort().Height())
                     break;
@@ -4333,7 +4335,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }
         if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
             cString StrTimer("");
-            for (int i {0}; i < TimerRemoteRec.Size(); ++i) {
+            int TimerRemoteRecSize = TimerRemoteRec.Size();
+            for (int i {0}; i < TimerRemoteRecSize; ++i) {
                 ++RemoteCount;
                 if (ContentTop + g_MarginItem > MenuPixmap->ViewPort().Height())
                     break;
@@ -4362,7 +4365,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }
         if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
             cString StrTimer("");
-            for (int i {0}; i < TimerRemoteActive.Size(); ++i) {
+            int TimerRemoteRecActiveSize = TimerRemoteActive.Size();
+            for (int i {0}; i < TimerRemoteActiveSize; ++i) {
                 ++RemoteCount;
                 if (ContentTop + g_MarginItem > MenuPixmap->ViewPort().Height())
                     break;
@@ -4529,7 +4533,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     } else {
         std::string item(""), ItemContent("");
         cString ItemFilename("");
-        for (unsigned i = 0; i < files.size(); ++i) {
+        int FilesSize = files.size();
+        for (unsigned i = 0; i < FilesSize; ++i) {
             // Check for height
             if (ContentTop + g_MarginItem > MenuPixmap->ViewPort().Height())
                 break;
