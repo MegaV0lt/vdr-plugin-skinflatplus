@@ -712,8 +712,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             ImageTop = Top + (m_FontHight - ImageBgHeight) / 2;
             MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         }
+        // Load named logo only for channels
+        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     }
-    img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     if (img) {
         ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -1168,7 +1169,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
-        } else if (Channel->GroupSep()) {
+        } else if (Channel->GroupSep()) {  // TODO: Is GroupSep() in SetItemTimer possible?
             img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1388,14 +1389,17 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageLeft = Left;
         int ImageBgHeight = m_FontHight;
         int ImageBgWidth = m_FontHight * 1.34;
-        img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
-        if (img && !IsGroup) {
-            ImageBgHeight = img->Height();
-            ImageBgWidth = img->Width();
-            ImageTop = Top + (m_FontHight - ImageBgHeight) / 2;
-            MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        if (!IsGroup) {
+            img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
+            if (img) {
+                ImageBgHeight = img->Height();
+                ImageBgWidth = img->Width();
+                ImageTop = Top + (m_FontHight - ImageBgHeight) / 2;
+                MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+            }
+            // Load named logo only for channels
+            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         }
-        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         if (img) {
             ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
