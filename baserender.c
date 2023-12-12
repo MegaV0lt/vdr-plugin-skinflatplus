@@ -727,23 +727,23 @@ bool cFlatBaseRender::ButtonsDrawn(void) {
 }
 
 void cFlatBaseRender::MessageCreate(void) {
-    MessageHeight = m_FontHight + m_MarginItem * 2;
+    m_MessageHeight = m_FontHight + m_MarginItem * 2;
     if (Config.MessageColorPosition == 1)
-        MessageHeight += 8;
+        m_MessageHeight += 8;
 
-    int top = m_OsdHeight - Config.MessageOffset - MessageHeight - Config.decorBorderMessageSize;
+    int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
     MessagePixmap = CreatePixmap(
         osd, "MessagePixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, MessageHeight));
+        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
     PixmapFill(MessagePixmap, clrTransparent);
     MessageIconPixmap = CreatePixmap(
         osd, "MessageIconPixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, MessageHeight));
+        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
     PixmapFill(MessageIconPixmap, clrTransparent);
     // dsyslog("flatPlus: MessagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, MessageHeight);
+    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
     // dsyslog("flatPlus: MessageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, MessageHeight);
+    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
 
     MessageScroller.SetOsd(osd);
     MessageScroller.SetScrollStep(Config.ScrollerStep);
@@ -779,10 +779,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
     if (Config.MessageColorPosition == 0) {
-        MessagePixmap->DrawRectangle(cRect(0, 0, 8, MessageHeight), Col);
-        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight), Col);
     } else {
-        MessagePixmap->DrawRectangle(cRect(0, MessageHeight - 8, m_OsdWidth, 8), Col);
+        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
     }
 
     int TextWidth = m_Font->Width(Text);
@@ -792,7 +792,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         MessageScroller.AddScroller(
             Text,
             cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
-                  m_OsdHeight - Config.MessageOffset - MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
+                  m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                   MaxWidth, m_FontHight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
@@ -814,7 +814,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                 MessageScroller.AddScroller(
                     Text,
                     cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
-                          m_OsdHeight - Config.MessageOffset - MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
+                          m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                           MaxWidth, m_FontHight),
                     Theme.Color(clrMessageFont), clrTransparent, m_Font);
             else
@@ -826,7 +826,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             MessageScroller.AddScroller(
                 Text,
                 cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
-                      m_OsdHeight - Config.MessageOffset - MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
+                      m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                       MaxWidth, m_FontHight),
                 Theme.Color(clrMessageFont), clrTransparent, m_Font);
         else
@@ -834,8 +834,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                                     Theme.Color(clrMessageBg), m_Font);
     }
 
-    int top = m_OsdHeight - Config.MessageOffset - MessageHeight - Config.decorBorderMessageSize;
-    DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, MessageHeight,
+    int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
+    DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight,
                     Config.decorBorderMessageSize, Config.decorBorderMessageType, Config.decorBorderMessageFg,
                     Config.decorBorderMessageBg, BorderMessage);
 }

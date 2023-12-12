@@ -148,7 +148,7 @@ class cComplexContent {
 
     tColor ColorBg;
 
-    bool m_FullFillBackground;  // g_* for global variables
+    bool m_FullFillBackground;  // m_* for private variables
     int m_DrawPortHeight;
     int m_ScrollSize;
     bool m_IsShown;

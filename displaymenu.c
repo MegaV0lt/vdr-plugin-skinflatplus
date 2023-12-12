@@ -2814,26 +2814,26 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
             if (RecInfo->Aux()) {
-                std::string str_epgsearch = xml_substring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+                std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
                 std::string channel(""), searchtimer("");
-                if (!str_epgsearch.empty()) {
-                    channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
-                    searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
+                if (!Buffer.empty()) {
+                    channel = XmlSubstring(Buffer, "<channel>", "</channel>");
+                    searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
                     if (searchtimer.empty())
-                        searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
+                        searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
                 }
 
-                std::string str_tvscraper = xml_substring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
+                Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
                 std::string causedby(""), reason("");
-                if (!str_tvscraper.empty()) {
-                    causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
-                    reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
+                if (!Buffer.empty()) {
+                    causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
+                    reason = XmlSubstring(Buffer, "<reason>", "</reason>");
                 }
 
-                std::string str_vdradmin = xml_substring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+                Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
                 std::string pattern("");
-                if (!str_vdradmin.empty()) {
-                    pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
+                if (!Buffer.empty()) {
+                    pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
                 }
 
                 if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) ||
@@ -3090,26 +3090,26 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
         if (RecInfo->Aux()) {
-            std::string str_epgsearch = xml_substring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+            std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
             std::string channel(""), searchtimer("");
-            if (!str_epgsearch.empty()) {
-                channel = xml_substring(str_epgsearch, "<channel>", "</channel>");
-                searchtimer = xml_substring(str_epgsearch, "<searchtimer>", "</searchtimer>");
+            if (!Buffer.empty()) {
+                channel = XmlSubstring(Buffer, "<channel>", "</channel>");
+                searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
                 if (searchtimer.empty())
-                    searchtimer = xml_substring(str_epgsearch, "<Search timer>", "</Search timer>");
+                    searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
             }
 
-            std::string str_tvscraper = xml_substring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
+            Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
             std::string causedby(""), reason("");
-            if (!str_tvscraper.empty()) {
-                causedby = xml_substring(str_tvscraper, "<causedBy>", "</causedBy>");
-                reason = xml_substring(str_tvscraper, "<reason>", "</reason>");
+            if (!Buffer.empty()) {
+                causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
+                reason = XmlSubstring(Buffer, "<reason>", "</reason>");
             }
 
-            std::string str_vdradmin = xml_substring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+            Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
             std::string pattern("");
-            if (!str_vdradmin.empty()) {
-                pattern = xml_substring(str_vdradmin, "<pattern>", "</pattern>");
+            if (!Buffer.empty()) {
+                pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
             }
 
             if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
@@ -3816,12 +3816,12 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 // Returns the string between start and end or an empty string if not found
-std::string cFlatDisplayMenu::xml_substring(std::string source, const char *str_start, const char *str_end) {
-    std::size_t start = source.find(str_start);
-    std::size_t end = source.find(str_end);
+std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
+    std::size_t start = source.find(StrStart);
+    std::size_t end = source.find(StrEnd);
 
     if (std::string::npos != start && std::string::npos != end)
-        return (source.substr(start + strlen(str_start), end - start - strlen(str_start)));
+        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
     return std::string();
 }
@@ -4104,9 +4104,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     }
 
     // Check currently recording devices
-    bool *RecDevices = new bool[NumDevices];  // TODO: Eliminate 'new'
-    for (int i {0}; i < NumDevices; ++i)
-        RecDevices[i] = false;
+    // bool *RecDevices = new bool[NumDevices];  // TODO: Eliminate 'new'
+    bool RecDevices[NumDevices] {false};  // Array initialised to false
+    // for (int i {0}; i < NumDevices; ++i)
+    //    RecDevices[i] = false;
+
 #if VDRVERSNUM >= 20301
     LOCK_TIMERS_READ;
     for (const cTimer *timer = Timers->First(); timer; timer = Timers->Next(timer)) {
@@ -4199,7 +4201,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         ContentTop += m_FontSmlHight;
     }
 
-    delete[] RecDevices;
+    // delete[] RecDevices;
 
     return ContentWidget.ContentHeight(false);
 }
