@@ -1172,13 +1172,13 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
-        } else if (Channel->GroupSep()) {  // TODO: Is GroupSep() in SetItemTimer possible?
+        /* } else if (Channel->GroupSep()) {  // TODO: Is GroupSep() in SetItemTimer possible?
             img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-            }
+            } */
         } else {
             if (Current)
                 img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
@@ -4104,7 +4104,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     }
 
     // Check currently recording devices
-    // bool *RecDevices = new bool[NumDevices];  // TODO: Eliminate 'new'
+    // bool *RecDevices = new bool[NumDevices];  // Eliminate 'new'
     bool RecDevices[NumDevices] {false};  // Array initialised to false
     // for (int i {0}; i < NumDevices; ++i)
     //    RecDevices[i] = false;
@@ -4199,7 +4199,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
 
         ContentTop += m_FontSmlHight;
-    }
+    }  // for NumDevices
 
     // delete[] RecDevices;
 

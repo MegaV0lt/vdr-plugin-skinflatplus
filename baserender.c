@@ -409,9 +409,11 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         Right = TopBarWidth - TimeWidth - std::max(WeekdayWidth, DateWidth) - m_MarginItem;
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0, taRight);
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
+                               taRight);
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop + m_TopBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0, taRight);
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
+                               taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
         cImage *ImgCon = NULL, *ImgRec = NULL;
@@ -568,7 +570,7 @@ void cFlatBaseRender::ButtonsCreate(void) {
                                        m_ButtonsWidth - Config.decorBorderButtonSize * 2, m_ButtonsHeight));
     PixmapFill(ButtonsPixmap, clrTransparent);
     // dsyslog("flatPlus: ButtonsPixmap left: %d top: %d width: %d height: %d",
-    //         Config.decorBorderButtonSize, m_ButtonsTop, m_ButtonsWidth - Config.decorBorderButtonSize*2, m_ButtonsHeight);
+    //    Config.decorBorderButtonSize, m_ButtonsTop, m_ButtonsWidth - Config.decorBorderButtonSize*2, m_ButtonsHeight);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -756,7 +758,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     tColor Col = Theme.Color(clrMessageInfo);
     cString Icon("message_info");
     switch (Type) {
-    case mtInfo: // Already preset
+    case mtInfo: //  Already preset
         break;
     case mtWarning:
         Col = Theme.Color(clrMessageWarning);
@@ -780,7 +782,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 
     if (Config.MessageColorPosition == 0) {
         MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
-        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight),
+                                     Col);
     } else {
         MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
     }
@@ -811,27 +814,27 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
             if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
-                MessageScroller.AddScroller(
-                    Text,
-                    cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
-                          m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
-                          MaxWidth, m_FontHight),
-                    Theme.Color(clrMessageFont), clrTransparent, m_Font);
+                MessageScroller.AddScroller(Text,
+                                            cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
+                                                  m_OsdHeight - Config.MessageOffset - m_MessageHeight -
+                                                      Config.decorBorderMessageSize + m_MarginItem,
+                                                  MaxWidth, m_FontHight),
+                                            Theme.Color(clrMessageFont), clrTransparent, m_Font);
             else
                 MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
                                         Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
         }
     } else {
         if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
-            MessageScroller.AddScroller(
-                Text,
-                cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
-                      m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
-                      MaxWidth, m_FontHight),
-                Theme.Color(clrMessageFont), clrTransparent, m_Font);
+            MessageScroller.AddScroller(Text,
+                                        cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
+                                              m_OsdHeight - Config.MessageOffset - m_MessageHeight -
+                                                  Config.decorBorderMessageSize + m_MarginItem,
+                                              MaxWidth, m_FontHight),
+                                        Theme.Color(clrMessageFont), clrTransparent, m_Font);
         else
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text, Theme.Color(clrMessageFont),
-                                    Theme.Color(clrMessageBg), m_Font);
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
+                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
     }
 
     int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
@@ -867,12 +870,12 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    ProgressBarPixmap =
-        CreatePixmap(osd, "ProgressBarPixmap", 3, cRect(Left, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
-    ProgressBarPixmapBg =
-        CreatePixmap(osd, "ProgressBarPixmapBg", 2,
-                     cRect(Left - m_ProgressBarMarginVer, m_ProgressBarTop - m_ProgressBarMarginHor,
-                           m_ProgressBarWidth + m_ProgressBarMarginVer * 2, m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
+    ProgressBarPixmap = CreatePixmap(osd, "ProgressBarPixmap", 3,
+                                     cRect(Left, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
+    ProgressBarPixmapBg = CreatePixmap(osd, "ProgressBarPixmapBg", 2,
+                                       cRect(Left - m_ProgressBarMarginVer, m_ProgressBarTop - m_ProgressBarMarginHor,
+                                             m_ProgressBarWidth + m_ProgressBarMarginVer * 2,
+                                             m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
     PixmapFill(ProgressBarPixmap, clrTransparent);
     PixmapFill(ProgressBarPixmapBg, clrTransparent);
 }
@@ -880,9 +883,9 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
     ProgressBarDrawRaw(
         ProgressBarPixmap, ProgressBarPixmapBg, cRect(0, 0, m_ProgressBarWidth, m_ProgressBarHeight),
-        cRect(0, 0, m_ProgressBarWidth + m_ProgressBarMarginVer * 2, m_ProgressBarHeight + m_ProgressBarMarginHor * 2), Current,
-        Total, m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBg, m_ProgressType, m_ProgressBarSetBackground,
-        m_ProgressBarIsSignal);
+        cRect(0, 0, m_ProgressBarWidth + m_ProgressBarMarginVer * 2, m_ProgressBarHeight + m_ProgressBarMarginHor * 2),
+        Current, Total, m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBg, m_ProgressType,
+        m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
 void cFlatBaseRender::ProgressBarDrawBgColor(void) {
@@ -1228,7 +1231,8 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
         ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml, 0, sml * 2, m_ProgressBarHeight),
                                          m_ProgressBarColorMarkCurrent);
     else if (PosMarkLast != 0)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight),
+                                         m_ProgressBarColorMark);
 }
 
 void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
@@ -1319,9 +1323,11 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             Pixmap->DrawRectangle(cRect(Left, ScrollTop + DotHeight, m_ScrollBarWidth, ScrollHeight - DotHeight * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
-                                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg,
+                                0);
+            Pixmap->DrawEllipse(
+                cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
+                Config.decorScrollBarBarFg, 0);
             break;
         }
         case 4: {
@@ -1334,8 +1340,9 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             Pixmap->DrawRectangle(cRect(Left + m_ScrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, ScrollHeight - out * 2),
-                                  Config.decorScrollBarBarFg);
+            Pixmap->DrawRectangle(
+                cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, ScrollHeight - out * 2),
+                Config.decorScrollBarBarFg);
             break;
         }
         case 5: {
@@ -1353,8 +1360,9 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
                                         ScrollHeight - DotHeight * 2 - out * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
-                                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(
+                cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
+                Config.decorScrollBarBarFg, 0);
             Pixmap->DrawEllipse(cRect(Left + out, ScrollTop + ScrollHeight - DotHeight * 2 + out,
                                       m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
                                 Config.decorScrollBarBarFg, 0);
@@ -1370,9 +1378,11 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             Pixmap->DrawRectangle(cRect(Left, ScrollTop + DotHeight, m_ScrollBarWidth, ScrollHeight - DotHeight * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
-                                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg,
+                                0);
+            Pixmap->DrawEllipse(
+                cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
+                Config.decorScrollBarBarFg, 0);
 
             break;
         }
