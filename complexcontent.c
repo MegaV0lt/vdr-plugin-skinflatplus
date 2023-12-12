@@ -126,9 +126,9 @@ bool cComplexContent::Scrollable(int height) {
 }
 
 void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
-                              cFont *m_Font, int textWidth, int textHeight, int textAlignment) {
+                              cFont *font, int textWidth, int textHeight, int textAlignment) {
     Contents.emplace_back(cSimpleContent());
-    Contents.back().SetText(text, multiline, position, colorFg, colorBg, m_Font, textWidth, textHeight, textAlignment);
+    Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, cRect position) {
@@ -137,12 +137,12 @@ void cComplexContent::AddImage(cImage *image, cRect position) {
 }
 
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos,
-                                              tColor colorFg, tColor colorBg, cFont *m_Font, int textWidth,
+                                              tColor colorFg, tColor colorBg, cFont *font, int textWidth,
                                               int textHeight, int textAlignment) {
     int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
 
     cTextWrapper WrapperFloat;
-    WrapperFloat.Set(text, m_Font, TextWidthLeft);
+    WrapperFloat.Set(text, font, TextWidthLeft);
     int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
     int Lines = WrapperFloat.Lines();
 
@@ -153,7 +153,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     FloatedTextPos.SetHeight(textPos.Height());
 
     if (Lines < FloatLines) {  // Text fits on the left side of the image
-        AddText(text, true, FloatedTextPos, colorFg, colorBg, m_Font, textWidth, textHeight, textAlignment);
+        AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     } else {
         int NumChars {0};
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
@@ -175,8 +175,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         SecondTextPos.SetWidth(textPos.Width());
         SecondTextPos.SetHeight(textPos.Height());
 
-        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, m_Font, textWidth, textHeight, textAlignment);
-        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, m_Font, textWidth, textHeight, textAlignment);
+        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     }
 
     cRect ImagePos;

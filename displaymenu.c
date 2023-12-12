@@ -5091,7 +5091,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         } else
             continue;
 
-        FileName = cString::sprintf("%s/weather/weather.%d.TempMax", WIDGETOUTPUTPATH, index);
+        FileName = cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, TempMax);
@@ -5099,7 +5099,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         } else
             continue;
 
-        FileName = cString::sprintf("%s/weather/weather.%d.TempMin", WIDGETOUTPUTPATH, index);
+        FileName = cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, TempMin);
@@ -5207,7 +5207,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
             ContentTop += m_FontHeight;
         }
-    }
+    }  // for Config.MainMenuWidgetWeatherDays
     return ContentWidget.ContentHeight(false);
 }
 
