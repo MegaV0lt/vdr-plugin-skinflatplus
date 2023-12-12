@@ -31,9 +31,9 @@ class cFlatConfig Config;
 class cImageCache ImgCache;
 
 cTheme Theme;
-static bool g_MenuActive = false;
-bool g_FirstDisplay = true;
-time_t g_RemoteTimersLastRefresh = 0;
+static bool m_MenuActive = false;
+bool m_FirstDisplay = true;
+time_t m_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
     Display_Menu = NULL;
@@ -50,7 +50,7 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
 cSkinDisplayMenu *cFlat::DisplayMenu(void) {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
     Display_Menu = menu;
-    g_MenuActive = true;
+    m_MenuActive = true;
     return menu;
 }
 /*
@@ -63,7 +63,7 @@ std::shared_ptr<cOsdItem> cMenuSetupSubMenu::InfoItem(const char *label, const c
     // was ist wenn, min. einer der beiden Parameter nullptr ist?
     std::shared_ptr<cOsdItem> retval = std::make_shared<cOsdItem>(cString::sprintf("%s: %s", label, value));
     retval->SetSelectable(false);
-    g_MenuActive = true;
+    m_MenuActive = true;
     Display_Menu = retval;
     return retval;
 }

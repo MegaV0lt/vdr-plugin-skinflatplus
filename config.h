@@ -20,7 +20,7 @@ class cFlatConfig {
  private:
         cString checkSlashAtEnd(std::string path);
 
-        int DecorCurrent;
+        int m_DecorCurrent;
 
  public:
         cFlatConfig(void);

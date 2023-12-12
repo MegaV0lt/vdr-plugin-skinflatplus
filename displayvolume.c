@@ -4,22 +4,22 @@
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
     // Muted = false;  // Unused?
 
-    g_LabelHeight = g_FontHight + g_MarginItem * 2;
+    m_LabelHeight = m_FontHight + m_MarginItem * 2;
 
     CreateFullOsd();
     TopBarCreate();
-    int width = g_OsdWidth / 4 * 3;
+    int width = m_OsdWidth / 4 * 3;
 
     int top =
-        g_OsdHeight - 50 - Config.decorProgressVolumeSize - g_LabelHeight - g_MarginItem - Config.decorBorderVolumeSize * 2;
-    int left = g_OsdWidth - width - Config.decorBorderVolumeSize;
+        m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem - Config.decorBorderVolumeSize * 2;
+    int left = m_OsdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
 
-    LabelPixmap = CreatePixmap(osd, "LabelPixmap", 1, cRect(0, top, g_OsdWidth, g_LabelHeight));
-    MuteLogoPixmap = CreatePixmap(osd, "MuteLogoPixmap", 2, cRect(0, top, g_OsdWidth, g_LabelHeight));
+    LabelPixmap = CreatePixmap(osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
+    MuteLogoPixmap = CreatePixmap(osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
 
-    ProgressBarCreate(left, g_OsdHeight - 50 - Config.decorProgressVolumeSize, width, Config.decorProgressVolumeSize,
-                      g_MarginItem, g_MarginItem, Config.decorProgressVolumeFg, Config.decorProgressVolumeBarFg,
+    ProgressBarCreate(left, m_OsdHeight - 50 - Config.decorProgressVolumeSize, width, Config.decorProgressVolumeSize,
+                      m_MarginItem, m_MarginItem, Config.decorProgressVolumeFg, Config.decorProgressVolumeBarFg,
                       Config.decorProgressVolumeBg, Config.decorProgressVolumeType, true);
 }
 
@@ -34,42 +34,42 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
     cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
-    int MaxLabelWidth = g_Font->Width(*MaxLabel) + g_MarginItem;
-    int left = g_OsdWidth / 2 - MaxLabelWidth / 2;
+    int MaxLabelWidth = m_Font->Width(*MaxLabel) + m_MarginItem;
+    int left = m_OsdWidth / 2 - MaxLabelWidth / 2;
 
-    int DecorTop = g_OsdHeight - 50 - Config.decorProgressVolumeSize - g_LabelHeight - Config.decorBorderVolumeSize * 2;
+    int DecorTop = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
 
-    LabelPixmap->DrawRectangle(cRect(left - g_MarginItem, g_MarginItem, g_MarginItem, g_FontHight), Theme.Color(clrVolumeBg));
+    LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHight), Theme.Color(clrVolumeBg));
 
-    DecorBorderClear(left - g_MarginItem, DecorTop, MaxLabelWidth + g_MarginItem * 4 + g_FontHight, g_FontHight,
+    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHight, m_FontHight,
                      Config.decorBorderVolumeSize);
-    DecorBorderClear(left - g_MarginItem, DecorTop, MaxLabelWidth + g_MarginItem, g_FontHight, Config.decorBorderVolumeSize);
+    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHight, Config.decorBorderVolumeSize);
 
     if (Mute) {
-        LabelPixmap->DrawText(cPoint(left, g_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
-            g_Font, MaxLabelWidth + g_MarginItem + g_LabelHeight, g_FontHight, taLeft);
-        cImage *img = ImgLoader.LoadIcon("mute", g_FontHight, g_FontHight);
+        LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
+            m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHight, taLeft);
+        cImage *img = ImgLoader.LoadIcon("mute", m_FontHight, m_FontHight);
         if (img) {
-            MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + g_MarginItem, g_MarginItem), *img);
+            MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + m_MarginItem, m_MarginItem), *img);
         }
-        DecorBorderDraw(left - g_MarginItem, DecorTop, MaxLabelWidth + g_MarginItem * 4 + g_FontHight, g_FontHight,
+        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHight, m_FontHight,
                         Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
                         Config.decorBorderVolumeBg);
     } else {
-        LabelPixmap->DrawText(cPoint(left, g_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
-            g_Font, MaxLabelWidth, g_FontHight, taLeft);
-        DecorBorderDraw(left - g_MarginItem, DecorTop, MaxLabelWidth + g_MarginItem, g_FontHight,
+        LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
+            m_Font, MaxLabelWidth, m_FontHight, taLeft);
+        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHight,
                         Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
                         Config.decorBorderVolumeBg);
     }
 
     ProgressBarDraw(Current, Total);
 
-    int width = (g_OsdWidth / 4 * 3);
-    left = g_OsdWidth - width - Config.decorBorderVolumeSize;
+    int width = (m_OsdWidth / 4 * 3);
+    left = m_OsdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
-    DecorBorderDraw(left - g_MarginItem, g_OsdHeight - 50 - Config.decorProgressVolumeSize - g_MarginItem,
-                    width + g_MarginItem * 2, Config.decorProgressVolumeSize + g_MarginItem * 2,
+    DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
+                    width + m_MarginItem * 2, Config.decorProgressVolumeSize + m_MarginItem * 2,
                     Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg),
                     Theme.Color(clrTopBarBg));
 }
@@ -80,5 +80,5 @@ void cFlatDisplayVolume::Flush(void) {
 }
 
 void cFlatDisplayVolume::PreLoadImages(void) {
-    ImgLoader.LoadIcon("mute", g_FontHight, g_FontHight);
+    ImgLoader.LoadIcon("mute", m_FontHight, m_FontHight);
 }

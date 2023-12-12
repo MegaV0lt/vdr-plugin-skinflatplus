@@ -30,58 +30,58 @@ class cFlatBaseRender {
  protected:
         cOsd *osd;
 
-        int g_OsdLeft, g_OsdTop, g_OsdWidth, g_OsdHeight;
-        int g_MarginItem;
+        int m_OsdLeft, m_OsdTop, m_OsdWidth, m_OsdHeight;
+        int m_MarginItem;
 
         // Standard fonts
-        cFont *g_Font;
-        cFont *g_FontSml;
-        cFont *g_FontFixed;
-        int g_FontHight;
-        int g_FontSmlHight;
-        int g_FontFixedHight;
+        cFont *m_Font;
+        cFont *m_FontSml;
+        cFont *m_FontFixed;
+        int m_FontHight;
+        int m_FontSmlHight;
+        int m_FontFixedHight;
 
         // TopBar
         cPixmap *TopBarPixmap;
         cPixmap *TopBarIconPixmap;
         cPixmap *TopBarIconBgPixmap;
-        cFont *g_TopBarFont, *g_TopBarFontSml, *g_TopBarFontClock;
-        int g_TopBarFontHeight, g_TopBarFontSmlHeight, g_TopBarFontClockHeight;
+        cFont *m_TopBarFont, *m_TopBarFontSml, *m_TopBarFontClock;
+        int m_TopBarFontHeight, m_TopBarFontSmlHeight, m_TopBarFontClockHeight;
 
-        cString g_TopBarTitle;
-        cString g_TopBarTitleExtra1, g_TopBarTitleExtra2;
-        cString g_TopBarExtraIcon;
-        bool g_TopBarExtraIconSet;
-        cString g_TopBarMenuIcon;
-        bool g_TopBarMenuIconSet;
-        cString g_TopBarMenuIconRight;
-        bool g_TopBarMenuIconRightSet;
-        cString g_TopBarMenuLogo;
-        bool g_TopBarMenuLogoSet;
+        cString m_TopBarTitle;
+        cString m_TopBarTitleExtra1, m_TopBarTitleExtra2;
+        cString m_TopBarExtraIcon;
+        bool m_TopBarExtraIconSet;
+        cString m_TopBarMenuIcon;
+        bool m_TopBarMenuIconSet;
+        cString m_TopBarMenuIconRight;
+        bool m_TopBarMenuIconRightSet;
+        cString m_TopBarMenuLogo;
+        bool m_TopBarMenuLogoSet;
 
-        bool g_TopBarUpdateTitle;
-        cString g_TopBarLastDate;
-        int g_TopBarHeight;
-        int g_VideoDiskUsageState;
+        bool m_TopBarUpdateTitle;
+        cString m_TopBarLastDate;
+        int m_TopBarHeight;
+        int m_VideoDiskUsageState;
 
         // Progressbar
         cPixmap *ProgressBarPixmap;
         cPixmap *ProgressBarPixmapBg;
-        int g_ProgressBarHeight, g_ProgressBarTop, g_ProgressBarWidth, g_ProgressBarMarginHor, g_ProgressBarMarginVer;
-        int g_ProgressType;
-        bool g_ProgressBarSetBackground;
-        bool g_ProgressBarIsSignal;
-        tColor g_ProgressBarColorFg, g_ProgressBarColorBarFg, g_ProgressBarColorBarCurFg, g_ProgressBarColorBg;
-        tColor g_ProgressBarColorMark, g_ProgressBarColorMarkCurrent;
+        int m_ProgressBarHeight, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarMarginHor, m_ProgressBarMarginVer;
+        int m_ProgressType;
+        bool m_ProgressBarSetBackground;
+        bool m_ProgressBarIsSignal;
+        tColor m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBarCurFg, m_ProgressBarColorBg;
+        tColor m_ProgressBarColorMark, m_ProgressBarColorMarkCurrent;
 
         // Scrollbar
-        int g_ScrollBarWidth;
+        int m_ScrollBarWidth;
 
         // Buttons red, green, yellow, blue
         cPixmap *ButtonsPixmap;
-        int g_ButtonsWidth, g_ButtonsHeight, g_ButtonsTop;
-        int g_MarginButtonColor, g_ButtonColorHeight;
-        bool g_ButtonsDrawn;
+        int m_ButtonsWidth, m_ButtonsHeight, m_ButtonsTop;
+        int m_MarginButtonColor, m_ButtonColorHeight;
+        bool m_ButtonsDrawn;
 
         // Message
         cPixmap *MessagePixmap, *MessageIconPixmap;

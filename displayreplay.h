@@ -7,15 +7,15 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
  private:
         cString current, total;
 
-        int g_LabelHeight;
+        int m_LabelHeight;
         cPixmap *LabelPixmap;
         cPixmap *labelJump;
         cPixmap *iconsPixmap;
         cPixmap *ChanEpgImagesPixmap;
         cPixmap *dimmPixmap;
 
-        cFont *g_FontSecs;
-        const cRecording *g_Recording;
+        cFont *m_FontSecs;
+        const cRecording *m_Recording;
 
         int ScreenWidth, LastScreenWidth;
         int ScreenHeight;
@@ -25,11 +25,11 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;
 
         // Dimm on pause
-        bool g_DimmActive;
-        time_t g_DimmStartTime;
+        bool m_DimmActive;
+        time_t m_DimmStartTime;
 
         bool ProgressShown;
-        bool g_ModeOnly;
+        bool m_ModeOnly;
         void UpdateInfo(void);
         void ResolutionAspectDraw(void);
 

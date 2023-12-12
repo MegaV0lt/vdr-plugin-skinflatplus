@@ -41,7 +41,7 @@ void cTextScroll::Draw(void) {
 
     if (ColorExtraTextFg) {
         std::string tilde = Text;
-        size_t found = tilde.find('~');  // Search for ~
+        std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 1);  // Default end is npos
@@ -123,7 +123,7 @@ void cTextScrollers::Clear(void) {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *g_Font,
+void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *m_Font,
                                  tColor ColorExtraTextFg) {
     Cancel(-1);
     while (Active())
@@ -131,7 +131,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
 
     Scrollers.emplace_back(new cTextScroll(Osd, ScrollType, ScrollStep,
         static_cast<int>(WAITDELAY * 1.0f / ScrollDelay), Layer));
-    Scrollers.back()->SetText(text, position, colorFg, colorBg, g_Font, ColorExtraTextFg);
+    Scrollers.back()->SetText(text, position, colorFg, colorBg, m_Font, ColorExtraTextFg);
 
     StartScrolling();
 }

@@ -17,9 +17,9 @@
 
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
-extern bool g_FirstDisplay;
+extern bool m_FirstDisplay;
 
-extern time_t g_RemoteTimersLastRefresh;
+extern time_t m_RemoteTimersLastRefresh;
 
 class cFlatDisplayMenu;
 extern cTheme Theme;
@@ -195,7 +195,7 @@ THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
  private:
-        cFlatDisplayMenu *Display_Menu;
+        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid nameconflict with DisplayMenu()
  public:
         cFlat(void);
         virtual const char *Description(void);

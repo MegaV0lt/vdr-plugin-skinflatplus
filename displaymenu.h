@@ -33,8 +33,8 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int MenuItemLastHeight;
         bool MenuFullOsdIsDrawn;
 
-        eMenuCategory g_MenuCategory;
-        int g_VideoDiskUsageState;
+        eMenuCategory m_MenuCategory;
+        int m_VideoDiskUsageState;
 
         int LastTimerCount, LastTimerActiveCount;
         cString LastTitle;
@@ -46,7 +46,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int cLeft, cTop, cWidth, cHeight;
 
         cPixmap *ScrollbarPixmap;
-        int g_ScrollBarTop, g_ScrollBarWidth, g_ScrollBarHeight;
+        int m_ScrollBarTop, m_ScrollBarWidth, m_ScrollBarHeight;
 
         int ItemHeight, ItemChannelHeight, ItemTimerHeight, ItemEventHeight, ItemRecordingHeight;
 

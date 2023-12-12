@@ -7,7 +7,7 @@ cFlatConfig::cFlatConfig(void) {
     IconPath = "";
     RecordingOldConfigFile = "";
 
-    DecorCurrent = -1;
+    m_DecorCurrent = -1;
     DecorIndex = 0;
 
     ButtonsShowEmpty = true;
@@ -410,8 +410,8 @@ void cFlatConfig::ThemeCheckAndInit(void) {
 }
 
 void cFlatConfig::DecorCheckAndInit(void) {
-    if (DecorCurrent != DecorIndex) {
-        DecorCurrent = DecorIndex;
+    if (m_DecorCurrent != DecorIndex) {
+        m_DecorCurrent = DecorIndex;
         DecorLoadCurrent();
     }
     if (decorBorderChannelByTheme) {

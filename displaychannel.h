@@ -8,12 +8,12 @@
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  private:
-        bool g_DoOutput;
+        bool m_DoOutput;
         const cEvent *present;
 
-        int g_ChannelWidth, g_ChannelHeight;
+        int m_ChannelWidth, m_ChannelHeight;
 
-        cString g_ChannelName;
+        cString m_ChannelName;
         const cChannel *CurChannel;
 
         cPixmap *ChanInfoTopPixmap;
