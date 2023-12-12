@@ -21,9 +21,9 @@ cFlatBaseRender::cFlatBaseRender(void) {
     m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
     m_TopBarFontClock = NULL;
 
-    m_FontHight = m_Font->Height();
-    m_FontSmlHight = m_FontSml->Height();
-    m_FontFixedHight = m_FontFixed->Height();
+    m_FontHeight = m_Font->Height();
+    m_FontSmlHeight = m_FontSml->Height();
+    m_FontFixedHeight = m_FontFixed->Height();
 
     m_TopBarTitle = "";
     m_TopBarTitleExtra1 = "";
@@ -561,7 +561,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 void cFlatBaseRender::ButtonsCreate(void) {
     m_MarginButtonColor = 10;
     m_ButtonColorHeight = 8;
-    m_ButtonsHeight = m_FontHight + m_MarginButtonColor + m_ButtonColorHeight;
+    m_ButtonsHeight = m_FontHeight + m_MarginButtonColor + m_ButtonColorHeight;
     m_ButtonsWidth = m_OsdWidth;
     m_ButtonsTop = m_OsdHeight - m_ButtonsHeight - Config.decorBorderButtonSize;
 
@@ -587,26 +587,26 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
         switch (Setup.ColorKey0) {
         case 0:
             ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
             ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
             ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
             ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
@@ -621,26 +621,26 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
         switch (Setup.ColorKey1) {
         case 0:
             ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
             ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
             ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
             ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
@@ -656,26 +656,26 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
         switch (Setup.ColorKey2) {
         case 0:
             ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
             ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
             ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
             ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
@@ -693,26 +693,26 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
         switch (Setup.ColorKey3) {
         case 0:
             ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
             ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
             ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
             ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
@@ -729,7 +729,7 @@ bool cFlatBaseRender::ButtonsDrawn(void) {
 }
 
 void cFlatBaseRender::MessageCreate(void) {
-    m_MessageHeight = m_FontHight + m_MarginItem * 2;
+    m_MessageHeight = m_FontHeight + m_MarginItem * 2;
     if (Config.MessageColorPosition == 1)
         m_MessageHeight += 8;
 
@@ -776,7 +776,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img = ImgLoader.LoadIcon(*Icon, m_FontHight, m_FontHight);
+    cImage *img = ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight);
     if (img)
         MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
@@ -789,14 +789,14 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     }
 
     int TextWidth = m_Font->Width(Text);
-    int MaxWidth = m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHight - m_MarginItem * 3 - 10;
+    int MaxWidth = m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem * 3 - 10;
 
     if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
         MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
                   m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
-                  MaxWidth, m_FontHight),
+                  MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string tilde = Text;
@@ -815,10 +815,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         } else {  // ~ not found
             if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
                 MessageScroller.AddScroller(Text,
-                                            cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
+                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
                                                   m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                       Config.decorBorderMessageSize + m_MarginItem,
-                                                  MaxWidth, m_FontHight),
+                                                  MaxWidth, m_FontHeight),
                                             Theme.Color(clrMessageFont), clrTransparent, m_Font);
             else
                 MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
@@ -827,10 +827,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     } else {
         if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
             MessageScroller.AddScroller(Text,
-                                        cRect(Config.decorBorderMessageSize + m_FontHight + m_MarginItem * 3 + 10,
+                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
                                               m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                   Config.decorBorderMessageSize + m_MarginItem,
-                                              MaxWidth, m_FontHight),
+                                              MaxWidth, m_FontHeight),
                                         Theme.Color(clrMessageFont), clrTransparent, m_Font);
         else
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
@@ -1928,7 +1928,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
     left += WeatherFontSml->Width(PrecTomorrow.c_str());
 
-    // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHight), clrTransparent);
+    // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
     WeatherWidget.CreatePixmaps(false);
     WeatherWidget.Draw();

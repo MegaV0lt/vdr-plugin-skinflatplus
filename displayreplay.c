@@ -2,7 +2,7 @@
 #include "flat.h"
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
-    m_LabelHeight = m_FontHight + m_FontSmlHight;
+    m_LabelHeight = m_FontHeight + m_FontSmlHeight;
     current = "";
     total = "";
     m_Recording = NULL;
@@ -41,8 +41,8 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
                        Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
     labelJump = CreatePixmap(osd, "labelJump", 1, cRect(Config.decorBorderReplaySize,
-        m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem*3 - m_FontHight
-         - Config.decorBorderReplaySize * 2, m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHight));
+        m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem*3 - m_FontHeight
+         - Config.decorBorderReplaySize * 2, m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
 
     dimmPixmap = CreatePixmap(osd, "dimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
 
@@ -87,10 +87,10 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     // Show if still recording
     cImage *img = NULL;
     if ((m_Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHight);  // Small image
+        img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
 
         if (img) {
-            int ImageTop = m_FontHight + (m_FontSmlHight - img->Height()) / 2;
+            int ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left += img->Width() + m_MarginItem;
         }
@@ -110,16 +110,16 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     int infoWidth = m_FontSml->Width(*info);  // Width of shorttext
     // TODO: How to get width of aspect and format icons?
     //  Done: Substract 'left' in case of displayed recording icon
-    //  Done: Substract 'm_FontSmlHight' in case of recordingerror icon is displayed later
+    //  Done: Substract 'm_FontSmlHeight' in case of recordingerror icon is displayed later
     //  Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors)
-        MaxWidth -= m_FontSmlHight;  // Substract width of imgRecErr
+        MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    img = ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHight);
+    img = ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHeight);
     if (img)
         MaxWidth -= img->Width() * 3;  // Substract guessed max. used space of aspect and format icons
 
@@ -127,21 +127,21 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         if (Config.ScrollerEnable) {
             MessageScroller.AddScroller(*info,
                                         cRect(Config.decorBorderReplaySize + left,
-                                              m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize + m_FontHight,
-                                              MaxWidth, m_FontSmlHight),
+                                              m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize + m_FontHeight,
+                                              MaxWidth, m_FontSmlHeight),
                                         Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
             left += MaxWidth;
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Shorttext too long! (%d) Setting MaxWidth to %d", infoWidth, MaxWidth);
             int DotsWidth = m_FontSml->Width("...");
-            LabelPixmap->DrawText(cPoint(left, m_FontHight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+            LabelPixmap->DrawText(cPoint(left, m_FontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   m_FontSml, MaxWidth - DotsWidth);
-            LabelPixmap->DrawText(cPoint(left, m_FontHight), "...", Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+            LabelPixmap->DrawText(cPoint(left, m_FontHeight), "...", Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   m_FontSml, DotsWidth);
             left += MaxWidth + DotsWidth;
         }
     } else {  // Shorttext fits into maxwidth
-        LabelPixmap->DrawText(cPoint(left, m_FontHight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+        LabelPixmap->DrawText(cPoint(left, m_FontHeight), *info, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               m_FontSml, infoWidth);
         left += infoWidth;
     }
@@ -151,10 +151,10 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
         cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
 
-        img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHight);  // Small image
+        img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            int ImageTop = m_FontHight + (m_FontSmlHight - img->Height()) / 2;
+            int ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
             iconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
         }
     }  // PlaybackShowRecordingErrors
@@ -198,7 +198,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         }
     }
     if (Setup.ShowReplayMode) {
-        left = m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHight * 4 + m_MarginItem * 3);
+        left = m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem * 3);
         left /= 2;
 
         if (m_ModeOnly)
@@ -206,7 +206,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         // PixmapFill(iconsPixmap, clrTransparent);  // Moved to SetRecording
         LabelPixmap->DrawRectangle(cRect(left - m_Font->Width("99") - m_MarginItem, 0,
-                                         m_FontHight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHight),
+                                         m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
 
         cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
@@ -216,7 +216,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             cString speed = cString::sprintf("%d", Speed);
             if (Forward) {
                 forward = "forward_sel";
-                LabelPixmap->DrawText(cPoint(left + m_FontHight * 4 + m_MarginItem * 4, 0), speed,
+                LabelPixmap->DrawText(cPoint(left + m_FontHeight * 4 + m_MarginItem * 4, 0), speed,
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), m_Font);
             } else {
                 rewind = "rewind_sel";
@@ -224,21 +224,21 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), m_Font);
             }
         }
-        cImage *img = ImgLoader.LoadIcon(*rewind, m_FontHight, m_FontHight);
+        cImage *img = ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight);
         if (img)
             iconsPixmap->DrawImage(cPoint(left, 0), *img);
 
-        img = ImgLoader.LoadIcon(*pause, m_FontHight, m_FontHight);
+        img = ImgLoader.LoadIcon(*pause, m_FontHeight, m_FontHeight);
         if (img)
-            iconsPixmap->DrawImage(cPoint(left + m_FontHight + m_MarginItem, 0), *img);
+            iconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
 
-        img = ImgLoader.LoadIcon(*play, m_FontHight, m_FontHight);
+        img = ImgLoader.LoadIcon(*play, m_FontHeight, m_FontHeight);
         if (img)
-            iconsPixmap->DrawImage(cPoint(left + m_FontHight * 2 + m_MarginItem * 2, 0), *img);
+            iconsPixmap->DrawImage(cPoint(left + m_FontHeight * 2 + m_MarginItem * 2, 0), *img);
 
-        img = ImgLoader.LoadIcon(*forward, m_FontHight, m_FontHight);
+        img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
         if (img)
-            iconsPixmap->DrawImage(cPoint(left + m_FontHight * 3 + m_MarginItem * 3, 0), *img);
+            iconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem * 3, 0), *img);
     }
 
     if (ProgressShown) {
@@ -252,7 +252,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (m_ModeOnly) {
             DecorBorderDraw(left - m_Font->Width("99") - m_MarginItem + Config.decorBorderReplaySize,
                             m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                            m_FontHight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHight,
+                            m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight,
                             Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg,
                             Config.decorBorderReplayBg);
         } else {
@@ -303,7 +303,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     if (Config.TimeSecsScale == 1.0)
         LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                              m_Font, m_Font->Width(*current), m_FontHight);
+                              m_Font, m_Font->Width(*current), m_FontHeight);
     else {
         std::string cur = *current;
         std::size_t found = cur.find_last_of(':');
@@ -313,13 +313,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             secs.append(1, ' ');  // Fix for extra pixel glitch
 
             LabelPixmap->DrawText(cPoint(m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHight);
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
             LabelPixmap->DrawText(cPoint(m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                   m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
         } else {
             LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                                  m_Font, m_Font->Width(*current), m_FontHight);
+                                  m_Font, m_Font->Width(*current), m_FontHeight);
         }
     }
 
@@ -407,7 +407,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     if (IsCutted) {
-        img = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHight, m_FontHight);
+        img = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
         int imgWidth {0};
         if (img)
             imgWidth = img->Width();
@@ -436,7 +436,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                             m_Font->Width(cutted);
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
@@ -444,13 +444,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 right += m_Font->Width(' ');
             } else {
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), total, Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
                 right += m_Font->Width(total);
                 right += m_Font->Width(' ');
             }
         } else {
             LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), total, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHight);
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
             right += m_Font->Width(total);
             right += m_Font->Width(' ');
         }
@@ -468,17 +468,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 std::string secs = cutt.substr(found, cutt.length() - found);
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrMenuItemExtraTextFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHeight);
             }
         } else {
             LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHight);
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHeight);
         }
     } else {  // Not cutted
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(total);
@@ -492,17 +492,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                         m_FontSecs->Width(secs.c_str());
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *total, Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHight);
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
             }
         } else {
             LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *total, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHight);
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
         }
     }  // IsCutted
 }
@@ -518,12 +518,12 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     left /= 2;
 
     labelJump->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
-                        m_Font->Width(Jump), m_FontHight, taCenter);
+                        m_Font->Width(Jump), m_FontHeight, taCenter);
 
     DecorBorderDraw(left + Config.decorBorderReplaySize,
-                    m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 - m_FontHight -
+                    m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 - m_FontHeight -
                         Config.decorBorderReplaySize * 2,
-                    m_Font->Width(Jump), m_FontHight, Config.decorBorderReplaySize, Config.decorBorderReplayType,
+                    m_Font->Width(Jump), m_FontHeight, Config.decorBorderReplaySize, Config.decorBorderReplayType,
                     Config.decorBorderReplayFg, Config.decorBorderReplayBg, BorderRecordJump);
 }
 
@@ -537,18 +537,18 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         cString IconName("");
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(ScreenWidth, ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = m_FontHight + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
             }
 
             IconName = GetScreenResolutionIcon(ScreenWidth, ScreenHeight, ScreenAspect);  // Show Resolution
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = m_FontHight + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
@@ -557,9 +557,9 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             IconName = GetFormatIcon(ScreenWidth);  // Show Format
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = m_FontHight + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 iconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
@@ -587,39 +587,39 @@ void cFlatDisplayReplay::Flush(void) {
 }
 
 void cFlatDisplayReplay::PreLoadImages(void) {
-    ImgLoader.LoadIcon("rewind", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("pause", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("play", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("forward", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("rewind_sel", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("pause_sel", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("play_sel", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("forward_sel", m_FontHight, m_FontHight);
-    ImgLoader.LoadIcon("recording_cutted_extra", m_FontHight, m_FontHight);
+    ImgLoader.LoadIcon("rewind", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("pause", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("forward", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("rewind_sel", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("pause_sel", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
 
-    ImgLoader.LoadIcon("recording_untested_replay", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("recording_ok_replay", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("recording_warning_replay", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("recording_error_replay", 999, m_FontSmlHight);
+    ImgLoader.LoadIcon("recording_untested_replay", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_ok_replay", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_warning_replay", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_error_replay", 999, m_FontSmlHeight);
 
-    ImgLoader.LoadIcon("43", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("169", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("169w", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("221", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("7680x4320", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("3840x2160", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("1440x1080", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("1280x720", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("960x720", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("704x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("720x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("544x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("528x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("480x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("352x576", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("unknown_res", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("uhd", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("hd", 999, m_FontSmlHight);
-    ImgLoader.LoadIcon("sd", 999, m_FontSmlHight);
+    ImgLoader.LoadIcon("43", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("169", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("169w", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("221", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("7680x4320", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("3840x2160", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1440x1080", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1280x720", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("960x720", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("704x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("720x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("544x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("528x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("480x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("352x576", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("unknown_res", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("uhd", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("hd", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("sd", 999, m_FontSmlHeight);
 }

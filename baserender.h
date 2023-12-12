@@ -37,9 +37,9 @@ class cFlatBaseRender {
         cFont *m_Font;
         cFont *m_FontSml;
         cFont *m_FontFixed;
-        int m_FontHight;
-        int m_FontSmlHight;
-        int m_FontFixedHight;
+        int m_FontHeight;
+        int m_FontSmlHeight;
+        int m_FontFixedHeight;
 
         // TopBar
         cPixmap *TopBarPixmap;

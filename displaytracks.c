@@ -5,8 +5,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     CreateFullOsd();
     TopBarCreate();
 
-    img_ac3 = ImgLoader.LoadIcon("tracks_ac3", 999, m_FontHight);
-    img_stereo = ImgLoader.LoadIcon("tracks_stereo", 999, m_FontHight);
+    img_ac3 = ImgLoader.LoadIcon("tracks_ac3", 999, m_FontHeight);
+    img_stereo = ImgLoader.LoadIcon("tracks_stereo", 999, m_FontHeight);
 
     Ac3Width = StereoWidth = 0;
     if (img_ac3)
@@ -15,7 +15,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
         StereoWidth = img_stereo->Width();
 
     int imgWidthMax = std::max(Ac3Width, StereoWidth);
-    ItemHeight = m_FontHight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
+    ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     CurrentIndex = -1;
     MaxItemWidth = m_Font->Width(Title) + m_MarginItem * 4;
     for (int i {0}; i < NumTracks; ++i)
@@ -74,13 +74,13 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     int top = m_OsdHeight - ItemsHeight - m_MarginItem + y;
 
     if (Current)
-        DecorBorderDraw(left, top, MaxItemWidth, m_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
     else if (Index >= 0)
-        DecorBorderDraw(left, top, MaxItemWidth, m_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
     else
-        DecorBorderDraw(left, top, MaxItemWidth, m_FontHight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
+        DecorBorderDraw(left, top, MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
                         Config.decorBorderTrackFg, Config.decorBorderTrackBg);
 }
 
@@ -97,11 +97,11 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     PixmapFill(TracksLogoPixmap, clrTransparent);
     if (AudioChannel == -1 && img_ac3) {
         int IconLeft = MaxItemWidth - img_ac3->Width() - m_MarginItem;
-        int IconTop = (m_FontHight - img_ac3->Height()) / 2;
+        int IconTop = (m_FontHeight - img_ac3->Height()) / 2;
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_ac3);
     } else if (img_stereo) {
         int IconLeft = MaxItemWidth - img_stereo->Width() - m_MarginItem;
-        int IconTop = (m_FontHight - img_stereo->Height()) / 2;
+        int IconTop = (m_FontHeight - img_stereo->Height()) / 2;
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_stereo);
     }
     return;

@@ -4,7 +4,7 @@
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
     // Muted = false;  // Unused?
 
-    m_LabelHeight = m_FontHight + m_MarginItem * 2;
+    m_LabelHeight = m_FontHeight + m_MarginItem * 2;
 
     CreateFullOsd();
     TopBarCreate();
@@ -39,26 +39,26 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     int DecorTop = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
 
-    LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHight), Theme.Color(clrVolumeBg));
+    LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight), Theme.Color(clrVolumeBg));
 
-    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHight, m_FontHight,
+    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight,
                      Config.decorBorderVolumeSize);
-    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHight, Config.decorBorderVolumeSize);
+    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight, Config.decorBorderVolumeSize);
 
     if (Mute) {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
-            m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHight, taLeft);
-        cImage *img = ImgLoader.LoadIcon("mute", m_FontHight, m_FontHight);
+            m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHeight, taLeft);
+        cImage *img = ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
         if (img) {
             MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + m_MarginItem, m_MarginItem), *img);
         }
-        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHight, m_FontHight,
+        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight,
                         Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
                         Config.decorBorderVolumeBg);
     } else {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
-            m_Font, MaxLabelWidth, m_FontHight, taLeft);
-        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHight,
+            m_Font, MaxLabelWidth, m_FontHeight, taLeft);
+        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight,
                         Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
                         Config.decorBorderVolumeBg);
     }
@@ -80,5 +80,5 @@ void cFlatDisplayVolume::Flush(void) {
 }
 
 void cFlatDisplayVolume::PreLoadImages(void) {
-    ImgLoader.LoadIcon("mute", m_FontHight, m_FontHight);
+    ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
 }

@@ -37,14 +37,14 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_ChannelWidth = m_OsdWidth - Config.decorBorderChannelSize * 2;
     m_ChannelHeight = m_OsdHeight - Config.decorBorderChannelSize * 2;
     // From bottom to top (2 * EPG + 2 * EPGsml)
-    HeightBottom = (m_FontHight * 2) + (m_FontSmlHight * 2) + m_MarginItem;  // Top, Bottom, Between
+    HeightBottom = (m_FontHeight * 2) + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
     HeightImageLogo = HeightBottom;
     if (Config.SignalQualityShow)
-        HeightBottom += std::max(m_FontSmlHight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
+        HeightBottom += std::max(m_FontSmlHeight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
     else if (Config.ChannelIconsShow)
-        HeightBottom += m_FontSmlHight + m_MarginItem;
+        HeightBottom += m_FontSmlHeight + m_MarginItem;
 
-    int HeightTop = m_FontHight;
+    int HeightTop = m_FontHeight;
 
     int height = HeightBottom;
     ChanInfoBottomPixmap =
@@ -193,15 +193,15 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     // if (!Resolution)
         PixmapFill(ChanIconsPixmap, clrTransparent);
 
-    int top = HeightBottom - m_FontSmlHight - m_MarginItem;
+    int top = HeightBottom - m_FontSmlHeight - m_MarginItem;
     int ImageTop {0};
-    int left = m_ChannelWidth - m_FontSmlHight - m_MarginItem * 2;
+    int left = m_ChannelWidth - m_FontSmlHeight - m_MarginItem * 2;
 
     cImage *img = NULL;
     if (Channel) {
-        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHight);
+        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHeight);
         if (img) {
-            ImageTop = top + (m_FontSmlHight - img->Height()) / 2;
+            ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
             ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem * 2;
         }
@@ -211,18 +211,18 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         cString IconName("");
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(ScreenWidth, ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
             }
 
             IconName = GetScreenResolutionIcon(ScreenWidth, ScreenHeight, ScreenAspect);  // Show Resolution
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
@@ -231,9 +231,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = GetFormatIcon(ScreenWidth);  // Show Format
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHight);
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHight - img->Height()) / 2;
+                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem * 2;
@@ -297,7 +297,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem * 2, 0), *StrTime,
             Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_FontSml, StrTimeWidth, 0, taRight);
-        ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - SeenWidth - m_MarginItem * 2, m_FontSmlHight), *seen,
+        ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - SeenWidth - m_MarginItem * 2, m_FontSmlHeight), *seen,
                 Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_FontSml, SeenWidth, 0, taRight);
 
         if (Config.ChannelShowStartTime) {
@@ -309,7 +309,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             Scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
                                               Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom,
                                               m_ChannelWidth - left - MaxWidth,
-                                              m_FontHight), Theme.Color(clrChannelFontEpg), clrTransparent, m_Font);
+                                              m_FontHeight), Theme.Color(clrChannelFontEpg), clrTransparent, m_Font);
         } else {
             ChanInfoBottomPixmap->DrawText(cPoint(left, 0), *epg, Theme.Color(clrChannelFontEpg),
                                            Theme.Color(clrChannelBg), m_Font, m_ChannelWidth - left - MaxWidth);
@@ -317,11 +317,11 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
-                                  Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHight,
+                                  Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight,
                                   m_ChannelWidth - left - MaxWidth,
-                                  m_FontSmlHight), Theme.Color(clrChannelFontEpg), clrTransparent, m_FontSml);
+                                  m_FontSmlHeight), Theme.Color(clrChannelFontEpg), clrTransparent, m_FontSml);
         } else {
-            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHight), *EpgShort, Theme.Color(clrChannelFontEpg),
+            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight), *EpgShort, Theme.Color(clrChannelFontEpg),
                                            Theme.Color(clrChannelBg), m_FontSml, m_ChannelWidth - left - MaxWidth);
         }
 
@@ -354,39 +354,39 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         int MaxWidth = std::max(StrTimeWidth, DurWidth);
 
         ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem * 2,
-                                       m_FontHight + m_FontSmlHight), *StrTime, Theme.Color(clrChannelFontEpgFollow),
+                                       m_FontHeight + m_FontSmlHeight), *StrTime, Theme.Color(clrChannelFontEpgFollow),
                                        Theme.Color(clrChannelBg), m_FontSml, StrTimeWidth, 0, taRight);
-        ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - DurWidth - m_MarginItem * 2, m_FontHight + m_FontSmlHight * 2),
+        ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - DurWidth - m_MarginItem * 2, m_FontHeight + m_FontSmlHeight * 2),
                                        *dur, Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg),
                                        m_FontSml, DurWidth, 0, taRight);
 
         if (Config.ChannelShowStartTime)
-            ChanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, m_FontHight + m_FontSmlHight), *StartTime,
+            ChanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, m_FontHeight + m_FontSmlHeight), *StartTime,
                                            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_Font);
 
         if ((EpgWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
-                                  Config.decorBorderChannelSize + m_ChannelHeight - HeightBottom + m_FontHight
-                                   + m_FontSmlHight, m_ChannelWidth - left - MaxWidth, m_FontHight),
+                                  Config.decorBorderChannelSize + m_ChannelHeight - HeightBottom + m_FontHeight
+                                   + m_FontSmlHeight, m_ChannelWidth - left - MaxWidth, m_FontHeight),
                                    Theme.Color(clrChannelFontEpgFollow), clrTransparent, m_Font);
         } else {
-            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHight + m_FontSmlHight), *epg,
+            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight + m_FontSmlHeight), *epg,
                 Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_Font, m_ChannelWidth - left - MaxWidth);
         }
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
-                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHight*2 + m_FontSmlHight,
-                m_ChannelWidth - left - MaxWidth, m_FontSmlHight), Theme.Color(clrChannelFontEpgFollow),
+                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight*2 + m_FontSmlHeight,
+                m_ChannelWidth - left - MaxWidth, m_FontSmlHeight), Theme.Color(clrChannelFontEpgFollow),
                 clrTransparent, m_FontSml);
         } else {
-            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHight*2 + m_FontSmlHight), *EpgShort,
+            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight*2 + m_FontSmlHeight), *EpgShort,
                                            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg),
                                            m_FontSml, m_ChannelWidth - left - MaxWidth);
         }
 
         if (IsRec) {
-            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, m_FontHight + m_FontSmlHight),
+            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, m_FontHeight + m_FontSmlHeight),
                                            "REC", Theme.Color(clrChannelRecordingFollowFg),
                                            Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
         }
@@ -463,8 +463,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
-    int top = m_FontHight * 2 + m_FontSmlHight * 2 + m_MarginItem;
-    top += std::max(m_FontSmlHight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2) - m_MarginItem;
+    int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
+    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2) - m_MarginItem;
     int left = m_MarginItem * 2;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
@@ -523,8 +523,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0 || ecmInfo.ecmtime > 9999)
         return;
 
-    int top = m_FontHight * 2 + m_FontSmlHight * 2 + m_MarginItem;
-    top += std::max(m_FontSmlHight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
+    int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
+    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem * 2;
     int left = SignalStrengthRight + m_MarginItem * 2;
 
@@ -588,7 +588,7 @@ void cFlatDisplayChannel::Flush(void) {
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {
-    int height = (m_FontHight * 2) + (m_FontSmlHight * 2) + m_MarginItem - m_MarginItem * 2;
+    int height = (m_FontHeight * 2) + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem * 2;
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);
 
@@ -613,7 +613,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
         if (img) ++index;
     }
 
-    height = std::max(m_FontSmlHight, Config.decorProgressSignalSize);
+    height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize);
     ImgLoader.LoadIcon("crypted", 999, height);
     ImgLoader.LoadIcon("uncrypted", 999, height);
     ImgLoader.LoadIcon("unknown_asp", 999, height);
