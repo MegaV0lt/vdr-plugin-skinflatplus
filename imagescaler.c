@@ -1,5 +1,5 @@
 
-#include "imagescaler.h"
+#include "./imagescaler.h"
 
 #include <cstdlib>
 #include <cmath>

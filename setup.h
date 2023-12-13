@@ -2,8 +2,8 @@
 
 #include <vdr/menu.h>
 #include <vdr/tools.h>
-#include "config.h"
-#include "services/scraper2vdr.h"
+#include "./config.h"
+#include "./services/scraper2vdr.h"
 
 class cFlatSetup : public cMenuSetupPage {
  public:

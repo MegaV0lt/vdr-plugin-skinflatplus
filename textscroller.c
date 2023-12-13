@@ -1,4 +1,4 @@
-#include "textscroller.h"
+#include "./textscroller.h"
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {

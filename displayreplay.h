@@ -1,7 +1,7 @@
 #pragma once
 
-#include "baserender.h"
-#include "services/scraper2vdr.h"
+#include "./baserender.h"
+#include "./services/scraper2vdr.h"
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  private:

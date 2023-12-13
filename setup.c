@@ -1,4 +1,4 @@
-#include "setup.h"
+#include "./setup.h"
 
 cStringList Bordertypes;
 cStringList DiskUsages;

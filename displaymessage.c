@@ -1,4 +1,4 @@
-#include "displaymessage.h"
+#include "./displaymessage.h"
 
 cFlatDisplayMessage::cFlatDisplayMessage(void) {
     CreateFullOsd();

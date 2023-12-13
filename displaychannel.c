@@ -1,5 +1,5 @@
-#include "displaychannel.h"
-#include "flat.h"
+#include "./displaychannel.h"
+#include "./flat.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (m_FirstDisplay) {
@@ -103,8 +103,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (Config.ChannelWeatherShow)
         DrawWidgetWeather();
 
-    DecorBorderDraw(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
-                    HeightTop + HeightBottom + Config.decorProgressChannelSize + m_MarginItem * 2,
+    DecorBorderDraw(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
+                    m_ChannelWidth, HeightTop + HeightBottom + Config.decorProgressChannelSize + m_MarginItem * 2,
                     Config.decorBorderChannelSize, Config.decorBorderChannelType, Config.decorBorderChannelFg,
                     Config.decorBorderChannelBg);
 }
@@ -356,9 +356,9 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem * 2,
                                        m_FontHeight + m_FontSmlHeight), *StrTime, Theme.Color(clrChannelFontEpgFollow),
                                        Theme.Color(clrChannelBg), m_FontSml, StrTimeWidth, 0, taRight);
-        ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - DurWidth - m_MarginItem * 2, m_FontHeight + m_FontSmlHeight * 2),
-                                       *dur, Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg),
-                                       m_FontSml, DurWidth, 0, taRight);
+        ChanInfoBottomPixmap->DrawText(
+            cPoint(m_ChannelWidth - DurWidth - m_MarginItem * 2, m_FontHeight + m_FontSmlHeight * 2), *dur,
+            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_FontSml, DurWidth, 0, taRight);
 
         if (Config.ChannelShowStartTime)
             ChanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, m_FontHeight + m_FontSmlHeight), *StartTime,

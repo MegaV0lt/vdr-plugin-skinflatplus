@@ -1,5 +1,5 @@
-#include "displayreplay.h"
-#include "flat.h"
+#include "./displayreplay.h"
+#include "./flat.h"
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;

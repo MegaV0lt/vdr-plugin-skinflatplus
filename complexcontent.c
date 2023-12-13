@@ -1,4 +1,4 @@
-#include "complexcontent.h"
+#include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
     Osd = NULL;

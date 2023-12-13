@@ -6,7 +6,7 @@
 #include <vdr/skins.h>
 
 #include <Magick++.h>
-#include "imagemagickwrapper.h"
+#include "./imagemagickwrapper.h"
 
 using namespace Magick;
 

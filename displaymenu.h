@@ -1,7 +1,7 @@
 #pragma once
 
-#include "baserender.h"
-#include "complexcontent.h"
+#include "./baserender.h"
+#include "./complexcontent.h"
 #include <vdr/menu.h>
 #include <vdr/tools.h>
 #include <list>

@@ -1,5 +1,5 @@
-#include "imagemagickwrapper.h"
-#include "imagescaler.h"
+#include "./imagemagickwrapper.h"
+#include "./imagescaler.h"
 #include <sstream>
 #include <string>
 

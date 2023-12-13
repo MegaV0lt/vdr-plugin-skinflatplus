@@ -1,7 +1,7 @@
 #pragma once
 
 #include <list>
-#include "flat.h"
+#include "./flat.h"
 #include <string.h>
 #include <vdr/thread.h>
 

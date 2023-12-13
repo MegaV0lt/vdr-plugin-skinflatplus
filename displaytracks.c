@@ -1,5 +1,5 @@
-#include "displaytracks.h"
-#include "flat.h"
+#include "./displaytracks.h"
+#include "./flat.h"
 
 cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) {
     CreateFullOsd();

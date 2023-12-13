@@ -1,5 +1,5 @@
-#include "displayvolume.h"
-#include "flat.h"
+#include "./displayvolume.h"
+#include "./flat.h"
 
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
     // Muted = false;  // Unused?

@@ -12,8 +12,8 @@
 #include <vdr/skins.h>
 #include <vdr/videodir.h>
 
-#include "config.h"
-#include "imagecache.h"
+#include "./config.h"
+#include "./imagecache.h"
 
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;

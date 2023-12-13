@@ -16,7 +16,7 @@
 #endif
 
 #include "./flat.h"
-#include "locale"
+#include "./locale"
 
 static int CompareTimers(const void *a, const void *b) {
     return (*(const cTimer **)a)->Compare(**(const cTimer **)b);

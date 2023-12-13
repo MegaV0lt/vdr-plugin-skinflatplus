@@ -1,13 +1,13 @@
-#include "imagecache.h"
-#include "config.h"
+#include "./imagecache.h"
 #include <libgen.h>
 
-#include "displaychannel.h"
-#include "displaymenu.h"
-#include "displaymessage.h"
-#include "displayreplay.h"
-#include "displaytracks.h"
-#include "displayvolume.h"
+#include "./config.h"
+#include "./displaychannel.h"
+#include "./displaymenu.h"
+#include "./displaymessage.h"
+#include "./displayreplay.h"
+#include "./displaytracks.h"
+#include "./displayvolume.h"
 
 
 cImageCache::cImageCache() {

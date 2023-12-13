@@ -1,9 +1,9 @@
 #pragma once
 
-#include "imageloader.h"
-#include <list>
-#include "flat.h"
 #include <string.h>
+#include <list>
+#include "./imageloader.h"
+#include "./flat.h"
 
 enum eContentType {
     CT_Text,
