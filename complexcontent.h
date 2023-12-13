@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string.h>
+#include <cstring>  // string.h
 #include <list>
 #include "./imageloader.h"
 #include "./flat.h"

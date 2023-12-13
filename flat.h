@@ -5,7 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <string.h>
+#include <cstring>  // string.h
 #include <random>
 
 #include <vdr/plugin.h>

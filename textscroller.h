@@ -1,9 +1,9 @@
 #pragma once
 
+#include <cstring>  // string.h
+#include <vdr/thread.h>
 #include <list>
 #include "./flat.h"
-#include <string.h>
-#include <vdr/thread.h>
 
 #define WAITDELAY 1000  // In ms
 
