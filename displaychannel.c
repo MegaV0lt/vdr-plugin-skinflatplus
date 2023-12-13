@@ -10,7 +10,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_DoOutput = true;
 
     present = NULL;
-    m_ChannelName = "";
+    // m_ChannelName = "";
     ChanInfoTopPixmap = NULL;
     ChanInfoBottomPixmap = NULL;
     ChanLogoPixmap = NULL;
@@ -137,12 +137,12 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanIconsPixmap, clrTransparent);
     LastScreenWidth = -1;
 
-    cString ChannelNumber("");
+    cString ChannelName(""), ChannelNumber("");
     if (Channel) {
         IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         IsGroup = Channel->GroupSep();
 
-        m_ChannelName = Channel->Name();
+        ChannelName = Channel->Name();
         if (!IsGroup)
             ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
@@ -150,9 +150,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
         CurChannel = Channel;
     } else
-        m_ChannelName = ChannelString(NULL, 0);
+        ChannelName = ChannelString(NULL, 0);
 
-    cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *m_ChannelName);
+    cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
 
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
     ChanInfoTopPixmap->DrawText(cPoint(50, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
@@ -172,7 +172,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         ChanLogoBGPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
-    img = ImgLoader.LoadLogo(*m_ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
+    img = ImgLoader.LoadLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
     if (img) {
         ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
