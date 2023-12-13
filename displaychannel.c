@@ -19,7 +19,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ChanEpgImagesPixmap = NULL;
 
     IsGroup = false;
-    IsRecording = false,
+    // IsRecording = false,  / Unused?
     IsRadioChannel = false;
 
     ScreenWidth = LastScreenWidth = -1;
@@ -133,7 +133,7 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     if (!m_DoOutput) return;
 
-    IsRecording = false;
+    // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
     LastScreenWidth = -1;
 
