@@ -4105,7 +4105,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     // Check currently recording devices
     // bool *RecDevices = new bool[NumDevices];  // Eliminate 'new'
-    bool RecDevices[NumDevices] {false};  // Array initialised to false
+    bool RecDevices[NumDevices] {false};  // Array initialisized to false
     // for (int i {0}; i < NumDevices; ++i)
     //    RecDevices[i] = false;
 
@@ -4845,12 +4845,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     }
 
     ItemFilename = cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH);
-    std::ifstream file2(*ItemFilename, std::ifstream::in);
-    if (file2.is_open()) {
+    file.open(*ItemFilename, std::ifstream::in);
+    if (file.is_open()) {
         std::string cont("");
-        std::getline(file2, cont);
+        std::getline(file, cont);
         SecurityUpdates = atoi(cont.c_str());
-        file2.close();
+        file.close();
     } else {
         SecurityUpdates = -1;
     }
@@ -4909,32 +4909,32 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int C
     }
 
     ItemFilename = cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH);
-    std::ifstream file2(*ItemFilename, std::ifstream::in);
-    if (file2.is_open()) {
+    file.open(*ItemFilename, std::ifstream::in);
+    if (file.is_open()) {
         // std::string cont("");
-        std::getline(file2, TempCase);
-        file2.close();
+        std::getline(file, TempCase);
+        file.close();
         ++CountTemps;
     } else {
         TempCase = "-1";
     }
 
     ItemFilename = cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH);
-    std::ifstream file3(*ItemFilename, std::ifstream::in);
-    if (file3.is_open()) {
+    file.open(*ItemFilename, std::ifstream::in);
+    if (file.is_open()) {
         // std::string cont("");
-        std::getline(file3, TempMB);
-        file3.close();
+        std::getline(file, TempMB);
+        file.close();
         ++CountTemps;
     } else {
         TempMB = "-1";
     }
     ItemFilename = cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH);
-    std::ifstream file4(*ItemFilename, std::ifstream::in);
-    if (file4.is_open()) {
+    file.open(*ItemFilename, std::ifstream::in);
+    if (file.is_open()) {
         // std::string cont("");
-        std::getline(file4, TempGPU);
-        file4.close();
+        std::getline(file, TempGPU);
+        file.close();
         ++CountTemps;
     } else {
         TempGPU = "-1";
@@ -5012,9 +5012,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     std::string Output("");
     ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
-    std::ifstream file2(*ItemFilename, std::ifstream::in);
-    if (file2.is_open()) {
-        for (; std::getline(file2, Output);) {
+    file.open(*ItemFilename, std::ifstream::in);
+    if (file.is_open()) {
+        for (; std::getline(file, Output);) {
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
                 break;
             ContentWidget.AddText(
@@ -5022,7 +5022,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem * 2);
             ContentTop += m_FontSmlHeight;
         }
-        file2.close();
+        file.close();
     } else {
         ContentWidget.AddText(tr("no output available"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
@@ -5050,7 +5050,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     }
 
     std::string TempToday("");
-    // cString FileName("");
     FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -5072,7 +5071,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left = m_MarginItem;
     std::string icon(""), summary(""), TempMax(""), TempMin(""), prec("");
-    cString /* Filename(""),*/ PrecString("0%");
+    cString PrecString("0%");
     double p {0.0};
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
         FileName = cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index);
@@ -5126,7 +5125,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         time_t t2 = mktime(&tm_r);
 
         int FontTempSmlHeight = FontTempSml->Height();
-        // cImage *img = NULL;
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
             if (left + m_FontHeight * 2 + FontTempSml->Width("-99,9°C") + FontTempSml->Width("XXXX") + m_MarginItem * 6 >
                 wWidth)
@@ -5219,7 +5217,6 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     cReadDir d(*Path);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        // FileName = cString::sprintf("menuIcons/%s", GetFilenameWithoutext(e->d_name));
         File = e->d_name;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
         ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem * 2, m_FontHeight - m_MarginItem * 2);

@@ -1787,7 +1787,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    FileName = cString::sprintf("%s/weather/weather.0.TempMax", WIDGETOUTPUTPATH);
+    FileName = cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, TempMaxToday);
@@ -1795,7 +1795,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    FileName = cString::sprintf("%s/weather/weather.1.TempMax", WIDGETOUTPUTPATH);
+    FileName = cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, TempMaxTomorrow);
@@ -1803,7 +1803,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    FileName = cString::sprintf("%s/weather/weather.0.TempMin", WIDGETOUTPUTPATH);
+    FileName = cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, TempMinToday);
@@ -1811,7 +1811,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    FileName = cString::sprintf("%s/weather/weather.1.TempMin", WIDGETOUTPUTPATH);
+    FileName = cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, TempMinTomorrow);
