@@ -21,9 +21,9 @@ class cImageLoader : public cImageMagickWrapper {
     bool FileExits(const std::string &name);
     bool SearchRecordingPoster(cString RecPath, cString &found);
  private:
-    int epgImageWidthLarge, epgImageHeightLarge;
-    int epgImageWidth, epgImageHeight;
-    cString LogoExtension;
+    // int epgImageWidthLarge, epgImageHeightLarge;  // Unused?
+    // int epgImageWidth, epgImageHeight;
+    cString m_LogoExtension;
 
     void ToLowerCase(std::string &str);
 };

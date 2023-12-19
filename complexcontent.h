@@ -30,12 +30,13 @@ class cSimpleContent {
 
  public:
     cSimpleContent(void) {
-        Image = NULL;
-        Font = NULL;
-
         ContentType = CT_None;  // Added to avoid compiler warning
+        // Position
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
         // tColor ColorFg, ColorBg;  // TODO ???
+        // Text
+        Image = NULL;
+        Font = NULL;
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -58,12 +59,12 @@ class cSimpleContent {
         if (this != &other) {
             this->ContentType = other.ContentType;
             this->Position = other.Position;
-            this->Text = other.Text;
             this->TextWidth = other.TextWidth;
             this->TextHeight = other.TextHeight;
             this->TextAlignment = other.TextAlignment;
             this->ColorFg = other.ColorFg;
             this->ColorBg = other.ColorBg;
+            this->Text = other.Text;
             this->Image = other.Image;
             this->Font = other.Font;
         }
@@ -73,22 +74,21 @@ class cSimpleContent {
     void SetText(const char *text, bool Multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                  int textWidth = 0, int textHeight = 0, int textAlignment = taDefault) {
         ContentType = CT_Text;
-        Text = text;
-
-        Font = font;
         Position = position;
+        Text = text;
+        Font = font;
 
         if (Multiline)
             ContentType = CT_TextMultiline;
 
-        ColorFg = colorFg; ColorBg = colorBg;
         TextWidth = textWidth; TextHeight = textHeight; TextAlignment = textAlignment;
+        ColorFg = colorFg; ColorBg = colorBg;
     }
 
     void SetImage(cImage *image, cRect position) {
         ContentType = CT_Image;
-        Image = image;
         Position = position;
+        Image = image;
     }
 
     void SetRect(cRect position, tColor colorBg) {

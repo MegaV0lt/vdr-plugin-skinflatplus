@@ -3,15 +3,14 @@
 
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
     // Muted = false;  // Unused?
-
     m_LabelHeight = m_FontHeight + m_MarginItem * 2;
 
     CreateFullOsd();
     TopBarCreate();
     int width = m_OsdWidth / 4 * 3;
 
-    int top =
-        m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem - Config.decorBorderVolumeSize * 2;
+    int top = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
+              Config.decorBorderVolumeSize * 2;
     int left = m_OsdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
 
@@ -37,13 +36,14 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     int MaxLabelWidth = m_Font->Width(*MaxLabel) + m_MarginItem;
     int left = m_OsdWidth / 2 - MaxLabelWidth / 2;
 
+    LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight),
+                               Theme.Color(clrVolumeBg));
+
     int DecorTop = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
-
-    LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight), Theme.Color(clrVolumeBg));
-
     DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight,
                      Config.decorBorderVolumeSize);
-    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight, Config.decorBorderVolumeSize);
+    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight,
+                     Config.decorBorderVolumeSize);
 
     if (Mute) {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),

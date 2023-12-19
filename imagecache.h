@@ -16,8 +16,8 @@ class cImageCache {
     int CacheWidth[MAX_IMAGE_CACHE];
     int CacheHeight[MAX_IMAGE_CACHE];
 
-    int InsertIndex;
-    bool Overflow;
+    int m_InsertIndex;  // Imagecache index
+    bool m_OverFlow;    // Set when cache is full
 
  public:
     cImageCache();
@@ -27,10 +27,9 @@ class cImageCache {
     void Clear(void);
     bool RemoveFromCache(std::string Name);
 
-    int getCacheCount(void) {
-      if (Overflow)
-         return MAX_IMAGE_CACHE;
-      return InsertIndex + 1;
+    int GetCacheCount(void) {
+      if (m_OverFlow) return MAX_IMAGE_CACHE;
+      return m_InsertIndex + 1;
     }
 
     cImage *GetImage(std::string Name, int Width, int Height);

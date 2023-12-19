@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-xx-xx: Version 0.8.3
+
+
 2023-12-04: Version 0.8.3
 - [add] Make fsk/genre icon size configurable
 - [update] Remove space between ~ and estimated free minutes

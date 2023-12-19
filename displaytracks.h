@@ -9,11 +9,11 @@ class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
 
         cImage *img_ac3;
         cImage *img_stereo;
-        int Ac3Width, StereoWidth;
+        int m_Ac3Width, m_StereoWidth;
 
-        int ItemHeight, ItemsHeight;
-        int MaxItemWidth;
-        int CurrentIndex;
+        int m_ItemHeight, ItemsHeight;
+        int m_MaxItemWidth;
+        int m_CurrentIndex;
 
         void SetItem(const char *Text, int Index, bool Current);
  public:

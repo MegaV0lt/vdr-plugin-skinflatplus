@@ -12,14 +12,14 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         cPixmap *labelJump;
         cPixmap *iconsPixmap;
         cPixmap *ChanEpgImagesPixmap;
-        cPixmap *dimmPixmap;
+        cPixmap *DimmPixmap;
 
         cFont *m_FontSecs;
         const cRecording *m_Recording;
 
-        int ScreenWidth, LastScreenWidth;
-        int ScreenHeight;
-        double ScreenAspect;
+        int m_ScreenWidth, m_LastScreenWidth;
+        int m_ScreenHeight;
+        double m_ScreenAspect;
 
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;

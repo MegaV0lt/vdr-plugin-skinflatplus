@@ -40,13 +40,14 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
+        unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
-                unsigned char r = c.quantumRed() * 255 / QuantumRange;
-                unsigned char g = c.quantumGreen() * 255 / QuantumRange;
-                unsigned char b = c.quantumBlue() * 255 / QuantumRange;
-                unsigned char o = c.quantumAlpha() * 255 / QuantumRange;
+                /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
+                /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
+                /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
+                /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
                 scaler.PutSourcePixel((int(b)), (int(g)), (int(r)), (int(o)));
             }
         }
@@ -59,13 +60,14 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return image;
     }
 #ifdef IMAGEMAGICK7
+    unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
-            unsigned char r = c.quantumRed() * 255 / QuantumRange;
-            unsigned char g = c.quantumGreen() * 255 / QuantumRange;
-            unsigned char b = c.quantumBlue() * 255 / QuantumRange;
-            unsigned char o = c.quantumAlpha() * 255 / QuantumRange;
+            /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
+            /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
+            /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
+            /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
             *imgData++ = ((int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b)));
         }
     }
@@ -85,15 +87,17 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     cImage image(cSize(w, h));
 #ifndef IMAGEMAGICK7
     const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+#else
+    unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
 #endif
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
 #ifdef IMAGEMAGICK7
             Color c = buffer.pixelColor(ix, iy);
-            unsigned char r = c.quantumRed() * 255 / QuantumRange;
-            unsigned char g = c.quantumGreen() * 255 / QuantumRange;
-            unsigned char b = c.quantumBlue() * 255 / QuantumRange;
-            unsigned char o = c.quantumAlpha() * 255 / QuantumRange;
+            /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
+            /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
+            /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
+            /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
             tColor col = (int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b));
 #else
             tColor col = (~int(pixels->opacity * 255 / MaxRGB) << 24) | (int(pixels->green * 255 / MaxRGB) << 8) |

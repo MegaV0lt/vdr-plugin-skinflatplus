@@ -28,34 +28,34 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         cPixmap *MenuIconsBgPixmap;
         cPixmap *MenuIconsOvlPixmap;
 
-        int MenuTop, MenuWidth;
-        int MenuItemWidth;
-        int MenuItemLastHeight;
-        bool MenuFullOsdIsDrawn;
+        int m_MenuTop, m_MenuWidth;
+        int m_MenuItemWidth;
+        int m_MenuItemLastHeight;
+        bool m_MenuFullOsdIsDrawn;
 
         eMenuCategory m_MenuCategory;
         int m_VideoDiskUsageState;
 
-        int LastTimerCount, LastTimerActiveCount;
-        cString LastTitle;
+        int m_LastTimerCount, m_LastTimerActiveCount;
+        cString m_LastTitle;
 
-        int chLeft, chTop, chWidth, chHeight;
+        int m_chLeft, m_chTop, m_chWidth, m_chHeight;
         cPixmap *ContentHeadPixmap;
         cPixmap *ContentHeadIconsPixmap;
 
-        int cLeft, cTop, cWidth, cHeight;
+        int m_cLeft, m_cTop, m_cWidth, m_cHeight;
 
         cPixmap *ScrollbarPixmap;
         int m_ScrollBarTop, m_ScrollBarWidth, m_ScrollBarHeight;
 
-        int ItemHeight, ItemChannelHeight, ItemTimerHeight, ItemEventHeight, ItemRecordingHeight;
+        int m_ItemHeight, m_ItemChannelHeight, m_ItemTimerHeight, m_ItemEventHeight, m_ItemRecordingHeight;
 
         std::list<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool IsScrolling;
-        bool IsGroup;
-        bool ShowEvent, ShowRecording, ShowText;
+        bool m_IsScrolling;
+        bool m_IsGroup;
+        bool m_ShowEvent, m_ShowRecording, m_ShowText;
 
         cComplexContent ComplexContent;
 
@@ -65,10 +65,10 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         // TextScroller
         cTextScrollers MenuItemScroller;
 
-        cString ItemEventLastChannelName;
+        cString m_ItemEventLastChannelName;
 
-        std::string RecFolder, LastRecFolder;
-        int LastItemRecordingLevel;
+        std::string m_RecFolder, m_LastRecFolder;
+        int m_LastItemRecordingLevel;
 
         // Icons
         cImage *IconTimerFull;

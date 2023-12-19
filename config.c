@@ -706,7 +706,8 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     std::sort(files.begin(), files.end(), StringCompare);
     std::string File_Name("");
     cString Desc("");
-    for (unsigned i = 0; i < files.size(); ++i) {
+    std::size_t FilesSize {files.size()};
+    for (unsigned i = 0; i < FilesSize; ++i) {
         File_Name = files.at(i);
         Desc = DecorDescription(File_Name.c_str());
         Decors.Append(strdup(*Desc));
@@ -718,7 +719,7 @@ cString cFlatConfig::DecorDescription(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -738,7 +739,8 @@ cString cFlatConfig::DecorDescription(cString File) {
                     }
                 }
             }
-        }
+        }  // while
+        fclose(f);
     }
     return description;
 }
@@ -770,7 +772,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0}, value {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -856,7 +858,8 @@ void cFlatConfig::DecorLoadFile(cString File) {
                         decorScrollBarSizeTheme = value; continue; }
                 }
             }
-        }
+        }  // while
+        fclose(f);
     }
 }
 
@@ -868,7 +871,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
     FILE *f = fopen(RecordingOldConfigFile, "r");
     if (f) {
         int line {0}, value {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -889,6 +892,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                 }
             }
         }  // while
+        fclose(f);
     }
 }
 
@@ -902,10 +906,10 @@ int cFlatConfig::GetRecordingOldValue(std::string folder) {
 }
 
 void cFlatConfig::SetLogoPath(cString path) {
-    LogoPath = checkSlashAtEnd(*path);
+    LogoPath = CheckSlashAtEnd(*path);
 }
 
-cString cFlatConfig::checkSlashAtEnd(std::string path) {
+cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     try {
         if (!(path.at(path.size() - 1) == '/'))
             return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
@@ -945,7 +949,8 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
 
     std::sort(files.begin(), files.end(), StringCompare);
     std::string FileName("");
-    for (unsigned i = 0; i < files.size(); ++i) {
+    std::size_t FilesSize {files.size()};
+    for (unsigned i = 0; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

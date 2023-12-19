@@ -85,26 +85,26 @@ class cFlatBaseRender {
 
         // Message
         cPixmap *MessagePixmap, *MessageIconPixmap;
-        int m_MessageWidth, m_MessageHeight;  // TODO: m_MessageWidth unused?
+        int /* m_MessageWidth, */ m_MessageHeight;  // TODO: m_MessageWidth unused?
         cTextScrollers MessageScroller;
 
         // Multiline content with scrollbar
-        cPixmap *ContentPixmap;
-        cPixmap *ContentEpgImagePixmap;
-        int ContentLeft, ContentTop, ContentHeight, ContentWidth;
-        int ContentDrawPortHeight;  // Complete high of text
-        int ContentTextHeight;
-        bool ContentHasScrollbar;
-        bool ContentShown;
-        int ContentFontType;
-        int ContentEventType;
-        int ContentEventHeight;
-        int ContentEventPosterWidth, ContentEventPosterHeight;
+        // cPixmap *ContentPixmap;  // TODO: Content* unused?
+        // cPixmap *ContentEpgImagePixmap;
+        // int ContentLeft, ContentTop, ContentHeight, ContentWidth;
+        // int ContentDrawPortHeight;  // Complete high of text
+        // int ContentTextHeight;
+        // bool ContentHasScrollbar;
+        // bool ContentShown;
+        // int ContentFontType;
+        // int ContentEventType;
+        // int ContentEventHeight;
+        // int ContentEventPosterWidth, ContentEventPosterHeight;
 
-        tColor ContentColorFg, ContentColorBg;
-        cTextWrapper ContentWrapper;
-        cTextWrapper ContentWrapperPoster;
-        const cEvent *ContentEvent;
+        // tColor ContentColorFg, ContentColorBg;
+        // cTextWrapper ContentWrapper;
+        // cTextWrapper ContentWrapperPoster;
+        // const cEvent *ContentEvent;
 
         cComplexContent WeatherWidget;
 

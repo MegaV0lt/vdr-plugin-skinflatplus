@@ -18,7 +18,7 @@ int RoundUp(int NumToRound, int multiple);
 
 class cFlatConfig {
  private:
-        cString checkSlashAtEnd(std::string path);
+        cString CheckSlashAtEnd(std::string path);
 
         int m_DecorCurrent;
 

@@ -9,8 +9,9 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     } else
         m_DoOutput = true;
 
-    present = NULL;
+    m_Present = NULL;
     // m_ChannelName = "";
+    
     ChanInfoTopPixmap = NULL;
     ChanInfoBottomPixmap = NULL;
     ChanLogoPixmap = NULL;
@@ -18,15 +19,15 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ChanIconsPixmap = NULL;
     ChanEpgImagesPixmap = NULL;
 
-    IsGroup = false;
+    m_IsGroup = false;
     // IsRecording = false,  / Unused?
-    IsRadioChannel = false;
+    m_IsRadioChannel = false;
 
-    ScreenWidth = LastScreenWidth = -1;
-    LastSignalStrength = -1;
-    LastSignalQuality = -1;
+    m_ScreenWidth = m_LastScreenWidth = -1;
+    m_LastSignalStrength = -1;
+    m_LastSignalQuality = -1;
 
-    SignalStrengthRight = 0;
+    m_SignalStrengthRight = 0;
 
     CreateFullOsd();
     if (!osd) return;
@@ -135,20 +136,20 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
-    LastScreenWidth = -1;
+    m_LastScreenWidth = -1;
 
     cString ChannelName(""), ChannelNumber("");
     if (Channel) {
-        IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
-        IsGroup = Channel->GroupSep();
+        m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
+        m_IsGroup = Channel->GroupSep();
 
         ChannelName = Channel->Name();
-        if (!IsGroup)
+        if (!m_IsGroup)
             ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
             ChannelNumber = cString::sprintf("%d-", Number);
 
-        CurChannel = Channel;
+        m_CurChannel = Channel;
     } else
         ChannelName = ChannelString(NULL, 0);
 
@@ -177,8 +178,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
         ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-    } else if (!IsGroup) {  // Draw default logo
-        img = ImgLoader.LoadIcon((IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
+    } else if (!m_IsGroup) {  // Draw default logo
+        img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
         if (img) {
             ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
@@ -197,7 +198,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     int ImageTop {0};
     int left = m_ChannelWidth - m_FontSmlHeight - m_MarginItem * 2;
 
-    cImage *img = NULL;
+    cImage *img {nullptr};
     if (Channel) {
         img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHeight);
         if (img) {
@@ -207,10 +208,10 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
     }
 
-    if (Resolution && !IsRadioChannel && ScreenWidth > 0) {
+    if (Resolution && !m_IsRadioChannel && m_ScreenWidth > 0) {
         cString IconName("");
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
-            IconName = GetAspectIcon(ScreenWidth, ScreenAspect);
+            IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
@@ -219,7 +220,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= m_MarginItem * 2;
             }
 
-            IconName = GetScreenResolutionIcon(ScreenWidth, ScreenHeight, ScreenAspect);  // Show Resolution
+            IconName = GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);  // Show Resolution
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
@@ -230,7 +231,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
-            IconName = GetFormatIcon(ScreenWidth);  // Show Format
+            IconName = GetFormatIcon(m_ScreenWidth);  // Show Format
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
@@ -245,7 +246,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
     if (!m_DoOutput) return;
 
-    present = Present;
+    m_Present = Present;
     cString EpgShort("");
     cString epg("");
 
@@ -392,8 +393,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
     }
 
-    if (Config.ChannelIconsShow && CurChannel)
-        ChannelIconsDraw(CurChannel, false);
+    if (Config.ChannelIconsShow && m_CurChannel)
+        ChannelIconsDraw(m_CurChannel, false);
 
     cString MediaPath("");
     int MediaWidth {0}, MediaHeight {0};
@@ -455,11 +456,11 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
-    if (LastSignalStrength == SignalStrength && LastSignalQuality == SignalQuality)
+    if (m_LastSignalStrength == SignalStrength && m_LastSignalQuality == SignalQuality)
         return;
 
-    LastSignalStrength = SignalStrength;
-    LastSignalQuality = SignalQuality;
+    m_LastSignalStrength = SignalStrength;
+    m_LastSignalQuality = SignalQuality;
 
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
@@ -490,7 +491,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
-    SignalStrengthRight = ProgressLeft + ProgressWidth;
+    m_SignalStrengthRight = ProgressLeft + ProgressWidth;
 
     delete SignalFont;
 }
@@ -508,8 +509,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ecmInfo.ecmtime = -1;
     ecmInfo.hops = -1;
 
-    int ChannelSid = CurChannel->Sid();
-    // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, CurChannel->Name());
+    int ChannelSid = m_CurChannel->Sid();
+    // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, m_CurChannel->Name());
 
     ecmInfo.sid = ChannelSid;
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
@@ -526,7 +527,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem * 2;
-    int left = SignalStrengthRight + m_MarginItem * 2;
+    int left = m_SignalStrengthRight + m_MarginItem * 2;
 
     cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
 
@@ -561,11 +562,11 @@ void cFlatDisplayChannel::Flush(void) {
     if (!m_DoOutput) return;
 
     int Current {0}, Total {0};
-    if (present) {
+    if (m_Present) {
         time_t t = time(NULL);
-        if (t > present->StartTime())
-            Current = t - present->StartTime();
-        Total = present->Duration();
+        if (t > m_Present->StartTime())
+            Current = t - m_Present->StartTime();
+        Total = m_Present->Duration();
         ProgressBarDraw(Current, Total);
     }
 
@@ -573,10 +574,10 @@ void cFlatDisplayChannel::Flush(void) {
         SignalQualityDraw();
 
     if (Config.ChannelIconsShow) {
-        cDevice::PrimaryDevice()->GetVideoSize(ScreenWidth, ScreenHeight, ScreenAspect);
-        if (ScreenWidth != LastScreenWidth) {
-            LastScreenWidth = ScreenWidth;
-            ChannelIconsDraw(CurChannel, true);
+        cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
+        if (m_ScreenWidth != m_LastScreenWidth) {
+            m_LastScreenWidth = m_ScreenWidth;
+            ChannelIconsDraw(m_CurChannel, true);
         }
     }
 

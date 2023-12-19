@@ -51,8 +51,8 @@ cFlatBaseRender::cFlatBaseRender(void) {
     ButtonsPixmap = NULL;
     MessagePixmap = NULL;
     MessageIconPixmap = NULL;
-    ContentPixmap = NULL;
-    ContentEpgImagePixmap = NULL;
+    // ContentPixmap = NULL;  // Unused?
+    // ContentEpgImagePixmap = NULL;  // Unused?
     ProgressBarPixmap = NULL;
     ProgressBarPixmapBg = NULL;
     DecorPixmap = NULL;
@@ -77,8 +77,10 @@ cFlatBaseRender::~cFlatBaseRender(void) {
             osd->DestroyPixmap(MessagePixmap);
         if (MessageIconPixmap)
             osd->DestroyPixmap(MessageIconPixmap);
-        if (ContentPixmap)
-            osd->DestroyPixmap(ContentPixmap);
+        /* if (ContentPixmap)
+            osd->DestroyPixmap(ContentPixmap); */  // Unused
+        /* if (ContentEpgImagePixmap)
+            osd->DestroyPixmap(ContentEpgImagePixmap); */  // Unused?
         if (ProgressBarPixmap)
             osd->DestroyPixmap(ProgressBarPixmap);
         if (ProgressBarPixmapBg)
@@ -89,8 +91,6 @@ cFlatBaseRender::~cFlatBaseRender(void) {
             osd->DestroyPixmap(TopBarIconPixmap);
         if (TopBarIconBgPixmap)
             osd->DestroyPixmap(TopBarIconBgPixmap);
-        if (ContentEpgImagePixmap)
-            osd->DestroyPixmap(ContentEpgImagePixmap);
 
         delete osd;
     }
@@ -354,7 +354,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         PixmapFill(TopBarIconPixmap, clrTransparent);
         PixmapFill(TopBarIconBgPixmap, clrTransparent);
 
-        cImage *img = NULL;
+        cImage *img {nullptr};
         if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
             int IconLeft = m_MarginItem;
             img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, 999, m_TopBarHeight - m_MarginItem * 2);
@@ -416,7 +416,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                                taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
-        cImage *ImgCon = NULL, *ImgRec = NULL;
+        cImage *ImgCon {nullptr}, *ImgRec {nullptr};
         if (Config.TopBarRecConflictsShow) {
             NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
@@ -758,7 +758,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     tColor Col = Theme.Color(clrMessageInfo);
     cString Icon("message_info");
     switch (Type) {
-    case mtInfo: //  Already preset
+    case mtInfo: // Already preset
         break;
     case mtWarning:
         Col = Theme.Color(clrMessageWarning);
@@ -804,7 +804,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 1);  // Default end is npos
-            RightTrim(first);   // Trim possible space on right side
+            RightTrim(first);  // Trim possible space on right side
             LeftTrim(second);  // Trim possible space at begin
 
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),

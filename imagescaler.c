@@ -23,32 +23,34 @@ ImageScaler::ImageScaler() :
 
 ImageScaler::~ImageScaler() {
     if (m_memory) free(m_memory);
+    // if (m_memory) m_memory = NULL;
 }
 
 // sin(x)/(x)
 static float sincf(float x) {
-    if (fabsf(x) < 0.05f) return 1.0f - (1.0f/6.0f)*x*x;  // taylor series approximation to avoid 0/0
-    return sin(x)/x;
+    if (fabsf(x) < 0.05f) return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
+    return sin(x) / x;
 }
 
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
-    const float fc = dst_size >= src_size ? 1.0f : ((float) dst_size)/((float) src_size);
+    const float fc = dst_size >= src_size ? 1.0f : (dst_size * 1.0 / src_size);
 
     for (int i {0}; i < dst_size; ++i) {
-        const int    d          = 2 * dst_size;                       // sample position denominator
-        const int    e          = (2 * i + 1) * src_size - dst_size;  // sample position enumerator
-        int          offset     =  e / d;                             // truncated sample position
+        const int    d          = 2 * dst_size;                       // Sample position denominator
+        const int    e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
+        int          offset     =  e / d;                             // Truncated sample position
         const float sub_offset =
-            ((float)(e - offset * d)) / ((float)d);  // exact sample position is (float) e/d = offset + sub_offset
+            ((e * 1.0 - offset * d) / d);  // Exact sample position is (float) e/d = offset + sub_offset
+            // ((float)(e - offset * d)) / ((float)d);  // Exact sample position is (float) e/d = offset + sub_offset
 
-        // calculate filter coefficients
+        // Calculate filter coefficients
         float  h[4];
         for (int j {0}; j < 4; ++j) {
             const float t = 3.14159265359f * (sub_offset + (1 - j));
-            h[j] = sincf(fc * t) * cosf(0.25f * t);  // sinc-lowpass and cos-window
+            h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-lowpass and cos-window
         }
 
-        // ensure that filter does not reach out off image bounds:
+        // Ensure that filter does not reach out off image bounds:
         while (offset < 1) {
             h[0] += h[1];
             h[1] = h[2];
@@ -65,21 +67,21 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
             --offset;
         }
 
-        // coefficients are normalized to sum up to 2048
+        // Coefficients are normalized to sum up to 2048
         const float  norm = 2048.0f / (h[0] + h[1] + h[2] + h[3]);
 
-        --offset;  // offset of fist used pixel
+        --offset;  // Offset of fist used pixel
 
-        filters[i].m_offset = offset + 4;  // store offset of first unused pixel
+        filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
 
         for (int j {0}; j < 4; ++j) {
             const float t = norm * h[j];
             filters[i].m_coeff[(offset + j) & 3] =
-                static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // consider ring buffer index permutations
+                static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
         }
     }
 
-    // set end marker
+    // Set end marker
     filters[dst_size].m_offset = (unsigned) -1;
 }
 
@@ -93,7 +95,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_dst_image  = dst_image;
     m_dst_stride = dst_stride;
 
-    // if image dimensions do not change we can keep the old filter coefficients
+    // If image dimensions do not change we can keep the old filter coefficients
     if ((src_width == m_src_width) && (src_height == m_src_height) && (dst_width == m_dst_width) &&
         (dst_height == m_dst_height))
         return;
@@ -104,12 +106,18 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_src_height = src_height;
 
     if (m_memory) free(m_memory);
+    // if (m_memory) m_memory = NULL;
 
-    const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // reserve one extra position for end marker
+    const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
     const unsigned ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
     const unsigned buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     char *p = (char *) malloc(hor_filters_size + ver_filters_size + buffer_size);
+    // Besser std::vector, den vector als Parameter übergeben, falls notwendig
+    // std::vector<char> buffer(hor_filters_size + ver_filters_size + buffer_size);
+
+    // Zugriff auf den Puffer
+    // char *p = buffer.data();
 
     m_memory = p;
 
@@ -121,7 +129,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     CalculateFilters(m_ver_filters, m_dst_height, m_src_height);
 }
 
-// shift range to 0..255 and clamp overflows
+// Shift range to 0..255 and clamp overflows
 static unsigned shift_clamp(int x) {
     x = (x + (1 << 21)) >> 22;
     if (x < 0) return 0;

@@ -338,7 +338,7 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
     FILE *f = fopen(Filename, "r");
     if (f) {
         int line {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -357,7 +357,8 @@ void cFlatSetupGeneral::LoadConfigFile(void) {
                         dsyslog("flatPlus: Failed to load config: %s with value: %s", n, v);
                 }
             }
-        }
+        }  // while
+        fclose(f);
     } else
         dsyslog("flatPlus: Failed to load config: file <%s> not found", *Filename);
     cString msg = cString::sprintf("%s %s %s", tr("configfile"), ConfigFiles[ConfigFileSelection], tr("loaded"));
@@ -822,7 +823,7 @@ void cFlatSetupGeneral::Setup(void) {
         Add(new cMenuEditIntItem(tr("Button border size"), &SetupConfig->decorBorderButtonSizeUser));
     }
 
-    cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), ImgCache.getCacheCount(), MAX_IMAGE_CACHE);
+    cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), ImgCache.GetCacheCount(), MAX_IMAGE_CACHE);
     Add(new cOsdItem(ImageCache, osUnknown, true));
 
     if (ItemLastSel >= 0) {

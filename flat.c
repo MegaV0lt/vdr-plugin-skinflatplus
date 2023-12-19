@@ -84,7 +84,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
+cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, const cRect &ViewPort/* = cRect::Null */,
+                      const cRect &DrawPort/* = cRect::Null */) {
     if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
@@ -196,7 +197,7 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     return "recording_seen_10";
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {  // NOLINT
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine /* = false */) {  // NOLINT
     cString audio_type("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);
@@ -252,7 +253,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 int GetEpgsearchConflichts(void) {
-    int NumConflicts {0};
+    // int NumConflicts {0};
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData;
@@ -261,26 +262,26 @@ int GetEpgsearchConflichts(void) {
         ServiceData.totalConflicts = 0;
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
         if (ServiceData.relevantConflicts > 0) {
-            NumConflicts = ServiceData.relevantConflicts;
+            /*NumConflicts =*/return ServiceData.relevantConflicts;
         }
     }  // pEpgSearch
-    return NumConflicts;
+    return 0 /*NumConflicts*/;
 }
 
-bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
-    cMarks marks;
-    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText /* = false */) {  // NOLINT
+    cMarks Marks;
     bool HasMarks = false;
-    cIndexFile *index = NULL;
+    cIndexFile *index {nullptr};
+    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
-        HasMarks = marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
-                   marks.Count();
+        HasMarks = Marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
+                   Marks.Count();
         index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
-        // cIndexFile *index(Recording->FileName(), false, Recording->IsPesRecording());
+        // cIndexFile index(Recording->FileName(), false, Recording->IsPesRecording());
     }
 
     bool IsCutted = false;
-    uint64_t FileSize[100000];
+    uint64_t FileSize[65535];
     FileSize[0] = 0;
     uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
     int i {0}, rc {0};
@@ -298,7 +299,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
         else {
             if (ENOENT != errno) {
-                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", (const char *)FileName, errno,
+                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", /*(const char *)*/*FileName, errno,
                         strerror(errno));
             }
         }
@@ -312,9 +313,9 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         bool CutIn = true;
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};
-        cMark *mark = marks.First();
-        while (mark) {
-            position = mark->Position();
+        cMark *Mark = Marks.First();
+        while (Mark) {
+            position = Mark->Position();
             index->Get(position, &FileNumber, &FileOffset);
             if (CutIn) {
                 CutInFrame = position;
@@ -325,8 +326,8 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
                 CutIn = true;
                 RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
             }
-            cMark *NextMark = marks.Next(mark);
-            mark = NextMark;
+            cMark *NextMark = Marks.Next(Mark);
+            Mark = NextMark;
         }
         if (!CutIn) {
             CuttedLength += index->Last() - CutInFrame;
@@ -351,7 +352,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
     uint64_t RecSize {0};
     if (AddText) {
-        /* if (!rc) */ RecSize = FileSize[i - 1];  // 0 when error opening file
+        /* if (!rc) */ RecSize = FileSize[i - 1];  // 0 when error opening file / Show partial size
         if (RecSize > MEGABYTE(1023))
             Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
