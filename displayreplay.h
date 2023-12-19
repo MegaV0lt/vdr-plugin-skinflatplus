@@ -9,8 +9,8 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
 
         int m_LabelHeight;
         cPixmap *LabelPixmap;
-        cPixmap *labelJump;
-        cPixmap *iconsPixmap;
+        cPixmap *LabelJumpPixmap;
+        cPixmap *IconsPixmap;
         cPixmap *ChanEpgImagesPixmap;
         cPixmap *DimmPixmap;
 
