@@ -85,13 +85,16 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
 void cComplexContent::CalculateDrawPortHeight(void) {
     m_DrawPortHeight = 0;
+    if (m_IsScrollingActive) {  // Check for scrolling first
+        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
+        return;
+    }
+
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
         if ((*it).GetBottom() > m_DrawPortHeight)
             m_DrawPortHeight = (*it).GetBottom();
     }
-    if (m_IsScrollingActive)
-        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
 }
 
 int cComplexContent::BottomContent(void) {
