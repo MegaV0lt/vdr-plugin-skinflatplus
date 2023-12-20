@@ -11,7 +11,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     m_Present = NULL;
     // m_ChannelName = "";
-    
+
     ChanInfoTopPixmap = NULL;
     ChanInfoBottomPixmap = NULL;
     ChanLogoPixmap = NULL;
@@ -610,8 +610,11 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels.Next(Channel)) {
 #endif
-        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-        if (img) ++index;
+        if (!Channel->GroupSep()) {  // Don't cache named channelgroup logo
+            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            if (img)
+                ++index;
+        }
     }
 
     height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize);

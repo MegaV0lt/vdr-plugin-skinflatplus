@@ -253,7 +253,6 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 int GetEpgsearchConflichts(void) {
-    // int NumConflicts {0};
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData;
@@ -262,10 +261,10 @@ int GetEpgsearchConflichts(void) {
         ServiceData.totalConflicts = 0;
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
         if (ServiceData.relevantConflicts > 0) {
-            /*NumConflicts =*/return ServiceData.relevantConflicts;
+            return ServiceData.relevantConflicts;
         }
     }  // pEpgSearch
-    return 0 /*NumConflicts*/;
+    return 0;
 }
 
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText /* = false */) {  // NOLINT
@@ -287,7 +286,6 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName("");
-
     do {
         ++i;
         if (Recording->IsPesRecording())
@@ -299,8 +297,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
         else {
             if (ENOENT != errno) {
-                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", /*(const char *)*/*FileName, errno,
-                        strerror(errno));
+                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
             }
         }
     } while (i <= MaxFiles && !rc);
@@ -308,8 +305,8 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     int CuttedLength {0};
     uint64_t RecSizeCutted {0};
     if (HasMarks && index) {
-        uint16_t FileNumber;
-        off_t FileOffset;
+        uint16_t FileNumber {0};
+        off_t FileOffset {0};
         bool CutIn = true;
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};

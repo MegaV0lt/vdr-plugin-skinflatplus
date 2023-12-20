@@ -38,13 +38,10 @@ void cImageCache::Clear(void) {
 }
 
 bool cImageCache::RemoveFromCache(std::string Name) {
-    // bool found = false;
     // char *bname;
     std::string BaseFileName("");
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
         // bname = basename((char *)CacheName[i].c_str());  // TODO: Improve
-        // imagecache.c:45:26: error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
-        //   45 |         bname = basename(reinterpret_cast<char *>(CacheName[i].c_str()));
         BaseFileName = CacheName[i].substr(CacheName[i].find_last_of("/") + 1);  // Part after the last '/'
 
         // if (!strcmp(bname, Name.c_str())) {

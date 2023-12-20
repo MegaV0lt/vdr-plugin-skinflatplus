@@ -296,12 +296,9 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
 void cFlatDisplayReplay::UpdateInfo(void) {
     if (m_ModeOnly) return;
 
-    cString cutted(""), Dummy("");
-    bool IsCutted = false;
-
-    int fontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
-    int fontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
-    int topSecs = fontAscender - fontSecsAscender;
+    int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
+    int FontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
+    int TopSecs = FontAscender - FontSecsAscender;
 
     if (Config.TimeSecsScale == 1.0)
         LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
@@ -316,7 +313,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
             LabelPixmap->DrawText(cPoint(m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
-            LabelPixmap->DrawText(cPoint(m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
+            LabelPixmap->DrawText(cPoint(m_MarginItem + m_Font->Width(hm.c_str()), TopSecs), secs.c_str(),
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                   m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
         } else {
@@ -326,6 +323,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     cImage *img {nullptr};
+    cString cutted(""), Dummy("");
+    bool IsCutted = false;
     if (m_Recording) {
         IsCutted = GetCuttedLengthMarks(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
 
@@ -439,7 +438,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
+                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), TopSecs), secs.c_str(),
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
                 right += m_Font->Width(hm.c_str()) + m_FontSecs->Width(secs.c_str());
@@ -472,7 +471,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
                                       m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
+                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), TopSecs), secs.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
@@ -496,7 +495,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         m_FontSecs->Width(secs.c_str());
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), topSecs), secs.c_str(),
+                LabelPixmap->DrawText(cPoint(right - m_MarginItem + m_Font->Width(hm.c_str()), TopSecs), secs.c_str(),
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
