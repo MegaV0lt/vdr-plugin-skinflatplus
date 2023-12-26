@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include <vdr/osd.h>
 #include <vdr/menu.h>
 // #include <memory>
@@ -198,7 +205,7 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine /* = false */) {  // NOLINT
-    cString audio_type("");
+    cString AudioType("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);
         switch (p->stream) {
@@ -231,15 +238,15 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             switch (p->stream) {
             case sc_audio_MP2:
                 // Workaround for wrongfully used stream type X 02 05 for AC3
-                audio_type = (p->type == 5) ? "AC3" : "MP2";
+                AudioType = (p->type == 5) ? "AC3" : "MP2";
                 break;
-            case sc_audio_AC3: audio_type = "AC3"; break;
-            case sc_audio_HEAAC: audio_type = "HEAAC"; break;
+            case sc_audio_AC3: AudioType = "AC3"; break;
+            case sc_audio_HEAAC: AudioType = "HEAAC"; break;
             }  // switch p->stream
             if (p->description)
                 Audio.Append(cString::sprintf("%s (%s)", p->description, p->language));
             else
-                Audio.Append(cString::sprintf("%s (%s)", p->language, *audio_type));
+                Audio.Append(cString::sprintf("%s (%s)", p->language, *AudioType));
             break;
         case sc_subtitle:
             if (!isempty(*Subtitle)) Subtitle.Append(", ");
@@ -255,10 +262,11 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 int GetEpgsearchConflichts(void) {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
-        Epgsearch_lastconflictinfo_v1_0 ServiceData;
-        ServiceData.nextConflict = 0;
-        ServiceData.relevantConflicts = 0;
-        ServiceData.totalConflicts = 0;
+        Epgsearch_lastconflictinfo_v1_0 ServiceData {
+            .nextConflict = 0,
+            .relevantConflicts = 0,
+            .totalConflicts = 0
+        };
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
         if (ServiceData.relevantConflicts > 0) {
             return ServiceData.relevantConflicts;

@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
@@ -221,6 +228,8 @@ int cComplexContent::ScrollShown(void) {
 }
 
 int cComplexContent::ScrollOffset(void) {
+    if (!Pixmap) return;
+
     int y = Pixmap->DrawPort().Point().Y() * -1;
     if (y + Position.Height() + m_ScrollSize > m_DrawPortHeight) {
         if (y == m_DrawPortHeight - Position.Height())
@@ -233,6 +242,8 @@ int cComplexContent::ScrollOffset(void) {
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {
+    if (!Pixmap || !PixmapImage) return;
+
     int AktHeight = Pixmap->DrawPort().Point().Y();
     int TotalHeight = Pixmap->DrawPort().Height();
     int ScreenHeight = Pixmap->ViewPort().Height();

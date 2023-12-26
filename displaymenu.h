@@ -1,15 +1,24 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
+
+#include <ctype.h>
+#include <vdr/menu.h>
+#include <vdr/tools.h>
+
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <sstream>
+#include <string>
 
 #include "./baserender.h"
 #include "./complexcontent.h"
-#include <vdr/menu.h>
-#include <vdr/tools.h>
-#include <list>
-#include <ctype.h>
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-#include <string>
 
 #if APIVERSNUM < 20107
     enum eMenuSortMode {
@@ -21,7 +30,7 @@
     };
 #endif
 
-class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
+class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
         cPixmap *MenuPixmap;
         cPixmap *MenuIconsPixmap;
@@ -34,7 +43,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         bool m_MenuFullOsdIsDrawn;
 
         eMenuCategory m_MenuCategory;
-        int m_VideoDiskUsageState;
+        // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
         int m_LastTimerCount, m_LastTimerActiveCount;
         cString m_LastTitle;
@@ -46,7 +55,7 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         int m_cLeft, m_cTop, m_cWidth, m_cHeight;
 
         cPixmap *ScrollbarPixmap;
-        int m_ScrollBarTop, m_ScrollBarWidth, m_ScrollBarHeight;
+        int m_ScrollBarTop/*, m_ScrollBarWidth, m_ScrollBarHeight*/;  // Also in cFlatBaseRender
 
         int m_ItemHeight, m_ItemChannelHeight, m_ItemTimerHeight, m_ItemEventHeight, m_ItemRecordingHeight;
 

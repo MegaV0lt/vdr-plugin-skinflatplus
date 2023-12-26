@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./textscroller.h"
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
@@ -24,6 +31,8 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 }
 
 void cTextScroll::UpdateViewPortWidth(int w) {
+    if (!Pixmap) return;
+
     cRect ViewPort = Pixmap->ViewPort();
     ViewPort.SetWidth(ViewPort.Width() - w);
     Pixmap->SetViewPort(ViewPort);

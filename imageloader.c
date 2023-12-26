@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./imageloader.h"
 #include <dirent.h>
 #include <math.h>

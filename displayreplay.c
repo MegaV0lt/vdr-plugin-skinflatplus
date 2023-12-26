@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./displayreplay.h"
 #include "./flat.h"
 
@@ -75,6 +82,7 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (m_ModeOnly) return;
+    if (!IconsPixmap || !LabelPixmap) return;
 
     const cRecordingInfo *RecInfo = Recording->Info();
     m_Recording = Recording;
@@ -186,6 +194,8 @@ void cFlatDisplayReplay::Action(void) {
 }
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
+    if (!LabelPixmap || !IconsPixmap) return;
+
     int left {0};
     if (Play == false && Config.RecordingDimmOnPause) {
         time(&m_DimmStartTime);
@@ -295,6 +305,7 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
 
 void cFlatDisplayReplay::UpdateInfo(void) {
     if (m_ModeOnly) return;
+    if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap) return;
 
     int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
     int FontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
@@ -510,6 +521,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {
+    if (!LabelJumpPixmap) return;
+
     DecorBorderClearByFrom(BorderRecordJump);
 
     if (!Jump) {
@@ -531,6 +544,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 
 void cFlatDisplayReplay::ResolutionAspectDraw(void) {
     if (m_ModeOnly) return;
+    if (!IconsPixmap) return;
 
     if (m_ScreenWidth > 0) {
         int left = m_OsdWidth - Config.decorBorderReplaySize * 2;

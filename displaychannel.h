@@ -1,14 +1,21 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 #include <vdr/status.h>
 #include "./baserender.h"
 #include "./flat.h"
-#include "./services/scraper2vdr.h"
 #include "./services/dvbapi.h"
+#include "./services/scraper2vdr.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  private:
-        bool m_DoOutput;
+        // bool m_DoOutput;
         const cEvent *m_Present;
 
         int m_ChannelWidth, m_ChannelHeight;

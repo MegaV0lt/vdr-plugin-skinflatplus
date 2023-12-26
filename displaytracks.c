@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./displaytracks.h"
 #include "./flat.h"
 
@@ -49,6 +56,8 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 }
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
+    if (!TracksPixmap) return; 
+
     int y = (Index + 1) * m_ItemHeight;
     tColor ColorFg = Theme.Color(clrTrackItemFont);
     tColor ColorBg = Theme.Color(clrTrackItemBg);
@@ -92,9 +101,11 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 }
 
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
+    if (!TracksLogoPixmap) return; 
+
+    PixmapFill(TracksLogoPixmap, clrTransparent);
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
-    PixmapFill(TracksLogoPixmap, clrTransparent);
     if (AudioChannel == -1 && img_ac3) {
         int IconLeft = m_MaxItemWidth - img_ac3->Width() - m_MarginItem;
         int IconTop = (m_FontHeight - img_ac3->Height()) / 2;

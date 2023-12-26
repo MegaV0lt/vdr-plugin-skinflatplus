@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./config.h"
 
 #include <vector>
@@ -41,7 +48,7 @@ cFlatConfig::cFlatConfig(void) {
     RecordingAdditionalInfoShow = true;
     EpgAdditionalInfoShow = true;
     EpgRerunsShow = true;
-    EpgFskGenreIconSize = 0.005;  // Percent of content head heigh
+    EpgFskGenreIconSize = 0.005;  // Percent of content head height
 
     TopBarRecordingShow = true;
     TopBarRecConflictsShow = true;

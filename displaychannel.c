@@ -1,13 +1,21 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./displaychannel.h"
 #include "./flat.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
+    /* Disabled because all pixmaps are checked before use
     if (m_FirstDisplay) {
         m_FirstDisplay = false;
         m_DoOutput = false;
         return;
-    } else
-        m_DoOutput = true;
+    } else 
+        m_DoOutput = true; */
 
     m_Present = NULL;
     // m_ChannelName = "";
@@ -111,7 +119,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
 
     if (osd) {
         Scrollers.Clear();
@@ -132,7 +140,10 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
-    if (!m_DoOutput) return;
+    if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
+        return;
+
+    // if (!m_DoOutput) return;
 
     // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -189,7 +200,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
+    if (!ChanIconsPixmap) return;
 
     // if (!Resolution)
         PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -244,7 +256,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
+    if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
     cString EpgShort("");
@@ -446,13 +459,14 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
 
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
+    if (!ChanInfoBottomPixmap) return;
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
     int SignalQuality = cDevice::ActualDevice()->SignalQuality();
@@ -499,7 +513,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
+    if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
     // dsyslog("flatPlus: DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
@@ -559,7 +574,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 }
 
 void cFlatDisplayChannel::Flush(void) {
-    if (!m_DoOutput) return;
+    // if (!m_DoOutput) return;
+    // if (!osd) return;
 
     int Current {0}, Total {0};
     if (m_Present) {

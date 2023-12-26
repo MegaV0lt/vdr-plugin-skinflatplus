@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 #include <vdr/plugin.h>
@@ -13,7 +20,7 @@
 
 bool StringCompare(const std::string &left, const std::string &right);
 bool PairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j);
-bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);
+bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);  // NOLINT
 int RoundUp(int NumToRound, int multiple);
 
 class cFlatConfig {
@@ -32,13 +39,13 @@ class cFlatConfig {
 
         void ThemeCheckAndInit(void);
         void ThemeInit(void);
-        void DecorDescriptions(cStringList &Decors);
+        void DecorDescriptions(cStringList &Decors);  // NOLINT
         cString DecorDescription(cString File);
         void DecorLoadFile(cString File);
         void DecorLoadCurrent(void);
         void DecorCheckAndInit(void);
 
-        void GetConfigFiles(cStringList &Files);
+        void GetConfigFiles(cStringList &Files);  // NOLINT
 
         void RecordingOldLoadConfig(void);
         int GetRecordingOldValue(std::string folder);
@@ -337,5 +344,5 @@ class cFlatConfig {
 
         void Store(const char *Name, const char *Value, const char *Filename);
         void Store(const char *Name, int Value, const char *Filename);
-        void Store(const char *Name, double &Value, const char *Filename);
+        void Store(const char *Name, double &Value, const char *Filename);  // NOLINT
 };

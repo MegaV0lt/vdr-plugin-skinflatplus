@@ -1,10 +1,18 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 #include <list>
-#include "./imageloader.h"
-#include "./flat.h"
-#include "./textscroller.h"
+
 #include "./complexcontent.h"
+#include "./flat.h"
+#include "./imageloader.h"
+#include "./textscroller.h"
 
 enum eBorder {
     BorderMenuItem,
@@ -187,6 +195,9 @@ class cFlatBaseRender {
         void DecorBorderClearAll(void);
         void DecorBorderRedrawAll(void);
         void DecorBorderClearByFrom(int From);
+
+        /* void DrawText(cPixmap *Pixmap, int x, int y, const char *s, tColor ColorFg, tColor ColorBg,
+                      const cFont *Font, int Width, int Height, int Alignment); */
 
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 

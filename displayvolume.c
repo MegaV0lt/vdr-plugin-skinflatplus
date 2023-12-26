@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./displayvolume.h"
 #include "./flat.h"
 
@@ -28,6 +35,8 @@ cFlatDisplayVolume::~cFlatDisplayVolume() {
 }
 
 void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
+    if (!LabelPixmap || !MuteLogoPixmap) return; 
+
     PixmapFill(LabelPixmap, clrTransparent);
     PixmapFill(MuteLogoPixmap, clrTransparent);
 

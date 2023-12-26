@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./displaymenu.h"
 #include <fstream>
 #include <iostream>
@@ -105,13 +112,15 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
 
-    osd->DestroyPixmap(MenuPixmap);
-    osd->DestroyPixmap(MenuIconsPixmap);
-    osd->DestroyPixmap(MenuIconsBgPixmap);
-    osd->DestroyPixmap(MenuIconsOvlPixmap);
-    osd->DestroyPixmap(ScrollbarPixmap);
-    osd->DestroyPixmap(ContentHeadPixmap);
-    osd->DestroyPixmap(ContentHeadIconsPixmap);
+    if (osd) {
+        osd->DestroyPixmap(MenuPixmap);
+        osd->DestroyPixmap(MenuIconsPixmap);
+        osd->DestroyPixmap(MenuIconsBgPixmap);
+        osd->DestroyPixmap(MenuIconsOvlPixmap);
+        osd->DestroyPixmap(ScrollbarPixmap);
+        osd->DestroyPixmap(ContentHeadPixmap);
+        osd->DestroyPixmap(ContentHeadIconsPixmap);
+    }
 }
 
 void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
@@ -157,6 +166,7 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
     // dsyslog("flatPlus: Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
+    if (!MenuPixmap) return;
 
     if (Total > 0 && Total > Shown) {
         if (m_IsScrolling == false && m_ShowEvent == false && m_ShowRecording == false && m_ShowText == false) {
@@ -384,6 +394,8 @@ void cFlatDisplayMenu::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool Selectable) {
+    if (!MenuPixmap || !MenuIconsPixmap) return;
+
     m_ShowEvent = false;
     m_ShowRecording = false;
     m_ShowText = false;
@@ -654,7 +666,9 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
 
 bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                       bool WithProvider) {
-    if (Config.MenuChannelView == 0 || !Channel)
+        if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsBgPixmap) return;
+
+        if (Config.MenuChannelView == 0 || !Channel)
         return false;
 
     if (Current)
@@ -1076,6 +1090,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 }
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap) return;
+
     if (Config.MenuTimerView == 0 || !Timer)
         return false;
 
@@ -1351,6 +1367,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch) {
 #endif
+    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return;
+
     if (Config.MenuEventView == 0)
         return false;
 
@@ -1403,12 +1421,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             m_ItemEventLastChannelName = Channel->Name();
 
         /* Disabled because invalid lock sequence
-    #if VDRVERSNUM >= 20301
+        #if VDRVERSNUM >= 20301
             LOCK_CHANNELS_READ;
             cString ws = cString::sprintf("%d", Channels->MaxNumber());
-    #else
+        #else
             cString ws = cString::sprintf("%d", Channels.MaxNumber());
-    #endif
+        #endif
             int w = m_Font->Width(ws); */
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         m_IsGroup = Channel->GroupSep();
@@ -1574,7 +1592,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         ImageHeight = m_FontSmlHeight;
         MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
         Left += m_FontSml->Width(Event->GetTimeString()) + m_MarginItem;
-        /* } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
+    /* } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
             MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_Font);
             Left += m_Font->Width(Event->GetTimeString()) + m_MarginItem; */
     } else if (Event && Selectable) {  // Same as above
@@ -1775,6 +1793,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap) return;
+
     if (Config.MenuRecordingView == 0)
         return false;
 
@@ -2241,8 +2261,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
-    if (!Event)
-        return;
+    if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
+
+    if (!Event) return;
 
 #ifdef DEBUGEPGTIME
     uint32_t tick0 = GetMsTicks();
@@ -2369,17 +2390,17 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
-            Epgsearch_searchresults_v1_0 data;
             std::string StrQuery = Event->Title();
-            data.useSubTitle = false;
-
-            data.query = (char *)StrQuery.c_str();
+            Epgsearch_searchresults_v1_0 data {
+                .useSubTitle = false,
+                .query = (char *)StrQuery.c_str(),
+                .mode = 0,
+                .channelNr = 0,
+                .useTitle = true,
+                .useDescription = false
+            };
             // data.query = reinterpret_cast<char *>(StrQuery.c_str());
             // error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
-            data.mode = 0;
-            data.channelNr = 0;
-            data.useTitle = true;
-            data.useDescription = false;
 
             if (pEpgSearchPlugin->Service("Epgsearch-searchresults-v1.0", &data)) {
                 cList<Epgsearch_searchresults_v1_0::cServiceSearchResult> *list = data.pResultList;
@@ -2410,7 +2431,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 }  // if list
             }
         }
-    }
+    }  // Config.EpgRerunsShow
 #ifdef DEBUGEPGTIME
     uint32_t tick2 = GetMsTicks();
     dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
@@ -2467,7 +2488,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         if (series.banners.size() > 0) {  // Use random banner
                             // Gets 'entropy' from device that generates random numbers itself
                             // to seed a mersenne twister (pseudo) random generator
-                            std::mt19937 generator(std::random_device{}());
+                            std::mt19937 generator(std::random_device {}());
 
                             // Make sure all numbers have an equal chance.
                             // Range is inclusive (so we need -1 for vector index)
@@ -3017,6 +3038,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
+    if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
+
     if (!Recording) return;
 
 #ifdef DEBUGEPGTIME
@@ -3028,8 +3051,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_ShowText = false;
     ItemBorderClear();
 
-    const cRecordingInfo *RecInfo = Recording->Info();
-
+    /* Alreday created in cFlatDisplayMenu()
     m_chLeft = Config.decorBorderMenuContentHeadSize;
     m_chTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
     m_chWidth = m_MenuWidth - Config.decorBorderMenuContentHeadSize * 2;
@@ -3037,6 +3059,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     ContentHeadPixmap = CreatePixmap(osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
     // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
     // m_chHeight);
+    */
 
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
@@ -3057,6 +3080,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     // Text.imbue(std::locale(""));
     // TextAdditional.imbue(std::locale(""));
     // RecAdditional.imbue(std::locale(""));
+
+    const cRecordingInfo *RecInfo = Recording->Info();
 
     std::string Fsk("");
     std::list<std::string> GenreIcons;
@@ -3722,27 +3747,28 @@ int cFlatDisplayMenu::GetTextAreaWidth(void) const {
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
-    const cFont *rfont = FixedFont ? m_FontFixed : m_Font;
-    return rfont;
+    const cFont *font = FixedFont ? m_FontFixed : m_Font;
+    return font;
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     cString SortIcon("SortUnknown");
     switch (MenuSortMode) {
+    case msmTime: SortIcon = "SortDate"; break;
+    case msmName: SortIcon = "SortName"; break;
+    case msmNumber: SortIcon = "SortNumber"; break;
+    case msmProvider: SortIcon = "SortProvider"; break;
     case msmUnknown:
         return;  // Do not set search icon if it is unknown
         break;
-    case msmNumber: SortIcon = "SortNumber"; break;
-    case msmName: SortIcon = "SortName"; break;
-    case msmTime: [[likely]] SortIcon = "SortDate"; break;
-    case msmProvider: SortIcon = "SortProvider"; break;
-    default: return;  // Do not set search icon if it is unknown
+    default: return;
     }
 
     TopBarSetMenuIconRight(*SortIcon);
 }
 
 void cFlatDisplayMenu::Flush(void) {
+    if (!MenuPixmap) return;
     TopBarUpdate();
 
     if (Config.MenuFullOsd && !m_MenuFullOsdIsDrawn) {
@@ -3821,7 +3847,7 @@ void cFlatDisplayMenu::ItemBorderClear(void) {
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
-    std::string m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
 
     int value = Config.GetRecordingOldValue(m_RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
@@ -3840,7 +3866,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    std::string m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
     std::string RecFolder2("");
     time_t RecStart = Recording->Start();
     time_t RecStart2 {0};

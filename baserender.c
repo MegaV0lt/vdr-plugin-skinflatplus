@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./baserender.h"
 
 #include <vdr/menu.h>
@@ -71,6 +78,10 @@ cFlatBaseRender::~cFlatBaseRender(void) {
         MessageScroller.Clear();
         if (TopBarPixmap)
             osd->DestroyPixmap(TopBarPixmap);
+        if (TopBarIconPixmap)
+            osd->DestroyPixmap(TopBarIconPixmap);
+        if (TopBarIconBgPixmap)
+            osd->DestroyPixmap(TopBarIconBgPixmap);
         if (ButtonsPixmap)
             osd->DestroyPixmap(ButtonsPixmap);
         if (MessagePixmap)
@@ -87,10 +98,6 @@ cFlatBaseRender::~cFlatBaseRender(void) {
             osd->DestroyPixmap(ProgressBarPixmapBg);
         if (DecorPixmap)
             osd->DestroyPixmap(DecorPixmap);
-        if (TopBarIconPixmap)
-            osd->DestroyPixmap(TopBarIconPixmap);
-        if (TopBarIconBgPixmap)
-            osd->DestroyPixmap(TopBarIconBgPixmap);
 
         delete osd;
     }
@@ -338,6 +345,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
+    if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
+        return;
+
     cString Buffer(""), CurDate = DayDateTime();
     int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
@@ -574,6 +584,8 @@ void cFlatBaseRender::ButtonsCreate(void) {
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
+    if (!ButtonsPixmap) return;
+
     int WidthMargin = m_ButtonsWidth - m_MarginItem * 3;
     int ButtonWidth = (WidthMargin / 4) - Config.decorBorderButtonSize * 2;
 
@@ -755,6 +767,9 @@ void cFlatBaseRender::MessageCreate(void) {
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
+    if (!MessagePixmap || !MessageIconPixmap)
+        return;
+
     tColor Col = Theme.Color(clrMessageInfo);
     cString Icon("message_info");
     switch (Type) {
@@ -895,6 +910,8 @@ void cFlatBaseRender::ProgressBarDrawBgColor(void) {
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rect, cRect rectBg, int Current,
                                          int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
                                          bool SetBackground, bool IsSignal) {
+    if (!Pixmap) return;
+
     int Middle = rect.Height() / 2;
     double PercentLeft = Current * 1.0 / Total;
 
@@ -1090,6 +1107,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
 void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color,
                                            tColor ColorCurrent) {
+    if (!ProgressBarPixmap) return;
+
     m_ProgressBarColorMark = Color;
     m_ProgressBarColorMarkCurrent = ColorCurrent;
     int PosMark {0}, PosMarkLast {0}, PosCurrent {0};
@@ -1166,6 +1185,8 @@ int cFlatBaseRender::ProgressBarMarkPos(int P, int Total) {
 }
 
 void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent) {
+    if (!ProgressBarPixmap) return;
+
     int top = m_ProgressBarHeight / 2;
     int sml = Config.decorProgressReplaySize / 10 * 2;
     if (sml <= 4) sml = 4;
@@ -1454,7 +1475,9 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
-        DecorPixmap = CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+        if (!DecorPixmap = CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight())))
+          return;
+
         PixmapFill(DecorPixmap, clrTransparent);
     }
 
@@ -1584,6 +1607,8 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     if (Height < 0) {
@@ -1603,6 +1628,8 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     if (Width < 0) {
@@ -1622,6 +1649,8 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}; i < Width; ++i) {
@@ -1632,6 +1661,8 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1642,6 +1673,8 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1652,6 +1685,8 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1663,6 +1698,8 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1676,6 +1713,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1689,6 +1728,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1702,6 +1743,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1713,6 +1756,24 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
+// Wrapper for Pixmap->Draw*
+// Instead of wrappers we check for pixmap before useage
+/* void cFlatBaseRender::DrawText(cPixmap *Pixmap, int x, int y, const char *s, tColor ColorFg, tColor ColorBg,
+              const cFont *Font, int Width, int Height, int Alignment) {
+    if (Pixmap)
+        Pixmap->DrawText(cPoint(x, y), s, ColorFg, ColorBg, Font, Width, Height, Alignment);
+}
+
+void cFlatBaseRender::DrawImage(cPixmap *Pixmap, int x, int y, cImage *img) {
+    if (Pixmap)
+        Pixmap->DrawImage(cPoint(x, y), img);
+}
+
+void cFlatBaseRender::DrawRectangle(cPixmap *Pixmap, int x, int y, int x2, int y2, tColor Color) {
+    if (Pixmap)
+        Pixmap->DrawRectangle(cRect(x, y, x2, y2), Color);
+} */
+
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
     FT_Library library;
     FT_Face face;
@@ -1723,7 +1784,6 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
         rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
             if (face->num_fixed_sizes && face->available_sizes) {  // Fixed font
-                // TODO what exactly does all this mean?
                 Ascender = face->available_sizes->height;
             } else {
                 rc = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
