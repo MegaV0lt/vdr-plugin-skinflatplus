@@ -2882,7 +2882,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
             if (RecInfo->Aux()) {
-                std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+                /* std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
                 std::string channel(""), searchtimer("");
                 if (!Buffer.empty()) {
                     channel = XmlSubstring(Buffer, "<channel>", "</channel>");
@@ -2926,7 +2926,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     if (!pattern.empty()) {
                         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
                     }
-                }
+                } */
+                InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with infoline
             }
         }  // if Config.RecordingAdditionalInfoShow
     } else
@@ -3164,7 +3165,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
         if (RecInfo->Aux()) {
-            std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+            /* std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
             std::string channel(""), searchtimer("");
             if (!Buffer.empty()) {
                 channel = XmlSubstring(Buffer, "<channel>", "</channel>");
@@ -3204,7 +3205,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
             if (!pattern.empty()) {  // VDR-Admin
                 RecAdditional.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
-            }
+            } */
+            InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without infoline
         }
     }  // if Config.RecordingAdditionalInfoShow
 
@@ -3893,6 +3895,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 // Returns the string between start and end or an empty string if not found
+/* Moved to flat.c
 std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
     std::size_t start = source.find(StrStart);
     std::size_t end = source.find(StrEnd);
@@ -3901,7 +3904,7 @@ std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrSt
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
     return std::string();
-}
+} */
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
     if (!Recording) return "";
@@ -4071,6 +4074,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
     return "";
 }
 
+/* Widgets */
 void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     int wLeft = m_OsdWidth * Config.MainMenuItemScale + m_MarginItem + Config.decorBorderMenuContentSize +
                 Config.decorBorderMenuItemSize;

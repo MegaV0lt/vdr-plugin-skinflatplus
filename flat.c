@@ -259,6 +259,57 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
     }  // for
 }
 
+void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine /* = false */) {  // NOLINT
+    std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+    std::string Channel(""), Searchtimer("");
+    if (!Buffer.empty()) {
+        Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
+        Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
+        if (Searchtimer.empty())
+            Searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
+    }
+
+    Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
+    std::string Causedby(""), Reason("");
+    if (!Buffer.empty()) {
+        Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
+        Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
+    }
+
+    Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+    std::string Pattern("");
+    if (!Buffer.empty()) {
+        Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
+    }
+
+    if (InfoLine) {
+        if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) ||
+             !Pattern.empty())
+            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show infoline
+    }
+
+    if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
+        Text.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), Channel.c_str(),
+                                         tr("search pattern"), Searchtimer.c_str()));
+    }
+
+    if (!Causedby.empty() && !Reason.empty()) {  // TVScraper
+        Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), Causedby.c_str(), tr("reason")));
+        if (Reason == "improve")
+            Text.Append(tr("improve"));
+        else if (Reason == "collection")
+            Text.Append(tr("collection"));
+        else if (Reason == "TV show, missing episode")
+            Text.Append(tr("TV show, missing episode"));
+        else
+            Text.Append(Reason.c_str());  // To be safe if there are more options
+    }
+
+    if (!Pattern.empty()) {  // VDRAdmin
+        Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
+    }
+}
+
 int GetEpgsearchConflichts(void) {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
@@ -366,7 +417,8 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         if (HasMarks) {
             if (RecSize > MEGABYTE(1023))
                 Text.Append(
-                    cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+                    cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
+                                     static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
             else
                 Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
         }
@@ -381,4 +433,15 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         }
     }  // AddText
     return IsCutted;
+}
+
+// Returns the string between start and end or an empty string if not found
+std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
+    std::size_t start = source.find(StrStart);
+    std::size_t end = source.find(StrEnd);
+
+    if (std::string::npos != start && std::string::npos != end)
+        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
+
+    return std::string();
 }
