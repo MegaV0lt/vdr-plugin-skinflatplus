@@ -18,7 +18,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
     cRect DrawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
 
-    if (Osd && Pixmap)
+    if (Pixmap)
         Osd->DestroyPixmap(Pixmap);
 
     Pixmap = CreatePixmap(Osd, "Pixmap", Layer, Position, DrawPort);
