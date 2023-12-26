@@ -124,18 +124,12 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
     if (osd) {
         Scrollers.Clear();
 
-        if (ChanInfoTopPixmap)
-            osd->DestroyPixmap(ChanInfoTopPixmap);
-        if (ChanInfoBottomPixmap)
-            osd->DestroyPixmap(ChanInfoBottomPixmap);
-        if (ChanLogoPixmap)
-            osd->DestroyPixmap(ChanLogoPixmap);
-        if (ChanLogoBGPixmap)
-            osd->DestroyPixmap(ChanLogoBGPixmap);
-        if (ChanIconsPixmap)
-            osd->DestroyPixmap(ChanIconsPixmap);
-        if (ChanEpgImagesPixmap)
-            osd->DestroyPixmap(ChanEpgImagesPixmap);
+        osd->DestroyPixmap(ChanInfoTopPixmap);
+        osd->DestroyPixmap(ChanInfoBottomPixmap);
+        osd->DestroyPixmap(ChanLogoPixmap);
+        osd->DestroyPixmap(ChanLogoBGPixmap);
+        osd->DestroyPixmap(ChanIconsPixmap);
+        osd->DestroyPixmap(ChanEpgImagesPixmap);
     }
 }
 

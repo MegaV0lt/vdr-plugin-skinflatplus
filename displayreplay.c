@@ -68,16 +68,11 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
     if (m_FontSecs)
         delete m_FontSecs;
 
-    if (LabelPixmap)
-        osd->DestroyPixmap(LabelPixmap);
-    if (LabelJumpPixmap)
-        osd->DestroyPixmap(LabelJumpPixmap);
-    if (IconsPixmap)
-        osd->DestroyPixmap(IconsPixmap);
-    if (ChanEpgImagesPixmap)
-        osd->DestroyPixmap(ChanEpgImagesPixmap);
-    if (DimmPixmap)
-        osd->DestroyPixmap(DimmPixmap);
+    osd->DestroyPixmap(LabelPixmap);
+    osd->DestroyPixmap(LabelJumpPixmap);
+    osd->DestroyPixmap(IconsPixmap);
+    osd->DestroyPixmap(ChanEpgImagesPixmap);
+    osd->DestroyPixmap(DimmPixmap);
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {

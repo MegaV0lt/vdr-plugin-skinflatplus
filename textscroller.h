@@ -54,11 +54,10 @@ class cTextScroll {
         ResetX = false;
     }
 
-    virtual ~cTextScroll() {  // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
-        if (Pixmap) {         // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-            Osd->DestroyPixmap(Pixmap);
-            Pixmap = NULL;
-        }
+    virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
+                             // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
+        Osd->DestroyPixmap(Pixmap);
+        Pixmap = NULL;
     }
 
     void UpdateViewPortWidth(int w);

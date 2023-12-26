@@ -34,14 +34,10 @@ void cComplexContent::Clear(void) {
     m_IsShown = false;
     Contents.clear();
     if (Osd) {
-        if (Pixmap) {
-            Osd->DestroyPixmap(Pixmap);
-            Pixmap = NULL;
-        }
-        if (PixmapImage) {
-            Osd->DestroyPixmap(PixmapImage);
-            PixmapImage = NULL;
-        }
+        Osd->DestroyPixmap(Pixmap);
+        Pixmap = NULL;
+        Osd->DestroyPixmap(PixmapImage);
+        PixmapImage = NULL;
     }
 }
 
@@ -51,14 +47,10 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
 
     if (!Osd) return;
 
-    if (Pixmap) {
-        Osd->DestroyPixmap(Pixmap);
-        Pixmap = NULL;
-    }
-    if (PixmapImage) {
-        Osd->DestroyPixmap(PixmapImage);
-        PixmapImage = NULL;
-    }
+    Osd->DestroyPixmap(Pixmap);
+    Pixmap = NULL;
+    Osd->DestroyPixmap(PixmapImage);
+    PixmapImage = NULL;
 
     cRect PositionDraw;
     PositionDraw.SetLeft(0);

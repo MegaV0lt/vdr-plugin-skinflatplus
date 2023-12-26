@@ -76,28 +76,17 @@ cFlatBaseRender::~cFlatBaseRender(void) {
 
     if (osd) {
         MessageScroller.Clear();
-        if (TopBarPixmap)
-            osd->DestroyPixmap(TopBarPixmap);
-        if (TopBarIconPixmap)
-            osd->DestroyPixmap(TopBarIconPixmap);
-        if (TopBarIconBgPixmap)
-            osd->DestroyPixmap(TopBarIconBgPixmap);
-        if (ButtonsPixmap)
-            osd->DestroyPixmap(ButtonsPixmap);
-        if (MessagePixmap)
-            osd->DestroyPixmap(MessagePixmap);
-        if (MessageIconPixmap)
-            osd->DestroyPixmap(MessageIconPixmap);
-        /* if (ContentPixmap)
-            osd->DestroyPixmap(ContentPixmap); */  // Unused
-        /* if (ContentEpgImagePixmap)
-            osd->DestroyPixmap(ContentEpgImagePixmap); */  // Unused?
-        if (ProgressBarPixmap)
-            osd->DestroyPixmap(ProgressBarPixmap);
-        if (ProgressBarPixmapBg)
-            osd->DestroyPixmap(ProgressBarPixmapBg);
-        if (DecorPixmap)
-            osd->DestroyPixmap(DecorPixmap);
+        osd->DestroyPixmap(TopBarPixmap);
+        osd->DestroyPixmap(TopBarIconPixmap);
+        osd->DestroyPixmap(TopBarIconBgPixmap);
+        osd->DestroyPixmap(ButtonsPixmap);
+        osd->DestroyPixmap(MessagePixmap);
+        osd->DestroyPixmap(MessageIconPixmap);
+        /* osd->DestroyPixmap(ContentPixmap); */  // Unused?
+        /* osd->DestroyPixmap(ContentEpgImagePixmap); */
+        osd->DestroyPixmap(ProgressBarPixmap);
+        osd->DestroyPixmap(ProgressBarPixmapBg);
+        osd->DestroyPixmap(DecorPixmap);
 
         delete osd;
     }
