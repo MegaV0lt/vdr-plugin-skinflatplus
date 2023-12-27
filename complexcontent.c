@@ -220,7 +220,7 @@ int cComplexContent::ScrollShown(void) {
 }
 
 int cComplexContent::ScrollOffset(void) {
-    if (!Pixmap) return;
+    if (!Pixmap) return 0;
 
     int y = Pixmap->DrawPort().Point().Y() * -1;
     if (y + Position.Height() + m_ScrollSize > m_DrawPortHeight) {
@@ -234,7 +234,7 @@ int cComplexContent::ScrollOffset(void) {
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {
-    if (!Pixmap || !PixmapImage) return;
+    if (!Pixmap || !PixmapImage) return false;
 
     int AktHeight = Pixmap->DrawPort().Point().Y();
     int TotalHeight = Pixmap->DrawPort().Height();

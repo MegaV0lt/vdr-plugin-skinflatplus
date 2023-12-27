@@ -666,7 +666,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
 
 bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                       bool WithProvider) {
-        if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsBgPixmap) return;
+        if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsBgPixmap) return false;
 
         if (Config.MenuChannelView == 0 || !Channel)
         return false;
@@ -1090,7 +1090,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 }
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
-    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap) return;
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap) return false;
 
     if (Config.MenuTimerView == 0 || !Timer)
         return false;
@@ -1367,7 +1367,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch) {
 #endif
-    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return;
+    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return false;
 
     if (Config.MenuEventView == 0)
         return false;
@@ -1793,7 +1793,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap) return;
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap) return false;
 
     if (Config.MenuRecordingView == 0)
         return false;
@@ -2392,12 +2392,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
             std::string StrQuery = Event->Title();
             Epgsearch_searchresults_v1_0 data {
-                .useSubTitle = false,
-                .query = (char *)StrQuery.c_str(),
-                .mode = 0,
-                .channelNr = 0,
-                .useTitle = true,
-                .useDescription = false
+                .query = (char *)StrQuery.c_str(),  // Search term
+                .mode = 0,                          // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
+                .channelNr = 0,                     // Channel number to search in (0=any)
+                .useTitle = true,                   // Search in title
+                .useSubTitle = false,               // Search in subtitle
+                .useDescription = false             // Search in description
             };
             // data.query = reinterpret_cast<char *>(StrQuery.c_str());
             // error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers

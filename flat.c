@@ -436,7 +436,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 }
 
 // Returns the string between start and end or an empty string if not found
-std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
+std::string XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
     std::size_t start = source.find(StrStart);
     std::size_t end = source.find(StrEnd);
 

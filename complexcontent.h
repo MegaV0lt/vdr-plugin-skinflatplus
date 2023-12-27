@@ -10,7 +10,6 @@
 #include <cstring>  // string.h
 #include <list>
 
-#include "./baserender.h"
 #include "./imageloader.h"
 #include "./flat.h"
 

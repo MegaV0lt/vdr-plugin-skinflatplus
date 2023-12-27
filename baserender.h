@@ -9,10 +9,10 @@
 
 #include <list>
 
-#include "./complexcontent.h"
-#include "./flat.h"
 #include "./imageloader.h"
+#include "./flat.h"
 #include "./textscroller.h"
+#include "./complexcontent.h"
 
 enum eBorder {
     BorderMenuItem,
