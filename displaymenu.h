@@ -115,6 +115,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;
         void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
         void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
+        void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
+                       std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
+                       int NumActors);  // Add Actors to compexcontent
         void DrawMainMenuWidgets(void);
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);

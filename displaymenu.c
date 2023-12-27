@@ -2644,7 +2644,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         NumActors = ActorsPath.size();
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+            //* Add actors to compexcontent for later displaying
+            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
+
+            /* ContentTop = ComplexContent.BottomContent() + m_FontHeight;
             ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
             ContentTop += m_FontHeight;
@@ -2686,7 +2689,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 }
                 x = m_MarginItem;
                 y = ComplexContent.BottomContent() + m_FontHeight;
-            }
+            } */
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick6 = GetMsTicks();
@@ -2724,7 +2727,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+            // dsyslog("flatPlus: --- SetEvent second run with no scrollbars ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3036,6 +3039,54 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         DecorBorderDraw(m_cLeft, m_cTop, m_cWidth, ComplexContent.ContentHeight(false),
                         Config.decorBorderMenuContentSize, Config.decorBorderMenuContentType,
                         Config.decorBorderMenuContentFg, Config.decorBorderMenuContentBg, BorderContent);
+}
+
+void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
+                                 std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
+                                 int NumActors) {
+    int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+    ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
+                           Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
+    ContentTop += m_FontHeight;
+    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
+    ContentTop += 6;
+
+    cImage *img {nullptr};
+    int Actor{0}, ActorsPerLine{6};  // TODO: Config option
+    int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
+    cString Name(""), Path(""), Role(""); // Actor name, path and role
+    int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
+    int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
+    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
+    int x = m_MarginItem;
+    int y = ContentTop;
+    if (NumActors > 50)  // TODO: Config option
+        dsyslog("flatPlus: %d actor images found! First display will propably be slow.", NumActors);
+
+    for (int row{0}; row < PicLines; ++row) {
+        for (int col{0}; col < PicsPerLine; ++col) {
+            if (Actor == NumActors)
+                break;
+            Path = ActorsPath[Actor];
+            img = ImgLoader.LoadFile(*Path, ActorWitdh, 999);
+            if (img) {
+                ComplexContent.AddImage(img, cRect(x, y, 0, 0));
+                Name = ActorsName[Actor];
+                Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
+                ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWitdh, 0),
+                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
+                                       ActorWitdh, m_FontSmlHeight, taCenter);
+                ComplexContent.AddText(
+                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWitdh, 0),
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWitdh,
+                    m_FontSmlHeight, taCenter);
+            }
+            x += ActorWitdh + ActorMargin;
+            ++Actor;
+        }  // for col
+        x = m_MarginItem;
+        y = ComplexContent.BottomContent() + m_FontHeight;
+    }  // for row
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
@@ -3470,8 +3521,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
         NumActors = ActorsPath.size();
-        if (Config.TVScraperRecInfoShowActors && NumActors > 0) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+        if (Config.TVScraperRecInfoShowActors && NumActors > 0) {  // TODO: Merge
+            //* Add actors to compexcontent for later displaying
+            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
+
+            /*ContentTop = ComplexContent.BottomContent() + m_FontHeight;
             ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
             ContentTop += m_FontHeight;
@@ -3513,7 +3567,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
                 x = m_MarginItem;
                 y = ComplexContent.BottomContent() + m_FontHeight;
-            }
+            } */
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
