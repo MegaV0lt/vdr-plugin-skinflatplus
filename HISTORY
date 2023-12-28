@@ -1,9 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
-2023-xx-xx: Version 0.8.4
+2023-12-28: Version 0.8.4
 - [fix] Fix dots with long not scrolling text
 - [update] Load named logos only for channels
 - [update] Merge Epgsearch numConflicts
+- [update] Merge AddActors
+- [update] Merge InsertAuxInfos
 - [update] Some internal optimizations
 
 2023-12-04: Version 0.8.3

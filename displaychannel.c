@@ -123,7 +123,6 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 
     if (osd) {
         Scrollers.Clear();
-
         osd->DestroyPixmap(ChanInfoTopPixmap);
         osd->DestroyPixmap(ChanInfoBottomPixmap);
         osd->DestroyPixmap(ChanLogoPixmap);
@@ -629,7 +628,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
             if (img)
                 ++index;
         }
-    }
+    }  // for cChannel
 
     height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize);
     ImgLoader.LoadIcon("crypted", 999, height);

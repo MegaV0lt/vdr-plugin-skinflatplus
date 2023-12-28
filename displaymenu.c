@@ -666,9 +666,9 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
 
 bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                       bool WithProvider) {
-        if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsBgPixmap) return false;
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsBgPixmap) return false;
 
-        if (Config.MenuChannelView == 0 || !Channel)
+    if (Config.MenuChannelView == 0 || !Channel)
         return false;
 
     if (Current)
@@ -2876,7 +2876,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 if (series.banners.size() > 0) {  // Use random banner
                     // Gets 'entropy' from device that generates random numbers itself
                     // to seed a mersenne twister (pseudo) random generator
-                    std::mt19937 generator(std::random_device{}());
+                    std::mt19937 generator(std::random_device {}());
 
                     // Make sure all numbers have an equal chance.
                     // Range is inclusive (so we need -1 for vector index)
@@ -3228,7 +3228,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         if (series.banners.size() > 0) {  // Use random banner
                             // Gets 'entropy' from device that generates random numbers itself
                             // to seed a mersenne twister (pseudo) random generator
-                            std::mt19937 generator(std::random_device{}());
+                            std::mt19937 generator(std::random_device {}());
 
                             // Make sure all numbers have an equal chance.
                             // Range is inclusive (so we need -1 for vector index)
@@ -3389,7 +3389,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
         NumActors = ActorsPath.size();
-        if (Config.TVScraperRecInfoShowActors && NumActors > 0) {  // TODO: Merge
+        if (Config.TVScraperRecInfoShowActors && NumActors > 0) {
             //* Add actors to compexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
