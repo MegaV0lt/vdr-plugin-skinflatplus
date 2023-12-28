@@ -14,7 +14,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_FirstDisplay = false;
         m_DoOutput = false;
         return;
-    } else 
+    } else
         m_DoOutput = true; */
 
     m_Present = NULL;
@@ -166,29 +166,32 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
-    int ImageHeight = HeightImageLogo - m_MarginItem * 2;
-    int ImageBgHeight = ImageHeight;
-    int ImageBgWidth = ImageHeight;
-    int ImageLeft = m_MarginItem * 2;
-    int ImageTop = m_MarginItem;
-    cImage *img = ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
-    if (img) {
-        ImageBgHeight = img->Height();
-        ImageBgWidth = img->Width();
-        ChanLogoBGPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-    }
 
-    img = ImgLoader.LoadLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
-    if (img) {
-        ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
-        ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
-        ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-    } else if (!m_IsGroup) {  // Draw default logo
-        img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
+    if (!m_IsGroup) {
+        int ImageHeight = HeightImageLogo - m_MarginItem * 2;
+        int ImageBgHeight = ImageHeight;
+        int ImageBgWidth = ImageHeight;
+        int ImageLeft = m_MarginItem * 2;
+        int ImageTop = m_MarginItem;
+        cImage *img = ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
         if (img) {
-            ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
+            ImageBgHeight = img->Height();
+            ImageBgWidth = img->Width();
+            ChanLogoBGPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        }
+
+        img = ImgLoader.LoadLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
+        if (img) {
+            ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
             ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        } else /*if (!m_IsGroup)*/ {  // Draw default logo
+            img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (img) {
+                ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
+                ImageLeft = m_MarginItem * 2 + (ImageBgWidth - img->Width()) / 2;
+                ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+            }
         }
     }
 }
@@ -379,7 +382,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                                    Theme.Color(clrChannelFontEpgFollow), clrTransparent, m_Font);
         } else {
             ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight + m_FontSmlHeight), *epg,
-                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_Font, m_ChannelWidth - left - MaxWidth);
+                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_Font,
+                m_ChannelWidth - left - MaxWidth);
         }
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
