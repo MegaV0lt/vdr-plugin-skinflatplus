@@ -1464,7 +1464,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
-        CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+        DecorPixmap = CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 
         PixmapFill(DecorPixmap, clrTransparent);
