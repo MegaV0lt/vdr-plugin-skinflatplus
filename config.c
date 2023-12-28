@@ -1,13 +1,20 @@
-#include "config.h"
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
+#include "./config.h"
 
 #include <vector>
 #include <algorithm>
 cFlatConfig::cFlatConfig(void) {
-    logoPath = "";
-    iconPath = "";
+    LogoPath = "";
+    IconPath = "";
     RecordingOldConfigFile = "";
 
-    DecorCurrent = -1;
+    m_DecorCurrent = -1;
     DecorIndex = 0;
 
     ButtonsShowEmpty = true;
@@ -41,7 +48,7 @@ cFlatConfig::cFlatConfig(void) {
     RecordingAdditionalInfoShow = true;
     EpgAdditionalInfoShow = true;
     EpgRerunsShow = true;
-    EpgFskGenreIconSize = 0.005;  // Percent of content head heigh
+    EpgFskGenreIconSize = 0.005;  // Percent of content head height
 
     TopBarRecordingShow = true;
     TopBarRecConflictsShow = true;
@@ -410,8 +417,8 @@ void cFlatConfig::ThemeCheckAndInit(void) {
 }
 
 void cFlatConfig::DecorCheckAndInit(void) {
-    if (DecorCurrent != DecorIndex) {
-        DecorCurrent = DecorIndex;
+    if (m_DecorCurrent != DecorIndex) {
+        m_DecorCurrent = DecorIndex;
         DecorLoadCurrent();
     }
     if (decorBorderChannelByTheme) {
@@ -643,13 +650,13 @@ void cFlatConfig::ThemeInit(void) {
 }
 
 void cFlatConfig::Init(void) {
-    if (!strcmp(logoPath, "")) {
-        logoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
-        dsyslog("flatPlus: logoPath: %s", *logoPath);
+    if (!strcmp(LogoPath, "")) {
+        LogoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
+        dsyslog("flatPlus: LogoPath: %s", *LogoPath);
     }
-    if (!strcmp(iconPath, "")) {
-        iconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
-        dsyslog("flatPlus: iconPath: %s", *iconPath);
+    if (!strcmp(IconPath, "")) {
+        IconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
+        dsyslog("flatPlus: IconPath: %s", *IconPath);
     }
     if (!strcmp(RecordingOldConfigFile, "")) {
         dsyslog("flatPlus: PLUGINCONFIGPATH: %s", PLUGINCONFIGPATH);
@@ -661,7 +668,7 @@ void cFlatConfig::Init(void) {
     DecorCheckAndInit();
 }
 
-bool stringCompare(const std::string &left, const std::string &right) {
+bool StringCompare(const std::string &left, const std::string &right) {
     std::string::const_iterator lit, rit, leftEnd = left.end(), rightEnd = right.end();
     for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit) {
         if (tolower(*lit) < tolower(*rit)) return true;
@@ -672,7 +679,7 @@ bool stringCompare(const std::string &left, const std::string &right) {
     return false;
 }
 
-bool pairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
+bool PairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
     return i.first < j.first;
 }
 
@@ -680,35 +687,36 @@ bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
     return i.first > j.first;
 }
 
-int roundUp(int numToRound, int multiple) {
-    if (multiple == 0) return numToRound;
+int RoundUp(int NumToRound, int multiple) {
+    if (multiple == 0) return NumToRound;
 
-    int remainder = numToRound % multiple;
-    if (remainder == 0) return numToRound;
+    int remainder = NumToRound % multiple;
+    if (remainder == 0) return NumToRound;
 
-    return numToRound + multiple - remainder;
+    return NumToRound + multiple - remainder;
 }
 
 void cFlatConfig::DecorDescriptions(cStringList &Decors) {
-    cString decorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
+    cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entrys
     Decors.Clear();
 
     cString FileName("");
-    cReadDir d(*decorPath);
+    cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        FileName = AddDirectory(*decorPath, e->d_name);
+        FileName = AddDirectory(*DecorPath, e->d_name);
         files.emplace_back(*FileName);
     }
 
-    std::sort(files.begin(), files.end(), stringCompare);
-    std::string fileName("");
+    std::sort(files.begin(), files.end(), StringCompare);
+    std::string File_Name("");
     cString Desc("");
-    for (unsigned i = 0; i < files.size(); ++i) {
-        fileName = files.at(i);
-        Desc = DecorDescription(fileName.c_str());
+    std::size_t FilesSize {files.size()};
+    for (unsigned i = 0; i < FilesSize; ++i) {
+        File_Name = files.at(i);
+        Desc = DecorDescription(File_Name.c_str());
         Decors.Append(strdup(*Desc));
     }
 }
@@ -718,7 +726,7 @@ cString cFlatConfig::DecorDescription(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -738,29 +746,30 @@ cString cFlatConfig::DecorDescription(cString File) {
                     }
                 }
             }
-        }
+        }  // while
+        fclose(f);
     }
     return description;
 }
 
 void cFlatConfig::DecorLoadCurrent(void) {
-    cString decorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
+    cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entrys
 
     cString FileName("");
-    cReadDir d(*decorPath);
+    cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
-        FileName = AddDirectory(*decorPath, e->d_name);
+        FileName = AddDirectory(*DecorPath, e->d_name);
         files.emplace_back(*FileName);
     }
 
-    std::string fileName("");
-    std::sort(files.begin(), files.end(), stringCompare);
+    std::string FileName2("");
+    std::sort(files.begin(), files.end(), StringCompare);
     if (DecorIndex >= 0 && DecorIndex < static_cast<int>(files.size())) {
-        fileName = files.at(DecorIndex);
-        DecorLoadFile(fileName.c_str());
+        FileName2 = files.at(DecorIndex);
+        DecorLoadFile(FileName2.c_str());
     }
 }
 
@@ -770,7 +779,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0}, value {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -856,7 +865,8 @@ void cFlatConfig::DecorLoadFile(cString File) {
                         decorScrollBarSizeTheme = value; continue; }
                 }
             }
-        }
+        }  // while
+        fclose(f);
     }
 }
 
@@ -868,7 +878,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
     FILE *f = fopen(RecordingOldConfigFile, "r");
     if (f) {
         int line {0}, value {0};
-        char *s = NULL, *p = NULL, *n = NULL, *v = NULL;
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != NULL) {
             ++line;
@@ -889,6 +899,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
                 }
             }
         }  // while
+        fclose(f);
     }
 }
 
@@ -902,10 +913,10 @@ int cFlatConfig::GetRecordingOldValue(std::string folder) {
 }
 
 void cFlatConfig::SetLogoPath(cString path) {
-    logoPath = checkSlashAtEnd(*path);
+    LogoPath = CheckSlashAtEnd(*path);
 }
 
-cString cFlatConfig::checkSlashAtEnd(std::string path) {
+cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     try {
         if (!(path.at(path.size() - 1) == '/'))
             return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
@@ -932,20 +943,21 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
 }
 
 void cFlatConfig::GetConfigFiles(cStringList &Files) {
-    cString configsPath = cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
+    cString ConfigsPath = cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entrys
     Files.Clear();
 
-    cReadDir d(*configsPath);
+    cReadDir d(*ConfigsPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         files.emplace_back(e->d_name);
     }
 
-    std::sort(files.begin(), files.end(), stringCompare);
+    std::sort(files.begin(), files.end(), StringCompare);
     std::string FileName("");
-    for (unsigned i = 0; i < files.size(); ++i) {
+    std::size_t FilesSize {files.size()};
+    for (unsigned i = 0; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

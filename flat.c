@@ -1,14 +1,25 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include <vdr/osd.h>
 #include <vdr/menu.h>
+// #include <memory>
 
-#include "flat.h"
+#include "./flat.h"
 
-#include "displaychannel.h"
-#include "displaymenu.h"
-#include "displaymessage.h"
-#include "displayreplay.h"
-#include "displaytracks.h"
-#include "displayvolume.h"
+#include "./displaychannel.h"
+#include "./displaymenu.h"
+#include "./displaymessage.h"
+#include "./displayreplay.h"
+#include "./displaytracks.h"
+#include "./displayvolume.h"
+
+
+#include "./services/epgsearch.h"
 
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
@@ -24,15 +35,15 @@ enum stream_content {
 };
 
 class cFlatConfig Config;
-class cImageCache imgCache;
+class cImageCache ImgCache;
 
 cTheme Theme;
-static bool menuActive = false;
-bool firstDisplay = true;
-time_t remoteTimersLastRefresh = 0;
+static bool m_MenuActive = false;
+bool m_FirstDisplay = true;
+time_t m_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
-    displayMenu = NULL;
+    Display_Menu = NULL;
 }
 
 const char *cFlat::Description(void) {
@@ -45,8 +56,8 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
 
 cSkinDisplayMenu *cFlat::DisplayMenu(void) {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
-    displayMenu = menu;
-    menuActive = true;
+    Display_Menu = menu;
+    m_MenuActive = true;
     return menu;
 }
 
@@ -66,7 +77,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
+cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, const cRect &ViewPort/* = cRect::Null */,
+                      const cRect &DrawPort/* = cRect::Null */) {
     if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
@@ -94,7 +106,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-// void PixmapFill(cPixmap *pixmap, tColor Color);  // See flat.h
+// void inline PixmapFill(cPixmap *pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
@@ -103,24 +115,24 @@ cPlugin *GetScraperPlugin(void) {
     return pScraper;
 }
 
-cString GetAspectIcon(int screenWidth, double screenAspect) {
-    if (Config.ChannelSimpleAspectFormat && screenWidth > 720)
-        return (screenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
+cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
+    if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
+        return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    if (screenAspect == 16.0/9.0) return "169";
-    if (screenAspect == 4.0/3.0) return "43";
-    if (screenAspect == 20.0/11.0 || screenAspect == 15.0/11.0) return "169w";
-    if (screenAspect == 2.21) return "221";
+    if (ScreenAspect == 16.0/9.0) return "169";
+    if (ScreenAspect == 4.0/3.0) return "43";
+    if (ScreenAspect == 20.0/11.0 || ScreenAspect == 15.0/11.0) return "169w";
+    if (ScreenAspect == 2.21) return "221";
 
     return "unknown_asp";
 }
 
-cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect) {
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect) {
     cString res("unknown_res");
-    switch (screenWidth) {
+    switch (ScreenWidth) {
         case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
         case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
-        // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD) Is that used somewhere on sat/cable?
+        // case 2560: res = "2560x1440"; break;  //* 2560x1440 (QHD) Is that used somewhere on sat/cable?
         case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
         case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
         case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
@@ -133,36 +145,36 @@ cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screen
         case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
         default:
             dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
-                    screenWidth, screenHeight, screenAspect);
+                    ScreenWidth, ScreenHeight, ScreenAspect);
             break;
     }
     return res;
 }
 
-cString GetFormatIcon(int screenWidth) {
-    if (screenWidth > 1920) return "uhd";
-    if (screenWidth > 720) [[likely]] return "hd";
+cString GetFormatIcon(int ScreenWidth) {
+    if (ScreenWidth > 1920) return "uhd";
+    if (ScreenWidth > 720) [[likely]] return "hd";
 
     return "sd";  // 720 and below is considered sd
 }
 
-cString GetRecordingerrorIcon(int recInfoErrors) {
+cString GetRecordingerrorIcon(int RecInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
-    if (recInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
-    if (recInfoErrors == 0) return "recording_ok";       // No errors
-    if (recInfoErrors < RecErrIconThreshold) return "recording_warning";
-    if (recInfoErrors >= RecErrIconThreshold) return "recording_error";
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
+    if (RecInfoErrors == 0) return "recording_ok";       // No errors
+    if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
+    if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
 
     return "";
 }
 
-cString GetRecordingseenIcon(int frameTotal, int frameResume) {
-    double FrameSeen = frameResume * 1.0 / frameTotal;
-    double seenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
-    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", seenThreshold);
+cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
+    double FrameSeen = FrameResume * 1.0 / FrameTotal;
+    double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
-    if (FrameSeen >= seenThreshold) return "recording_seen_10";
+    if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
     if (FrameSeen < 0.1) return "recording_seen_0";
     if (FrameSeen < 0.2) return "recording_seen_1";
@@ -178,8 +190,8 @@ cString GetRecordingseenIcon(int frameTotal, int frameResume) {
     return "recording_seen_10";
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine) {
-    cString audio_type("");
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine /* = false */) {  // NOLINT
+    cString AudioType("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);
         switch (p->stream) {
@@ -211,18 +223,16 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             if (!isempty(*Audio)) Audio.Append(", ");
             switch (p->stream) {
             case sc_audio_MP2:
-                if (p->type == 5)  // Workaround for wrongfully used stream type X 02 05 for AC3
-                    audio_type = "AC3";
-                else
-                    audio_type = "MP2";
+                // Workaround for wrongfully used stream type X 02 05 for AC3
+                AudioType = (p->type == 5) ? "AC3" : "MP2";
                 break;
-            case sc_audio_AC3: audio_type = "AC3"; break;
-            case sc_audio_HEAAC: audio_type = "HEAAC"; break;
+            case sc_audio_AC3: AudioType = "AC3"; break;
+            case sc_audio_HEAAC: AudioType = "HEAAC"; break;
             }  // switch p->stream
             if (p->description)
                 Audio.Append(cString::sprintf("%s (%s)", p->description, p->language));
             else
-                Audio.Append(cString::sprintf("%s (%s)", p->language, *audio_type));
+                Audio.Append(cString::sprintf("%s (%s)", p->language, *AudioType));
             break;
         case sc_subtitle:
             if (!isempty(*Subtitle)) Subtitle.Append(", ");
@@ -233,4 +243,191 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         }  // switch
     }  // for
+}
+
+void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine /* = false */) {  // NOLINT
+    std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
+    std::string Channel(""), Searchtimer("");
+    if (!Buffer.empty()) {
+        Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
+        Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
+        if (Searchtimer.empty())
+            Searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
+    }
+
+    Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
+    std::string Causedby(""), Reason("");
+    if (!Buffer.empty()) {
+        Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
+        Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
+    }
+
+    Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+    std::string Pattern("");
+    if (!Buffer.empty()) {
+        Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
+    }
+
+    if (InfoLine) {
+        if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) ||
+             !Pattern.empty())
+            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show infoline
+    }
+
+    if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
+        Text.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), Channel.c_str(),
+                                         tr("search pattern"), Searchtimer.c_str()));
+    }
+
+    if (!Causedby.empty() && !Reason.empty()) {  // TVScraper
+        Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), Causedby.c_str(), tr("reason")));
+        if (Reason == "improve")
+            Text.Append(tr("improve"));
+        else if (Reason == "collection")
+            Text.Append(tr("collection"));
+        else if (Reason == "TV show, missing episode")
+            Text.Append(tr("TV show, missing episode"));
+        else
+            Text.Append(Reason.c_str());  // To be safe if there are more options
+    }
+
+    if (!Pattern.empty()) {  // VDRAdmin
+        Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
+    }
+}
+
+int GetEpgsearchConflichts(void) {
+    cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
+    if (pEpgSearch) {
+        Epgsearch_lastconflictinfo_v1_0 ServiceData {
+            .nextConflict = 0,
+            .relevantConflicts = 0,
+            .totalConflicts = 0
+        };
+        pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
+        if (ServiceData.relevantConflicts > 0) {
+            return ServiceData.relevantConflicts;
+        }
+    }  // pEpgSearch
+    return 0;
+}
+
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText /* = false */) {  // NOLINT
+    cMarks Marks;
+    bool HasMarks = false;
+    cIndexFile *index {nullptr};
+    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+    if (Recording->NumFrames() > 0) {
+        HasMarks = Marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
+                   Marks.Count();
+        index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
+        // cIndexFile index(Recording->FileName(), false, Recording->IsPesRecording());
+    }
+
+    bool IsCutted = false;
+    uint64_t FileSize[65535];
+    FileSize[0] = 0;
+    uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
+    int i {0}, rc {0};
+    struct stat FileBuf;
+    cString FileName("");
+    do {
+        ++i;
+        if (Recording->IsPesRecording())
+            FileName = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
+        else
+            FileName = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
+        rc = stat(*FileName, &FileBuf);
+        if (rc == 0)
+            FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
+        else {
+            if (ENOENT != errno) {
+                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
+            }
+        }
+    } while (i <= MaxFiles && !rc);
+
+    int CuttedLength {0};
+    uint64_t RecSizeCutted {0};
+    if (HasMarks && index) {
+        uint16_t FileNumber {0};
+        off_t FileOffset {0};
+        bool CutIn = true;
+        int32_t CutInFrame {0}, position {0};
+        uint64_t CutInOffset {0};
+        cMark *Mark = Marks.First();
+        while (Mark) {
+            position = Mark->Position();
+            index->Get(position, &FileNumber, &FileOffset);
+            if (CutIn) {
+                CutInFrame = position;
+                CutIn = false;
+                CutInOffset = FileSize[FileNumber - 1] + FileOffset;
+            } else {
+                CuttedLength += position - CutInFrame;
+                CutIn = true;
+                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+            }
+            cMark *NextMark = Marks.Next(Mark);
+            Mark = NextMark;
+        }
+        if (!CutIn) {
+            CuttedLength += index->Last() - CutInFrame;
+            index->Get(index->Last() - 1, &FileNumber, &FileOffset);
+            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+        }
+        Cutted = IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond());
+        IsCutted = true;
+    }
+
+    int LastIndex {0};
+    if (AddText && index) {
+        LastIndex = index->Last();
+        Text.Append(
+            cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, Recording->FramesPerSecond())));
+        if (HasMarks)
+            Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
+                                         *IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond())));
+        Text.Append("\n");
+    }
+    delete index;
+
+    uint64_t RecSize {0};
+    if (AddText) {
+        /* if (!rc) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
+        if (RecSize > MEGABYTE(1023))
+            Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
+        else
+            Text.Append(cString::sprintf("%s: %lld MB", tr("Size"), RecSize / MEGABYTE(1)));
+
+        if (HasMarks) {
+            if (RecSize > MEGABYTE(1023))
+                Text.Append(
+                    cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
+                                     static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+            else
+                Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+        }
+        Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
+                                     Recording->Lifetime()));
+
+        if (LastIndex) {
+            Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
+                                         (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
+                                         static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 /
+                                             MEGABYTE(1)));
+        }
+    }  // AddText
+    return IsCutted;
+}
+
+// Returns the string between start and end or an empty string if not found
+std::string XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
+    std::size_t start = source.find(StrStart);
+    std::size_t end = source.find(StrEnd);
+
+    if (std::string::npos != start && std::string::npos != end)
+        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
+
+    return std::string();
 }

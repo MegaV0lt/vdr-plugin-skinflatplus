@@ -1,35 +1,42 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "baserender.h"
-#include "services/scraper2vdr.h"
+#include "./baserender.h"
+#include "./services/scraper2vdr.h"
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  private:
         cString current, total;
 
-        int labelHeight;
-        cPixmap *labelPixmap;
-        cPixmap *labelJump;
-        cPixmap *iconsPixmap;
-        cPixmap *chanEpgImagesPixmap;
-        cPixmap *dimmPixmap;
+        int m_LabelHeight;
+        cPixmap *LabelPixmap;
+        cPixmap *LabelJumpPixmap;
+        cPixmap *IconsPixmap;
+        cPixmap *ChanEpgImagesPixmap;
+        cPixmap *DimmPixmap;
 
-        cFont *fontSecs;
-        const cRecording *recording;
+        cFont *m_FontSecs;
+        const cRecording *m_Recording;
 
-        int screenWidth, lastScreenWidth;
-        int screenHeight;
-        double screenAspect;
+        int m_ScreenWidth, m_LastScreenWidth;
+        int m_ScreenHeight;
+        double m_ScreenAspect;
 
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;
 
-        // dimm on pause
-        bool dimmActive;
-        time_t dimmStartTime;
+        // Dimm on pause
+        bool m_DimmActive;
+        time_t m_DimmStartTime;
 
         bool ProgressShown;
-        bool modeOnly;
+        bool m_ModeOnly;
         void UpdateInfo(void);
         void ResolutionAspectDraw(void);
 

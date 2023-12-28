@@ -1,5 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2023-12-28: Version 0.8.4
+- [fix] Fix dots with long not scrolling text
+- [update] Load named logos only for channels
+- [update] Merge Epgsearch numConflicts
+- [update] Merge AddActors
+- [update] Merge InsertAuxInfos
+- [update] Some internal optimizations
+
 2023-12-04: Version 0.8.3
 - [add] Make fsk/genre icon size configurable
 - [update] Remove space between ~ and estimated free minutes
@@ -7,7 +15,7 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2023-11-25: Version 0.8.2
 - [fix] Fix horizontal position scrolling message text
-- [add] Add suppoort for native channel logonames
+- [add] Add support for native channel logonames
 - [update] Diplay ts errors using local locale
 - [update] Use TVScraperInfoPosterSize also for too big images
 - [update] Bigger images for genre/fsk

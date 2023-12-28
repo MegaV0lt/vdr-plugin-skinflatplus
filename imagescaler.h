@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 /*!
@@ -14,11 +21,11 @@ class ImageScaler {
     ImageScaler();
     ~ImageScaler();
 
-    //! set destination image and source image size
+    //! Set destination image and source image size
     void SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height,
                             unsigned src_width, unsigned src_height);
 
-    /*! process one pixel of source image; destination image is written while input is processed
+    /*! Process one pixel of source image; destination image is written while input is processed
      * SetImageParameters() must be called first
      */
     void PutSourcePixel(unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3) {
@@ -38,7 +45,7 @@ class ImageScaler {
     }
 
  private:
-    //! temporary image pixel class - a 4-element integer vector
+    //! Temporary image pixel class - a 4-element integer vector
     class TmpPixel {
      public:
         TmpPixel() {
@@ -63,7 +70,7 @@ class ImageScaler {
             return TmpPixel(m_comp[0] + x[0], m_comp[1] + x[1], m_comp[2] + x[2], m_comp[3] + x[3]);
         }
 
-        // return component i=[0..3] - No range check!
+        // Return component i=[0..3] - No range check!
         int operator[](unsigned i) const {
             return m_comp[i];
         }
@@ -72,20 +79,20 @@ class ImageScaler {
         int m_comp[4];
     };
 
-    //! this is called whenever one input line is processed completely
+    //! This is called whenever one input line is processed completely
     void NextSourceLine();
 
-    TmpPixel   m_hbuf[4];      //! ring buffer for 4 input pixels
-    char      *m_memory;       //! buffer container
-    Filter    *m_hor_filters;  //! buffer for horizontal filters (one for each output image column)
-    Filter    *m_ver_filters;  //! buffer for vertical   filters (one for each output image row)
-    TmpPixel  *m_buffer;       //! buffer contains 4 horizontally filtered input lines, multiplexed
-    unsigned  *m_dst_image;    //! pointer to destination image
-    unsigned   m_dst_stride;   //! destination image stride
-    unsigned   m_dst_width;    //! destination image width
-    unsigned   m_dst_height;   //! destination image height
-    unsigned   m_src_width;    //! source image width
-    unsigned   m_src_height;   //! source image height
+    TmpPixel   m_hbuf[4];      //! Ring buffer for 4 input pixels
+    char      *m_memory;       //! Buffer container
+    Filter    *m_hor_filters;  //! Buffer for horizontal filters (one for each output image column)
+    Filter    *m_ver_filters;  //! Buffer for vertical   filters (one for each output image row)
+    TmpPixel  *m_buffer;       //! Buffer contains 4 horizontally filtered input lines, multiplexed
+    unsigned  *m_dst_image;    //! Pointer to destination image
+    unsigned   m_dst_stride;   //! Destination image stride
+    unsigned   m_dst_width;    //! Destination image width
+    unsigned   m_dst_height;   //! Destination image height
+    unsigned   m_src_width;    //! Source image width
+    unsigned   m_src_height;   //! Source image height
     unsigned   m_src_x;        //! x position of next source image pixel
     unsigned   m_src_y;        //! y position of source image line currently beeing processed
     unsigned   m_dst_x;        //! x position of next destination image pixel

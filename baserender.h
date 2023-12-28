@@ -1,10 +1,18 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "imageloader.h"
 #include <list>
-#include "flat.h"
-#include "textscroller.h"
-#include "complexcontent.h"
+
+#include "./imageloader.h"
+#include "./flat.h"
+#include "./textscroller.h"
+#include "./complexcontent.h"
 
 enum eBorder {
     BorderMenuItem,
@@ -24,98 +32,98 @@ struct sDecorBorder {
     int From;
 };
 
-template<class T> inline T myMax(T a, T b) { return a >= b ? a : b; }
+template<class T> inline T MyMax(T a, T b) { return a >= b ? a : b; }
 
 class cFlatBaseRender {
  protected:
         cOsd *osd;
 
-        int osdLeft, osdTop, osdWidth, osdHeight;
-        int marginItem;
+        int m_OsdLeft, m_OsdTop, m_OsdWidth, m_OsdHeight;
+        int m_MarginItem;
 
         // Standard fonts
-        cFont *font;
-        cFont *fontSml;
-        cFont *fontFixed;
-        int fontHeight;
-        int fontSmlHeight;
-        int fontFixedHeight;
+        cFont *m_Font;
+        cFont *m_FontSml;
+        cFont *m_FontFixed;
+        int m_FontHeight;
+        int m_FontSmlHeight;
+        int m_FontFixedHeight;
 
         // TopBar
-        cPixmap *topBarPixmap;
-        cPixmap *topBarIconPixmap;
-        cPixmap *topBarIconBGPixmap;
-        cFont *topBarFont, *topBarFontSml, *topBarFontClock;
-        int topBarFontHeight, topBarFontSmlHeight, topBarFontClockHeight;
+        cPixmap *TopBarPixmap;
+        cPixmap *TopBarIconPixmap;
+        cPixmap *TopBarIconBgPixmap;
+        cFont *m_TopBarFont, *m_TopBarFontSml, *m_TopBarFontClock;
+        int m_TopBarFontHeight, m_TopBarFontSmlHeight, m_TopBarFontClockHeight;
 
-        cString topBarTitle;
-        cString topBarTitleExtra1, topBarTitleExtra2;
-        cString topBarExtraIcon;
-        bool topBarExtraIconSet;
-        cString topBarMenuIcon;
-        bool topBarMenuIconSet;
-        cString topBarMenuIconRight;
-        bool topBarMenuIconRightSet;
-        cString topBarMenuLogo;
-        bool topBarMenuLogoSet;
+        cString m_TopBarTitle;
+        cString m_TopBarTitleExtra1, m_TopBarTitleExtra2;
+        cString m_TopBarExtraIcon;
+        bool m_TopBarExtraIconSet;
+        cString m_TopBarMenuIcon;
+        bool m_TopBarMenuIconSet;
+        cString m_TopBarMenuIconRight;
+        bool m_TopBarMenuIconRightSet;
+        cString m_TopBarMenuLogo;
+        bool m_TopBarMenuLogoSet;
 
-        bool topBarUpdateTitle;
-        cString topBarLastDate;
-        int topBarHeight;
-        int VideoDiskUsageState;
+        bool m_TopBarUpdateTitle;
+        cString m_TopBarLastDate;
+        int m_TopBarHeight;
+        int m_VideoDiskUsageState;
 
         // Progressbar
-        cPixmap *progressBarPixmap;
-        cPixmap *progressBarPixmapBg;
-        int progressBarHeight, progressBarTop, progressBarWidth, progressBarMarginHor, progressBarMarginVer;
-        int ProgressType;
-        bool progressBarSetBackground;
-        bool progressBarIsSignal;
-        tColor progressBarColorFg, progressBarColorBarFg, progressBarColorBarCurFg, progressBarColorBg;
-        tColor progressBarColorMark, progressBarColorMarkCurrent;
+        cPixmap *ProgressBarPixmap;
+        cPixmap *ProgressBarPixmapBg;
+        int m_ProgressBarHeight, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarMarginHor, m_ProgressBarMarginVer;
+        int m_ProgressType;
+        bool m_ProgressBarSetBackground;
+        bool m_ProgressBarIsSignal;
+        tColor m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBarCurFg, m_ProgressBarColorBg;
+        tColor m_ProgressBarColorMark, m_ProgressBarColorMarkCurrent;
 
         // Scrollbar
-        int scrollBarWidth;
+        int m_ScrollBarWidth;
 
-        // Buttons rot, grün, gelb, blau
-        cPixmap *buttonsPixmap;
-        int buttonsWidth, buttonsHeight, buttonsTop;
-        int marginButtonColor, buttonColorHeight;
-        bool buttonsDrawn;
+        // Buttons red, green, yellow, blue
+        cPixmap *ButtonsPixmap;
+        int m_ButtonsWidth, m_ButtonsHeight, m_ButtonsTop;
+        int m_MarginButtonColor, m_ButtonColorHeight;
+        bool m_ButtonsDrawn;
 
-        // Nachricht
-        cPixmap *messagePixmap, *messageIconPixmap;
-        int messageWidth, messageHeight;
-        cTextScrollers messageScroller;
+        // Message
+        cPixmap *MessagePixmap, *MessageIconPixmap;
+        int /* m_MessageWidth, */ m_MessageHeight;  // TODO: m_MessageWidth unused?
+        cTextScrollers MessageScroller;
 
-        // Mehrzeiliger Content mit Scrollbalken
-        cPixmap *contentPixmap;
-        cPixmap *contentEpgImagePixmap;
-        int contentLeft, contentTop, contentHeight, contentWidth;
-        int contentDrawPortHeight;  // gesamthöhe des Textes
-        int contentTextHeight;
-        bool contentHasScrollbar;
-        bool contentShown;
-        int contentFontType;
-        int contentEventType;
-        int contentEventHeight;
-        int contentEventPosterWidth, contentEventPosterHeight;
+        // Multiline content with scrollbar
+        // cPixmap *ContentPixmap;  // TODO: Content* unused?
+        // cPixmap *ContentEpgImagePixmap;
+        // int ContentLeft, ContentTop, ContentHeight, ContentWidth;
+        // int ContentDrawPortHeight;  // Complete high of text
+        // int ContentTextHeight;
+        // bool ContentHasScrollbar;
+        // bool ContentShown;
+        // int ContentFontType;
+        // int ContentEventType;
+        // int ContentEventHeight;
+        // int ContentEventPosterWidth, ContentEventPosterHeight;
 
-        tColor contentColorFg, contentColorBg;
-        cTextWrapper contentWrapper;
-        cTextWrapper contentWrapperPoster;
-        const cEvent *contentEvent;
+        // tColor ContentColorFg, ContentColorBg;
+        // cTextWrapper ContentWrapper;
+        // cTextWrapper ContentWrapperPoster;
+        // const cEvent *ContentEvent;
 
-        cComplexContent weatherWidget;
+        cComplexContent WeatherWidget;
 
-        cPixmap *decorPixmap;
+        cPixmap *DecorPixmap;
         std::list<sDecorBorder> Borders;  // For clear specific Borders (clear only MenuItems and not TopBar)
 
-        void contentDraw(void);
-        void contentEventDraw(void);
+        /* void ContentDraw(void);  // Unused?
+        void ContentEventDraw(void); */
         double ScrollbarSize(void);
 
-        void ProgressBarDrawMark(int posMark, int posMarkLast, int posCurrent, bool Start, bool isCurrent);
+        void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
         int ProgressBarMarkPos(int P, int Total);
 
         void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
@@ -140,7 +148,7 @@ class cFlatBaseRender {
         tColor SetAlpha(tColor Color, double am);
 
  public:
-        cImageLoader imgLoader;
+        cImageLoader ImgLoader;
 
         cFlatBaseRender(void);
         ~cFlatBaseRender(void);
@@ -151,7 +159,7 @@ class cFlatBaseRender {
         void TopBarCreate(void);
         void TopBarSetTitle(cString title);
         void TopBarSetTitleWithoutClear(cString title);
-        void TopBarSetTitleExtra(cString extra1, cString extra2);
+        void TopBarSetTitleExtra(cString Extra1, cString Extra2);
         void TopBarSetMenuIcon(cString icon);
         void TopBarSetMenuIconRight(cString icon);
         void TopBarClearMenuIconRight(void);
@@ -169,10 +177,10 @@ class cFlatBaseRender {
 
         void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
                                 tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
-                                int Type, bool SetBackground, bool isSignal = false);
+                                int Type, bool SetBackground, bool IsSignal = false);
         void ProgressBarCreate(int Left, int Top, int Width, int Height, int MarginHor, int MarginVer,
                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
-                               bool SetBackground = false, bool isSignal = false);
+                               bool SetBackground = false, bool IsSignal = false);
         void ProgressBarDrawBgColor(void);
         void ProgressBarDraw(int Current, int Total);
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);

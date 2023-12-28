@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./imageloader.h"
 #include <dirent.h>
 #include <math.h>
@@ -10,7 +17,7 @@
 using namespace Magick;
 
 cImageLoader::cImageLoader() {
-    logoExtension = "png";
+    m_LogoExtension = "png";
 }
 
 cImageLoader::~cImageLoader() {
@@ -20,20 +27,20 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if ((width == 0) || (height == 0)) return NULL;
 
     // Plain logo without converting to lower including '/'
-    cString File = cString::sprintf("%s%s.%s", *Config.logoPath, logo, *logoExtension);
-    cImage *img = NULL;
-    for (int i {0}; i < 2; ++i) {
+    cString File = cString::sprintf("%s%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
+    cImage *img {nullptr};
+    for (int i {0}; i < 2; ++i) {  // Run two times (0 and 1)
         if (i == 1) {  // Second try (Plain logo not found)
-            std::string logoLower = logo;
-            toLowerCase(logoLower);  // Convert to lowercase (A-Z)
-            File = cString::sprintf("%s%s.%s", *Config.logoPath, logoLower.c_str(), *logoExtension);
+            std::string LogoLower = logo;
+            ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
+            File = cString::sprintf("%s%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
             uint32_t tick1 = GetMsTicks();
         #endif
 
-        img = imgCache.GetImage(*File, width, height);  // Check if image is in imagecache
+        img = ImgCache.GetImage(*File, width, height);  // Check if image is in imagecache
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick2 = GetMsTicks();
@@ -48,11 +55,11 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
         bool success = LoadImage(*File);  // Try to load image from disk
 
-        if (!success) {
+        if (!success) {  // Image not found on disk
             if (i == 1)  // Second try
                 dsyslog("flatPlus: ImageLoader LoadLogo: %s (%s.%s) could not be loaded", *File, logo,
-                        *logoExtension);
-            continue;  // Image not found on disk
+                        *m_LogoExtension);
+            continue;
         }
 
         #ifdef DEBUGIMAGELOADTIME
@@ -70,7 +77,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             dsyslog("   scale logo: %d ms", tick6 - tick5);
         #endif
 
-        imgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
+        ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
         return img;  // Image loaded from disk
     }  // for
     return NULL;  // No image; so return Null
@@ -79,19 +86,19 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if ((width == 0) || (height == 0)) return NULL;
 
-    cString File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, Setup.OSDTheme, cIcon, *logoExtension);
+    cString File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
     #ifdef DEBUGIMAGELOADTIME
         dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
     #endif
 
-    cImage *img = NULL;
+    cImage *img {nullptr};
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick1 = GetMsTicks();
     #endif
 
-    img = imgCache.GetImage(*File, width, height);
+    img = ImgCache.GetImage(*File, width, height);
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick2 = GetMsTicks();
@@ -112,13 +119,13 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     #endif
 
     if (!success) {  // Search for logo in default folder
-        File = cString::sprintf("%s%s/%s.%s", *Config.iconPath, "default", cIcon, *logoExtension);
+        File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
             uint32_t tick5 = GetMsTicks();
         #endif
 
-        img = imgCache.GetImage(*File, width, height);
+        img = ImgCache.GetImage(*File, width, height);
 
         #ifdef DEBUGIMAGELOADTIME
             uint32_t tick6 = GetMsTicks();
@@ -158,7 +165,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
             return NULL;
         }
 
-        imgCache.InsertImage(img, *File, width, height);
+        ImgCache.InsertImage(img, *File, width, height);
         return img;
 }
 
@@ -170,12 +177,12 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         dsyslog("flatPlus: ImageLoader LoadFile %s", *File);
     #endif
 
-    cImage *img = NULL;
+    cImage *img {nullptr};
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick1 = GetMsTicks();
     #endif
 
-    img = imgCache.GetImage(*File, width, height);
+    img = ImgCache.GetImage(*File, width, height);
 
     #ifdef DEBUGIMAGELOADTIME
         uint32_t tick2 = GetMsTicks();
@@ -212,11 +219,11 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         dsyslog("   scale logo: %d ms", tick6 - tick5);
     #endif
 
-    imgCache.InsertImage(img, *File, width, height);
+    ImgCache.InsertImage(img, *File, width, height);
     return img;
 }
 
-void cImageLoader::toLowerCase(std::string &str) {
+void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
         if (ch >= 'A' && ch <= 'Z')
             ch += 32;  // Or: ch ^= 1 << 5;
@@ -224,27 +231,27 @@ void cImageLoader::toLowerCase(std::string &str) {
 }
 
 bool cImageLoader::FileExits(const std::string &name) {
-    struct stat buffer;
-    return (stat (name.c_str(), &buffer) == 0);
+    struct stat Buffer;
+    return (stat (name.c_str(), &Buffer) == 0);
 }
 
-bool cImageLoader::SearchRecordingPoster(cString recPath, cString &found) {
-    cString manualPoster = cString::sprintf("%s/cover_vdr.jpg", *recPath);
-    if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *recPath);
-        found = manualPoster;
+bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {
+    cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
+    if (FileSize(*ManualPoster) != -1) {
+        dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
+        found = ManualPoster;
         return true;
     }
-    manualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *recPath);
-    if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *recPath);
-        found = manualPoster;
+    ManualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *RecPath);
+    if (FileSize(*ManualPoster) != -1) {
+        dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
+        found = ManualPoster;
         return true;
     }
-    manualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *recPath);
-    if (FileSize(*manualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *recPath);
-        found = manualPoster;
+    ManualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *RecPath);
+    if (FileSize(*ManualPoster) != -1) {
+        dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
+        found = ManualPoster;
         return true;
     }
     return false;

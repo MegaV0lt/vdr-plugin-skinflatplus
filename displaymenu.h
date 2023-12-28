@@ -1,15 +1,24 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "baserender.h"
-#include "complexcontent.h"
+#include <ctype.h>
 #include <vdr/menu.h>
 #include <vdr/tools.h>
-#include <list>
-#include <ctype.h>
-#include <iostream>
-#include <sstream>
+
 #include <iomanip>
+#include <iostream>
+#include <list>
+#include <sstream>
 #include <string>
+
+#include "./baserender.h"
+#include "./complexcontent.h"
 
 #if APIVERSNUM < 20107
     enum eMenuSortMode {
@@ -21,60 +30,61 @@
     };
 #endif
 
-class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
+class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
-        cPixmap *menuPixmap;
-        cPixmap *menuIconsPixmap;
-        cPixmap *menuIconsBGPixmap;
-        cPixmap *menuIconsOVLPixmap;
+        cPixmap *MenuPixmap;
+        cPixmap *MenuIconsPixmap;
+        cPixmap *MenuIconsBgPixmap;
+        cPixmap *MenuIconsOvlPixmap;
 
-        int menuTop, menuWidth;
-        int menuItemWidth;
-        int menuItemLastHeight;
-        bool MenuFullOsdIsDrawn;
+        int m_MenuTop, m_MenuWidth;
+        int m_MenuItemWidth;
+        int m_MenuItemLastHeight;
+        bool m_MenuFullOsdIsDrawn;
 
-        eMenuCategory menuCategory;
-        int VideoDiskUsageState;
+        eMenuCategory m_MenuCategory;
+        // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        int LastTimerCount, LastTimerActiveCount;
-        cString LastTitle;
+        int m_LastTimerCount, m_LastTimerActiveCount;
+        cString m_LastTitle;
 
-        int chLeft, chTop, chWidth, chHeight;
-        cPixmap *contentHeadPixmap;
-        cPixmap *contentHeadIconsPixmap;
+        int m_chLeft, m_chTop, m_chWidth, m_chHeight;
+        cPixmap *ContentHeadPixmap;
+        cPixmap *ContentHeadIconsPixmap;
 
-        int cLeft, cTop, cWidth, cHeight;
+        int m_cLeft, m_cTop, m_cWidth, m_cHeight;
 
-        cPixmap *scrollbarPixmap;
-        int scrollBarTop, scrollBarWidth, scrollBarHeight;
+        cPixmap *ScrollbarPixmap;
+        int m_ScrollBarTop;
+        int m_ScrollBarWidth, m_ScrollBarHeight;  //? Also in cFlatBaseRender
 
-        int itemHeight, itemChannelHeight, itemTimerHeight, itemEventHeight, itemRecordingHeight;
+        int m_ItemHeight, m_ItemChannelHeight, m_ItemTimerHeight, m_ItemEventHeight, m_ItemRecordingHeight;
 
         std::list<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool isScrolling;
-        bool isGroup;
-        bool ShowEvent, ShowRecording, ShowText;
+        bool m_IsScrolling;
+        bool m_IsGroup;
+        bool m_ShowEvent, m_ShowRecording, m_ShowText;
 
         cComplexContent ComplexContent;
 
         // Content for Widgets
-        cComplexContent contentWidget;
+        cComplexContent ContentWidget;
 
         // TextScroller
-        cTextScrollers menuItemScroller;
+        cTextScrollers MenuItemScroller;
 
-        cString ItemEventLastChannelName;
+        cString m_ItemEventLastChannelName;
 
-        std::string RecFolder, LastRecFolder;
-        int LastItemRecordingLevel;
+        std::string m_RecFolder, m_LastRecFolder;
+        int m_LastItemRecordingLevel;
 
         // Icons
-        cImage *iconTimerFull;
-        // cImage *iconTimerPartial;
-        cImage *iconArrowTurn;
-        cImage *iconRec;
+        cImage *IconTimerFull;
+        // cImage *IconTimerPartial;
+        cImage *IconArrowTurn;
+        cImage *IconRec;
         // cImage *iconVps;
         // cImage *iconNew;
         // Icons
@@ -88,16 +98,16 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         std::string MainMenuText(std::string Text);
         cString GetIconName(std::string element);
 
-        std::string GetRecordingName(const cRecording *Recording, int Level, bool isFolder);
-        std::string xml_substring(std::string source, const char* str_start, const char* str_end);
+        std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
-        bool isRecordingOld(const cRecording *Recording, int Level);
+        bool IsRecordingOld(const cRecording *Recording, int Level);
         const char *GetGenreIcon(uchar genre);
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
         void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
-                           bool CanScrollDown, bool isContent = false);
+                           bool CanScrollDown, bool IsContent = false);
         int ItemsHeight(void);
         bool CheckProgressBar(const char *text);
         void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
@@ -106,6 +116,9 @@ class cFlatDisplayMenu : public cFlatBaseRender,  public cSkinDisplayMenu {
         static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;
         void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
         void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
+        void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
+                       std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
+                       int NumActors);  // Add Actors to compexcontent
         void DrawMainMenuWidgets(void);
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);

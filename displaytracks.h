@@ -1,19 +1,26 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "baserender.h"
+#include "./baserender.h"
 
 class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
  private:
-        cPixmap *tracksPixmap;
-        cPixmap *tracksLogoPixmap;
+        cPixmap *TracksPixmap;
+        cPixmap *TracksLogoPixmap;
 
         cImage *img_ac3;
         cImage *img_stereo;
-        int ac3Width, stereoWidth;
+        int m_Ac3Width, m_StereoWidth;
 
-        int itemHeight, itemsHeight;
-        int maxItemWidth;
-        int currentIndex;
+        int m_ItemHeight, ItemsHeight;
+        int m_MaxItemWidth;
+        int m_CurrentIndex;
 
         void SetItem(const char *Text, int Index, bool Current);
  public:

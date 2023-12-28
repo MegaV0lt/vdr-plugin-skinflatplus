@@ -1,25 +1,32 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
+
+#include <vdr/plugin.h>
+#include <vdr/skins.h>
+#include <vdr/videodir.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 #include <stdint.h>
-#include <string.h>
+#include <cstring>  // string.h
 #include <random>
 
-#include <vdr/plugin.h>
-#include <vdr/skins.h>
-#include <vdr/videodir.h>
-
-#include "config.h"
-#include "imagecache.h"
+#include "./config.h"
+#include "./imagecache.h"
 
 extern class cFlatConfig Config;
-extern class cImageCache imgCache;
-extern bool firstDisplay;
+extern class cImageCache ImgCache;
+extern bool m_FirstDisplay;
 
-extern time_t remoteTimersLastRefresh;
+extern time_t m_RemoteTimersLastRefresh;
 
 class cFlatDisplayMenu;
 extern cTheme Theme;
@@ -195,7 +202,7 @@ THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
  private:
-        cFlatDisplayMenu *displayMenu;
+        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid nameconflict with DisplayMenu()
  public:
         cFlat(void);
         virtual const char *Description(void);
@@ -228,31 +235,32 @@ inline void PixmapFill(cPixmap *pixmap, tColor Color) {
     if (pixmap) pixmap->Fill(Color);
 }
 cPlugin *GetScraperPlugin(void);
-cString GetAspectIcon(int screenWidth, double screenAspect);
-cString GetScreenResolutionIcon(int screenWidth, int screenHeight, double screenAspect);
-cString GetFormatIcon(int screenWidth);
-cString GetRecordingerrorIcon(int recInfoErrors);
-cString GetRecordingseenIcon(int frameTotal, int frameResume);
+cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
+cString GetFormatIcon(int ScreenWidth);
+cString GetRecordingerrorIcon(int RecInfoErrors);
+cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
-// Trim from left
-inline void ltrim(std::string &s, const char *t = " \t\n\r\f\v") {
-    s.erase(0, s.find_first_not_of(t));
+inline void LeftTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
+    s.erase(0, s.find_first_not_of(t));  // Trim from left
     // return s;  // Only inplace trimming
 }
 
-// Trim from right
-inline void rtrim(std::string &s, const char *t = " \t\n\r\f\v") {
-    s.erase(s.find_last_not_of(t) + 1);
+inline void RightTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
+    s.erase(s.find_last_not_of(t) + 1);  // Trim from right
     // return s;  // Only inplace trimming
 }
 
-// Trim from left & right
-inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {
-    /* return */ // ltrim(rtrim(s, t), t);
-    ltrim(s, t);
-    rtrim(s, t);
+inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
+    LeftTrim(s, t);  // Trim from left & right
+    RightTrim(s, t);
+    /* return */  // LeftTrim(RightTrim(s, t), t);
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,
-                      cString &Subtitle, bool NewLine = false);
-// void GetRecSize(const cRecording *Recording, uint64_t &recsize);
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT
+                      cString &Subtitle, bool NewLine = false);                      // NOLINT
+void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine);    // NOLINT
+int GetEpgsearchConflichts(void);
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
+std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);
+

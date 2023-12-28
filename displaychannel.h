@@ -1,45 +1,52 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 #include <vdr/status.h>
-#include "baserender.h"
-#include "flat.h"
-#include "services/scraper2vdr.h"
-#include "services/dvbapi.h"
+#include "./baserender.h"
+#include "./flat.h"
+#include "./services/dvbapi.h"
+#include "./services/scraper2vdr.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  private:
-        bool doOutput;
-        const cEvent *present;
+        // bool m_DoOutput;
+        const cEvent *m_Present;
 
-        int channelWidth, channelHeight;
+        int m_ChannelWidth, m_ChannelHeight;
 
-        cString channelName;
-        const cChannel *CurChannel;
+        // cString m_ChannelName;
+        const cChannel *m_CurChannel;
 
-        cPixmap *chanInfoTopPixmap;
-        cPixmap *chanInfoBottomPixmap;
-        cPixmap *chanLogoPixmap;
-        cPixmap *chanLogoBGPixmap;
-        cPixmap *chanIconsPixmap;
-        cPixmap *chanEpgImagesPixmap;
+        cPixmap *ChanInfoTopPixmap;
+        cPixmap *ChanInfoBottomPixmap;
+        cPixmap *ChanLogoPixmap;
+        cPixmap *ChanLogoBGPixmap;
+        cPixmap *ChanIconsPixmap;
+        cPixmap *ChanEpgImagesPixmap;
 
-        int screenWidth, lastScreenWidth;
-        int screenHeight;
-        double screenAspect;
-        int heightBottom, heightImageLogo;
+        int m_ScreenWidth, m_LastScreenWidth;
+        int m_ScreenHeight;
+        double m_ScreenAspect;
+        int HeightBottom, HeightImageLogo;
 
-        int LastSignalStrength, LastSignalQuality;
-        int SignalStrengthRight;
+        int m_LastSignalStrength, m_LastSignalQuality;
+        int m_SignalStrengthRight;
 
         // TVScraper
         int TVSLeft, TVSTop, TVSWidth, TVSHeight;
 
         // TextScroller
-        cTextScrollers scrollers;
+        cTextScrollers Scrollers;
 
-        bool isRecording;
-        bool isRadioChannel;
-        bool isGroup;
+        // bool IsRecording;  / Unused?
+        bool m_IsRadioChannel;
+        bool m_IsGroup;
 
         void SignalQualityDraw(void);
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);

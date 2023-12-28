@@ -1,9 +1,17 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "imageloader.h"
+#include <cstring>  // string.h
 #include <list>
-#include "flat.h"
-#include <string.h>
+
+#include "./imageloader.h"
+#include "./flat.h"
 
 enum eContentType {
     CT_Text,
@@ -30,12 +38,13 @@ class cSimpleContent {
 
  public:
     cSimpleContent(void) {
-        Image = NULL;
-        Font = NULL;
-
         ContentType = CT_None;  // Added to avoid compiler warning
+        // Position
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
         // tColor ColorFg, ColorBg;  // TODO ???
+        // Text
+        Image = NULL;
+        Font = NULL;
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -58,12 +67,12 @@ class cSimpleContent {
         if (this != &other) {
             this->ContentType = other.ContentType;
             this->Position = other.Position;
-            this->Text = other.Text;
             this->TextWidth = other.TextWidth;
             this->TextHeight = other.TextHeight;
             this->TextAlignment = other.TextAlignment;
             this->ColorFg = other.ColorFg;
             this->ColorBg = other.ColorBg;
+            this->Text = other.Text;
             this->Image = other.Image;
             this->Font = other.Font;
         }
@@ -73,22 +82,21 @@ class cSimpleContent {
     void SetText(const char *text, bool Multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                  int textWidth = 0, int textHeight = 0, int textAlignment = taDefault) {
         ContentType = CT_Text;
-        Text = text;
-
-        Font = font;
         Position = position;
+        Text = text;
+        Font = font;
 
         if (Multiline)
             ContentType = CT_TextMultiline;
 
-        ColorFg = colorFg; ColorBg = colorBg;
         TextWidth = textWidth; TextHeight = textHeight; TextAlignment = textAlignment;
+        ColorFg = colorFg; ColorBg = colorBg;
     }
 
     void SetImage(cImage *image, cRect position) {
         ContentType = CT_Image;
-        Image = image;
         Position = position;
+        Image = image;
     }
 
     void SetRect(cRect position, tColor colorBg) {
@@ -148,11 +156,11 @@ class cComplexContent {
 
     tColor ColorBg;
 
-    bool FullFillBackground;
-    int DrawPortHeight;
-    int ScrollSize;
-    bool isShown;
-    bool isScrollingActive;
+    bool m_FullFillBackground;  // m_* for private variables
+    int m_DrawPortHeight;
+    int m_ScrollSize;
+    bool m_IsShown;
+    bool m_IsScrollingActive;
 
     cOsd *Osd;
 
@@ -160,12 +168,12 @@ class cComplexContent {
 
  public:
     cComplexContent(void);
-    cComplexContent(cOsd *osd, int scrollSize);
+    cComplexContent(cOsd *osd, int ScrollSize);
     ~cComplexContent();
 
     void SetOsd(cOsd *osd) { Osd = osd; }
     void SetPosition(cRect position) { Position = position; }
-    void SetScrollSize(int scrollSize) { ScrollSize = scrollSize; }
+    void SetScrollSize(int ScrollSize) { m_ScrollSize = ScrollSize; }
     void SetBGColor(tColor colorBg) { ColorBg = colorBg; }
     void CreatePixmaps(bool fullFillBackground);
 
@@ -184,7 +192,7 @@ class cComplexContent {
      int ScrollShown(void);
     bool Scroll(bool Up, bool Page);
     double ScrollbarSize(void);
-    void SetScrollingActive(bool active) { isScrollingActive = active; }
+    void SetScrollingActive(bool active) { m_IsScrollingActive = active; }
 
     int Height(void) { return Position.Height(); }
     int ContentHeight(bool Full);
@@ -193,6 +201,6 @@ class cComplexContent {
 
     int Top(void) { return Position.Top(); }
     void Draw();
-    bool IsShown(void) { return isShown; }
-    bool IsScrollingActive(void) { return isScrollingActive; }
+    bool IsShown(void) { return m_IsShown; }
+    bool IsScrollingActive(void) { return m_IsScrollingActive; }
 };

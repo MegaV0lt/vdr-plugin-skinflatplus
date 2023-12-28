@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
 #include <vdr/osd.h>
@@ -6,8 +13,8 @@
 
 #define MAX_IMAGE_CACHE     999
 #define LOGO_PRE_CACHE      200
-// Note: LOGO_PRE_CACHE is used twice one for displaychannel and one for menu
-// You must double the value for the real amount of pre cached logos
+//! Note: LOGO_PRE_CACHE is used twice one for displaychannel and one for menu
+//! You must double the value for the real amount of pre cached logos
 
 class cImageCache {
  private:
@@ -16,8 +23,8 @@ class cImageCache {
     int CacheWidth[MAX_IMAGE_CACHE];
     int CacheHeight[MAX_IMAGE_CACHE];
 
-    int InsertIndex;
-    bool Overflow;
+    int m_InsertIndex;  // Imagecache index
+    bool m_OverFlow;    // Set when cache is full
 
  public:
     cImageCache();
@@ -27,10 +34,9 @@ class cImageCache {
     void Clear(void);
     bool RemoveFromCache(std::string Name);
 
-    int getCacheCount(void) {
-      if (Overflow)
-         return MAX_IMAGE_CACHE;
-      return InsertIndex + 1;
+    int GetCacheCount(void) {
+      if (m_OverFlow) return MAX_IMAGE_CACHE;
+      return m_InsertIndex + 1;
     }
 
     cImage *GetImage(std::string Name, int Width, int Height);

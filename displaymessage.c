@@ -1,4 +1,11 @@
-#include "displaymessage.h"
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
+#include "./displaymessage.h"
 
 cFlatDisplayMessage::cFlatDisplayMessage(void) {
     CreateFullOsd();

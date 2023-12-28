@@ -1,3 +1,10 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #include "./baserender.h"
 
 #include <vdr/menu.h>
@@ -14,84 +21,72 @@
 #endif
 
 #include "./flat.h"
-#include "services/epgsearch.h"
 
 cFlatBaseRender::cFlatBaseRender(void) {
-    font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
-    fontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
-    fontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
-    topBarFontClock = NULL;
+    m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
+    m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
+    m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
+    m_TopBarFontClock = NULL;
 
-    fontHeight = font->Height();
-    fontSmlHeight = fontSml->Height();
-    fontFixedHeight = fontFixed->Height();
+    m_FontHeight = m_Font->Height();
+    m_FontSmlHeight = m_FontSml->Height();
+    m_FontFixedHeight = m_FontFixed->Height();
 
-    topBarTitle = "";
-    topBarTitleExtra1 = "";
-    topBarTitleExtra2 = "";
-    topBarLastDate = "";
-    topBarUpdateTitle = false;
-    topBarHeight = 0;
-    topBarExtraIconSet = false;
-    topBarMenuIcon = "";
-    topBarMenuIconSet = false;
-    topBarMenuIconRight = "";
-    topBarMenuIconRightSet = false;
-    topBarMenuLogo = "";
-    topBarMenuLogoSet = false;
+    m_TopBarTitle = "";
+    m_TopBarTitleExtra1 = "";
+    m_TopBarTitleExtra2 = "";
+    m_TopBarLastDate = "";
+    m_TopBarUpdateTitle = false;
+    m_TopBarHeight = 0;
+    m_TopBarExtraIconSet = false;
+    m_TopBarMenuIcon = "";
+    m_TopBarMenuIconSet = false;
+    m_TopBarMenuIconRight = "";
+    m_TopBarMenuIconRightSet = false;
+    m_TopBarMenuLogo = "";
+    m_TopBarMenuLogoSet = false;
 
-    marginItem = 5;
+    m_MarginItem = 5;
 
-    scrollBarWidth = Config.decorScrollBarSize;
+    m_ScrollBarWidth = Config.decorScrollBarSize;
 
-    buttonsHeight = 0;
-    buttonsDrawn = false;
+    m_ButtonsHeight = 0;
+    m_ButtonsDrawn = false;
 
     osd = NULL;
-    topBarPixmap = NULL;
-    buttonsPixmap = NULL;
-    messagePixmap = NULL;
-    messageIconPixmap = NULL;
-    contentPixmap = NULL;
-    contentEpgImagePixmap = NULL;
-    progressBarPixmap = NULL;
-    progressBarPixmapBg = NULL;
-    decorPixmap = NULL;
+    TopBarPixmap = NULL;
+    ButtonsPixmap = NULL;
+    MessagePixmap = NULL;
+    MessageIconPixmap = NULL;
+    // ContentPixmap = NULL;  // Unused?
+    // ContentEpgImagePixmap = NULL;  // Unused?
+    ProgressBarPixmap = NULL;
+    ProgressBarPixmapBg = NULL;
+    DecorPixmap = NULL;
 
     Config.ThemeCheckAndInit();
     Config.DecorCheckAndInit();
 }
 
 cFlatBaseRender::~cFlatBaseRender(void) {
-    delete font;
-    delete fontSml;
-    delete fontFixed;
-    if (topBarFontClock) delete topBarFontClock;
+    delete m_Font;
+    delete m_FontSml;
+    delete m_FontFixed;
+    if (m_TopBarFontClock) delete m_TopBarFontClock;
 
     if (osd) {
-        messageScroller.Clear();
-        if (topBarPixmap)
-            osd->DestroyPixmap(topBarPixmap);
-        if (buttonsPixmap)
-            osd->DestroyPixmap(buttonsPixmap);
-        if (messagePixmap)
-            osd->DestroyPixmap(messagePixmap);
-        if (messageIconPixmap)
-            osd->DestroyPixmap(messageIconPixmap);
-        if (contentPixmap)
-            osd->DestroyPixmap(contentPixmap);
-        if (progressBarPixmap)
-            osd->DestroyPixmap(progressBarPixmap);
-        if (progressBarPixmapBg)
-            osd->DestroyPixmap(progressBarPixmapBg);
-        if (decorPixmap)
-            osd->DestroyPixmap(decorPixmap);
-        if (topBarIconPixmap)
-            osd->DestroyPixmap(topBarIconPixmap);
-        if (topBarIconBGPixmap)
-            osd->DestroyPixmap(topBarIconBGPixmap);
-        if (contentEpgImagePixmap)
-            osd->DestroyPixmap(contentEpgImagePixmap);
+        MessageScroller.Clear();
+        osd->DestroyPixmap(TopBarPixmap);
+        osd->DestroyPixmap(TopBarIconPixmap);
+        osd->DestroyPixmap(TopBarIconBgPixmap);
+        osd->DestroyPixmap(ButtonsPixmap);
+        osd->DestroyPixmap(MessagePixmap);
+        osd->DestroyPixmap(MessageIconPixmap);
+        /* osd->DestroyPixmap(ContentPixmap); */  // Unused?
+        /* osd->DestroyPixmap(ContentEpgImagePixmap); */
+        osd->DestroyPixmap(ProgressBarPixmap);
+        osd->DestroyPixmap(ProgressBarPixmapBg);
+        osd->DestroyPixmap(DecorPixmap);
 
         delete osd;
     }
@@ -103,10 +98,10 @@ void cFlatBaseRender::CreateFullOsd(void) {
 }
 
 void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
-    osdLeft = left;
-    osdTop = top;
-    osdWidth = width;
-    osdHeight = height;
+    m_OsdLeft = left;
+    m_OsdTop = top;
+    m_OsdWidth = width;
+    m_OsdHeight = height;
 
     osd = cOsdProvider::NewOsd(left, top);
     if (osd) {
@@ -122,108 +117,108 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
 
 void cFlatBaseRender::TopBarCreate(void) {
     int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);
-    topBarFont = cFont::CreateFont(Setup.FontOsd, fs);
-    topBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
-    topBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
-    topBarFontHeight = topBarFont->Height();
-    topBarFontSmlHeight = topBarFontSml->Height();
-    topBarFontClockHeight = topBarFontClock->Height();
+    m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
+    m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
+    m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
+    m_TopBarFontHeight = m_TopBarFont->Height();
+    m_TopBarFontSmlHeight = m_TopBarFontSml->Height();
+    m_TopBarFontClockHeight = m_TopBarFontClock->Height();
 
-    if (topBarFontHeight > topBarFontSmlHeight * 2)
-        topBarHeight = topBarFontHeight;
+    if (m_TopBarFontHeight > m_TopBarFontSmlHeight * 2)
+        m_TopBarHeight = m_TopBarFontHeight;
     else
-        topBarHeight = topBarFontSmlHeight * 2;
+        m_TopBarHeight = m_TopBarFontSmlHeight * 2;
 
-    topBarPixmap = CreatePixmap(osd, "topBarPixmap", 1,
+    TopBarPixmap = CreatePixmap(osd, "TopBarPixmap", 1,
                                 cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                      osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-    // dsyslog("flatPlus: topBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
-    topBarIconBGPixmap = CreatePixmap(osd, "topBarIconBGPixmap", 2,
+                                      m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+    // dsyslog("flatPlus: TopBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
+    TopBarIconBgPixmap = CreatePixmap(osd, "TopBarIconBgPixmap", 2,
                                       cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                            osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-    // dsyslog("flatPlus: topBarIconBGPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
-    topBarIconPixmap = CreatePixmap(osd, "topBarIconPixmap", 3,
+                                            m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+    // dsyslog("flatPlus: TopBarIconBgPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
+    TopBarIconPixmap = CreatePixmap(osd, "TopBarIconPixmap", 3,
                                     cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                          osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight));
-    // dsyslog("flatPlus: topBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, osdWidth - Config.decorBorderTopBarSize*2, topBarHeight);
-    PixmapFill(topBarPixmap, clrTransparent);
-    PixmapFill(topBarIconBGPixmap, clrTransparent);
-    PixmapFill(topBarIconPixmap, clrTransparent);
+                                          m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+    // dsyslog("flatPlus: TopBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
+    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
+    PixmapFill(TopBarPixmap, clrTransparent);
+    PixmapFill(TopBarIconBgPixmap, clrTransparent);
+    PixmapFill(TopBarIconPixmap, clrTransparent);
 
     if (Config.DiskUsageShow == 3)
         TopBarEnableDiskUsage();
 }
 
 void cFlatBaseRender::TopBarSetTitle(cString title) {
-    topBarTitle = title;
-    topBarTitleExtra1 = "";
-    topBarTitleExtra2 = "";
-    topBarExtraIcon = "";
-    topBarMenuIcon = "";
-    topBarUpdateTitle = true;
-    topBarExtraIconSet = false;
-    topBarMenuIconSet = false;
-    topBarMenuLogo = "";
-    topBarMenuLogoSet = false;
+    m_TopBarTitle = title;
+    m_TopBarTitleExtra1 = "";
+    m_TopBarTitleExtra2 = "";
+    m_TopBarExtraIcon = "";
+    m_TopBarMenuIcon = "";
+    m_TopBarUpdateTitle = true;
+    m_TopBarExtraIconSet = false;
+    m_TopBarMenuIconSet = false;
+    m_TopBarMenuLogo = "";
+    m_TopBarMenuLogoSet = false;
     if (Config.DiskUsageShow == 3)
         TopBarEnableDiskUsage();
 }
 
 void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
-    topBarTitle = title;
-    topBarUpdateTitle = true;
+    m_TopBarTitle = title;
+    m_TopBarUpdateTitle = true;
     if (Config.DiskUsageShow == 3)
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitleExtra(cString extra1, cString extra2) {
-    topBarTitleExtra1 = extra1;
-    topBarTitleExtra2 = extra2;
-    topBarUpdateTitle = true;
+void cFlatBaseRender::TopBarSetTitleExtra(cString Extra1, cString Extra2) {
+    m_TopBarTitleExtra1 = Extra1;
+    m_TopBarTitleExtra2 = Extra2;
+    m_TopBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarSetExtraIcon(cString icon) {
     if (!strcmp(*icon, "")) return;
 
-    topBarExtraIcon = icon;
-    topBarExtraIconSet = true;
-    topBarUpdateTitle = true;
+    m_TopBarExtraIcon = icon;
+    m_TopBarExtraIconSet = true;
+    m_TopBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarSetMenuIcon(cString icon) {
     if (!strcmp(*icon, "")) return;
 
-    topBarMenuIcon = icon;
-    topBarMenuIconSet = true;
-    topBarUpdateTitle = true;
+    m_TopBarMenuIcon = icon;
+    m_TopBarMenuIconSet = true;
+    m_TopBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarSetMenuIconRight(cString icon) {
     if (!strcmp(*icon, "")) return;
 
-    topBarMenuIconRight = icon;
-    topBarMenuIconRightSet = true;
-    topBarUpdateTitle = true;
+    m_TopBarMenuIconRight = icon;
+    m_TopBarMenuIconRightSet = true;
+    m_TopBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarClearMenuIconRight(void) {
-    topBarMenuIconRight = "";
-    topBarMenuIconRightSet = false;
+    m_TopBarMenuIconRight = "";
+    m_TopBarMenuIconRightSet = false;
 }
 
 void cFlatBaseRender::TopBarSetMenuLogo(cString icon) {
     if (!strcmp(*icon, "")) return;
 
-    topBarMenuLogo = icon;
-    topBarMenuLogoSet = true;
-    topBarUpdateTitle = true;
+    m_TopBarMenuLogo = icon;
+    m_TopBarMenuLogoSet = true;
+    m_TopBarUpdateTitle = true;
 }
 
 void cFlatBaseRender::TopBarEnableDiskUsage(void) {
-    // cVideoDiskUsage::HasChanged(VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
+    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     int DiskUsagePercent = cVideoDiskUsage::UsedPercent();  // Used %
     int DiskFreePercent = (100 - DiskUsagePercent);         // Free %
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
@@ -233,683 +228,681 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
-    cString iconName("");
-    cString extra1(""), extra2("");
+    cString IconName("");
+    cString Extra1(""), Extra2("");
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
         if (Config.DiskUsageShort == false) {     // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
+            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
+                Extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
                                           FreeMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
-            extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
+            Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
+            Extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
         }
         switch (DiskFreePercent) {  // Show free space
-        case 0 ... 2: iconName = "chart0b"; break;  // < 2% (chart1b in red)
-        case 3 ... 4: iconName = "chart1b"; break;  // 3,125 (4)
-        case 5 ... 6: iconName = "chart2b"; break;  // 6,25
-        case 7 ... 9: iconName = "chart3b"; break;  // 9,375
-        case 10 ... 13: iconName = "chart4b"; break;  // 12,5
-        case 14 ... 16: iconName = "chart5b"; break;  // 15,625
-        case 17 ... 19: iconName = "chart6b"; break;  // 18,75
-        case 20 ... 22: iconName = "chart7b"; break;  // 21,875
-        case 23 ... 25: iconName = "chart8b"; break;  // 25
-        case 26 ... 28: iconName = "chart9b"; break;  // 28,125
-        case 29 ... 31: iconName = "chart10b"; break;  // 31,25
-        case 32 ... 34: iconName = "chart11b"; break;  // 34,375
-        case 35 ... 38: iconName = "chart12b"; break;  // 37,5
-        case 39 ... 41: iconName = "chart13b"; break;  // 40,625
-        case 42 ... 44: iconName = "chart14b"; break;  // 43,75
-        case 45 ... 47: iconName = "chart15b"; break;  // 46,875
-        case 48 ... 50: iconName = "chart16b"; break;  // 50
-        case 51 ... 53: iconName = "chart17b"; break;  // 53,125
-        case 54 ... 56: iconName = "chart18b"; break;  // 56,25
-        case 57 ... 59: iconName = "chart19b"; break;  // 59,375
-        case 60 ... 63: iconName = "chart20b"; break;  // 62,5
-        case 64 ... 66: iconName = "chart21b"; break;  // 65,625
-        case 67 ... 69: iconName = "chart22b"; break;  // 68,75
-        case 70 ... 72: iconName = "chart23b"; break;  // 71,875
-        case 73 ... 75: iconName = "chart24b"; break;  // 75
-        case 76 ... 78: iconName = "chart25b"; break;  // 78,125
-        case 79 ... 81: iconName = "chart26b"; break;  // 81,25
-        case 82 ... 84: iconName = "chart27b"; break;  // 84,375
-        case 85 ... 88: iconName = "chart28b"; break;  // 87,5
-        case 89 ... 91: iconName = "chart29b"; break;  // 90,625
-        case 92 ... 94: iconName = "chart30b"; break;  // 93,75
-        case 95 ... 100: iconName = "chart31b"; break;  // 96,875 - 100
+        case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
+        case 3 ... 4: IconName = "chart1b"; break;  // 3,125 (4)
+        case 5 ... 6: IconName = "chart2b"; break;  // 6,25
+        case 7 ... 9: IconName = "chart3b"; break;  // 9,375
+        case 10 ... 13: IconName = "chart4b"; break;  // 12,5
+        case 14 ... 16: IconName = "chart5b"; break;  // 15,625
+        case 17 ... 19: IconName = "chart6b"; break;  // 18,75
+        case 20 ... 22: IconName = "chart7b"; break;  // 21,875
+        case 23 ... 25: IconName = "chart8b"; break;  // 25
+        case 26 ... 28: IconName = "chart9b"; break;  // 28,125
+        case 29 ... 31: IconName = "chart10b"; break;  // 31,25
+        case 32 ... 34: IconName = "chart11b"; break;  // 34,375
+        case 35 ... 38: IconName = "chart12b"; break;  // 37,5
+        case 39 ... 41: IconName = "chart13b"; break;  // 40,625
+        case 42 ... 44: IconName = "chart14b"; break;  // 43,75
+        case 45 ... 47: IconName = "chart15b"; break;  // 46,875
+        case 48 ... 50: IconName = "chart16b"; break;  // 50
+        case 51 ... 53: IconName = "chart17b"; break;  // 53,125
+        case 54 ... 56: IconName = "chart18b"; break;  // 56,25
+        case 57 ... 59: IconName = "chart19b"; break;  // 59,375
+        case 60 ... 63: IconName = "chart20b"; break;  // 62,5
+        case 64 ... 66: IconName = "chart21b"; break;  // 65,625
+        case 67 ... 69: IconName = "chart22b"; break;  // 68,75
+        case 70 ... 72: IconName = "chart23b"; break;  // 71,875
+        case 73 ... 75: IconName = "chart24b"; break;  // 75
+        case 76 ... 78: IconName = "chart25b"; break;  // 78,125
+        case 79 ... 81: IconName = "chart26b"; break;  // 81,25
+        case 82 ... 84: IconName = "chart27b"; break;  // 84,375
+        case 85 ... 88: IconName = "chart28b"; break;  // 87,5
+        case 89 ... 91: IconName = "chart29b"; break;  // 90,625
+        case 92 ... 94: IconName = "chart30b"; break;  // 93,75
+        case 95 ... 100: IconName = "chart31b"; break;  // 96,875 - 100
         }
     } else {  // Show in occupied mode
         double OccupiedGB = AllGB - FreeGB;
         int OccupiedMinutes = AllMinutes - FreeMinutes;
         if (Config.DiskUsageShort == false) {  // Long format
-            extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                extra2 =
+                Extra2 =
                     cString::sprintf("%.1f GB ~%02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
-            extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-            extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
+            Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+            Extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
         switch (DiskUsagePercent) {  // show used space
-        case 0 ... 3: iconName = "chart1"; break;  // 3,125
-        case 4 ... 6: iconName = "chart2"; break;  // 6,25
-        case 7 ... 9: iconName = "chart3"; break;  // 9,375
-        case 10 ... 13: iconName = "chart4"; break;  // 12,5
-        case 14 ... 16: iconName = "chart5"; break;  // 15,625
-        case 17 ... 19: iconName = "chart6"; break;  // 18,75
-        case 20 ... 22: iconName = "chart7"; break;  // 21,875
-        case 23 ... 25: iconName = "chart8"; break;  // 25
-        case 26 ... 28: iconName = "chart9"; break;  // 28,125
-        case 29 ... 31: iconName = "chart10"; break;  // 31,25
-        case 32 ... 34: iconName = "chart11"; break;  // 34,375
-        case 35 ... 38: iconName = "chart12"; break;  // 37,5
-        case 39 ... 41: iconName = "chart13"; break;  // 40,625
-        case 42 ... 44: iconName = "chart14"; break;  // 43,75
-        case 45 ... 47: iconName = "chart15"; break;  // 46,875
-        case 48 ... 50: iconName = "chart16"; break;  // 50
-        case 51 ... 53: iconName = "chart17"; break;  // 53,125
-        case 54 ... 56: iconName = "chart18"; break;  // 56,25
-        case 57 ... 59: iconName = "chart19"; break;  // 59,375
-        case 60 ... 63: iconName = "chart20"; break;  // 62,5
-        case 64 ... 66: iconName = "chart21"; break;  // 65,625
-        case 67 ... 69: iconName = "chart22"; break;  // 68,75
-        case 70 ... 72: iconName = "chart23"; break;  // 71,875
-        case 73 ... 75: iconName = "chart24"; break;  // 75
-        case 76 ... 78: iconName = "chart25"; break;  // 78,125
-        case 79 ... 81: iconName = "chart26"; break;  // 81,25
-        case 82 ... 84: iconName = "chart27"; break;  // 84,375
-        case 85 ... 88: iconName = "chart28"; break;  // 87,5
-        case 89 ... 91: iconName = "chart29"; break;  // 90,625
-        case 92 ... 94: iconName = "chart30"; break;  // 93,75
-        case 95 ... 97: iconName = "chart31"; break;  // 96,875
-        case 98 ... 100: iconName = "chart32"; break;  // > 98% (chart31 in red)
+        case 0 ... 3: IconName = "chart1"; break;  // 3,125
+        case 4 ... 6: IconName = "chart2"; break;  // 6,25
+        case 7 ... 9: IconName = "chart3"; break;  // 9,375
+        case 10 ... 13: IconName = "chart4"; break;  // 12,5
+        case 14 ... 16: IconName = "chart5"; break;  // 15,625
+        case 17 ... 19: IconName = "chart6"; break;  // 18,75
+        case 20 ... 22: IconName = "chart7"; break;  // 21,875
+        case 23 ... 25: IconName = "chart8"; break;  // 25
+        case 26 ... 28: IconName = "chart9"; break;  // 28,125
+        case 29 ... 31: IconName = "chart10"; break;  // 31,25
+        case 32 ... 34: IconName = "chart11"; break;  // 34,375
+        case 35 ... 38: IconName = "chart12"; break;  // 37,5
+        case 39 ... 41: IconName = "chart13"; break;  // 40,625
+        case 42 ... 44: IconName = "chart14"; break;  // 43,75
+        case 45 ... 47: IconName = "chart15"; break;  // 46,875
+        case 48 ... 50: IconName = "chart16"; break;  // 50
+        case 51 ... 53: IconName = "chart17"; break;  // 53,125
+        case 54 ... 56: IconName = "chart18"; break;  // 56,25
+        case 57 ... 59: IconName = "chart19"; break;  // 59,375
+        case 60 ... 63: IconName = "chart20"; break;  // 62,5
+        case 64 ... 66: IconName = "chart21"; break;  // 65,625
+        case 67 ... 69: IconName = "chart22"; break;  // 68,75
+        case 70 ... 72: IconName = "chart23"; break;  // 71,875
+        case 73 ... 75: IconName = "chart24"; break;  // 75
+        case 76 ... 78: IconName = "chart25"; break;  // 78,125
+        case 79 ... 81: IconName = "chart26"; break;  // 81,25
+        case 82 ... 84: IconName = "chart27"; break;  // 84,375
+        case 85 ... 88: IconName = "chart28"; break;  // 87,5
+        case 89 ... 91: IconName = "chart29"; break;  // 90,625
+        case 92 ... 94: IconName = "chart30"; break;  // 93,75
+        case 95 ... 97: IconName = "chart31"; break;  // 96,875
+        case 98 ... 100: IconName = "chart32"; break;  // > 98% (chart31 in red)
         }
     }
-    TopBarSetTitleExtra(*extra1, *extra2);
-    TopBarSetExtraIcon(*iconName);
+    TopBarSetTitleExtra(*Extra1, *Extra2);
+    TopBarSetExtraIcon(*IconName);
 }
 // Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
-    cString curDate = DayDateTime();
-    int TopBarWidth = osdWidth - Config.decorBorderTopBarSize * 2;
+    if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
+        return;
+
+    cString Buffer(""), CurDate = DayDateTime();
+    int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
     int MenuIconWidth {0};
 
-    if (strcmp(curDate, topBarLastDate) || topBarUpdateTitle) {
-        topBarUpdateTitle = false;
-        topBarLastDate = curDate;
+    if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
+        m_TopBarUpdateTitle = false;
+        m_TopBarLastDate = CurDate;
 
-        int fontTop = (topBarHeight - topBarFontHeight) / 2;
-        int fontSmlTop = (topBarHeight - topBarFontSmlHeight * 2) / 2;
-        int fontClockTop = (topBarHeight - topBarFontClockHeight) / 2;
+        int FontTop = (m_TopBarHeight - m_TopBarFontHeight) / 2;
+        int FontSmlTop = (m_TopBarHeight - m_TopBarFontSmlHeight * 2) / 2;
+        int FontClockTop = (m_TopBarHeight - m_TopBarFontClockHeight) / 2;
 
-        PixmapFill(topBarPixmap, Theme.Color(clrTopBarBg));
-        PixmapFill(topBarIconPixmap, clrTransparent);
-        PixmapFill(topBarIconBGPixmap, clrTransparent);
+        PixmapFill(TopBarPixmap, Theme.Color(clrTopBarBg));
+        PixmapFill(TopBarIconPixmap, clrTransparent);
+        PixmapFill(TopBarIconBgPixmap, clrTransparent);
 
-        cImage *img = NULL;
-        if (topBarMenuIconSet && Config.TopBarMenuIconShow) {
-            int IconLeft = marginItem;
-            img = imgLoader.LoadIcon(*topBarMenuIcon, 999, topBarHeight - marginItem * 2);
+        cImage *img {nullptr};
+        if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
+            int IconLeft = m_MarginItem;
+            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, 999, m_TopBarHeight - m_MarginItem * 2);
             if (img) {
-                int iconTop = (topBarHeight / 2 - img->Height() / 2);
-                topBarIconPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
-                MenuIconWidth = img->Width() + marginItem * 2;
+                int IconTop = (m_TopBarHeight / 2 - img->Height() / 2);
+                TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                MenuIconWidth = img->Width() + m_MarginItem * 2;
             }
         }
 
-        if (topBarMenuLogoSet && Config.TopBarMenuIconShow) {
-            PixmapFill(topBarIconPixmap, clrTransparent);
-            int IconLeft = marginItem;
-            int imageBGHeight = topBarHeight - marginItem * 2;
-            int imageBGWidth = imageBGHeight * 1.34;
-            int iconTop {0};
+        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {
+            PixmapFill(TopBarIconPixmap, clrTransparent);
+            int IconLeft = m_MarginItem;
+            int ImageBGHeight = m_TopBarHeight - m_MarginItem * 2;
+            int ImageBGWidth = ImageBGHeight * 1.34;
+            int IconTop {0};
 
-            img = imgLoader.LoadIcon("logo_background", imageBGWidth, imageBGHeight);
+            img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
             if (img) {
-                imageBGHeight = img->Height();
-                imageBGWidth = img->Width();
-                iconTop = (topBarHeight / 2 - imageBGHeight / 2);
-                topBarIconBGPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
+                ImageBGHeight = img->Height();
+                ImageBGWidth = img->Width();
+                IconTop = (m_TopBarHeight / 2 - ImageBGHeight / 2);
+                TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
             }
 
-            img = imgLoader.LoadLogo(*topBarMenuLogo, imageBGWidth - 4, imageBGHeight - 4);
+            img = ImgLoader.LoadLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
             if (img) {
-                iconTop += (imageBGHeight - img->Height()) / 2;
-                IconLeft += (imageBGWidth - img->Width()) / 2;
-                topBarIconPixmap->DrawImage(cPoint(IconLeft, iconTop), *img);
+                IconTop += (ImageBGHeight - img->Height()) / 2;
+                IconLeft += (ImageBGWidth - img->Width()) / 2;
+                TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
             }
-            MenuIconWidth = imageBGWidth + marginItem * 2;
+            MenuIconWidth = ImageBGWidth + m_MarginItem * 2;
         }
-        int titleLeft = MenuIconWidth + marginItem * 2;
+        int TitleLeft = MenuIconWidth + m_MarginItem * 2;
 
         time_t t = time(NULL);
         cString time = TimeString(t);
-        cString time2 = cString::sprintf("%s %s", *time, tr("clock"));
+        Buffer = cString::sprintf("%s %s", *time, tr("clock"));
         if (Config.TopBarHideClockText)
-            time2 = cString::sprintf("%s", *time);
+            Buffer = cString::sprintf("%s", *time);
 
-        int timeWidth = topBarFontClock->Width(*time2) + marginItem * 2;
-        int Right = TopBarWidth - timeWidth;
-        topBarPixmap->DrawText(cPoint(Right, fontClockTop), *time2, Theme.Color(clrTopBarTimeFont),
-                               Theme.Color(clrTopBarBg), topBarFontClock);
+        int TimeWidth = m_TopBarFontClock->Width(*Buffer) + m_MarginItem * 2;
+        int Right = TopBarWidth - TimeWidth;
+        TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
         cString weekday = WeekDayNameFull(t);
-        int weekdayWidth = topBarFontSml->Width(*weekday);
+        int WeekdayWidth = m_TopBarFontSml->Width(*weekday);
 
         cString date = ShortDateString(t);
-        int dateWidth = topBarFontSml->Width(*date);
+        int DateWidth = m_TopBarFontSml->Width(*date);
 
-        Right = TopBarWidth - timeWidth - std::max(weekdayWidth, dateWidth) - marginItem;
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), topBarFontSml, std::max(weekdayWidth, dateWidth), 0, taRight);
+        Right = TopBarWidth - TimeWidth - std::max(WeekdayWidth, DateWidth) - m_MarginItem;
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
+                               taRight);
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop + m_TopBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
+                               taRight);
 
-        int middleWidth {0};
-        int numConflicts {0};
-        cImage *imgCon = NULL, *imgRec = NULL;
+        int MiddleWidth {0}, NumConflicts {0};
+        cImage *ImgCon {nullptr}, *ImgRec {nullptr};
         if (Config.TopBarRecConflictsShow) {
-            cPlugin *p = cPluginManager::GetPlugin("epgsearch");
-            if (p) {
-                Epgsearch_lastconflictinfo_v1_0 *serviceData = new Epgsearch_lastconflictinfo_v1_0;
-                if (serviceData) {
-                    serviceData->nextConflict = 0;
-                    serviceData->relevantConflicts = 0;
-                    serviceData->totalConflicts = 0;
-                    p->Service("Epgsearch-lastconflictinfo-v1.0", serviceData);
-                    if (serviceData->relevantConflicts > 0) {
-                        numConflicts = serviceData->relevantConflicts;
-                    }
-                    delete serviceData;
-                }
-            }
-            if (numConflicts) {
-                if (numConflicts < Config.TopBarRecConflictsHigh)
-                    imgCon = imgLoader.LoadIcon("topbar_timerconflict_low", topBarFontHeight - marginItem * 2,
-                                                topBarFontHeight - marginItem * 2);
+            NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
+            if (NumConflicts) {
+                if (NumConflicts < Config.TopBarRecConflictsHigh)
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", m_TopBarFontHeight - m_MarginItem * 2,
+                                                m_TopBarFontHeight - m_MarginItem * 2);
                 else
-                    imgCon = imgLoader.LoadIcon("topbar_timerconflict_high", topBarFontHeight - marginItem * 2,
-                                                topBarFontHeight - marginItem * 2);
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", m_TopBarFontHeight - m_MarginItem * 2,
+                                                m_TopBarFontHeight - m_MarginItem * 2);
 
-                if (imgCon) {
-                    cString Con = cString::sprintf("%d", numConflicts);
-                    Right -= imgCon->Width() + topBarFontSml->Width(*Con) + marginItem;
-                    middleWidth += imgCon->Width() + topBarFontSml->Width(*Con) + marginItem;
+                if (ImgCon) {
+                    Buffer = cString::sprintf("%d", NumConflicts);
+                    Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                    MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
             }
-        }
+        }  // Config.TopBarRecConflictsShow
 
-        int numRec {0};
+        int NumRec {0};
         if (Config.TopBarRecordingShow) {
 // Look for timers
 #if VDRVERSNUM >= 20301
-            auto recCounterFuture = std::async([&numRec]() {
+            auto recCounterFuture = std::async([&NumRec]() {
                 LOCK_TIMERS_READ;
                 for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
                     if (ti->HasFlags(tfRecording))
-                        ++numRec;
+                        ++NumRec;
                 }
             });
             recCounterFuture.get();
 #else
             for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti))
                 if (ti->HasFlags(tfRecording))
-                    ++numRec;
+                    ++NumRec;
 #endif
-            if (numRec) {
-                imgRec = imgLoader.LoadIcon("topbar_timer", topBarFontHeight - marginItem * 2,
-                                            topBarFontHeight - marginItem * 2);
-                if (imgRec) {
-                    cString Rec = cString::sprintf("%d", numRec);
-                    Right -= imgRec->Width() + topBarFontSml->Width(*Rec) + marginItem;
-                    middleWidth += imgRec->Width() + topBarFontSml->Width(*Rec) + marginItem;
+            if (NumRec) {
+                ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem * 2,
+                                            m_TopBarFontHeight - m_MarginItem * 2);
+                if (ImgRec) {
+                    Buffer = cString::sprintf("%d", NumRec);
+                    Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                    MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
             }
-        }
+        }  // Config.TopBarRecordingShow
 
-        if (topBarExtraIconSet) {
-            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+        if (m_TopBarExtraIconSet) {
+            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
             if (img) {
-                Right -= img->Width() + marginItem;
-                middleWidth += img->Width() + marginItem;
+                Right -= img->Width() + m_MarginItem;
+                MiddleWidth += img->Width() + m_MarginItem;
             }
         }
-        int topBarMenuIconRightWidth {0};
-        int topBarMenuIconRightLeft {0};
-        int titleWidth = topBarFont->Width(*topBarTitle);
-        if (topBarMenuIconRightSet) {
-            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+        int TopBarMenuIconRightWidth {0};
+        int TopBarMenuIconRightLeft {0};
+        int TitleWidth = m_TopBarFont->Width(*m_TopBarTitle);
+        if (m_TopBarMenuIconRightSet) {
+            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                topBarMenuIconRightWidth = img->Width() + marginItem * 3;
-                titleWidth += topBarMenuIconRightWidth;
+                TopBarMenuIconRightWidth = img->Width() + m_MarginItem * 3;
+                TitleWidth += TopBarMenuIconRightWidth;
             }
         }
 
-        int extra1Width = topBarFontSml->Width(*topBarTitleExtra1);
-        int extra2Width = topBarFontSml->Width(*topBarTitleExtra2);
-        int extraMaxWidth = std::max(extra1Width, extra2Width);
-        middleWidth += extraMaxWidth;
-        Right -= extraMaxWidth + marginItem;
+        int Extra1Width = m_TopBarFontSml->Width(*m_TopBarTitleExtra1);
+        int Extra2Width = m_TopBarFontSml->Width(*m_TopBarTitleExtra2);
+        int ExtraMaxWidth = std::max(Extra1Width, Extra2Width);
+        MiddleWidth += ExtraMaxWidth;
+        Right -= ExtraMaxWidth + m_MarginItem;
 
-        if ((titleLeft + titleWidth) < (TopBarWidth / 2 - middleWidth / 2)) {
-            Right = TopBarWidth / 2 - middleWidth / 2;
-        } else if ((titleLeft + titleWidth) < Right) {
-            Right = titleLeft + titleWidth + marginItem;
+        if ((TitleLeft + TitleWidth) < (TopBarWidth / 2 - MiddleWidth / 2)) {
+            Right = TopBarWidth / 2 - MiddleWidth / 2;
+        } else if ((TitleLeft + TitleWidth) < Right) {
+            Right = TitleLeft + TitleWidth + m_MarginItem;
         }
 
-        int titleMaxWidth = Right - titleLeft - marginItem;
-        if (titleWidth + topBarMenuIconRightWidth > titleMaxWidth) {
-            topBarMenuIconRightLeft = titleMaxWidth + marginItem * 2;
-            titleMaxWidth -= topBarMenuIconRightWidth;
+        int TitleMaxWidth = Right - TitleLeft - m_MarginItem;
+        if (TitleWidth + TopBarMenuIconRightWidth > TitleMaxWidth) {
+            TopBarMenuIconRightLeft = TitleMaxWidth + m_MarginItem * 2;
+            TitleMaxWidth -= TopBarMenuIconRightWidth;
         } else {
-            topBarMenuIconRightLeft = titleLeft + titleWidth + marginItem * 2;
+            TopBarMenuIconRightLeft = TitleLeft + TitleWidth + m_MarginItem * 2;
         }
 
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop), *topBarTitleExtra1, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth, 0, taRight);
-        topBarPixmap->DrawText(cPoint(Right, fontSmlTop + topBarFontSmlHeight), *topBarTitleExtra2,
-                               Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), topBarFontSml, extraMaxWidth,
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *m_TopBarTitleExtra1, Theme.Color(clrTopBarDateFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, ExtraMaxWidth, 0, taRight);
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop + m_TopBarFontSmlHeight), *m_TopBarTitleExtra2,
+                               Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), m_TopBarFontSml, ExtraMaxWidth,
                                0, taRight);
-        Right += extraMaxWidth + marginItem;
+        Right += ExtraMaxWidth + m_MarginItem;
 
-        if (topBarExtraIconSet) {
-            img = imgLoader.LoadIcon(*topBarExtraIcon, 999, topBarHeight);
+        if (m_TopBarExtraIconSet) {
+            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
             if (img) {
-                int iconTop {0};
-                topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *img);
-                Right += img->Width() + marginItem;
+                int IconTop {0};
+                TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *img);
+                Right += img->Width() + m_MarginItem;
             }
         }
 
-        if (numRec && imgRec) {
-            int iconTop = (topBarFontHeight - imgRec->Height()) / 2;
-            topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgRec);
-            Right += imgRec->Width();
-            cString RecNum = cString::sprintf("%d", numRec);
-            topBarPixmap->DrawText(cPoint(Right, fontSmlTop), RecNum, Theme.Color(clrTopBarRecordingActiveFg),
-                                   Theme.Color(clrTopBarRecordingActiveBg), topBarFontSml);
-            Right += topBarFontSml->Width(*RecNum) + marginItem;
+        if (NumRec && ImgRec) {
+            int IconTop = (m_TopBarFontHeight - ImgRec->Height()) / 2;
+            TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgRec);
+            Right += ImgRec->Width();
+            Buffer = cString::sprintf("%d", NumRec);
+            TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarRecordingActiveFg),
+                                   Theme.Color(clrTopBarRecordingActiveBg), m_TopBarFontSml);
+            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (numConflicts && imgCon) {
-            int iconTop = (topBarFontHeight - imgCon->Height()) / 2;
-            topBarIconPixmap->DrawImage(cPoint(Right, iconTop), *imgCon);
-            Right += imgCon->Width();
+        if (NumConflicts && ImgCon) {
+            int IconTop = (m_TopBarFontHeight - ImgCon->Height()) / 2;
+            TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgCon);
+            Right += ImgCon->Width();
 
-            cString ConNum = cString::sprintf("%d", numConflicts);
-            if (numConflicts < Config.TopBarRecConflictsHigh)
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), ConNum, Theme.Color(clrTopBarConflictLowFg),
-                                       Theme.Color(clrTopBarConflictLowBg), topBarFontSml);
+            Buffer = cString::sprintf("%d", NumConflicts);
+            if (NumConflicts < Config.TopBarRecConflictsHigh)
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictLowFg),
+                                       Theme.Color(clrTopBarConflictLowBg), m_TopBarFontSml);
             else
-                topBarPixmap->DrawText(cPoint(Right, fontSmlTop), ConNum, Theme.Color(clrTopBarConflictHighFg),
-                                       Theme.Color(clrTopBarConflictHighBg), topBarFontSml);
-            Right += topBarFontSml->Width(*ConNum) + marginItem;
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictHighFg),
+                                       Theme.Color(clrTopBarConflictHighBg), m_TopBarFontSml);
+            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (topBarMenuIconRightSet) {
-            img = imgLoader.LoadIcon(*topBarMenuIconRight, 999, topBarHeight);
+        if (m_TopBarMenuIconRightSet) {
+            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                int iconTop = (topBarHeight / 2 - img->Height() / 2);
-                topBarIconPixmap->DrawImage(cPoint(topBarMenuIconRightLeft, iconTop), *img);
+                int IconTop = (m_TopBarHeight / 2 - img->Height() / 2);
+                TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, IconTop), *img);
             }
         }
-        topBarPixmap->DrawText(cPoint(titleLeft, fontTop), *topBarTitle, Theme.Color(clrTopBarFont),
-                               Theme.Color(clrTopBarBg), topBarFont, titleMaxWidth);
+        TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFont, TitleMaxWidth);
 
         DecorBorderDraw(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                        osdWidth - Config.decorBorderTopBarSize * 2, topBarHeight, Config.decorBorderTopBarSize,
+                        m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight, Config.decorBorderTopBarSize,
                         Config.decorBorderTopBarType, Config.decorBorderTopBarFg, Config.decorBorderTopBarBg);
     }
 }
 
 void cFlatBaseRender::ButtonsCreate(void) {
-    marginButtonColor = 10;
-    buttonColorHeight = 8;
-    buttonsHeight = fontHeight + marginButtonColor + buttonColorHeight;
-    buttonsWidth = osdWidth;
-    buttonsTop = osdHeight - buttonsHeight - Config.decorBorderButtonSize;
+    m_MarginButtonColor = 10;
+    m_ButtonColorHeight = 8;
+    m_ButtonsHeight = m_FontHeight + m_MarginButtonColor + m_ButtonColorHeight;
+    m_ButtonsWidth = m_OsdWidth;
+    m_ButtonsTop = m_OsdHeight - m_ButtonsHeight - Config.decorBorderButtonSize;
 
-    buttonsPixmap = CreatePixmap(osd, "buttonsPixmap", 1,
-                                 cRect(Config.decorBorderButtonSize, buttonsTop,
-                                       buttonsWidth - Config.decorBorderButtonSize * 2, buttonsHeight));
-    PixmapFill(buttonsPixmap, clrTransparent);
-    // dsyslog("flatPlus: buttonsPixmap left: %d top: %d width: %d height: %d",
-    //         Config.decorBorderButtonSize, buttonsTop, buttonsWidth - Config.decorBorderButtonSize*2, buttonsHeight);
+    ButtonsPixmap = CreatePixmap(osd, "ButtonsPixmap", 1,
+                                 cRect(Config.decorBorderButtonSize, m_ButtonsTop,
+                                       m_ButtonsWidth - Config.decorBorderButtonSize * 2, m_ButtonsHeight));
+    PixmapFill(ButtonsPixmap, clrTransparent);
+    // dsyslog("flatPlus: ButtonsPixmap left: %d top: %d width: %d height: %d",
+    //    Config.decorBorderButtonSize, m_ButtonsTop, m_ButtonsWidth - Config.decorBorderButtonSize*2, m_ButtonsHeight);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
-    int WidthMargin = buttonsWidth - marginItem * 3;
-    int buttonWidth = (WidthMargin / 4) - Config.decorBorderButtonSize * 2;
+    if (!ButtonsPixmap) return;
 
-    PixmapFill(buttonsPixmap, clrTransparent);
+    int WidthMargin = m_ButtonsWidth - m_MarginItem * 3;
+    int ButtonWidth = (WidthMargin / 4) - Config.decorBorderButtonSize * 2;
+
+    PixmapFill(ButtonsPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderButton);
 
-    buttonsDrawn = false;
+    m_ButtonsDrawn = false;
 
     int x {0};
     if (!(!Config.ButtonsShowEmpty && !Red)) {
         switch (Setup.ColorKey0) {
         case 0:
-            buttonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
-            buttonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
-            buttonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
-            buttonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
-        DecorBorderDraw(x + Config.decorBorderButtonSize, buttonsTop, buttonWidth, buttonsHeight,
+        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
                         Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
                         Config.decorBorderButtonBg, BorderButton);
-        buttonsDrawn = true;
+        m_ButtonsDrawn = true;
     }
 
-    x += buttonWidth + marginItem + Config.decorBorderButtonSize * 2;
+    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
     if (!(!Config.ButtonsShowEmpty && !Green)) {
         switch (Setup.ColorKey1) {
         case 0:
-            buttonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
-            buttonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
-            buttonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
-            buttonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, buttonsTop, buttonWidth, buttonsHeight,
+        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
                         Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
                         Config.decorBorderButtonBg, BorderButton);
-        buttonsDrawn = true;
+        m_ButtonsDrawn = true;
     }
 
-    x += buttonWidth + marginItem + Config.decorBorderButtonSize * 2;
+    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
     if (!(!Config.ButtonsShowEmpty && !Yellow)) {
         switch (Setup.ColorKey2) {
         case 0:
-            buttonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
-            buttonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
-            buttonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
-            buttonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, buttonsTop, buttonWidth, buttonsHeight,
+        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
                         Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
                         Config.decorBorderButtonBg, BorderButton);
-        buttonsDrawn = true;
+        m_ButtonsDrawn = true;
     }
 
-    x += buttonWidth + marginItem + Config.decorBorderButtonSize * 2;
-    if (x + buttonWidth + Config.decorBorderButtonSize * 2 < buttonsWidth)
-        buttonWidth += buttonsWidth - (x + buttonWidth + Config.decorBorderButtonSize * 2);
+    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
+    if (x + ButtonWidth + Config.decorBorderButtonSize * 2 < m_ButtonsWidth)
+        ButtonWidth += m_ButtonsWidth - (x + ButtonWidth + Config.decorBorderButtonSize * 2);
     if (!(!Config.ButtonsShowEmpty && !Blue)) {
         switch (Setup.ColorKey3) {
         case 0:
-            buttonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonRed));
             break;
         case 1:
-            buttonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonGreen));
             break;
         case 2:
-            buttonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonYellow));
             break;
         case 3:
-            buttonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), font,
-                                    buttonWidth, fontHeight + marginButtonColor, taCenter);
-            buttonsPixmap->DrawRectangle(cRect(x, fontHeight + marginButtonColor, buttonWidth, buttonColorHeight),
+            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
+                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
                                          Theme.Color(clrButtonBlue));
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, buttonsTop, buttonWidth, buttonsHeight,
+        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
                         Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
                         Config.decorBorderButtonBg, BorderButton);
-        buttonsDrawn = true;
+        m_ButtonsDrawn = true;
     }
 }
 
 bool cFlatBaseRender::ButtonsDrawn(void) {
-    return buttonsDrawn;
+    return m_ButtonsDrawn;
 }
 
 void cFlatBaseRender::MessageCreate(void) {
-    messageHeight = fontHeight + marginItem * 2;
+    m_MessageHeight = m_FontHeight + m_MarginItem * 2;
     if (Config.MessageColorPosition == 1)
-        messageHeight += 8;
+        m_MessageHeight += 8;
 
-    int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
-    messagePixmap = CreatePixmap(
-        osd, "messagePixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
-    PixmapFill(messagePixmap, clrTransparent);
-    messageIconPixmap = CreatePixmap(
-        osd, "messageIconPixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight));
-    PixmapFill(messageIconPixmap, clrTransparent);
-    // dsyslog("flatPlus: messagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
-    // dsyslog("flatPlus: messageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, osdWidth - Config.decorBorderMessageSize*2, messageHeight);
+    int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
+    MessagePixmap = CreatePixmap(
+        osd, "MessagePixmap", 5,
+        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
+    PixmapFill(MessagePixmap, clrTransparent);
+    MessageIconPixmap = CreatePixmap(
+        osd, "MessageIconPixmap", 5,
+        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
+    PixmapFill(MessageIconPixmap, clrTransparent);
+    // dsyslog("flatPlus: MessagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
+    // dsyslog("flatPlus: MessageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
+    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
 
-    messageScroller.SetOsd(osd);
-    messageScroller.SetScrollStep(Config.ScrollerStep);
-    messageScroller.SetScrollDelay(Config.ScrollerDelay);
-    messageScroller.SetScrollType(Config.ScrollerType);
-    messageScroller.SetPixmapLayer(5);
+    MessageScroller.SetOsd(osd);
+    MessageScroller.SetScrollStep(Config.ScrollerStep);
+    MessageScroller.SetScrollDelay(Config.ScrollerDelay);
+    MessageScroller.SetScrollType(Config.ScrollerType);
+    MessageScroller.SetPixmapLayer(5);
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
-    tColor col = Theme.Color(clrMessageInfo);
-    cString icon("message_info");
+    if (!MessagePixmap || !MessageIconPixmap)
+        return;
+
+    tColor Col = Theme.Color(clrMessageInfo);
+    cString Icon("message_info");
     switch (Type) {
-    case mtStatus:
-        col = Theme.Color(clrMessageStatus);
-        icon = "message_status";
-        break;
-    case mtInfo: [[likely]]  // Already preset
+    case mtInfo: // Already preset
         break;
     case mtWarning:
-        col = Theme.Color(clrMessageWarning);
-        icon = "message_warning";
+        Col = Theme.Color(clrMessageWarning);
+        Icon = "message_warning";
+        break;
+    case mtStatus:
+        Col = Theme.Color(clrMessageStatus);
+        Icon = "message_status";
         break;
     case mtError:
-        col = Theme.Color(clrMessageError);
-        icon = "message_error";
+        Col = Theme.Color(clrMessageError);
+        Icon = "message_error";
         break;
     }
-    PixmapFill(messagePixmap, Theme.Color(clrMessageBg));
-    messageScroller.Clear();
+    PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
+    MessageScroller.Clear();
 
-    cImage *img = imgLoader.LoadIcon(*icon, fontHeight, fontHeight);
+    cImage *img = ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight);
     if (img)
-        messageIconPixmap->DrawImage(cPoint(marginItem + 10, marginItem), *img);
+        MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
     if (Config.MessageColorPosition == 0) {
-        messagePixmap->DrawRectangle(cRect(0, 0, 8, messageHeight), col);
-        messagePixmap->DrawRectangle(cRect(osdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, messageHeight), col);
+        MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight),
+                                     Col);
     } else {
-        messagePixmap->DrawRectangle(cRect(0, messageHeight - 8, osdWidth, 8), col);
+        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
     }
 
-    int textWidth = font->Width(Text);
-    int maxWidth = osdWidth - Config.decorBorderMessageSize * 2 - fontHeight - marginItem * 3 - 10;
+    int TextWidth = m_Font->Width(Text);
+    int MaxWidth = m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem * 3 - 10;
 
-    if ((textWidth > maxWidth) && Config.ScrollerEnable) {
-        messageScroller.AddScroller(
+    if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
+        MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                  osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
-                  maxWidth, fontHeight),
-            Theme.Color(clrMessageFont), clrTransparent, font, Theme.Color(clrMenuItemExtraTextFont));
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                  m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
+                  MaxWidth, m_FontHeight),
+            Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string tilde = Text;
-        size_t found = tilde.find('~');  // Search for ~
+        std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string first = tilde.substr(0, found);
             std::string second = tilde.substr(found + 1);  // Default end is npos
-            rtrim(first);   // Trim possible space on right side
-            ltrim(second);  // Trim possible space at begin
+            RightTrim(first);  // Trim possible space on right side
+            LeftTrim(second);  // Trim possible space at begin
 
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), first.c_str(),
-                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
-            int l = font->Width(first.c_str()) + font->Width('X');
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2 + l, marginItem), second.c_str(),
-                                    Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), font);
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
+                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
+            int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.c_str(),
+                                    Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
-            if ((textWidth > maxWidth) && Config.ScrollerEnable)
-                messageScroller.AddScroller(
-                    Text,
-                    cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                          osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
-                          maxWidth, fontHeight),
-                    Theme.Color(clrMessageFont), clrTransparent, font);
+            if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
+                MessageScroller.AddScroller(Text,
+                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                                  m_OsdHeight - Config.MessageOffset - m_MessageHeight -
+                                                      Config.decorBorderMessageSize + m_MarginItem,
+                                                  MaxWidth, m_FontHeight),
+                                            Theme.Color(clrMessageFont), clrTransparent, m_Font);
             else
-                messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), Text,
-                                        Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), font);
+                MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
+                                        Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
         }
     } else {
-        if ((textWidth > maxWidth) && Config.ScrollerEnable)
-            messageScroller.AddScroller(
-                Text,
-                cRect(Config.decorBorderMessageSize + fontHeight + marginItem * 3 + 10,
-                      osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize + marginItem,
-                      maxWidth, fontHeight),
-                Theme.Color(clrMessageFont), clrTransparent, font);
+        if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
+            MessageScroller.AddScroller(Text,
+                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                              m_OsdHeight - Config.MessageOffset - m_MessageHeight -
+                                                  Config.decorBorderMessageSize + m_MarginItem,
+                                              MaxWidth, m_FontHeight),
+                                        Theme.Color(clrMessageFont), clrTransparent, m_Font);
         else
-            messagePixmap->DrawText(cPoint((osdWidth - textWidth) / 2, marginItem), Text, Theme.Color(clrMessageFont),
-                                    Theme.Color(clrMessageBg), font);
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
+                                    Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
     }
 
-    int top = osdHeight - Config.MessageOffset - messageHeight - Config.decorBorderMessageSize;
-    DecorBorderDraw(Config.decorBorderMessageSize, top, osdWidth - Config.decorBorderMessageSize * 2, messageHeight,
+    int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
+    DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight,
                     Config.decorBorderMessageSize, Config.decorBorderMessageType, Config.decorBorderMessageFg,
                     Config.decorBorderMessageBg, BorderMessage);
 }
 
 void cFlatBaseRender::MessageClear(void) {
-    PixmapFill(messagePixmap, clrTransparent);
-    PixmapFill(messageIconPixmap, clrTransparent);
+    PixmapFill(MessagePixmap, clrTransparent);
+    PixmapFill(MessageIconPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderMessage);
     DecorBorderRedrawAll();
-    messageScroller.Clear();
+    MessageScroller.Clear();
 }
 
 void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height, int MarginHor, int MarginVer,
                                         tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type, bool SetBackground,
-                                        bool isSignal) {
-    progressBarTop = Top;
-    progressBarWidth = Width;
-    progressBarHeight = Height;
-    ProgressType = Type;
-    progressBarMarginHor = MarginHor;
-    progressBarMarginVer = MarginVer;
+                                        bool IsSignal) {
+    m_ProgressBarTop = Top;
+    m_ProgressBarWidth = Width;
+    m_ProgressBarHeight = Height;
+    m_ProgressType = Type;
+    m_ProgressBarMarginHor = MarginHor;
+    m_ProgressBarMarginVer = MarginVer;
 
-    progressBarColorFg = ColorFg;
-    progressBarColorBarFg = ColorBarFg;
-    progressBarColorBg = ColorBg;
+    m_ProgressBarColorFg = ColorFg;
+    m_ProgressBarColorBarFg = ColorBarFg;
+    m_ProgressBarColorBg = ColorBg;
 
-    progressBarSetBackground = SetBackground;
-    progressBarIsSignal = isSignal;
+    m_ProgressBarSetBackground = SetBackground;
+    m_ProgressBarIsSignal = IsSignal;
 
-    progressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
+    m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    progressBarPixmap =
-        CreatePixmap(osd, "progressBarPixmap", 3, cRect(Left, progressBarTop, progressBarWidth, progressBarHeight));
-    progressBarPixmapBg =
-        CreatePixmap(osd, "progressBarPixmapBg", 2,
-                     cRect(Left - progressBarMarginVer, progressBarTop - progressBarMarginHor,
-                           progressBarWidth + progressBarMarginVer * 2, progressBarHeight + progressBarMarginHor * 2));
-    PixmapFill(progressBarPixmap, clrTransparent);
-    PixmapFill(progressBarPixmapBg, clrTransparent);
+    ProgressBarPixmap = CreatePixmap(osd, "ProgressBarPixmap", 3,
+                                     cRect(Left, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
+    ProgressBarPixmapBg = CreatePixmap(osd, "ProgressBarPixmapBg", 2,
+                                       cRect(Left - m_ProgressBarMarginVer, m_ProgressBarTop - m_ProgressBarMarginHor,
+                                             m_ProgressBarWidth + m_ProgressBarMarginVer * 2,
+                                             m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
+    PixmapFill(ProgressBarPixmap, clrTransparent);
+    PixmapFill(ProgressBarPixmapBg, clrTransparent);
 }
 
 void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
     ProgressBarDrawRaw(
-        progressBarPixmap, progressBarPixmapBg, cRect(0, 0, progressBarWidth, progressBarHeight),
-        cRect(0, 0, progressBarWidth + progressBarMarginVer * 2, progressBarHeight + progressBarMarginHor * 2), Current,
-        Total, progressBarColorFg, progressBarColorBarFg, progressBarColorBg, ProgressType, progressBarSetBackground,
-        progressBarIsSignal);
+        ProgressBarPixmap, ProgressBarPixmapBg, cRect(0, 0, m_ProgressBarWidth, m_ProgressBarHeight),
+        cRect(0, 0, m_ProgressBarWidth + m_ProgressBarMarginVer * 2, m_ProgressBarHeight + m_ProgressBarMarginHor * 2),
+        Current, Total, m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBg, m_ProgressType,
+        m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
 void cFlatBaseRender::ProgressBarDrawBgColor(void) {
-    PixmapFill(progressBarPixmapBg, progressBarColorBg);
+    PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
 }
 
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rect, cRect rectBg, int Current,
                                          int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
-                                         bool SetBackground, bool isSignal) {
-    int Middle = rect.Height() / 2;
+                                         bool SetBackground, bool IsSignal) {
+    if (!Pixmap) return;
 
-    double percentLeft = Current * 1.0 / Total;  // Eliminate c-style cast
+    int Middle = rect.Height() / 2;
+    double PercentLeft = Current * 1.0 / Total;
 
     if (PixmapBg && SetBackground)
         PixmapBg->DrawRectangle(rectBg, ColorBg);
@@ -931,7 +924,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0)
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
         break;
     }
     case 1:  // big line
@@ -939,7 +932,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         int big = rect.Height();
         if (Current > 0)
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
         break;
     }
     case 2:  // big line + outline
@@ -955,11 +948,11 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
-            if (isSignal) {
+            if (IsSignal) {
                 double perc = 100.0 / Total * Current * (1.0 / 100.0);
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * percentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
                                           Theme.Color(clrButtonGreen));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.666) - out * 2, big - out * 2),
@@ -969,18 +962,18 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                                           Theme.Color(clrButtonRed));
                 } else if (perc > 0.333) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * percentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
                                           Theme.Color(clrButtonYellow));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.333) - out * 2, big - out * 2),
                                           Theme.Color(clrButtonRed));
                 } else
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * percentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
                                           Theme.Color(clrButtonRed));
             } else
                 Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                            (rect.Width() * percentLeft) - out * 2, big - out * 2),
+                                            (rect.Width() * PercentLeft) - out * 2, big - out * 2),
                                       ColorBarFg);
         }
         break;
@@ -995,9 +988,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
+            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
@@ -1008,9 +1001,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         int big = rect.Height();
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
+            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
@@ -1029,9 +1022,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * percentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
+            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
@@ -1047,7 +1040,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
+            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
@@ -1066,7 +1059,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * percentLeft) - (big / 2),
+            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
                                       rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
@@ -1081,8 +1074,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
         if (Current > 0) {
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), (rect.Width() * percentLeft), big, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + sml / 2, (rect.Width() * percentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), (rect.Width() * PercentLeft), big, ColorBarFg);
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + sml / 2, (rect.Width() * PercentLeft),
                                  big * -1, ColorBarFg);
         }
         break;
@@ -1091,9 +1084,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         int big = rect.Height();
         if (Current > 0) {
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - big / 2, (rect.Width() * percentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - big / 2, (rect.Width() * PercentLeft),
                                  big / 2, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, (rect.Width() * percentLeft), big / -2,
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, (rect.Width() * PercentLeft), big / -2,
                                  ColorBarFg);
         }
         break;
@@ -1103,83 +1096,87 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
 void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color,
                                            tColor ColorCurrent) {
-    progressBarColorMark = Color;
-    progressBarColorMarkCurrent = ColorCurrent;
-    int posMark {0}, posMarkLast {0}, posCurrent {0};
+    if (!ProgressBarPixmap) return;
 
-    int top = progressBarHeight / 2;
-    if (progressBarPixmapBg)
-        progressBarPixmapBg->DrawRectangle(
-            cRect(0, progressBarMarginHor + progressBarHeight, progressBarWidth, progressBarMarginHor),
-            progressBarColorBg);
+    m_ProgressBarColorMark = Color;
+    m_ProgressBarColorMarkCurrent = ColorCurrent;
+    int PosMark {0}, PosMarkLast {0}, PosCurrent {0};
 
-    PixmapFill(progressBarPixmap, progressBarColorBg);
+    int top = m_ProgressBarHeight / 2;
+    if (ProgressBarPixmapBg)
+        ProgressBarPixmapBg->DrawRectangle(
+            cRect(0, m_ProgressBarMarginHor + m_ProgressBarHeight, m_ProgressBarWidth, m_ProgressBarMarginHor),
+            m_ProgressBarColorBg);
+
+    PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
 
     int sml = Config.decorProgressReplaySize / 10 * 2;
     if (sml <= 4) sml = 4;
     int big = Config.decorProgressReplaySize - sml * 2 - 2;
 
     if (!Marks) {
-        // progressBarColorFg = progressBarColorBarFg;
-        progressBarColorBarFg = progressBarColorBarCurFg;
+        // m_ProgressBarColorFg = m_ProgressBarColorBarFg;
+        m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
 
         ProgressBarDraw(Current, Total);
         return;
     }
     if (!Marks->First()) {
-        // progressBarColorFg = progressBarColorBarCurFg;
-        progressBarColorBarFg = progressBarColorBarCurFg;
+        // m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
+        m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
 
         ProgressBarDraw(Current, Total);
         return;
     }
 
     // the small line
-    progressBarPixmap->DrawRectangle(cRect(0, top - sml / 2, progressBarWidth, sml), progressBarColorFg);
+    ProgressBarPixmap->DrawRectangle(cRect(0, top - sml / 2, m_ProgressBarWidth, sml), m_ProgressBarColorFg);
 
     bool Start = true;
 
     for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
-        posMark = ProgressBarMarkPos(m->Position(), Total);
-        posCurrent = ProgressBarMarkPos(Current, Total);
+        PosMark = ProgressBarMarkPos(m->Position(), Total);
+        PosCurrent = ProgressBarMarkPos(Current, Total);
 
-        ProgressBarDrawMark(posMark, posMarkLast, posCurrent, Start, m->Position() == Current);
-        posMarkLast = posMark;
+        ProgressBarDrawMark(PosMark, PosMarkLast, PosCurrent, Start, m->Position() == Current);
+        PosMarkLast = PosMark;
         Start = !Start;
     }
 
     // Draw last marker vertical line
-    if (posCurrent == posMark)
-        progressBarPixmap->DrawRectangle(cRect(posMark - sml, 0, sml * 2, progressBarHeight),
-                                         progressBarColorMarkCurrent);
+    if (PosCurrent == PosMark)
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
+                                         m_ProgressBarColorMarkCurrent);
     else
-        progressBarPixmap->DrawRectangle(cRect(posMark - sml / 2, 0, sml, progressBarHeight), progressBarColorMark);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
 
     if (!Start) {
-        // progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml / 2, top - big / 2,
-        //                                  progressBarWidth - posMarkLast, big), progressBarColorBarFg);
-        if (posCurrent > posMarkLast)
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast + sml / 2, top - big / 2, posCurrent - posMarkLast, big),
-                                             progressBarColorBarCurFg);
+        // ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast + sml / 2, top - big / 2,
+        //                                  m_ProgressBarWidth - PosMarkLast, big), m_ProgressBarColorBarFg);
+        if (PosCurrent > PosMarkLast)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast + sml / 2, top - big / 2, PosCurrent - PosMarkLast, big),
+                                             m_ProgressBarColorBarCurFg);
     } else {
         // Marker
-        progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posCurrent - posMarkLast, sml),
-                                         progressBarColorBarCurFg);
-        progressBarPixmap->DrawRectangle(cRect(posCurrent - big / 2, top - big / 2, big, big),
-                                         progressBarColorBarCurFg);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosCurrent - PosMarkLast, sml),
+                                         m_ProgressBarColorBarCurFg);
+        ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - big / 2, top - big / 2, big, big),
+                                         m_ProgressBarColorBarCurFg);
 
-        if (posCurrent > posMarkLast + sml / 2)
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast - sml / 2, 0, sml, progressBarHeight),
-                                             progressBarColorMark);
+        if (PosCurrent > PosMarkLast + sml / 2)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight),
+                                             m_ProgressBarColorMark);
     }
 }
 
 int cFlatBaseRender::ProgressBarMarkPos(int P, int Total) {
-    return (int64_t)P * progressBarWidth / Total;
+    return (int64_t)P * m_ProgressBarWidth / Total;
 }
 
-void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posCurrent, bool Start, bool isCurrent) {
-    int top = progressBarHeight / 2;
+void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent) {
+    if (!ProgressBarPixmap) return;
+
+    int top = m_ProgressBarHeight / 2;
     int sml = Config.decorProgressReplaySize / 10 * 2;
     if (sml <= 4) sml = 4;
     int big = Config.decorProgressReplaySize - sml * 2 - 2;
@@ -1189,71 +1186,72 @@ void cFlatBaseRender::ProgressBarDrawMark(int posMark, int posMarkLast, int posC
         mbig = Config.decorProgressReplaySize;
 
     // Marker vertical line
-    if (posCurrent == posMark)
-        progressBarPixmap->DrawRectangle(cRect(posMark - sml, 0, sml * 2, progressBarHeight),
-                                         progressBarColorMarkCurrent);
+    if (PosCurrent == PosMark)
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
+                                         m_ProgressBarColorMarkCurrent);
     else
-        progressBarPixmap->DrawRectangle(cRect(posMark - sml / 2, 0, sml, progressBarHeight), progressBarColorMark);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
 
     if (Start) {
-        if (posCurrent > posMark)
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posMark - posMarkLast, sml),
-                                             progressBarColorBarCurFg);
+        if (PosCurrent > PosMark)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosMark - PosMarkLast, sml),
+                                             m_ProgressBarColorBarCurFg);
         else {
             // Marker
-            progressBarPixmap->DrawRectangle(cRect(posCurrent - big / 2, top - big / 2, big, big),
-                                             progressBarColorBarCurFg);
-            if (posCurrent > posMarkLast)
-                progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - sml / 2, posCurrent - posMarkLast, sml),
-                                                 progressBarColorBarCurFg);
+            ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - big / 2, top - big / 2, big, big),
+                                             m_ProgressBarColorBarCurFg);
+            if (PosCurrent > PosMarkLast)
+                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosCurrent - PosMarkLast, sml),
+                                                 m_ProgressBarColorBarCurFg);
         }
         // Marker top
-        if (isCurrent)
-            progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, 0, mbig, sml), progressBarColorMarkCurrent);
+        if (IsCurrent)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, 0, mbig, sml), m_ProgressBarColorMarkCurrent);
         else
-            progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, 0, mbig, sml), progressBarColorMark);
+            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, 0, mbig, sml), m_ProgressBarColorMark);
     } else {
         // Big line
-        if (posCurrent > posMark) {
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - big / 2, posMark - posMarkLast, big),
-                                             progressBarColorBarCurFg);
+        if (PosCurrent > PosMark) {
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosMark - PosMarkLast, big),
+                                             m_ProgressBarColorBarCurFg);
             // Draw last marker top
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast - mbig / 2, 0, mbig, marginItem / 2),
-                                             progressBarColorMark);
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - mbig / 2, 0, mbig, m_MarginItem / 2),
+                                             m_ProgressBarColorMark);
         } else {
-            progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - big / 2, posMark - posMarkLast, big),
-                                             progressBarColorBarFg);
-            if (posCurrent > posMarkLast) {
-                progressBarPixmap->DrawRectangle(cRect(posMarkLast, top - big / 2, posCurrent - posMarkLast, big),
-                                                 progressBarColorBarCurFg);
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosMark - PosMarkLast, big),
+                                             m_ProgressBarColorBarFg);
+            if (PosCurrent > PosMarkLast) {
+                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosCurrent - PosMarkLast, big),
+                                                 m_ProgressBarColorBarCurFg);
                 // Draw last marker top
-                progressBarPixmap->DrawRectangle(cRect(posMarkLast - mbig / 2, 0, mbig, marginItem / 2),
-                                                 progressBarColorMark);
+                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - mbig / 2, 0, mbig, m_MarginItem / 2),
+                                                 m_ProgressBarColorMark);
             }
         }
         // Marker bottom
-        if (isCurrent)
-            progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, progressBarHeight - sml, mbig, sml),
-                                             progressBarColorMarkCurrent);
+        if (IsCurrent)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, m_ProgressBarHeight - sml, mbig, sml),
+                                             m_ProgressBarColorMarkCurrent);
         else
-            progressBarPixmap->DrawRectangle(cRect(posMark - mbig / 2, progressBarHeight - sml, mbig, sml),
-                                             progressBarColorMark);
+            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, m_ProgressBarHeight - sml, mbig, sml),
+                                             m_ProgressBarColorMark);
     }
 
-    if (posCurrent == posMarkLast && posMarkLast != 0)
-        progressBarPixmap->DrawRectangle(cRect(posMarkLast - sml, 0, sml * 2, progressBarHeight),
-                                         progressBarColorMarkCurrent);
-    else if (posMarkLast != 0)
-        progressBarPixmap->DrawRectangle(cRect(posMarkLast - sml / 2, 0, sml, progressBarHeight), progressBarColorMark);
+    if (PosCurrent == PosMarkLast && PosMarkLast != 0)
+        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml, 0, sml * 2, m_ProgressBarHeight),
+                                         m_ProgressBarColorMarkCurrent);
+    else if (PosMarkLast != 0)
+        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight),
+                                         m_ProgressBarColorMark);
 }
 
 void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
                                     bool CanScrollUp, bool CanScrollDown) {
     if (!Pixmap) return;
 
-    int scrollHeight = std::max(static_cast<int>(Height * 1.0f * Shown / Total + 0.5f), 5);
-    int scrollTop =
-        std::min(static_cast<int>(Top * 1.0f + Height * Offset / Total + 0.5f), Top + Height - scrollHeight);
+    int ScrollHeight = std::max(static_cast<int>(Height * 1.0f * Shown / Total + 0.5f), 5);
+    int ScrollTop =
+        std::min(static_cast<int>(Top * 1.0f + Height * Offset / Total + 0.5f), Top + Height - ScrollHeight);
 
     /* Types
      * 0 = left line + rect bar
@@ -1269,126 +1267,132 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
 
     if (Total > 0 && Total > Shown) {
         PixmapFill(Pixmap, clrTransparent);
-        Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, Height), Config.decorScrollBarBg);
+        Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
         switch (Type) {
         default:
         case 0: {
-            int lineWidth {6};
-            if (scrollBarWidth <= 10)
-                lineWidth = 2;
-            else if (scrollBarWidth <= 20)
-                lineWidth = 4;
-            Pixmap->DrawRectangle(cRect(Left, Top, lineWidth, Height), Config.decorScrollBarFg);
+            int LineWidth {6};
+            if (m_ScrollBarWidth <= 10)
+                LineWidth = 2;
+            else if (m_ScrollBarWidth <= 20)
+                LineWidth = 4;
+            Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + lineWidth, scrollTop, scrollBarWidth - lineWidth, scrollHeight),
+            Pixmap->DrawRectangle(cRect(Left + LineWidth, ScrollTop, m_ScrollBarWidth - LineWidth, ScrollHeight),
                                   Config.decorScrollBarBarFg);
             break;
         }
         case 1: {
-            int dotHeight = scrollBarWidth / 2;
-            int lineWidth {6};
-            if (scrollBarWidth <= 10)
-                lineWidth = 2;
-            else if (scrollBarWidth <= 20)
-                lineWidth = 4;
-            Pixmap->DrawRectangle(cRect(Left, Top, lineWidth, Height), Config.decorScrollBarFg);
+            int DotHeight = m_ScrollBarWidth / 2;
+            int LineWidth {6};
+            if (m_ScrollBarWidth <= 10)
+                LineWidth = 2;
+            else if (m_ScrollBarWidth <= 20)
+                LineWidth = 4;
+            Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + lineWidth, scrollTop + dotHeight, scrollBarWidth - lineWidth,
-                                        scrollHeight - dotHeight * 2),
+            Pixmap->DrawRectangle(cRect(Left + LineWidth, ScrollTop + DotHeight, m_ScrollBarWidth - LineWidth,
+                                        ScrollHeight - DotHeight * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
             Pixmap->DrawEllipse(
-                cRect(Left + lineWidth, scrollTop, scrollBarWidth - lineWidth, scrollBarWidth - lineWidth),
+                cRect(Left + LineWidth, ScrollTop, m_ScrollBarWidth - LineWidth, m_ScrollBarWidth - LineWidth),
                 Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left + lineWidth, scrollTop + scrollHeight - dotHeight * 2,
-                                      scrollBarWidth - lineWidth, scrollBarWidth - lineWidth),
+            Pixmap->DrawEllipse(cRect(Left + LineWidth, ScrollTop + ScrollHeight - DotHeight * 2,
+                                      m_ScrollBarWidth - LineWidth, m_ScrollBarWidth - LineWidth),
                                 Config.decorScrollBarBarFg, 0);
             break;
         }
         case 2: {
-            int Middle = Left + scrollBarWidth / 2;
-            int lineWidth {6};
-            if (scrollBarWidth <= 10)
-                lineWidth = 2;
-            else if (scrollBarWidth <= 20)
-                lineWidth = 4;
+            int Middle = Left + m_ScrollBarWidth / 2;
+            int LineWidth {6};
+            if (m_ScrollBarWidth <= 10)
+                LineWidth = 2;
+            else if (m_ScrollBarWidth <= 20)
+                LineWidth = 4;
 
-            Pixmap->DrawRectangle(cRect(Middle - lineWidth / 2, Top, lineWidth, Height), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
             // Bar
-            Pixmap->DrawRectangle(cRect(Left, scrollTop, scrollBarWidth, scrollHeight), Config.decorScrollBarBarFg);
+            Pixmap->DrawRectangle(cRect(Left, ScrollTop, m_ScrollBarWidth, ScrollHeight), Config.decorScrollBarBarFg);
             break;
         }
         case 3: {
-            int dotHeight = scrollBarWidth / 2;
-            int Middle = Left + scrollBarWidth / 2;
-            int lineWidth {6};
-            if (scrollBarWidth <= 10)
-                lineWidth = 2;
-            else if (scrollBarWidth <= 20)
-                lineWidth = 4;
+            int DotHeight = m_ScrollBarWidth / 2;
+            int Middle = Left + m_ScrollBarWidth / 2;
+            int LineWidth {6};
+            if (m_ScrollBarWidth <= 10)
+                LineWidth = 2;
+            else if (m_ScrollBarWidth <= 20)
+                LineWidth = 4;
 
-            Pixmap->DrawRectangle(cRect(Middle - lineWidth / 2, Top, lineWidth, Height), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left, scrollTop + dotHeight, scrollBarWidth, scrollHeight - dotHeight * 2),
+            Pixmap->DrawRectangle(cRect(Left, ScrollTop + DotHeight, m_ScrollBarWidth, ScrollHeight - DotHeight * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left, scrollTop, scrollBarWidth, scrollBarWidth), Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left, scrollTop + scrollHeight - dotHeight * 2, scrollBarWidth, scrollBarWidth),
-                                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg,
+                                0);
+            Pixmap->DrawEllipse(
+                cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
+                Config.decorScrollBarBarFg, 0);
             break;
         }
         case 4: {
             int out {1};
-            if (scrollBarWidth > 10) out = 2;
+            if (m_ScrollBarWidth > 10) out = 2;
             // Outline
-            Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
-            Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, out), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left, Top + Height - out, m_ScrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top, out, Height), Config.decorScrollBarFg);
-            Pixmap->DrawRectangle(cRect(Left + scrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left + m_ScrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + out, scrollTop + out, scrollBarWidth - out * 2, scrollHeight - out * 2),
-                                  Config.decorScrollBarBarFg);
+            Pixmap->DrawRectangle(
+                cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, ScrollHeight - out * 2),
+                Config.decorScrollBarBarFg);
             break;
         }
         case 5: {
-            int dotHeight = scrollBarWidth / 2;
+            int DotHeight = m_ScrollBarWidth / 2;
             int out {1};
-            if (scrollBarWidth > 10) out = 2;
+            if (m_ScrollBarWidth > 10) out = 2;
             // Outline
-            Pixmap->DrawRectangle(cRect(Left, Top, scrollBarWidth, out), Config.decorScrollBarFg);
-            Pixmap->DrawRectangle(cRect(Left, Top + Height - out, scrollBarWidth, out), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, out), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left, Top + Height - out, m_ScrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top, out, Height), Config.decorScrollBarFg);
-            Pixmap->DrawRectangle(cRect(Left + scrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
+            Pixmap->DrawRectangle(cRect(Left + m_ScrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + out, scrollTop + dotHeight + out, scrollBarWidth - out * 2,
-                                        scrollHeight - dotHeight * 2 - out * 2),
+            Pixmap->DrawRectangle(cRect(Left + out, ScrollTop + DotHeight + out, m_ScrollBarWidth - out * 2,
+                                        ScrollHeight - DotHeight * 2 - out * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left + out, scrollTop + out, scrollBarWidth - out * 2, scrollBarWidth - out * 2),
-                                Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left + out, scrollTop + scrollHeight - dotHeight * 2 + out,
-                                      scrollBarWidth - out * 2, scrollBarWidth - out * 2),
+            Pixmap->DrawEllipse(
+                cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
+                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left + out, ScrollTop + ScrollHeight - DotHeight * 2 + out,
+                                      m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
                                 Config.decorScrollBarBarFg, 0);
             break;
         }
         case 6: {
-            Pixmap->DrawRectangle(cRect(Left, scrollTop, scrollBarWidth, scrollHeight), Config.decorScrollBarBarFg);
+            Pixmap->DrawRectangle(cRect(Left, ScrollTop, m_ScrollBarWidth, ScrollHeight), Config.decorScrollBarBarFg);
             break;
         }
         case 7: {
-            int dotHeight = scrollBarWidth / 2;
+            int DotHeight = m_ScrollBarWidth / 2;
 
-            Pixmap->DrawRectangle(cRect(Left, scrollTop + dotHeight, scrollBarWidth, scrollHeight - dotHeight * 2),
+            Pixmap->DrawRectangle(cRect(Left, ScrollTop + DotHeight, m_ScrollBarWidth, ScrollHeight - DotHeight * 2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(Left, scrollTop, scrollBarWidth, scrollBarWidth), Config.decorScrollBarBarFg, 0);
-            Pixmap->DrawEllipse(cRect(Left, scrollTop + scrollHeight - dotHeight * 2, scrollBarWidth, scrollBarWidth),
-                                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left, ScrollTop, m_ScrollBarWidth, m_ScrollBarWidth), Config.decorScrollBarBarFg,
+                                0);
+            Pixmap->DrawEllipse(
+                cRect(Left, ScrollTop + ScrollHeight - DotHeight * 2, m_ScrollBarWidth, m_ScrollBarWidth),
+                Config.decorScrollBarBarFg, 0);
 
             break;
         }
@@ -1397,7 +1401,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
 }
 
 int cFlatBaseRender::ScrollBarWidth(void) {
-    return scrollBarWidth;
+    return m_ScrollBarWidth;
 }
 
 void cFlatBaseRender::DecorBorderClear(int Left, int Top, int Width, int Height, int Size) {
@@ -1407,15 +1411,15 @@ void cFlatBaseRender::DecorBorderClear(int Left, int Top, int Width, int Height,
     int HeightDecor = Height + Size * 2;
     int BottomDecor = Height + Size;
 
-    if (decorPixmap) {
+    if (DecorPixmap) {
         // Top
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), clrTransparent);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), clrTransparent);
         // Right
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), clrTransparent);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), clrTransparent);
         // Bottom
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), clrTransparent);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), clrTransparent);
         // Left
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), clrTransparent);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), clrTransparent);
     }
 }
 
@@ -1439,7 +1443,7 @@ void cFlatBaseRender::DecorBorderRedrawAll(void) {
 }
 
 void cFlatBaseRender::DecorBorderClearAll(void) {
-    PixmapFill(decorPixmap, clrTransparent);
+    PixmapFill(DecorPixmap, clrTransparent);
 }
 
 void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
@@ -1459,110 +1463,112 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     int HeightDecor = Height + Size * 2;
     int BottomDecor = Height + Size;
 
-    if (!decorPixmap) {
-        decorPixmap = CreatePixmap(osd, "decorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
-        PixmapFill(decorPixmap, clrTransparent);
+    if (!DecorPixmap) {
+        DecorPixmap = CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+        if (!DecorPixmap) return;
+
+        PixmapFill(DecorPixmap, clrTransparent);
     }
 
     switch (Type) {
     case 1:  // rect
         // Top
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
         // Right
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), ColorBg);
         // Bottom
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), ColorBg);
         // Left
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), ColorBg);
         break;
     case 2:  // Round
         // Top
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
         // Right
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
         // Bottom
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
         // Left
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
 
         // Top,left corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, 2);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, 2);
         // Top,right corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, 1);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, 1);
         // Bottom,left corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, 3);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, 3);
         // Bottom,right corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, 4);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, 4);
         break;
     case 3:  // Invert round
         // Top
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
         // Right
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
         // Bottom
-        decorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
         // Left
-        decorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
 
         // Top,left corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, -4);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, -4);
         // Top,right corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, -3);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, -3);
         // Bottom,left corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, -1);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, -1);
         // Bottom,right corner
-        decorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
         break;
     case 4:  // rect + alpha blend
         // Top
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 
-        DecorDrawGlowRectTL(decorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg);
-        DecorDrawGlowRectTR(decorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg);
-        DecorDrawGlowRectBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg);
-        DecorDrawGlowRectBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg);
+        DecorDrawGlowRectTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg);
+        DecorDrawGlowRectTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg);
+        DecorDrawGlowRectBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg);
+        DecorDrawGlowRectBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg);
         break;
     case 5:  // Round + alpha blend
         // Top
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 
-        DecorDrawGlowEllipseTL(decorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, 2);
-        DecorDrawGlowEllipseTR(decorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, 1);
-        DecorDrawGlowEllipseBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, 3);
-        DecorDrawGlowEllipseBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg, 4);
+        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, 2);
+        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, 1);
+        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, 3);
+        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg, 4);
         break;
     case 6:  // Invert round + alpha blend
         // Top
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(decorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(decorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
                              ColorBg);
 
-        DecorDrawGlowEllipseTL(decorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, -4);
-        DecorDrawGlowEllipseTR(decorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, -3);
-        DecorDrawGlowEllipseBL(decorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, -1);
-        DecorDrawGlowEllipseBR(decorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg,
+        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, -4);
+        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, -3);
+        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, -1);
+        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg,
                                -2);
         break;
     }
@@ -1590,6 +1596,8 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     if (Height < 0) {
@@ -1609,6 +1617,8 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     if (Width < 0) {
@@ -1628,6 +1638,8 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}; i < Width; ++i) {
@@ -1638,6 +1650,8 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1648,6 +1662,8 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1658,6 +1674,8 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1669,6 +1687,8 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1682,6 +1702,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1695,6 +1717,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1708,6 +1732,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
+    if (!pixmap) return;
+
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
@@ -1722,26 +1748,25 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
     FT_Library library;
     FT_Face face;
-    cString fontFileName = cFont::GetFontFileName(Name);
+    cString FontFileName = cFont::GetFontFileName(Name);
     int Ascender = CharHeight;
     int rc = FT_Init_FreeType(&library);
     if (!rc) {
-        rc = FT_New_Face(library, *fontFileName, 0, &face);
+        rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
-            if (face->num_fixed_sizes && face->available_sizes) {  // fixed font
-                // TODO what exactly does all this mean?
+            if (face->num_fixed_sizes && face->available_sizes) {  // Fixed font
                 Ascender = face->available_sizes->height;
             } else {
                 rc = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
                 if (!rc) {
                     Ascender = face->size->metrics.ascender / 64;
                 } else
-                    esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *fontFileName);
+                    esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
             }
         } else
-            esyslog("ERROR: FreeType: load error %d (font = %s)", rc, *fontFileName);
+            esyslog("ERROR: FreeType: load error %d (font = %s)", rc, *FontFileName);
     } else
-        esyslog("ERROR: FreeType: initialization error %d (font = %s)", rc, *fontFileName);
+        esyslog("ERROR: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
 
     FT_Done_Face(face);
     FT_Done_FreeType(library);
@@ -1751,191 +1776,191 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
     int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
-    cFont *weatherFont = cFont::CreateFont(Setup.FontOsd, fs);
-    cFont *weatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
-    cFont *weatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
+    cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
+    cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
+    cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
 
-    std::string tempToday(""), tempTodaySign("");
-    std::string iconToday(""), iconTomorrow("");
-    std::string tempMaxToday(""), tempMaxTomorrow("");
-    std::string tempMinToday(""), tempMinTomorrow("");
-    std::string precToday(""), precTomorrow("");
+    std::string TempToday(""), TempTodaySign("");
+    std::string IconToday(""), IconTomorrow("");
+    std::string TempMaxToday(""), TempMaxTomorrow("");
+    std::string TempMinToday(""), TempMinTomorrow("");
+    std::string PrecToday(""), PrecTomorrow("");
 
     std::ifstream file;
-    cString filename("");
+    cString FileName("");
 
-    filename = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, tempToday);
+        std::getline(file, TempToday);
         file.close();
-        std::size_t found = tempToday.find("°");
+        std::size_t found = TempToday.find("°");
         if (found != std::string::npos) {
-            tempTodaySign = tempToday.substr(found);
-            tempToday = tempToday.substr(0, found);
+            TempTodaySign = TempToday.substr(found);
+            TempToday = TempToday.substr(0, found);
         }
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, iconToday);
+        std::getline(file, IconToday);
         file.close();
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.1.icon", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.1.icon", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, iconTomorrow);
+        std::getline(file, IconTomorrow);
         file.close();
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, tempMaxToday);
+        std::getline(file, TempMaxToday);
         file.close();
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, tempMaxTomorrow);
+        std::getline(file, TempMaxTomorrow);
         file.close();
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, tempMinToday);
+        std::getline(file, TempMinToday);
         file.close();
     } else
         return;
 
-    filename = cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, tempMinTomorrow);
+        std::getline(file, TempMinTomorrow);
         file.close();
     } else
         return;
 
     double p {0.0};
-    filename = cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, precToday);
-        std::replace(precToday.begin(), precToday.end(), '.', ',');
+        std::getline(file, PrecToday);
+        std::replace(PrecToday.begin(), PrecToday.end(), '.', ',');
         file.close();
-        p = atof(precToday.c_str()) * 100.0f;
-        p = roundUp(p, 10);
-        precToday = cString::sprintf("%.0f%%", p);
+        p = atof(PrecToday.c_str()) * 100.0f;
+        p = RoundUp(p, 10);
+        PrecToday = cString::sprintf("%.0f%%", p);
     }
 
-    filename = cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH);
-    file.open(*filename, std::ifstream::in);
+    FileName = cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH);
+    file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
-        std::getline(file, precTomorrow);
-        std::replace(precTomorrow.begin(), precTomorrow.end(), '.', ',');
+        std::getline(file, PrecTomorrow);
+        std::replace(PrecTomorrow.begin(), PrecTomorrow.end(), '.', ',');
         file.close();
-        p = atof(precTomorrow.c_str()) * 100.0f;
-        p = roundUp(p, 10);
-        precTomorrow = cString::sprintf("%.0f%%", p);
+        p = atof(PrecTomorrow.c_str()) * 100.0f;
+        p = RoundUp(p, 10);
+        PrecTomorrow = cString::sprintf("%.0f%%", p);
     }
 
-    int left = marginItem;
+    int left = m_MarginItem;
 
-    int widthTempToday =
-        std::max(weatherFontSml->Width(tempMaxToday.c_str()), weatherFontSml->Width(tempMinToday.c_str()));
-    int widthTempTomorrow =
-        std::max(weatherFontSml->Width(tempMaxTomorrow.c_str()), weatherFontSml->Width(tempMinTomorrow.c_str()));
-    int weatherFontHeight = weatherFont->Height();  // Used multiple times
-    int weatherFontSmlHeight = weatherFontSml->Height();
+    int WidthTempToday =
+        std::max(WeatherFontSml->Width(TempMaxToday.c_str()), WeatherFontSml->Width(TempMinToday.c_str()));
+    int WidthTempTomorrow =
+        std::max(WeatherFontSml->Width(TempMaxTomorrow.c_str()), WeatherFontSml->Width(TempMinTomorrow.c_str()));
+    int WeatherFontHeight = WeatherFont->Height();  // Used multiple times
+    int WeatherFontSmlHeight = WeatherFontSml->Height();
 
-    int wTop = topBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    int wWidth = marginItem + weatherFont->Width(tempToday.c_str()) + weatherFontSign->Width(tempTodaySign.c_str()) +
-                 marginItem * 2 + weatherFontHeight + marginItem + widthTempToday + marginItem +
-                 weatherFontHeight - marginItem * 2 + weatherFontSml->Width(precToday.c_str()) + marginItem * 4 +
-                 weatherFontHeight + marginItem + widthTempTomorrow + marginItem + weatherFontHeight -
-                 marginItem * 2 + weatherFontSml->Width(precTomorrow.c_str()) + marginItem * 2;
-    int wLeft = osdWidth - wWidth - 20;
+    int wTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    int wWidth = m_MarginItem + WeatherFont->Width(TempToday.c_str()) + WeatherFontSign->Width(TempTodaySign.c_str()) +
+                 m_MarginItem * 2 + WeatherFontHeight + m_MarginItem + WidthTempToday + m_MarginItem +
+                 WeatherFontHeight - m_MarginItem * 2 + WeatherFontSml->Width(PrecToday.c_str()) + m_MarginItem * 4 +
+                 WeatherFontHeight + m_MarginItem + WidthTempTomorrow + m_MarginItem + WeatherFontHeight -
+                 m_MarginItem * 2 + WeatherFontSml->Width(PrecTomorrow.c_str()) + m_MarginItem * 2;
+    int wLeft = m_OsdWidth - wWidth - 20;
 
-    weatherWidget.Clear();
-    weatherWidget.SetOsd(osd);
-    weatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, weatherFontHeight));
-    weatherWidget.SetBGColor(Theme.Color(clrItemCurrentBg));
-    weatherWidget.SetScrollingActive(false);
+    WeatherWidget.Clear();
+    WeatherWidget.SetOsd(osd);
+    WeatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, WeatherFontHeight));
+    WeatherWidget.SetBGColor(Theme.Color(clrItemCurrentBg));
+    WeatherWidget.SetScrollingActive(false);
 
-    weatherWidget.AddText(tempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), weatherFont);
-    left += weatherFont->Width(tempToday.c_str());
+    WeatherWidget.AddText(TempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), WeatherFont);
+    left += WeatherFont->Width(TempToday.c_str());
 
-    int fontAscender = GetFontAscender(Setup.FontOsd, fs);
-    int fontAscender2 = GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5));
-    int t = (weatherFontHeight - fontAscender) - (weatherFontSign->Height() - fontAscender2);
+    int FontAscender = GetFontAscender(Setup.FontOsd, fs);
+    int FontAscender2 = GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5));
+    int t = (WeatherFontHeight - FontAscender) - (WeatherFontSign->Height() - FontAscender2);
 
-    weatherWidget.AddText(tempTodaySign.c_str(), false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), weatherFontSign);
-    left += weatherFontSign->Width(tempTodaySign.c_str()) + marginItem * 2;
+    WeatherWidget.AddText(TempTodaySign.c_str(), false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), WeatherFontSign);
+    left += WeatherFontSign->Width(TempTodaySign.c_str()) + m_MarginItem * 2;
 
-    cString weatherIcon = cString::sprintf("widgets/%s", iconToday.c_str());
-    cImage *img = imgLoader.LoadIcon(*weatherIcon, weatherFontHeight, weatherFontHeight - marginItem * 2);
+    cString WeatherIcon = cString::sprintf("widgets/%s", IconToday.c_str());
+    cImage *img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
-        left += weatherFontHeight + marginItem;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        left += WeatherFontHeight + m_MarginItem;
     }
-    weatherWidget.AddText(tempMaxToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), weatherFontSml, widthTempToday, weatherFontSmlHeight,
+    WeatherWidget.AddText(TempMaxToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
                           taRight);
-    weatherWidget.AddText(tempMinToday.c_str(), false, cRect(left, 0 + weatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), weatherFontSml, widthTempToday,
-                          weatherFontSmlHeight, taRight);
-    left += widthTempToday + marginItem;
+    WeatherWidget.AddText(TempMinToday.c_str(), false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday,
+                          WeatherFontSmlHeight, taRight);
+    left += WidthTempToday + m_MarginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", weatherFontHeight, weatherFontHeight - marginItem * 2);
+    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
-        left += weatherFontHeight - marginItem * 2;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        left += WeatherFontHeight - m_MarginItem * 2;
     }
-    weatherWidget.AddText(precToday.c_str(), false,
-                          cRect(left, 0 + (weatherFontHeight / 2 - weatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), weatherFontSml);
-    left += weatherFontSml->Width(precToday.c_str()) + marginItem * 4;
+    WeatherWidget.AddText(PrecToday.c_str(), false,
+                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml);
+    left += WeatherFontSml->Width(PrecToday.c_str()) + m_MarginItem * 4;
 
-    weatherWidget.AddRect(cRect(left - marginItem * 2, 0, wWidth - left + marginItem * 2, weatherFontHeight),
+    WeatherWidget.AddRect(cRect(left - m_MarginItem * 2, 0, wWidth - left + m_MarginItem * 2, WeatherFontHeight),
                           Theme.Color(clrChannelBg));
 
-    weatherIcon = cString::sprintf("widgets/%s", iconTomorrow.c_str());
-    img = imgLoader.LoadIcon(*weatherIcon, weatherFontHeight, weatherFontHeight - marginItem * 2);
+    WeatherIcon = cString::sprintf("widgets/%s", IconTomorrow.c_str());
+    img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
-        left += weatherFontHeight + marginItem;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        left += WeatherFontHeight + m_MarginItem;
     }
-    weatherWidget.AddText(tempMaxTomorrow.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), weatherFontSml, widthTempTomorrow, weatherFontSmlHeight,
+    WeatherWidget.AddText(TempMaxTomorrow.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
-    weatherWidget.AddText(tempMinTomorrow.c_str(), false, cRect(left, 0 + weatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), weatherFontSml, widthTempTomorrow,
-                          weatherFontSmlHeight, taRight);
-    left += widthTempTomorrow + marginItem;
+    WeatherWidget.AddText(TempMinTomorrow.c_str(), false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow,
+                          WeatherFontSmlHeight, taRight);
+    left += WidthTempTomorrow + m_MarginItem;
 
-    img = imgLoader.LoadIcon("widgets/umbrella", weatherFontHeight, weatherFontHeight - marginItem * 2);
+    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem * 2);
     if (img) {
-        weatherWidget.AddImage(img, cRect(left, 0 + marginItem, weatherFontHeight, weatherFontHeight));
-        left += weatherFontHeight - marginItem * 2;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        left += WeatherFontHeight - m_MarginItem * 2;
     }
-    weatherWidget.AddText(precTomorrow.c_str(), false,
-                          cRect(left, 0 + (weatherFontHeight / 2 - weatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), weatherFontSml);
-    left += weatherFontSml->Width(precTomorrow.c_str());
+    WeatherWidget.AddText(PrecTomorrow.c_str(), false,
+                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
+    left += WeatherFontSml->Width(PrecTomorrow.c_str());
 
-    // weatherWidget.AddRect(cRect(left, 0, wWidth - left, fontHeight), clrTransparent);
+    // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
-    weatherWidget.CreatePixmaps(false);
-    weatherWidget.Draw();
+    WeatherWidget.CreatePixmaps(false);
+    WeatherWidget.Draw();
 }

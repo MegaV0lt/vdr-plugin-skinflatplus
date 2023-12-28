@@ -1,5 +1,5 @@
 /*
- * skinflatplus.c: A plugin for the Video Disk Recorder
+ * Skin flatPlus: A plugin for the Video Disk Recorder
  *
  * See the README file for copyright information and how to reach the author.
  *
@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "0.8.3";
+static const char *VERSION        = "0.8.4";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -97,15 +97,15 @@ bool cPluginFlat::Start(void) {
     } else
         dsyslog("flatPlus: TrueColor OSD found");
 
-    imgCache.Create();
-    imgCache.PreLoadImage();
+    ImgCache.Create();
+    ImgCache.PreLoadImage();
 
     flat = new cFlat;
     return flat;
 }
 
 void cPluginFlat::Stop(void) {
-    imgCache.Clear();
+    ImgCache.Clear();
 }
 
 void cPluginFlat::Housekeeping(void) {
@@ -159,7 +159,7 @@ cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &
             return "No logo given";
         }
 
-        if (imgCache.RemoveFromCache(Option)) {
+        if (ImgCache.RemoveFromCache(Option)) {
             ReplyCode = 900;
             return "Successfully remove logo from cache";
         } else {

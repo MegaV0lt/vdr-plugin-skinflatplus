@@ -1,15 +1,22 @@
+/*
+ * Skin flatPlus: A plugin for the Video Disk Recorder
+ *
+ * See the README file for copyright information and how to reach the author.
+ *
+ * $Id$
+ */
 #pragma once
 
-#include "baserender.h"
+#include "./baserender.h"
 
 class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
  private:
-        bool muted;
+        // bool Muted;  // Unused?
 
-        cPixmap *labelPixmap;
-        cPixmap *muteLogoPixmap;
+        cPixmap *LabelPixmap;
+        cPixmap *MuteLogoPixmap;
 
-        int labelHeight;
+        int m_LabelHeight;
  public:
         cFlatDisplayVolume(void);
         virtual ~cFlatDisplayVolume();
