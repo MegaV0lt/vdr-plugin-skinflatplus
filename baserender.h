@@ -196,9 +196,6 @@ class cFlatBaseRender {
         void DecorBorderRedrawAll(void);
         void DecorBorderClearByFrom(int From);
 
-        /* void DrawText(cPixmap *Pixmap, int x, int y, const char *s, tColor ColorFg, tColor ColorBg,
-                      const cFont *Font, int Width, int Height, int Alignment); */
-
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
         void DrawWidgetWeather(void);

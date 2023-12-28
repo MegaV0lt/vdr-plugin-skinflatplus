@@ -1595,7 +1595,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     /* } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
             MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_Font);
             Left += m_Font->Width(Event->GetTimeString()) + m_MarginItem; */
-    } else if (Event && Selectable) {  // Same as above
+    } else if (Event && Selectable) {  //? Same as above
         MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_Font);
         Left += m_Font->Width(Event->GetTimeString()) + m_MarginItem;
     }
@@ -2646,50 +2646,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0) {
             //* Add actors to compexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
-
-            /* ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
-
-            int actor {0}, ActorsPerLine {6};
-            int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-            cString name(""), path(""), role("");  // Actor name, path and role
-            int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
-            int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
-            int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
-            int x = m_MarginItem;
-            int y = ContentTop;
-            if (PicLines > 10)
-                dsyslog("flatPlus: %d actor images found! First display will propably be slow.",
-                        NumActors);  // TODO: Config option
-
-            for (int row {0}; row < PicLines; ++row) {
-                for (int col {0}; col < PicsPerLine; ++col) {
-                    if (actor == NumActors)
-                        break;
-                    path = ActorsPath[actor];
-                    img = ImgLoader.LoadFile(*path, ActorWitdh, 999);
-                    if (img) {
-                        ComplexContent.AddImage(img, cRect(x, y, 0, 0));
-                        name = ActorsName[actor];
-                        role = cString::sprintf("\"%s\"", *ActorsRole[actor]);
-                        ComplexContent.AddText(*name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWitdh, 0),
-                                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg),
-                                               m_FontSml, ActorWitdh, m_FontSmlHeight, taCenter);
-                        ComplexContent.AddText(
-                            *role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWitdh, 0),
-                            Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, ActorWitdh,
-                            m_FontSmlHeight, taCenter);
-                    }
-                    x += ActorWitdh + ActorMargin;
-                    ++actor;
-                }
-                x = m_MarginItem;
-                y = ComplexContent.BottomContent() + m_FontHeight;
-            } */
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick6 = GetMsTicks();
@@ -2884,54 +2840,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 if (!isempty(*Subtitle))
                     Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
-            if (RecInfo->Aux()) {
-                /* std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
-                std::string channel(""), searchtimer("");
-                if (!Buffer.empty()) {
-                    channel = XmlSubstring(Buffer, "<channel>", "</channel>");
-                    searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
-                    if (searchtimer.empty())
-                        searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
-                }
-
-                Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
-                std::string causedby(""), reason("");
-                if (!Buffer.empty()) {
-                    causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
-                    reason = XmlSubstring(Buffer, "<reason>", "</reason>");
-                }
-
-                Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
-                std::string pattern("");
-                if (!Buffer.empty()) {
-                    pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
-                }
-
-                if ((!channel.empty() && !searchtimer.empty()) || (!causedby.empty() && !reason.empty()) ||
-                    !pattern.empty()) {
-                    Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show extrainfos
-                    if (!channel.empty() && !searchtimer.empty()) {
-                        Text.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(),
-                                                     tr("search pattern"), searchtimer.c_str()));
-                    }
-                    if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                        Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(),
-                                                     tr("reason")));
-                        if (reason == "improve")
-                            Text.Append(tr("improve"));
-                        else if (reason == "collection")
-                            Text.Append(tr("collection"));
-                        else if (reason == "TV show, missing episode")
-                            Text.Append(tr("TV show, missing episode"));
-                        else
-                            Text.Append(reason.c_str());  // To be safe if there are more options
-                    }
-                    if (!pattern.empty()) {
-                        Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
-                    }
-                } */
+            if (RecInfo->Aux())
                 InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with infoline
-            }
         }  // if Config.RecordingAdditionalInfoShow
     } else
         Text.Append(*EmptyText);
@@ -3215,50 +3125,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
         }
-        if (RecInfo->Aux()) {
-            /* std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
-            std::string channel(""), searchtimer("");
-            if (!Buffer.empty()) {
-                channel = XmlSubstring(Buffer, "<channel>", "</channel>");
-                searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
-                if (searchtimer.empty())
-                    searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
-            }
-
-            Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
-            std::string causedby(""), reason("");
-            if (!Buffer.empty()) {
-                causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
-                reason = XmlSubstring(Buffer, "<reason>", "</reason>");
-            }
-
-            Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
-            std::string pattern("");
-            if (!Buffer.empty()) {
-                pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
-            }
-
-            if (!channel.empty() && !searchtimer.empty()) {  // EPGSearch
-                RecAdditional.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), channel.c_str(),
-                                                      tr("search pattern"), searchtimer.c_str()));
-            }
-            if (!causedby.empty() && !reason.empty()) {  // TVScraper
-                RecAdditional.Append(
-                    cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), causedby.c_str(), tr("reason")));
-                if (reason == "improve")
-                    RecAdditional.Append(tr("improve"));
-                else if (reason == "collection")
-                    RecAdditional.Append(tr("collection"));
-                else if (reason == "TV show, missing episode")
-                    RecAdditional.Append(tr("TV show, missing episode"));
-                else
-                    RecAdditional.Append(reason.c_str());
-            }
-            if (!pattern.empty()) {  // VDR-Admin
-                RecAdditional.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), pattern.c_str()));
-            } */
+        if (RecInfo->Aux())
             InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without infoline
-        }
     }  // if Config.RecordingAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
@@ -3524,50 +3392,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (Config.TVScraperRecInfoShowActors && NumActors > 0) {  // TODO: Merge
             //* Add actors to compexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
-
-            /*ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
-
-            int actor {0}, ActorsPerLine {6};
-            int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-            cString name(""), path(""), role("");  // Actor name, path and role
-            int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
-            int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
-            int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
-            int x = m_MarginItem;
-            int y = ContentTop;
-            if (PicLines > 10)
-                dsyslog("flatPlus: %d actor images found! First display will propably be slow.",
-                        NumActors);  // TODO: Config option
-
-            for (int row {0}; row < PicLines; ++row) {
-                for (int col {0}; col < PicsPerLine; ++col) {
-                    if (actor == NumActors)
-                        break;
-                    path = ActorsPath[actor];
-                    img = ImgLoader.LoadFile(*path, ActorWitdh, 999);
-                    if (img) {
-                        ComplexContent.AddImage(img, cRect(x, y, 0, 0));
-                        name = ActorsName[actor];
-                        role = cString::sprintf("\"%s\"", *ActorsRole[actor]);
-                        ComplexContent.AddText(*name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWitdh, 0),
-                                               Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
-                                               ActorWitdh, m_FontSmlHeight, taCenter);
-                        ComplexContent.AddText(
-                            *role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWitdh, 0),
-                            Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWitdh,
-                            m_FontSmlHeight, taCenter);
-                    }
-                    x += ActorWitdh + ActorMargin;
-                    ++actor;
-                }
-                x = m_MarginItem;
-                y = ComplexContent.BottomContent() + m_FontHeight;
-            } */
         }
 #ifdef DEBUGEPGTIME
         uint32_t tick5 = GetMsTicks();
@@ -3947,18 +3771,6 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     return RecStart;
 }
-
-// Returns the string between start and end or an empty string if not found
-/* Moved to flat.c
-std::string cFlatDisplayMenu::XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
-    std::size_t start = source.find(StrStart);
-    std::size_t end = source.find(StrEnd);
-
-    if (std::string::npos != start && std::string::npos != end)
-        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
-
-    return std::string();
-} */
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
     if (!Recording) return "";

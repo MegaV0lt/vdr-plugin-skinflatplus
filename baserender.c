@@ -1745,24 +1745,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
-// Wrapper for Pixmap->Draw*
-// Instead of wrappers we check for pixmap before useage
-/* void cFlatBaseRender::DrawText(cPixmap *Pixmap, int x, int y, const char *s, tColor ColorFg, tColor ColorBg,
-              const cFont *Font, int Width, int Height, int Alignment) {
-    if (Pixmap)
-        Pixmap->DrawText(cPoint(x, y), s, ColorFg, ColorBg, Font, Width, Height, Alignment);
-}
-
-void cFlatBaseRender::DrawImage(cPixmap *Pixmap, int x, int y, cImage *img) {
-    if (Pixmap)
-        Pixmap->DrawImage(cPoint(x, y), img);
-}
-
-void cFlatBaseRender::DrawRectangle(cPixmap *Pixmap, int x, int y, int x2, int y2, tColor Color) {
-    if (Pixmap)
-        Pixmap->DrawRectangle(cRect(x, y, x2, y2), Color);
-} */
-
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
     FT_Library library;
     FT_Face face;

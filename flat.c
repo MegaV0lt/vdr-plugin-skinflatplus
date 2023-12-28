@@ -60,21 +60,7 @@ cSkinDisplayMenu *cFlat::DisplayMenu(void) {
     m_MenuActive = true;
     return menu;
 }
-/*
-// shared_ptr ist der bequemere Smart Pointer, vllt ist std::unique_ptr die bessere Alternative
-std::shared_ptr<cSkinDisplayChannel> cFlat::DisplayChannel(bool WithInfo) {
-    return std::make_shared<cFlatDisplayChannel>(WithInfo);
-}
 
-std::shared_ptr<cOsdItem> cMenuSetupSubMenu::InfoItem(const char *label, const char *value) {
-    // was ist wenn, min. einer der beiden Parameter nullptr ist?
-    std::shared_ptr<cOsdItem> retval = std::make_shared<cOsdItem>(cString::sprintf("%s: %s", label, value));
-    retval->SetSelectable(false);
-    m_MenuActive = true;
-    Display_Menu = retval;
-    return retval;
-}
-*/
 cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) {
     return new cFlatDisplayReplay(ModeOnly);
 }
@@ -120,7 +106,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, con
     return NULL;
 }
 
-// void inline PixmapFill(cPixmap *pixmap, tColor Color);  // See flat.h
+// void inline PixmapFill(cPixmap *pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
@@ -146,7 +132,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double Screen
     switch (ScreenWidth) {
         case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
         case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
-        // case 2560: res = "2560x1440"; break;  // 2560x1440 (QHD) Is that used somewhere on sat/cable?
+        // case 2560: res = "2560x1440"; break;  //* 2560x1440 (QHD) Is that used somewhere on sat/cable?
         case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
         case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
         case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
@@ -408,7 +394,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
     uint64_t RecSize {0};
     if (AddText) {
-        /* if (!rc) */ RecSize = FileSize[i - 1];  // 0 when error opening file / Show partial size
+        /* if (!rc) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
         if (RecSize > MEGABYTE(1023))
             Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
