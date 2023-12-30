@@ -330,6 +330,7 @@ void cFlatSetup::Store(void) {
     SetupStore("TVScraperEPGInfoShowActors", Config.TVScraperEPGInfoShowActors);
     SetupStore("TVScraperEPGInfoShowPoster", Config.TVScraperEPGInfoShowPoster);
     SetupStore("TVScraperRecInfoShowActors", Config.TVScraperRecInfoShowActors);
+    SetupStore("TVScraperShowMaxActors", Config.TVScraperShowMaxActors);
     SetupStore("TVScraperRecInfoShowPoster", Config.TVScraperRecInfoShowPoster);
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("TVScraperReplayInfoShowPoster", Config.TVScraperReplayInfoShowPoster);
@@ -529,6 +530,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperEPGInfoShowActors") == 0)           SetupConfig->TVScraperEPGInfoShowActors = atoi(Value);
     else if (strcmp(Name, "TVScraperEPGInfoShowPoster") == 0)           SetupConfig->TVScraperEPGInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperRecInfoShowActors") == 0)           SetupConfig->TVScraperRecInfoShowActors = atoi(Value);
+    else if (strcmp(Name, "TVScraperShowMaxActors") == 0)               SetupConfig->TVScraperShowMaxActors = atoi(Value);
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           SetupConfig->TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
@@ -708,6 +710,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("TVScraperEPGInfoShowActors", SetupConfig->TVScraperEPGInfoShowActors, *Filename);
     Config.Store("TVScraperEPGInfoShowPoster", SetupConfig->TVScraperEPGInfoShowPoster, *Filename);
     Config.Store("TVScraperRecInfoShowActors", SetupConfig->TVScraperRecInfoShowActors, *Filename);
+    Config.Store("TVScraperShowMaxActors", SetupConfig->TVScraperShowMaxActors, *Filename);
     Config.Store("TVScraperRecInfoShowPoster", SetupConfig->TVScraperRecInfoShowPoster, *Filename);
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("TVScraperReplayInfoShowPoster", SetupConfig->TVScraperReplayInfoShowPoster, *Filename);
@@ -1290,6 +1293,7 @@ void cFlatSetupTvsraper::Setup(void) {
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("recording info show actors?"), &SetupConfig->TVScraperRecInfoShowActors));
+    Add(new cMenuEditBoolItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors));
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));

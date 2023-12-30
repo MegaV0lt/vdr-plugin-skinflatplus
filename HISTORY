@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2024-01-xx: Version 1.0.0
+- [add] Option to limit max. shon actors
+
 2023-12-28: Version 0.8.4
 - [fix] Fix dots with long not scrolling text
 - [update] Load named logos only for channels

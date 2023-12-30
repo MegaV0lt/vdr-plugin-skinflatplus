@@ -339,6 +339,7 @@ class cFlatConfig {
 
         int TVScraperEPGInfoShowActors;
         int TVScraperRecInfoShowActors;
+        int TVScraperShowMaxActors;
 
         int DecorIndex;
 

@@ -801,6 +801,9 @@ msgstr "Mostrare attori nelle EPG-Info?"
 msgid "recording info show actors?"
 msgstr "Mostrare attori nelle info delle registrazioni?"
 
+msgid "Max. actors to show?"
+msgstr ""
+
 msgid "Enable main menu widgets"
 msgstr "Abilita il menù principale dei widget"
 

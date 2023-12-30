@@ -2954,6 +2954,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
+    // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
+    int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and recinfo
+    if (ShowMaxActors == 0) return;  // Do not schow actors
+    if (ShowMaxActors != -1 && ShowMaxActors > 0 && ShowMaxActors < NumActors)
+        NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all ators)
+
     int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
     ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
                            Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
@@ -2962,16 +2968,16 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ContentTop += 6;
 
     cImage *img {nullptr};
+    cString Name(""), Path(""), Role("");  // Actor name, path and role
     int Actor{0}, ActorsPerLine{6};  // TODO: Config option
     int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-    cString Name(""), Path(""), Role(""); // Actor name, path and role
+    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
     int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
     int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
-    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
     int x = m_MarginItem;
     int y = ContentTop;
-    if (NumActors > 50)  // TODO: Config option
-        dsyslog("flatPlus: %d actor images found! First display will propably be slow.", NumActors);
+    if (NumActors > 50)
+        dsyslog("flatPlus: Showing %d actor images! First display will propably be slow.", NumActors);
 
     for (int row{0}; row < PicLines; ++row) {
         for (int col{0}; col < PicsPerLine; ++col) {
