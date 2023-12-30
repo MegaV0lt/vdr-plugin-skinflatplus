@@ -10,8 +10,8 @@
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
-    current = "";
-    total = "";
+    m_Current = "";
+    m_Total = "";
     m_Recording = NULL;
 
     m_ModeOnly = ModeOnly;
@@ -287,14 +287,14 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
     if (m_ModeOnly) return;
 
-    current = Current;
+    m_Current = Current;
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
     if (m_ModeOnly) return;
 
-    total = Total;
+    m_Total = Total;
     UpdateInfo();
 }
 
@@ -307,10 +307,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     int TopSecs = FontAscender - FontSecsAscender;
 
     if (Config.TimeSecsScale == 1.0)
-        LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                              m_Font, m_Font->Width(*current), m_FontHeight);
+        LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
+                              m_Font, m_Font->Width(*m_Current), m_FontHeight);
     else {
-        std::string cur = *current;
+        std::string cur = *m_Current;
         std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
             std::string hm = cur.substr(0, found);
@@ -323,8 +323,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                   m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
         } else {
-            LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *current, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(*current), m_FontHeight);
+            LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *m_Current, Theme.Color(clrReplayFont),
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(*m_Current), m_FontHeight);
         }
     }
 
@@ -419,10 +419,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (img)
             imgWidth = img->Width();
 
-        int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(total) - m_MarginItem - imgWidth -
+        int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total) - m_MarginItem - imgWidth -
                     m_Font->Width(' ') - m_Font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
-            std::string tot = *total;
+            std::string tot = *m_Total;
             std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
                 std::string hm = tot.substr(0, found);
@@ -450,15 +450,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 right += m_Font->Width(hm.c_str()) + m_FontSecs->Width(secs.c_str());
                 right += m_Font->Width(' ');
             } else {
-                LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), total, Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
-                right += m_Font->Width(total);
+                LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), m_Total, Theme.Color(clrReplayFont),
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
+                right += m_Font->Width(m_Total);
                 right += m_Font->Width(' ');
             }
         } else {
-            LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), total, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
-            right += m_Font->Width(total);
+            LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), m_Total, Theme.Color(clrReplayFont),
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
+            right += m_Font->Width(m_Total);
             right += m_Font->Width(' ');
         }
 
@@ -489,9 +489,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHeight);
         }
     } else {  // Not cutted
-        int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(total);
+        int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total);
         if (Config.TimeSecsScale < 1.0) {
-            std::string tot = *total;
+            std::string tot = *m_Total;
             std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
                 std::string hm = tot.substr(0, found);
@@ -505,12 +505,12 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
-                LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *total, Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
+                LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *m_Total, Theme.Color(clrReplayFont),
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
             }
         } else {
-            LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *total, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(total), m_FontHeight);
+            LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), *m_Total, Theme.Color(clrReplayFont),
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
         }
     }  // IsCutted
 }

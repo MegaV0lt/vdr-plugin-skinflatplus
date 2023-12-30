@@ -12,7 +12,7 @@
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  private:
-        cString current, total;
+        cString m_Current, m_Total;
 
         int m_LabelHeight;
         cPixmap *LabelPixmap;
