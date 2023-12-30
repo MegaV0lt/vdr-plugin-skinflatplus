@@ -4066,11 +4066,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     // Check currently recording devices
     const int NumDevices = cDevice::NumDevices();
-    // bool *RecDevices = new bool[NumDevices];  // Eliminate 'new'
     bool RecDevices[NumDevices] {false};  // Array initialisized to false
-    // std::array<bool, NumDevices> RecDevices;
-    // for (int i {0}; i < NumDevices; ++i)
-    //    RecDevices[i] = false;
 
 #if VDRVERSNUM >= 20301
     LOCK_TIMERS_READ;
@@ -4164,8 +4160,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
         ContentTop += m_FontSmlHeight;
     }  // for NumDevices
-
-    // delete[] RecDevices;
 
     return ContentWidget.ContentHeight(false);
 }
@@ -4421,13 +4415,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     }
     // Sort by RecStart
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeStringDesc);
+    std::pair<time_t, std::string> PairRec {};
     int index {0};
     cString Rec("");
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
         if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
             continue;
 
-        std::pair<time_t, std::string> PairRec = Recs.back();
+        PairRec = Recs.back();
         Recs.pop_back();
         Rec = PairRec.second.c_str();
 

@@ -115,7 +115,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     // TODO: How to get width of aspect and format icons?
     //  Done: Substract 'left' in case of displayed recording icon
     //  Done: Substract 'm_FontSmlHeight' in case of recordingerror icon is displayed later
-    //  Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
+    //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
 
 #if APIVERSNUM >= 20505
@@ -125,7 +125,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     img = ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHeight);
     if (img)
-        MaxWidth -= img->Width() * 3;  // Substract guessed max. used space of aspect and format icons
+        MaxWidth -= img->Width() * 3;  //* Substract guessed max. used space of aspect and format icons
 
     if (InfoWidth > MaxWidth) {  // Infotext too long
         if (Config.ScrollerEnable) {
@@ -211,7 +211,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (m_ModeOnly)
             PixmapFill(LabelPixmap, clrTransparent);
 
-        // PixmapFill(IconsPixmap, clrTransparent);  // Moved to SetRecording
+        // PixmapFill(IconsPixmap, clrTransparent);  //* Moved to SetRecording
         LabelPixmap->DrawRectangle(cRect(left - m_Font->Width("99") - m_MarginItem, 0,
                                          m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
