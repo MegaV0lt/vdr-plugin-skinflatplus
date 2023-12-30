@@ -3474,7 +3474,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long shorttext
     if (ShortTextWidth > MaxWidth) {  // Shorttext too long
-        if (Config.ScrollerEnable) {  // TODO: Position left; maxwidth too small
+        if (Config.ScrollerEnable) {  // TODO: Maxwidth too small
             MenuItemScroller.AddScroller(*ShortText,
                                          cRect(m_chLeft + left, m_chTop + m_MarginItem + m_FontSmlHeight + m_FontHeight,
                                                MaxWidth, m_FontSmlHeight),
@@ -3500,7 +3500,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }
 
 #if APIVERSNUM >= 20505
-    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option
+    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
         cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
         cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
 
@@ -3985,10 +3985,11 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
         widgets.emplace_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
 
     std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
+    std::pair<int, std::string> PairWidget {};
     std::string widget("");
     int AddHeight {0};
     while (!widgets.empty()) {
-        std::pair<int, std::string> PairWidget = widgets.back();
+        PairWidget = widgets.back();
         widgets.pop_back();
         widget = PairWidget.second;
 
