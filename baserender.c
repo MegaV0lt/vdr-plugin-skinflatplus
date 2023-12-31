@@ -16,9 +16,7 @@
 #include <iostream>
 #include <utility>
 
-// #if VDRVERSNUM >= 20301
 #include <future>
-// #endif
 
 #include "./flat.h"
 
@@ -437,7 +435,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int NumRec {0};
         if (Config.TopBarRecordingShow) {
 // Look for timers
-// #if VDRVERSNUM >= 20301
             auto recCounterFuture = std::async([&NumRec]() {
                 LOCK_TIMERS_READ;
                 for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
@@ -446,11 +443,6 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 }
             });
             recCounterFuture.get();
-/* #else 
-            for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti))
-                if (ti->HasFlags(tfRecording))
-                    ++NumRec;
-#endif */
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem * 2,
                                             m_TopBarFontHeight - m_MarginItem * 2);
@@ -1689,8 +1681,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        // if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
-        //    continue;
         Alpha = 255 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
@@ -1704,8 +1694,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        // if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
-        //    continue;
         Alpha = 255 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
@@ -1719,8 +1707,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        // if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
-        //    continue;
         Alpha = 255 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
@@ -1734,8 +1720,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        // if (VDRVERSNUM < 20002 && j == 1)  // in VDR Version < 2.0.2 osd breaks if width & height == 1
-        //    continue;
         Alpha = 255 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);

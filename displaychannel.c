@@ -574,8 +574,8 @@ void cFlatDisplayChannel::Flush(void) {
     // if (!m_DoOutput) return;
     // if (!osd) return;
 
-    int Current {0}, Total {0};
     if (m_Present) {
+        int Current {0}, Total {0};
         time_t t = time(NULL);
         if (t > m_Present->StartTime())
             Current = t - m_Present->StartTime();
@@ -615,14 +615,9 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
-// #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
-/* #else
-    for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE;
-         Channel = Channels.Next(Channel)) {
-#endif */
         if (!Channel->GroupSep()) {  // Don't cache named channelgroup logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)

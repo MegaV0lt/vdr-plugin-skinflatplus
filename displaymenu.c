@@ -10,9 +10,7 @@
 #include <iostream>
 #include <utility>
 
-// #if VDRVERSNUM >= 20301
 #include <future>
-// #endif
 
 #include "./services/epgsearch.h"
 #include "./services/remotetimers.h"
@@ -285,12 +283,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             icon = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
                 int ChanCount{0};
-// #if VDRVERSNUM >= 20301
                 LOCK_CHANNELS_READ;
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
-/* #else
-                for (cChannel *Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)) {
-#endif */
                     if (!Channel->GroupSep())
                         ++ChanCount;
                 }  // for
@@ -302,12 +296,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             icon = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
                 int TimerCount{0}, TimerActiveCount{0};
-// #if VDRVERSNUM >= 20301
                 LOCK_TIMERS_READ;
                 for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-/* #else
-                for (cTimer *Timer = Timers.First(); Timer; Timer = Timers.Next(Timer)) {
-#endif */
                     ++TimerCount;
                     if (Timer->HasFlags(tfActive))
                         ++TimerActiveCount;
@@ -324,12 +314,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                 m_LastRecFolder = m_RecFolder;
                 if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
                     std::string RecFolder2("");
-// #if VDRVERSNUM >= 20301
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-/* #else
-                    for (cRecording *Rec = Recordings.First(); Rec; Rec = Recordings.Next(Rec)) {
-#endif */
                         RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
                         if (m_RecFolder == RecFolder2) {
                             ++RecCount;
@@ -338,12 +324,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                         }
                     }  // for
                 } else {
-// #if VDRVERSNUM >= 20301
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-/* #else
-                    for (cRecording *Rec = Recordings.First(); Rec; Rec = Recordings.Next(Rec)) {
-#endif */
                         ++RecCount;
                         if (Rec->IsNew())
                             ++RecNewCount;
@@ -706,12 +688,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         DrawProgress = false;
 
     /* Disabled because invalid lock sequence
-// #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
-// #else
-//    cString ws = cString::sprintf("%d", Channels.MaxNumber());
-//#endif
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     int w = m_Font->Width("9999");  // At least four digits in channellist because of different sortmodes
     cString Buffer("");
@@ -791,14 +769,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     // Event from channel
     const cEvent *Event {nullptr};
-// #if VDRVERSNUM >= 20301
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
-/* #else
-    cSchedulesLock SchedulesLock;
-    const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
-    const cSchedule *Schedule = Schedules->GetSchedule(Channel->GetChannelID());
-#endif */
     float progress {0.0};
     cString EventTitle("");
     if (Schedule) {
@@ -1162,12 +1134,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageHeight + m_MarginItem * 2;
 
     /* Disabled because invalid lock sequence
-// #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
-// #else
-//    cString ws = cString::sprintf("%d", Channels.MaxNumber());
-// #endif
     int w = m_Font->Width(ws); */
     int w = m_Font->Width("999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
@@ -1356,13 +1324,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     return true;
 }
 
-// #if APIVERSNUM >= 20308
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch, bool TimerActive) {
-/* #else
-bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                                    const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch) {
-#endif */
     if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return false;
 
     if (Config.MenuEventView == 0)
@@ -1417,12 +1380,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             m_ItemEventLastChannelName = Channel->Name();
 
         /* Disabled because invalid lock sequence
-        // #if VDRVERSNUM >= 20301
             LOCK_CHANNELS_READ;
             cString ws = cString::sprintf("%d", Channels->MaxNumber());
-        // #else
-        //    cString ws = cString::sprintf("%d", Channels.MaxNumber());
-        // #endif
             int w = m_Font->Width(ws); */
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         m_IsGroup = Channel->GroupSep();
@@ -1806,12 +1765,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_LastRecFolder = m_RecFolder;
         if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
             std::string RecFolder2("");
-// #if VDRVERSNUM >= 20301
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-/* #else
-            for (cRecording *Rec = Recordings.First(); Rec; Rec = Recordings.Next(Rec)) {
-#endif */
                 RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
                 if (m_RecFolder == RecFolder2) {
                     ++RecCount;
@@ -1820,12 +1775,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 }
             }  // for
         } else {
-// #if VDRVERSNUM >= 20301
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-/* #else
-            for (cRecording *Rec = Recordings.First(); Rec; Rec = Recordings.Next(Rec)) {
-#endif */
                 ++RecCount;
                 if (Rec->IsNew())
                     ++RecNewCount;
@@ -1931,9 +1882,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             } else if (Recording->IsNew()) {
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
-            }
-// #if APIVERSNUM >= 20108
-            else /* if (!RecordingIsInUse) */ {
+            } else /* if (!RecordingIsInUse) */ {
                 IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
@@ -1946,7 +1895,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
-// #endif
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *RecInfo = Recording->Info();
@@ -2114,9 +2062,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             } else if (Recording->IsNew()) {
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
-            }
-// #if APIVERSNUM >= 20108
-            else {
+            } else {
                 IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
@@ -2129,7 +2075,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             }
-// #endif
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *RecInfo = Recording->Info();
@@ -2409,12 +2354,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             continue;
                         ++i;
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
-// #if VDRVERSNUM >= 20301
                         LOCK_CHANNELS_READ;
                         const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
-/* #else
-                        cChannel *channel = Channels.GetByChannelID(r->event->ChannelID(), true, true);
-#endif */
                         if (channel)
                             Reruns.Append(cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
 
@@ -2781,16 +2722,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
-// #if VDRVERSNUM >= 20301
             LOCK_CHANNELS_READ;
             const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
             // const cChannel *channel =
             //    Channels->GetByChannelID((reinterpret_cast<cRecordingInfo *>(RecInfo))->ChannelID());
             // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’
             //         casts away qualifiers
-/* #else
-            cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
-#endif */
             if (channel)
                 Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
 
@@ -3059,7 +2996,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-// #if VDRVERSNUM >= 20301
         auto channelFuture = std::async(
             [&RecAdditional](tChannelID channelId) {
                 LOCK_CHANNELS_READ;
@@ -3070,15 +3006,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             },
             RecInfo->ChannelID());
         channelFuture.get();
-/* #else
-        cChannel *channel = Channels.GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
-        // cChannel *channel = Channels.GetByChannelID((reinterpret_cast<cRecordingInfo *>(RecInfo))->ChannelID());
-
-        if (channel)
-            RecAdditional.Append(
-                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
-#endif */
-
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3674,12 +3601,8 @@ void cFlatDisplayMenu::Flush(void) {
 
     if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
         int TimerCount {0}, TimerActiveCount {0};
-// #if VDRVERSNUM >= 20301
         LOCK_TIMERS_READ;
         for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-/* #else
-        for (cTimer *Timer = Timers.First(); Timer; Timer = Timers.Next(Timer)) {
-#endif */
             ++TimerCount;
             if (Timer->HasFlags(tfActive))
                 ++TimerActiveCount;
@@ -3762,12 +3685,8 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     time_t RecStart = Recording->Start();
     time_t RecStart2 {0};
 
-// #if VDRVERSNUM >= 20301
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-/* #else
-    for (cRecording *rec = Recordings.First(); rec; rec = Recordings.Next(rec)) {
-#endif */
         RecFolder2 = GetRecordingName(rec, Level, true).c_str();
         if (m_RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStart2 = rec->Start();
@@ -4073,12 +3992,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     const int NumDevices = cDevice::NumDevices();
     bool RecDevices[NumDevices] {false};  // Array initialisized to false
 
-// #if VDRVERSNUM >= 20301
     LOCK_TIMERS_READ;
     for (const cTimer *timer = Timers->First(); timer; timer = Timers->Next(timer)) {
-/* #else
-    for (cTimer *timer = Timers.First(); timer; timer = Timers.Next(timer)) {
-#endif */
         if (!timer->Recording())
             continue;
 
@@ -4199,12 +4114,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     cVector<const cTimer *> TimerRemoteRec;
     cVector<const cTimer *> TimerRemoteActive;
 
-// #if VDRVERSNUM >= 20301
     LOCK_TIMERS_READ;
     for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
-/* #else
-    for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti)) {
-#endif */
         if (ti->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowRecording)
             TimerRec.Append(ti);
 
@@ -4215,12 +4126,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             break;
     }
 
-// #if VDRVERSNUM >= 20301
     LOCK_SCHEDULES_READ;
-/* #else
-    cSchedulesLock SchedulesLock;
-    const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
-#endif */
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && TimerRec.Size() + TimerActive.Size() < Config.MainMenuWidgetActiveTimerMaxCount) {
         cTimer *RemoteTimer {nullptr};
@@ -4403,12 +4309,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     int Minutes {0};
     cString DateTime(""), Length("");
     std::string StrRec("");
-// #if VDRVERSNUM >= 20301
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-/* #else
-    for (cRecording *rec = Recordings.First(); rec; rec = Recordings.Next(rec)) {
-#endif */
         RecStart = rec->Start();
 
         Minutes = (rec->LengthInSeconds() + 30) / 60;
@@ -5208,13 +5110,9 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
     int index {0};
-// #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
-/* #else
-    for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE; Channel = Channels.Next(Channel)) {
-#endif */
         img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         if (img)
             ++index;
