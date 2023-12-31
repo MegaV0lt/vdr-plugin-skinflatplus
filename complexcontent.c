@@ -33,12 +33,12 @@ cComplexContent::~cComplexContent() {
 void cComplexContent::Clear(void) {
     m_IsShown = false;
     Contents.clear();
-    // if (Osd) {
+    if (Osd) {  //! Check because Clear() is called before SetOsd()
         Osd->DestroyPixmap(Pixmap);
         Pixmap = NULL;
         Osd->DestroyPixmap(PixmapImage);
         PixmapImage = NULL;
-    // }
+    }
 }
 
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
