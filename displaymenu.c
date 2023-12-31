@@ -2826,6 +2826,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
             }
 #endif
+#if APIVERSNUM >= 20605
+            cString InfoFrameParams = RecInfo->FrameParams();
+            if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
+                Text.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO Translate
+#endif
+
             const cComponents *Components = RecInfo->Components();
             if (Components) {
                 cString Audio(""), Subtitle("");
@@ -3003,7 +3009,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
-
     if (!Recording) return;
 
 #ifdef DEBUGEPGTIME
@@ -3022,8 +3027,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2;
     ContentHeadPixmap = CreatePixmap(osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
     // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
-    // m_chHeight);
-    */
+    // m_chHeight); */
 
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
@@ -3110,6 +3114,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             RecErrors << RecInfo->Errors();
             RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
         }
+#endif
+#if APIVERSNUM >= 20605
+        cString InfoFrameParams = RecInfo->FrameParams();
+        if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
+            RecAdditional.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO: Translate
 #endif
         const cComponents *Components = RecInfo->Components();
         if (Components) {

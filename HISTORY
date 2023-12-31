@@ -1,6 +1,7 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
 2024-01-xx: Version 1.0.0
+- [add] Add framedata to recordinginfo. Need VDR 2.6.5+
 - [add] Option to limit maximum actors to display
 - [update] VDR 2.3.8+ is needed now. For older version please use 
            Skin flatPlus 0.8.4
