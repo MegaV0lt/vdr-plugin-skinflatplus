@@ -109,9 +109,9 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, con
 // void inline PixmapFill(cPixmap *pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin(void) {
-    static cPlugin *pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    if (!pScraper)  // If it doesn't exit, try tvscraper
-        pScraper = cPluginManager::GetPlugin("tvscraper");
+    static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
+    if (!pScraper)  // If it doesn't exit, try scraper2vdr
+        pScraper = cPluginManager::GetPlugin("scraper2vdr");
     return pScraper;
 }
 
