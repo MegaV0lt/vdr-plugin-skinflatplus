@@ -20,7 +20,7 @@
 #include "./baserender.h"
 #include "./complexcontent.h"
 
-#if APIVERSNUM < 20107
+/* #if APIVERSNUM < 20107
     enum eMenuSortMode {
         msmUnknown = 0,
         msmNumber,
@@ -28,7 +28,7 @@
         msmTime,
         msmProvider
     };
-#endif
+#endif */
 
 class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
@@ -149,14 +149,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         virtual void SetMessage(eMessageType Type, const char *Text);
         virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
 
-        #if APIVERSNUM >= 20308
+        // #if APIVERSNUM >= 20308
                 virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                           const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
                                           bool TimerActive);
-        #else
+        /* #else
                 virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                           const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch);
-        #endif
+        #endif */
         virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
         virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                     bool WithProvider);

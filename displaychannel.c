@@ -615,14 +615,14 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
-#if VDRVERSNUM >= 20301
+// #if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
-#else
+/* #else
     for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels.Next(Channel)) {
-#endif
+#endif */
         if (!Channel->GroupSep()) {  // Don't cache named channelgroup logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)

@@ -1,7 +1,10 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
 2024-01-xx: Version 1.0.0
-- [add] Option to limit max. shon actors
+- [add] Option to limit maximum actors to display
+- [update] VDR 2.3.8+ is needed now. For older version please use 
+           Skin flatPlus 0.8.4
+- [update] Some internal optimizations
 
 2023-12-28: Version 0.8.4
 - [fix] Fix dots with long not scrolling text

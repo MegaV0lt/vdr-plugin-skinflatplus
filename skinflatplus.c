@@ -9,8 +9,8 @@
 #include <vdr/plugin.h>
 #include <Magick++.h>
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10734
-#error "VDR-1.7.34 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 20308
+#error "VDR-2.3.8 API version or greater is required!"
 #endif
 
 #include "./flat.h"

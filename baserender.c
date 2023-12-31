@@ -16,9 +16,9 @@
 #include <iostream>
 #include <utility>
 
-#if VDRVERSNUM >= 20301
+// #if VDRVERSNUM >= 20301
 #include <future>
-#endif
+// #endif
 
 #include "./flat.h"
 
@@ -437,7 +437,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int NumRec {0};
         if (Config.TopBarRecordingShow) {
 // Look for timers
-#if VDRVERSNUM >= 20301
+// #if VDRVERSNUM >= 20301
             auto recCounterFuture = std::async([&NumRec]() {
                 LOCK_TIMERS_READ;
                 for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
@@ -446,11 +446,11 @@ void cFlatBaseRender::TopBarUpdate(void) {
                 }
             });
             recCounterFuture.get();
-#else
+/* #else 
             for (cTimer *ti = Timers.First(); ti; ti = Timers.Next(ti))
                 if (ti->HasFlags(tfRecording))
                     ++NumRec;
-#endif
+#endif */
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem * 2,
                                             m_TopBarFontHeight - m_MarginItem * 2);
