@@ -74,7 +74,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     delete m_FontFixed;
     if (m_TopBarFontClock) delete m_TopBarFontClock;
 
-    if (osd) {
+    // if (osd) {
         MessageScroller.Clear();
         osd->DestroyPixmap(TopBarPixmap);
         osd->DestroyPixmap(TopBarIconPixmap);
@@ -89,7 +89,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
         osd->DestroyPixmap(DecorPixmap);
 
         delete osd;
-    }
+    // }
 }
 
 void cFlatBaseRender::CreateFullOsd(void) {
@@ -103,16 +103,16 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
     m_OsdWidth = width;
     m_OsdHeight = height;
 
-    osd = cOsdProvider::NewOsd(left, top);
-    if (osd) {
+    osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pionter
+    // if (osd) {
         tArea Area = {0, 0, width, height, 32};
         if (osd->SetAreas(&Area, 1) == oeOk) {
             // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
             return;
         }
-    }
-    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
-    return;
+    // }
+    // esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+    // return;
 }
 
 void cFlatBaseRender::TopBarCreate(void) {

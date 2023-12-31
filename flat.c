@@ -79,11 +79,11 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, const cRect &ViewPort/* = cRect::Null */,
                       const cRect &DrawPort/* = cRect::Null */) {
-    if (!osd) {
+    /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
         return NULL;
-    }
+    } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
         // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),

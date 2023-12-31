@@ -33,19 +33,19 @@ cComplexContent::~cComplexContent() {
 void cComplexContent::Clear(void) {
     m_IsShown = false;
     Contents.clear();
-    if (Osd) {
+    // if (Osd) {
         Osd->DestroyPixmap(Pixmap);
         Pixmap = NULL;
         Osd->DestroyPixmap(PixmapImage);
         PixmapImage = NULL;
-    }
+    // }
 }
 
 void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     CalculateDrawPortHeight();
     m_FullFillBackground = fullFillBackground;
 
-    if (!Osd) return;
+    // if (!Osd) return;
 
     Osd->DestroyPixmap(Pixmap);
     Pixmap = NULL;

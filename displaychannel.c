@@ -38,7 +38,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_SignalStrengthRight = 0;
 
     CreateFullOsd();
-    if (!osd) return;
+    // if (!osd) return;
 
     TopBarCreate();
     MessageCreate();
@@ -121,7 +121,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 cFlatDisplayChannel::~cFlatDisplayChannel() {
     // if (!m_DoOutput) return;
 
-    if (osd) {
+    // if (osd) {
         Scrollers.Clear();
         osd->DestroyPixmap(ChanInfoTopPixmap);
         osd->DestroyPixmap(ChanInfoBottomPixmap);
@@ -129,7 +129,7 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
         osd->DestroyPixmap(ChanLogoBGPixmap);
         osd->DestroyPixmap(ChanIconsPixmap);
         osd->DestroyPixmap(ChanEpgImagesPixmap);
-    }
+    // }
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {

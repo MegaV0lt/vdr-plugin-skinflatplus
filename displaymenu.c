@@ -112,7 +112,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
 
-    if (osd) {
+    // if (osd) {
         osd->DestroyPixmap(MenuPixmap);
         osd->DestroyPixmap(MenuIconsPixmap);
         osd->DestroyPixmap(MenuIconsBgPixmap);
@@ -120,7 +120,7 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
         osd->DestroyPixmap(ScrollbarPixmap);
         osd->DestroyPixmap(ContentHeadPixmap);
         osd->DestroyPixmap(ContentHeadIconsPixmap);
-    }
+    // }
 }
 
 void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {

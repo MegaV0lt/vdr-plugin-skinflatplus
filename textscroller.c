@@ -9,7 +9,7 @@
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
-    if (!Osd) return;
+    // if (!Osd) return;
 
     Text = text;
     Font = font;
