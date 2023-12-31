@@ -190,7 +190,8 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     return "recording_seen_10";
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle, bool NewLine /* = false */) {  // NOLINT
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
+                      bool NewLine) {
     cString AudioType("");
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);
@@ -291,9 +292,8 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine 
             Text.Append(Reason.c_str());  // To be safe if there are more options
     }
 
-    if (!Pattern.empty()) {  // VDRAdmin
+    if (!Pattern.empty())  // VDRAdmin
         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
-    }
 }
 
 int GetEpgsearchConflichts(void) {
@@ -305,9 +305,8 @@ int GetEpgsearchConflichts(void) {
             .totalConflicts = 0
         };
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
-        if (ServiceData.relevantConflicts > 0) {
+        if (ServiceData.relevantConflicts > 0)
             return ServiceData.relevantConflicts;
-        }
     }  // pEpgSearch
     return 0;
 }

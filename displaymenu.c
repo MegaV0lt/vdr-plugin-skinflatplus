@@ -201,10 +201,10 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 }
 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
-    // Wird das Menü gescrollt oder Content?
+    // Is the menu scrolling or content?
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
-        bool scrolled = ComplexContent.Scroll(Up, Page);
-        if (scrolled) {
+        bool IsScrolled = ComplexContent.Scroll(Up, Page);
+        if (IsScrolled) {
             DrawScrollbar(
                 ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
                 ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ComplexContent.ScrollOffset() > 0,
@@ -284,7 +284,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcChannel:
             icon = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
-                int chanCount{0};
+                int ChanCount{0};
 // #if VDRVERSNUM >= 20301
                 LOCK_CHANNELS_READ;
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
@@ -292,9 +292,9 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                 for (cChannel *Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)) {
 #endif */
                     if (!Channel->GroupSep())
-                        ++chanCount;
+                        ++ChanCount;
                 }  // for
-                cString NewTitle = cString::sprintf("%s (%d)", Title, chanCount);
+                cString NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuChannelShowCount
             break;
@@ -451,21 +451,21 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
             if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
                 switch (s[0]) {
-                case '!':
-                    if (IconArrowTurn)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconArrowTurn->Height()) / 2),
-                                                   *IconArrowTurn);
+                case '>':
+                    if (IconTimerFull)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconTimerFull->Height()) / 2),
+                                                   *IconTimerFull);
                     break;
                 case '#':
                     if (IconRec)
                         MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconRec->Height()) / 2), *IconRec);
                     break;
-                case '>': [[likely]]
-                    if (IconTimerFull)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconTimerFull->Height()) / 2),
-                                                   *IconTimerFull);
+                case '!':
+                    if (IconArrowTurn)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconArrowTurn->Height()) / 2),
+                                                   *IconArrowTurn);
                     break;
-                case ' ':
+                // case ' ':
                 default:
                     break;
                 }
@@ -569,17 +569,13 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     for (; i < TextLength; ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
-            if (!(s >= '0' && s <= '9'))
-                break;
+            if (!(s >= '0' && s <= '9')) break;
         }
         if (found) {
-            if (!(s >= '0' && s <= '9'))
-                DoBreak = true;
+            if (!(s >= '0' && s <= '9')) DoBreak = true;
         }
-        if (s >= '0' && s <= '9')
-            found = true;
-        if (DoBreak || i > 4)
-            break;
+        if (s >= '0' && s <= '9') found = true;
+        if (DoBreak || i > 4) break;
     }
     if (found) {
         // MenuNumber = skipspace(text.substr(0, i).c_str());  // Unused?

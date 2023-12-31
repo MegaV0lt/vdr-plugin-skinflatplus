@@ -486,11 +486,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
         MiddleWidth += ExtraMaxWidth;
         Right -= ExtraMaxWidth + m_MarginItem;
 
-        if ((TitleLeft + TitleWidth) < (TopBarWidth / 2 - MiddleWidth / 2)) {
+        if ((TitleLeft + TitleWidth) < (TopBarWidth / 2 - MiddleWidth / 2))
             Right = TopBarWidth / 2 - MiddleWidth / 2;
-        } else if ((TitleLeft + TitleWidth) < Right) {
+        else if ((TitleLeft + TitleWidth) < Right)
             Right = TitleLeft + TitleWidth + m_MarginItem;
-        }
 
         int TitleMaxWidth = Right - TitleLeft - m_MarginItem;
         if (TitleWidth + TopBarMenuIconRightWidth > TitleMaxWidth) {
@@ -762,7 +761,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     tColor Col = Theme.Color(clrMessageInfo);
     cString Icon("message_info");
     switch (Type) {
-    case mtInfo: // Already preset
+    case mtInfo:  // Already preset
         break;
     case mtWarning:
         Col = Theme.Color(clrMessageWarning);
@@ -1129,7 +1128,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         return;
     }
 
-    // the small line
+    // The small line
     ProgressBarPixmap->DrawRectangle(cRect(0, top - sml / 2, m_ProgressBarWidth, sml), m_ProgressBarColorFg);
 
     bool Start = true;
@@ -1471,7 +1470,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     }
 
     switch (Type) {
-    case 1:  // rect
+    case 1:  // Rect
         // Top
         DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
         // Right
@@ -1519,7 +1518,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         // Bottom,right corner
         DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
         break;
-    case 4:  // rect + alpha blend
+    case 4:  // Rect + alpha blend
         // Top
         DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
         // Bottom
@@ -1575,15 +1574,13 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
 }
 
 /*
-tColor cFlatBaseRender::Multiply(tColor Color, uint8_t Alpha)
-{
+tColor cFlatBaseRender::Multiply(tColor Color, uint8_t Alpha) {
   tColor RB = (Color & 0x00FF00FF) * Alpha;
   RB = ((RB + ((RB >> 8) & 0x00FF00FF) + 0x00800080) >> 8) & 0x00FF00FF;
   tColor AG = ((Color >> 8) & 0x00FF00FF) * Alpha;
   AG = ((AG + ((AG >> 8) & 0x00FF00FF) + 0x00800080)) & 0xFF00FF00;
   return AG | RB;
-}
-*/
+} */
 
 tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
     uint8_t A = (Color & 0xFF000000) >> 24;
@@ -1957,8 +1954,8 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     WeatherWidget.AddText(PrecTomorrow.c_str(), false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
-    left += WeatherFontSml->Width(PrecTomorrow.c_str());
-
+    
+    // left += WeatherFontSml->Width(PrecTomorrow.c_str());
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
     WeatherWidget.CreatePixmaps(false);
