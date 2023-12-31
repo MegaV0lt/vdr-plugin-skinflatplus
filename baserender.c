@@ -111,8 +111,8 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
             return;
         }
     // }
-    // esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
-    // return;
+    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+    return;
 }
 
 void cFlatBaseRender::TopBarCreate(void) {
