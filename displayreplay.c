@@ -8,7 +8,7 @@
 #include "./displayreplay.h"
 #include "./flat.h"
 
-cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) {
+cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
     m_Current = "";
     m_Total = "";

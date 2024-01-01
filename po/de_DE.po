@@ -818,7 +818,7 @@ msgid "recording info show actors?"
 msgstr "Aufnahmeinfo: Zeige Darsteller?"
 
 msgid "Max. actors to show?"
-msgstr "Maximale Anzahl Darsteller"
+msgstr "Begrenze Anzahl der Darsteller"
 
 msgid "Enable main menu widgets"
 msgstr "Hauptmenü-Widgets anzeigen"

@@ -111,7 +111,7 @@ void cTextScroll::DoStep(void) {
     Pixmap->SetDrawPortPoint(cPoint(DrawPortX, 0));
 }
 
-cTextScrollers::cTextScrollers() {
+cTextScrollers::cTextScrollers() : cThread("TextScrollers") {
     Layer = 2;
 }
 
