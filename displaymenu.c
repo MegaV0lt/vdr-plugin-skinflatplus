@@ -2841,14 +2841,16 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 MediaType = 2;
             }
         }
-    }
+    }  // TVScraperRecInfoShowPoster
 
-    cString RecPath = cString::sprintf("%s", Recording->FileName());
-    cString RecImage("");
-    if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-        MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
-        MediaType = 2;
-        MediaPath = RecImage;
+    if (isempty(*MediaPath)) {  // TODO: Prio for manual poster or tvscraper?
+        cString RecPath = cString::sprintf("%s", Recording->FileName());
+        cString RecImage("");
+        if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
+            MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+            MediaType = 2;
+            MediaPath = RecImage;
+        }
     }
 
     if (!isempty(*MediaPath)) {
@@ -3251,11 +3253,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
             }  // Scraper plugin
 
-            cString RecPath = cString::sprintf("%s", Recording->FileName());
-            cString RecImage("");
-            if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
-                MediaPath = RecImage;
+            if (isempty(*MediaPath)) {  // TODO: Prio for manual poster or tvscraper?
+                cString RecPath = cString::sprintf("%s", Recording->FileName());
+                cString RecImage("");
+                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
+                    MediaPath = RecImage;
+            }
         }  // FirstRun
+
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
         dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);

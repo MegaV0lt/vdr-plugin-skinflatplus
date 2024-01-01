@@ -234,7 +234,7 @@ bool cImageLoader::FileExits(const std::string &name) {
     struct stat Buffer;
     return (stat (name.c_str(), &Buffer) == 0);
 }
-
+// TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {
     cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
     if (FileSize(*ManualPoster) != -1) {
