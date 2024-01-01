@@ -2515,35 +2515,27 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
 #endif
         ContentTop = m_MarginItem;
-        if (!isempty(*MediaPath)) {
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-            if (img) {
-                ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                       Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-                ContentTop += m_FontHeight;
-                ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-                ContentTop += 6;
-                ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
-            } else if (!isempty(*Text)) {
-                ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                       Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-                ContentTop += m_FontHeight;
-                ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-                ContentTop += 6;
-                ComplexContent.AddText(
-                    *Text, true,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
-            }
-        } else if (!isempty(*Text)) {
+        if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
             ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
             ContentTop += 6;
+        }
+        if (!isempty(*MediaPath)) {
+            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            if (img) {  // Insert image with floating text
+                ComplexContent.AddImageWithFloatedText(
+                    img, CIP_Right, *Text,
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+            } else if (!isempty(*Text)) {  // No image; insert text
+                ComplexContent.AddText(
+                    *Text, true,
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+            }
+        } else if (!isempty(*Text)) {  // No image; insert text
             ComplexContent.AddText(
                 *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
@@ -2855,12 +2847,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
     if (!isempty(*MediaPath)) {
         cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-        if (img && MediaType == 2) {
+        if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, *Text,
                 cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
-        } else if (img && MediaType == 1) {
+        } else if (img && MediaType == 1) {  // Series
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
             ComplexContent.AddText(*Text, true,
                                    cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,
@@ -3267,35 +3259,27 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
         ContentTop = m_MarginItem;
-        if (!isempty(*MediaPath)) {
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-            if (img) {
-                ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                       Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-                ContentTop += m_FontHeight;
-                ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-                ContentTop += 6;
-                ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
-            } else if (!isempty(*Text)) {
-                ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                                       Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-                ContentTop += m_FontHeight;
-                ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-                ContentTop += 6;
-                ComplexContent.AddText(
-                    *Text, true,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
-            }
-        } else if (!isempty(*Text)) {
+        if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
             ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
             ContentTop += 6;
+        }
+        if (!isempty(*MediaPath)) {
+            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            if (img) {  // Insert image with floating text
+                ComplexContent.AddImageWithFloatedText(
+                    img, CIP_Right, *Text,
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+            } else if (!isempty(*Text)) {  // No image; insert text
+                ComplexContent.AddText(
+                    *Text, true,
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+            }
+        } else if (!isempty(*Text)) {  // No image; insert text
             ComplexContent.AddText(
                 *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
