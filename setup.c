@@ -1293,7 +1293,7 @@ void cFlatSetupTvsraper::Setup(void) {
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("recording info show actors?"), &SetupConfig->TVScraperRecInfoShowActors));
-    Add(new cMenuEditBoolItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors));
+    Add(new cMenuEditIntItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors, -1, 999, trVDR("no")));
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
