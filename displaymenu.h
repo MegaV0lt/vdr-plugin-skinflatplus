@@ -92,7 +92,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
+
         const char *GetGenreIcon(uchar genre);
+        void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons);  // NOLINT
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 

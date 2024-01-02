@@ -935,26 +935,17 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                        Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
     bool IsEmpty = false;
-    // Description
     cString Text("");
     if (Event) {
+        // Description
         if (!isempty(Event->Description()))
             Text.Append(Event->Description());
 
         if (Config.EpgAdditionalInfoShow) {
             Text.Append("\n");
             // Genre
-            bool FirstContent = true;
-            for (int i {0}; Event->Contents(i); ++i) {
-                if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
-                    if (!FirstContent)
-                        Text.Append(", ");
-                    else
-                        Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
-                    Text.Append(Event->ContentToString(Event->Contents(i)));
-                    FirstContent = false;
-                }
-            }
+            InsertGenreInfo(Event, Text);  // Add genre info
+
             // FSK
             if (Event->ParentalRating())
                 Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Event->GetParentalRatingString()));
@@ -1043,7 +1034,6 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
         }
     }
     ComplexContent.CreatePixmaps(Config.MenuContentFullSize);
-
     ComplexContent.Draw();
 
     DecorBorderClearByFrom(BorderContent);
@@ -2203,7 +2193,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
-
     if (!Event) return;
 
 #ifdef DEBUGEPGTIME
@@ -2230,30 +2219,19 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
-    // Description
     cString Text(""), TextAdditional("");
     std::string Fsk("");
     std::list<std::string> GenreIcons;
 
+    // Description
     if (!isempty(Event->Description()))
         Text.Append(Event->Description());
 
     if (Config.EpgAdditionalInfoShow) {
         Text.Append("\n");
         // Genre
-        bool FirstContent = true;
-        for (int i {0}; Event->Contents(i); ++i) {
-            if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
-                if (!FirstContent) {
-                    Text.Append(", ");
-                } else {
-                    Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
-                }
-                Text.Append(Event->ContentToString(Event->Contents(i)));
-                FirstContent = false;
-                GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
-            }
-        }
+        InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
+
         // FSK
         if (Event->ParentalRating()) {
             Fsk = *Event->GetParentalRatingString();
@@ -2726,17 +2704,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             const cEvent *Event = RecInfo->GetEvent();
             if (Event) {
                 // Genre
-                bool FirstContent = true;
-                for (int i {0}; Event->Contents(i); ++i) {
-                    if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
-                        if (!FirstContent)
-                            Text.Append(", ");
-                        else
-                            Text.Append(cString::sprintf("%s: ", tr("Genre")));
-                        Text.Append(Event->ContentToString(Event->Contents(i)));
-                        FirstContent = false;
-                    }
-                }
+                InsertGenreInfo(Event, Text);  // Add genre info
+
                 if (Event->Contents(0))
                     Text.Append("\n");
                 // FSK
@@ -2889,7 +2858,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                                  int NumActors) {
     // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
     int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and recinfo
-    if (ShowMaxActors == 0) return;  // Do not schow actors
+    if (ShowMaxActors == 0) return;  // Do not show actors
     if (ShowMaxActors != -1 && ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all ators)
 
@@ -2902,7 +2871,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 
     cImage *img {nullptr};
     cString Name(""), Path(""), Role("");  // Actor name, path and role
-    int Actor{0}, ActorsPerLine{6};  // TODO: Config option
+    int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
     int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
     int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
     int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
@@ -2951,15 +2920,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_ShowText = false;
     ItemBorderClear();
 
-    /* Alreday created in cFlatDisplayMenu()
-    m_chLeft = Config.decorBorderMenuContentHeadSize;
-    m_chTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
-    m_chWidth = m_MenuWidth - Config.decorBorderMenuContentHeadSize * 2;
-    m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2;
-    ContentHeadPixmap = CreatePixmap(osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
-    // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
-    // m_chHeight); */
-
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
     m_cLeft = Config.decorBorderMenuContentSize;
@@ -2981,10 +2941,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     // RecAdditional.imbue(std::locale(""));
 
     const cRecordingInfo *RecInfo = Recording->Info();
-
-    std::string Fsk("");
     std::list<std::string> GenreIcons;
-
+    std::string Fsk("");
     if (!isempty(RecInfo->Description()))
         Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
 
@@ -3003,19 +2961,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
-            bool FirstContent = true;
-            for (int i {0}; Event->Contents(i); ++i) {
-                if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
-                    if (!FirstContent)
-                        Text.Append(", ");
-                    else
-                        Text.Append(cString::sprintf("%s: ", tr("Genre")));
+            InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
-                    Text.Append(Event->ContentToString(Event->Contents(i)));
-                    FirstContent = false;
-                    GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
-                }
-            }
             if (Event->Contents(0))
                 Text.Append("\n");
             // FSK
@@ -3715,6 +3662,36 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     }
 
     return RecNamePart;
+}
+
+void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
+    bool FirstContent = true;
+    for (int i{0}; Event->Contents(i); ++i) {
+        if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
+            if (!FirstContent)
+                Text.Append(", ");
+            else
+                Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
+
+            Text.Append(Event->ContentToString(Event->Contents(i)));
+            FirstContent = false;
+        }
+    }
+}
+void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons) {
+    bool FirstContent = true;
+    for (int i{0}; Event->Contents(i); ++i) {
+        if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
+            if (!FirstContent)
+                Text.Append(", ");
+            else
+                Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
+
+            Text.Append(Event->ContentToString(Event->Contents(i)));
+            FirstContent = false;
+            GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
+        }
+    }
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
