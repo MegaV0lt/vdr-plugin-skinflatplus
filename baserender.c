@@ -70,8 +70,15 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     delete m_Font;
     delete m_FontSml;
     delete m_FontFixed;
-    /* if (m_TopBarFontClock) */ delete m_TopBarFontClock;
 
+    if (m_TopBarFont) delete m_TopBarFont;
+    if (m_TopBarFontSml) delete m_TopBarFontSml;
+    if (m_TopBarFontClock) delete m_TopBarFontClock;
+
+    if (WeatherFont) delete WeatherFont;
+    if (WeatherFontSml) delete WeatherFontSml;
+    if (WeatherFontSign) delete WeatherFontSign;
+    
     // if (osd) {
         MessageScroller.Clear();
         osd->DestroyPixmap(TopBarPixmap);
@@ -1938,7 +1945,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     WeatherWidget.AddText(PrecTomorrow.c_str(), false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
-    
+
     // left += WeatherFontSml->Width(PrecTomorrow.c_str());
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 

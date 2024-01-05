@@ -568,6 +568,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont,
                                    DvbapiInfoFont->Width(*DvbapiInfoText) * 2);
+    delete DvbapiInfoFont;
 }
 
 void cFlatDisplayChannel::Flush(void) {

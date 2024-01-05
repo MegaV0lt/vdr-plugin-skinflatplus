@@ -110,7 +110,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
-
+    if (FontTempSml) delete FontTempSml;
     // if (osd) {
         osd->DestroyPixmap(MenuPixmap);
         osd->DestroyPixmap(MenuIconsPixmap);
