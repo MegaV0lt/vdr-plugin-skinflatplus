@@ -24,13 +24,13 @@ cFlatBaseRender::cFlatBaseRender(void) {
     m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
-    m_TopBarFontClock = NULL;
+    // m_TopBarFontClock = NULL;
 
     m_FontHeight = m_Font->Height();
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 
-    m_TopBarTitle = "";
+    /* m_TopBarTitle = "";
     m_TopBarTitleExtra1 = "";
     m_TopBarTitleExtra2 = "";
     m_TopBarLastDate = "";
@@ -44,14 +44,14 @@ cFlatBaseRender::cFlatBaseRender(void) {
     m_TopBarMenuLogo = "";
     m_TopBarMenuLogoSet = false;
 
-    m_MarginItem = 5;
+    m_MarginItem = 5; */
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
-    m_ButtonsHeight = 0;
-    m_ButtonsDrawn = false;
+    // m_ButtonsHeight = 0;
+    // m_ButtonsDrawn = false;
 
-    osd = NULL;
+    /* osd = NULL;
     TopBarPixmap = NULL;
     ButtonsPixmap = NULL;
     MessagePixmap = NULL;
@@ -60,7 +60,7 @@ cFlatBaseRender::cFlatBaseRender(void) {
     // ContentEpgImagePixmap = NULL;  // Unused?
     ProgressBarPixmap = NULL;
     ProgressBarPixmapBg = NULL;
-    DecorPixmap = NULL;
+    DecorPixmap = NULL; */
 
     Config.ThemeCheckAndInit();
     Config.DecorCheckAndInit();
@@ -70,7 +70,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     delete m_Font;
     delete m_FontSml;
     delete m_FontFixed;
-    if (m_TopBarFontClock) delete m_TopBarFontClock;
+    /* if (m_TopBarFontClock) */ delete m_TopBarFontClock;
 
     // if (osd) {
         MessageScroller.Clear();

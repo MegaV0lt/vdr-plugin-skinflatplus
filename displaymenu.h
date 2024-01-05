@@ -24,38 +24,41 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
         cPixmap *MenuPixmap;
         cPixmap *MenuIconsPixmap;
-        cPixmap *MenuIconsBgPixmap;
-        cPixmap *MenuIconsOvlPixmap;
+        cPixmap *MenuIconsBgPixmap;   // Background for icons/logos
+        cPixmap *MenuIconsOvlPixmap;  // Overlay for icons/logos
 
-        int m_MenuTop, m_MenuWidth;
-        int m_MenuItemWidth;
-        int m_MenuItemLastHeight;
-        bool m_MenuFullOsdIsDrawn;
+        int m_MenuTop {0}, m_MenuWidth {0};
+        int m_MenuItemWidth {0};
+        int m_MenuItemLastHeight {0};
+        bool m_MenuFullOsdIsDrawn = false;
 
         eMenuCategory m_MenuCategory;
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        int m_LastTimerCount, m_LastTimerActiveCount;
-        cString m_LastTitle;
+        int m_LastTimerCount {0}, m_LastTimerActiveCount {0};
+        cString m_LastTitle{""};
 
-        int m_chLeft, m_chTop, m_chWidth, m_chHeight;
+        int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
         cPixmap *ContentHeadPixmap;
         cPixmap *ContentHeadIconsPixmap;
 
-        int m_cLeft, m_cTop, m_cWidth, m_cHeight;
+        int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
 
         cPixmap *ScrollbarPixmap;
-        int m_ScrollBarTop;
-        int m_ScrollBarWidth, m_ScrollBarHeight;  //? Also in cFlatBaseRender
+        int m_ScrollBarTop {0};
+        int m_ScrollBarWidth {0}, m_ScrollBarHeight {0};  //? Also in cFlatBaseRender
 
-        int m_ItemHeight, m_ItemChannelHeight, m_ItemTimerHeight, m_ItemEventHeight, m_ItemRecordingHeight;
+        int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
+        int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
         std::list<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool m_IsScrolling;
-        bool m_IsGroup;
-        bool m_ShowEvent, m_ShowRecording, m_ShowText;
+        bool m_IsScrolling = false;
+        bool m_IsGroup = false;
+        bool m_ShowEvent = false;
+        bool m_ShowRecording = false;
+        bool m_ShowText = false;
 
         cComplexContent ComplexContent;
 
@@ -65,10 +68,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // TextScroller
         cTextScrollers MenuItemScroller;
 
-        cString m_ItemEventLastChannelName;
+        cString m_ItemEventLastChannelName{""};
 
-        std::string m_RecFolder, m_LastRecFolder;
-        int m_LastItemRecordingLevel;
+        std::string m_RecFolder{""}, m_LastRecFolder{""};
+        int m_LastItemRecordingLevel {0};
 
         // Icons
         cImage *IconTimerFull;

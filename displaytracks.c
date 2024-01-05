@@ -15,7 +15,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     img_ac3 = ImgLoader.LoadIcon("tracks_ac3", 999, m_FontHeight);
     img_stereo = ImgLoader.LoadIcon("tracks_stereo", 999, m_FontHeight);
 
-    m_Ac3Width = m_StereoWidth = 0;
+    // m_Ac3Width = m_StereoWidth = 0;
     if (img_ac3)
         m_Ac3Width = img_ac3->Width();
     if (img_stereo)
@@ -56,7 +56,7 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 }
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
-    if (!TracksPixmap) return; 
+    if (!TracksPixmap) return;
 
     int y = (Index + 1) * m_ItemHeight;
     tColor ColorFg = Theme.Color(clrTrackItemFont);
@@ -101,7 +101,7 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 }
 
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
-    if (!TracksLogoPixmap) return; 
+    if (!TracksLogoPixmap) return;
 
     PixmapFill(TracksLogoPixmap, clrTransparent);
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.

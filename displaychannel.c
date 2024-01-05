@@ -17,7 +17,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     } else
         m_DoOutput = true; */
 
-    m_Present = NULL;
+    /* m_Present = NULL;
     // m_ChannelName = "";
 
     ChanInfoTopPixmap = NULL;
@@ -36,7 +36,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_LastSignalQuality = -1;
 
     m_SignalStrengthRight = 0;
-
+    */
     CreateFullOsd();
     // if (!osd) return;
 
@@ -68,12 +68,12 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                            m_ChannelWidth, HeightBottom));
     PixmapFill(ChanIconsPixmap, clrTransparent);
     // Area for TVScraper images
-    TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    m_TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     ChanLogoBGPixmap =
@@ -430,15 +430,15 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (!isempty(*MediaPath)) {
-        if (MediaHeight > TVSHeight || MediaWidth > TVSWidth) {  // Resize too big poster/banner
+        if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-            MediaHeight = TVSHeight * 0.7 * Config.TVScraperChanInfoPosterSize * 100;  // Max 70% of pixmap height
+            MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperChanInfoPosterSize * 100;  // Max 70% of pixmap height
             if (Config.ChannelWeatherShow)
                 // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = TVSWidth * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
+                MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
             else
                 // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = TVSWidth * 0.7 * Config.TVScraperChanInfoPosterSize * 100;
+                MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperChanInfoPosterSize * 100;
 
             dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
         }

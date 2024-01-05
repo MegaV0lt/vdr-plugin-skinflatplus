@@ -36,64 +36,66 @@ template<class T> inline T MyMax(T a, T b) { return a >= b ? a : b; }
 
 class cFlatBaseRender {
  protected:
-        cOsd *osd;
+        cOsd *osd {nullptr};
 
-        int m_OsdLeft, m_OsdTop, m_OsdWidth, m_OsdHeight;
-        int m_MarginItem;
+        int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
+        int m_MarginItem {5};
 
         // Standard fonts
-        cFont *m_Font;
-        cFont *m_FontSml;
-        cFont *m_FontFixed;
-        int m_FontHeight;
-        int m_FontSmlHeight;
-        int m_FontFixedHeight;
+        cFont *m_Font {nullptr};
+        cFont *m_FontSml {nullptr};
+        cFont *m_FontFixed {nullptr};
+        int m_FontHeight {0};
+        int m_FontSmlHeight {0};
+        int m_FontFixedHeight {0};
 
         // TopBar
-        cPixmap *TopBarPixmap;
-        cPixmap *TopBarIconPixmap;
-        cPixmap *TopBarIconBgPixmap;
-        cFont *m_TopBarFont, *m_TopBarFontSml, *m_TopBarFontClock;
-        int m_TopBarFontHeight, m_TopBarFontSmlHeight, m_TopBarFontClockHeight;
+        cPixmap *TopBarPixmap {nullptr};
+        cPixmap *TopBarIconPixmap {nullptr};
+        cPixmap *TopBarIconBgPixmap {nullptr};
+        cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};
+        int m_TopBarFontHeight {0}, m_TopBarFontSmlHeight {0}, m_TopBarFontClockHeight {0};
 
-        cString m_TopBarTitle;
-        cString m_TopBarTitleExtra1, m_TopBarTitleExtra2;
-        cString m_TopBarExtraIcon;
-        bool m_TopBarExtraIconSet;
-        cString m_TopBarMenuIcon;
-        bool m_TopBarMenuIconSet;
-        cString m_TopBarMenuIconRight;
-        bool m_TopBarMenuIconRightSet;
-        cString m_TopBarMenuLogo;
-        bool m_TopBarMenuLogoSet;
+        cString m_TopBarTitle{""};
+        cString m_TopBarTitleExtra1{""}, m_TopBarTitleExtra2{""};
+        cString m_TopBarExtraIcon{""};
+        bool m_TopBarExtraIconSet = false;
+        cString m_TopBarMenuIcon{""};
+        bool m_TopBarMenuIconSet = false;
+        cString m_TopBarMenuIconRight{""};
+        bool m_TopBarMenuIconRightSet = false;
+        cString m_TopBarMenuLogo{""};
+        bool m_TopBarMenuLogoSet = false;
 
-        bool m_TopBarUpdateTitle;
-        cString m_TopBarLastDate;
-        int m_TopBarHeight;
-        int m_VideoDiskUsageState;
+        bool m_TopBarUpdateTitle = false;
+        cString m_TopBarLastDate{""};
+        int m_TopBarHeight {0};
+        int m_VideoDiskUsageState {-1};
 
         // Progressbar
-        cPixmap *ProgressBarPixmap;
-        cPixmap *ProgressBarPixmapBg;
-        int m_ProgressBarHeight, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarMarginHor, m_ProgressBarMarginVer;
-        int m_ProgressType;
-        bool m_ProgressBarSetBackground;
-        bool m_ProgressBarIsSignal;
-        tColor m_ProgressBarColorFg, m_ProgressBarColorBarFg, m_ProgressBarColorBarCurFg, m_ProgressBarColorBg;
-        tColor m_ProgressBarColorMark, m_ProgressBarColorMarkCurrent;
+        cPixmap *ProgressBarPixmap {nullptr};
+        cPixmap *ProgressBarPixmapBg {nullptr};
+        int m_ProgressBarHeight {0}, m_ProgressBarTop {0}, m_ProgressBarWidth {0};
+        int m_ProgressBarMarginHor {0}, m_ProgressBarMarginVer {0};
+        int m_ProgressType {0};
+        bool m_ProgressBarSetBackground = false;
+        bool m_ProgressBarIsSignal = false;
+        tColor m_ProgressBarColorFg {0}, m_ProgressBarColorBarFg {0};
+        tColor m_ProgressBarColorBarCurFg {0}, m_ProgressBarColorBg {0};
+        tColor m_ProgressBarColorMark {0}, m_ProgressBarColorMarkCurrent {0};
 
         // Scrollbar
-        int m_ScrollBarWidth;
+        int m_ScrollBarWidth {0};
 
         // Buttons red, green, yellow, blue
-        cPixmap *ButtonsPixmap;
-        int m_ButtonsWidth, m_ButtonsHeight, m_ButtonsTop;
-        int m_MarginButtonColor, m_ButtonColorHeight;
-        bool m_ButtonsDrawn;
+        cPixmap *ButtonsPixmap {nullptr};
+        int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
+        int m_MarginButtonColor {0}, m_ButtonColorHeight {0};
+        bool m_ButtonsDrawn = false;
 
         // Message
-        cPixmap *MessagePixmap, *MessageIconPixmap;
-        int /* m_MessageWidth, */ m_MessageHeight;  // TODO: m_MessageWidth unused?
+        cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
+        int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // TODO: m_MessageWidth unused?
         cTextScrollers MessageScroller;
 
         // Multiline content with scrollbar
@@ -116,7 +118,7 @@ class cFlatBaseRender {
 
         cComplexContent WeatherWidget;
 
-        cPixmap *DecorPixmap;
+        cPixmap *DecorPixmap {nullptr};
         std::list<sDecorBorder> Borders;  // For clear specific Borders (clear only MenuItems and not TopBar)
 
         /* void ContentDraw(void);  // Unused?

@@ -8,11 +8,11 @@
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
-    Osd = NULL;
+    /* Osd = NULL;
     Pixmap = NULL;
     PixmapImage = NULL;
     m_IsShown = false;
-    m_IsScrollingActive = true;
+    m_IsScrollingActive = true; */
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
@@ -20,10 +20,10 @@ cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
     Osd = osd;
     m_ScrollSize = ScrollSize;
 
-    Pixmap = NULL;
+    /* Pixmap = NULL;
     PixmapImage = NULL;
     m_IsShown = false;
-    m_IsScrollingActive = true;
+    m_IsScrollingActive = true; */
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
@@ -68,7 +68,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
     //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
 
-    if (Pixmap) {  // Check for nullptr
+    if (Pixmap) {
         if (m_FullFillBackground) {
             PixmapFill(Pixmap, ColorBg);
         } else {
@@ -156,7 +156,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
             NumChars += strlen(WrapperFloat.GetLine(i));
         }
-        // Detect end of last word
+        // Detect end of last word  //TODO: Improve; Result is not accurate sometimes
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }

@@ -39,7 +39,7 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive = false;
-bool m_FirstDisplay = true;
+// bool m_FirstDisplay = true;
 time_t m_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {

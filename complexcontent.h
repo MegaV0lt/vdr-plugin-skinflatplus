@@ -41,10 +41,10 @@ class cSimpleContent {
         ContentType = CT_None;  // Added to avoid compiler warning
         // Position
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
-        // tColor ColorFg, ColorBg;  // TODO ???
+        ColorFg = 0, ColorBg = 0;
         // Text
-        Image = NULL;
-        Font = NULL;
+        Image = nullptr;
+        Font = nullptr;
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -151,18 +151,18 @@ class cComplexContent {
  private:
     std::vector<cSimpleContent> Contents;
 
-    cPixmap *Pixmap, *PixmapImage;
+    cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
     cRect Position;
 
-    tColor ColorBg;
+    tColor ColorBg {0};
 
-    bool m_FullFillBackground;  // m_* for private variables
-    int m_DrawPortHeight;
-    int m_ScrollSize;
-    bool m_IsShown;
-    bool m_IsScrollingActive;
+    bool m_FullFillBackground = false;  // m_* for private variables
+    int m_DrawPortHeight {0};
+    int m_ScrollSize  {0};
+    bool m_IsShown = false;
+    bool m_IsScrollingActive = true;
 
-    cOsd *Osd;
+    cOsd *Osd {nullptr};
 
     void CalculateDrawPortHeight(void);
 

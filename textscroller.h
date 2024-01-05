@@ -18,46 +18,46 @@ class cTextScroll {
  private:
     cRect Position;
 
-    tColor ColorFg, ColorExtraTextFg, ColorBg;
-    std::string Text;
-    cFont *Font;
-    cPixmap *Pixmap;
-    cOsd *Osd;
-    int Layer;
-    int PixelsPerStep;
-    int WAITSTEPS, WaitSteps {0};
-    bool IsReserveStep;
-    bool ResetX;
-    int ScrollType;
+    tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
+    std::string Text{""};
+    cFont *Font {nullptr};
+    cPixmap *Pixmap {nullptr};
+    cOsd *Osd  {nullptr};
+    int Layer {0};
+    int PixelsPerStep {0};
+    int WAITSTEPS {0}, WaitSteps {0};
+    bool IsReserveStep = false;
+    bool ResetX = false;
+    int ScrollType {0};
 
  public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
-        Font = NULL;
-        Pixmap = NULL;
+        // Font = NULL;  // TODO: Is that needed?
+        // Pixmap = NULL;
         Osd = osd;
         Layer = layer;
         PixelsPerStep = pixels;
         ScrollType = type;
-        IsReserveStep = false;
+        // IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        ResetX = false;
+        // ResetX = false;
     }
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps) {
-        Font = NULL;
-        Pixmap = NULL;
+        // Font = NULL;
+        // Pixmap = NULL;
         Osd = osd;
         Layer = 2;
         PixelsPerStep = pixels;
         ScrollType = type;
-        IsReserveStep = false;
+        // IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        ResetX = false;
+        // ResetX = false;
     }
 
     virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
                              // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
         Osd->DestroyPixmap(Pixmap);
-        Pixmap = NULL;
+        Pixmap = nullptr;
     }
 
     void UpdateViewPortWidth(int w);
@@ -74,9 +74,9 @@ class cTextScrollers : public cThread {
     std::vector<cTextScroll *> Scrollers;
 
     cOsd *Osd;
-    int ScrollStep, ScrollDelay;
-    int ScrollType;
-    int Layer;
+    int ScrollStep {0}, ScrollDelay {0};
+    int ScrollType {0};
+    int Layer {0};
     virtual void Action(void);
     void StartScrolling(void);
  public:

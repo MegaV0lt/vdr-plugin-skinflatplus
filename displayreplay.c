@@ -10,26 +10,26 @@
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
-    m_Current = "";
+    /* m_Current = "";
     m_Total = "";
-    m_Recording = NULL;
+    m_Recording = NULL; */
 
     m_ModeOnly = ModeOnly;
-    m_DimmActive = false;
+    // m_DimmActive = false;
 
-    ProgressShown = false;
+    // ProgressShown = false;
     CreateFullOsd();
     TopBarCreate();
     MessageCreate();
 
-    m_ScreenWidth = m_LastScreenWidth = -1;
+    // m_ScreenWidth = m_LastScreenWidth = -1;
 
-    TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    TVSHeight = m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    m_TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSHeight = m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     LabelPixmap = CreatePixmap(osd, "LabelPixmap", 1,
@@ -388,15 +388,15 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         PixmapFill(ChanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
-            if (MediaHeight > TVSHeight || MediaWidth > TVSWidth) {  // Resize too big poster/banner
+            if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
                 dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-                MediaHeight = TVSHeight * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;  // Max 70% of pixmap height
+                MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;  // Max 70% of pixmap height
                 if (Config.ChannelWeatherShow)
                     // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = TVSWidth * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
+                    MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
                 else
                     // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = TVSWidth * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;
+                    MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;
 
                 dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
             }
