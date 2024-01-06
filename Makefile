@@ -72,12 +72,10 @@ SOFILE = libvdr-$(PLUGIN).so
 ### Includes and Defines and Dependencies (add further entries here):
 
 ifeq ($(IMAGELIB), imagemagick)
-  $(info Compiling with ImageMagick++)
   INCLUDES += $(shell pkg-config --cflags Magick++ freetype2 fontconfig)
   LIBS += $(shell pkg-config --libs Magick++)
   DEFINES += -DIMAGEMAGICK
 else ifeq ($(IMAGELIB), graphicsmagick)
-  $(info Compiling with GraphicsMagick++)
   INCLUDES += $(shell pkg-config --cflags GraphicsMagick++ freetype2 fontconfig)
   LIBS += $(shell pkg-config --libs GraphicsMagick++)
 else

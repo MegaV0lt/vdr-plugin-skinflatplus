@@ -110,6 +110,9 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
+    if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
+        delete m_FontTempSml;
+
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
         m_Osd->DestroyPixmap(MenuIconsPixmap);
@@ -3923,22 +3926,12 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
                 ContentTop = AddHeight + m_MarginItem;
         }
     }
-    // dsyslog("flatPlus: Creating MainMenuWidgets");
     ContentWidget.CreatePixmaps(false);
-    // dsyslog("flatPlus: Drawing MainMenuWidgets");
     ContentWidget.Draw();
-    //! TODO: Segfault when deleting 'm_FontTempSml'
-    /* dsyslog("flatPlus: Deleting m_FontTempSml");
-    if (m_FontTempSml) {  // Created in 'DrawMainMenuWidgetWeather()'
-        delete m_FontTempSml;
-        m_FontTempSml = nullptr;
-    } */
-    // dsyslog("flatPlus: Drawing DecorBorder");
 
     DecorBorderDraw(wLeft, wTop, wWidth, ContentWidget.ContentHeight(false), Config.decorBorderMenuContentSize,
                     Config.decorBorderMenuContentType, Config.decorBorderMenuContentFg, Config.decorBorderMenuContentBg,
                     BorderMMWidget);
-    // dsyslog("flatPlus: DecorBorder drawn");
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop) {
@@ -4899,9 +4892,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         std::getline(file, TempToday);
         file.close();
     }
-    // dsyslog("flatPlus: Creating m_FontTempSml");
     //* Declared in 'baserender.h'
-    //? Only create once, because segfault when deleting?
+    // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
 
     cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
