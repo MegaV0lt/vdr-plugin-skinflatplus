@@ -259,7 +259,7 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT
                       cString &Subtitle, bool NewLine = false);                      // NOLINT
-void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine);    // NOLINT
+void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflichts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
 std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);
