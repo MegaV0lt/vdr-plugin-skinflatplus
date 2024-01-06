@@ -4882,12 +4882,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
 
-    cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
-
     cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem * 2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
+    cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
     ContentWidget.AddText(*Title, false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
@@ -4896,8 +4895,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left = m_MarginItem;
     std::string icon(""), summary(""), TempMax(""), TempMin(""), prec("");
-    cString PrecString("0%");
+    cString DayName(""), PrecString("0%"), StrWeekDayName(""), WeatherIcon("");
     double p {0.0};
+    time_t t = time(NULL), t2 = time(NULL);
+    struct tm tm_r;
+    localtime_r(&t, &tm_r);
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
         FileName = cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
@@ -4943,11 +4945,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         } else
             continue;
 
-        time_t t = time(NULL);
-        struct tm tm_r;
-        localtime_r(&t, &tm_r);
         tm_r.tm_mday += index;
-        time_t t2 = mktime(&tm_r);
+        /* time_t */ t2 = mktime(&tm_r);
 
         int FontTempSmlHeight = m_FontTempSml->Height();
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
@@ -4961,7 +4960,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 left += m_Font->Width('|') + m_MarginItem * 2;
             }
 
-            cString WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
+            WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
             img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem * 2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
@@ -4991,14 +4990,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 break;
 
             left = m_MarginItem;
-            cString StrWeekDayName = WeekDayName(t2);
-            cString DayName = cString::sprintf("%s ", *StrWeekDayName);
+            StrWeekDayName = WeekDayName(t2);
+            DayName = cString::sprintf("%s ", *StrWeekDayName);
             ContentWidget.AddText(*DayName, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font,
                                   wWidth - m_MarginItem * 2);
             left += m_Font->Width("XXXX") + m_MarginItem;
 
-            cString WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
+            WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
             img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem * 2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
