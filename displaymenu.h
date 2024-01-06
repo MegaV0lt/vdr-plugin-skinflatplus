@@ -87,7 +87,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar(void);
         void ItemBorderClear(void);
 
-        static std::string items[16];
+        //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
+        // static std::string items[16];
+        const std::string items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                       "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                       "Replay",   "Miscellaneous", "Plugins", "Restart"};
         std::string MainMenuText(std::string Text);
         cString GetIconName(std::string element);
 

@@ -526,10 +526,10 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     SetEditableWidth(m_MenuWidth - Tab(1));
 }
 
-std::string cFlatDisplayMenu::items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+/* std::string cFlatDisplayMenu::items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                            "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                            "Replay",   "Miscellaneous", "Plugins", "Restart"};
-
+*/
 std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string text = skipspace(Text.c_str());
     std::string MenuEntry("") /*, MenuNumber("")*/;
