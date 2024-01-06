@@ -5088,14 +5088,15 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
-    int index {0};
+    //* Double code? Already in 'displaychannel.d' 'PreLoadImages()'
+    /* int index {0};
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
         img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         if (img)
             ++index;
-    }
+    } */
 
     ImgLoader.LoadIcon("radio", 999, m_TopBarHeight - m_MarginItem * 2);
     ImgLoader.LoadIcon("changroup", 999, m_TopBarHeight - m_MarginItem * 2);
