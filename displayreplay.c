@@ -29,14 +29,14 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     m_TVSHeight = m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
-    LabelPixmap = CreatePixmap(osd, "LabelPixmap", 1,
+    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1,
                                cRect(Config.decorBorderReplaySize,
                                m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
                                m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
-    IconsPixmap = CreatePixmap(osd, "IconsPixmap", 2,
+    IconsPixmap = CreatePixmap(m_Osd, "IconsPixmap", 2,
                                cRect(Config.decorBorderReplaySize,
                                m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
                                m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
@@ -47,11 +47,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                        m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
                        Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
-    LabelJumpPixmap = CreatePixmap(osd, "LabelJumpPixmap", 1, cRect(Config.decorBorderReplaySize,
+    LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1, cRect(Config.decorBorderReplaySize,
         m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem*3 - m_FontHeight
          - Config.decorBorderReplaySize * 2, m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
 
-    DimmPixmap = CreatePixmap(osd, "DimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
+    DimmPixmap = CreatePixmap(m_Osd, "DimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
 
     PixmapFill(LabelPixmap, Theme.Color(clrReplayBg));
     PixmapFill(LabelJumpPixmap, clrTransparent);
@@ -68,11 +68,11 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
     if (m_FontSecs)
         delete m_FontSecs;
 
-    osd->DestroyPixmap(LabelPixmap);
-    osd->DestroyPixmap(LabelJumpPixmap);
-    osd->DestroyPixmap(IconsPixmap);
-    osd->DestroyPixmap(ChanEpgImagesPixmap);
-    osd->DestroyPixmap(DimmPixmap);
+    m_Osd->DestroyPixmap(LabelPixmap);
+    m_Osd->DestroyPixmap(LabelJumpPixmap);
+    m_Osd->DestroyPixmap(IconsPixmap);
+    m_Osd->DestroyPixmap(ChanEpgImagesPixmap);
+    m_Osd->DestroyPixmap(DimmPixmap);
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
@@ -594,7 +594,7 @@ void cFlatDisplayReplay::Flush(void) {
         }
     }
 
-    osd->Flush();
+    m_Osd->Flush();
 }
 
 void cFlatDisplayReplay::PreLoadImages(void) {

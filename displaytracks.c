@@ -36,11 +36,11 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     left /= 2;
     TopBarSetTitle(Title);
 
-    TracksPixmap = CreatePixmap(osd, "TracksPixmap", 1,
+    TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1,
                                 cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
     PixmapFill(TracksPixmap, clrTransparent);
 
-    TracksLogoPixmap = CreatePixmap(osd, "TracksLogoPixmap", 1,
+    TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1,
                                     cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
     PixmapFill(TracksLogoPixmap, clrTransparent);
 
@@ -51,8 +51,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 }
 
 cFlatDisplayTracks::~cFlatDisplayTracks() {
-    osd->DestroyPixmap(TracksPixmap);
-    osd->DestroyPixmap(TracksLogoPixmap);
+    m_Osd->DestroyPixmap(TracksPixmap);
+    m_Osd->DestroyPixmap(TracksLogoPixmap);
 }
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
@@ -120,5 +120,5 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
 
 void cFlatDisplayTracks::Flush(void) {
     TopBarUpdate();
-    osd->Flush();
+    m_Osd->Flush();
 }

@@ -21,8 +21,8 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
     int left = m_OsdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
 
-    LabelPixmap = CreatePixmap(osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
-    MuteLogoPixmap = CreatePixmap(osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
+    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
+    MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
 
     ProgressBarCreate(left, m_OsdHeight - 50 - Config.decorProgressVolumeSize, width, Config.decorProgressVolumeSize,
                       m_MarginItem, m_MarginItem, Config.decorProgressVolumeFg, Config.decorProgressVolumeBarFg,
@@ -30,8 +30,8 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
 }
 
 cFlatDisplayVolume::~cFlatDisplayVolume() {
-    osd->DestroyPixmap(LabelPixmap);
-    osd->DestroyPixmap(MuteLogoPixmap);
+    m_Osd->DestroyPixmap(LabelPixmap);
+    m_Osd->DestroyPixmap(MuteLogoPixmap);
 }
 
 void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
@@ -85,7 +85,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
 void cFlatDisplayVolume::Flush(void) {
     TopBarUpdate();
-    osd->Flush();
+    m_Osd->Flush();
 }
 
 void cFlatDisplayVolume::PreLoadImages(void) {

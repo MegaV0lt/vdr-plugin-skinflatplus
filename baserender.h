@@ -36,7 +36,7 @@ template<class T> inline T MyMax(T a, T b) { return a >= b ? a : b; }
 
 class cFlatBaseRender {
  protected:
-        cOsd *osd {nullptr};
+        cOsd *m_Osd {nullptr};
 
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
         int m_MarginItem {5};
@@ -48,6 +48,9 @@ class cFlatBaseRender {
         int m_FontHeight {0};
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
+
+        // Font for mainmenu weatherwidget
+        cFont *m_FontTempSml {nullptr};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};

@@ -16,13 +16,13 @@
 
 class cTextScroll {
  private:
-    cRect Position;
+    cRect Position {0, 0, 0, 0};
 
     tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
     std::string Text{""};
     cFont *Font {nullptr};
     cPixmap *Pixmap {nullptr};
-    cOsd *Osd  {nullptr};
+    cOsd *m_Osd {nullptr};
     int Layer {0};
     int PixelsPerStep {0};
     int WAITSTEPS {0}, WaitSteps {0};
@@ -34,7 +34,7 @@ class cTextScroll {
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
         // Font = NULL;  // TODO: Is that needed?
         // Pixmap = NULL;
-        Osd = osd;
+        m_Osd = osd;
         Layer = layer;
         PixelsPerStep = pixels;
         ScrollType = type;
@@ -45,7 +45,7 @@ class cTextScroll {
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps) {
         // Font = NULL;
         // Pixmap = NULL;
-        Osd = osd;
+        m_Osd = osd;
         Layer = 2;
         PixelsPerStep = pixels;
         ScrollType = type;
@@ -56,7 +56,7 @@ class cTextScroll {
 
     virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
                              // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-        Osd->DestroyPixmap(Pixmap);
+        m_Osd->DestroyPixmap(Pixmap);
         Pixmap = nullptr;
     }
 
@@ -73,7 +73,7 @@ class cTextScrollers : public cThread {
  private:
     std::vector<cTextScroll *> Scrollers;
 
-    cOsd *Osd;
+    cOsd *m_Osd {nullptr};
     int ScrollStep {0}, ScrollDelay {0};
     int ScrollType {0};
     int Layer {0};
@@ -84,7 +84,7 @@ class cTextScrollers : public cThread {
     ~cTextScrollers();
 
     void Clear(void);
-    void SetOsd(cOsd *osd) { Osd = osd;}
+    void SetOsd(cOsd *osd) { m_Osd = osd;}
     void SetPixmapLayer(int layer) { Layer = layer; }
     void SetScrollStep(int step) { ScrollStep = step; }
     void SetScrollDelay(int delay) { ScrollDelay = delay; }

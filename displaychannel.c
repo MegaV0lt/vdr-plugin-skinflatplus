@@ -38,7 +38,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_SignalStrengthRight = 0;
     */
     CreateFullOsd();
-    // if (!osd) return;
+    // if (!m_Osd) return;
 
     TopBarCreate();
     MessageCreate();
@@ -57,13 +57,13 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     int height = HeightBottom;
     ChanInfoBottomPixmap =
-        CreatePixmap(osd, "ChanInfoBottomPixmap", 1,
+        CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightBottom));
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
     ChanIconsPixmap =
-        CreatePixmap(osd, "ChanIconsPixmap", 2,
+        CreatePixmap(m_Osd, "ChanIconsPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightBottom));
     PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -73,17 +73,17 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     m_TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     ChanLogoBGPixmap =
-        CreatePixmap(osd, "ChanLogoBGPixmap", 2,
+        CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            HeightBottom * 2, HeightBottom * 2));
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
     ChanLogoPixmap =
-        CreatePixmap(osd, "ChanLogoPixmap", 3,
+        CreatePixmap(m_Osd, "ChanLogoPixmap", 3,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            HeightBottom * 2, HeightBottom * 2));
     PixmapFill(ChanLogoPixmap, clrTransparent);
@@ -99,12 +99,12 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     height += HeightTop;
     ChanInfoTopPixmap =
-        CreatePixmap(osd, "ChanInfoTopPixmap", 1,
+        CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightTop));
     PixmapFill(ChanInfoTopPixmap, clrTransparent);
 
-    Scrollers.SetOsd(osd);
+    Scrollers.SetOsd(m_Osd);
     Scrollers.SetScrollStep(Config.ScrollerStep);
     Scrollers.SetScrollDelay(Config.ScrollerDelay);
     Scrollers.SetScrollType(Config.ScrollerType);
@@ -121,14 +121,14 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 cFlatDisplayChannel::~cFlatDisplayChannel() {
     // if (!m_DoOutput) return;
 
-    // if (osd) {
+    // if (m_Osd) {
         Scrollers.Clear();
-        osd->DestroyPixmap(ChanInfoTopPixmap);
-        osd->DestroyPixmap(ChanInfoBottomPixmap);
-        osd->DestroyPixmap(ChanLogoPixmap);
-        osd->DestroyPixmap(ChanLogoBGPixmap);
-        osd->DestroyPixmap(ChanIconsPixmap);
-        osd->DestroyPixmap(ChanEpgImagesPixmap);
+        m_Osd->DestroyPixmap(ChanInfoTopPixmap);
+        m_Osd->DestroyPixmap(ChanInfoBottomPixmap);
+        m_Osd->DestroyPixmap(ChanLogoPixmap);
+        m_Osd->DestroyPixmap(ChanLogoBGPixmap);
+        m_Osd->DestroyPixmap(ChanIconsPixmap);
+        m_Osd->DestroyPixmap(ChanEpgImagesPixmap);
     // }
 }
 
@@ -573,7 +573,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 
 void cFlatDisplayChannel::Flush(void) {
     // if (!m_DoOutput) return;
-    // if (!osd) return;
+    // if (!m_Osd) return;
 
     if (m_Present) {
         int Current {0}, Total {0};
@@ -599,7 +599,7 @@ void cFlatDisplayChannel::Flush(void) {
         DvbapiInfoDraw();
 
     TopBarUpdate();
-    osd->Flush();
+    m_Osd->Flush();
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {

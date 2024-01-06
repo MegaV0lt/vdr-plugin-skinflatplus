@@ -8,7 +8,7 @@
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
-    /* Osd = NULL;
+    /* m_Osd = NULL;
     Pixmap = NULL;
     PixmapImage = NULL;
     m_IsShown = false;
@@ -17,7 +17,7 @@ cComplexContent::cComplexContent() {
 }
 
 cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
-    Osd = osd;
+    m_Osd = osd;
     m_ScrollSize = ScrollSize;
 
     /* Pixmap = NULL;
@@ -33,10 +33,10 @@ cComplexContent::~cComplexContent() {
 void cComplexContent::Clear(void) {
     m_IsShown = false;
     Contents.clear();
-    if (Osd) {  //! Check because Clear() is called before SetOsd()
-        Osd->DestroyPixmap(Pixmap);
+    if (m_Osd) {  //! Check because Clear() is called before SetOsd()
+        m_Osd->DestroyPixmap(Pixmap);
         Pixmap = NULL;
-        Osd->DestroyPixmap(PixmapImage);
+        m_Osd->DestroyPixmap(PixmapImage);
         PixmapImage = NULL;
     }
 }
@@ -45,11 +45,11 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     CalculateDrawPortHeight();
     m_FullFillBackground = fullFillBackground;
 
-    // if (!Osd) return;
+    // if (!m_Osd) return;
 
-    Osd->DestroyPixmap(Pixmap);
+    m_Osd->DestroyPixmap(Pixmap);
     Pixmap = NULL;
-    Osd->DestroyPixmap(PixmapImage);
+    m_Osd->DestroyPixmap(PixmapImage);
     PixmapImage = NULL;
 
     cRect PositionDraw;
@@ -61,8 +61,8 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     else
         PositionDraw.SetHeight(m_DrawPortHeight);
 
-    Pixmap = CreatePixmap(Osd, "Pixmap", 1, Position, PositionDraw);
-    PixmapImage = CreatePixmap(Osd, "PixmapImage", 2, Position, PositionDraw);
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, Position, PositionDraw);
+    PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, Position, PositionDraw);
     // dsyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
     //         Position.Left(), Position.Top(), Position.Width(), Position.Height());
     // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),

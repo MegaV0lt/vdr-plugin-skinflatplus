@@ -44,8 +44,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
                                        m_ButtonsHeight + Config.decorBorderButtonSize * 2);
 
     m_ScrollBarTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2;
-    /* //* Default set in displaymenu.h
-    m_IsScrolling = false;
+    //* Default set in displaymenu.h
+    /* m_IsScrolling = false;
     m_IsGroup = false;
     m_ShowEvent = false;
     m_ShowRecording = false;
@@ -60,17 +60,17 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     */
     m_MenuWidth = m_OsdWidth;
     m_MenuTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
-    MenuPixmap = CreatePixmap(osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+    MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuPixmap left: %d top: %d width: %d height: %d", 0, m_MenuTop, m_MenuWidth,
     // m_ScrollBarHeight);
-    MenuIconsBgPixmap = CreatePixmap(osd, "MenuIconsBgPixmap", 2, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+    MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsBgPixmap left: %d top: %d width: %d height: %d", 0,
     //         m_MenuTop, m_MenuWidth, m_ScrollBarHeight);
-    MenuIconsPixmap = CreatePixmap(osd, "MenuIconsPixmap", 3, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+    MenuIconsPixmap = CreatePixmap(m_Osd, "MenuIconsPixmap", 3, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsPixmap left: %d top: %d width: %d height: %d",
     //         0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight);
     MenuIconsOvlPixmap =
-        CreatePixmap(osd, "MenuIconsOvlPixmap", 4, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+        CreatePixmap(m_Osd, "MenuIconsOvlPixmap", 4, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsOvlPixmap left: %d top: %d width: %d height: %d",
     //         0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight);
 
@@ -78,14 +78,14 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_chTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
     m_chWidth = m_MenuWidth - Config.decorBorderMenuContentHeadSize * 2;
     m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2;
-    ContentHeadPixmap = CreatePixmap(osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
+    ContentHeadPixmap = CreatePixmap(m_Osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
     // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
     // m_chHeight);
     ContentHeadIconsPixmap =
-        CreatePixmap(osd, "ContentHeadIconsPixmap", 2, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
+        CreatePixmap(m_Osd, "ContentHeadIconsPixmap", 2, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
 
     ScrollbarPixmap = CreatePixmap(
-        osd, "ScrollbarPixmap", 2,
+        m_Osd, "ScrollbarPixmap", 2,
         cRect(0, m_ScrollBarTop, m_MenuWidth, m_ScrollBarHeight + m_ButtonsHeight + Config.decorBorderButtonSize * 2));
     // dsyslog("flatPlus: ScrollbarPixmap left: %d top: %d width: %d height: %d", 0, m_ScrollBarTop, m_MenuWidth,
     //         m_ScrollBarHeight + m_ButtonsHeight + Config.decorBorderButtonSize * 2);
@@ -99,7 +99,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
     m_MenuCategory = mcUndefined;
 
-    MenuItemScroller.SetOsd(osd);
+    MenuItemScroller.SetOsd(m_Osd);
     MenuItemScroller.SetScrollStep(Config.ScrollerStep);
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     MenuItemScroller.SetScrollType(Config.ScrollerType);
@@ -110,15 +110,14 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
-    if (FontTempSml) delete FontTempSml;
-    // if (osd) {
-        osd->DestroyPixmap(MenuPixmap);
-        osd->DestroyPixmap(MenuIconsPixmap);
-        osd->DestroyPixmap(MenuIconsBgPixmap);
-        osd->DestroyPixmap(MenuIconsOvlPixmap);
-        osd->DestroyPixmap(ScrollbarPixmap);
-        osd->DestroyPixmap(ContentHeadPixmap);
-        osd->DestroyPixmap(ContentHeadIconsPixmap);
+    // if (m_Osd) {
+        m_Osd->DestroyPixmap(MenuPixmap);
+        m_Osd->DestroyPixmap(MenuIconsPixmap);
+        m_Osd->DestroyPixmap(MenuIconsBgPixmap);
+        m_Osd->DestroyPixmap(MenuIconsOvlPixmap);
+        m_Osd->DestroyPixmap(ScrollbarPixmap);
+        m_Osd->DestroyPixmap(ContentHeadPixmap);
+        m_Osd->DestroyPixmap(ContentHeadIconsPixmap);
     // }
 }
 
@@ -970,7 +969,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
     ComplexContent.Clear();
     ComplexContent.SetScrollSize(m_FontSmlHeight);
     ComplexContent.SetScrollingActive(false);
-    ComplexContent.SetOsd(osd);
+    ComplexContent.SetOsd(m_Osd);
     ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuEventBg));
 
@@ -2373,7 +2372,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
-        ComplexContent.SetOsd(osd);
+        ComplexContent.SetOsd(m_Osd);
         ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
         ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
         ComplexContent.SetScrollSize(m_FontHeight);
@@ -2750,7 +2749,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.Clear();
     ComplexContent.SetScrollSize(m_FontSmlHeight);
     ComplexContent.SetScrollingActive(false);
-    ComplexContent.SetOsd(osd);
+    ComplexContent.SetOsd(m_Osd);
     ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
@@ -3077,7 +3076,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
-        ComplexContent.SetOsd(osd);
+        ComplexContent.SetOsd(m_Osd);
         ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
         ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
         ComplexContent.SetScrollSize(m_FontHeight);
@@ -3469,7 +3468,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
         }
     }
 
-    ComplexContent.SetOsd(osd);
+    ComplexContent.SetOsd(m_Osd);
     ComplexContent.SetPosition(cRect(Left, Top, Width, Height));
     ComplexContent.SetBGColor(Theme.Color(clrMenuTextBg));
     ComplexContent.SetScrollingActive(true);
@@ -3554,7 +3553,7 @@ void cFlatDisplayMenu::Flush(void) {
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
         TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
-    osd->Flush();
+    m_Osd->Flush();
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
@@ -3839,6 +3838,8 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
 
 /* Widgets */
 void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
+    if (!MenuPixmap) return;
+
     int wLeft = m_OsdWidth * Config.MainMenuItemScale + m_MarginItem + Config.decorBorderMenuContentSize +
                 Config.decorBorderMenuItemSize;
     int wTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
@@ -3848,7 +3849,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     int ContentTop {0};
 
     ContentWidget.Clear();
-    ContentWidget.SetOsd(osd);
+    ContentWidget.SetOsd(m_Osd);
     ContentWidget.SetPosition(cRect(wLeft, wTop, wWidth, wHeight));
     ContentWidget.SetBGColor(Theme.Color(clrMenuRecBg));
     ContentWidget.SetScrollingActive(false);
@@ -3922,13 +3923,22 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
                 ContentTop = AddHeight + m_MarginItem;
         }
     }
-
+    // dsyslog("flatPlus: Creating MainMenuWidgets");
     ContentWidget.CreatePixmaps(false);
+    // dsyslog("flatPlus: Drawing MainMenuWidgets");
     ContentWidget.Draw();
+    //! TODO: Segfault when deleting 'm_FontTempSml'
+    /* dsyslog("flatPlus: Deleting m_FontTempSml");
+    if (m_FontTempSml) {  // Created in 'DrawMainMenuWidgetWeather()'
+        delete m_FontTempSml;
+        m_FontTempSml = nullptr;
+    } */
+    // dsyslog("flatPlus: Drawing DecorBorder");
 
     DecorBorderDraw(wLeft, wTop, wWidth, ContentWidget.ContentHeight(false), Config.decorBorderMenuContentSize,
                     Config.decorBorderMenuContentType, Config.decorBorderMenuContentFg, Config.decorBorderMenuContentBg,
                     BorderMMWidget);
+    // dsyslog("flatPlus: DecorBorder drawn");
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop) {
@@ -4872,8 +4882,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cFont *FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
-
     std::string Location("");
     cString FileName = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
     std::ifstream file(*FileName, std::ifstream::in);
@@ -4891,6 +4899,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         std::getline(file, TempToday);
         file.close();
     }
+    // dsyslog("flatPlus: Creating m_FontTempSml");
+    //* Declared in 'baserender.h'
+    //? Only create once, because segfault when deleting?
+    m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
 
     cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
 
@@ -4959,9 +4971,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         tm_r.tm_mday += index;
         time_t t2 = mktime(&tm_r);
 
-        int FontTempSmlHeight = FontTempSml->Height();
+        int FontTempSmlHeight = m_FontTempSml->Height();
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
-            if (left + m_FontHeight * 2 + FontTempSml->Width("-99,9°C") + FontTempSml->Width("XXXX") +
+            if (left + m_FontHeight * 2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
                     m_MarginItem * 6 >
                 wWidth)
                 break;
@@ -4977,12 +4989,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            int wtemp = MyMax(FontTempSml->Width(TempMax.c_str()), FontTempSml->Width(TempMin.c_str()));
+            int wtemp = MyMax(m_FontTempSml->Width(TempMax.c_str()), m_FontTempSml->Width(TempMin.c_str()));
             ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml, wtemp,
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   FontTempSmlHeight, taRight);
             ContentWidget.AddText(TempMin.c_str(), false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml, wtemp,
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   FontTempSmlHeight, taRight);
 
             left += wtemp + m_MarginItem;
@@ -4994,8 +5006,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
             ContentWidget.AddText(*PrecString, false,
                                   cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml);
-            left += FontTempSml->Width(*PrecString) + m_MarginItem * 2;
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
+            left += m_FontTempSml->Width(*PrecString) + m_MarginItem * 2;
         } else {  // Long
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
                 break;
@@ -5015,13 +5027,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 left += m_FontHeight + m_MarginItem;
             }
             ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml,
-                                  FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                  m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
             ContentWidget.AddText(TempMin.c_str(), false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml,
-                                  FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                  m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
 
-            left += FontTempSml->Width("-99,9°C ") + m_MarginItem;
+            left += m_FontTempSml->Width("-99,9°C ") + m_MarginItem;
 
             img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem * 2);
             if (img) {
@@ -5030,14 +5042,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
             ContentWidget.AddText(*PrecString, false,
                                   cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml,
-                                  FontTempSml->Width("100%"), FontTempSmlHeight, taRight);
-            left += FontTempSml->Width("100% ") + m_MarginItem;
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                  m_FontTempSml->Width("100%"), FontTempSmlHeight, taRight);
+            left += m_FontTempSml->Width("100% ") + m_MarginItem;
 
             ContentWidget.AddText(
                 summary.c_str(), false,
                 cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), wWidth - left, m_FontHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), FontTempSml, wWidth - left);
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
 
             ContentTop += m_FontHeight;
         }

@@ -51,7 +51,7 @@ cFlatBaseRender::cFlatBaseRender(void) {
     // m_ButtonsHeight = 0;
     // m_ButtonsDrawn = false;
 
-    /* osd = NULL;
+    /* m_Osd = NULL;
     TopBarPixmap = NULL;
     ButtonsPixmap = NULL;
     MessagePixmap = NULL;
@@ -75,25 +75,21 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     if (m_TopBarFontSml) delete m_TopBarFontSml;
     if (m_TopBarFontClock) delete m_TopBarFontClock;
 
-    if (WeatherFont) delete WeatherFont;
-    if (WeatherFontSml) delete WeatherFontSml;
-    if (WeatherFontSign) delete WeatherFontSign;
-    
-    // if (osd) {
+    // if (m_Osd) {
         MessageScroller.Clear();
-        osd->DestroyPixmap(TopBarPixmap);
-        osd->DestroyPixmap(TopBarIconPixmap);
-        osd->DestroyPixmap(TopBarIconBgPixmap);
-        osd->DestroyPixmap(ButtonsPixmap);
-        osd->DestroyPixmap(MessagePixmap);
-        osd->DestroyPixmap(MessageIconPixmap);
-        /* osd->DestroyPixmap(ContentPixmap); */  // Unused?
-        /* osd->DestroyPixmap(ContentEpgImagePixmap); */
-        osd->DestroyPixmap(ProgressBarPixmap);
-        osd->DestroyPixmap(ProgressBarPixmapBg);
-        osd->DestroyPixmap(DecorPixmap);
+        m_Osd->DestroyPixmap(TopBarPixmap);
+        m_Osd->DestroyPixmap(TopBarIconPixmap);
+        m_Osd->DestroyPixmap(TopBarIconBgPixmap);
+        m_Osd->DestroyPixmap(ButtonsPixmap);
+        m_Osd->DestroyPixmap(MessagePixmap);
+        m_Osd->DestroyPixmap(MessageIconPixmap);
+        /* m_Osd->DestroyPixmap(ContentPixmap); */  // Unused?
+        /* m_Osd->DestroyPixmap(ContentEpgImagePixmap); */
+        m_Osd->DestroyPixmap(ProgressBarPixmap);
+        m_Osd->DestroyPixmap(ProgressBarPixmapBg);
+        m_Osd->DestroyPixmap(DecorPixmap);
 
-        delete osd;
+        delete m_Osd;
     // }
 }
 
@@ -108,10 +104,10 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
     m_OsdWidth = width;
     m_OsdHeight = height;
 
-    osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pionter
-    // if (osd) {
+    m_Osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pionter
+    // if (m_Osd) {
         tArea Area = {0, 0, width, height, 32};
-        if (osd->SetAreas(&Area, 1) == oeOk) {
+        if (m_Osd->SetAreas(&Area, 1) == oeOk) {
             // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
             return;
         }
@@ -134,17 +130,17 @@ void cFlatBaseRender::TopBarCreate(void) {
     else
         m_TopBarHeight = m_TopBarFontSmlHeight * 2;
 
-    TopBarPixmap = CreatePixmap(osd, "TopBarPixmap", 1,
+    TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1,
                                 cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                       m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
     //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
-    TopBarIconBgPixmap = CreatePixmap(osd, "TopBarIconBgPixmap", 2,
+    TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2,
                                       cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                             m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarIconBgPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
     //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
-    TopBarIconPixmap = CreatePixmap(osd, "TopBarIconPixmap", 3,
+    TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3,
                                     cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                           m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
@@ -441,7 +437,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
         int NumRec {0};
         if (Config.TopBarRecordingShow) {
-// Look for timers
+            // Look for timers
             auto recCounterFuture = std::async([&NumRec]() {
                 LOCK_TIMERS_READ;
                 for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
@@ -562,7 +558,7 @@ void cFlatBaseRender::ButtonsCreate(void) {
     m_ButtonsWidth = m_OsdWidth;
     m_ButtonsTop = m_OsdHeight - m_ButtonsHeight - Config.decorBorderButtonSize;
 
-    ButtonsPixmap = CreatePixmap(osd, "ButtonsPixmap", 1,
+    ButtonsPixmap = CreatePixmap(m_Osd, "ButtonsPixmap", 1,
                                  cRect(Config.decorBorderButtonSize, m_ButtonsTop,
                                        m_ButtonsWidth - Config.decorBorderButtonSize * 2, m_ButtonsHeight));
     PixmapFill(ButtonsPixmap, clrTransparent);
@@ -734,11 +730,11 @@ void cFlatBaseRender::MessageCreate(void) {
 
     int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
     MessagePixmap = CreatePixmap(
-        osd, "MessagePixmap", 5,
+        m_Osd, "MessagePixmap", 5,
         cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
     PixmapFill(MessagePixmap, clrTransparent);
     MessageIconPixmap = CreatePixmap(
-        osd, "MessageIconPixmap", 5,
+        m_Osd, "MessageIconPixmap", 5,
         cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
     PixmapFill(MessageIconPixmap, clrTransparent);
     // dsyslog("flatPlus: MessagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
@@ -746,7 +742,7 @@ void cFlatBaseRender::MessageCreate(void) {
     // dsyslog("flatPlus: MessageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
     //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
 
-    MessageScroller.SetOsd(osd);
+    MessageScroller.SetOsd(m_Osd);
     MessageScroller.SetScrollStep(Config.ScrollerStep);
     MessageScroller.SetScrollDelay(Config.ScrollerDelay);
     MessageScroller.SetScrollType(Config.ScrollerType);
@@ -872,9 +868,9 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
 
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    ProgressBarPixmap = CreatePixmap(osd, "ProgressBarPixmap", 3,
+    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3,
                                      cRect(Left, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
-    ProgressBarPixmapBg = CreatePixmap(osd, "ProgressBarPixmapBg", 2,
+    ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
                                        cRect(Left - m_ProgressBarMarginVer, m_ProgressBarTop - m_ProgressBarMarginHor,
                                              m_ProgressBarWidth + m_ProgressBarMarginVer * 2,
                                              m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
@@ -1462,7 +1458,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
-        DecorPixmap = CreatePixmap(osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
+        DecorPixmap = CreatePixmap(m_Osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 
         PixmapFill(DecorPixmap, clrTransparent);
@@ -1763,11 +1759,6 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
-    cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
-    cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
-    cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
-
     std::string TempToday(""), TempTodaySign("");
     std::string IconToday(""), IconTomorrow("");
     std::string TempMaxToday(""), TempMaxTomorrow("");
@@ -1861,6 +1852,11 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         PrecTomorrow = cString::sprintf("%.0f%%", p);
     }
 
+    int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);
+    cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
+    cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
+    cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
+
     int left = m_MarginItem;
 
     int WidthTempToday =
@@ -1879,7 +1875,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     int wLeft = m_OsdWidth - wWidth - 20;
 
     WeatherWidget.Clear();
-    WeatherWidget.SetOsd(osd);
+    WeatherWidget.SetOsd(m_Osd);
     WeatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, WeatherFontHeight));
     WeatherWidget.SetBGColor(Theme.Color(clrItemCurrentBg));
     WeatherWidget.SetScrollingActive(false);
@@ -1951,4 +1947,8 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
 
     WeatherWidget.CreatePixmaps(false);
     WeatherWidget.Draw();
+
+    delete WeatherFont;
+    delete WeatherFontSml;
+    delete WeatherFontSign;
 }
