@@ -9,34 +9,6 @@
 #include "./flat.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
-    /* Disabled because all pixmaps are checked before use
-    if (m_FirstDisplay) {
-        m_FirstDisplay = false;
-        m_DoOutput = false;
-        return;
-    } else
-        m_DoOutput = true; */
-
-    /* m_Present = NULL;
-    // m_ChannelName = "";
-
-    ChanInfoTopPixmap = NULL;
-    ChanInfoBottomPixmap = NULL;
-    ChanLogoPixmap = NULL;
-    ChanLogoBGPixmap = NULL;
-    ChanIconsPixmap = NULL;
-    ChanEpgImagesPixmap = NULL;
-
-    m_IsGroup = false;
-    // IsRecording = false,  / Unused?
-    m_IsRadioChannel = false;
-
-    m_ScreenWidth = m_LastScreenWidth = -1;
-    m_LastSignalStrength = -1;
-    m_LastSignalQuality = -1;
-
-    m_SignalStrengthRight = 0;
-    */
     CreateFullOsd();
     // if (!m_Osd) return;
 
@@ -119,8 +91,6 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    // if (!m_DoOutput) return;
-
     // if (m_Osd) {
         Scrollers.Clear();
         m_Osd->DestroyPixmap(ChanInfoTopPixmap);
@@ -135,8 +105,6 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
         return;
-
-    // if (!m_DoOutput) return;
 
     // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -196,7 +164,6 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    // if (!m_DoOutput) return;
     if (!ChanIconsPixmap) return;
 
     // if (!Resolution)
@@ -252,7 +219,6 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
@@ -456,13 +422,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    // if (!m_DoOutput) return;
-
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap) return;
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
@@ -510,7 +473,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
     // dsyslog("flatPlus: DvbapiInfoDraw");
@@ -572,9 +534,6 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 }
 
 void cFlatDisplayChannel::Flush(void) {
-    // if (!m_DoOutput) return;
-    // if (!m_Osd) return;
-
     if (m_Present) {
         int Current {0}, Total {0};
         time_t t = time(NULL);

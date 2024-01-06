@@ -7,7 +7,6 @@
  */
 #include <vdr/osd.h>
 #include <vdr/menu.h>
-// #include <memory>
 
 #include "./flat.h"
 
@@ -39,7 +38,6 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive = false;
-// bool m_FirstDisplay = true;
 time_t m_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
@@ -77,8 +75,7 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-cPixmap *CreatePixmap(cOsd *osd, cString Name/* = "" */, int Layer/* = 0 */, const cRect &ViewPort/* = cRect::Null */,
-                      const cRect &DrawPort/* = cRect::Null */) {
+cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());

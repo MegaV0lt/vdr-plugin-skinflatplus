@@ -32,26 +32,18 @@ class cTextScroll {
 
  public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
-        // Font = NULL;  // TODO: Is that needed?
-        // Pixmap = NULL;
         m_Osd = osd;
         Layer = layer;
         PixelsPerStep = pixels;
         ScrollType = type;
-        // IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        // ResetX = false;
     }
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps) {
-        // Font = NULL;
-        // Pixmap = NULL;
         m_Osd = osd;
         Layer = 2;
         PixelsPerStep = pixels;
         ScrollType = type;
-        // IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        // ResetX = false;
     }
 
     virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has

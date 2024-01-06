@@ -9,7 +9,6 @@
 #include "./flat.h"
 
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
-    // Muted = false;  // Unused?
     m_LabelHeight = m_FontHeight + m_MarginItem * 2;
 
     CreateFullOsd();

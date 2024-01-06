@@ -42,22 +42,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
     m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem * 3 +
                                        m_ButtonsHeight + Config.decorBorderButtonSize * 2);
-
     m_ScrollBarTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2;
-    //* Default set in displaymenu.h
-    /* m_IsScrolling = false;
-    m_IsGroup = false;
-    m_ShowEvent = false;
-    m_ShowRecording = false;
-    m_ShowText = false;
-    
-    m_ItemEventLastChannelName = "";
-    m_RecFolder = "";
-    m_LastRecFolder = "";
 
-    m_MenuItemLastHeight = 0;
-    m_MenuFullOsdIsDrawn = false;
-    */
     m_MenuWidth = m_OsdWidth;
     m_MenuTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
     MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));

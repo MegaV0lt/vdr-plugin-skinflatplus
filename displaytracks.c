@@ -15,7 +15,6 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     img_ac3 = ImgLoader.LoadIcon("tracks_ac3", 999, m_FontHeight);
     img_stereo = ImgLoader.LoadIcon("tracks_stereo", 999, m_FontHeight);
 
-    // m_Ac3Width = m_StereoWidth = 0;
     if (img_ac3)
         m_Ac3Width = img_ac3->Width();
     if (img_stereo)

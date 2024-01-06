@@ -10,19 +10,11 @@
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
-    /* m_Current = "";
-    m_Total = "";
-    m_Recording = NULL; */
-
     m_ModeOnly = ModeOnly;
-    // m_DimmActive = false;
 
-    // ProgressShown = false;
     CreateFullOsd();
     TopBarCreate();
     MessageCreate();
-
-    // m_ScreenWidth = m_LastScreenWidth = -1;
 
     m_TVSLeft = 20 + Config.decorBorderChannelEPGSize;
     m_TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;

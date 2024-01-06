@@ -17,7 +17,6 @@
 using namespace Magick;
 
 cImageLoader::cImageLoader() {
-    // m_LogoExtension = "png";
 }
 
 cImageLoader::~cImageLoader() {

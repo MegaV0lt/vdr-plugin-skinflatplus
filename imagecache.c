@@ -18,7 +18,6 @@
 
 
 cImageCache::cImageCache() {
-    // m_OverFlow = false;
 }
 
 cImageCache::~cImageCache() {

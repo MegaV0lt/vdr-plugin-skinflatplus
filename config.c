@@ -14,7 +14,6 @@ cFlatConfig::cFlatConfig(void) {
     IconPath = "";
     RecordingOldConfigFile = "";
 
-    // m_DecorCurrent = -1;
     DecorIndex = 0;
 
     ButtonsShowEmpty = true;

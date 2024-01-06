@@ -8,11 +8,6 @@
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
-    /* m_Osd = NULL;
-    Pixmap = NULL;
-    PixmapImage = NULL;
-    m_IsShown = false;
-    m_IsScrollingActive = true; */
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
@@ -20,10 +15,6 @@ cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
     m_Osd = osd;
     m_ScrollSize = ScrollSize;
 
-    /* Pixmap = NULL;
-    PixmapImage = NULL;
-    m_IsShown = false;
-    m_IsScrollingActive = true; */
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
