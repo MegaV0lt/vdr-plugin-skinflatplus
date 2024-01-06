@@ -13,8 +13,8 @@ class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
  private:
         // bool Muted;  // Unused?
 
-        cPixmap *LabelPixmap;
-        cPixmap *MuteLogoPixmap;
+        cPixmap *LabelPixmap {nullptr};
+        cPixmap *MuteLogoPixmap {nullptr};
 
         int m_LabelHeight{0};
  public:

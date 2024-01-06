@@ -11,11 +11,11 @@
 
 class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
  private:
-        cPixmap *TracksPixmap;
-        cPixmap *TracksLogoPixmap;
+        cPixmap *TracksPixmap {nullptr};
+        cPixmap *TracksLogoPixmap {nullptr};
 
-        cImage *img_ac3;
-        cImage *img_stereo;
+        cImage *img_ac3 {nullptr};
+        cImage *img_stereo {nullptr};
         int m_Ac3Width {0}, m_StereoWidth {0};
 
         int m_ItemHeight {0}, ItemsHeight {0};

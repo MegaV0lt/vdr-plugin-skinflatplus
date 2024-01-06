@@ -27,24 +27,24 @@ enum eContentImageAlignment {
 
 class cSimpleContent {
  private:
-    int ContentType;
-    cRect Position;
+    int ContentType = CT_None;  // Added to avoid compiler warning
+    cRect Position {0, 0, 0, 0};
 
-    int TextWidth, TextHeight, TextAlignment;
-    tColor ColorFg, ColorBg;
-    std::string Text;
-    cImage *Image;
-    cFont *Font;
+    int TextWidth {0}, TextHeight {0}, TextAlignment {0};
+    tColor ColorFg {0}, ColorBg {0};
+    std::string Text{""};
+    cImage *Image {nullptr};
+    cFont *Font {nullptr};
 
  public:
     cSimpleContent(void) {
-        ContentType = CT_None;  // Added to avoid compiler warning
-        Position = {0, 0, 0, 0};
+        /* ContentType 
+        Position =
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
         ColorFg = 0, ColorBg = 0;
         // Text
         Image = nullptr;
-        Font = nullptr;
+        Font = nullptr; */
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -156,7 +156,7 @@ class cComplexContent {
 
     tColor ColorBg {0};
 
-    bool m_FullFillBackground = false;  // m_* for private variables
+    bool m_FullFillBackground = false;
     int m_DrawPortHeight {0};
     int m_ScrollSize  {0};
     bool m_IsShown = false;

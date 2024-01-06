@@ -98,7 +98,7 @@ class cFlatBaseRender {
 
         // Message
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
-        int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // TODO: m_MessageWidth unused?
+        int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // m_MessageWidth is unused
         cTextScrollers MessageScroller;
 
         // Multiline content with scrollbar

@@ -22,10 +22,10 @@
 
 class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
-        cPixmap *MenuPixmap;
-        cPixmap *MenuIconsPixmap;
-        cPixmap *MenuIconsBgPixmap;   // Background for icons/logos
-        cPixmap *MenuIconsOvlPixmap;  // Overlay for icons/logos
+        cPixmap *MenuPixmap {nullptr};
+        cPixmap *MenuIconsPixmap {nullptr};
+        cPixmap *MenuIconsBgPixmap {nullptr};   // Background for icons/logos
+        cPixmap *MenuIconsOvlPixmap {nullptr};  // Overlay for icons/logos
 
         int m_MenuTop {0}, m_MenuWidth {0};
         int m_MenuItemWidth {0};
@@ -39,14 +39,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString m_LastTitle{""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
-        cPixmap *ContentHeadPixmap;
-        cPixmap *ContentHeadIconsPixmap;
+        cPixmap *ContentHeadPixmap {nullptr};
+        cPixmap *ContentHeadIconsPixmap {nullptr};
 
         int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
 
-        cPixmap *ScrollbarPixmap;
+        cPixmap *ScrollbarPixmap {nullptr};
         int m_ScrollBarTop {0};
-        int m_ScrollBarWidth {0}, m_ScrollBarHeight {0};  //? Also in cFlatBaseRender
+        int /* m_ScrollBarWidth {0}, */ m_ScrollBarHeight {0};  //? Also in cFlatBaseRender
 
         int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
         int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
@@ -74,10 +74,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_LastItemRecordingLevel {0};
 
         // Icons
-        cImage *IconTimerFull;
+        cImage *IconTimerFull {nullptr};
         // cImage *IconTimerPartial;
-        cImage *IconArrowTurn;
-        cImage *IconRec;
+        cImage *IconArrowTurn {nullptr};
+        cImage *IconRec {nullptr};
         // cImage *iconVps;
         // cImage *iconNew;
         // Icons
