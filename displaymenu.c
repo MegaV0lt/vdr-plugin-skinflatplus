@@ -1795,7 +1795,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_MenuItemLastHeight = y + m_ItemRecordingHeight;
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
-    // Preload for calculation of position
+    //* Preload for calculation of position
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
@@ -1894,6 +1894,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += ImgRecNew->Width() + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecCut);
+
+            IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+            if (!isempty(*IconName)) {
+                int ImageHeight = m_FontHeight / 2;  // Half height
+                img = ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight);
+                    if (img) {
+                        int ImageTop = Top + m_FontHeight - img->Height();
+                        int ImageLeft = Left + m_FontHeight - img->Width();
+                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                    }
+            }
 
             Left += ImgRecCut->Width() + m_MarginItem;
 
@@ -2074,6 +2085,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += ImgRecNew->Width() + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecCut);
+
+            IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+            if (!isempty(*IconName)) {
+                int ImageHeight = m_FontHeight / 2;  // Half height
+                img = ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight);
+                    if (img) {
+                        int ImageTop = Top + m_FontHeight - img->Height();
+                        int ImageLeft = Left + m_FontHeight - img->Width();
+                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                    }
+            }
 
             Left += ImgRecCut->Width() + m_MarginItem;
 
@@ -2713,11 +2735,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
             }
 #endif
-#if APIVERSNUM >= 20605
+/* #if APIVERSNUM >= 20605
             cString InfoFrameParams = RecInfo->FrameParams();
             if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
                 Text.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO Translate
-#endif
+#endif */
 
             const cComponents *Components = RecInfo->Components();
             if (Components) {
@@ -2972,11 +2994,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
         }
 #endif
-#if APIVERSNUM >= 20605
+/* #if APIVERSNUM >= 20605
         cString InfoFrameParams = RecInfo->FrameParams();
         if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
             RecAdditional.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO: Translate
-#endif
+#endif */
         const cComponents *Components = RecInfo->Components();
         if (Components) {
             cString Audio(""), Subtitle("");

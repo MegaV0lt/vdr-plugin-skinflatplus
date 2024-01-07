@@ -238,6 +238,7 @@ cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
 cString GetFormatIcon(int ScreenWidth);
+cString GetRecordingFormatIcon(const cRecording *Recording);
 cString GetRecordingerrorIcon(int RecInfoErrors);
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
@@ -262,5 +263,6 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflichts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
+void AddVideoFormatText(const cRecording *Recording, cString &Text, int RecSize, int LastIndex);  // NOLINT
 std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);
 

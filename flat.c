@@ -155,6 +155,35 @@ cString GetFormatIcon(int ScreenWidth) {
     return "sd";  // 720 and below is considered sd
 }
 
+cString GetRecordingFormatIcon(const cRecording *Recording) {
+    // From skinElchiHD
+    #if APIVERSNUM >= 20605
+        uint16_t FrameHeight = Recording->Info()->FrameHeight();
+        if (FrameHeight > 0) {
+            if (FrameHeight >= 2160) return "uhd";  // TODO: Separate images
+            if (FrameHeight >= 720) return "hd";
+            return "sd";
+        }
+        else
+    #endif
+        {   // Find radio and H.264/H.265 streams - detection FAILED: RTL/SAT1 etc. do not send a video component :-(
+            if (Recording->Info()->Components()) {
+                const cComponents *Components = Recording->Info()->Components();
+                int i {-1}, NumComponents = Components->NumComponents();
+                while (++i < NumComponents) {
+                    const tComponent *p = Components->Component(i);
+                    switch (p->stream) {
+                        case sc_video_MPEG2:     return "sd";
+                        case sc_video_H264_AVC:  return "hd";
+                        case sc_video_H265_HEVC: return "uhd";
+                        default:                 break;
+                    }
+                }
+            }
+        }
+    return "";  // Nothing found
+}
+
 cString GetRecordingerrorIcon(int RecInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
@@ -308,7 +337,7 @@ int GetEpgsearchConflichts(void) {
     return 0;
 }
 
-bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText /* = false */) {  // NOLINT
+bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     cMarks Marks;
     bool HasMarks = false;
     cIndexFile *index {nullptr};
@@ -404,17 +433,45 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             else
                 Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
         }
-        Text.Append(cString::sprintf("\n%s: %d, %s: %d\n", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
+        Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                      Recording->Lifetime()));
 
-        if (LastIndex) {
-            Text.Append(cString::sprintf("%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
+        /* if (LastIndex) {
+            Text.Append(cString::sprintf("\n%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
                                          (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
                                          static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 /
                                              MEGABYTE(1)));
-        }
+        } */
+        // Add Video Format information (Format, Resolution, Framerate, ...)
+        AddVideoFormatText(Recording, Text, RecSize,LastIndex);
     }  // AddText
     return IsCutted;
+}
+
+void AddVideoFormatText(const cRecording *Recording, cString &Text, int RecSize, int LastIndex) { // NOLINT
+#if APIVERSNUM >= 20605
+    const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
+    if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
+        Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
+                    RecInfo->FrameWidth(), RecInfo->FrameHeight()));
+        if (RecInfo->FramesPerSecond() > 0)
+            Text.Append(cString::sprintf("@%.2g%c", RecInfo->FramesPerSecond(), RecInfo->ScanTypeChar()));
+        if (RecInfo->AspectRatio() != arUnknown)
+            Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
+
+        if (LastIndex)  //* Bitrate in new line
+            Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                        static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+    }
+    else
+#endif
+    {
+        Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
+
+        if (LastIndex)  //* Bitrate at same line
+            Text.Append(cString::sprintf(", %s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                        static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+    }
 }
 
 // Returns the string between start and end or an empty string if not found
