@@ -1897,10 +1897,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
             if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight / 2;  // Half height
-                img = ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight);
+                int ImageHeight = m_FontHeight / 3;  // 1/3 image height
+                img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
-                        int ImageTop = Top + m_FontHeight - img->Height();
+                        int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
+                        int ImageTop = Top + m_FontHeight - FontAscender;
                         int ImageLeft = Left + m_FontHeight - img->Width();
                         MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                     }
@@ -2088,10 +2089,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
             if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight / 2;  // Half height
-                img = ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight);
+                int ImageHeight = m_FontHeight / 3;  // 1/3 image height
+                img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
-                        int ImageTop = Top + m_FontHeight - img->Height();
+                        int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
+                        int ImageTop = Top + m_FontHeight - FontAscender;
                         int ImageLeft = Left + m_FontHeight - img->Width();
                         MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                     }

@@ -157,10 +157,10 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
         std::string s = text;  // Convert text to string
         cString FloatedText = cString::sprintf("%s", s.substr(0, NumChars).c_str());  // From start to NumChars
-        dsyslog("flatPlus: NumChars(-15,NumChars) = ...%s", s.substr(NumChars -15, NumChars).c_str());
+        dsyslog("flatPlus: NumChars(NumChars) = \n%s", s.substr(0, NumChars).c_str());
         ++NumChars;
         cString SecondText = cString::sprintf("%s", s.substr(NumChars).c_str());  // From NumChars to the end
-        dsyslog("flatPlus: NumChars(NumChars,+25) = %s...", s.substr(NumChars, NumChars + 25).c_str());
+        dsyslog("flatPlus: NumChars(NumChars,+25) = \n%s...", s.substr(NumChars, NumChars + 25).c_str());
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());

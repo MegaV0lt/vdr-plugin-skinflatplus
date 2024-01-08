@@ -443,35 +443,30 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
                                              MEGABYTE(1)));
         } */
         // Add Video Format information (Format, Resolution, Framerate, ...)
-        AddVideoFormatText(Recording, Text, RecSize,LastIndex);
+        #if APIVERSNUM >= 20605
+        const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
+        if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
+            Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
+                        RecInfo->FrameWidth(), RecInfo->FrameHeight()));
+            if (RecInfo->FramesPerSecond() > 0)
+                Text.Append(cString::sprintf("@%.2g%c", RecInfo->FramesPerSecond(), RecInfo->ScanTypeChar()));
+            if (RecInfo->AspectRatio() != arUnknown)
+                Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
+
+            if (LastIndex)  //* Bitrate in new line
+                Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                            static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+        } else
+        #endif
+        {
+            Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
+
+            if (LastIndex)  //* Bitrate at same line
+                Text.Append(cString::sprintf(", %s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                            static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+        }
     }  // AddText
     return IsCutted;
-}
-
-void AddVideoFormatText(const cRecording *Recording, cString &Text, int RecSize, int LastIndex) { // NOLINT
-#if APIVERSNUM >= 20605
-    const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
-    if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
-        Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
-                    RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        if (RecInfo->FramesPerSecond() > 0)
-            Text.Append(cString::sprintf("@%.2g%c", RecInfo->FramesPerSecond(), RecInfo->ScanTypeChar()));
-        if (RecInfo->AspectRatio() != arUnknown)
-            Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
-
-        if (LastIndex)  //* Bitrate in new line
-            Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
-                        static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
-    }
-    else
-#endif
-    {
-        Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
-
-        if (LastIndex)  //* Bitrate at same line
-            Text.Append(cString::sprintf(", %s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
-                        static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
-    }
 }
 
 // Returns the string between start and end or an empty string if not found

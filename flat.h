@@ -263,6 +263,5 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflichts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
-void AddVideoFormatText(const cRecording *Recording, cString &Text, int RecSize, int LastIndex);  // NOLINT
 std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);
 
