@@ -147,15 +147,20 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         for (int i {0}; i < Lines && i < FloatLines; ++i) {
             NumChars += strlen(WrapperFloat.GetLine(i));
         }
+        dsyslog("flatPlus: NumChars = %d", NumChars);
+
         // Detect end of last word  //TODO: Improve; Result is not accurate sometimes
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
-        std::string Text = text;
-        cString FloatedText = cString::sprintf("%s", Text.substr(0, NumChars).c_str());  // From start to NumChars
+        dsyslog("flatPlus: NumChars after detection of end of last word: %d", NumChars);
 
+        std::string s = text;  // Convert text to string
+        cString FloatedText = cString::sprintf("%s", s.substr(0, NumChars).c_str());  // From start to NumChars
+        dsyslog("flatPlus: NumChars(-15,NumChars) = ...%s", s.substr(NumChars -15, NumChars).c_str());
         ++NumChars;
-        cString SecondText = cString::sprintf("%s", Text.substr(NumChars).c_str());  // From NumChars to the end
+        cString SecondText = cString::sprintf("%s", s.substr(NumChars).c_str());  // From NumChars to the end
+        dsyslog("flatPlus: NumChars(NumChars,+25) = %s...", s.substr(NumChars, NumChars + 25).c_str());
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());
