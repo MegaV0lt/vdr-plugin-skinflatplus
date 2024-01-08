@@ -162,7 +162,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
         if (FrameHeight > 0) {
             if (FrameHeight >= 2160) return "uhd";  // TODO: Separate images
             if (FrameHeight >= 720) return "hd";
-            return "sd";
+            return "sd";  // 720 and below is considered sd
         }
         else
     #endif
@@ -436,12 +436,6 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                      Recording->Lifetime()));
 
-        /* if (LastIndex) {
-            Text.Append(cString::sprintf("\n%s: %s, %s: ~%.2f MBit/s (Video + Audio)", tr("format"),
-                                         (Recording->IsPesRecording() ? "PES" : "TS"), tr("bit rate"),
-                                         static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 /
-                                             MEGABYTE(1)));
-        } */
         // Add Video Format information (Format, Resolution, Framerate, ...)
         #if APIVERSNUM >= 20605
         const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
@@ -470,12 +464,12 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 }
 
 // Returns the string between start and end or an empty string if not found
-std::string XmlSubstring(std::string source, const char *StrStart, const char *StrEnd) {
+std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
     std::size_t start = source.find(StrStart);
     std::size_t end = source.find(StrEnd);
 
     if (std::string::npos != start && std::string::npos != end)
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
-    return std::string();
+    return std::string();  // Empty string
 }
