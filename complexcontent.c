@@ -130,7 +130,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
 
     cTextWrapper WrapperFloat;
-    WrapperFloat.Set(text, font, TextWidthLeft);
+    WrapperFloat.Set(text, font, TextWidthLeft);  //* cTextWrapper.Set() strips trailing newlines!
     int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
     int Lines = WrapperFloat.Lines();
 
@@ -143,24 +143,35 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     if (Lines < FloatLines) {  // Text fits on the left side of the image
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     } else {
+        std::string s("");
+        s.reserve(128);
         int NumChars {0};
-        for (int i {0}; i < Lines && i < FloatLines; ++i) {
-            NumChars += strlen(WrapperFloat.GetLine(i));
-        }
-        dsyslog("flatPlus: NumChars = %d", NumChars);
+        for (int i {0}; i < FloatLines && i < Lines; ++i)
+            NumChars += strlen(WrapperFloat.GetLine(i));  //! Line breaks are removed, so NumChars may be to small
 
-        // Detect end of last word  //TODO: Improve; Result is not accurate sometimes
+        dsyslog("flatPlus: NumChars = %d, FloatLines = %d", NumChars, FloatLines);
+
+        //* Try to readd stripped newlines ('\n') to NumChars
+        s = text;  // Convert text to string
+        for (size_t i {0}; i < s[NumChars]; ++i)
+            if (s[i] == '\n') NumChars += 1;
+
+        dsyslog("flatPlus: Added line breaks, NumChars is now %d", NumChars);
+
+        //! To be removed
+        // Detect end of last word  // TODO: Improve; Result is not accurate sometimes
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
         }
         dsyslog("flatPlus: NumChars after detection of end of last word: %d", NumChars);
 
-        std::string s = text;  // Convert text to string
+        // Split the text to 'FloatedText' and 'SecondText'
         cString FloatedText = cString::sprintf("%s", s.substr(0, NumChars).c_str());  // From start to NumChars
-        dsyslog("flatPlus: NumChars(NumChars) = \n%s", s.substr(0, NumChars).c_str());
+        dsyslog("flatPlus: Text(0 to %d) = \n%s", NumChars, s.substr(0, NumChars).c_str());
         ++NumChars;
         cString SecondText = cString::sprintf("%s", s.substr(NumChars).c_str());  // From NumChars to the end
-        dsyslog("flatPlus: NumChars(NumChars,+25) = \n%s...", s.substr(NumChars, NumChars + 25).c_str());
+        dsyslog("flatPlus: Text(%d to %d) = \n%s...", NumChars, NumChars + 15,
+                                                      s.substr(NumChars, NumChars + 15).c_str());
 
         cRect SecondTextPos;
         SecondTextPos.SetLeft(textPos.Left());

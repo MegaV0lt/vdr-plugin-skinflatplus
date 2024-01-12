@@ -1243,8 +1243,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
         if (Current && m_FontSml->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(File,
-                                         cRect(Left, Top + m_FontHeight + m_MenuTop,
-                                               m_MenuItemWidth - Left - m_MarginItem - m_ScrollBarWidth,
+                                         cRect(Left, Top + m_FontHeight + m_MenuTop,  // TODO: Mismatch when scrolling
+                                               m_MenuItemWidth - Left - m_MarginItem /*- m_ScrollBarWidth*/,
                                                m_FontSmlHeight),
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
@@ -2957,7 +2957,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::list<std::string> GenreIcons;
     std::string Fsk("");
     if (!isempty(RecInfo->Description()))
-        Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
+        Text.Append(cString::sprintf("%s", RecInfo->Description()));
+        // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two linebreaks?
 
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {

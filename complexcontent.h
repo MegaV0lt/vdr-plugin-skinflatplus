@@ -38,7 +38,7 @@ class cSimpleContent {
 
  public:
     cSimpleContent(void) {
-        /* ContentType 
+        /* ContentType
         Position =
         TextWidth = 0, TextHeight = 0, TextAlignment = 0;
         ColorFg = 0, ColorBg = 0;
