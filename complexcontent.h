@@ -204,3 +204,27 @@ class cComplexContent {
     bool IsShown(void) { return m_IsShown; }
     bool IsScrollingActive(void) { return m_IsScrollingActive; }
 };
+
+// Based on VDR's cTextWrapper
+class cTextFloatingWrapper {
+ private:
+    char *m_Text {nullptr};
+    char *m_EoL {nullptr};
+    int m_Lines {0};
+    int m_LastLine {-1};
+
+ public:
+    cTextFloatingWrapper(void);
+    ~cTextFloatingWrapper();
+    void Set(const char *Text, const cFont *Font, int UpperLines, int WidthLower, int WidthUpper = 0);
+    ///< Wraps the Text to make it fit into the area defined by the given Width
+    ///< when displayed with the given Font.
+    ///< Wrapping is done by inserting the necessary number of newline
+    ///< characters into the string.
+    const char *Text(void);
+    ///< Returns the full wrapped text.
+    int Lines(void) { return m_Lines; }
+    ///< Returns the actual number of lines needed to display the full wrapped text.
+    const char *GetLine(int Line);
+    ///< Returns the given Line. The first line is numbered 0.
+};

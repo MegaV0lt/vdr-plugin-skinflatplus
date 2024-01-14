@@ -24,7 +24,6 @@
 
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
-// extern bool m_FirstDisplay;
 
 extern time_t m_RemoteTimersLastRefresh;
 

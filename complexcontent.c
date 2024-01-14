@@ -127,19 +127,25 @@ void cComplexContent::AddImage(cImage *image, cRect position) {
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos,
                                               tColor colorFg, tColor colorBg, cFont *font, int textWidth,
                                               int textHeight, int textAlignment) {
-    int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
-
-    cTextWrapper WrapperFloat;
-    WrapperFloat.Set(text, font, TextWidthLeft);  //* cTextWrapper.Set() strips trailing newlines!
+    int TextWidthFull = (textWidth > 0) ? textWidth : Position.Width() - textPos.Left();
+    // int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
+    int TextWidthLeft = TextWidthFull - image->Width() - 10;
     int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
+
+    cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
+    WrapperFloat.Set(text, font, FloatLines, TextWidthFull, TextWidthLeft);  //* Set() strips trailing newlines!
     int Lines = WrapperFloat.Lines();
 
-    cRect FloatedTextPos;
+    dsyslog("flatPlus: AddImageWithFloatedText:\nTextWithLeft %d, FloatLines %d, TextWidthFull %d, Lines %d",
+            TextWidthLeft, FloatLines, TextWidthFull, Lines);
+    
+    //* Old code disabled. Inacurate result sometimes
+    /* cRect FloatedTextPos;
     FloatedTextPos.SetLeft(textPos.Left());
     FloatedTextPos.SetTop(textPos.Top());
     FloatedTextPos.SetWidth(TextWidthLeft);
-    FloatedTextPos.SetHeight(textPos.Height());
-
+    FloatedTextPos.SetHeight(textPos.Height()); 
+    
     if (Lines < FloatLines) {  // Text fits on the left side of the image
         AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
     } else {
@@ -147,18 +153,17 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         s.reserve(128);
         int NumChars {0};
         for (int i {0}; i < FloatLines && i < Lines; ++i)
-            NumChars += strlen(WrapperFloat.GetLine(i));  //! Line breaks are removed, so NumChars may be to small
+            NumChars += strlen(WrapperFloat.GetLine(i));  // ! Line breaks are removed, so NumChars may be to small
 
         dsyslog("flatPlus: NumChars = %d, FloatLines = %d", NumChars, FloatLines);
 
-        //* Try to readd stripped newlines ('\n') to NumChars
+        // * Try to readd stripped newlines ('\n') to NumChars
         s = text;  // Convert text to string
         for (size_t i {0}; i < s[NumChars]; ++i)
             if (s[i] == '\n') NumChars += 1;
 
         dsyslog("flatPlus: Added line breaks, NumChars is now %d", NumChars);
 
-        //! To be removed
         // Detect end of last word  // TODO: Improve; Result is not accurate sometimes
         for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
              ++NumChars) {
@@ -181,6 +186,19 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
         AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
         AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    } */
+
+    cRect FloatedTextPos;
+    FloatedTextPos.SetLeft(textPos.Left());
+    FloatedTextPos.SetTop(textPos.Top());
+    FloatedTextPos.SetWidth(textPos.Width());
+    FloatedTextPos.SetHeight(textPos.Height());
+
+    for (int i {0}; i < Lines; ++i) {  // Add text line by line
+        FloatedTextPos.SetTop(textPos.Top() + i * m_ScrollSize);
+        AddText(WrapperFloat.GetLine(i), false, FloatedTextPos, colorFg, colorBg, font,
+               TextWidthFull, textHeight, textAlignment);
+        dsyslog("flatPlus: Adding Floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
 
     cRect ImagePos;
@@ -288,4 +306,108 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
     }
 
     return scrolled;
+}
+
+// --- cTextFloatingWrapper --- // From skin ElchiHD
+// Based on VDR's cTextWrapper
+cTextFloatingWrapper::cTextFloatingWrapper(void) {
+}
+
+cTextFloatingWrapper::~cTextFloatingWrapper() {
+    free(m_Text);
+}
+
+void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLines, int WidthLower, int WidthUpper) {
+    free(m_Text);
+    m_Text = Text ? strdup(Text) : NULL;
+    if (!m_Text)
+        return;
+    m_Lines = 1;
+    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+        return;
+
+    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
+    int cw {0}, l {0}, sl {0}, w {0};
+    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
+    uint sym {0};
+    stripspace(m_Text);  // Strips trailing newlines
+
+    for (char *p = m_Text; *p;) {
+        /* int */ sl = Utf8CharLen(p);
+        /* uint */ sym = Utf8CharGet(p, sl);
+        if (sym == '\n') {
+            ++m_Lines;
+            if (m_Lines > UpperLines)
+                Width = WidthLower;
+            w = 0;
+            Blank = Delim = nullptr;
+            p++;
+            continue;
+        } else if (sl == 1 && isspace(sym))
+            Blank = p;
+        /* int */ cw = Font->Width(sym);
+        if (w + cw > Width) {
+            if (Blank) {
+                *Blank = '\n';
+                p = Blank;
+                continue;
+            } else if (w > 0) {  // There has to be at least one character before the newline.
+                                 // Here's the ugly part, where we don't have any whitespace to
+                                 // punch in a newline, so we need to make room for it:
+                if (Delim)
+                    p = Delim + 1;  // Let's fall back to the most recent delimiter
+                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* int */ l = p - m_Text;
+                strncpy(s, m_Text, l);
+                s[l] = '\n';
+                strcpy(s + l + 1, p);
+                free(m_Text);
+                m_Text = s;
+                p = m_Text + l;
+                continue;
+            }
+        }
+        w += cw;
+        if (strchr("-.,:;!?_", *p)) {
+            Delim = p;
+            Blank = nullptr;
+        }
+        p += sl;
+    }  // for char
+}
+
+const char *cTextFloatingWrapper::Text(void) {
+    if (m_EoL) {
+        *m_EoL = '\n';
+        m_EoL = nullptr;
+    }
+    return m_Text;
+}
+
+const char *cTextFloatingWrapper::GetLine(int Line) {
+    char *s {nullptr};
+    if (Line < m_Lines) {
+        if (m_EoL) {
+            *m_EoL = '\n';
+            if (Line == m_LastLine + 1)
+                s = m_EoL + 1;
+            m_EoL = nullptr;
+        }
+        if (!s) {
+            s = m_Text;
+            for (int i {0}; i < Line; i++) {
+                s = strchr(s, '\n');
+                if (s)
+                    s++;
+                else
+                    break;
+            }
+        }
+        if (s) {
+            if ((m_EoL = strchr(s, '\n')) != NULL)
+                *m_EoL = 0;
+        }
+        m_LastLine = Line;
+    }
+    return s;
 }
