@@ -72,13 +72,12 @@ void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
     m_OsdHeight = height;
 
     m_Osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pionter
-    // if (m_Osd) {
-        tArea Area = {0, 0, width, height, 32};
-        if (m_Osd->SetAreas(&Area, 1) == oeOk) {
-            // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
-            return;
-        }
-    // }
+    tArea Area = {0, 0, width, height, 32};
+    if (m_Osd->SetAreas(&Area, 1) == oeOk) {
+        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+        return;
+    }
+
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
     return;
 }
@@ -306,10 +305,9 @@ void cFlatBaseRender::TopBarUpdate(void) {
         return;
 
     cString Buffer(""), CurDate = DayDateTime();
-    int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
-    int MenuIconWidth {0};
-
     if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
+        int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
+        int MenuIconWidth {0};
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = CurDate;
 
