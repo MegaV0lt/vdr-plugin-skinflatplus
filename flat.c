@@ -528,10 +528,12 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     uint64_t RecSize {0};
     if (AddText) {
         /* if (!rc) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
+        cString Warn = (rc) ? "!" : "";  // Show a '!' when an error occured detecting filesize
         if (RecSize > MEGABYTE(1023))
-            Text.Append(cString::sprintf("%s: %.2f GB", tr("Size"), static_cast<float>(RecSize) / MEGABYTE(1024)));
+            Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), *Warn,
+                                         static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
-            Text.Append(cString::sprintf("%s: %lld MB", tr("Size"), RecSize / MEGABYTE(1)));
+            Text.Append(cString::sprintf("%s: %s%lld MB%s", tr("Size"), *Warn, RecSize / MEGABYTE(1)));
 
         if (HasMarks) {
             if (RecSize > MEGABYTE(1023))
@@ -544,7 +546,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                      Recording->Lifetime()));
 
-        // Add Video Format information (Format, Resolution, Framerate, ...)
+        // Add Video Format information (Format, Resolution, Framerate, …)
         #if APIVERSNUM >= 20605
         const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
         if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
