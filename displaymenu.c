@@ -49,7 +49,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuPixmap left: %d top: %d width: %d height: %d", 0, m_MenuTop, m_MenuWidth,
     // m_ScrollBarHeight);
-    MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+    MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2,
+                                     cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsBgPixmap left: %d top: %d width: %d height: %d", 0,
     //         m_MenuTop, m_MenuWidth, m_ScrollBarHeight);
     MenuIconsPixmap = CreatePixmap(m_Osd, "MenuIconsPixmap", 3, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
@@ -526,10 +527,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     SetEditableWidth(m_MenuWidth - Tab(1));
 }
 
-/* std::string cFlatDisplayMenu::items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                           "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                           "Replay",   "Miscellaneous", "Plugins", "Restart"};
-*/
 std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string text = skipspace(Text.c_str());
     std::string MenuEntry("") /*, MenuNumber("")*/;
@@ -1844,7 +1841,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 img = nullptr;
                 if (Current)
-                    img = ImgLoader.LoadIcon("timerRecordinm_cur", m_FontHeight, m_FontHeight);
+                    img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
                 if (!img)
                     img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
                 if (img)
@@ -2611,8 +2608,15 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
+#ifdef DEBUGEPGTIME
+        uint32_t tick7 = GetMsTicks();
+#endif
 
     ComplexContent.Draw();
+#ifdef DEBUGEPGTIME
+        uint32_t tick8 = GetMsTicks();
+        dsyslog("flatPlus: SetRecording actor time: %d ms", tick8 - tick7);
+#endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
@@ -2679,8 +2683,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         Config.decorBorderMenuContentFg, Config.decorBorderMenuContentBg);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick7 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent total time: %d ms", tick7 - tick0);
+    uint32_t tick9 = GetMsTicks();
+    dsyslog("flatPlus: SetEvent total time: %d ms", tick9 - tick0);
 #endif
 }
 
@@ -2872,7 +2876,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
     int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and recinfo
     if (ShowMaxActors == 0) return;  // Do not show actors
-    if (ShowMaxActors != -1 && ShowMaxActors > 0 && ShowMaxActors < NumActors)
+    if ( /* ShowMaxActors != -1 && */ ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all ators)
 
     int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
@@ -3326,8 +3330,15 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
+#ifdef DEBUGEPGTIME
+        uint32_t tick6 = GetMsTicks();
+#endif
 
     ComplexContent.Draw();
+#ifdef DEBUGEPGTIME
+        uint32_t tick7 = GetMsTicks();
+        dsyslog("flatPlus: SetRecording complexcontent draw time: %d ms", tick7 - tick6);
+#endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
@@ -3425,8 +3436,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                         RecordingBorder.ColorFg, RecordingBorder.ColorBg, RecordingBorder.From, false);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick6 = GetMsTicks();
-    dsyslog("flatPlus: SetRecording total time: %d ms", tick6 - tick0);
+    uint32_t tick8 = GetMsTicks();
+    dsyslog("flatPlus: SetRecording total time: %d ms", tick8 - tick0);
 #endif
 }
 
@@ -3453,6 +3464,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     ComplexContent.Clear();
 
     m_MenuItemWidth = Width;
+
+    Width -= m_ScrollBarWidth;  // First assume text is with scrollbar and redraw if not
     if (FixedFont) {
         ComplexContent.AddText(Text, true,
                                cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem * 2, Height - m_MarginItem * 2),
@@ -3466,8 +3479,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     }
 
     bool Scrollable = ComplexContent.Scrollable(Height - m_MarginItem * 2);
-    if (Scrollable) {
-        Width -= m_ScrollBarWidth;
+    if (!Scrollable) {
+        Width += m_ScrollBarWidth;  // Readd scrollbarwidth
         ComplexContent.Clear();
         if (FixedFont) {
             ComplexContent.AddText(
@@ -3526,9 +3539,7 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     case msmName: SortIcon = "SortName"; break;
     case msmNumber: SortIcon = "SortNumber"; break;
     case msmProvider: SortIcon = "SortProvider"; break;
-    case msmUnknown:
-        return;  // Do not set search icon if it is unknown
-        break;
+    case msmUnknown: return;  // Do not set search icon if it is unknown
     default: return;
     }
 
@@ -3680,7 +3691,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
     bool FirstContent = true;
-    for (int i{0}; Event->Contents(i); ++i) {
+    for (int i {0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
                 Text.Append(", ");

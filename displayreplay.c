@@ -240,7 +240,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem * 3, 0), *img);
     }
 
-    if (ProgressShown) {
+    if (m_ProgressShown) {
         DecorBorderDraw(Config.decorBorderReplaySize,
                         m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize -
                             m_MarginItem,
@@ -272,7 +272,7 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 
     if (m_ModeOnly) return;
 
-    ProgressShown = true;
+    m_ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
 }
 

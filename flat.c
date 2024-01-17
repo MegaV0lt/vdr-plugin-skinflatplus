@@ -85,6 +85,8 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLines, int WidthLower, int WidthUpper) {
+    uint32_t tick0 = GetMsTicks();  //! For testing
+
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
     if (!m_Text)
@@ -110,8 +112,9 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLin
             Blank = Delim = nullptr;
             p++;
             continue;
-        } else if (sl == 1 && isspace(sym))
+        } else if (sl == 1 && isspace(sym)) {
             Blank = p;
+        }
         /* int */ cw = Font->Width(sym);
         if (w + cw > Width) {
             if (Blank) {
@@ -123,11 +126,12 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLin
                                  // punch in a newline, so we need to make room for it:
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
+
                 /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
                 /* int */ l = p - m_Text;
-                strncpy(s, m_Text, l);
-                s[l] = '\n';
-                strcpy(s + l + 1, p);
+                strncpy(s, m_Text, l);  // Dest, Source, Size
+                s[l] = '\n';            // Insert line break.
+                strcpy(s + l + 1, p);   // Dest, Source
                 free(m_Text);
                 m_Text = s;
                 p = m_Text + l;
@@ -141,6 +145,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLin
         }
         p += sl;
     }  // for char
+    uint32_t tick1 = GetMsTicks();  //! For testing
+    dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
 }
 
 const char *cTextFloatingWrapper::Text(void) {

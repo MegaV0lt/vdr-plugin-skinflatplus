@@ -27,37 +27,30 @@ enum eContentImageAlignment {
 
 class cSimpleContent {
  private:
-    int ContentType = CT_None;  // Added to avoid compiler warning
-    cRect Position {0, 0, 0, 0};
+    int m_ContentType = CT_None;  // Added to avoid compiler warning
+    cRect m_Position {0, 0, 0, 0};
 
-    int TextWidth {0}, TextHeight {0}, TextAlignment {0};
-    tColor ColorFg {0}, ColorBg {0};
-    std::string Text{""};
-    cImage *Image {nullptr};
-    cFont *Font {nullptr};
+    int m_TextWidth {0}, m_TextHeight {0}, m_TextAlignment {0};
+    tColor m_ColorFg {0}, m_ColorBg {0};
+    std::string m_Text{""};
+    cImage *m_Image {nullptr};
+    cFont *m_Font {nullptr};
 
  public:
     cSimpleContent(void) {
-        /* ContentType
-        Position =
-        TextWidth = 0, TextHeight = 0, TextAlignment = 0;
-        ColorFg = 0, ColorBg = 0;
-        // Text
-        Image = nullptr;
-        Font = nullptr; */
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
-        ContentType = rhs.ContentType;
-        Position = rhs.Position;
-        TextWidth = rhs.TextWidth;
-        TextHeight = rhs.TextHeight;
-        TextAlignment = rhs.TextAlignment;
-        ColorFg = rhs.ColorFg;
-        ColorBg = rhs.ColorBg;
-        Text = rhs.Text;
-        Image = rhs.Image;
-        Font = rhs.Font;
+        m_ContentType = rhs.m_ContentType;
+        m_Position = rhs.m_Position;
+        m_TextWidth = rhs.m_TextWidth;
+        m_TextHeight = rhs.m_TextHeight;
+        m_TextAlignment = rhs.m_TextAlignment;
+        m_ColorFg = rhs.m_ColorFg;
+        m_ColorBg = rhs.m_ColorBg;
+        m_Text = rhs.m_Text;
+        m_Image = rhs.m_Image;
+        m_Font = rhs.m_Font;
     }
 
     ~cSimpleContent() {
@@ -65,62 +58,59 @@ class cSimpleContent {
 
     cSimpleContent& operator=(const cSimpleContent& other) {
         if (this != &other) {
-            this->ContentType = other.ContentType;
-            this->Position = other.Position;
-            this->TextWidth = other.TextWidth;
-            this->TextHeight = other.TextHeight;
-            this->TextAlignment = other.TextAlignment;
-            this->ColorFg = other.ColorFg;
-            this->ColorBg = other.ColorBg;
-            this->Text = other.Text;
-            this->Image = other.Image;
-            this->Font = other.Font;
+            this->m_ContentType = other.m_ContentType;
+            this->m_Position = other.m_Position;
+            this->m_TextWidth = other.m_TextWidth;
+            this->m_TextHeight = other.m_TextHeight;
+            this->m_TextAlignment = other.m_TextAlignment;
+            this->m_ColorFg = other.m_ColorFg;
+            this->m_ColorBg = other.m_ColorBg;
+            this->m_Text = other.m_Text;
+            this->m_Image = other.m_Image;
+            this->m_Font = other.m_Font;
         }
         return *this;
     }
 
-    void SetText(const char *text, bool Multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
-                 int textWidth = 0, int textHeight = 0, int textAlignment = taDefault) {
-        ContentType = CT_Text;
-        Position = position;
-        Text = text;
-        Font = font;
+    void SetText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg, cFont *Font,
+                 int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
+        m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
+        m_Position = Position;
+        m_Text = Text;
+        m_Font = Font;
 
-        if (Multiline)
-            ContentType = CT_TextMultiline;
-
-        TextWidth = textWidth; TextHeight = textHeight; TextAlignment = textAlignment;
-        ColorFg = colorFg; ColorBg = colorBg;
+        m_TextWidth = TextWidth; m_TextHeight = TextHeight; m_TextAlignment = TextAlignment;
+        m_ColorFg = ColorFg; m_ColorBg = ColorBg;
     }
 
-    void SetImage(cImage *image, cRect position) {
-        ContentType = CT_Image;
-        Position = position;
-        Image = image;
+    void SetImage(cImage *image, cRect Position) {
+        m_ContentType = CT_Image;
+        m_Position = Position;
+        m_Image = image;
     }
 
-    void SetRect(cRect position, tColor colorBg) {
-        ContentType = CT_Rect;
-        Position = position;
-        ColorBg = colorBg;
+    void SetRect(cRect Position, tColor ColorBg) {
+        m_ContentType = CT_Rect;
+        m_Position = Position;
+        m_ColorBg = ColorBg;
     }
 
-    int GetContentType(void) { return ContentType; }
+    int GetContentType(void) { return m_ContentType; }
     int GetBottom(void) {
-        if (ContentType == CT_Text)
-            return Position.Top() + Font->Height();
+        if (m_ContentType == CT_Text)
+            return m_Position.Top() + m_Font->Height();
 
-        if (ContentType == CT_TextMultiline) {
+        if (m_ContentType == CT_TextMultiline) {
             /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(Text.c_str(), Font, 0, Position.Width());
-            return Position.Top() + (Wrapper.Lines() * Font->Height());
+            Wrapper.Set(m_Text.c_str(), m_Font, 0, m_Position.Width());
+            return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
         }
 
-        if (ContentType == CT_Image)
-            return Position.Top() + Image->Height();
+        if (m_ContentType == CT_Image)
+            return m_Position.Top() + m_Image->Height();
 
-        if (ContentType == CT_Rect)
-            return Position.Top() + Position.Height();
+        if (m_ContentType == CT_Rect)
+            return m_Position.Top() + m_Position.Height();
 
         return 0;
     }
@@ -128,22 +118,22 @@ class cSimpleContent {
     void Draw(cPixmap *Pixmap) {
         if (!Pixmap) return;
 
-        if (ContentType == CT_Text) {
-            Pixmap->DrawText(cPoint(Position.Left(), Position.Top()), Text.c_str(), ColorFg, ColorBg, Font,
-                             TextWidth, TextHeight, TextAlignment);
-        } else if (ContentType == CT_TextMultiline) {
+        if (m_ContentType == CT_Text) {
+            Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top()), m_Text.c_str(), m_ColorFg, m_ColorBg, m_Font,
+                             m_TextWidth, m_TextHeight, m_TextAlignment);
+        } else if (m_ContentType == CT_TextMultiline) {
             /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(Text.c_str(), Font, 0, Position.Width());
+            Wrapper.Set(m_Text.c_str(), m_Font, 0, m_Position.Width());
             int Lines = Wrapper.Lines();
-            int FontHeight = Font->Height();
+            int FontHeight = m_Font->Height();
             for (int i {0}; i < Lines; ++i) {
-                Pixmap->DrawText(cPoint(Position.Left(), Position.Top() + (i * FontHeight)), Wrapper.GetLine(i),
-                                 ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
+                Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)), Wrapper.GetLine(i),
+                                 m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight, m_TextAlignment);
             }
-        } else if (ContentType == CT_Rect) {
-            Pixmap->DrawRectangle(Position, ColorBg);
-        } else if (ContentType == CT_Image) {
-            Pixmap->DrawImage(cPoint(Position.Left(), Position.Top()), *Image);
+        } else if (m_ContentType == CT_Rect) {
+            Pixmap->DrawRectangle(m_Position, m_ColorBg);
+        } else if (m_ContentType == CT_Image) {
+            Pixmap->DrawImage(cPoint(m_Position.Left(), m_Position.Top()), *m_Image);
         }
     }
 };
@@ -153,9 +143,9 @@ class cComplexContent {
     std::vector<cSimpleContent> Contents;
 
     cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
-    cRect Position {0, 0, 0, 0};
+    cRect m_Position {0, 0, 0, 0};
 
-    tColor ColorBg {0};
+    tColor m_ColorBg {0};
 
     bool m_FullFillBackground = false;
     int m_DrawPortHeight {0};
@@ -173,20 +163,20 @@ class cComplexContent {
     ~cComplexContent();
 
     void SetOsd(cOsd *osd) { m_Osd = osd; }
-    void SetPosition(cRect position) { Position = position; }
+    void SetPosition(cRect Position) { m_Position = Position; }
     void SetScrollSize(int ScrollSize) { m_ScrollSize = ScrollSize; }
-    void SetBGColor(tColor colorBg) { ColorBg = colorBg; }
+    void SetBGColor(tColor ColorBg) { m_ColorBg = ColorBg; }
     void CreatePixmaps(bool fullFillBackground);
 
     void Clear(void);
 
-    void AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg, cFont *font,
-                 int textWidth = 0, int textHeight = 0, int textAlignment = taDefault);
-    void AddImage(cImage *image, cRect position);
-    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos, tColor colorFg,
-                                 tColor colorBg, cFont *font, int textWidth = 0, int textHeight = 0,
-                                 int textAlignment = taDefault);
-    void AddRect(cRect position, tColor colorBg);
+    void AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg, cFont *Font,
+                 int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
+    void AddImage(cImage *image, cRect Position);
+    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos, tColor ColorFg,
+                                 tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
+                                 int TextAlignment = taDefault);
+    void AddRect(cRect Position, tColor ColorBg);
     bool Scrollable(int height = 0);
      int ScrollTotal(void);
      int ScrollOffset(void);
@@ -195,12 +185,12 @@ class cComplexContent {
     double ScrollbarSize(void);
     void SetScrollingActive(bool active) { m_IsScrollingActive = active; }
 
-    int Height(void) { return Position.Height(); }
+    int Height(void) { return m_Position.Height(); }
     int ContentHeight(bool Full);
 
     int BottomContent(void);
 
-    int Top(void) { return Position.Top(); }
+    int Top(void) { return m_Position.Top(); }
     void Draw();
     bool IsShown(void) { return m_IsShown; }
     bool IsScrollingActive(void) { return m_IsScrollingActive; }
