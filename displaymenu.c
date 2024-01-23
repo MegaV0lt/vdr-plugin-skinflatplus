@@ -1712,7 +1712,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
 
     DecorBorderDraw(ib.Left, ib.Top, ib.Width, ib.Height, ib.Size, ib.Type, ib.ColorFg, ib.ColorBg, BorderMenuItem);
-
     if (!m_IsScrolling)
         ItemBorderInsertUnique(ib);
 
@@ -1797,14 +1796,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3 * 2));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
     }
     if (!ImgRecNew)
         ImgRecNew = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
     if (!ImgRecNewSml)
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (1.0 / 3 * 2));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (1.0 / 3.0 * 2.0));
 
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
@@ -5103,7 +5102,7 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
-    //* Double code? Already in 'displaychannel.d' 'PreLoadImages()'
+    //* Double code? Already in 'displaychannel.c' 'PreLoadImages()'
     /* int index {0};
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
@@ -5123,12 +5122,16 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
 
+    ImgLoader.LoadIcon("sd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("hd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("uhd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
+
     ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
+    ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
     ImgLoader.LoadIcon("recording", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("recording_old", m_FontHeight, m_FontHeight);
