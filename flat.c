@@ -84,8 +84,8 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
     free(m_Text);
 }
 
-void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLines, int WidthLower, int WidthUpper) {
-    uint32_t tick0 = GetMsTicks();  //! For testing
+void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
+    // uint32_t tick0 = GetMsTicks();  //! For testing
 
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
@@ -145,8 +145,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int UpperLin
         }
         p += sl;
     }  // for char
-    uint32_t tick1 = GetMsTicks();  //! For testing
-    dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
+    // uint32_t tick1 = GetMsTicks();  //! For testing
+    // dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
 }
 
 const char *cTextFloatingWrapper::Text(void) {
@@ -266,7 +266,7 @@ cString GetFormatIcon(int ScreenWidth) {
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
-    // From skinElchiHD
+    // From skin ElchiHD
     #if APIVERSNUM >= 20605
         uint16_t FrameHeight = Recording->Info()->FrameHeight();
         if (FrameHeight > 0) {
@@ -274,7 +274,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
             if (FrameHeight >= 720) return "hd";
             return "sd";  // 720 and below is considered sd
         }
-        else
+        else  // NOLINT
     #endif
         {   // Find radio and H.264/H.265 streams.
             //! Detection FAILED: RTL/SAT1 etc. They do not send a video component :-(
@@ -460,7 +460,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         // cIndexFile index(Recording->FileName(), false, Recording->IsPesRecording());
     }
 
-    bool IsCutted = false;
+    bool FsErr = false, IsCutted = false;
     uint64_t FileSize[65535];
     FileSize[0] = 0;
     uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
@@ -474,10 +474,12 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         else
             FileName = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
         rc = stat(*FileName, &FileBuf);
-        if (rc == 0)
+        if (rc == 0) {
             FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
-        else if (ENOENT != errno)
-                esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
+        } else if (ENOENT != errno) {
+            esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
+            FsErr = true;  // Remember failed status for later displaying an '!'
+        }
     } while (i <= MaxFiles && !rc);
 
     int CuttedLength {0};
@@ -527,13 +529,12 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
     uint64_t RecSize {0};
     if (AddText) {
-        /* if (!rc) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
-        cString Warn = (rc) ? "!" : "";  // Show a '!' when an error occured detecting filesize
-        if (RecSize > MEGABYTE(1023))
-            Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), *Warn,
+        /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
+        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occured detecting filesize
+            Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                          static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
-            Text.Append(cString::sprintf("%s: %s%lld MB%s", tr("Size"), *Warn, RecSize / MEGABYTE(1)));
+            Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
 
         if (HasMarks) {
             if (RecSize > MEGABYTE(1023))
@@ -552,15 +553,18 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
             Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
                         RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-            if (RecInfo->FramesPerSecond() > 0)
-                Text.Append(cString::sprintf("@%.2g%c", RecInfo->FramesPerSecond(), RecInfo->ScanTypeChar()));
+            if (RecInfo->FramesPerSecond() > 0) {
+                Text.Append(cString::sprintf("@%.2g", RecInfo->FramesPerSecond()));
+                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scantype
+                    Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
+            }
             if (RecInfo->AspectRatio() != arUnknown)
                 Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
             if (LastIndex)  //* Bitrate in new line
                 Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
-        } else
+        } else  // NOLINT
         #endif
         {
             Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));

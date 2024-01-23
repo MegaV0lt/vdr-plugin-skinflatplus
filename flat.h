@@ -224,7 +224,7 @@ class cTextFloatingWrapper {
  public:
     cTextFloatingWrapper(void);
     ~cTextFloatingWrapper();
-    void Set(const char *Text, const cFont *Font, int UpperLines, int WidthLower, int WidthUpper = 0);
+    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width
     ///< when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline

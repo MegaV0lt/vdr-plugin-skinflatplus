@@ -133,7 +133,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
-    WrapperFloat.Set(Text, Font, FloatLines, TextWidthFull, TextWidthLeft);  //* Set() strips trailing newlines!
+    WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
     int Lines = WrapperFloat.Lines();
 
     // dsyslog("flatPlus: AddImageWithFloatedText:\nFloatLines %d, Lines %d, TextWithLeft %d, TextWidthFull %d",

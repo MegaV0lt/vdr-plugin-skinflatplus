@@ -112,7 +112,7 @@ msgid "Length"
 msgstr "Länge"
 
 msgid "cutted"
-msgstr "geschnitten"
+msgstr "Geschnitten"
 
 msgid "Size"
 msgstr "Größe"

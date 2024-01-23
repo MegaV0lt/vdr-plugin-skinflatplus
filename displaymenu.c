@@ -559,7 +559,7 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
     // Check for standard menu entries
     std::string s("");
     s.reserve(16);  // Space for translated menu entry
-    for (int i {0}; i < 16; ++i) {
+    for (int i {0}; i < 16; ++i) {  // 16 menu entrys in vdr
         s = trVDR(items[i].c_str());
         if (s == element) {
             return cString::sprintf("menuIcons/%s", items[i].c_str());
@@ -1797,14 +1797,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight);
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3 * 2));
     }
     if (!ImgRecNew)
         ImgRecNew = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
     if (!ImgRecNewSml)
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight);
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (1.0 / 3 * 2));
 
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
@@ -1889,12 +1889,13 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #endif
 
             Left += ImgRecNew->Width() + m_MarginItem;
-            if (Recording->IsEdited() && ImgRecCut)
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecCut);
-
+            if (Recording->IsEdited() && ImgRecCut) {
+                int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
+                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
+            }
             IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
             if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight / 3;  // 1/3 image height
+                int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                 img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
                         int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
@@ -1904,7 +1905,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     }
             }
 
-            Left += ImgRecCut->Width() + m_MarginItem;
+            Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
@@ -2081,12 +2082,13 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #endif
 
             Left += ImgRecNew->Width() + m_MarginItem;
-            if (Recording->IsEdited() && ImgRecCut)
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecCut);
-
+            if (Recording->IsEdited() && ImgRecCut) {
+                int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
+                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
+            }
             IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
             if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight / 3;  // 1/3 image height
+                int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                 img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
                         int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
@@ -2096,7 +2098,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     }
             }
 
-            Left += ImgRecCut->Width() + m_MarginItem;
+            Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
         } else if (Total > 0) {
             img = nullptr;

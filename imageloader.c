@@ -23,16 +23,23 @@ cImageLoader::~cImageLoader() {
 }
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
-    if ((width == 0) || (height == 0)) return NULL;
+    if (width == 0 || height == 0) return NULL;
 
     // Plain logo without converting to lower including '/'
     cString File = cString::sprintf("%s%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
+    std::string LogoLower("");
     cImage *img {nullptr};
-    for (int i {0}; i < 2; ++i) {  // Run two times (0 and 1)
+    for (int i {0}; i < 3; ++i) {  // Run up to three times (0..2)
         if (i == 1) {  // Second try (Plain logo not found)
-            std::string LogoLower = logo;
+            LogoLower = logo;
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
             File = cString::sprintf("%s%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
+        }
+        if (i == 2) {  // Third try. Search for lowercase logo with '~' for path '/'
+            for (std::size_t i {0}; i < LogoLower.length(); ++i) {
+                if (LogoLower[i] == '/')
+                    LogoLower[i] = '~';
+            }
         }
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
@@ -55,9 +62,9 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         bool success = LoadImage(*File);  // Try to load image from disk
 
         if (!success) {  // Image not found on disk
-            if (i == 1)  // Second try
-                dsyslog("flatPlus: ImageLoader LoadLogo: %s (%s.%s) could not be loaded", *File, logo,
-                        *m_LogoExtension);
+            if (i == 2)  // Third try and not found
+                dsyslog("flatPlus: LoadLogo: %s.%s (Also lowercase and ~ for path) could not be loaded",
+                        logo, *m_LogoExtension);
             continue;
         }
 
@@ -83,7 +90,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 }
 
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
-    if ((width == 0) || (height == 0)) return NULL;
+    if (width == 0 || height == 0) return NULL;
 
     cString File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
@@ -169,7 +176,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 }
 
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
-    if ((width == 0) || (height == 0)) return NULL;
+    if (width == 0 || height == 0) return NULL;
 
     cString File = cFile;
     #ifdef DEBUGIMAGELOADTIME

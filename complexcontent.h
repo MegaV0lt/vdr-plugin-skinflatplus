@@ -102,7 +102,7 @@ class cSimpleContent {
 
         if (m_ContentType == CT_TextMultiline) {
             /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(m_Text.c_str(), m_Font, 0, m_Position.Width());
+            Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
         }
 
@@ -123,7 +123,7 @@ class cSimpleContent {
                              m_TextWidth, m_TextHeight, m_TextAlignment);
         } else if (m_ContentType == CT_TextMultiline) {
             /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(m_Text.c_str(), m_Font, 0, m_Position.Width());
+            Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             int Lines = Wrapper.Lines();
             int FontHeight = m_Font->Height();
             for (int i {0}; i < Lines; ++i) {
