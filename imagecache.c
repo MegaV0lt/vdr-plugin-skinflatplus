@@ -18,7 +18,6 @@
 
 
 cImageCache::cImageCache() {
-    m_OverFlow = false;
 }
 
 cImageCache::~cImageCache() {
@@ -73,7 +72,7 @@ cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
 }
 
 void cImageCache::InsertImage(cImage *Image, std::string Name, int Width, int Height) {
-    // if (m_OverFlow) return;  // TODO; Leave cache as is or refill?
+    // if (m_OverFlow) return;  // TODO: Leave cache as is or refill?
 
     CacheImage[m_InsertIndex] = Image;
     CacheName[m_InsertIndex] = Name;

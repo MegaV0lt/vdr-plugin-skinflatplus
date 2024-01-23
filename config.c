@@ -14,7 +14,6 @@ cFlatConfig::cFlatConfig(void) {
     IconPath = "";
     RecordingOldConfigFile = "";
 
-    m_DecorCurrent = -1;
     DecorIndex = 0;
 
     ButtonsShowEmpty = true;
@@ -112,7 +111,7 @@ cFlatConfig::cFlatConfig(void) {
     MainMenuWidgetActiveTimerShowRemoteActive = false;
     MainMenuWidgetActiveTimerShowRemoteRecording = false;
 
-    MainMenuWidgetActiveTimerShowRemoteRefreshTime = 60 * 30;  // every 30 minutes
+    MainMenuWidgetActiveTimerShowRemoteRefreshTime = 60 * 30;  // Every 30 minutes
 
     MainMenuWidgetLastRecShow = false;
     MainMenuWidgetLastRecPosition = 4;
@@ -164,6 +163,7 @@ cFlatConfig::cFlatConfig(void) {
 
     TVScraperEPGInfoShowActors = 1;
     TVScraperRecInfoShowActors = 1;
+    TVScraperShowMaxActors = -1;  // -1 Show all actors
 
     decorBorderChannelByTheme = 1;
     decorBorderChannelTypeUser = 0;
@@ -398,6 +398,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperEPGInfoShowActors") == 0)           TVScraperEPGInfoShowActors = atoi(Value);
     else if (strcmp(Name, "TVScraperEPGInfoShowPoster") == 0)           TVScraperEPGInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperRecInfoShowActors") == 0)           TVScraperRecInfoShowActors = atoi(Value);
+    else if (strcmp(Name, "TVScraperShowMaxActors") == 0)               TVScraperShowMaxActors = atoi(Value);
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);

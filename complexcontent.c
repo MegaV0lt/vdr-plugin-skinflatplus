@@ -8,22 +8,13 @@
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
-    Osd = NULL;
-    Pixmap = NULL;
-    PixmapImage = NULL;
-    m_IsShown = false;
-    m_IsScrollingActive = true;
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
 cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
-    Osd = osd;
+    m_Osd = osd;
     m_ScrollSize = ScrollSize;
 
-    Pixmap = NULL;
-    PixmapImage = NULL;
-    m_IsShown = false;
-    m_IsScrollingActive = true;
     Contents.reserve(128);  // Set to at least 128 entrys
 }
 
@@ -33,11 +24,11 @@ cComplexContent::~cComplexContent() {
 void cComplexContent::Clear(void) {
     m_IsShown = false;
     Contents.clear();
-    if (Osd) {
-        Osd->DestroyPixmap(Pixmap);
-        Pixmap = NULL;
-        Osd->DestroyPixmap(PixmapImage);
-        PixmapImage = NULL;
+    if (m_Osd) {  //! Check because Clear() is called before SetOsd()
+        m_Osd->DestroyPixmap(Pixmap);
+        Pixmap = nullptr;
+        m_Osd->DestroyPixmap(PixmapImage);
+        PixmapImage = nullptr;
     }
 }
 
@@ -45,38 +36,38 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     CalculateDrawPortHeight();
     m_FullFillBackground = fullFillBackground;
 
-    if (!Osd) return;
+    // if (!m_Osd) return;
 
-    Osd->DestroyPixmap(Pixmap);
+    m_Osd->DestroyPixmap(Pixmap);
     Pixmap = NULL;
-    Osd->DestroyPixmap(PixmapImage);
+    m_Osd->DestroyPixmap(PixmapImage);
     PixmapImage = NULL;
 
     cRect PositionDraw;
     PositionDraw.SetLeft(0);
     PositionDraw.SetTop(0);
-    PositionDraw.SetWidth(Position.Width());
-    if (m_FullFillBackground && m_DrawPortHeight < Position.Height())
-        PositionDraw.SetHeight(Position.Height());
+    PositionDraw.SetWidth(m_Position.Width());
+    if (m_FullFillBackground && m_DrawPortHeight < m_Position.Height())
+        PositionDraw.SetHeight(m_Position.Height());
     else
         PositionDraw.SetHeight(m_DrawPortHeight);
 
-    Pixmap = CreatePixmap(Osd, "Pixmap", 1, Position, PositionDraw);
-    PixmapImage = CreatePixmap(Osd, "PixmapImage", 2, Position, PositionDraw);
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, m_Position, PositionDraw);
+    PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, m_Position, PositionDraw);
     // dsyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
-    //         Position.Left(), Position.Top(), Position.Width(), Position.Height());
-    // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", PositionDraw.Left(),
-    //         PositionDraw.Top(), PositionDraw.Width(), PositionDraw.Height());
+    //         m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
+    // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", m_PositionDraw.Left(),
+    //         m_PositionDraw.Top(), m_PositionDraw.Width(), m_PositionDraw.Height());
 
-    if (Pixmap) {  // Check for nullptr
+    if (Pixmap) {
         if (m_FullFillBackground) {
-            PixmapFill(Pixmap, ColorBg);
+            PixmapFill(Pixmap, m_ColorBg);
         } else {
-            Pixmap->DrawRectangle(cRect(0, 0, Position.Width(), ContentHeight(false)), ColorBg);
+            Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
         }
     } else {  // Log values and return
         esyslog("flatPlus: Failed to create ComplexContentPixmap left: %d top: %d width: %d height: %d",
-                Position.Left(), Position.Top(), Position.Width(), Position.Height());
+                m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
     PixmapFill(PixmapImage, clrTransparent);
@@ -113,7 +104,7 @@ int cComplexContent::ContentHeight(bool Full) {
 
 bool cComplexContent::Scrollable(int height) {
     CalculateDrawPortHeight();
-    if (height == 0) height = Position.Height();
+    if (height == 0) height = m_Position.Height();
 
     int total = ScrollTotal();
     int shown = ceil(height * 1.0f / m_ScrollSize);
@@ -122,72 +113,57 @@ bool cComplexContent::Scrollable(int height) {
     return false;
 }
 
-void cComplexContent::AddText(const char *text, bool multiline, cRect position, tColor colorFg, tColor colorBg,
-                              cFont *font, int textWidth, int textHeight, int textAlignment) {
+void cComplexContent::AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg,
+                              cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
     Contents.emplace_back(cSimpleContent());
-    Contents.back().SetText(text, multiline, position, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
 }
 
-void cComplexContent::AddImage(cImage *image, cRect position) {
+void cComplexContent::AddImage(cImage *image, cRect Position) {
     Contents.emplace_back(cSimpleContent());
-    Contents.back().SetImage(image, position);
+    Contents.back().SetImage(image, Position);
 }
 
-void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *text, cRect textPos,
-                                              tColor colorFg, tColor colorBg, cFont *font, int textWidth,
-                                              int textHeight, int textAlignment) {
-    int TextWidthLeft = Position.Width() - image->Width() - 10 - textPos.Left();
-
-    cTextWrapper WrapperFloat;
-    WrapperFloat.Set(text, font, TextWidthLeft);
+void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos,
+                                              tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
+                                              int TextHeight, int TextAlignment) {
+    int TextWidthFull = (TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left();
+    // int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
+    int TextWidthLeft = TextWidthFull - image->Width() - 10;
     int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
+
+    cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
+    WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
     int Lines = WrapperFloat.Lines();
 
+    // dsyslog("flatPlus: AddImageWithFloatedText:\nFloatLines %d, Lines %d, TextWithLeft %d, TextWidthFull %d",
+    //         FloatLines, Lines, TextWidthLeft, TextWidthFull);
+
     cRect FloatedTextPos;
-    FloatedTextPos.SetLeft(textPos.Left());
-    FloatedTextPos.SetTop(textPos.Top());
-    FloatedTextPos.SetWidth(TextWidthLeft);
-    FloatedTextPos.SetHeight(textPos.Height());
+    FloatedTextPos.SetLeft(TextPos.Left());
+    FloatedTextPos.SetTop(TextPos.Top());
+    FloatedTextPos.SetWidth(TextPos.Width());
+    FloatedTextPos.SetHeight(TextPos.Height());
 
-    if (Lines < FloatLines) {  // Text fits on the left side of the image
-        AddText(text, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-    } else {
-        int NumChars {0};
-        for (int i {0}; i < Lines && i < FloatLines; ++i) {
-            NumChars += strlen(WrapperFloat.GetLine(i));
-        }
-        // Detect end of last word
-        for (; text[NumChars] != ' ' && text[NumChars] != '\0' && text[NumChars] != '\r' && text[NumChars] != '\n';
-             ++NumChars) {
-        }
-        std::string Text = text;
-        cString FloatedText = cString::sprintf("%s", Text.substr(0, NumChars).c_str());  // From start to NumChars
-
-        ++NumChars;
-        cString SecondText = cString::sprintf("%s", Text.substr(NumChars).c_str());  // From NumChars to the end
-
-        cRect SecondTextPos;
-        SecondTextPos.SetLeft(textPos.Left());
-        SecondTextPos.SetTop(textPos.Top() + FloatLines * m_ScrollSize);
-        SecondTextPos.SetWidth(textPos.Width());
-        SecondTextPos.SetHeight(textPos.Height());
-
-        AddText(*FloatedText, true, FloatedTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
-        AddText(*SecondText, true, SecondTextPos, colorFg, colorBg, font, textWidth, textHeight, textAlignment);
+    for (int i {0}; i < Lines; ++i) {  // Add text line by line
+        FloatedTextPos.SetTop(TextPos.Top() + i * m_ScrollSize);
+        AddText(WrapperFloat.GetLine(i), false, FloatedTextPos, ColorFg, ColorBg, Font,
+                                                TextWidthFull, TextHeight, TextAlignment);
+        // dsyslog("flatPlus: Adding Floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
 
     cRect ImagePos;
-    ImagePos.SetLeft(textPos.Left() + TextWidthLeft + 5);
-    ImagePos.SetTop(textPos.Top());
+    ImagePos.SetLeft(TextPos.Left() + TextWidthLeft + 5);
+    ImagePos.SetTop(TextPos.Top());
     ImagePos.SetWidth(image->Width());
     ImagePos.SetHeight(image->Height());
 
     AddImage(image, ImagePos);
 }
 
-void cComplexContent::AddRect(cRect position, tColor colorBg) {
+void cComplexContent::AddRect(cRect Position, tColor ColorBg) {
     Contents.emplace_back(cSimpleContent());
-    Contents.back().SetRect(position, colorBg);
+    Contents.back().SetRect(Position, ColorBg);
 }
 
 void cComplexContent::Draw() {
@@ -202,7 +178,7 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize(void) {
-    return Position.Height() * 1.0f / m_DrawPortHeight;
+    return m_Position.Height() * 1.0f / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal(void) {
@@ -210,19 +186,19 @@ int cComplexContent::ScrollTotal(void) {
 }
 
 int cComplexContent::ScrollShown(void) {
-    // return ceil(Position.Height() * 1.0 / m_ScrollSize);
-    return Position.Height() / m_ScrollSize;
+    // return ceil(m_Position.Height() * 1.0 / m_ScrollSize);
+    return m_Position.Height() / m_ScrollSize;
 }
 
 int cComplexContent::ScrollOffset(void) {
     if (!Pixmap) return 0;
 
     int y = Pixmap->DrawPort().Point().Y() * -1;
-    if (y + Position.Height() + m_ScrollSize > m_DrawPortHeight) {
-        if (y == m_DrawPortHeight - Position.Height())
+    if (y + m_Position.Height() + m_ScrollSize > m_DrawPortHeight) {
+        if (y == m_DrawPortHeight - m_Position.Height())
             y += m_ScrollSize;
         else
-            y = m_DrawPortHeight - Position.Height() - 1;
+            y = m_DrawPortHeight - m_Position.Height() - 1;
     }
     double offset = y * 1.0f / m_DrawPortHeight;
     return ScrollTotal() * offset;

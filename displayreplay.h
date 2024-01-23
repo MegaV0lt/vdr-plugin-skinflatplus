@@ -12,31 +12,31 @@
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  private:
-        cString current, total;
+        cString m_Current{""}, m_Total{""};
 
-        int m_LabelHeight;
-        cPixmap *LabelPixmap;
-        cPixmap *LabelJumpPixmap;
-        cPixmap *IconsPixmap;
-        cPixmap *ChanEpgImagesPixmap;
-        cPixmap *DimmPixmap;
+        int m_LabelHeight {0};
+        cPixmap *LabelPixmap {nullptr};
+        cPixmap *LabelJumpPixmap {nullptr};
+        cPixmap *IconsPixmap {nullptr};
+        cPixmap *ChanEpgImagesPixmap {nullptr};
+        cPixmap *DimmPixmap {nullptr};
 
-        cFont *m_FontSecs;
-        const cRecording *m_Recording;
+        cFont *m_FontSecs {nullptr};
+        const cRecording *m_Recording {nullptr};
 
-        int m_ScreenWidth, m_LastScreenWidth;
-        int m_ScreenHeight;
-        double m_ScreenAspect;
+        int m_ScreenWidth {-1}, m_LastScreenWidth {-1};
+        int m_ScreenHeight {0};
+        double m_ScreenAspect {0.0};
 
         // TVScraper
-        int TVSLeft, TVSTop, TVSWidth, TVSHeight;
+        int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
 
         // Dimm on pause
-        bool m_DimmActive;
-        time_t m_DimmStartTime;
+        bool m_DimmActive = false;
+        time_t m_DimmStartTime {0};
 
-        bool ProgressShown;
-        bool m_ModeOnly;
+        bool m_ProgressShown = false;
+        bool m_ModeOnly = false;
         void UpdateInfo(void);
         void ResolutionAspectDraw(void);
 

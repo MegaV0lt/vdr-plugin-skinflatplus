@@ -20,52 +20,45 @@
 #include "./baserender.h"
 #include "./complexcontent.h"
 
-#if APIVERSNUM < 20107
-    enum eMenuSortMode {
-        msmUnknown = 0,
-        msmNumber,
-        msmName,
-        msmTime,
-        msmProvider
-    };
-#endif
-
 class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
  private:
-        cPixmap *MenuPixmap;
-        cPixmap *MenuIconsPixmap;
-        cPixmap *MenuIconsBgPixmap;
-        cPixmap *MenuIconsOvlPixmap;
+        cPixmap *MenuPixmap {nullptr};
+        cPixmap *MenuIconsPixmap {nullptr};
+        cPixmap *MenuIconsBgPixmap {nullptr};   // Background for icons/logos
+        cPixmap *MenuIconsOvlPixmap {nullptr};  // Overlay for icons/logos
 
-        int m_MenuTop, m_MenuWidth;
-        int m_MenuItemWidth;
-        int m_MenuItemLastHeight;
-        bool m_MenuFullOsdIsDrawn;
+        int m_MenuTop {0}, m_MenuWidth {0};
+        int m_MenuItemWidth {0};
+        int m_MenuItemLastHeight {0};
+        bool m_MenuFullOsdIsDrawn = false;
 
         eMenuCategory m_MenuCategory;
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        int m_LastTimerCount, m_LastTimerActiveCount;
-        cString m_LastTitle;
+        int m_LastTimerCount {0}, m_LastTimerActiveCount {0};
+        cString m_LastTitle{""};
 
-        int m_chLeft, m_chTop, m_chWidth, m_chHeight;
-        cPixmap *ContentHeadPixmap;
-        cPixmap *ContentHeadIconsPixmap;
+        int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
+        cPixmap *ContentHeadPixmap {nullptr};
+        cPixmap *ContentHeadIconsPixmap {nullptr};
 
-        int m_cLeft, m_cTop, m_cWidth, m_cHeight;
+        int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
 
-        cPixmap *ScrollbarPixmap;
-        int m_ScrollBarTop;
-        int m_ScrollBarWidth, m_ScrollBarHeight;  //? Also in cFlatBaseRender
+        cPixmap *ScrollbarPixmap {nullptr};
+        int m_ScrollBarTop {0};
+        int /* m_ScrollBarWidth {0}, */ m_ScrollBarHeight {0};  //? Also in cFlatBaseRender
 
-        int m_ItemHeight, m_ItemChannelHeight, m_ItemTimerHeight, m_ItemEventHeight, m_ItemRecordingHeight;
+        int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
+        int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
         std::list<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool m_IsScrolling;
-        bool m_IsGroup;
-        bool m_ShowEvent, m_ShowRecording, m_ShowText;
+        bool m_IsScrolling = false;
+        bool m_IsGroup = false;
+        bool m_ShowEvent = false;
+        bool m_ShowRecording = false;
+        bool m_ShowText = false;
 
         cComplexContent ComplexContent;
 
@@ -75,16 +68,16 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // TextScroller
         cTextScrollers MenuItemScroller;
 
-        cString m_ItemEventLastChannelName;
+        cString m_ItemEventLastChannelName{""};
 
-        std::string m_RecFolder, m_LastRecFolder;
-        int m_LastItemRecordingLevel;
+        std::string m_RecFolder{""}, m_LastRecFolder{""};
+        int m_LastItemRecordingLevel {0};
 
         // Icons
-        cImage *IconTimerFull;
+        cImage *IconTimerFull {nullptr};
         // cImage *IconTimerPartial;
-        cImage *IconArrowTurn;
-        cImage *IconRec;
+        cImage *IconArrowTurn {nullptr};
+        cImage *IconRec {nullptr};
         // cImage *iconVps;
         // cImage *iconNew;
         // Icons
@@ -94,7 +87,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar(void);
         void ItemBorderClear(void);
 
-        static std::string items[16];
+        //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
+        // static std::string items[16];
+        const std::string items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                       "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                       "Replay",   "Miscellaneous", "Plugins", "Restart"};
         std::string MainMenuText(std::string Text);
         cString GetIconName(std::string element);
 
@@ -102,7 +99,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
+
         const char *GetGenreIcon(uchar genre);
+        void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons);  // NOLINT
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
@@ -149,14 +149,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         virtual void SetMessage(eMessageType Type, const char *Text);
         virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
 
-        #if APIVERSNUM >= 20308
-                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                                          const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
-                                          bool TimerActive);
-        #else
-                virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                                          const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch);
-        #endif
+        virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
+                                  const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
+                                  bool TimerActive);
         virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
         virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                     bool WithProvider);

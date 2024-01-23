@@ -9,36 +9,8 @@
 #include "./flat.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
-    /* Disabled because all pixmaps are checked before use
-    if (m_FirstDisplay) {
-        m_FirstDisplay = false;
-        m_DoOutput = false;
-        return;
-    } else
-        m_DoOutput = true; */
-
-    m_Present = NULL;
-    // m_ChannelName = "";
-
-    ChanInfoTopPixmap = NULL;
-    ChanInfoBottomPixmap = NULL;
-    ChanLogoPixmap = NULL;
-    ChanLogoBGPixmap = NULL;
-    ChanIconsPixmap = NULL;
-    ChanEpgImagesPixmap = NULL;
-
-    m_IsGroup = false;
-    // IsRecording = false,  / Unused?
-    m_IsRadioChannel = false;
-
-    m_ScreenWidth = m_LastScreenWidth = -1;
-    m_LastSignalStrength = -1;
-    m_LastSignalQuality = -1;
-
-    m_SignalStrengthRight = 0;
-
     CreateFullOsd();
-    if (!osd) return;
+    // if (!m_Osd) return;
 
     TopBarCreate();
     MessageCreate();
@@ -57,33 +29,33 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     int height = HeightBottom;
     ChanInfoBottomPixmap =
-        CreatePixmap(osd, "ChanInfoBottomPixmap", 1,
+        CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightBottom));
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
     ChanIconsPixmap =
-        CreatePixmap(osd, "ChanIconsPixmap", 2,
+        CreatePixmap(m_Osd, "ChanIconsPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightBottom));
     PixmapFill(ChanIconsPixmap, clrTransparent);
     // Area for TVScraper images
-    TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSLeft = 20 + Config.decorBorderChannelEPGSize;
+    m_TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
+    m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
+    m_TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(osd, "ChanEpgImagesPixmap", 2, cRect(TVSLeft, TVSTop, TVSWidth, TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     ChanLogoBGPixmap =
-        CreatePixmap(osd, "ChanLogoBGPixmap", 2,
+        CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            HeightBottom * 2, HeightBottom * 2));
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
     ChanLogoPixmap =
-        CreatePixmap(osd, "ChanLogoPixmap", 3,
+        CreatePixmap(m_Osd, "ChanLogoPixmap", 3,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            HeightBottom * 2, HeightBottom * 2));
     PixmapFill(ChanLogoPixmap, clrTransparent);
@@ -99,12 +71,12 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     height += HeightTop;
     ChanInfoTopPixmap =
-        CreatePixmap(osd, "ChanInfoTopPixmap", 1,
+        CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightTop));
     PixmapFill(ChanInfoTopPixmap, clrTransparent);
 
-    Scrollers.SetOsd(osd);
+    Scrollers.SetOsd(m_Osd);
     Scrollers.SetScrollStep(Config.ScrollerStep);
     Scrollers.SetScrollDelay(Config.ScrollerDelay);
     Scrollers.SetScrollType(Config.ScrollerType);
@@ -119,24 +91,20 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    // if (!m_DoOutput) return;
-
-    if (osd) {
+    // if (m_Osd) {
         Scrollers.Clear();
-        osd->DestroyPixmap(ChanInfoTopPixmap);
-        osd->DestroyPixmap(ChanInfoBottomPixmap);
-        osd->DestroyPixmap(ChanLogoPixmap);
-        osd->DestroyPixmap(ChanLogoBGPixmap);
-        osd->DestroyPixmap(ChanIconsPixmap);
-        osd->DestroyPixmap(ChanEpgImagesPixmap);
-    }
+        m_Osd->DestroyPixmap(ChanInfoTopPixmap);
+        m_Osd->DestroyPixmap(ChanInfoBottomPixmap);
+        m_Osd->DestroyPixmap(ChanLogoPixmap);
+        m_Osd->DestroyPixmap(ChanLogoBGPixmap);
+        m_Osd->DestroyPixmap(ChanIconsPixmap);
+        m_Osd->DestroyPixmap(ChanEpgImagesPixmap);
+    // }
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
         return;
-
-    // if (!m_DoOutput) return;
 
     // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -196,7 +164,6 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    // if (!m_DoOutput) return;
     if (!ChanIconsPixmap) return;
 
     // if (!Resolution)
@@ -252,7 +219,6 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
@@ -430,15 +396,15 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (!isempty(*MediaPath)) {
-        if (MediaHeight > TVSHeight || MediaWidth > TVSWidth) {  // Resize too big poster/banner
+        if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
             dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-            MediaHeight = TVSHeight * 0.7 * Config.TVScraperChanInfoPosterSize * 100;  // Max 70% of pixmap height
+            MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperChanInfoPosterSize * 100;  // Max 70% of pixmap height
             if (Config.ChannelWeatherShow)
                 // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = TVSWidth * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
+                MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
             else
                 // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = TVSWidth * 0.7 * Config.TVScraperChanInfoPosterSize * 100;
+                MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperChanInfoPosterSize * 100;
 
             dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
         }
@@ -456,13 +422,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    // if (!m_DoOutput) return;
-
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayChannel::SignalQualityDraw(void) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap) return;
 
     int SignalStrength = cDevice::ActualDevice()->SignalStrength();
@@ -510,7 +473,6 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
-    // if (!m_DoOutput) return;
     if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
     // dsyslog("flatPlus: DvbapiInfoDraw");
@@ -568,14 +530,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont,
                                    DvbapiInfoFont->Width(*DvbapiInfoText) * 2);
+    delete DvbapiInfoFont;
 }
 
 void cFlatDisplayChannel::Flush(void) {
-    // if (!m_DoOutput) return;
-    // if (!osd) return;
-
-    int Current {0}, Total {0};
     if (m_Present) {
+        int Current {0}, Total {0};
         time_t t = time(NULL);
         if (t > m_Present->StartTime())
             Current = t - m_Present->StartTime();
@@ -598,7 +558,7 @@ void cFlatDisplayChannel::Flush(void) {
         DvbapiInfoDraw();
 
     TopBarUpdate();
-    osd->Flush();
+    m_Osd->Flush();
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {
@@ -615,14 +575,9 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
-#if VDRVERSNUM >= 20301
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
-#else
-    for (cChannel *Channel = Channels.First(); Channel && index < LOGO_PRE_CACHE;
-         Channel = Channels.Next(Channel)) {
-#endif
         if (!Channel->GroupSep()) {  // Don't cache named channelgroup logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)

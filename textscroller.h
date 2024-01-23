@@ -16,48 +16,40 @@
 
 class cTextScroll {
  private:
-    cRect Position;
+    cRect Position {0, 0, 0, 0};
 
-    tColor ColorFg, ColorExtraTextFg, ColorBg;
-    std::string Text;
-    cFont *Font;
-    cPixmap *Pixmap;
-    cOsd *Osd;
-    int Layer;
-    int PixelsPerStep;
-    int WAITSTEPS, WaitSteps {0};
-    bool IsReserveStep;
-    bool ResetX;
-    int ScrollType;
+    tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
+    std::string Text{""};
+    cFont *Font {nullptr};
+    cPixmap *Pixmap {nullptr};
+    cOsd *m_Osd {nullptr};
+    int Layer {0};
+    int PixelsPerStep {0};
+    int WAITSTEPS {0}, WaitSteps {0};
+    bool IsReserveStep = false;
+    bool ResetX = false;
+    int ScrollType {0};
 
  public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
-        Font = NULL;
-        Pixmap = NULL;
-        Osd = osd;
+        m_Osd = osd;
         Layer = layer;
         PixelsPerStep = pixels;
         ScrollType = type;
-        IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        ResetX = false;
     }
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps) {
-        Font = NULL;
-        Pixmap = NULL;
-        Osd = osd;
+        m_Osd = osd;
         Layer = 2;
         PixelsPerStep = pixels;
         ScrollType = type;
-        IsReserveStep = false;
         WAITSTEPS = waitsteps;
-        ResetX = false;
     }
 
     virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
                              // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
-        Osd->DestroyPixmap(Pixmap);
-        Pixmap = NULL;
+        m_Osd->DestroyPixmap(Pixmap);
+        Pixmap = nullptr;
     }
 
     void UpdateViewPortWidth(int w);
@@ -73,10 +65,10 @@ class cTextScrollers : public cThread {
  private:
     std::vector<cTextScroll *> Scrollers;
 
-    cOsd *Osd;
-    int ScrollStep, ScrollDelay;
-    int ScrollType;
-    int Layer;
+    cOsd *m_Osd {nullptr};
+    int ScrollStep {0}, ScrollDelay {0};
+    int ScrollType {0};
+    int Layer {0};
     virtual void Action(void);
     void StartScrolling(void);
  public:
@@ -84,7 +76,7 @@ class cTextScrollers : public cThread {
     ~cTextScrollers();
 
     void Clear(void);
-    void SetOsd(cOsd *osd) { Osd = osd;}
+    void SetOsd(cOsd *osd) { m_Osd = osd;}
     void SetPixmapLayer(int layer) { Layer = layer; }
     void SetScrollStep(int step) { ScrollStep = step; }
     void SetScrollDelay(int delay) { ScrollDelay = delay; }

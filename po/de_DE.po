@@ -88,7 +88,7 @@ msgid "popularity: "
 msgstr "Beliebtheit: "
 
 msgid "vote average: "
-msgstr "Durchsch. Wertung: "
+msgstr "Durchschnittliche Wertung: "
 
 msgid "Description"
 msgstr "Beschreibung"
@@ -112,7 +112,7 @@ msgid "Length"
 msgstr "Länge"
 
 msgid "cutted"
-msgstr "geschnitten"
+msgstr "Geschnitten"
 
 msgid "Size"
 msgstr "Größe"
@@ -816,6 +816,9 @@ msgstr "EPG-Info: Zeige Darsteller?"
 
 msgid "recording info show actors?"
 msgstr "Aufnahmeinfo: Zeige Darsteller?"
+
+msgid "Max. actors to show?"
+msgstr "Begrenze Anzahl der Darsteller"
 
 msgid "Enable main menu widgets"
 msgstr "Hauptmenü-Widgets anzeigen"

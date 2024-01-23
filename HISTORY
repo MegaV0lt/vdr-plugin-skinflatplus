@@ -1,5 +1,21 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2024-01-23: Version 1.0.0
+- [add] Add framedata to recordinginfo. Need VDR >= 2.6.5
+- [add] Option to limit maximum actors to display
+- [add] Add formatsymbols (sd/hd/uhd) to recordinglist
+- [update] VDR >= 2.3.8 is needed now. For older version please use
+           Skin flatPlus 0.8.4
+- [update] Show a '!' when an error occurred detecting file size
+- [update] Make floating text more accurate by using modified text wrapper
+           Lent from skin ElchiHD
+- [update] Search for manual poster only if no scraper image is found
+- [update] First try tvscraper then scraper2vdr
+- [update] Speed up showing scrolling text
+- [update] Also try to load lower case channel logos with '~' as path separator
+- [update] Use '-std=c++17' in Makefile
+- [update] Some internal optimizations
+
 2023-12-28: Version 0.8.4
 - [fix] Fix dots with long not scrolling text
 - [update] Load named logos only for channels

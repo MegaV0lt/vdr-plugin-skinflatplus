@@ -51,7 +51,7 @@ SKINFLATPLUS_WIDGETDIR ?= $(LIBDIR)/$(PLUGIN)/widgets
 export CFLAGS   = $(call PKGCFG,cflags)
 export CXXFLAGS = $(call PKGCFG,cxxflags)
 
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++17
 
 ### Allow user defined options to overwrite defaults:
 
@@ -72,12 +72,10 @@ SOFILE = libvdr-$(PLUGIN).so
 ### Includes and Defines and Dependencies (add further entries here):
 
 ifeq ($(IMAGELIB), imagemagick)
-  $(info Compiling with ImageMagick++)
   INCLUDES += $(shell pkg-config --cflags Magick++ freetype2 fontconfig)
   LIBS += $(shell pkg-config --libs Magick++)
   DEFINES += -DIMAGEMAGICK
 else ifeq ($(IMAGELIB), graphicsmagick)
-  $(info Compiling with GraphicsMagick++)
   INCLUDES += $(shell pkg-config --cflags GraphicsMagick++ freetype2 fontconfig)
   LIBS += $(shell pkg-config --libs GraphicsMagick++)
 else

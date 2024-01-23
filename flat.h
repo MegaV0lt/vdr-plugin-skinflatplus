@@ -24,7 +24,6 @@
 
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
-extern bool m_FirstDisplay;
 
 extern time_t m_RemoteTimersLastRefresh;
 
@@ -214,6 +213,30 @@ class cFlat : public cSkin {
         virtual cSkinDisplayMessage *DisplayMessage(void);
 };
 
+// Based on VDR's cTextWrapper
+class cTextFloatingWrapper {
+ private:
+    char *m_Text {nullptr};
+    char *m_EoL {nullptr};
+    int m_Lines {0};
+    int m_LastLine {-1};
+
+ public:
+    cTextFloatingWrapper(void);
+    ~cTextFloatingWrapper();
+    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
+    ///< Wraps the Text to make it fit into the area defined by the given Width
+    ///< when displayed with the given Font.
+    ///< Wrapping is done by inserting the necessary number of newline
+    ///< characters into the string.
+    const char *Text(void);
+    ///< Returns the full wrapped text.
+    int Lines(void) { return m_Lines; }
+    ///< Returns the actual number of lines needed to display the full wrapped text.
+    const char *GetLine(int Line);
+    ///< Returns the given Line. The first line is numbered 0.
+};
+
 static inline uint32_t GetMsTicks(void) {
 #ifdef CLOCK_MONOTONIC
     struct timespec tspec;
@@ -238,6 +261,7 @@ cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
 cString GetFormatIcon(int ScreenWidth);
+cString GetRecordingFormatIcon(const cRecording *Recording);
 cString GetRecordingerrorIcon(int RecInfoErrors);
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
@@ -259,8 +283,8 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT
                       cString &Subtitle, bool NewLine = false);                      // NOLINT
-void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine);    // NOLINT
+void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflichts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
-std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);
+std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
 

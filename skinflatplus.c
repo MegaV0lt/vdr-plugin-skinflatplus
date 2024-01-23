@@ -9,15 +9,15 @@
 #include <vdr/plugin.h>
 #include <Magick++.h>
 
-#if defined(APIVERSNUM) && APIVERSNUM < 10734
-#error "VDR-1.7.34 API version or greater is required!"
+#if defined(APIVERSNUM) && APIVERSNUM < 20308
+#error "VDR-2.3.8 API version or greater is required!"
 #endif
 
 #include "./flat.h"
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "0.8.4";
+static const char *VERSION        = "1.0.0";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -43,7 +43,7 @@ class cPluginFlat : public cPlugin {
         virtual bool SetupParse(const char *Name, const char *Value);
         virtual bool Service(const char *Id, void *Data = NULL);
         virtual const char **SVDRPHelpPages(void);
-        virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);
+        virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);  // NOLINT
 };
 
 cPluginFlat::cPluginFlat(void) {

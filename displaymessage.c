@@ -25,5 +25,5 @@ void cFlatDisplayMessage::SetMessage(eMessageType Type, const char *Text) {
 
 void cFlatDisplayMessage::Flush(void) {
     TopBarUpdate();
-    osd->Flush();
+    m_Osd->Flush();
 }

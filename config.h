@@ -27,7 +27,7 @@ class cFlatConfig {
  private:
         cString CheckSlashAtEnd(std::string path);
 
-        int m_DecorCurrent;
+        int m_DecorCurrent {-1};
 
  public:
         cFlatConfig(void);
@@ -339,6 +339,7 @@ class cFlatConfig {
 
         int TVScraperEPGInfoShowActors;
         int TVScraperRecInfoShowActors;
+        int TVScraperShowMaxActors;
 
         int DecorIndex;
 

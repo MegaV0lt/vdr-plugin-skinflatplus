@@ -9,7 +9,7 @@
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
-    if (!Osd) return;
+    // if (!m_Osd) return;
 
     Text = text;
     Font = font;
@@ -18,9 +18,9 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
     cRect DrawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
 
-    Osd->DestroyPixmap(Pixmap);
+    m_Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(Osd, "Pixmap", Layer, Position, DrawPort);
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, Position, DrawPort);
     // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
     //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
     // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
@@ -111,7 +111,7 @@ void cTextScroll::DoStep(void) {
     Pixmap->SetDrawPortPoint(cPoint(DrawPortX, 0));
 }
 
-cTextScrollers::cTextScrollers() {
+cTextScrollers::cTextScrollers() : cThread("TextScrollers") {
     Layer = 2;
 }
 
@@ -137,7 +137,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
     while (Active())
         cCondWait::SleepMs(10);
 
-    Scrollers.emplace_back(new cTextScroll(Osd, ScrollType, ScrollStep,
+    Scrollers.emplace_back(new cTextScroll(m_Osd, ScrollType, ScrollStep,
         static_cast<int>(WAITDELAY * 1.0f / ScrollDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, m_Font, ColorExtraTextFg);
 
@@ -190,6 +190,6 @@ void cTextScrollers::Action(void) {
         }
 
         if (Running())
-            Osd->Flush();
+            m_Osd->Flush();
     }
 }
