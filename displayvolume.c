@@ -34,7 +34,7 @@ cFlatDisplayVolume::~cFlatDisplayVolume() {
 }
 
 void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
-    if (!LabelPixmap || !MuteLogoPixmap) return; 
+    if (!LabelPixmap || !MuteLogoPixmap) return;
 
     PixmapFill(LabelPixmap, clrTransparent);
     PixmapFill(MuteLogoPixmap, clrTransparent);
