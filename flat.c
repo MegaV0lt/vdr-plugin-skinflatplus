@@ -530,7 +530,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     uint64_t RecSize {0};
     if (AddText) {
         /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
-        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occured detecting filesize
+        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occurred detecting filesize
             Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                          static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
@@ -547,15 +547,15 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                      Recording->Lifetime()));
 
-        // Add Video Format information (Format, Resolution, Framerate, …)
+        // Add video format information (Format, Resolution, Framerate, …)
         #if APIVERSNUM >= 20605
-        const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
+        const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
         if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
             Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
                         RecInfo->FrameWidth(), RecInfo->FrameHeight()));
             if (RecInfo->FramesPerSecond() > 0) {
                 Text.Append(cString::sprintf("@%.2g", RecInfo->FramesPerSecond()));
-                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scantype
+                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
                     Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
             }
             if (RecInfo->AspectRatio() != arUnknown)

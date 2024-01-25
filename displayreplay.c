@@ -79,7 +79,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(RecInfo->Title());
 
     // Show if still recording
-    int left = m_MarginItem;  // Position for recordingsymbol/shorttext/date
+    int left = m_MarginItem;  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((m_Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
@@ -98,7 +98,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                     *TimeString(m_Recording->Start()), RecInfo->ShortText());
         else
             InfoText = cString::sprintf("%s", RecInfo->ShortText());
-    } else {  // No shorttext
+    } else {  // No short text
         InfoText = cString::sprintf("%s  %s", *ShortDateString(m_Recording->Start()),
                                     *TimeString(m_Recording->Start()));
     }
@@ -106,7 +106,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     int InfoWidth = m_FontSml->Width(*InfoText);  // Width of infotext
     // TODO: How to get width of aspect and format icons?
     //  Done: Substract 'left' in case of displayed recording icon
-    //  Done: Substract 'm_FontSmlHeight' in case of recordingerror icon is displayed later
+    //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
     //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
 
@@ -128,7 +128,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                         Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
             left += MaxWidth;
         } else {  // Add ... if info ist too long
-            dsyslog("flatPlus: Shorttext too long! (%d) Setting MaxWidth to %d", InfoWidth, MaxWidth);
+            dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", InfoWidth, MaxWidth);
             int DotsWidth = m_FontSml->Width("...");
             LabelPixmap->DrawText(cPoint(left, m_FontHeight), *InfoText, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_FontSml, MaxWidth - DotsWidth);
@@ -137,7 +137,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                   Theme.Color(clrReplayBg), m_FontSml, DotsWidth);
             left += DotsWidth;
         }
-    } else {  // Shorttext fits into maxwidth
+    } else {  // Short text fits into maxwidth
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *InfoText, Theme.Color(clrReplayFont),
                                      Theme.Color(clrReplayBg), m_FontSml, InfoWidth);
         left += InfoWidth;

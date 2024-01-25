@@ -559,7 +559,7 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
     // Check for standard menu entries
     std::string s("");
     s.reserve(16);  // Space for translated menu entry
-    for (int i {0}; i < 16; ++i) {  // 16 menu entrys in vdr
+    for (int i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(items[i].c_str());
         if (s == element) {
             return cString::sprintf("menuIcons/%s", items[i].c_str());
@@ -677,7 +677,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     LOCK_CHANNELS_READ;
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-    int w = m_Font->Width("9999");  // At least four digits in channellist because of different sortmodes
+    int w = m_Font->Width("9999");  // At least four digits in channel list because of different sort modes
     cString Buffer("");
     if (!m_IsGroup) {
         Buffer = cString::sprintf("%d", Channel->Number());
@@ -685,7 +685,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     }
 
     if (Width < w)
-        Width = w;  // Minimal width for channelnumber
+        Width = w;  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1117,7 +1117,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     cString Buffer = cString::sprintf("%d", Channel->Number());
     int Width = m_Font->Width(*Buffer);
     if (Width < w)
-        Width = w;  // Minimal width for channelnumber
+        Width = w;  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1307,7 +1307,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Config.MenuEventView == 0)
         return false;
 
-    if (Config.MenuEventViewAllwaysWithDate)
+    if (Config.MenuEventViewAlwaysWithDate)
         WithDate = true;
 
     if (Current)
@@ -1365,7 +1365,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             Buffer = cString::sprintf("%d", Channel->Number());
             int Width = m_Font->Width(*Buffer);  // w is used here for calculation of width
             if (Width > w)
-                w = Width;  // Minimal width for channelnumber in Event (epgSearch)
+                w = Width;  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1851,7 +1851,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
                 if (!img)
                     img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-                    // img = ImgLoader.LoadIcon("recordinm_replay", m_FontHeight, m_FontHeight);
+                    // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             } else if (Recording->IsNew()) {
@@ -2378,7 +2378,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     do {  // Runs up to two times!
         if (FirstRun)
-            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbars most of the time
+            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbar most of the time
         else
             m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
 
@@ -2631,7 +2631,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString title = Event->Title();
     cString ShortText = Event->ShortText();
-    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of shorttext
+    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
     int left = m_MarginItem;
 
@@ -2640,15 +2640,15 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title,
                                 Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font,
                                 m_MenuWidth - m_MarginItem * 2);
-    // Add scroller to long shorttext
-    if (ShortTextWidth > MaxWidth) {  // Shorttext too long
+    // Add scroller to long short text
+    if (ShortTextWidth > MaxWidth) {  // Short text too long
         if (Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(*ShortText,
                                          cRect(m_chLeft + left, m_chTop + m_MarginItem + m_FontSmlHeight + m_FontHeight,
                                                MaxWidth, m_FontSmlHeight),
                                          Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
         } else {  // Add ... if info ist too long
-            dsyslog("flatPlus: Shorttext too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
+            dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
             int DotsWidth = m_FontSml->Width("...");
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -2658,7 +2658,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                         DotsWidth);
         }
-    } else {  // Shorttext fits into maxwidth
+    } else {  // Short text fits into maxwidth
         ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                     ShortTextWidth);
@@ -2742,11 +2742,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                 Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
             }
 #endif
-/* #if APIVERSNUM >= 20605
-            cString InfoFrameParams = RecInfo->FrameParams();
-            if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
-                Text.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO Translate
-#endif */
 
             const cComponents *Components = RecInfo->Components();
             if (Components) {
@@ -2759,7 +2754,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
             if (RecInfo->Aux())
-                InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with infoline
+                InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
     } else
         Text.Append(*EmptyText);
@@ -2875,10 +2870,10 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
     // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
-    int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and recinfo
+    int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and rec info
     if (ShowMaxActors == 0) return;  // Do not show actors
     if ( /* ShowMaxActors != -1 && */ ShowMaxActors > 0 && ShowMaxActors < NumActors)
-        NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all ators)
+        NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
 
     int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
     ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
@@ -2890,34 +2885,34 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     cImage *img {nullptr};
     cString Name(""), Path(""), Role("");  // Actor name, path and role
     int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
-    int ActorWitdh = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWitdh * ActorsPerLine) / (ActorsPerLine - 1);
-    int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWitdh;
+    int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
+    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
+    int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWidth;
     int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
     int x = m_MarginItem;
     int y = ContentTop;
     if (NumActors > 50)
-        dsyslog("flatPlus: Showing %d actor images! First display will propably be slow.", NumActors);
+        dsyslog("flatPlus: Showing %d actor images! First display will probably be slow.", NumActors);
 
     for (int row{0}; row < PicLines; ++row) {
         for (int col{0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
             Path = ActorsPath[Actor];
-            img = ImgLoader.LoadFile(*Path, ActorWitdh, 999);
+            img = ImgLoader.LoadFile(*Path, ActorWidth, 999);
             if (img) {
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 Name = ActorsName[Actor];
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
-                ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWitdh, 0),
+                ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWidth, 0),
                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
-                                       ActorWitdh, m_FontSmlHeight, taCenter);
+                                       ActorWidth, m_FontSmlHeight, taCenter);
                 ComplexContent.AddText(
-                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWitdh, 0),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWitdh,
+                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWidth,
                     m_FontSmlHeight, taCenter);
             }
-            x += ActorWitdh + ActorMargin;
+            x += ActorWidth + ActorMargin;
             ++Actor;
         }  // for col
         x = m_MarginItem;
@@ -2963,7 +2958,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::string Fsk("");
     if (!isempty(RecInfo->Description()))
         Text.Append(cString::sprintf("%s", RecInfo->Description()));
-        // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two linebreaks?
+        // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
 
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
@@ -3002,11 +2997,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
         }
 #endif
-/* #if APIVERSNUM >= 20605
-        cString InfoFrameParams = RecInfo->FrameParams();
-        if (*InfoFrameParams)  // Add Resolution, FramesPerSecond and AspectRatio
-            RecAdditional.Append("Videoparameter: %s\n", *InfoFrameParams);  // TODO: Translate
-#endif */
+
         const cComponents *Components = RecInfo->Components();
         if (Components) {
             cString Audio(""), Subtitle("");
@@ -3024,7 +3015,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
         if (RecInfo->Aux())
-            InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without infoline
+            InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
@@ -3090,7 +3081,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     do {  // Runs up to two times!
         if (FirstRun)
-            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbars most of the time
+            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbar most of the time
         else
             m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
 
@@ -3323,7 +3314,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetRecording second run with no scrollbars ---");
+            // dsyslog("flatPlus: --- SetRecording second run with no scrollbar ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3353,7 +3344,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         title = Recording->Name();
 
     cString ShortText = RecInfo->ShortText();
-    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of shorttext
+    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // HeadIconLeft includes right margin
     int left = m_MarginItem;
 
@@ -3366,8 +3357,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 Theme.Color(clrMenuRecBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title, Theme.Color(clrMenuRecFontTitle),
                                 Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
-    // Add scroller to long shorttext
-    if (ShortTextWidth > MaxWidth) {  // Shorttext too long
+    // Add scroller to long short text
+    if (ShortTextWidth > MaxWidth) {  // Short text too long
         if (Config.ScrollerEnable) {  // TODO: Maxwidth too small
             MenuItemScroller.AddScroller(*ShortText,
                                          cRect(m_chLeft + left, m_chTop + m_MarginItem + m_FontSmlHeight + m_FontHeight,
@@ -3375,7 +3366,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                          Theme.Color(clrMenuRecFontInfo), clrTransparent, m_FontSml);
             left += MaxWidth;
         } else {  // Add ... if info ist too long
-            dsyslog("flatPlus: Shorttext too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
+            dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
             int DotsWidth = m_FontSml->Width("...");
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
@@ -3386,7 +3377,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                         DotsWidth);
             left += DotsWidth;
         }
-    } else {  // Shorttext fits into maxwidth
+    } else {  // Short text fits into maxwidth
         ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
                                     ShortTextWidth);
@@ -3481,7 +3472,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     bool Scrollable = ComplexContent.Scrollable(Height - m_MarginItem * 2);
     if (!Scrollable) {
-        Width += m_ScrollBarWidth;  // Readd scrollbarwidth
+        Width += m_ScrollBarWidth;  // Readd scrollbar width
         ComplexContent.Clear();
         if (FixedFont) {
             ComplexContent.AddText(
@@ -3671,7 +3662,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     std::string RecName = Recording->Name();
     try {
         std::vector<std::string> tokens;
-        tokens.reserve(6);  // Set to at least 6 entrys
+        tokens.reserve(6);  // Set to at least 6 entry's
         std::istringstream f(RecName.c_str());
         std::string s("");
         while (std::getline(f, s, FOLDERDELIMCHAR)) {
@@ -3881,7 +3872,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     ContentWidget.SetScrollingActive(false);
 
     std::vector<std::pair<int, std::string>> widgets;
-    widgets.reserve(10);  // Set to at leat 10 entrys
+    widgets.reserve(10);  // Set to at least 10 entry's
 
     if (Config.MainMenuWidgetDVBDevicesShow)
         widgets.emplace_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"));
@@ -3983,7 +3974,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     // Check currently recording devices
     const int NumDevices = cDevice::NumDevices();
-    bool RecDevices[NumDevices] {false};  // Array initialisized to false
+    bool RecDevices[NumDevices] {false};  // Array initialised to false
 
     LOCK_TIMERS_READ;
     for (const cTimer *timer = Timers->First(); timer; timer = Timers->Next(timer)) {
@@ -4297,7 +4288,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     ContentTop += 6;
 
     std::vector<std::pair<time_t, std::string>> Recs;
-    Recs.reserve(512);  // Set to at least 512 entrys
+    Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
     int Minutes {0};
     cString DateTime(""), Length("");
@@ -4388,7 +4379,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at leat 64 entrys
+    files.reserve(64);  // Set to at leat 64 entry's
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
