@@ -2,6 +2,8 @@ VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
 2024-xx-xx: Version 1.0.1
  - [fix] Fis scrollbar in timer short view
+ - [update] Use '≈' for almost equal
+ - [update] Use 'Ø' for average
 
 2024-01-23: Version 1.0.0
 - [add] Add framedata to recordinginfo. Need VDR >= 2.6.5

@@ -202,14 +202,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         if (Config.DiskUsageShort == false) {     // Long format
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                Extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
+                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
                                           FreeMinutes % 60);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
-            Extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
+            Extra2 = cString::sprintf("≈ %02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
         }
         switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
@@ -252,14 +252,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
                 Extra2 =
-                    cString::sprintf("%.1f GB ~%02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
+                    cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-            Extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
+            Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
         switch (DiskUsagePercent) {  // show used space
         case 0 ... 3: IconName = "chart1"; break;  // 3,125
