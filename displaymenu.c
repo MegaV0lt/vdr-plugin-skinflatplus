@@ -2895,8 +2895,8 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     if (NumActors > 50)
         dsyslog("flatPlus: Showing %d actor images! First display will probably be slow.", NumActors);
 
-    for (int row{0}; row < PicLines; ++row) {
-        for (int col{0}; col < PicsPerLine; ++col) {
+    for (int row {0}; row < PicLines; ++row) {
+        for (int col {0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
             Path = ActorsPath[Actor];
