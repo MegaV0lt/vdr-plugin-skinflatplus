@@ -562,7 +562,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
                 Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
             if (LastIndex)  //* Bitrate in new line
-                Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         } else  // NOLINT
         #endif
@@ -570,7 +570,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
 
             if (LastIndex)  //* Bitrate at same line
-                Text.Append(cString::sprintf(", %s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         }
     }  // AddText
