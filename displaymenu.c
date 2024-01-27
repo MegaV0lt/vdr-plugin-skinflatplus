@@ -412,7 +412,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, m_FontHeight), ColorBg);
 
     int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
-    int lh = m_FontHeight;
     int XOff {0}, xt {0};
     const char *s {nullptr};
     for (int i {0}; i < MaxTabs; ++i) {
@@ -427,16 +426,16 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 switch (s[0]) {
                 case '>':
                     if (IconTimerFull)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconTimerFull->Height()) / 2),
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconTimerFull->Height()) / 2),
                                                    *IconTimerFull);
                     break;
                 case '#':
                     if (IconRec)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconRec->Height()) / 2), *IconRec);
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconRec->Height()) / 2), *IconRec);
                     break;
                 case '!':
                     if (IconArrowTurn)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (lh - IconArrowTurn->Height()) / 2),
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconArrowTurn->Height()) / 2),
                                                    *IconArrowTurn);
                     break;
                 // case ' ':
