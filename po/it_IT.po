@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflatplus 0.7.9\n"
+"Project-Id-Version: vdr-skinflatplus 1.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Language-Team: Italian\n"
 "Language: it_IT\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Disk"
@@ -85,7 +85,7 @@ msgid "release date: "
 msgstr "Data uscita: "
 
 msgid "popularity: "
-msgstr "popolarità: "
+msgstr "popolaritÃ : "
 
 msgid "vote average: "
 msgstr "voto medio: "
@@ -319,10 +319,10 @@ msgid "do not show"
 msgstr "non mostrare"
 
 msgid "timer & recording menu"
-msgstr "Timer & Menù Registrazioni"
+msgstr "Timer & MenÃ¹ Registrazioni"
 
 msgid "always on the menu"
-msgstr "sempre in Menù"
+msgstr "sempre in MenÃ¹"
 
 msgid "always show"
 msgstr "mostra sempre"
@@ -403,7 +403,7 @@ msgid "Channelinfo settings"
 msgstr "Impostazioni Channelinfo"
 
 msgid "Menu settings"
-msgstr "Impostazioni Menù"
+msgstr "Impostazioni MenÃ¹"
 
 msgid "Replay settings"
 msgstr "Impostazioni Replay"
@@ -421,7 +421,7 @@ msgid "TVScraper / scraper2vdr not installed"
 msgstr "TVScraper / scraper2vdr non istallati"
 
 msgid "Main menu widgets settings"
-msgstr "Impostazioni menù widget"
+msgstr "Impostazioni menÃ¹ widget"
 
 msgid "configfile"
 msgstr "file di configurazione"
@@ -454,7 +454,7 @@ msgid "Show empty color-buttons"
 msgstr "Mostra i color-buttons liberi"
 
 msgid "Show TopBar menu icons"
-msgstr "Mostra il menù icone della topbar"
+msgstr "Mostra il menÃ¹ icone della topbar"
 
 msgid "Diskusage show"
 msgstr "Mostra utilizzo dell'hardisk"
@@ -547,7 +547,7 @@ msgid "Show event start time left"
 msgstr ""
 
 msgid "Show signal quality"
-msgstr "Mostra qualità segnale"
+msgstr "Mostra qualitÃ  segnale"
 
 msgid "Show weather widget"
 msgstr "Mostra Widget tempo"
@@ -556,7 +556,7 @@ msgid "Weather widget font size"
 msgstr "Dimensione font widget previsioni"
 
 msgid "Colors for signal quality"
-msgstr "Colori per qualità del segnale"
+msgstr "Colori per qualitÃ  del segnale"
 
 msgid "Show resolution & aspect"
 msgstr "Mostra risoluzione & aspetto"
@@ -604,22 +604,22 @@ msgid "Channelinfo progress size"
 msgstr "Channelinfo: dimensione progresso"
 
 msgid "Signalquality progress by decor-file?"
-msgstr "Qualità Segnale con decor-file?"
+msgstr "QualitÃ  Segnale con decor-file?"
 
 msgid "Signalquality progress type"
-msgstr "Qualità Segnale: tipo"
+msgstr "QualitÃ  Segnale: tipo"
 
 msgid "Signalquality progress size"
-msgstr "Qualità Segnale: dimensione"
+msgstr "QualitÃ  Segnale: dimensione"
 
 msgid "Menuitem padding"
-msgstr "Riempimento voci del menù"
+msgstr "Riempimento voci del menÃ¹"
 
 msgid "Show mainmenu item icons"
-msgstr "Mostra icone del menù principale"
+msgstr "Mostra icone del menÃ¹ principale"
 
 msgid "Menu content fullsize background"
-msgstr "Menù: contenuto a dimensioni piene in background"
+msgstr "MenÃ¹: contenuto a dimensioni piene in background"
 
 msgid "Show additional recording info"
 msgstr "Mostra ulteriori informazioni delle registrazioni"
@@ -631,10 +631,10 @@ msgid "Show reruns in EPG info"
 msgstr "Mostra riavii in EPG info"
 
 msgid "Menu draw background over the entire height"
-msgstr "Menü: traccia il background per l'intera altezza"
+msgstr "MenÃ¼: traccia il background per l'intera altezza"
 
 msgid "Recording menu show recording count in title"
-msgstr "Menù registrazioni mostra la lunghezza nel titolo"
+msgstr "MenÃ¹ registrazioni mostra la lunghezza nel titolo"
 
 msgid "Recording menu recording seen threshold"
 msgstr ""
@@ -661,19 +661,19 @@ msgid "Channel menu show channel count in title"
 msgstr "Canale: calcola la lunghezza nel titolo"
 
 msgid "Menu channel view"
-msgstr "Menù: mostra canali"
+msgstr "MenÃ¹: mostra canali"
 
 msgid "Menu timer view"
-msgstr "Menù: mostra Timer"
+msgstr "MenÃ¹: mostra Timer"
 
 msgid "Menu event view"
-msgstr "Menù: mostra eventi"
+msgstr "MenÃ¹: mostra eventi"
 
 msgid "Menu event view allways with date"
-msgstr "Menù: mostra eventi sempre con la data"
+msgstr "MenÃ¹: mostra eventi sempre con la data"
 
 msgid "Menu recording view"
-msgstr "Menù: mostra registrazione in corso"
+msgstr "MenÃ¹: mostra registrazione in corso"
 
 msgid "Scrollbar by decor-file?"
 msgstr "Scrollbar con decor-file?"
@@ -685,40 +685,40 @@ msgid "Scrollbar size"
 msgstr "Scrollbar: dimensione"
 
 msgid "Menuitem border by decor-file?"
-msgstr "Bordo voci del menù con decor-file?"
+msgstr "Bordo voci del menÃ¹ con decor-file?"
 
 msgid "Menuitem border type"
-msgstr "Voci del menù: tipo"
+msgstr "Voci del menÃ¹: tipo"
 
 msgid "Menuitem border size"
-msgstr "Voci del menù: dimensione"
+msgstr "Voci del menÃ¹: dimensione"
 
 msgid "Menucont. border by decor-file?"
-msgstr "Voci del menù: bordo con decor-file?"
+msgstr "Voci del menÃ¹: bordo con decor-file?"
 
 msgid "Menucont. border type"
-msgstr "Testa del menù: tipo"
+msgstr "Testa del menÃ¹: tipo"
 
 msgid "Menucont. border size"
-msgstr "Testa del menù: dimensione bordo"
+msgstr "Testa del menÃ¹: dimensione bordo"
 
 msgid "Menucont. head border by decor-file?"
-msgstr "Testa del menù: bordo principale con decor-file?"
+msgstr "Testa del menÃ¹: bordo principale con decor-file?"
 
 msgid "Menucont. head border type"
-msgstr "Testa del menù: tipo"
+msgstr "Testa del menÃ¹: tipo"
 
 msgid "Menucont. head border size"
-msgstr "Testa del menù: dimensione bordo principale"
+msgstr "Testa del menÃ¹: dimensione bordo principale"
 
 msgid "Menuitem progress by decor-file?"
-msgstr "Voci del menù: progresso in corso con decor-file?"
+msgstr "Voci del menÃ¹: progresso in corso con decor-file?"
 
 msgid "Menuitem progress type"
-msgstr "Voci del menù: tipo progresso in corso"
+msgstr "Voci del menÃ¹: tipo progresso in corso"
 
 msgid "Menuitem progress size"
-msgstr "Voci del menù: dimensione progresso in corso"
+msgstr "Voci del menÃ¹: dimensione progresso in corso"
 
 msgid "Time seconds font scale"
 msgstr "Scala i font dei secondi"
@@ -805,10 +805,10 @@ msgid "Max. actors to show?"
 msgstr ""
 
 msgid "Enable main menu widgets"
-msgstr "Abilita il menù principale dei widget"
+msgstr "Abilita il menÃ¹ principale dei widget"
 
 msgid "Main menu item scale"
-msgstr "Voci del menù: scala (%)"
+msgstr "Voci del menÃ¹: scala (%)"
 
 msgid "Widget weather"
 msgstr "Widget previsioni"

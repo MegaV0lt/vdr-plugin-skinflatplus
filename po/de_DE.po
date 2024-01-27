@@ -4,15 +4,15 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflatplus 0.7.9\n"
+"Project-Id-Version: vdr-skinflatplus 1.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
-"PO-Revision-Date: 2015-02-09 20:09+0100\n"
+"PO-Revision-Date: 2024-01-27 10:09+0100\n"
 "Last-Translator: Martin Schirrmacher\n"
 "Language-Team: Martin Schirrmacher\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-15\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Disk"
@@ -88,7 +88,7 @@ msgid "popularity: "
 msgstr "Beliebtheit: "
 
 msgid "vote average: "
-msgstr "Durchschnittliche Wertung: "
+msgstr "Ã˜ Wertung: "
 
 msgid "Description"
 msgstr "Beschreibung"
@@ -109,13 +109,13 @@ msgid "Video information"
 msgstr "Video Informationen"
 
 msgid "Length"
-msgstr "Länge"
+msgstr "LÃ¤nge"
 
 msgid "cutted"
 msgstr "Geschnitten"
 
 msgid "Size"
-msgstr "Größe"
+msgstr "GrÃ¶ÃŸe"
 
 msgid "format"
 msgstr "Format"
@@ -137,7 +137,7 @@ msgstr "Suchmuster"
 
 # TVScraper
 msgid "caused by"
-msgstr "Ausgelöst durch"
+msgstr "AusgelÃ¶st durch"
 
 msgid "reason"
 msgstr "Grund"
@@ -155,7 +155,7 @@ msgid "Recording information"
 msgstr "Aufnahme Informationen"
 
 msgid "DVB Devices"
-msgstr "DVB Geräte"
+msgstr "DVB GerÃ¤te"
 
 msgid "LiveTV"
 msgstr ""
@@ -191,7 +191,7 @@ msgid "System Information"
 msgstr "Systeminformation"
 
 msgid "no information available please check the script"
-msgstr "Keine Informationen verfügbar; Bitte Skript prüfen"
+msgstr "Keine Informationen verfÃ¼gbar; Bitte Skript prÃ¼fen"
 
 msgid "System Version"
 msgstr ""
@@ -200,7 +200,7 @@ msgid "Kernel Version"
 msgstr ""
 
 msgid "Uptime"
-msgstr "Läuft"
+msgstr "LÃ¤uft"
 
 msgid "Load"
 msgstr "Last"
@@ -233,7 +233,7 @@ msgid "Temp GPU"
 msgstr "GPU-Temperatur"
 
 msgid "Temp PC-Case"
-msgstr "Gehäuse-Temperatur"
+msgstr "GehÃ¤use-Temperatur"
 
 msgid "Temp MB"
 msgstr "MB-Temperatur"
@@ -248,19 +248,19 @@ msgid "System Updates"
 msgstr "Systemupdates"
 
 msgid "Updatestatus not available please check the widget"
-msgstr "Updatestatus nicht vorhanden; Bitte Widget prüfen"
+msgstr "Updatestatus nicht vorhanden; Bitte Widget prÃ¼fen"
 
 msgid "Temperatures"
 msgstr "Temperaturen"
 
 msgid "Temperatures not available please check the widget"
-msgstr "Temperaturen nicht vorhanden; Bitte Widget prüfen"
+msgstr "Temperaturen nicht vorhanden; Bitte Widget prÃ¼fen"
 
 msgid "CPU"
 msgstr ""
 
 msgid "PC-Case"
-msgstr "Gehäuse"
+msgstr "GehÃ¤use"
 
 msgid "MB"
 msgstr ""
@@ -278,7 +278,7 @@ msgid "Weather"
 msgstr "Wetter"
 
 msgid "Volume"
-msgstr "Lautstärke"
+msgstr "LautstÃ¤rke"
 
 msgid "none"
 msgstr "keine"
@@ -302,7 +302,7 @@ msgid "invert round + alpha blend"
 msgstr "Rund invertiert + Transparent"
 
 msgid "small line + big line"
-msgstr "Dünne Linie + Dicke Linie"
+msgstr "DÃ¼nne Linie + Dicke Linie"
 
 msgid "big line"
 msgstr "Dicke Linie"
@@ -311,7 +311,7 @@ msgid "big line + outline"
 msgstr "Dicke Linie + Outline"
 
 msgid "small line + big line + dot"
-msgstr "Dünne Linie + Dicke Linie + Punkt"
+msgstr "DÃ¼nne Linie + Dicke Linie + Punkt"
 
 msgid "big line + dot"
 msgstr "Dicke Linie + Punkt"
@@ -320,13 +320,13 @@ msgid "big line + outline + dot"
 msgstr "Dicke Linie + Outline + Punkt"
 
 msgid "small line + dot"
-msgstr "Dünne Linie + Punkt"
+msgstr "DÃ¼nne Linie + Punkt"
 
 msgid "outline + dot"
 msgstr "Outline + Punkt"
 
 msgid "small line + big line + alpha blend"
-msgstr "Dünne Linie + Dicke Linie + Transparenz"
+msgstr "DÃ¼nne Linie + Dicke Linie + Transparenz"
 
 msgid "big line + alpha blend"
 msgstr "Dicke Linie + Transparenz"
@@ -335,10 +335,10 @@ msgid "do not show"
 msgstr "Nicht anzeigen"
 
 msgid "timer & recording menu"
-msgstr "Timer & Aufnahme Menü"
+msgstr "Timer & Aufnahme MenÃ¼"
 
 msgid "always on the menu"
-msgstr "Immer im Menü"
+msgstr "Immer im MenÃ¼"
 
 msgid "always show"
 msgstr "Immer anzeigen"
@@ -368,7 +368,7 @@ msgid "hoizontal"
 msgstr "horizontal"
 
 msgid "carriage return"
-msgstr "Am Ende zurückspringen"
+msgstr "Am Ende zurÃ¼ckspringen"
 
 msgid "left-right-left"
 msgstr "links-rechts-links"
@@ -419,13 +419,13 @@ msgid "Channelinfo settings"
 msgstr "Kanalinfo Einstellungen"
 
 msgid "Menu settings"
-msgstr "Menü Einstellungen"
+msgstr "MenÃ¼ Einstellungen"
 
 msgid "Replay settings"
 msgstr "Wiedergabe Einstellungen"
 
 msgid "Volume settings"
-msgstr "Lautstärke Einstellungen"
+msgstr "LautstÃ¤rke Einstellungen"
 
 msgid "Tracks settings"
 msgstr "Tonspur Einstellungen"
@@ -437,7 +437,7 @@ msgid "TVScraper / scraper2vdr not installed"
 msgstr "TVScraper / scraper2vdr nicht installiert"
 
 msgid "Main menu widgets settings"
-msgstr "Hauptmenü: Widget Einstellungen"
+msgstr "HauptmenÃ¼: Widget Einstellungen"
 
 msgid "configfile"
 msgstr "Konfigdatei"
@@ -449,28 +449,28 @@ msgid "saved settings in file:"
 msgstr "Einstellungen gespeichert in Datei:"
 
 msgid "no decorfiles found, check install"
-msgstr "Keine Dekordateien gefunden, prüfe Installation"
+msgstr "Keine Dekordateien gefunden, prÃ¼fe Installation"
 
 msgid "Decorfile"
 msgstr "Dekordatei"
 
 msgid "no config-files found, check install"
-msgstr "Keine Konfigdateien gefunden, prüfe Installation"
+msgstr "Keine Konfigdateien gefunden, prÃ¼fe Installation"
 
 msgid "Press ok to load config file"
-msgstr "OK drücken um die Konfigdatei zu laden"
+msgstr "OK drÃ¼cken um die Konfigdatei zu laden"
 
 msgid "Save current settings"
 msgstr "Aktuelle Einstellungen abspeichern"
 
 msgid "press ok to save current settings"
-msgstr "OK drücken um die Einstellungen zu speichern"
+msgstr "OK drÃ¼cken um die Einstellungen zu speichern"
 
 msgid "Show empty color-buttons"
 msgstr "Zeige leere Farbtasten"
 
 msgid "Show TopBar menu icons"
-msgstr "Zeige Menüsymbole in Titelleiste"
+msgstr "Zeige MenÃ¼symbole in Titelleiste"
 
 msgid "Diskusage show"
 msgstr "Plattenverbrauch anzeigen"
@@ -482,7 +482,7 @@ msgid "Diskusage free/occupied"
 msgstr "Plattenverbrauch: frei/belegt"
 
 msgid "EPG FSK/Genre icon size"
-msgstr "EPG FSK/Genre Symbolgröße"
+msgstr "EPG FSK/Genre SymbolgrÃ¶ÃŸe"
 
 msgid "OSD vertical margin"
 msgstr "OSD vertikaler Rand"
@@ -491,7 +491,7 @@ msgid "OSD horizontal margin"
 msgstr "OSD horizontaler Rand"
 
 msgid "TopBar font size"
-msgstr "Titelleiste: Font Größe"
+msgstr "Titelleiste: Font GrÃ¶ÃŸe"
 
 msgid "TopBar show recording"
 msgstr "Titelleiste: Zeige Aufnahme"
@@ -506,7 +506,7 @@ msgid "TopBar clock font scale"
 msgstr "Titelleiste: Uhr Skalierung"
 
 msgid "Conflicts min value for red"
-msgstr "Konflikte min. Wert für Rot"
+msgstr "Konflikte min. Wert fÃ¼r Rot"
 
 msgid "Message bottom offset"
 msgstr "Meldung unterer Abstand"
@@ -521,7 +521,7 @@ msgid "Scroller step (in pixel)"
 msgstr "Laufschrift: Schrittweite (Pixel)"
 
 msgid "Scroller delay (in ms)"
-msgstr "Laufschrift: Verzögerung (ms)"
+msgstr "Laufschrift: VerzÃ¶gerung (ms)"
 
 msgid "Scroller type"
 msgstr "Laufschrift: Typ"
@@ -533,7 +533,7 @@ msgid "TopBar border type"
 msgstr "Titelleiste: Rand Typ"
 
 msgid "TopBar border size"
-msgstr "Titelleiste: Rand Größe"
+msgstr "Titelleiste: Rand GrÃ¶ÃŸe"
 
 msgid "Message border by decor-file?"
 msgstr "Meldung: Rand aus Dekordatei?"
@@ -542,7 +542,7 @@ msgid "Message border type"
 msgstr "Meldung: Rand Typ"
 
 msgid "Message border size"
-msgstr "Meldung: Rand Größe"
+msgstr "Meldung: Rand GrÃ¶ÃŸe"
 
 msgid "Button border by decor-file?"
 msgstr "Tasten: Rand aus Dekordatei?"
@@ -551,10 +551,10 @@ msgid "Button border type"
 msgstr "Tasten: Rand Typ"
 
 msgid "Button border size"
-msgstr "Tasten: Rand Größe"
+msgstr "Tasten: Rand GrÃ¶ÃŸe"
 
 msgid "Imagecache entries"
-msgstr "Bildercache Einträge"
+msgstr "Bildercache EintrÃ¤ge"
 
 msgid "Show Channelinfo icons"
 msgstr "Zeige Kanalinfo Logos"
@@ -563,25 +563,25 @@ msgid "Show event start time left"
 msgstr "Zeige Event Startzeit links"
 
 msgid "Show signal quality"
-msgstr "Zeige Signalqualität"
+msgstr "Zeige SignalqualitÃ¤t"
 
 msgid "Show weather widget"
 msgstr "Zeige Wetter Widget"
 
 msgid "Weather widget font size"
-msgstr "Wetter Widget Schriftgröße"
+msgstr "Wetter Widget SchriftgrÃ¶ÃŸe"
 
 msgid "Colors for signal quality"
-msgstr "Farben für Signalqualität"
+msgstr "Farben fÃ¼r SignalqualitÃ¤t"
 
 msgid "Show resolution & aspect"
-msgstr "Zeige Auflösung & Bildformat"
+msgstr "Zeige AuflÃ¶sung & Bildformat"
 
 msgid "Show format (hd/sd)"
 msgstr "Zeige Format (HD/SD)"
 
 msgid "Simple aspect & format"
-msgstr "Auflösung & Bildformat Einfache Anzeige"
+msgstr "AuflÃ¶sung & Bildformat Einfache Anzeige"
 
 msgid "dvbapi plugin not installed"
 msgstr "Plugin dvbapi ist nicht installiert"
@@ -599,7 +599,7 @@ msgid "Channelinfo border type"
 msgstr "Kanalinfo: Rand Typ"
 
 msgid "Channelinfo border size"
-msgstr "Kanalinfo: Rand Größe"
+msgstr "Kanalinfo: Rand GrÃ¶ÃŸe"
 
 msgid "Channelinfo EPG border by decor-file?"
 msgstr "Kanalinfo: EPG Rand aus Dekordatei?"
@@ -608,7 +608,7 @@ msgid "Channelinfo EPG border type"
 msgstr "Kanalinfo: EPG Rand Typ"
 
 msgid "Channelinfo EPG border size"
-msgstr "Kanalinfo: EPG Rand Größe"
+msgstr "Kanalinfo: EPG Rand GrÃ¶ÃŸe"
 
 msgid "Channelinfo progress by decor-file?"
 msgstr "Kanalinfo: Fortschritt aus Dekordatei?"
@@ -617,7 +617,7 @@ msgid "Channelinfo progress type"
 msgstr "Kanalinfo: Fortschritt Typ"
 
 msgid "Channelinfo progress size"
-msgstr "Kanalinfo: Fortschritt Größe"
+msgstr "Kanalinfo: Fortschritt GrÃ¶ÃŸe"
 
 msgid "Signalquality progress by decor-file?"
 msgstr "Signalpegelanzeige aus Dekordatei?"
@@ -626,16 +626,16 @@ msgid "Signalquality progress type"
 msgstr "Signalpegelanzeige: Typ"
 
 msgid "Signalquality progress size"
-msgstr "Signalpegelanzeige: Größe"
+msgstr "Signalpegelanzeige: GrÃ¶ÃŸe"
 
 msgid "Menuitem padding"
-msgstr "Menüpunkt Abstand"
+msgstr "MenÃ¼punkt Abstand"
 
 msgid "Show mainmenu item icons"
-msgstr "Zeige Symbole für Hauptmenüeinträge"
+msgstr "Zeige Symbole fÃ¼r HauptmenÃ¼eintrÃ¤ge"
 
 msgid "Menu content fullsize background"
-msgstr "Menü: Inhalt voller Hintergrund"
+msgstr "MenÃ¼: Inhalt voller Hintergrund"
 
 msgid "Show additional recording info"
 msgstr "Zeige Zusatzinfo bei Aufnahmen"
@@ -647,7 +647,7 @@ msgid "Show reruns in EPG info"
 msgstr "Zeige Wiederholungen bei EPG"
 
 msgid "Menu draw background over the entire height"
-msgstr "Menü: Zeichne Hintergrund über gesamte Höhe"
+msgstr "MenÃ¼: Zeichne Hintergrund Ã¼ber gesamte HÃ¶he"
 
 msgid "Recording menu show recording count in title"
 msgstr "Aufnahmen: Anzahl der Aufnahmen in Titelleiste"
@@ -674,22 +674,22 @@ msgid "Timer menu show timer count in title"
 msgstr "Timer: Anzahl der Timer in Titelleiste"
 
 msgid "Channel menu show channel count in title"
-msgstr "Kanäle: Anzahl der Kanäle in Titelleiste"
+msgstr "KanÃ¤le: Anzahl der KanÃ¤le in Titelleiste"
 
 msgid "Menu channel view"
-msgstr "Menü: Kanal Ansicht"
+msgstr "MenÃ¼: Kanal Ansicht"
 
 msgid "Menu timer view"
-msgstr "Menü: Timer Ansicht"
+msgstr "MenÃ¼: Timer Ansicht"
 
 msgid "Menu event view"
-msgstr "Menü: Programm Ansicht"
+msgstr "MenÃ¼: Programm Ansicht"
 
 msgid "Menu event view allways with date"
-msgstr "Menü: Programm immer mit Datum"
+msgstr "MenÃ¼: Programm immer mit Datum"
 
 msgid "Menu recording view"
-msgstr "Menü: Aufzeichnungen Ansicht"
+msgstr "MenÃ¼: Aufzeichnungen Ansicht"
 
 msgid "Scrollbar by decor-file?"
 msgstr "Scrollbar aus Dekordatei?"
@@ -698,43 +698,43 @@ msgid "Scrollbar type"
 msgstr "Scrollbar: Typ"
 
 msgid "Scrollbar size"
-msgstr "Scrollbar: Größe"
+msgstr "Scrollbar: GrÃ¶ÃŸe"
 
 msgid "Menuitem border by decor-file?"
-msgstr "Menüpunkt: Rand aus Dekordatei?"
+msgstr "MenÃ¼punkt: Rand aus Dekordatei?"
 
 msgid "Menuitem border type"
-msgstr "Menüpunkt: Rand Typ"
+msgstr "MenÃ¼punkt: Rand Typ"
 
 msgid "Menuitem border size"
-msgstr "Menüpunkt: Rand Größe"
+msgstr "MenÃ¼punkt: Rand GrÃ¶ÃŸe"
 
 msgid "Menucont. border by decor-file?"
-msgstr "Menüinhalt: Rand aus Dekordatei?"
+msgstr "MenÃ¼inhalt: Rand aus Dekordatei?"
 
 msgid "Menucont. border type"
-msgstr "Menüinhalt: Rand Typ"
+msgstr "MenÃ¼inhalt: Rand Typ"
 
 msgid "Menucont. border size"
-msgstr "Menüinhalt: Rand Größe"
+msgstr "MenÃ¼inhalt: Rand GrÃ¶ÃŸe"
 
 msgid "Menucont. head border by decor-file?"
-msgstr "Menükopf: Rand aus Dekordatei?"
+msgstr "MenÃ¼kopf: Rand aus Dekordatei?"
 
 msgid "Menucont. head border type"
-msgstr "Menükopf: Rand Typ"
+msgstr "MenÃ¼kopf: Rand Typ"
 
 msgid "Menucont. head border size"
-msgstr "Menükopf: Rand Größe"
+msgstr "MenÃ¼kopf: Rand GrÃ¶ÃŸe"
 
 msgid "Menuitem progress by decor-file?"
-msgstr "Menüpunkt: Fortschritt aus Dekordatei?"
+msgstr "MenÃ¼punkt: Fortschritt aus Dekordatei?"
 
 msgid "Menuitem progress type"
-msgstr "Menüpunkt: Fortschritt Typ"
+msgstr "MenÃ¼punkt: Fortschritt Typ"
 
 msgid "Menuitem progress size"
-msgstr "Menüitem: Fortschritt Größe"
+msgstr "MenÃ¼item: Fortschritt GrÃ¶ÃŸe"
 
 msgid "Time seconds font scale"
 msgstr "Uhrzeit: Sekunden Skalierung"
@@ -743,7 +743,7 @@ msgid "Dimm on pause?"
 msgstr "Dimmen bei Pause?"
 
 msgid "Dimm on pause delay"
-msgstr "Dimmen bei Pause Verzögerung"
+msgstr "Dimmen bei Pause VerzÃ¶gerung"
 
 msgid "Dimm on pause opaque"
 msgstr "Dimmen bei Pause Transparenz"
@@ -755,31 +755,31 @@ msgid "Replay border type"
 msgstr "Wiedergabe: Rand Typ"
 
 msgid "Replay border size"
-msgstr "Wiedergabe: Rand Größe"
+msgstr "Wiedergabe: Rand GrÃ¶ÃŸe"
 
 msgid "Replay progress by decor-file?"
 msgstr "Wiedergabe: Fortschritt aus Dekordatei?"
 
 msgid "Replay progress size"
-msgstr "Wiedergabe: Fortschritt Größe"
+msgstr "Wiedergabe: Fortschritt GrÃ¶ÃŸe"
 
 msgid "Volume border by decor-file?"
-msgstr "Lautstärke: Rand aus Dekordatei?"
+msgstr "LautstÃ¤rke: Rand aus Dekordatei?"
 
 msgid "Volume border type"
-msgstr "Lautstärke: Rand Typ"
+msgstr "LautstÃ¤rke: Rand Typ"
 
 msgid "Volume border size"
-msgstr "Lautstärke: Rand Größe"
+msgstr "LautstÃ¤rke: Rand GrÃ¶ÃŸe"
 
 msgid "Volume progress by decor-file?"
-msgstr "Lautstärke: Fortschritt aus Dekordatei?"
+msgstr "LautstÃ¤rke: Fortschritt aus Dekordatei?"
 
 msgid "Volume progress type"
-msgstr "Lautstärke: Fortschritt Typ"
+msgstr "LautstÃ¤rke: Fortschritt Typ"
 
 msgid "Volume progress size"
-msgstr "Lautstärke: Fortschritt Größe"
+msgstr "LautstÃ¤rke: Fortschritt GrÃ¶ÃŸe"
 
 msgid "Tracks border by decor-file?"
 msgstr "Tonspur: Rand aus Dekordatei?"
@@ -788,7 +788,7 @@ msgid "Tracks border type"
 msgstr "Tonspur: Rand Typ"
 
 msgid "Tracks border size"
-msgstr "Tonspur: Rand Größe"
+msgstr "Tonspur: Rand GrÃ¶ÃŸe"
 
 msgid "TVScraper settings"
 msgstr "TVScraper: Einstellungen"
@@ -797,13 +797,13 @@ msgid "Channelinfo show poster?"
 msgstr "Kanalinfo: Zeige Poster?"
 
 msgid "Channelinfo poster size"
-msgstr "Kanalinfo: Poster Größe"
+msgstr "Kanalinfo: Poster GrÃ¶ÃŸe"
 
 msgid "Replayinfo show poster?"
 msgstr "Wiedergabeinfo: Zeige Poster?"
 
 msgid "Replayinfo poster size"
-msgstr "Wiedergabeinfo: Poster Größe"
+msgstr "Wiedergabeinfo: Poster GrÃ¶ÃŸe"
 
 msgid "EPG info show poster?"
 msgstr "EPG-Info: Zeige Poster?"
@@ -821,10 +821,10 @@ msgid "Max. actors to show?"
 msgstr "Begrenze Anzahl der Darsteller"
 
 msgid "Enable main menu widgets"
-msgstr "Hauptmenü-Widgets anzeigen"
+msgstr "HauptmenÃ¼-Widgets anzeigen"
 
 msgid "Main menu item scale"
-msgstr "Hauptmenü Widgets: Breite (%)"
+msgstr "HauptmenÃ¼ Widgets: Breite (%)"
 
 msgid "Widget weather"
 msgstr "Wetter-Widget"
@@ -842,22 +842,22 @@ msgid "Widget weather: type"
 msgstr "Wetter-Widget: Typ"
 
 msgid "Widget DVB devices"
-msgstr "DVB Geräte-Widget"
+msgstr "DVB GerÃ¤te-Widget"
 
 msgid "Widget DVB devices: enable"
-msgstr "DVB Geräte-Widget: Anzeigen"
+msgstr "DVB GerÃ¤te-Widget: Anzeigen"
 
 msgid "Widget DVB devices: position"
-msgstr "DVB Geräte-Widget: Position"
+msgstr "DVB GerÃ¤te-Widget: Position"
 
 msgid "Widget DVB devices: don't show unknown"
-msgstr "DVB Geräte-Widget: Unbekannte ausblenden"
+msgstr "DVB GerÃ¤te-Widget: Unbekannte ausblenden"
 
 msgid "Widget DVB devices: don't show not used"
-msgstr "DVB Geräte-Widget: Nicht verw. ausblenden"
+msgstr "DVB GerÃ¤te-Widget: Nicht verw. ausblenden"
 
 msgid "Widget DVB devices: native numbering (0..)"
-msgstr "DVB Geräte-Widget: Interne Nummerierung (0..)"
+msgstr "DVB GerÃ¤te-Widget: Interne Nummerierung (0..)"
 
 msgid "Widget timer"
 msgstr "Timer-Widget"
