@@ -33,6 +33,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         bool m_MenuFullOsdIsDrawn = false;
 
         eMenuCategory m_MenuCategory;
+
+        int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
         int m_LastTimerCount {0}, m_LastTimerActiveCount {0};

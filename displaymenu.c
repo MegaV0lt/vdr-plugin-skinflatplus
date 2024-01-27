@@ -33,6 +33,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     ButtonsCreate();
     MessageCreate();
 
+    m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
+
     m_VideoDiskUsageState = -1;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
@@ -1897,8 +1899,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                 img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
-                        int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
-                        int ImageTop = Top + m_FontHeight - FontAscender;
+                        // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
+                        int ImageTop = Top + m_FontHeight - m_FontAscender;
                         int ImageLeft = Left + m_FontHeight - img->Width();
                         MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                     }
@@ -2090,8 +2092,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                 img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                     if (img) {
-                        int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
-                        int ImageTop = Top + m_FontHeight - FontAscender;
+                        // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
+                        int ImageTop = Top + m_FontHeight - m_FontAscender;
                         int ImageLeft = Left + m_FontHeight - img->Width();
                         MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                     }
