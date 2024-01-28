@@ -376,6 +376,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+        PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
             SetMediaSize(MediaSize, cSize(m_TVSWidth, m_TVSHeight));  // Check for too big images

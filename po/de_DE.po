@@ -805,6 +805,9 @@ msgstr "Wiedergabeinfo: Zeige Poster?"
 msgid "Replayinfo poster size"
 msgstr "Wiedergabeinfo: Poster Größe"
 
+msgid "Replay/channelinfo poster opacity"
+msgstr "Wiedergabe/Kanalinfo: Poster Transparenz"
+
 msgid "EPG info show poster?"
 msgstr "EPG-Info: Zeige Poster?"
 

@@ -334,6 +334,7 @@ void cFlatSetup::Store(void) {
     SetupStore("TVScraperRecInfoShowPoster", Config.TVScraperRecInfoShowPoster);
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("TVScraperReplayInfoShowPoster", Config.TVScraperReplayInfoShowPoster);
+    SetupStore("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity));
     SetupStore("WeatherFontSize", dtoa(Config.WeatherFontSize));
 
     Config.Init();
@@ -534,6 +535,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           SetupConfig->TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
+    else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               SetupConfig->TVScraperPosterOpacity = atod(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
     else
         return false;
@@ -714,6 +716,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("TVScraperRecInfoShowPoster", SetupConfig->TVScraperRecInfoShowPoster, *Filename);
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("TVScraperReplayInfoShowPoster", SetupConfig->TVScraperReplayInfoShowPoster, *Filename);
+    Config.Store("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity), *Filename);
     Config.Store("WeatherFontSize", dtoa(Config.WeatherFontSize), *Filename);
 
     cString msg = cString::sprintf("%s %s", tr("saved settings in file:"), *File);
@@ -1289,6 +1292,7 @@ void cFlatSetupTvsraper::Setup(void) {
     Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015, 2));
     Add(new cMenuEditBoolItem(tr("Replayinfo show poster?"), &SetupConfig->TVScraperReplayInfoShowPoster));
     Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015, 2));
+    Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001, 0.01, 2));
     Add(new cMenuEditBoolItem(tr("EPG info show poster?"), &SetupConfig->TVScraperEPGInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));

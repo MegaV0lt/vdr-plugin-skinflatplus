@@ -789,6 +789,9 @@ msgstr "Mostrare poster nelle Replayinfo?"
 msgid "Replayinfo poster size"
 msgstr "Dimensione poster nelle Replayinfo"
 
+msgid "Replay/channelinfo poster opacity"
+msgstr ""
+
 msgid "EPG info show poster?"
 msgstr "EPG-Info: mostrare Poster?"
 

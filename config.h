@@ -333,6 +333,7 @@ class cFlatConfig {
 
         int TVScraperReplayInfoShowPoster;
         double TVScraperReplayInfoPosterSize;
+        double TVScraperPosterOpacity;  // Transparency for channel info and replay info poster
 
         int TVScraperEPGInfoShowPoster;
         int TVScraperRecInfoShowPoster;

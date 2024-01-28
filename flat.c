@@ -104,7 +104,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-// void inline PixmapFill(cPixmap *pixmap, tColor Color);  //* See flat.h
+// void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");

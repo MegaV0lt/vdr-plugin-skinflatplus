@@ -254,9 +254,13 @@ static inline uint32_t GetMsTicks(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
-inline void PixmapFill(cPixmap *pixmap, tColor Color) {
-    if (pixmap) pixmap->Fill(Color);
+inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
+    if (Pixmap) Pixmap->Fill(Color);
 }
+inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
+    if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
+}
+
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);

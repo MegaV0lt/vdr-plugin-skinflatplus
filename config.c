@@ -157,6 +157,7 @@ cFlatConfig::cFlatConfig(void) {
 
     TVScraperReplayInfoShowPoster = 1;
     TVScraperReplayInfoPosterSize = 0.01;
+    TVScraperPosterOpacity = 0.008;  // Opacitiy of poster in replay info and channel info (80%)
 
     TVScraperEPGInfoShowPoster = 1;
     TVScraperRecInfoShowPoster = 1;
@@ -402,6 +403,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);
+    else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               TVScraperPosterOpacity = atod(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      WeatherFontSize = atod(Value);
     else
         return false;
