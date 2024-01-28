@@ -221,31 +221,20 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 void SetMediaSize(cSize &MediaSize, const cSize &TVSSize) {  // NOLINT
     int MediaWidth = MediaSize.Width();
     int MediaHeight = MediaSize.Height();
-    int Aspect = MediaWidth / MediaHeight;  // 5+ Banner, <1 Poster, 1+ Portrait
-    if (MediaHeight > TVSSize.Height() || MediaWidth > TVSSize.Width()) {  // Resize too big poster/banner
+    int Aspect = MediaWidth / MediaHeight;  // <1 = Poster, >1 = Portrait, >5 = Banner
+    if (MediaHeight > TVSSize.Height() || MediaWidth > TVSSize.Width())  // Too big poster/banner
         dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-        //* Aspect is preserved in LoadFile()
-        if (Aspect < 1) {  //* Poster (For example 680x1000)
-            MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
-            dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
-            MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
-            dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        } else {  //* Banner (Usually 758x140)
-            MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
-            dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        }
-    } else {  // Normal sized image  //! Same code
-        if (Aspect < 1) {  //* Poster (For example 680x1000)
-            MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
-            dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
-            MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
-            dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        } else {  //* Banner (Usually 758x140)
-            MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
-            dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
-        }
+        
+    //* Aspect is preserved in LoadFile()
+    if (Aspect < 1) {  //* Poster (For example 680x1000)
+        MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
+        dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
+        MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
+        dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    } else {  //* Banner (Usually 758x140)
+        MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
+        dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
     }
 }
 

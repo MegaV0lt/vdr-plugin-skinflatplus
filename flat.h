@@ -257,6 +257,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &
 inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
     if (Pixmap) Pixmap->Fill(Color);
 }
+
 inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
@@ -285,8 +286,7 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     /* return */  // LeftTrim(RightTrim(s, t), t);
 }
 
-void SetMediaSize(cSize &MediaSize, const cSize &TVSSize);
-
+void SetMediaSize(cSize &MediaSize, const cSize &TVSSize);  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT

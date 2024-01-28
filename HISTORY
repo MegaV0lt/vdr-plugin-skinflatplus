@@ -5,6 +5,7 @@ VDR Plugin 'skin flatPlus' Revision History
  - [add] Add configurable transparency for poster in replay- and channelinfo
  - [update] Use '≈' for almost equal
  - [update] Use 'Ø' for average
+ - [update] Some internal optimizations
 
 2024-01-23: Version 1.0.0
 - [add] Add framedata to recordinginfo. Need VDR >= 2.6.5
