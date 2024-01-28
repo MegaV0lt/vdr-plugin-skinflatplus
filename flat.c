@@ -19,6 +19,7 @@
 
 
 #include "./services/epgsearch.h"
+#include "flat.h"
 
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
@@ -73,116 +74,6 @@ cSkinDisplayTracks *cFlat::DisplayTracks(const char *Title, int NumTracks, const
 
 cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
-}
-
-// --- cTextFloatingWrapper --- // From skin ElchiHD
-// Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {
-}
-
-cTextFloatingWrapper::~cTextFloatingWrapper() {
-    free(m_Text);
-}
-
-void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    // uint32_t tick0 = GetMsTicks();  //! For testing
-
-    free(m_Text);
-    m_Text = Text ? strdup(Text) : nullptr;
-    if (!m_Text)
-        return;
-    m_Lines = 1;
-    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
-        return;
-
-    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
-    int cw {0}, l {0}, sl {0}, w {0};
-    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
-    uint sym {0};
-    stripspace(m_Text);  // Strips trailing newlines
-
-    for (char *p = m_Text; *p;) {
-        /* int */ sl = Utf8CharLen(p);
-        /* uint */ sym = Utf8CharGet(p, sl);
-        if (sym == '\n') {
-            ++m_Lines;
-            if (m_Lines > UpperLines)
-                Width = WidthLower;
-            w = 0;
-            Blank = Delim = nullptr;
-            p++;
-            continue;
-        } else if (sl == 1 && isspace(sym)) {
-            Blank = p;
-        }
-        /* int */ cw = Font->Width(sym);
-        if (w + cw > Width) {
-            if (Blank) {
-                *Blank = '\n';
-                p = Blank;
-                continue;
-            } else if (w > 0) {  // There has to be at least one character before the newline.
-                                 // Here's the ugly part, where we don't have any whitespace to
-                                 // punch in a newline, so we need to make room for it:
-                if (Delim)
-                    p = Delim + 1;  // Let's fall back to the most recent delimiter
-
-                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
-                /* int */ l = p - m_Text;
-                strncpy(s, m_Text, l);  // Dest, Source, Size
-                s[l] = '\n';            // Insert line break.
-                strcpy(s + l + 1, p);   // Dest, Source
-                free(m_Text);
-                m_Text = s;
-                p = m_Text + l;
-                continue;
-            }
-        }
-        w += cw;
-        if (strchr("-.,:;!?_", *p)) {  // Breaks '...'
-            Delim = p;
-            Blank = nullptr;
-        }
-        p += sl;
-    }  // for char
-    // uint32_t tick1 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
-}
-
-const char *cTextFloatingWrapper::Text(void) {
-    if (m_EoL) {
-        *m_EoL = '\n';
-        m_EoL = nullptr;
-    }
-    return m_Text;
-}
-
-const char *cTextFloatingWrapper::GetLine(int Line) {
-    char *s {nullptr};
-    if (Line < m_Lines) {
-        if (m_EoL) {
-            *m_EoL = '\n';
-            if (Line == m_LastLine + 1)
-                s = m_EoL + 1;
-            m_EoL = nullptr;
-        }
-        if (!s) {
-            s = m_Text;
-            for (int i {0}; i < Line; i++) {
-                s = strchr(s, '\n');
-                if (s)
-                    s++;
-                else
-                    break;
-            }
-        }
-        if (s) {
-            if ((m_EoL = strchr(s, '\n')) != NULL)
-                *m_EoL = 0;
-        }
-        m_LastLine = Line;
-    }
-    return s;
 }
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
@@ -325,6 +216,37 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     if (FrameSeen < 0.98) return "recording_seen_9";
 
     return "recording_seen_10";
+}
+
+void SetMediaSize(cSize &MediaSize, const cSize &TVSSize) {  // NOLINT
+    int MediaWidth = MediaSize.Width();
+    int MediaHeight = MediaSize.Height();
+    int Aspect = MediaWidth / MediaHeight;  // 5+ Banner, <1 Poster, 1+ Portrait
+    if (MediaHeight > TVSSize.Height() || MediaWidth > TVSSize.Width()) {  // Resize too big poster/banner
+        dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
+        //* Aspect is preserved in LoadFile()
+        if (Aspect < 1) {  //* Poster (For example 680x1000)
+            MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
+            dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
+            MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
+            dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        } else {  //* Banner (Usually 758x140)
+            MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
+            dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        }
+    } else {  // Normal sized image  //! Same code
+        if (Aspect < 1) {  //* Poster (For example 680x1000)
+            MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
+            dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
+            MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
+            dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        } else {  //* Banner (Usually 758x140)
+            MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
+            dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
+        }
+    }
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
@@ -586,4 +508,114 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
     return std::string();  // Empty string
+}
+
+// --- cTextFloatingWrapper --- // From skin ElchiHD
+// Based on VDR's cTextWrapper
+cTextFloatingWrapper::cTextFloatingWrapper(void) {
+}
+
+cTextFloatingWrapper::~cTextFloatingWrapper() {
+    free(m_Text);
+}
+
+void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
+    // uint32_t tick0 = GetMsTicks();  //! For testing
+
+    free(m_Text);
+    m_Text = Text ? strdup(Text) : nullptr;
+    if (!m_Text)
+        return;
+    m_Lines = 1;
+    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+        return;
+
+    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
+    int cw {0}, l {0}, sl {0}, w {0};
+    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
+    uint sym {0};
+    stripspace(m_Text);  // Strips trailing newlines
+
+    for (char *p = m_Text; *p;) {
+        /* int */ sl = Utf8CharLen(p);
+        /* uint */ sym = Utf8CharGet(p, sl);
+        if (sym == '\n') {
+            ++m_Lines;
+            if (m_Lines > UpperLines)
+                Width = WidthLower;
+            w = 0;
+            Blank = Delim = nullptr;
+            p++;
+            continue;
+        } else if (sl == 1 && isspace(sym)) {
+            Blank = p;
+        }
+        /* int */ cw = Font->Width(sym);
+        if (w + cw > Width) {
+            if (Blank) {
+                *Blank = '\n';
+                p = Blank;
+                continue;
+            } else if (w > 0) {  // There has to be at least one character before the newline.
+                                 // Here's the ugly part, where we don't have any whitespace to
+                                 // punch in a newline, so we need to make room for it:
+                if (Delim)
+                    p = Delim + 1;  // Let's fall back to the most recent delimiter
+
+                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* int */ l = p - m_Text;
+                strncpy(s, m_Text, l);  // Dest, Source, Size
+                s[l] = '\n';            // Insert line break.
+                strcpy(s + l + 1, p);   // Dest, Source
+                free(m_Text);
+                m_Text = s;
+                p = m_Text + l;
+                continue;
+            }
+        }
+        w += cw;
+        if (strchr("-.,:;!?_", *p)) {  // Breaks '...'
+            Delim = p;
+            Blank = nullptr;
+        }
+        p += sl;
+    }  // for char
+    // uint32_t tick1 = GetMsTicks();  //! For testing
+    // dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
+}
+
+const char *cTextFloatingWrapper::Text(void) {
+    if (m_EoL) {
+        *m_EoL = '\n';
+        m_EoL = nullptr;
+    }
+    return m_Text;
+}
+
+const char *cTextFloatingWrapper::GetLine(int Line) {
+    char *s {nullptr};
+    if (Line < m_Lines) {
+        if (m_EoL) {
+            *m_EoL = '\n';
+            if (Line == m_LastLine + 1)
+                s = m_EoL + 1;
+            m_EoL = nullptr;
+        }
+        if (!s) {
+            s = m_Text;
+            for (int i {0}; i < Line; i++) {
+                s = strchr(s, '\n');
+                if (s)
+                    s++;
+                else
+                    break;
+            }
+        }
+        if (s) {
+            if ((m_EoL = strchr(s, '\n')) != NULL)
+                *m_EoL = 0;
+        }
+        m_LastLine = Line;
+    }
+    return s;
 }

@@ -39,9 +39,9 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     // if (!m_Osd) return;
 
     m_Osd->DestroyPixmap(Pixmap);
-    Pixmap = NULL;
+    Pixmap = nullptr;
     m_Osd->DestroyPixmap(PixmapImage);
-    PixmapImage = NULL;
+    PixmapImage = nullptr;
 
     cRect PositionDraw;
     PositionDraw.SetPoint(0, 0);

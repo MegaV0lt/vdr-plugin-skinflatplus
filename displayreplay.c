@@ -327,7 +327,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         IsCutted = GetCuttedLengthMarks(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
 
         cString MediaPath("");
-        int MediaWidth {0}, MediaHeight {0};
+        cSize MediaSize {0, 0};  // Width, Height
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
@@ -358,8 +358,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         std::size_t number = distribution(generator);
 
                         MediaPath = series.banners[number].path.c_str();
-                        MediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
-                        MediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
+                        MediaSize.Set(series.banners[number].width, series.banners[number].height);
                         if (series.banners.size() > 1)
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
                                     static_cast<int>(number + 1), *MediaPath,
@@ -371,8 +370,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
                     MediaPath = movie.poster.path.c_str();
-                    MediaWidth = movie.poster.width * Config.TVScraperReplayInfoPosterSize * 100;
-                    MediaHeight = movie.poster.height * Config.TVScraperReplayInfoPosterSize * 100;
+                    MediaSize.Set(movie.poster.width, movie.poster.height);
                 }
             }
         }
@@ -380,19 +378,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         PixmapFill(ChanEpgImagesPixmap, clrTransparent);
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
-            if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
-                dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-                MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;  // Max 70% of pixmap height
-                if (Config.ChannelWeatherShow)
-                    // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
-                else
-                    // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;
-
-                dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
-            }
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            SetMediaSize(MediaSize, cSize(m_TVSWidth, m_TVSHeight));  // Check for too big images
+            MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
+            MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
+            img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 

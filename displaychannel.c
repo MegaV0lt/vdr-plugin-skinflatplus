@@ -45,7 +45,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     m_TVSHeight = m_OsdHeight - m_TopBarHeight - HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2,
+                                       cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     ChanLogoBGPixmap =
@@ -363,7 +364,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         if (IsRec) {
-            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, m_FontHeight + m_FontSmlHeight),
+            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth,
+                                                  m_FontHeight + m_FontSmlHeight),
                                            "REC", Theme.Color(clrChannelRecordingFollowFg),
                                            Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
         }
@@ -373,7 +375,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         ChannelIconsDraw(m_CurChannel, false);
 
     cString MediaPath("");
-    int MediaWidth {0}, MediaHeight {0};
+    cSize MediaSize {0, 0};  // Width, Height
 
     static cPlugin *pScraper = GetScraperPlugin();
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
@@ -382,12 +384,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         call.recording = NULL;
         if (pScraper->Service("GetPosterBannerV2", &call)) {
             if ((call.type == tSeries) && call.banner.path.size() > 0) {
-                MediaWidth = call.banner.width * Config.TVScraperChanInfoPosterSize * 100;
-                MediaHeight = call.banner.height * Config.TVScraperChanInfoPosterSize * 100;
+                MediaSize.Set(call.banner.width, call.banner.height);
                 MediaPath = call.banner.path.c_str();
             } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                MediaWidth = call.poster.width * Config.TVScraperChanInfoPosterSize * 100;
-                MediaHeight = call.poster.height * Config.TVScraperChanInfoPosterSize * 100;
+                MediaSize.Set(call.poster.width, call.poster.height);
                 MediaPath = call.poster.path.c_str();
             }
         }
@@ -396,19 +396,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderTVSPoster);
     if (!isempty(*MediaPath)) {
-        if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
-            dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-            MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperChanInfoPosterSize * 100;  // Max 70% of pixmap height
-            if (Config.ChannelWeatherShow)
-                // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperChanInfoPosterSize * 100;
-            else
-                // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperChanInfoPosterSize * 100;
-
-            dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
-        }
-        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+        SetMediaSize(MediaSize, cSize(m_TVSWidth, m_TVSHeight));  // Check for too big images
+        MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperChanInfoPosterSize * 100);
+        MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperChanInfoPosterSize * 100);
+        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
         if (img) {
             ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -439,7 +430,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
     int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
-    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2) - m_MarginItem;
+    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
+                    - m_MarginItem;
     int left = m_MarginItem * 2;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
