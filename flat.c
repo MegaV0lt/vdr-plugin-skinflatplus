@@ -19,7 +19,6 @@
 
 
 #include "./services/epgsearch.h"
-#include "flat.h"
 
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
@@ -189,7 +188,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 cString GetRecordingerrorIcon(int RecInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
     if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
     if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
@@ -224,7 +223,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &TVSSize) {  // NOLINT
     int Aspect = MediaWidth / MediaHeight;  // <1 = Poster, >1 = Portrait, >5 = Banner
     if (MediaHeight > TVSSize.Height() || MediaWidth > TVSSize.Width())  // Too big poster/banner
         dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-        
+
     //* Aspect is preserved in LoadFile()
     if (Aspect < 1) {  //* Poster (For example 680x1000)
         MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
@@ -320,7 +319,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     if (InfoLine) {
         if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) ||
              !Pattern.empty())
-            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show infoline
+            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show info line
     }
 
     if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
@@ -344,7 +343,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
 }
 
-int GetEpgsearchConflichts(void) {
+int GetEpgsearchConflicts(void) {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {

@@ -148,7 +148,6 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     }
 
     cRect ImagePos(TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height());
-
     AddImage(image, ImagePos);
 }
 

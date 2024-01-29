@@ -383,7 +383,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int MiddleWidth {0}, NumConflicts {0};
         cImage *ImgCon {nullptr}, *ImgRec {nullptr};
         if (Config.TopBarRecConflictsShow) {
-            NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
+            NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
                     ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", m_TopBarFontHeight - m_MarginItem * 2,

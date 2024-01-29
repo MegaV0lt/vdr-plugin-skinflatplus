@@ -164,7 +164,7 @@ eOSState cFlatSetup::ProcessKey(eKeys Key) {
             if (strcmp(ItemText, tr("Tracks settings")) == 0)
                 state = AddSubMenu(new cFlatSetupTracks(&SetupConfig));
             if (strcmp(ItemText, tr("TVScraper / scraper2vdr settings")) == 0)
-                state = AddSubMenu(new cFlatSetupTvsraper(&SetupConfig));
+                state = AddSubMenu(new cFlatSetupTVScraper(&SetupConfig));
             if (strcmp(ItemText, tr("Main menu widgets settings")) == 0)
                 state = AddSubMenu(new cFlatSetupMMWidget(&SetupConfig));
         }
@@ -1285,11 +1285,11 @@ eOSState cFlatSetupTracks::ProcessKey(eKeys Key) {
 }
 
 // TVScraper Settings
-cFlatSetupTvsraper::cFlatSetupTvsraper(cFlatConfig* data) : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
+cFlatSetupTVScraper::cFlatSetupTVScraper(cFlatConfig* data) : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
     Setup();
 }
 
-void cFlatSetupTvsraper::Setup(void) {
+void cFlatSetupTVScraper::Setup(void) {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Channelinfo show poster?"), &SetupConfig->TVScraperChanInfoShowPoster));
@@ -1311,7 +1311,7 @@ void cFlatSetupTvsraper::Setup(void) {
     Display();
 }
 
-eOSState cFlatSetupTvsraper::ProcessKey(eKeys Key) {
+eOSState cFlatSetupTVScraper::ProcessKey(eKeys Key) {
     eOSState state = cOsdMenu::ProcessKey(Key);
     if (state == osUnknown) {
         switch (Key) {

@@ -15,7 +15,6 @@
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  private:
-        // bool m_DoOutput;
         const cEvent *m_Present {nullptr};
 
         int m_ChannelWidth {0}, m_ChannelHeight {0};
@@ -44,7 +43,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         // TextScroller
         cTextScrollers Scrollers;
 
-        // bool IsRecording;  / Unused?
+        // bool IsRecording;  // Unused?
         bool m_IsRadioChannel = false;
         bool m_IsGroup = false;
 

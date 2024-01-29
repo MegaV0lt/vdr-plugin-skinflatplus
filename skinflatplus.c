@@ -78,7 +78,7 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 
 __attribute__((constructor)) static void init(void) {
 #ifndef IMAGEMAGICK
-    // From skinnopacity: Prevents *magick from occupying segfaults
+    // From skin nopacity: Prevents *magick from occupying segfaults
     MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
 #else
     Magick::InitializeMagick(NULL);

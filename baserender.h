@@ -49,7 +49,7 @@ class cFlatBaseRender {
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
 
-        // Font for mainmenu weatherwidget
+        // Font for main menu weather widget
         cFont *m_FontTempSml {nullptr};
 
         // TopBar

@@ -120,7 +120,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
-                       int NumActors);  // Add Actors to compexcontent
+                       int NumActors);  // Add Actors to complexcontent
         void DrawMainMenuWidgets(void);
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);
@@ -128,7 +128,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop);
-        int DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int ContentTop);
+        int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
 

@@ -2567,7 +2567,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         NumActors = ActorsPath.size();
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0) {
-            //* Add actors to compexcontent for later displaying
+            //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
@@ -3279,7 +3279,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         NumActors = ActorsPath.size();
         if (Config.TVScraperRecInfoShowActors && NumActors > 0) {
-            //* Add actors to compexcontent for later displaying
+            //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
@@ -3364,7 +3364,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long short text
     if (ShortTextWidth > MaxWidth) {  // Short text too long
-        if (Config.ScrollerEnable) {  // TODO: Maxwidth too small
+        if (Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(*ShortText,
                                          cRect(m_chLeft + left, m_chTop + m_MarginItem + m_FontSmlHeight + m_FontHeight,
                                                MaxWidth, m_FontSmlHeight),
@@ -3738,7 +3738,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
         case 0x01: return "News_Weather Report";
         case 0x02: return "News Magazine";
         case 0x03: return "Documentary";
-        case 0x04: return "Discussion_Inverview_Debate";
+        case 0x04: return "Discussion_Interview_Debate";
         default: return "News_Current Affairs";
         }
         break;
@@ -3784,7 +3784,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
         case 0x00: return "Music_Ballet_Dance";
         case 0x01: return "Rock_Pop";
         case 0x02: return "Serious_Classical Music";
-        case 0x03: return "Folk_Tradional Music";
+        case 0x03: return "Folk_Traditional Music";
         case 0x04: return "Jazz";
         case 0x05: return "Musical_Opera";
         case 0x06: return "Ballet";
@@ -3801,7 +3801,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
         case 0x05: return "Literature";
         case 0x06: return "Film_Cinema";
         case 0x07: return "Experimental Film_Video";
-        case 0x08: return "Broadcastinm_Press";
+        case 0x08: return "Broadcasting_Press";
         case 0x09: return "New Media";
         case 0x0A: return "Arts_Culture Magazine";
         case 0x0B: return "Fashion";
@@ -3928,7 +3928,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
             if (AddHeight > 0)
                 ContentTop = AddHeight + m_MarginItem;
         } else if (widget.compare("temperatures") == 0) {
-            AddHeight = DrawMainMenuWidgetTemperaturs(wLeft, wWidth, ContentTop);
+            AddHeight = DrawMainMenuWidgetTemperatures(wLeft, wWidth, ContentTop);
             if (AddHeight > 0)
                 ContentTop = AddHeight + m_MarginItem;
         } else if (widget.compare("timer_conflicts") == 0) {
@@ -4345,7 +4345,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    int NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
+    int NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
     if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty) {
         return 0;
     } else if (NumConflicts == 0) {
@@ -4384,7 +4384,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at leat 64 entry's
+    files.reserve(64);  // Set to at least 64 entry's
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
@@ -4733,7 +4733,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop) {
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
