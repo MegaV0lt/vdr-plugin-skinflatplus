@@ -1893,16 +1893,18 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
-            IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
-            if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
-                img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
-                    if (img) {
-                        // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
-                        int ImageTop = Top + m_FontHeight - m_FontAscender;
-                        int ImageLeft = Left + m_FontHeight - img->Width();
-                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                    }
+            if (Config.MenuItemRecordingShowFormatIcons) {
+                IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+                if (!isempty(*IconName)) {
+                    int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
+                    img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
+                        if (img) {
+                            // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
+                            int ImageTop = Top + m_FontHeight - m_FontAscender;
+                            int ImageLeft = Left + m_FontHeight - img->Width();
+                            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                        }
+                }
             }
 
             Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
@@ -2086,16 +2088,18 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
-            IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
-            if (!isempty(*IconName)) {
-                int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
-                img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
-                    if (img) {
-                        // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
-                        int ImageTop = Top + m_FontHeight - m_FontAscender;
-                        int ImageLeft = Left + m_FontHeight - img->Width();
-                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                    }
+            if (Config.MenuItemRecordingShowFormatIcons) {
+                IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+                if (!isempty(*IconName)) {
+                    int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
+                    img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
+                        if (img) {
+                            // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
+                            int ImageTop = Top + m_FontHeight - m_FontAscender;
+                            int ImageLeft = Left + m_FontHeight - img->Width();
+                            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                        }
+                }
             }
 
             Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999

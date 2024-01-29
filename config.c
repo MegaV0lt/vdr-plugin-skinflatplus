@@ -83,6 +83,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingShowFolderDate = 1;
     MenuItemRecordingShowRecordingErrors = true;
     MenuItemRecordingShowRecordingErrorsThreshold = 1000;  // Threshold for displaying error instead of warning
+    MenuItemRecordingShowFormatIcons = 1;  // Show foramt icans (sd/hd/uhd) in menu recordings
     MenuItemParseTilde = 1;
 
     RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
@@ -363,6 +364,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     MenuItemRecordingShowFormatIcons = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   MenuTimerShowCount = atoi(Value);

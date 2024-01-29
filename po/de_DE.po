@@ -661,6 +661,9 @@ msgstr "Aufnahmen: Vorgabewert alter Ordner in Tagen"
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
+msgid "Recording menu show format icon"
+msgstr "Aufnahmen: Zeige Formatsymbole (sd/hd/uhd)"
+
 msgid "Show recerrors icon in playback"
 msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
 

@@ -275,6 +275,8 @@ class cFlatConfig {
         int PlaybackShowRecordingErrors;
         int PlaybackShowRecordingDate;
         int MenuItemRecordingShowRecordingErrorsThreshold;
+        int MenuItemRecordingShowFormatIcons;  // Show format icons (sd/hd/uhd) in menu recordings
+
 
         // Text scroller
         int ScrollerEnable;
