@@ -10,7 +10,7 @@ API_KEY=''                              # https://openweathermap.org/price
 LOCATION='Frankfurt am Main'            # Wird im Skin angezeigt
 LATITUDE='50.110924'                    # https://www.latlong.net/
 LONGITUDE='8.682127'
-_LANG='de_DE.UTF-8' ; L="${_LANG%%_*}"  # Sprache
-UNITS='metric'                          # Einheit (standard [°K], metric [°C], imperial [°F])
+_LANG='de_DE.UTF-8'                     # Sprache
+UNITS='metric'                          # Einheit (Standard [°K], Metric [°C], Imperial [°F])
 
 FORECAST_DAYS=7                         # Anzahl der Tage für die Vorschau (Max. 7)
