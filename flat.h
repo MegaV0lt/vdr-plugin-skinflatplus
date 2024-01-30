@@ -286,7 +286,7 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     /* return */  // LeftTrim(RightTrim(s, t), t);
 }
 
-void SetMediaSize(cSize &MediaSize, const cSize &TVSSize);  // NOLINT
+void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT

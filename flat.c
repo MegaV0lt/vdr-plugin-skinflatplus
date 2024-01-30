@@ -217,22 +217,17 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     return "recording_seen_10";
 }
 
-void SetMediaSize(cSize &MediaSize, const cSize &TVSSize) {  // NOLINT
-    // int MediaWidth = MediaSize.Width();
-    // int MediaHeight = MediaSize.Height();
+void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                                                        // NOLINT
     int Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
-    /* if (MediaHeight > TVSSize.Height() || MediaWidth > TVSSize.Width())  // Too big poster/banner
-        dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight); */
-
-    //* Aspect is preserved in LoadFile()
-    if (Aspect < 1) {  //* Poster (For example 680x1000)
-        MediaSize.SetHeight(TVSSize.Height() * 0.7);  // Max 70% of pixmap height
+    //* Aspect of image is preserved in LoadFile()
+    if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
+        MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
         // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else if (/*Aspect >= 1 &&*/ Aspect < 5) {  //* Portrait (For example 1920x1080)
-        MediaSize.SetWidth(TVSSize.Width() / 3);  // Max 33% of pixmap width
+    } else if (/*Aspect >= 1 &&*/ Aspect < 4) {           //* Portrait (For example 1920x1080 = 1.77)
+        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 33% of pixmap width
         // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else {  //* Banner (Usually 758x140)
-        MediaSize.SetWidth(TVSSize.Width() / 2.53);  // To get 758 with @ 1920
+    } else {                                              //* Banner (Usually 758x140 = 5.41)
+        MediaSize.SetWidth(ContentSize.Width() / 2.53);   // To get 758 with @ 1920
         // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
     }
 }
@@ -508,8 +503,6 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    // uint32_t tick0 = GetMsTicks();  //! For testing
-
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
     if (!m_Text)
@@ -523,6 +516,9 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     int Width = UpperLines > 0 ? WidthUpper : WidthLower;
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
+
+    const char *ThreeDots {"..."}, *CompactDots {"…"};
+    strreplace(m_Text, ThreeDots, CompactDots);  // Try to fix wrong line break in '...'
 
     for (char *p = m_Text; *p;) {
         /* int */ sl = Utf8CharLen(p);
@@ -562,14 +558,12 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr("-.,:;!?_", *p)) {  // Breaks '...'
+        if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
             Delim = p;
             Blank = nullptr;
         }
         p += sl;
     }  // for char
-    // uint32_t tick1 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
 }
 
 const char *cTextFloatingWrapper::Text(void) {
