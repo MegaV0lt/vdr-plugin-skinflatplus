@@ -9,6 +9,7 @@ VDR Plugin 'skin flatPlus' Revision History
  - [update] Merge SetMediaSize()
  - [update] *.po files now in 'UTF-8'
  - [update] Cache 'FontAscender' in 'displaymenu.c'
+ - [update] Update weather script and config
  - [update] Some internal optimizations
 
 2024-01-23: Version 1.0.0

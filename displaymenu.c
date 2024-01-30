@@ -1100,7 +1100,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
-    // TODO: Make overlay configurable (disable)
+    //? Make overlay configurable? (disable)
     if (Timer->Remote()) {  // Remote timer
         img = ImgLoader.LoadIcon("timerRemote", ImageHeight, ImageHeight);
         if (img) {
@@ -1153,7 +1153,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
-            /* } else if (Channel->GroupSep()) {  // TODO: Is GroupSep() in SetItemTimer possible?
+            /* } else if (Channel->GroupSep()) {  //? Is GroupSep() in SetItemTimer() possible/needed?
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1176,9 +1176,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageBgWidth + m_MarginItem * 2;
 
     cString day(""), name("");
-    if (Timer->WeekDays())
+    if (Timer->WeekDays()) {
         day = Timer->PrintDay(0, Timer->WeekDays(), false);
-    else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
+    } else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
         day = itoa(Timer->GetMDay(Timer->Day()));
         name = WeekDayName(Timer->Day());
     } else {
@@ -1225,9 +1225,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
                     MenuPixmap->DrawText(cPoint(Left + l, Top), second.c_str(), ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - l - m_MarginItem);
-                } else  // ~ not found
+                } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top), File, ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
+                }
             } else {  // MenuItemParseTilde disabled
                 MenuPixmap->DrawText(cPoint(Left, Top), File, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
@@ -1242,7 +1243,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         if (Current && m_FontSml->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(File,
                                          cRect(Left, Top + m_FontHeight + m_MenuTop,  // TODO: Mismatch when scrolling
-                                               m_MenuItemWidth - Left - m_MarginItem /*- m_ScrollBarWidth*/,
+                                               m_MenuItemWidth - Left - m_MarginItem - m_ScrollBarWidth,
                                                m_FontSmlHeight),
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
@@ -1260,9 +1261,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                     int l = m_FontSml->Width(first.c_str()) + m_FontSml->Width('X');
                     MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.c_str(), ColorExtraTextFg,
                                          ColorBg, m_FontSml, m_MenuItemWidth - Left - l - m_MarginItem);
-                } else  // ~ not found
+                } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), File, ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
+                }
             } else {  // MenuItemParseTilde disabled
                 MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), File, ColorFg, ColorBg, m_FontSml,
                                      m_MenuItemWidth - Left - m_MarginItem);
@@ -2822,7 +2824,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
     }  // TVScraperRecInfoShowPoster
 
-    if (isempty(*MediaPath)) {  // TODO: Prio for manual poster or tvscraper?
+    if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         cString RecPath = cString::sprintf("%s", Recording->FileName());
         cString RecImage("");
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
@@ -3207,7 +3209,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 }
             }  // Scraper plugin
 
-            if (isempty(*MediaPath)) {  // TODO: Prio for manual poster or tvscraper?
+            if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 cString RecPath = cString::sprintf("%s", Recording->FileName());
                 cString RecImage("");
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
@@ -3229,6 +3231,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
         }
         if (!isempty(*MediaPath)) {
+            int Aspect = MediaWidth / MediaHeight;  // 50% x 100% of content size
+            //* Make portrait smaller then poster or banner to prevent wasting of spece
+            if (Aspect >= 1 && Aspect < 5) {  //* Portrait (For example 1920x1080)
+                MediaWidth *= (1.0 / 3.0 * 2);  // Size * 0,666 = 1/3
+                MediaHeight *= (1.0 / 3.0 *2);
+            }
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
