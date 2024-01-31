@@ -2,7 +2,8 @@ VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
 2024-xx-xx: Version 1.0.1
  - [fix] Fix scrollbar in timer short view
- - [add] Add configurable transparency for poster in replay- and channelinfo
+ - [fix] Try to fix wrong line breaks in '...'
+ - [add] Add configurable transparency for poster in replay- and channel info
  - [add] Add option to disable display of format icon in menu recordings
  - [update] Use '≈' for almost equal
  - [update] Use 'Ø' for average
@@ -13,9 +14,9 @@ VDR Plugin 'skin flatPlus' Revision History
  - [update] Some internal optimizations
 
 2024-01-23: Version 1.0.0
-- [add] Add framedata to recordinginfo. Need VDR >= 2.6.5
+- [add] Add frame data to recording info. Need VDR >= 2.6.5
 - [add] Option to limit maximum actors to display
-- [add] Add formatsymbols (sd/hd/uhd) to recordinglist
+- [add] Add format symbols (sd/hd/uhd) to recording list
 - [update] VDR >= 2.3.8 is needed now. For older version please use
            Skin flatPlus 0.8.4
 - [update] Show a '!' when an error occurred detecting file size
@@ -43,24 +44,24 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2023-11-25: Version 0.8.2
 - [fix] Fix horizontal position scrolling message text
-- [add] Add support for native channel logonames
-- [update] Diplay ts errors using local locale
+- [add] Add support for native channel logo names
+- [update] Display ts errors using local locale
 - [update] Use TVScraperInfoPosterSize also for too big images
 - [update] Bigger images for genre/fsk
 - [update] Some internal optimizations
 
 2023-11-20: Version 0.8.1
-- [update] Refine logmessages
+- [update] Refine log messages
 - [update] Speed up loading epg info and images
 - [update] Merge InsertComponents()
 - [update] Some internal optimizations
 
 2023-11-08: Version 0.8.0
-- [fix] Better display of channelicons (Resolution, ...)
-- [add] Option to show shorttext without date in playback
+- [fix] Better display of channel icons (Resolution, ...)
+- [add] Option to show short text without date in playback
 - [update] Tweak toLowerCase(). Preloading time of images reduced by ~15%
-            Before: Imagecache pre load images time: 425 ms
-            After: Imagecache pre load images time: 361 ms
+            Before: Image cache pre load images time: 425 ms
+            After: Image cache pre load images time: 361 ms
 - [update] Some internal optimizations
 
 2023-11-01: Version 0.7.9
@@ -70,11 +71,11 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Some internal optimizations
 
 2023-10-31: Version 0.7.8
- - [fix] Fix display of channelnumber in eventview (epgSearch)
+ - [fix] Fix display of channel number in event view (epgSearch)
 
 2023-10-30: Version 0.7.7
 - [update] Log when more then 10 Lines of actor images fond
-- [update] Min with for channelnumber: 3
+- [update] Min with for channel number: 3
 - [update] Try to fix invalid lock sequence with scraper2vdr - Program
 - [update] Remove extra '/' in LoadLogo
 - [update] Some internal optimizations
@@ -88,10 +89,10 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2023-10-16: Version 0.7.5
 - [update] Prevents *magick from occupying segfaults
-- [update] Use original postersize in replay and channelinfo
+- [update] Use original poster size in replay and channel info
 - [update] Minor changes to de_DE.po
-- [add] Resize too big poster/banner in replay and channelinfo
-- [add] Translate tvscrapers 'reason' in extrarecordinginfo
+- [add] Resize too big poster/banner in replay and channel info
+- [add] Translate tvscrapers 'reason' in extra recording info
 - [add] Show random banner. Not working!
 
 2023-10-02: Version 0.7.4
@@ -100,14 +101,14 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Some internal optimizations
 
 2023-10-02: Version 0.7.3
-- [Add] Cut very long shorttext in replay, recording- and event info
+- [Add] Cut very long short text in replay, recording- and event info
 - [update] Removed unused icons text_new*
 - [update] Remove unused icon text_timer_partial*
 - [update] Replace icons text_rec_* with timerRecording_*
 - [update] Use time(NULL)
 - [update] Remove 'using namespace std'
 - [update] Remove double var progressTop
-- [update] Preincrement var 'it'
+- [update] Pre increment var 'it'
 
 2023-09-26: Version 0.7.2
 - [fix] Fix display of cuttet length in replay
@@ -115,42 +116,42 @@ VDR Plugin 'skin flatPlus' Revision History
 2023-09-25: Version 0.7.1
 - [add] New symbol 'Applikationen' (MenuOrg)
 - [add] Show if recording is still recording
-         or is replayed in menu and replaystatus
+         or is replayed in menu and replay status
 - [update] Eliminate some c-style casts
 - [update] Replace some long with int32_t, etc.
 - [update] Initialize some vars
 - [update] Use localtime_r instead of localtime
-- [update] Preincrement instead of postincrement
-- [update] Remove some temporary returnvariables
+- [update] Pre increment instead of post increment
+- [update] Remove some temporary return variables
 
 2023-09-15: Version 0.7.0
 - [fix] Fix wrongly named variables
 - [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
-- [add] Add some dooutput checks
+- [add] Add some 'dooutput' checks
 - [add] Add PixmapFill with null check
-- [add] Log unknown cardsystem
+- [add] Log unknown card system
 - [update] Simplify GetAspectIcon and GetFormatIcon
-- [update] Add more debug to CreatPixmap
+- [update] Add more debug to CreatePixmap
 - [update] Add pixmap names
-- [update] Simplyfy display of crypted/uncrypted
+- [update] Simplify display of crypted/uncrypted
 - [update] Merge ShowRecordingErrors
-- [update] Disable textscroller logging
+- [update] Disable text scroller logging
 - [update] Simplify display of radio/tv and SetMessage
 
 2023-09-12: Version 0.6.9
 - [update] Reformat some code
 - [update] Use CreatePixmap() instead of osd->CreatePixmap()
-- [update] Simplify check for EPGsearch searchtimermenu
+- [update] Simplify check for EPGsearch search timer menu
 - [update] Add parameter for Get...Icon()
 - [update] Move PlaybackShowRecordingErrors to playback menu
 - [update] Add space between Date and time in status
-- [update] Rearange replay statustext for recordingerror icon at end
-- [add] Add recordingerror icon to recording info header
+- [update] Rearrange replay status text for recording error icon at end
+- [add] Add recording error icon to recording info header
 
 2023-09-04: Version 0.6.8
-- [add] Add option to disable recerroricons in replay
+- [add] Add option to disable recerror icons in replay
 - [remove] Prevents *magick from occupying the segfaults (From SkinNopacity)
-- [update] Centralize getting iconnames of format and aspect
+- [update] Centralize getting icon names of format and aspect
 - [update] Centralize call of pscraper plugin (From Skinnopacity)
 
 2023-08-24: Version 0.6.7
@@ -159,21 +160,21 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Update scraper2vdr.h
 
 2023-08-17: Version 0.6.6
-- [fix] mixed icon and text in epgsearch searchtimer menü
+- [fix] mixed icon and text in epgsearch search timer menü
 - [fix] increased version to 0.6.5 in code
 - [fix] fix nullptr. after restart of vdr and hitting key menu
           Thanks to MarkusE @ VDR_Portal for reporting
-- [add] show recordingerroricons also during replay
+- [add] show recording error icons also during replay
 - [remove] delete obsolete genre icons
 - [update] update_weather.sh small tweaks
 
 2023-07-31: Version 0.6.5
 - [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]
           Thanks to wirbel @ VDR-Portal and FireFly @ VDR-Portal
-- [fix] Reenable icons in epgSearch's searchtimer menu
+- [fix] Reenable icons in epgSearch's search timer menu
 - [add] Add font 'Droid Sans' in /contrib
 - [add] Add 'eventsview-MV.sql' in /contrib
-- [add] Add overlayicon for remote timer
+- [add] Add overlay icon for remote timer
 . [add] New 'MV_rect_mid' and 'MV_rect_big' decor settings
 - [update] Move 'tpmfiles.d' to 'contrib'
 - [update] Change 'Schauspieler' to 'Darsteller'

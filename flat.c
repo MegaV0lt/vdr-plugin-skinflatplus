@@ -223,11 +223,11 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                 
     if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
         // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else if (/*Aspect >= 1 &&*/ Aspect < 4) {           //* Portrait (For example 1920x1080 = 1.77)
+    } else if (Aspect < 4) {                              //* Portrait (For example 1920x1080 = 1.77)
         MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 33% of pixmap width
         // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
     } else {                                              //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(ContentSize.Width() / 2.53);   // To get 758 with @ 1920
+        MediaSize.SetWidth(ContentSize.Width() / 2.53);   // To get 758 width @ 1920
         // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
     }
 }

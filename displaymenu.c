@@ -3231,15 +3231,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
         }
         if (!isempty(*MediaPath)) {
-            int Aspect = MediaWidth / MediaHeight;  // 50% x 100% of content size
-            //* Make portrait smaller then poster or banner to prevent wasting of spece
-            if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
-                dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 1/3 size.",
-                         MediaWidth, MediaHeight, Aspect);
-                MediaWidth *= (1.0 / 3.0 * 2);  // Size * 0,666 = 1/3
-                MediaHeight *= (1.0 / 3.0 * 2);
-            }
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+
+            //* Make portrait smaller than poster or banner to prevent wasting of space
+            if (img) {
+                int Aspect = img->Width() / img->Height();  // 50% x 100% of content size
+                if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
+                    // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
+                    //         img->Width(), img->Height(), Aspect);
+                    MediaHeight *= (1.0 / 3.0 * 2);  // Size * 0,666 = 2/3
+                    img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
+                }
+            }
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,

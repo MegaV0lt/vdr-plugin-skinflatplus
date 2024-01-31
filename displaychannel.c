@@ -483,7 +483,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
 /*
     dsyslog("flatPlus: caid: %d", ecmInfo.caid);
-    dsyslog("flatPlus: cardsystem: %s", *ecmInfo.cardsystem);
+    dsyslog("flatPlus: card system: %s", *ecmInfo.cardsystem);
     dsyslog("flatPlus: reader: %s", *ecmInfo.reader);
     dsyslog("flatPlus: from: %s", *ecmInfo.from);
     dsyslog("flatPlus: protocol: %s", *ecmInfo.protocol);
@@ -516,7 +516,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left += img->Width() + m_MarginItem;
         }
-        dsyslog("flatPlus: Unknown cardsystem: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
+        dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
 
     DvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
@@ -571,7 +571,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
          Channel = Channels->Next(Channel)) {
-        if (!Channel->GroupSep()) {  // Don't cache named channelgroup logo
+        if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)
                 ++index;
