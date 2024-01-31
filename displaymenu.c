@@ -3235,7 +3235,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
-                int Aspect = img->Width() / img->Height();  // 50% x 100% of content size
+                int Aspect = img->Width() / img->Height();
                 if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
@@ -4927,6 +4927,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     //* Declared in 'baserender.h'
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+    int FontTempSmlHeight = m_FontTempSml->Height();
 
     cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem * 2);
     if (img)
@@ -4994,7 +4995,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         tm_r.tm_mday += index;
         /* time_t */ t2 = mktime(&tm_r);
 
-        int FontTempSmlHeight = m_FontTempSml->Height();
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
             if (left + m_FontHeight * 2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
                     m_MarginItem * 6 >
