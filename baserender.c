@@ -202,14 +202,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
         if (Config.DiskUsageShort == false) {     // Long format
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                Extra2 = cString::sprintf("%.1f GB ~%02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
+                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, FreeMinutes / 60, FreeMinutes % 60);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeMinutes / 60,
                                           FreeMinutes % 60);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
-            Extra2 = cString::sprintf("~%02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
+            Extra2 = cString::sprintf("≈ %02d:%02d", FreeMinutes / 60, FreeMinutes % 60);
         }
         switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
@@ -252,14 +252,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
             if (OccupiedGB < 1000.0) {  // Less than 1000 GB
                 Extra2 =
-                    cString::sprintf("%.1f GB ~%02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
+                    cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedMinutes / 60, OccupiedMinutes % 60);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ~%02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedMinutes / 60,
                                           OccupiedMinutes % 60);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-            Extra2 = cString::sprintf("~%02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
+            Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedMinutes / 60, OccupiedMinutes % 60);
         }
         switch (DiskUsagePercent) {  // show used space
         case 0 ... 3: IconName = "chart1"; break;  // 3,125
@@ -383,7 +383,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         int MiddleWidth {0}, NumConflicts {0};
         cImage *ImgCon {nullptr}, *ImgRec {nullptr};
         if (Config.TopBarRecConflictsShow) {
-            NumConflicts = GetEpgsearchConflichts();  // Get conflicts from plugin Epgsearch
+            NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
                     ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", m_TopBarFontHeight - m_MarginItem * 2,
@@ -1799,8 +1799,8 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, PrecToday);
-        std::replace(PrecToday.begin(), PrecToday.end(), '.', ',');
         file.close();
+        std::replace(PrecToday.begin(), PrecToday.end(), '.', ',');
         p = atof(PrecToday.c_str()) * 100.0f;
         p = RoundUp(p, 10);
         PrecToday = cString::sprintf("%.0f%%", p);
@@ -1810,8 +1810,8 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, PrecTomorrow);
-        std::replace(PrecTomorrow.begin(), PrecTomorrow.end(), '.', ',');
         file.close();
+        std::replace(PrecTomorrow.begin(), PrecTomorrow.end(), '.', ',');
         p = atof(PrecTomorrow.c_str()) * 100.0f;
         p = RoundUp(p, 10);
         PrecTomorrow = cString::sprintf("%.0f%%", p);

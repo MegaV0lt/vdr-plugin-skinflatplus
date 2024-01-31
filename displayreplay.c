@@ -79,7 +79,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(RecInfo->Title());
 
     // Show if still recording
-    int left = m_MarginItem;  // Position for recordingsymbol/shorttext/date
+    int left = m_MarginItem;  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((m_Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
@@ -98,7 +98,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                     *TimeString(m_Recording->Start()), RecInfo->ShortText());
         else
             InfoText = cString::sprintf("%s", RecInfo->ShortText());
-    } else {  // No shorttext
+    } else {  // No short text
         InfoText = cString::sprintf("%s  %s", *ShortDateString(m_Recording->Start()),
                                     *TimeString(m_Recording->Start()));
     }
@@ -106,7 +106,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     int InfoWidth = m_FontSml->Width(*InfoText);  // Width of infotext
     // TODO: How to get width of aspect and format icons?
     //  Done: Substract 'left' in case of displayed recording icon
-    //  Done: Substract 'm_FontSmlHeight' in case of recordingerror icon is displayed later
+    //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
     //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
 
@@ -128,7 +128,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                         Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
             left += MaxWidth;
         } else {  // Add ... if info ist too long
-            dsyslog("flatPlus: Shorttext too long! (%d) Setting MaxWidth to %d", InfoWidth, MaxWidth);
+            dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", InfoWidth, MaxWidth);
             int DotsWidth = m_FontSml->Width("...");
             LabelPixmap->DrawText(cPoint(left, m_FontHeight), *InfoText, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_FontSml, MaxWidth - DotsWidth);
@@ -137,7 +137,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
                                   Theme.Color(clrReplayBg), m_FontSml, DotsWidth);
             left += DotsWidth;
         }
-    } else {  // Shorttext fits into maxwidth
+    } else {  // Short text fits into maxwidth
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *InfoText, Theme.Color(clrReplayFont),
                                      Theme.Color(clrReplayBg), m_FontSml, InfoWidth);
         left += InfoWidth;
@@ -327,7 +327,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         IsCutted = GetCuttedLengthMarks(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
 
         cString MediaPath("");
-        int MediaWidth {0}, MediaHeight {0};
+        cSize MediaSize {0, 0};  // Width, Height
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
@@ -358,8 +358,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         std::size_t number = distribution(generator);
 
                         MediaPath = series.banners[number].path.c_str();
-                        MediaWidth = series.banners[number].width * Config.TVScraperReplayInfoPosterSize * 100;
-                        MediaHeight = series.banners[number].height * Config.TVScraperReplayInfoPosterSize * 100;
+                        MediaSize.Set(series.banners[number].width, series.banners[number].height);
                         if (series.banners.size() > 1)
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
                                     static_cast<int>(number + 1), *MediaPath,
@@ -371,28 +370,19 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 movie.movieId = movieId;
                 if (pScraper->Service("GetMovie", &movie)) {
                     MediaPath = movie.poster.path.c_str();
-                    MediaWidth = movie.poster.width * Config.TVScraperReplayInfoPosterSize * 100;
-                    MediaHeight = movie.poster.height * Config.TVScraperReplayInfoPosterSize * 100;
+                    MediaSize.Set(movie.poster.width, movie.poster.height);
                 }
             }
         }
 
         PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+        PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
-            if (MediaHeight > m_TVSHeight || MediaWidth > m_TVSWidth) {  // Resize too big poster/banner
-                dsyslog("flatPlus: Poster/Banner size (%d x %d) is too big!", MediaWidth, MediaHeight);
-                MediaHeight = m_TVSHeight * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;  // Max 70% of pixmap height
-                if (Config.ChannelWeatherShow)
-                    // Max 50% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = m_TVSWidth * 0.5 * Config.TVScraperReplayInfoPosterSize * 100;
-                else
-                    // Max 70% of pixmap width. Aspect is preserved in LoadFile()
-                    MediaWidth = m_TVSWidth * 0.7 * Config.TVScraperReplayInfoPosterSize * 100;
-
-                dsyslog("flatPlus: Poster/Banner resized to max %d x %d", MediaWidth, MediaHeight);
-            }
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            SetMediaSize(MediaSize, cSize(m_TVSWidth, m_TVSHeight));  // Check for too big images
+            MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
+            MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
+            img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 

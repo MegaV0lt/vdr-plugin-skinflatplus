@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.0.0";
+static const char *VERSION        = "1.0.1";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -78,7 +78,7 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
 
 __attribute__((constructor)) static void init(void) {
 #ifndef IMAGEMAGICK
-    // From skinnopacity: Prevents *magick from occupying segfaults
+    // From skin nopacity: Prevents *magick from occupying segfaults
     MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
 #else
     Magick::InitializeMagick(NULL);
@@ -94,8 +94,9 @@ bool cPluginFlat::Start(void) {
     if (!cOsdProvider::SupportsTrueColor()) {
         esyslog("flatPlus: No TrueColor OSD found! Aborting!");
         return false;
-    } else
+    } else {
         dsyslog("flatPlus: TrueColor OSD found");
+    }
 
     ImgCache.Create();
     ImgCache.PreLoadImage();

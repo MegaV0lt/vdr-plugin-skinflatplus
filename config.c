@@ -69,7 +69,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuEventView = 1;
     MenuRecordingView = 1;
 
-    MenuEventViewAllwaysWithDate = 1;
+    MenuEventViewAlwaysWithDate = 1;
 
     MenuRecordingShowCount = 1;
     MenuTimerShowCount = 1;
@@ -83,9 +83,10 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingShowFolderDate = 1;
     MenuItemRecordingShowRecordingErrors = true;
     MenuItemRecordingShowRecordingErrorsThreshold = 1000;  // Threshold for displaying error instead of warning
+    MenuItemRecordingShowFormatIcons = 1;  // Show foramt icans (sd/hd/uhd) in menu recordings
     MenuItemParseTilde = 1;
 
-    RecordingOldFolder.reserve(64);  // Set to at least 64 entrys
+    RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
     RecordingOldValue.reserve(64);
     ScrollerEnable = 1;
     ScrollerStep = 2;
@@ -143,7 +144,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuItemRecordingDefaultOldDays = -1;
 
     PlaybackShowRecordingErrors = true;
-    PlaybackShowRecordingDate = true;  // Show date and time with shorttext
+    PlaybackShowRecordingDate = true;  // Show date and time with short text
 
     ChannelWeatherShow = 1;
     PlaybackWeatherShow = 1;
@@ -157,6 +158,7 @@ cFlatConfig::cFlatConfig(void) {
 
     TVScraperReplayInfoShowPoster = 1;
     TVScraperReplayInfoPosterSize = 0.01;
+    TVScraperPosterOpacity = 0.008;  // Opacitiy of poster in replay info and channel info (80%)
 
     TVScraperEPGInfoShowPoster = 1;
     TVScraperRecInfoShowPoster = 1;
@@ -351,7 +353,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuChannelView") == 0)                      MenuChannelView = atoi(Value);
     else if (strcmp(Name, "MenuContentFullSize") == 0)                  MenuContentFullSize = atoi(Value);
     else if (strcmp(Name, "MenuEventView") == 0)                        MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAllwaysWithDate") == 0)         MenuEventViewAllwaysWithDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)         MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    MenuItemIconsShow = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      MenuItemPadding = atoi(Value);
@@ -362,6 +364,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     MenuItemRecordingShowFormatIcons = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   MenuTimerShowCount = atoi(Value);
@@ -402,6 +405,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);
+    else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               TVScraperPosterOpacity = atod(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      WeatherFontSize = atod(Value);
     else
         return false;
@@ -700,7 +704,7 @@ int RoundUp(int NumToRound, int multiple) {
 void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at least 64 entrys
+    files.reserve(64);  // Set to at least 64 entry's
     Decors.Clear();
 
     cString FileName("");
@@ -756,7 +760,7 @@ cString cFlatConfig::DecorDescription(cString File) {
 void cFlatConfig::DecorLoadCurrent(void) {
     cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at least 64 entrys
+    files.reserve(64);  // Set to at least 64 entry's
 
     cString FileName("");
     cReadDir d(*DecorPath);
@@ -946,7 +950,7 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
 void cFlatConfig::GetConfigFiles(cStringList &Files) {
     cString ConfigsPath = cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at least 64 entrys
+    files.reserve(64);  // Set to at least 64 entry's
     Files.Clear();
 
     cReadDir d(*ConfigsPath);

@@ -33,6 +33,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         bool m_MenuFullOsdIsDrawn = false;
 
         eMenuCategory m_MenuCategory;
+
+        int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
         int m_LastTimerCount {0}, m_LastTimerActiveCount {0};
@@ -46,7 +48,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         cPixmap *ScrollbarPixmap {nullptr};
         int m_ScrollBarTop {0};
-        int /* m_ScrollBarWidth {0}, */ m_ScrollBarHeight {0};  //? Also in cFlatBaseRender
+        int m_ScrollBarWidth {0}, m_ScrollBarHeight {0};  //? 'm_ScrollBarWidth' also in cFlatBaseRender
 
         int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
         int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
@@ -118,7 +120,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
-                       int NumActors);  // Add Actors to compexcontent
+                       int NumActors);  // Add Actors to complexcontent
         void DrawMainMenuWidgets(void);
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);
@@ -126,7 +128,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop);
-        int DrawMainMenuWidgetTemperaturs(int wLeft, int wWidth, int ContentTop);
+        int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
 

@@ -59,9 +59,10 @@ void cTextScroll::Draw(void) {
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
             int l = Font->Width(first.c_str()) + Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
-        } else  // ~ not found
+        } else {  // ~ not found
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
-    } else {  // No extracolor defined
+        }
+    } else {  // No extra color defined
         Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
     }
 }
@@ -69,13 +70,12 @@ void cTextScroll::Draw(void) {
 void cTextScroll::DoStep(void) {
     if (!Pixmap) return;
 
-    // Wait at the beginning for better read
-    if (WaitSteps > 0) {
+    if (WaitSteps > 0) {  // Wait at the beginning for better read
         --WaitSteps;
         return;
     }
-    // Wait after return to the front
-    if (ResetX) {
+
+    if (ResetX) {  // Wait after return to the front
         ResetX = false;
         Pixmap->SetDrawPortPoint(cPoint(0, 0));
         WaitSteps = WAITSTEPS;
@@ -154,9 +154,8 @@ void cTextScrollers::UpdateViewPortWidth(int w) {
 }
 
 void cTextScrollers::StartScrolling(void) {
-    if (!Running() && Scrollers.size() > 0) {
+    if (!Running() && Scrollers.size() > 0)
         Start();
-    }
 }
 
 void cTextScrollers::Action(void) {

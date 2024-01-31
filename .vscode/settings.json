@@ -63,5 +63,12 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp"
-    }
+    },
+    "cSpell.words": [
+        "Epgsearch",
+        "ETSI",
+        "Scrollers",
+        "Substract",
+        "SVCD"
+    ]
 }

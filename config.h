@@ -250,7 +250,7 @@ class cFlatConfig {
         int MenuEventView;
         int MenuRecordingView;
         int MenuFullOsd;
-        int MenuEventViewAllwaysWithDate;
+        int MenuEventViewAlwaysWithDate;
 
         int MenuRecordingShowCount;
         int MenuTimerShowCount;
@@ -259,7 +259,7 @@ class cFlatConfig {
         double MenuItemRecordingSeenThreshold;
         int MenuItemRecordingDefaultOldDays;
 
-        // 0 = vertikal
+        // 0 = vertical
         // 1 = horizontal
         int MessageColorPosition;
 
@@ -271,10 +271,12 @@ class cFlatConfig {
         int MainMenuWidgetActiveTimerShowRemoteRefreshTime;  // in seconds
         /* Hidden configs (only in setup.conf, no osd menu) */
 
-        int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recordingerror icons
+        int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
         int PlaybackShowRecordingErrors;
         int PlaybackShowRecordingDate;
         int MenuItemRecordingShowRecordingErrorsThreshold;
+        int MenuItemRecordingShowFormatIcons;  // Show format icons (sd/hd/uhd) in menu recordings
+
 
         // Text scroller
         int ScrollerEnable;
@@ -282,7 +284,7 @@ class cFlatConfig {
         int ScrollerDelay;
         int ScrollerType;
 
-        // Mainmenu widgets
+        // Main menu widgets
         int MainMenuWidgetsEnable;
         double MainMenuItemScale;
 
@@ -333,6 +335,7 @@ class cFlatConfig {
 
         int TVScraperReplayInfoShowPoster;
         double TVScraperReplayInfoPosterSize;
+        double TVScraperPosterOpacity;  // Transparency for channel info and replay info poster
 
         int TVScraperEPGInfoShowPoster;
         int TVScraperRecInfoShowPoster;

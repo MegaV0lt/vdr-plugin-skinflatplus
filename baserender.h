@@ -49,7 +49,7 @@ class cFlatBaseRender {
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
 
-        // Font for mainmenu weatherwidget
+        // Font for main menu weather widget
         cFont *m_FontTempSml {nullptr};
 
         // TopBar
@@ -102,7 +102,7 @@ class cFlatBaseRender {
         cTextScrollers MessageScroller;
 
         // Multiline content with scrollbar
-        // cPixmap *ContentPixmap;  // TODO: Content* unused?
+        // cPixmap *ContentPixmap;  //* Content* is unused
         // cPixmap *ContentEpgImagePixmap;
         // int ContentLeft, ContentTop, ContentHeight, ContentWidth;
         // int ContentDrawPortHeight;  // Complete high of text
@@ -124,7 +124,7 @@ class cFlatBaseRender {
         cPixmap *DecorPixmap {nullptr};
         std::list<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
-        /* void ContentDraw(void);  // Unused?
+        /* void ContentDraw(void);  // Unused
         void ContentEventDraw(void); */
         double ScrollbarSize(void);
 

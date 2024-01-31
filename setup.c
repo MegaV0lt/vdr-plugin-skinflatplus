@@ -164,7 +164,7 @@ eOSState cFlatSetup::ProcessKey(eKeys Key) {
             if (strcmp(ItemText, tr("Tracks settings")) == 0)
                 state = AddSubMenu(new cFlatSetupTracks(&SetupConfig));
             if (strcmp(ItemText, tr("TVScraper / scraper2vdr settings")) == 0)
-                state = AddSubMenu(new cFlatSetupTvsraper(&SetupConfig));
+                state = AddSubMenu(new cFlatSetupTVScraper(&SetupConfig));
             if (strcmp(ItemText, tr("Main menu widgets settings")) == 0)
                 state = AddSubMenu(new cFlatSetupMMWidget(&SetupConfig));
         }
@@ -282,7 +282,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuChannelShowCount", Config.MenuChannelShowCount);
     SetupStore("MenuChannelView", Config.MenuChannelView);
     SetupStore("MenuContentFullSize", Config.MenuContentFullSize);
-    SetupStore("MenuEventViewAllwaysWithDate", Config.MenuEventViewAllwaysWithDate);
+    SetupStore("MenuEventViewAlwaysWithDate", Config.MenuEventViewAlwaysWithDate);
     SetupStore("MenuEventView", Config.MenuEventView);
     SetupStore("MenuFullOsd", Config.MenuFullOsd);
     SetupStore("MenuItemIconsShow", Config.MenuItemIconsShow);
@@ -294,6 +294,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuItemRecordingShowFolderDate", Config.MenuItemRecordingShowFolderDate);
     SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrors);
     SetupStore("MenuItemRecordingShowRecordingErrorsThreshold", Config.MenuItemRecordingShowRecordingErrorsThreshold);
+    SetupStore("MenuItemRecordingShowFormatIcons", Config.MenuItemRecordingShowFormatIcons);
     SetupStore("MenuRecordingShowCount", Config.MenuRecordingShowCount);
     SetupStore("MenuRecordingView", Config.MenuRecordingView);
     SetupStore("MenuTimerShowCount", Config.MenuTimerShowCount);
@@ -334,6 +335,7 @@ void cFlatSetup::Store(void) {
     SetupStore("TVScraperRecInfoShowPoster", Config.TVScraperRecInfoShowPoster);
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("TVScraperReplayInfoShowPoster", Config.TVScraperReplayInfoShowPoster);
+    SetupStore("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity));
     SetupStore("WeatherFontSize", dtoa(Config.WeatherFontSize));
 
     Config.Init();
@@ -483,7 +485,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuChannelView") == 0)                      SetupConfig->MenuChannelView = atoi(Value);
     else if (strcmp(Name, "MenuContentFullSize") == 0)                  SetupConfig->MenuContentFullSize = atoi(Value);
     else if (strcmp(Name, "MenuEventView") == 0)                        SetupConfig->MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAllwaysWithDate") == 0)         SetupConfig->MenuEventViewAllwaysWithDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)         SetupConfig->MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          SetupConfig->MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    SetupConfig->MenuItemIconsShow = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
@@ -494,6 +496,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0) SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0) SetupConfig->MenuItemRecordingShowFormatIcons = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
@@ -534,6 +537,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           SetupConfig->TVScraperRecInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
+    else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               SetupConfig->TVScraperPosterOpacity = atod(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
     else
         return false;
@@ -662,7 +666,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuChannelShowCount", SetupConfig->MenuChannelShowCount, *Filename);
     Config.Store("MenuChannelView", SetupConfig->MenuChannelView, *Filename);
     Config.Store("MenuContentFullSize", SetupConfig->MenuContentFullSize, *Filename);
-    Config.Store("MenuEventViewAllwaysWithDate", SetupConfig->MenuEventViewAllwaysWithDate, *Filename);
+    Config.Store("MenuEventViewAlwaysWithDate", SetupConfig->MenuEventViewAlwaysWithDate, *Filename);
     Config.Store("MenuEventView", SetupConfig->MenuEventView, *Filename);
     Config.Store("MenuFullOsd", SetupConfig->MenuFullOsd, *Filename);
     Config.Store("MenuItemIconsShow", SetupConfig->MenuItemIconsShow, *Filename);
@@ -674,6 +678,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuItemRecordingShowFolderDate", SetupConfig->MenuItemRecordingShowFolderDate, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrors", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrorsThreshold", dtoa(Config.MenuItemRecordingShowRecordingErrorsThreshold), *Filename);
+    Config.Store("MenuItemRecordingShowFormatIcons", SetupConfig->MenuItemRecordingShowFormatIcons, *Filename);
     Config.Store("MenuRecordingShowCount", SetupConfig->MenuRecordingShowCount, *Filename);
     Config.Store("MenuRecordingView", SetupConfig->MenuRecordingView, *Filename);
     Config.Store("MenuTimerShowCount", SetupConfig->MenuTimerShowCount, *Filename);
@@ -714,6 +719,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("TVScraperRecInfoShowPoster", SetupConfig->TVScraperRecInfoShowPoster, *Filename);
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("TVScraperReplayInfoShowPoster", SetupConfig->TVScraperReplayInfoShowPoster, *Filename);
+    Config.Store("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity), *Filename);
     Config.Store("WeatherFontSize", dtoa(Config.WeatherFontSize), *Filename);
 
     cString msg = cString::sprintf("%s %s", tr("saved settings in file:"), *File);
@@ -999,6 +1005,7 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditIntItem(tr("Recording menu default value - old folder in days"), &SetupConfig->MenuItemRecordingDefaultOldDays, -1));
     Add(new cMenuEditBoolItem(tr("Recording menu show recerrors icon"), &SetupConfig->MenuItemRecordingShowRecordingErrors));
     Add(new cMenuEditIntItem(tr("Recording recerrors icon threshold"), &SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold, 1, 999999));
+    Add(new cMenuEditBoolItem(tr("Recording menu show format icon"), &SetupConfig->MenuItemRecordingShowFormatIcons));
 
     Add(new cMenuEditBoolItem(tr("Timer menu show timer count in title"), &SetupConfig->MenuTimerShowCount));
     Add(new cMenuEditBoolItem(tr("Channel menu show channel count in title"), &SetupConfig->MenuChannelShowCount));
@@ -1006,7 +1013,7 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditStraItem(tr("Menu channel view"), &SetupConfig->MenuChannelView, MenuChannelViews.Size(), &MenuChannelViews[0]));
     Add(new cMenuEditStraItem(tr("Menu timer view"), &SetupConfig->MenuTimerView, MenuTimerViews.Size(), &MenuTimerViews[0]));
     Add(new cMenuEditStraItem(tr("Menu event view"), &SetupConfig->MenuEventView, MenuEventViews.Size(), &MenuEventViews[0]));
-    Add(new cMenuEditBoolItem(tr("Menu event view allways with date"), &SetupConfig->MenuEventViewAllwaysWithDate));
+    Add(new cMenuEditBoolItem(tr("Menu event view allways with date"), &SetupConfig->MenuEventViewAlwaysWithDate));
     Add(new cMenuEditStraItem(tr("Menu recording view"), &SetupConfig->MenuRecordingView, MenuRecordingViews.Size(), &MenuRecordingViews[0]));
 
     Add(new cMenuEditBoolItem(tr("Scrollbar by decor-file?"), &SetupConfig->decorScrollBarByTheme));
@@ -1278,17 +1285,18 @@ eOSState cFlatSetupTracks::ProcessKey(eKeys Key) {
 }
 
 // TVScraper Settings
-cFlatSetupTvsraper::cFlatSetupTvsraper(cFlatConfig* data) : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
+cFlatSetupTVScraper::cFlatSetupTVScraper(cFlatConfig* data) : cMenuSetupSubMenu(tr("TVScraper settings"), data) {
     Setup();
 }
 
-void cFlatSetupTvsraper::Setup(void) {
+void cFlatSetupTVScraper::Setup(void) {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Channelinfo show poster?"), &SetupConfig->TVScraperChanInfoShowPoster));
     Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015, 2));
     Add(new cMenuEditBoolItem(tr("Replayinfo show poster?"), &SetupConfig->TVScraperReplayInfoShowPoster));
     Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015, 2));
+    Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001, 0.01, 2));
     Add(new cMenuEditBoolItem(tr("EPG info show poster?"), &SetupConfig->TVScraperEPGInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
@@ -1303,7 +1311,7 @@ void cFlatSetupTvsraper::Setup(void) {
     Display();
 }
 
-eOSState cFlatSetupTvsraper::ProcessKey(eKeys Key) {
+eOSState cFlatSetupTVScraper::ProcessKey(eKeys Key) {
     eOSState state = cOsdMenu::ProcessKey(Key);
     if (state == osUnknown) {
         switch (Key) {

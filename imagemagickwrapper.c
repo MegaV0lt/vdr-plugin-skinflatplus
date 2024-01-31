@@ -47,7 +47,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
-        unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
+        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
@@ -67,7 +67,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return image;
     }
 #ifdef IMAGEMAGICK7
-    unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
+    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
@@ -95,7 +95,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 #ifndef IMAGEMAGICK7
     const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #else
-    unsigned char r {}, g {}, b {}, o {};  // Initialisize outside of for loop
+    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
 #endif
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {

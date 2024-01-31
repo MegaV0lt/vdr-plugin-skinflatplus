@@ -88,11 +88,11 @@ class cFlatSetupTracks : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 };
 
-class cFlatSetupTvsraper : public cMenuSetupSubMenu {
+class cFlatSetupTVScraper : public cMenuSetupSubMenu {
  protected:
         void Setup(void);
  public:
-        cFlatSetupTvsraper(cFlatConfig *data);
+        cFlatSetupTVScraper(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
 };
 

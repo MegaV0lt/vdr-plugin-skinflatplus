@@ -75,116 +75,6 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
     return new cFlatDisplayMessage;
 }
 
-// --- cTextFloatingWrapper --- // From skin ElchiHD
-// Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {
-}
-
-cTextFloatingWrapper::~cTextFloatingWrapper() {
-    free(m_Text);
-}
-
-void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    // uint32_t tick0 = GetMsTicks();  //! For testing
-
-    free(m_Text);
-    m_Text = Text ? strdup(Text) : nullptr;
-    if (!m_Text)
-        return;
-    m_Lines = 1;
-    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
-        return;
-
-    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
-    int cw {0}, l {0}, sl {0}, w {0};
-    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
-    uint sym {0};
-    stripspace(m_Text);  // Strips trailing newlines
-
-    for (char *p = m_Text; *p;) {
-        /* int */ sl = Utf8CharLen(p);
-        /* uint */ sym = Utf8CharGet(p, sl);
-        if (sym == '\n') {
-            ++m_Lines;
-            if (m_Lines > UpperLines)
-                Width = WidthLower;
-            w = 0;
-            Blank = Delim = nullptr;
-            p++;
-            continue;
-        } else if (sl == 1 && isspace(sym)) {
-            Blank = p;
-        }
-        /* int */ cw = Font->Width(sym);
-        if (w + cw > Width) {
-            if (Blank) {
-                *Blank = '\n';
-                p = Blank;
-                continue;
-            } else if (w > 0) {  // There has to be at least one character before the newline.
-                                 // Here's the ugly part, where we don't have any whitespace to
-                                 // punch in a newline, so we need to make room for it:
-                if (Delim)
-                    p = Delim + 1;  // Let's fall back to the most recent delimiter
-
-                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
-                /* int */ l = p - m_Text;
-                strncpy(s, m_Text, l);  // Dest, Source, Size
-                s[l] = '\n';            // Insert line break.
-                strcpy(s + l + 1, p);   // Dest, Source
-                free(m_Text);
-                m_Text = s;
-                p = m_Text + l;
-                continue;
-            }
-        }
-        w += cw;
-        if (strchr("-.,:;!?_", *p)) {  // Breaks '...'
-            Delim = p;
-            Blank = nullptr;
-        }
-        p += sl;
-    }  // for char
-    // uint32_t tick1 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: FloatingTextWrapper.Set() %d ms, Text length %ld", tick1 - tick0, strlen(Text));
-}
-
-const char *cTextFloatingWrapper::Text(void) {
-    if (m_EoL) {
-        *m_EoL = '\n';
-        m_EoL = nullptr;
-    }
-    return m_Text;
-}
-
-const char *cTextFloatingWrapper::GetLine(int Line) {
-    char *s {nullptr};
-    if (Line < m_Lines) {
-        if (m_EoL) {
-            *m_EoL = '\n';
-            if (Line == m_LastLine + 1)
-                s = m_EoL + 1;
-            m_EoL = nullptr;
-        }
-        if (!s) {
-            s = m_Text;
-            for (int i {0}; i < Line; i++) {
-                s = strchr(s, '\n');
-                if (s)
-                    s++;
-                else
-                    break;
-            }
-        }
-        if (s) {
-            if ((m_EoL = strchr(s, '\n')) != NULL)
-                *m_EoL = 0;
-        }
-        m_LastLine = Line;
-    }
-    return s;
-}
-
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
@@ -213,7 +103,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
     return NULL;
 }
 
-// void inline PixmapFill(cPixmap *pixmap, tColor Color);  //* See flat.h
+// void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin(void) {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
@@ -298,7 +188,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 cString GetRecordingerrorIcon(int RecInfoErrors) {
     int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
 
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untestet recording
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
     if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
     if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
@@ -325,6 +215,21 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     if (FrameSeen < 0.98) return "recording_seen_9";
 
     return "recording_seen_10";
+}
+
+void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                                                        // NOLINT
+    int Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
+    //* Aspect of image is preserved in LoadFile()
+    if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
+        MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
+        // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    } else if (Aspect < 4) {                              //* Portrait (For example 1920x1080 = 1.77)
+        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 33% of pixmap width
+        // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    } else {                                              //* Banner (Usually 758x140 = 5.41)
+        MediaSize.SetWidth(ContentSize.Width() / 2.53);   // To get 758 width @ 1920
+        // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    }
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
@@ -409,7 +314,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     if (InfoLine) {
         if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) ||
              !Pattern.empty())
-            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show infoline
+            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show info line
     }
 
     if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
@@ -433,7 +338,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
 }
 
-int GetEpgsearchConflichts(void) {
+int GetEpgsearchConflicts(void) {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {
@@ -530,7 +435,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     uint64_t RecSize {0};
     if (AddText) {
         /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
-        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occured detecting filesize
+        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occurred detecting filesize
             Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                          static_cast<float>(RecSize) / MEGABYTE(1024)));
         else
@@ -547,22 +452,22 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                      Recording->Lifetime()));
 
-        // Add Video Format information (Format, Resolution, Framerate, …)
+        // Add video format information (Format, Resolution, Framerate, …)
         #if APIVERSNUM >= 20605
-        const cRecordingInfo *RecInfo = Recording->Info();  // From skinElchiHD
+        const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
         if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
             Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
                         RecInfo->FrameWidth(), RecInfo->FrameHeight()));
             if (RecInfo->FramesPerSecond() > 0) {
                 Text.Append(cString::sprintf("@%.2g", RecInfo->FramesPerSecond()));
-                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scantype
+                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
                     Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
             }
             if (RecInfo->AspectRatio() != arUnknown)
                 Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
             if (LastIndex)  //* Bitrate in new line
-                Text.Append(cString::sprintf("\n%s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         } else  // NOLINT
         #endif
@@ -570,7 +475,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
 
             if (LastIndex)  //* Bitrate at same line
-                Text.Append(cString::sprintf(", %s: ~%.2f MBit/s (Video + Audio)", tr("bit rate"),
+                Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
         }
     }  // AddText
@@ -586,4 +491,113 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
     return std::string();  // Empty string
+}
+
+// --- cTextFloatingWrapper --- // From skin ElchiHD
+// Based on VDR's cTextWrapper
+cTextFloatingWrapper::cTextFloatingWrapper(void) {
+}
+
+cTextFloatingWrapper::~cTextFloatingWrapper() {
+    free(m_Text);
+}
+
+void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
+    free(m_Text);
+    m_Text = Text ? strdup(Text) : nullptr;
+    if (!m_Text)
+        return;
+    m_Lines = 1;
+    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+        return;
+
+    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
+    int cw {0}, l {0}, sl {0}, w {0};
+    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
+    uint sym {0};
+    stripspace(m_Text);  // Strips trailing newlines
+
+    const char *ThreeDots {"..."}, *CompactDots {"…"};
+    strreplace(m_Text, ThreeDots, CompactDots);  // Try to fix wrong line break in '...'
+
+    for (char *p = m_Text; *p;) {
+        /* int */ sl = Utf8CharLen(p);
+        /* uint */ sym = Utf8CharGet(p, sl);
+        if (sym == '\n') {
+            ++m_Lines;
+            if (m_Lines > UpperLines)
+                Width = WidthLower;
+            w = 0;
+            Blank = Delim = nullptr;
+            p++;
+            continue;
+        } else if (sl == 1 && isspace(sym)) {
+            Blank = p;
+        }
+        /* int */ cw = Font->Width(sym);
+        if (w + cw > Width) {
+            if (Blank) {
+                *Blank = '\n';
+                p = Blank;
+                continue;
+            } else if (w > 0) {  // There has to be at least one character before the newline.
+                                 // Here's the ugly part, where we don't have any whitespace to
+                                 // punch in a newline, so we need to make room for it:
+                if (Delim)
+                    p = Delim + 1;  // Let's fall back to the most recent delimiter
+
+                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* int */ l = p - m_Text;
+                strncpy(s, m_Text, l);  // Dest, Source, Size
+                s[l] = '\n';            // Insert line break.
+                strcpy(s + l + 1, p);   // Dest, Source
+                free(m_Text);
+                m_Text = s;
+                p = m_Text + l;
+                continue;
+            }
+        }
+        w += cw;
+        if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
+            Delim = p;
+            Blank = nullptr;
+        }
+        p += sl;
+    }  // for char
+}
+
+const char *cTextFloatingWrapper::Text(void) {
+    if (m_EoL) {
+        *m_EoL = '\n';
+        m_EoL = nullptr;
+    }
+    return m_Text;
+}
+
+const char *cTextFloatingWrapper::GetLine(int Line) {
+    char *s {nullptr};
+    if (Line < m_Lines) {
+        if (m_EoL) {
+            *m_EoL = '\n';
+            if (Line == m_LastLine + 1)
+                s = m_EoL + 1;
+            m_EoL = nullptr;
+        }
+        if (!s) {
+            s = m_Text;
+            for (int i {0}; i < Line; i++) {
+                s = strchr(s, '\n');
+                if (s)
+                    s++;
+                else
+                    break;
+            }
+        }
+        if (s) {
+            if ((m_EoL = strchr(s, '\n')) != NULL)
+                *m_EoL = 0;
+        }
+        m_LastLine = Line;
+    }
+    return s;
 }

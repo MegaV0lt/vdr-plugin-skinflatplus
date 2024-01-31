@@ -50,10 +50,10 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
             // ((float)(e - offset * d)) / ((float)d);  // Exact sample position is (float) e/d = offset + sub_offset
 
         // Calculate filter coefficients
-        float  h[4];
+        float h[4];
         for (int j {0}; j < 4; ++j) {
             const float t = 3.14159265359f * (sub_offset + (1 - j));
-            h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-lowpass and cos-window
+            h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
 
         // Ensure that filter does not reach out off image bounds:

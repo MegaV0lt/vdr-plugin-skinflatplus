@@ -254,9 +254,14 @@ static inline uint32_t GetMsTicks(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
-inline void PixmapFill(cPixmap *pixmap, tColor Color) {
-    if (pixmap) pixmap->Fill(Color);
+inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
+    if (Pixmap) Pixmap->Fill(Color);
 }
+
+inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
+    if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
+}
+
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
@@ -281,10 +286,11 @@ inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
     /* return */  // LeftTrim(RightTrim(s, t), t);
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,  // NOLINT
-                      cString &Subtitle, bool NewLine = false);                      // NOLINT
+void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
+void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
+                      cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
-int GetEpgsearchConflichts(void);
+int GetEpgsearchConflicts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
 

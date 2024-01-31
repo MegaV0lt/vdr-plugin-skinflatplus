@@ -8,14 +8,14 @@
 #include "./complexcontent.h"
 
 cComplexContent::cComplexContent() {
-    Contents.reserve(128);  // Set to at least 128 entrys
+    Contents.reserve(128);  // Set to at least 128 entry's
 }
 
 cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
     m_Osd = osd;
     m_ScrollSize = ScrollSize;
 
-    Contents.reserve(128);  // Set to at least 128 entrys
+    Contents.reserve(128);  // Set to at least 128 entry's
 }
 
 cComplexContent::~cComplexContent() {
@@ -39,13 +39,12 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     // if (!m_Osd) return;
 
     m_Osd->DestroyPixmap(Pixmap);
-    Pixmap = NULL;
+    Pixmap = nullptr;
     m_Osd->DestroyPixmap(PixmapImage);
-    PixmapImage = NULL;
+    PixmapImage = nullptr;
 
     cRect PositionDraw;
-    PositionDraw.SetLeft(0);
-    PositionDraw.SetTop(0);
+    PositionDraw.SetPoint(0, 0);
     PositionDraw.SetWidth(m_Position.Width());
     if (m_FullFillBackground && m_DrawPortHeight < m_Position.Height())
         PositionDraw.SetHeight(m_Position.Height());
@@ -139,11 +138,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     // dsyslog("flatPlus: AddImageWithFloatedText:\nFloatLines %d, Lines %d, TextWithLeft %d, TextWidthFull %d",
     //         FloatLines, Lines, TextWidthLeft, TextWidthFull);
 
-    cRect FloatedTextPos;
-    FloatedTextPos.SetLeft(TextPos.Left());
-    FloatedTextPos.SetTop(TextPos.Top());
-    FloatedTextPos.SetWidth(TextPos.Width());
-    FloatedTextPos.SetHeight(TextPos.Height());
+    cRect FloatedTextPos(TextPos.Left(), TextPos.Top(), TextPos.Width(), TextPos.Height());
 
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(TextPos.Top() + i * m_ScrollSize);
@@ -152,12 +147,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         // dsyslog("flatPlus: Adding Floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
 
-    cRect ImagePos;
-    ImagePos.SetLeft(TextPos.Left() + TextWidthLeft + 5);
-    ImagePos.SetTop(TextPos.Top());
-    ImagePos.SetWidth(image->Width());
-    ImagePos.SetHeight(image->Height());
-
+    cRect ImagePos(TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height());
     AddImage(image, ImagePos);
 }
 

@@ -31,23 +31,15 @@ class cTextScroll {
     int ScrollType {0};
 
  public:
-    cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer) {
+    cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer = 2) {
         m_Osd = osd;
+        ScrollType = type;
+        PixelsPerStep = pixels;
+        WAITSTEPS = waitsteps;
         Layer = layer;
-        PixelsPerStep = pixels;
-        ScrollType = type;
-        WAITSTEPS = waitsteps;
-    }
-    cTextScroll(cOsd *osd, int type, int pixels, int waitsteps) {
-        m_Osd = osd;
-        Layer = 2;
-        PixelsPerStep = pixels;
-        ScrollType = type;
-        WAITSTEPS = waitsteps;
     }
 
-    virtual ~cTextScroll() { // Fix deleting object of polymorphic class type ‘cTextScroll’ which has
-                             // non-virtual destructor might cause undefined behavior [-Wdelete-non-virtual-dtor]
+    ~cTextScroll() {
         m_Osd->DestroyPixmap(Pixmap);
         Pixmap = nullptr;
     }
