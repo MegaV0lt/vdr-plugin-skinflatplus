@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.0.0";
+static const char *VERSION        = "1.0.1";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -94,8 +94,9 @@ bool cPluginFlat::Start(void) {
     if (!cOsdProvider::SupportsTrueColor()) {
         esyslog("flatPlus: No TrueColor OSD found! Aborting!");
         return false;
-    } else
+    } else {
         dsyslog("flatPlus: TrueColor OSD found");
+    }
 
     ImgCache.Create();
     ImgCache.PreLoadImage();
