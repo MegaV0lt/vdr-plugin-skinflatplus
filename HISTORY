@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2024-02-xx: Version 1.0.2
+ - [fix] New try to fix wrong line breaks in '...'
+
 2024-01-31: Version 1.0.1
  - [fix] Fix scrollbar in timer short view
  - [fix] Try to fix wrong line breaks in '...'

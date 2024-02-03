@@ -495,14 +495,16 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
 
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {
-}
+cTextFloatingWrapper::cTextFloatingWrapper(void) {}
 
 cTextFloatingWrapper::~cTextFloatingWrapper() {
     free(m_Text);
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
+    uint32_t tick0 = GetMsTicks();  //! For testing
+    // dsyslog("flatPlus: FloatinTextWrapper start. Textlength: %ld", sizeof(*Text));
+
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
     if (!m_Text)
@@ -516,9 +518,6 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     int Width = UpperLines > 0 ? WidthUpper : WidthLower;
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
-
-    const char *ThreeDots {"..."}, *CompactDots {"…"};
-    strreplace(m_Text, ThreeDots, CompactDots);  // Try to fix wrong line break in '...'
 
     for (char *p = m_Text; *p;) {
         /* int */ sl = Utf8CharLen(p);
@@ -559,11 +558,17 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         }
         w += cw;
         if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
-            Delim = p;
-            Blank = nullptr;
+            if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
+                Delim = p;
+                Blank = nullptr;
+            } else {
+                dsyslog("flatPlus: FloatingTextWrapper found double delimiter char!");
+            }
         }
         p += sl;
     }  // for char
+    uint32_t tick1 = GetMsTicks();
+    dsyslog("flatPlus: FloatingTextWrapper time: %d ms", tick1 - tick0);
 }
 
 const char *cTextFloatingWrapper::Text(void) {

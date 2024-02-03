@@ -115,8 +115,7 @@ cTextScrollers::cTextScrollers() : cThread("TextScrollers") {
     Layer = 2;
 }
 
-cTextScrollers::~cTextScrollers() {
-}
+cTextScrollers::~cTextScrollers() {}
 
 void cTextScrollers::Clear(void) {
     Cancel(-1);
