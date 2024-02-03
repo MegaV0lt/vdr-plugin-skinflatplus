@@ -971,7 +971,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
         }
     } else {
         cString MediaPath("");
-        int MediaWidth {0}, MediaHeight {0};
+        int MediaWidth {0}, MediaHeight {999};
         int MediaType {0};
 
         static cPlugin *pScraper = GetScraperPlugin();
@@ -982,12 +982,10 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             if (pScraper->Service("GetPosterBannerV2", &call)) {
                 if ((call.type == tSeries) && call.banner.path.size() > 0) {
                     MediaWidth = m_cWidth - m_MarginItem * 2;
-                    MediaHeight = 999;
                     MediaPath = call.banner.path.c_str();
                     MediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
                     MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
-                    MediaHeight = 999;
                     MediaPath = call.poster.path.c_str();
                     MediaType = 2;
                 }
@@ -996,12 +994,12 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 
         if (!isempty(*MediaPath)) {
             cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-            if (img && MediaType == 2) {
+            if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
                     cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
-            } else if (img && MediaType == 1) {
+            } else if (img && MediaType == 1) {  // Series
                 ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
                 ComplexContent.AddText(*Text, true,
                                        cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,

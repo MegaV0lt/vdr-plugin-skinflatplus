@@ -503,7 +503,7 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
     uint32_t tick0 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: FloatinTextWrapper start. Textlength: %ld", sizeof(*Text));
+    dsyslog("flatPlus: FloatingTextWrapper start. Textlength: %ld", strlen(Text));
 
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
@@ -562,7 +562,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Delim = p;
                 Blank = nullptr;
             } else {
-                dsyslog("flatPlus: FloatingTextWrapper found double delimiter char!");
+                dsyslog("flatPlus: FloatingTextWrapper skipping double delimiter char!");
             }
         }
         p += sl;
