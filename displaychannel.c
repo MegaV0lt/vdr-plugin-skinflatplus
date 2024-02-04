@@ -62,9 +62,10 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     PixmapFill(ChanLogoPixmap, clrTransparent);
 
     height += Config.decorProgressChannelSize + m_MarginItem * 2;
-    ProgressBarCreate(Config.decorBorderChannelSize,
-                      Config.decorBorderChannelSize + m_ChannelHeight - height + m_MarginItem, m_ChannelWidth,
-                      Config.decorProgressChannelSize, m_MarginItem, 0, Config.decorProgressChannelFg,
+    ProgressBarCreate(cRect(Config.decorBorderChannelSize,
+                            Config.decorBorderChannelSize + m_ChannelHeight - height + m_MarginItem,
+                            m_ChannelWidth, Config.decorProgressChannelSize),
+                      m_MarginItem, 0, Config.decorProgressChannelFg,
                       Config.decorProgressChannelBarFg, Config.decorProgressChannelBg,
                       Config.decorProgressChannelType, true);
 

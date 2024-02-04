@@ -23,7 +23,8 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
     MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
 
-    ProgressBarCreate(left, m_OsdHeight - 50 - Config.decorProgressVolumeSize, width, Config.decorProgressVolumeSize,
+    ProgressBarCreate(cRect(left, m_OsdHeight - 50 - Config.decorProgressVolumeSize, width,
+                            Config.decorProgressVolumeSize),
                       m_MarginItem, m_MarginItem, Config.decorProgressVolumeFg, Config.decorProgressVolumeBarFg,
                       Config.decorProgressVolumeBg, Config.decorProgressVolumeType, true);
 }
@@ -48,9 +49,9 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
                                Theme.Color(clrVolumeBg));
 
     int DecorTop = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
-    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight,
-                     Config.decorBorderVolumeSize);
-    DecorBorderClear(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight,
+    DecorBorderClear(cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight,
+                     m_FontHeight), Config.decorBorderVolumeSize);
+    DecorBorderClear(cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight),
                      Config.decorBorderVolumeSize);
 
     if (Mute) {

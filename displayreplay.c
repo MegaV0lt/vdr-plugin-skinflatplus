@@ -33,11 +33,12 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                                m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
                                m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
 
-    ProgressBarCreate(Config.decorBorderReplaySize,
-                      m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize
-                       - m_MarginItem, m_OsdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize,
-                       m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
-                       Config.decorProgressReplayBg, Config.decorProgressReplayType);
+    ProgressBarCreate(cRect(Config.decorBorderReplaySize,
+                            m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize
+                            - m_MarginItem,
+                            m_OsdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize),
+                      m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
+                      Config.decorProgressReplayBg, Config.decorProgressReplayType);
 
     LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1, cRect(Config.decorBorderReplaySize,
         m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem*3 - m_FontHeight
