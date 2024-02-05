@@ -16,11 +16,9 @@
 
 using namespace Magick;
 
-cImageLoader::cImageLoader() {
-}
+cImageLoader::cImageLoader() {}
 
-cImageLoader::~cImageLoader() {
-}
+cImageLoader::~cImageLoader() {}
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if (width == 0 || height == 0) return NULL;
@@ -238,7 +236,7 @@ void cImageLoader::ToLowerCase(std::string &str) {
 
 bool cImageLoader::FileExits(const std::string &name) {
     struct stat Buffer;
-    return (stat (name.c_str(), &Buffer) == 0);
+    return (stat(name.c_str(), &Buffer) == 0);
 }
 // TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {

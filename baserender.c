@@ -65,20 +65,20 @@ void cFlatBaseRender::CreateFullOsd(void) {
               cOsd::OsdWidth() - Config.marginOsdHor * 2, cOsd::OsdHeight() - Config.marginOsdVer * 2);
 }
 
-void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
-    m_OsdLeft = left;
-    m_OsdTop = top;
-    m_OsdWidth = width;
-    m_OsdHeight = height;
+void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
+    m_OsdLeft = Left;
+    m_OsdTop = Top;
+    m_OsdWidth = Width;
+    m_OsdHeight = Height;
 
-    m_Osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pointer
-    tArea Area = {0, 0, width, height, 32};
+    m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
+    tArea Area = {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) {
-        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
         return;
     }
 
-    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
     return;
 }
 

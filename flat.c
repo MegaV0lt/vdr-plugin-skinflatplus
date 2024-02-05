@@ -502,8 +502,8 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    uint32_t tick0 = GetMsTicks();  //! For testing
-    dsyslog("flatPlus: FloatingTextWrapper start. Textlength: %ld", strlen(Text));
+    // uint32_t tick0 = GetMsTicks();  //! For testing
+    // dsyslog("flatPlus: FloatingTextWrapper start. Textlength: %ld", strlen(Text));
 
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
@@ -567,8 +567,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         }
         p += sl;
     }  // for char
-    uint32_t tick1 = GetMsTicks();
-    dsyslog("flatPlus: FloatingTextWrapper time: %d ms", tick1 - tick0);
+    // uint32_t tick1 = GetMsTicks();
+    // dsyslog("flatPlus: FloatingTextWrapper time: %d ms", tick1 - tick0);
 }
 
 const char *cTextFloatingWrapper::Text(void) {
