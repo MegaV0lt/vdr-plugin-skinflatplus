@@ -562,7 +562,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Delim = p;
                 Blank = nullptr;
             } else {
-                dsyslog("flatPlus: FloatingTextWrapper skipping double delimiter char!");
+                // dsyslog("flatPlus: FloatingTextWrapper skipping double delimiter char!");
             }
         }
         p += sl;
