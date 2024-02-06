@@ -299,10 +299,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     int FontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
     int TopSecs = FontAscender - FontSecsAscender;
 
-    if (Config.TimeSecsScale == 1.0)
+    if (Config.TimeSecsScale == 1.0) {
         LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               m_Font, m_Font->Width(*m_Current), m_FontHeight);
-    else {
+    } else {
         std::string cur = *m_Current;
         std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
@@ -373,6 +373,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     MediaPath = movie.poster.path.c_str();
                     MediaSize.Set(movie.poster.width, movie.poster.height);
                 }
+            }
+
+            if (isempty(*MediaPath)) {  // Prio for tvscraper poster
+                cString RecPath = cString::sprintf("%s", m_Recording->FileName());
+                cString RecImage("");
+                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
+                    MediaPath = RecImage;
             }
         }
 
