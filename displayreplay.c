@@ -382,7 +382,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
                     MediaPath = RecImage;
                     img = ImgLoader.LoadFile(*MediaPath, m_TVSWidth, m_TVSHeight);
-                    MediaSize.Set(img->Width(), img->Height());  // Get values fot SetMediaSize()
+                    if (img)
+                        MediaSize.Set(img->Width(), img->Height());  // Get values fot SetMediaSize()
+                    else
+                        MediaPath = "";  // Just in case image can not be loaded
                 }
             }
         }
