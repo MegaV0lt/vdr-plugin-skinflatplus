@@ -2789,18 +2789,29 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
     }  // TVScraperRecInfoShowPoster
 
+    cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         cString RecPath = cString::sprintf("%s", Recording->FileName());
         cString RecImage("");
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-            MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
-            MediaType = 2;
             MediaPath = RecImage;
+            // Preload image with full width. Get aspect and set parameters accordingly
+            img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem * 2, MediaHeight);
+            if (img) {
+                int Aspect = img->Width() / img->Height();
+                if (Aspect < 1) {  //* Poster (For example 680x1000 = 0.68)
+                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaType = 2;
+                } else {           //* Portrait (For example 1920x1080 = 1.77); Banner (Usually 758x140 = 5.41)
+                    MediaWidth = m_cWidth - m_MarginItem * 2;
+                    MediaType = 1;
+                }
+            }
         }
     }
 
     if (!isempty(*MediaPath)) {
-        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+        img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, *Text,
