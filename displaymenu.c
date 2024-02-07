@@ -691,11 +691,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
 
-    int ImageHeight = m_FontHeight;
     int ImageLeft = Left;
     int ImageTop = Top;
-    int ImageBgHeight = ImageHeight;
+    int ImageHeight = m_FontHeight;
     int ImageBgWidth = ImageHeight * 1.34;
+    int ImageBgHeight = ImageHeight;
 
     cImage *img {nullptr};
     if (!m_IsGroup) {
@@ -1074,9 +1074,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
 
-    int ImageHeight = m_FontHeight;
     int ImageLeft = Left;
     int ImageTop = Top;
+    int ImageHeight = m_FontHeight;
 
     cString IconName("");
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
@@ -1122,20 +1122,20 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += Width + m_MarginItem;
 
     ImageLeft = Left;
-    int ImageBgHeight = ImageHeight;
     int ImageBgWidth = ImageHeight * 1.34;
+    int ImageBgHeight = ImageHeight;
     img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
     if (img) {
-        ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
+        ImageBgHeight = img->Height();
         ImageTop = Top + (m_FontHeight - ImageBgHeight) / 2;
         MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
     img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     if (img) {
-        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     } else {
         bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
@@ -1147,15 +1147,15 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
 
             if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
             /* } else if (Channel->GroupSep()) {  //? Is GroupSep() in SetItemTimer() possible/needed?
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 } */
         } else {
@@ -1165,8 +1165,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
             if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
         }
@@ -1373,13 +1373,13 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem;
 
         int ImageLeft = Left;
-        int ImageBgHeight = m_FontHeight;
         int ImageBgWidth = m_FontHeight * 1.34;
+        int ImageBgHeight = m_FontHeight;
         if (!m_IsGroup) {
             img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
             if (img) {
-                ImageBgHeight = img->Height();
                 ImageBgWidth = img->Width();
+                ImageBgHeight = img->Height();
                 ImageTop = Top + (m_FontHeight - ImageBgHeight) / 2;
                 MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
@@ -1387,8 +1387,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         }
         if (img) {
-            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
             MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         } else {
             bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
@@ -1400,15 +1400,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
 
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             } else if (m_IsGroup) {
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             } else {
@@ -1418,8 +1418,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             }
@@ -1463,9 +1463,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     if (progress < 0) progress = 0.0;
                     else if (progress > 100) progress = 100;
 
+                    int PBLeft = Left;
                     int PBTop = y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
                                 Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize;
-                    int PBLeft = Left;
                     int PBHeight = Config.decorProgressMenuItemSize;
 
                     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
@@ -1519,8 +1519,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int ImageHeight = m_FontHeight;
     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel && Event && Selectable) {
         // flatPlus short, flatPlus short + EPG
-        Top += m_FontHeight;
         Left = LeftSecond;
+        Top += m_FontHeight;
         ImageHeight = m_FontSmlHeight;
         MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
         Left += m_FontSml->Width(Event->GetTimeString()) + m_MarginItem;
@@ -2029,8 +2029,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
                                  m_MenuItemWidth - Left - m_MarginItem);
 
-            Top -= m_FontHeight;
             Left = m_MenuItemWidth - ImagesWidth;
+            Top -= m_FontHeight;
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             int RecordingIsInUse = Recording->IsInUse();
             if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
@@ -2273,8 +2273,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }  // EpgAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
+    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
@@ -2844,7 +2844,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
     int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and rec info
     if (ShowMaxActors == 0) return;  // Do not show actors
-    if ( /* ShowMaxActors != -1 && */ ShowMaxActors > 0 && ShowMaxActors < NumActors)
+    if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
 
     int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
@@ -2991,8 +2991,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }  // if Config.RecordingAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
+    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
