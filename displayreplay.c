@@ -21,7 +21,8 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
     m_TVSHeight = m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
 
-    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
+    ChanEpgImagesPixmap =
+        CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1,
@@ -378,8 +379,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 cString RecPath = cString::sprintf("%s", m_Recording->FileName());
                 cString RecImage("");
-                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
+                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
                     MediaPath = RecImage;
+                    img = ImgLoader.LoadFile(*MediaPath, m_TVSWidth, m_TVSHeight);
+                    MediaSize.Set(img->Width(), img->Height());  // Get values fot SetMediaSize()
+                }
             }
         }
 
@@ -427,10 +431,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                             m_FontSecs->Width(secs.c_str()) - m_MarginItem - imgWidth - m_Font->Width(' ') -
                             m_Font->Width(hm2.c_str()) - m_FontSecs->Width(secs2.c_str());
-                } else
+                } else {
                     right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                             m_FontSecs->Width(secs.c_str()) - m_MarginItem - imgWidth - m_Font->Width(' ') -
                             m_Font->Width(cutted);
+                }
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);

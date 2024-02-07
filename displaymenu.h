@@ -17,6 +17,8 @@
 #include <sstream>
 #include <string>
 
+#include "./services/scraper2vdr.h"
+
 #include "./baserender.h"
 #include "./complexcontent.h"
 
@@ -105,6 +107,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         const char *GetGenreIcon(uchar genre);
         void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
         void InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons);  // NOLINT
+        void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
+        void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);  // NOLINT
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
@@ -115,7 +119,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                      tColor ColorBarFg, tColor ColorBg);
 
-        static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;
+        // static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;  // Unused?
         void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
         void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT

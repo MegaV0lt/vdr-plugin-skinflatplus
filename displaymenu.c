@@ -2446,24 +2446,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                 }
                             }
                         }
-                        if (series.name.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
-                        if (series.firstAired.length() > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
-                        if (series.network.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
-                        if (series.genre.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
-                        if (series.rating > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
-                        if (series.status.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
-                        if (series.episode.season > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
-                        if (series.episode.number > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -2483,23 +2466,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                 }
                             }
                         }
-                        if (movie.title.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
-                        if (movie.originalTitle.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
-                        if (movie.collectionName.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
-                        if (movie.genres.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
-                        if (movie.releaseDate.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
-                        if (movie.popularity > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
-                        if (movie.voteAverage > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
+                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
                     }
                 }
             }  // Scraper plugin
@@ -3149,24 +3116,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 }
                             }
                         }
-                        if (series.name.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
-                        if (series.firstAired.length() > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
-                        if (series.network.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
-                        if (series.genre.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
-                        if (series.rating > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
-                        if (series.status.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
-                        if (series.episode.season > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
-                        if (series.episode.number > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -3186,23 +3136,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 }
                             }
                         }
-                        if (movie.title.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
-                        if (movie.originalTitle.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
-                        if (movie.collectionName.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
-                        if (movie.genres.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
-                        if (movie.releaseDate.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
-                        if (movie.popularity > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
-                        if (movie.voteAverage > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
+                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
                     }
                 }
             }  // Scraper plugin
@@ -3662,9 +3596,10 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
                 if (RecStart2 > RecStart)
                     RecStart = RecStart2;
-            } else if (Config.MenuItemRecordingShowFolderDate == 2)  // Oldest
+            } else if (Config.MenuItemRecordingShowFolderDate == 2) {  // Oldest
                 if (RecStart2 < RecStart)
                     RecStart = RecStart2;
+            }
         }
     }
 
@@ -3725,6 +3660,35 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
             GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
         }
     }
+}
+
+void cFlatDisplayMenu::InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
+    if (Series.name.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), Series.name.c_str()));
+    if (Series.firstAired.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("first aired: "), Series.firstAired.c_str()));
+    if (Series.network.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), Series.network.c_str()));
+    if (Series.genre.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Series.genre.c_str()));
+    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));
+    if (Series.status.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), Series.status.c_str()));
+    if (Series.episode.season > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), Series.episode.season));
+    if (Series.episode.number > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("episode number: "), Series.episode.number));
+}
+
+void cFlatDisplayMenu::InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
+    if (Movie.title.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), Movie.title.c_str()));
+    if (Movie.originalTitle.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("original title: "), Movie.originalTitle.c_str()));
+    if (Movie.collectionName.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("collection name: "), Movie.collectionName.c_str()));
+    if (Movie.genres.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Movie.genres.c_str()));
+    if (Movie.releaseDate.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("release date: "), Movie.releaseDate.c_str()));
+    if (Movie.popularity > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), Movie.popularity));
+    if (Movie.voteAverage > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), Movie.voteAverage));
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
