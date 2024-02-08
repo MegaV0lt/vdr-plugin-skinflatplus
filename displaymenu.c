@@ -2293,9 +2293,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }
     bool IsUnknownDrawn = false;
+    GenreIcons.sort();  // Sort outside of loop
+    GenreIcons.unique();
     while (!GenreIcons.empty()) {
-        GenreIcons.sort();
-        GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
@@ -2852,8 +2852,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
-    // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
-    int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and rec info
+    // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
+    int ShowMaxActors = Config.TVScraperShowMaxActors;
     if (ShowMaxActors == 0) return;  // Do not show actors
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
@@ -3022,9 +3022,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }
     bool IsUnknownDrawn = false;
+    GenreIcons.sort();  // Sort outside of loop
+    GenreIcons.unique();
     while (!GenreIcons.empty()) {
-        GenreIcons.sort();
-        GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
