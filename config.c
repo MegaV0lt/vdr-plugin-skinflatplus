@@ -656,11 +656,11 @@ void cFlatConfig::ThemeInit(void) {
 
 void cFlatConfig::Init(void) {
     if (!strcmp(LogoPath, "")) {
-        LogoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
+        LogoPath = cString::sprintf("%s/logos", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: LogoPath: %s", *LogoPath);
     }
     if (!strcmp(IconPath, "")) {
-        IconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
+        IconPath = cString::sprintf("%s/icons", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: IconPath: %s", *IconPath);
     }
     if (!strcmp(RecordingOldConfigFile, "")) {
@@ -923,8 +923,8 @@ void cFlatConfig::SetLogoPath(cString path) {
 
 cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     try {
-        if (!(path.at(path.size() - 1) == '/'))
-            return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
+        if (!path.empty() && (path.at(path.size() - 1) == '/'))
+            return cString::sprintf("%s", path.erase(path.size() - 1).c_str());  // Remove '/' of path if found at end
     } catch (...) {
         return cString::sprintf("%s", path.c_str());
     }
