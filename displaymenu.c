@@ -2595,13 +2595,15 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
                                      Theme.Color(clrScrollbarBg));
 
-    cString date = Event->GetDateString();
+    /* cString date = Event->GetDateString();
     cString StartTime = Event->GetTimeString();
     cString EndTime = Event->GetEndTimeString();
 
-    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime);
+    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime); */
+    cString StrTime =
+        cString::sprintf("%s  %s - %s", Event->GetDateString(), Event->GetTimeString(), Event->GetEndTimeString());
 
-    cString title = Event->Title();
+    cString Title = Event->Title();
     cString ShortText = Event->ShortText();
     int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
@@ -2609,7 +2611,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuEventFontInfo),
                                 Theme.Color(clrMenuEventBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
-    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title,
+    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title,
                                 Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font,
                                 m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long short text
