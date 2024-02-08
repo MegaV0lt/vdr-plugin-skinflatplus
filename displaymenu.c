@@ -2730,8 +2730,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             if (RecInfo->Aux())
                 InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
-    } else
+    } else {
         Text.Append(*EmptyText);
+    }
 
     ComplexContent.Clear();
     ComplexContent.SetScrollSize(m_FontSmlHeight);
@@ -3184,7 +3185,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
-                    MediaHeight *= (1.0 / 3.0 * 2);  // Size * 0,666 = 2/3
+                    MediaHeight *= (2.0 / 3.0);  // Size * 0,666 = 2/3
                     img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
                 }
             }
@@ -3302,9 +3303,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString StrTime = cString::sprintf("%s  %s  %s", *DateString(Recording->Start()), *TimeString(Recording->Start()),
                                        RecInfo->ChannelName() ? RecInfo->ChannelName() : "");
 
-    cString title = RecInfo->Title();
-    if (isempty(*title))
-        title = Recording->Name();
+    cString Title = RecInfo->Title();
+    if (isempty(*Title))
+        Title = Recording->Name();
 
     cString ShortText = RecInfo->ShortText();
     int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
@@ -3318,7 +3319,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuRecFontInfo),
                                 Theme.Color(clrMenuRecBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
-    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title, Theme.Color(clrMenuRecFontTitle),
+    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title, Theme.Color(clrMenuRecFontTitle),
                                 Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long short text
     if (ShortTextWidth > MaxWidth) {  // Short text too long
@@ -3349,8 +3350,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
-        cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
-        cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
+        cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
