@@ -970,8 +970,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     } else {
-        cString MediaPath("");
-        int MediaWidth {0}, MediaHeight {999};
+        cString MediaPath("");          // \/ Better use content hight
+        int MediaWidth {0}, MediaHeight {/* 999 */ m_cHeight - m_MarginItem * 2};
         int MediaType {0};
 
         static cPlugin *pScraper = GetScraperPlugin();
@@ -2601,7 +2601,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime); */
     cString StrTime =
-        cString::sprintf("%s  %s - %s", Event->GetDateString(), Event->GetTimeString(), Event->GetEndTimeString());
+        cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
     cString Title = Event->Title();
     cString ShortText = Event->ShortText();
@@ -2740,8 +2740,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
-    cString MediaPath("");
-    int MediaWidth {0}, MediaHeight {999};
+    cString MediaPath("");          // \/ Better use content hight
+    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem *2};
     int MediaType {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
