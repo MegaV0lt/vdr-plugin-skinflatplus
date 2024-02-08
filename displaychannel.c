@@ -243,9 +243,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     if (Present) {
         cString StartTime = Present->GetTimeString();
-        cString EndTime = Present->GetEndTimeString();
-
-        cString StrTime = cString::sprintf("%s - %s", *StartTime, *EndTime);
+        cString StrTime = cString::sprintf("%s - %s", *StartTime, *Present->GetEndTimeString());
         int StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
 
         epg = Present->Title();
@@ -312,9 +310,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Following) {
         IsRec = false;
         cString StartTime = Following->GetTimeString();
-        cString EndTime = Following->GetEndTimeString();
-
-        cString StrTime = cString::sprintf("%s - %s", *StartTime, *EndTime);
+        cString StrTime = cString::sprintf("%s - %s", *StartTime, *Following->GetEndTimeString());
         int StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
 
         epg = Following->Title();
@@ -431,10 +427,10 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
+    int left = m_MarginItem * 2;
     int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                     - m_MarginItem;
-    int left = m_MarginItem * 2;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     int ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
@@ -492,10 +488,10 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime <= 0 || ecmInfo.ecmtime > 9999)
         return;
 
+    int left = m_SignalStrengthRight + m_MarginItem * 2;
     int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem * 2;
-    int left = m_SignalStrengthRight + m_MarginItem * 2;
 
     cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
 

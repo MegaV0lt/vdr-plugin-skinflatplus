@@ -910,7 +910,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
 int cFlatConfig::GetRecordingOldValue(std::string folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (unsigned i = 0; i < sz; ++i) {
+    for (unsigned i {0}; i < sz; ++i) {
         if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
