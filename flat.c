@@ -29,8 +29,8 @@ enum stream_content {
     sc_audio_AC3       = 0x04,
     sc_video_H264_AVC  = 0x05,
     sc_audio_HEAAC     = 0x06,
-    sc_video_H265_HEVC = 0x09,  // stream content 0x09, extension 0x00
-    sc_audio_AC4       = 0x19,  // stream content 0x09, extension 0x10
+    sc_video_H265_HEVC = 0x09,  // Stream content 0x09, extension 0x00
+    sc_audio_AC4       = 0x19,  // Stream content 0x09, extension 0x10
 };
 
 class cFlatConfig Config;
@@ -186,10 +186,10 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 }
 
 cString GetRecordingerrorIcon(int RecInfoErrors) {
-    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
+
+    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
     if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
     if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
 
@@ -590,7 +590,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
         }
         if (!s) {
             s = m_Text;
-            for (int i {0}; i < Line; i++) {
+            for (int i {0}; i < Line; ++i) {
                 s = strchr(s, '\n');
                 if (s)
                     s++;
