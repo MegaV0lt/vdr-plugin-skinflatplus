@@ -92,7 +92,7 @@ concat(
 
     case when epi_parts is Null then '' else concat('|Staffelfolgen: ', cast(epi_parts as char)) end,
     case when epi_number is Null then '' else concat('|Folge: ', cast(epi_number as char)) end,
-    case when cnt_source <> sub_source then concat('||EPG: ', upper(replace(cnt_source, 'vdr', 'dvb')), '/', upper(sub_source)) else 
+    case when cnt_source <> sub_source then concat('||EPG: ', upper(replace(cnt_source, 'vdr', 'dvb')), '/', upper(sub_source)) else
       concat('||EPG: ', upper(replace(cnt_source, 'vdr', 'dvb'))) end
   )
 )

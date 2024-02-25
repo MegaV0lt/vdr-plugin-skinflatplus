@@ -167,7 +167,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
         else  // NOLINT
     #endif
         {   // Find radio and H.264/H.265 streams.
-            //! Detection FAILED: RTL/SAT1 etc. They do not send a video component :-(
+            //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
             if (Recording->Info()->Components()) {
                 const cComponents *Components = Recording->Info()->Components();
                 int i {-1}, NumComponents = Components->NumComponents();
@@ -227,7 +227,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                 
         MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 1/3 of pixmap width
         // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
     } else {                                              //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(ContentSize.Width() * (1.0 / 2.53));  // To get 758 width @ 1920
+        MediaSize.SetWidth(ContentSize.Width() * (1.0 / (1920.0 / 758)));  // To get 758 width @ 1920
         // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
     }
 }

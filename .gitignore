@@ -4,6 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 .clang-format
+.dependencies
 
 # User-specific files
 *.rsuser
