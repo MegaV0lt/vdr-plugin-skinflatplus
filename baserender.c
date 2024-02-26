@@ -20,6 +20,9 @@
 
 #include "./flat.h"
 
+#include <sstream>
+#include <locale>
+
 cFlatBaseRender::cFlatBaseRender(void) {
     m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
@@ -1800,8 +1803,10 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     if (file.is_open()) {
         std::getline(file, PrecToday);
         file.close();
-        std::replace(PrecToday.begin(), PrecToday.end(), '.', ',');
-        p = atof(PrecToday.c_str()) * 100.0f;
+        std::istringstream istr(PrecToday);
+        istr.imbue(std::locale("C"));
+        istr >> p;
+        p = p * 100.0f;
         p = RoundUp(p, 10);
         PrecToday = cString::sprintf("%.0f%%", p);
     }
@@ -1811,8 +1816,10 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     if (file.is_open()) {
         std::getline(file, PrecTomorrow);
         file.close();
-        std::replace(PrecTomorrow.begin(), PrecTomorrow.end(), '.', ',');
-        p = atof(PrecTomorrow.c_str()) * 100.0f;
+        std::istringstream istr(PrecTomorrow);
+        istr.imbue(std::locale("C"));
+        istr >> p;
+        p = p * 100.0f;
         p = RoundUp(p, 10);
         PrecTomorrow = cString::sprintf("%.0f%%", p);
     }
