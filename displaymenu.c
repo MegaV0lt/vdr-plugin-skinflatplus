@@ -12,6 +12,9 @@
 
 #include <future>
 
+#include <sstream>
+#include <locale>
+
 #include "./services/epgsearch.h"
 #include "./services/remotetimers.h"
 #include "./services/scraper2vdr.h"
@@ -4983,9 +4986,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, prec);
-            std::replace(prec.begin(), prec.end(), '.', ',');
             file.close();
-            p = atof(prec.c_str()) * 100.0;
+            std::istringstream istr(prec);
+            istr.imbue(std::locale("C"));
+            istr >> p;
+            p = p * 100.0;
             p = RoundUp(p, 10);
             PrecString = cString::sprintf("%.0f%%", p);
         } else
