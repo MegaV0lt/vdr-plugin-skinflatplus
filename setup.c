@@ -284,6 +284,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MenuContentFullSize", Config.MenuContentFullSize);
     SetupStore("MenuEventViewAlwaysWithDate", Config.MenuEventViewAlwaysWithDate);
     SetupStore("MenuEventView", Config.MenuEventView);
+    SetupStore("MenuEventRecordingViewJustify", Config.MenuEventRecordingViewJustify);
     SetupStore("MenuFullOsd", Config.MenuFullOsd);
     SetupStore("MenuItemIconsShow", Config.MenuItemIconsShow);
     SetupStore("MenuItemPadding", Config.MenuItemPadding);
@@ -429,7 +430,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "decorScrollBarSizeUser") == 0)               SetupConfig->decorScrollBarSizeUser = atoi(Value);
 
     else if (strcmp(Name, "ButtonsShowEmpty") == 0)                     SetupConfig->ButtonsShowEmpty = atoi(Value);
-    else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)         SetupConfig->ChannelDvbapiInfoShow = atoi(Value);
+    else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)                SetupConfig->ChannelDvbapiInfoShow = atoi(Value);
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    SetupConfig->ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     SetupConfig->ChannelIconsShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          SetupConfig->ChannelResolutionAspectShow = atoi(Value);
@@ -485,7 +486,8 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuChannelView") == 0)                      SetupConfig->MenuChannelView = atoi(Value);
     else if (strcmp(Name, "MenuContentFullSize") == 0)                  SetupConfig->MenuContentFullSize = atoi(Value);
     else if (strcmp(Name, "MenuEventView") == 0)                        SetupConfig->MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)         SetupConfig->MenuEventViewAlwaysWithDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        SetupConfig->MenuEventRecordingViewJustify = atoi(Value);
+    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          SetupConfig->MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          SetupConfig->MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    SetupConfig->MenuItemIconsShow = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
@@ -496,7 +498,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0) SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0) SetupConfig->MenuItemRecordingShowFormatIcons = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     SetupConfig->MenuItemRecordingShowFormatIcons = atoi(Value);
     else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
     else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
     else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
@@ -668,6 +670,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MenuContentFullSize", SetupConfig->MenuContentFullSize, *Filename);
     Config.Store("MenuEventViewAlwaysWithDate", SetupConfig->MenuEventViewAlwaysWithDate, *Filename);
     Config.Store("MenuEventView", SetupConfig->MenuEventView, *Filename);
+    Config.Store("MenuEventRecordingViewJustify", SetupConfig->MenuEventRecordingViewJustify, *Filename);
     Config.Store("MenuFullOsd", SetupConfig->MenuFullOsd, *Filename);
     Config.Store("MenuItemIconsShow", SetupConfig->MenuItemIconsShow, *Filename);
     Config.Store("MenuItemPadding", SetupConfig->MenuItemPadding, *Filename);
@@ -1013,7 +1016,8 @@ void cFlatSetupMenu::Setup(void) {
     Add(new cMenuEditStraItem(tr("Menu channel view"), &SetupConfig->MenuChannelView, MenuChannelViews.Size(), &MenuChannelViews[0]));
     Add(new cMenuEditStraItem(tr("Menu timer view"), &SetupConfig->MenuTimerView, MenuTimerViews.Size(), &MenuTimerViews[0]));
     Add(new cMenuEditStraItem(tr("Menu event view"), &SetupConfig->MenuEventView, MenuEventViews.Size(), &MenuEventViews[0]));
-    Add(new cMenuEditBoolItem(tr("Menu event view allways with date"), &SetupConfig->MenuEventViewAlwaysWithDate));
+    Add(new cMenuEditBoolItem(tr("Justify menu event and recording view"), &SetupConfig->MenuEventRecordingViewJustify));
+    Add(new cMenuEditBoolItem(tr("Menu event view always with date"), &SetupConfig->MenuEventViewAlwaysWithDate));
     Add(new cMenuEditStraItem(tr("Menu recording view"), &SetupConfig->MenuRecordingView, MenuRecordingViews.Size(), &MenuRecordingViews[0]));
 
     Add(new cMenuEditBoolItem(tr("Scrollbar by decor-file?"), &SetupConfig->decorScrollBarByTheme));

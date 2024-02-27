@@ -29,8 +29,8 @@ enum stream_content {
     sc_audio_AC3       = 0x04,
     sc_video_H264_AVC  = 0x05,
     sc_audio_HEAAC     = 0x06,
-    sc_video_H265_HEVC = 0x09,  // stream content 0x09, extension 0x00
-    sc_audio_AC4       = 0x19,  // stream content 0x09, extension 0x10
+    sc_video_H265_HEVC = 0x09,  // Stream content 0x09, extension 0x00
+    sc_audio_AC4       = 0x19,  // Stream content 0x09, extension 0x10
 };
 
 class cFlatConfig Config;
@@ -167,7 +167,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
         else  // NOLINT
     #endif
         {   // Find radio and H.264/H.265 streams.
-            //! Detection FAILED: RTL/SAT1 etc. They do not send a video component :-(
+            //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
             if (Recording->Info()->Components()) {
                 const cComponents *Components = Recording->Info()->Components();
                 int i {-1}, NumComponents = Components->NumComponents();
@@ -186,10 +186,10 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 }
 
 cString GetRecordingerrorIcon(int RecInfoErrors) {
-    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
+    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
+
+    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
     if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
     if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
 
@@ -224,10 +224,10 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                 
         MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
         // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
     } else if (Aspect < 4) {                              //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 33% of pixmap width
+        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 1/3 of pixmap width
         // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
     } else {                                              //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(ContentSize.Width() / 2.53);   // To get 758 width @ 1920
+        MediaSize.SetWidth(ContentSize.Width() * (1.0 / (1920.0 / 758)));  // To get 758 width @ 1920
         // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
     }
 }
@@ -493,16 +493,111 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return std::string();  // Empty string
 }
 
+void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
+    if (isempty(Line.c_str())) {  // Check for empty line
+        // dsyslog("flatPlus: JustifyLine() ---Empty line---");
+        return;
+    }
+
+    int LineSpaces {0};
+    for (auto &ch : Line)  // Count spaces in 'Line'
+        if (ch == ' ') ++LineSpaces;
+
+    // Hair Space is a very small space: https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
+    const char *FillChar = " ";  // u8"\U00002009";  // Hair space U+200A (Decimal 8202), Thin space: U+2009 (thinsp)
+    int FillCharWidth = Font->Width(FillChar);
+    size_t FillCharLength = strlen(FillChar);
+
+    int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
+    if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one fill char fits in to the line
+        // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
+        return;
+    }
+
+    if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid div/0 with lines without space
+        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces, FillCharWidth);
+        return;
+    }
+
+    int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many fill char we need?
+    int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'
+    int FillCharRemainder = NeedFillChar % LineSpaces;  // Just for logging
+    std::string FillChars("");
+    for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+        FillChars.append(FillChar);
+    }
+    size_t FillCharsLength = FillChars.size();
+
+    if (LineWidth > (LineMaxWidth * 0.7)) {  // Lines shorter than 70% looking bad when justified
+        int InsertedFillChar {0};
+        size_t LineLength = Line.size(), pos = Line.find_first_of(".,?!;");
+        /* dsyslog("flatPlus: JustifyLine() [Line: %d Space, %d width, %ld length]"
+                " [FillChar: %d needed, %d blocksize, %d remainder, %d width]"
+                " [FillChars: %ld length]",
+                LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, FillCharRemainder, FillCharWidth,
+                FillCharsLength); */
+
+        if (FillCharBlock > 0) {  // Insert multiple 'FillChar'
+            while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) < NeedFillChar)) {
+                if (pos < (LineLength - FillCharBlock - 1)) {
+                    // dsyslog("flatPlus:  Insert block at %ld", pos);
+                    Line.insert(pos + 1, FillChars);  // Insert after pos!
+                    pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1);
+                    InsertedFillChar += FillCharBlock;
+                    LineLength = Line.size();
+                } else {
+                    // dsyslog("flatPlus:  End of line reached: %ld", pos);
+                    break;
+                }
+            }
+            dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (.,?!;): %d", InsertedFillChar);
+
+            // Is space for blocks left?
+            if (InsertedFillChar <= (NeedFillChar - FillCharBlock)) {
+                pos = Line.find_first_of(' ');
+                while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) < NeedFillChar)) {
+                    if (!(isspace(Line[pos - 1]))) {
+                        // dsyslog("flatPlus:  Insert block at %ld", pos);
+                        Line.insert(pos, FillChars);
+                        InsertedFillChar += FillCharBlock;
+                    }
+                    pos = Line.find_first_of(' ', pos + FillCharsLength + 1);  // Add inserted chars plus one
+                }
+                // dsyslog("flatPlus: JustifyLine() InsertedFillChar after second loop (' '): %d", InsertedFillChar);
+            }
+        }  // 'FillCharBlock' > 0
+
+        // Insert the remainder of 'NeedFillChar'
+        if (InsertedFillChar <= (NeedFillChar - 1)) {
+            pos = Line.find_first_of(' ');
+            while (pos != std::string::npos && (InsertedFillChar < NeedFillChar)) {
+                if (!(isspace(Line[pos - 1]))) {
+                    // dsyslog("flatPlus: Insert char at %ld", pos);
+                    Line.insert(pos, FillChar);
+                    ++InsertedFillChar;
+                }
+                pos = Line.find_first_of(' ', pos + FillCharLength + 1);  // 'FillChar' plus one
+            }
+            // dsyslog("flatPlus: JustifyLine() InsertedFillChar after third loop (' '): %d", InsertedFillChar);
+        }
+    } else {
+        // dsyslog("flatPlus: JustifyLine() Line too short for justifying: %.0f/%d", LineMaxWidth * 0.6, LineMaxWidth);
+        // return;
+    }
+}
+
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {
-}
+cTextFloatingWrapper::cTextFloatingWrapper(void) {}
 
 cTextFloatingWrapper::~cTextFloatingWrapper() {
     free(m_Text);
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
+    // uint32_t tick0 = GetMsTicks();  //! For testing
+    // dsyslog("flatPlus: FloatingTextWrapper start. Textlength: %ld", strlen(Text));
+
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
     if (!m_Text)
@@ -516,9 +611,6 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     int Width = UpperLines > 0 ? WidthUpper : WidthLower;
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
-
-    const char *ThreeDots {"..."}, *CompactDots {"…"};
-    strreplace(m_Text, ThreeDots, CompactDots);  // Try to fix wrong line break in '...'
 
     for (char *p = m_Text; *p;) {
         /* int */ sl = Utf8CharLen(p);
@@ -559,11 +651,17 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         }
         w += cw;
         if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
-            Delim = p;
-            Blank = nullptr;
+            if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
+                Delim = p;
+                Blank = nullptr;
+            } else {
+                // dsyslog("flatPlus: FloatingTextWrapper skipping double delimiter char!");
+            }
         }
         p += sl;
     }  // for char
+    // uint32_t tick1 = GetMsTicks();
+    // dsyslog("flatPlus: FloatingTextWrapper time: %d ms", tick1 - tick0);
 }
 
 const char *cTextFloatingWrapper::Text(void) {
@@ -585,7 +683,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
         }
         if (!s) {
             s = m_Text;
-            for (int i {0}; i < Line; i++) {
+            for (int i {0}; i < Line; ++i) {
                 s = strchr(s, '\n');
                 if (s)
                     s++;

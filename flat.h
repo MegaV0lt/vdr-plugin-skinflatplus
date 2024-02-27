@@ -225,10 +225,9 @@ class cTextFloatingWrapper {
     cTextFloatingWrapper(void);
     ~cTextFloatingWrapper();
     void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
-    ///< Wraps the Text to make it fit into the area defined by the given Width
-    ///< when displayed with the given Font.
-    ///< Wrapping is done by inserting the necessary number of newline
-    ///< characters into the string.
+    ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
+    ///< Wrapping is done by inserting the necessary number of newline characters into the string.
+    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fin in 'WidthUpper'.
     const char *Text(void);
     ///< Returns the full wrapped text.
     int Lines(void) { return m_Lines; }
@@ -262,6 +261,8 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
 
+void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth);  // NOLINT
+
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
@@ -292,5 +293,4 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts(void);
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
-std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
-
+std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);  // NOLINT

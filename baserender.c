@@ -68,20 +68,20 @@ void cFlatBaseRender::CreateFullOsd(void) {
               cOsd::OsdWidth() - Config.marginOsdHor * 2, cOsd::OsdHeight() - Config.marginOsdVer * 2);
 }
 
-void cFlatBaseRender::CreateOsd(int left, int top, int width, int height) {
-    m_OsdLeft = left;
-    m_OsdTop = top;
-    m_OsdWidth = width;
-    m_OsdHeight = height;
+void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
+    m_OsdLeft = Left;
+    m_OsdTop = Top;
+    m_OsdWidth = Width;
+    m_OsdHeight = Height;
 
-    m_Osd = cOsdProvider::NewOsd(left, top);  // Is always a valid pointer
-    tArea Area = {0, 0, width, height, 32};
+    m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
+    tArea Area = {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) {
-        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", left, top, width, height);
+        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
         return;
     }
 
-    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", left, top, width, height);
+    esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
     return;
 }
 
@@ -817,12 +817,11 @@ void cFlatBaseRender::MessageClear(void) {
     MessageScroller.Clear();
 }
 
-void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height, int MarginHor, int MarginVer,
-                                        tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type, bool SetBackground,
-                                        bool IsSignal) {
-    m_ProgressBarTop = Top;
-    m_ProgressBarWidth = Width;
-    m_ProgressBarHeight = Height;
+void cFlatBaseRender::ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
+                                        tColor ColorBg, int Type, bool SetBackground, bool IsSignal) {
+    m_ProgressBarTop = Rect.Top();
+    m_ProgressBarWidth = Rect.Width();
+    m_ProgressBarHeight = Rect.Height();
     m_ProgressType = Type;
     m_ProgressBarMarginHor = MarginHor;
     m_ProgressBarMarginVer = MarginVer;
@@ -837,9 +836,10 @@ void cFlatBaseRender::ProgressBarCreate(int Left, int Top, int Width, int Height
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
     ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3,
-                                     cRect(Left, m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
+                                     cRect(Rect.Left(), m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
     ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
-                                       cRect(Left - m_ProgressBarMarginVer, m_ProgressBarTop - m_ProgressBarMarginHor,
+                                       cRect(Rect.Left() - m_ProgressBarMarginVer,
+                                             m_ProgressBarTop - m_ProgressBarMarginHor,
                                              m_ProgressBarWidth + m_ProgressBarMarginVer * 2,
                                              m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
     PixmapFill(ProgressBarPixmap, clrTransparent);
@@ -1366,18 +1366,18 @@ int cFlatBaseRender::ScrollBarWidth(void) {
     return m_ScrollBarWidth;
 }
 
-void cFlatBaseRender::DecorBorderClear(int Left, int Top, int Width, int Height, int Size) {
-    int LeftDecor = Left - Size;
-    int TopDecor = Top - Size;
-    int WidthDecor = Width + Size * 2;
-    int HeightDecor = Height + Size * 2;
-    int BottomDecor = Height + Size;
+void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
+    int TopDecor = Rect.Top() - Size;
+    int LeftDecor = Rect.Left() - Size;
+    int WidthDecor = Rect.Width() + Size * 2;
+    int HeightDecor = Rect.Height() + Size * 2;
+    int BottomDecor = Rect.Height() + Size;
 
     if (DecorPixmap) {
         // Top
         DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), clrTransparent);
         // Right
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), clrTransparent);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Rect.Width(), TopDecor, Size, HeightDecor), clrTransparent);
         // Bottom
         DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), clrTransparent);
         // Left
@@ -1389,7 +1389,7 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
     std::list<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
-            DecorBorderClear((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size);
+            DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);
             it = Borders.erase(it);
         } else
             ++it;

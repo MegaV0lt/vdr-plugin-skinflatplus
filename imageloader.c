@@ -16,24 +16,22 @@
 
 using namespace Magick;
 
-cImageLoader::cImageLoader() {
-}
+cImageLoader::cImageLoader() {}
 
-cImageLoader::~cImageLoader() {
-}
+cImageLoader::~cImageLoader() {}
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if (width == 0 || height == 0) return NULL;
 
     // Plain logo without converting to lower including '/'
-    cString File = cString::sprintf("%s%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
+    cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
     std::string LogoLower("");
     cImage *img {nullptr};
     for (int i {0}; i < 3; ++i) {  // Run up to three times (0..2)
         if (i == 1) {  // Second try (Plain logo not found)
             LogoLower = logo;
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
-            File = cString::sprintf("%s%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
+            File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
         if (i == 2) {  // Third try. Search for lowercase logo with '~' for path '/'
             for (std::size_t i {0}; i < LogoLower.length(); ++i) {
@@ -92,7 +90,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if (width == 0 || height == 0) return NULL;
 
-    cString File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
+    cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
     #ifdef DEBUGIMAGELOADTIME
         dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
@@ -125,7 +123,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     #endif
 
     if (!success) {  // Search for logo in default folder
-        File = cString::sprintf("%s%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
+        File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
             uint32_t tick5 = GetMsTicks();
@@ -238,7 +236,7 @@ void cImageLoader::ToLowerCase(std::string &str) {
 
 bool cImageLoader::FileExits(const std::string &name) {
     struct stat Buffer;
-    return (stat (name.c_str(), &Buffer) == 0);
+    return (stat(name.c_str(), &Buffer) == 0);
 }
 // TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {

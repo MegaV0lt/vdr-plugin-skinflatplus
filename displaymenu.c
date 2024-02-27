@@ -694,11 +694,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
 
-    int ImageHeight = m_FontHeight;
     int ImageLeft = Left;
     int ImageTop = Top;
-    int ImageBgHeight = ImageHeight;
+    int ImageHeight = m_FontHeight;
     int ImageBgWidth = ImageHeight * 1.34;
+    int ImageBgHeight = ImageHeight;
 
     cImage *img {nullptr};
     if (!m_IsGroup) {
@@ -973,8 +973,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     } else {
-        cString MediaPath("");
-        int MediaWidth {0}, MediaHeight {0};
+        cString MediaPath("");          // \/ Better use content hight
+        int MediaWidth {0}, MediaHeight {/* 999 */ m_cHeight - m_MarginItem * 2};
         int MediaType {0};
 
         static cPlugin *pScraper = GetScraperPlugin();
@@ -985,12 +985,10 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             if (pScraper->Service("GetPosterBannerV2", &call)) {
                 if ((call.type == tSeries) && call.banner.path.size() > 0) {
                     MediaWidth = m_cWidth - m_MarginItem * 2;
-                    MediaHeight = 999;
                     MediaPath = call.banner.path.c_str();
                     MediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
                     MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
-                    MediaHeight = 999;
                     MediaPath = call.poster.path.c_str();
                     MediaType = 2;
                 }
@@ -999,12 +997,12 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 
         if (!isempty(*MediaPath)) {
             cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-            if (img && MediaType == 2) {
+            if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
                     cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
-            } else if (img && MediaType == 1) {
+            } else if (img && MediaType == 1) {  // Series
                 ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
                 ComplexContent.AddText(*Text, true,
                                        cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,
@@ -1079,9 +1077,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
 
-    int ImageHeight = m_FontHeight;
     int ImageLeft = Left;
     int ImageTop = Top;
+    int ImageHeight = m_FontHeight;
 
     cString IconName("");
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
@@ -1127,20 +1125,20 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += Width + m_MarginItem;
 
     ImageLeft = Left;
-    int ImageBgHeight = ImageHeight;
     int ImageBgWidth = ImageHeight * 1.34;
+    int ImageBgHeight = ImageHeight;
     img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
     if (img) {
-        ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
+        ImageBgHeight = img->Height();
         ImageTop = Top + (m_FontHeight - ImageBgHeight) / 2;
         MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
     img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     if (img) {
-        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     } else {
         bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
@@ -1152,15 +1150,15 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
 
             if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
             /* } else if (Channel->GroupSep()) {  //? Is GroupSep() in SetItemTimer() possible/needed?
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 } */
         } else {
@@ -1170,8 +1168,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
             if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
         }
@@ -1378,13 +1376,13 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem;
 
         int ImageLeft = Left;
-        int ImageBgHeight = m_FontHeight;
         int ImageBgWidth = m_FontHeight * 1.34;
+        int ImageBgHeight = m_FontHeight;
         if (!m_IsGroup) {
             img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
             if (img) {
-                ImageBgHeight = img->Height();
                 ImageBgWidth = img->Width();
+                ImageBgHeight = img->Height();
                 ImageTop = Top + (m_FontHeight - ImageBgHeight) / 2;
                 MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
@@ -1392,8 +1390,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         }
         if (img) {
-            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
             MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         } else {
             bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
@@ -1405,15 +1403,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
 
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             } else if (m_IsGroup) {
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             } else {
@@ -1423,8 +1421,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
                 if (img) {
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             }
@@ -1468,9 +1466,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     if (progress < 0) progress = 0.0;
                     else if (progress > 100) progress = 100;
 
+                    int PBLeft = Left;
                     int PBTop = y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
                                 Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize;
-                    int PBLeft = Left;
                     int PBHeight = Config.decorProgressMenuItemSize;
 
                     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
@@ -1524,8 +1522,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int ImageHeight = m_FontHeight;
     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel && Event && Selectable) {
         // flatPlus short, flatPlus short + EPG
-        Top += m_FontHeight;
         Left = LeftSecond;
+        Top += m_FontHeight;
         ImageHeight = m_FontSmlHeight;
         MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
         Left += m_FontSml->Width(Event->GetTimeString()) + m_MarginItem;
@@ -2034,8 +2032,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
                                  m_MenuItemWidth - Left - m_MarginItem);
 
-            Top -= m_FontHeight;
             Left = m_MenuItemWidth - ImagesWidth;
+            Top -= m_FontHeight;
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             int RecordingIsInUse = Recording->IsInUse();
             if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
@@ -2278,8 +2276,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }  // EpgAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
+    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
@@ -2298,9 +2296,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }
     bool IsUnknownDrawn = false;
+    GenreIcons.sort();  // Sort outside of loop
+    GenreIcons.unique();
     while (!GenreIcons.empty()) {
-        GenreIcons.sort();
-        GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
@@ -2451,24 +2449,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                 }
                             }
                         }
-                        if (series.name.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
-                        if (series.firstAired.length() > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
-                        if (series.network.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
-                        if (series.genre.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
-                        if (series.rating > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
-                        if (series.status.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
-                        if (series.episode.season > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
-                        if (series.episode.number > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -2488,23 +2469,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                 }
                             }
                         }
-                        if (movie.title.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
-                        if (movie.originalTitle.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
-                        if (movie.collectionName.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
-                        if (movie.genres.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
-                        if (movie.releaseDate.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
-                        if (movie.popularity > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
-                        if (movie.voteAverage > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
+                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
                     }
                 }
             }  // Scraper plugin
@@ -2633,13 +2598,15 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
                                      Theme.Color(clrScrollbarBg));
 
-    cString date = Event->GetDateString();
+    /* cString date = Event->GetDateString();
     cString StartTime = Event->GetTimeString();
     cString EndTime = Event->GetEndTimeString();
 
-    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime);
+    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime); */
+    cString StrTime =
+        cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
-    cString title = Event->Title();
+    cString Title = Event->Title();
     cString ShortText = Event->ShortText();
     int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
@@ -2647,7 +2614,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuEventFontInfo),
                                 Theme.Color(clrMenuEventBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
-    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title,
+    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title,
                                 Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font,
                                 m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long short text
@@ -2766,8 +2733,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             if (RecInfo->Aux())
                 InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
-    } else
+    } else {
         Text.Append(*EmptyText);
+    }
 
     ComplexContent.Clear();
     ComplexContent.SetScrollSize(m_FontSmlHeight);
@@ -2776,8 +2744,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
-    cString MediaPath("");
-    int MediaWidth {0}, MediaHeight {999};
+    cString MediaPath("");          // \/ Better use content hight
+    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem *2};
     int MediaType {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
@@ -2827,18 +2795,29 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         }
     }  // TVScraperRecInfoShowPoster
 
+    cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         cString RecPath = cString::sprintf("%s", Recording->FileName());
         cString RecImage("");
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-            MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
-            MediaType = 2;
             MediaPath = RecImage;
+            // Preload image with full width. Get aspect and set parameters accordingly
+            img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem * 2, MediaHeight);
+            if (img) {
+                int Aspect = img->Width() / img->Height();
+                if (Aspect < 1) {  //* Poster (For example 680x1000 = 0.68)
+                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaType = 2;
+                } else {           //* Portrait (For example 1920x1080 = 1.77); Banner (Usually 758x140 = 5.41)
+                    MediaWidth = m_cWidth - m_MarginItem * 2;
+                    MediaType = 1;
+                }
+            }
         }
     }
 
     if (!isempty(*MediaPath)) {
-        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+        img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, *Text,
@@ -2879,10 +2858,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
-    // TVScraperEPGInfoShowActors, TVScraperRecInfoShowActors
-    int ShowMaxActors = Config.TVScraperShowMaxActors;  // Global setting for epg- and rec info
+    // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
+    int ShowMaxActors = Config.TVScraperShowMaxActors;
     if (ShowMaxActors == 0) return;  // Do not show actors
-    if ( /* ShowMaxActors != -1 && */ ShowMaxActors > 0 && ShowMaxActors < NumActors)
+    if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
 
     int ContentTop = ComplexContent.BottomContent() + m_FontHeight;
@@ -3029,8 +3008,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }  // if Config.RecordingAdditionalInfoShow
 
     double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
+    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
@@ -3049,9 +3028,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }
     bool IsUnknownDrawn = false;
+    GenreIcons.sort();  // Sort outside of loop
+    GenreIcons.unique();
     while (!GenreIcons.empty()) {
-        GenreIcons.sort();
-        GenreIcons.unique();
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
@@ -3154,24 +3133,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 }
                             }
                         }
-                        if (series.name.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), series.name.c_str()));
-                        if (series.firstAired.length() > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%s\n", tr("first aired: "), series.firstAired.c_str()));
-                        if (series.network.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), series.network.c_str()));
-                        if (series.genre.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), series.genre.c_str()));
-                        if (series.rating > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), series.rating));
-                        if (series.status.length() > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), series.status.c_str()));
-                        if (series.episode.season > 0)
-                            SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), series.episode.season));
-                        if (series.episode.number > 0)
-                            SeriesInfo.Append(
-                                cString::sprintf("%s%d\n", tr("episode number: "), series.episode.number));
+                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
                     }
                 } else if (call.type == tMovie) {
                     cMovie movie;
@@ -3191,23 +3153,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                                 }
                             }
                         }
-                        if (movie.title.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), movie.title.c_str()));
-                        if (movie.originalTitle.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("original title: "), movie.originalTitle.c_str()));
-                        if (movie.collectionName.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("collection name: "), movie.collectionName.c_str()));
-                        if (movie.genres.length() > 0)
-                            MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), movie.genres.c_str()));
-                        if (movie.releaseDate.length() > 0)
-                            MovieInfo.Append(
-                                cString::sprintf("%s%s\n", tr("release date: "), movie.releaseDate.c_str()));
-                        if (movie.popularity > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), movie.popularity));
-                        if (movie.voteAverage > 0)
-                            MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), movie.voteAverage));
+                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
                     }
                 }
             }  // Scraper plugin
@@ -3238,11 +3184,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
-                int Aspect = img->Width() / img->Height();  // 50% x 100% of content size
+                int Aspect = img->Width() / img->Height();
                 if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
-                    MediaHeight *= (1.0 / 3.0 * 2);  // Size * 0,666 = 2/3
+                    MediaHeight *= (2.0 / 3.0);  // Size * 0,666 = 2/3
                     img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
                 }
             }
@@ -3360,9 +3306,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString StrTime = cString::sprintf("%s  %s  %s", *DateString(Recording->Start()), *TimeString(Recording->Start()),
                                        RecInfo->ChannelName() ? RecInfo->ChannelName() : "");
 
-    cString title = RecInfo->Title();
-    if (isempty(*title))
-        title = Recording->Name();
+    cString Title = RecInfo->Title();
+    if (isempty(*Title))
+        Title = Recording->Name();
 
     cString ShortText = RecInfo->ShortText();
     int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
@@ -3376,7 +3322,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuRecFontInfo),
                                 Theme.Color(clrMenuRecBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
-    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *title, Theme.Color(clrMenuRecFontTitle),
+    ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title, Theme.Color(clrMenuRecFontTitle),
                                 Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
     // Add scroller to long short text
     if (ShortTextWidth > MaxWidth) {  // Short text too long
@@ -3407,8 +3353,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
-        cString ErrIcon = GetRecordingerrorIcon(RecInfo->Errors());
-        cString RecErrIcon = cString::sprintf("%s_replay", *ErrIcon);
+        cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
@@ -3667,9 +3612,10 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
                 if (RecStart2 > RecStart)
                     RecStart = RecStart2;
-            } else if (Config.MenuItemRecordingShowFolderDate == 2)  // Oldest
+            } else if (Config.MenuItemRecordingShowFolderDate == 2) {  // Oldest
                 if (RecStart2 < RecStart)
                     RecStart = RecStart2;
+            }
         }
     }
 
@@ -3730,6 +3676,35 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
             GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
         }
     }
+}
+
+void cFlatDisplayMenu::InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
+    if (Series.name.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), Series.name.c_str()));
+    if (Series.firstAired.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("first aired: "), Series.firstAired.c_str()));
+    if (Series.network.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), Series.network.c_str()));
+    if (Series.genre.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Series.genre.c_str()));
+    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));
+    if (Series.status.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), Series.status.c_str()));
+    if (Series.episode.season > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), Series.episode.season));
+    if (Series.episode.number > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("episode number: "), Series.episode.number));
+}
+
+void cFlatDisplayMenu::InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
+    if (Movie.title.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), Movie.title.c_str()));
+    if (Movie.originalTitle.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("original title: "), Movie.originalTitle.c_str()));
+    if (Movie.collectionName.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("collection name: "), Movie.collectionName.c_str()));
+    if (Movie.genres.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Movie.genres.c_str()));
+    if (Movie.releaseDate.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("release date: "), Movie.releaseDate.c_str()));
+    if (Movie.popularity > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), Movie.popularity));
+    if (Movie.voteAverage > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), Movie.voteAverage));
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
@@ -4930,6 +4905,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     //* Declared in 'baserender.h'
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+    int FontTempSmlHeight = m_FontTempSml->Height();
 
     cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem * 2);
     if (img)
@@ -4999,7 +4975,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         tm_r.tm_mday += index;
         /* time_t */ t2 = mktime(&tm_r);
 
-        int FontTempSmlHeight = m_FontTempSml->Height();
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
             if (left + m_FontHeight * 2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
                     m_MarginItem * 6 >
@@ -5087,7 +5062,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
 void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
-    cString Path = cString::sprintf("%s%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
+    cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
     std::string File("");
     cString FileName("");
     cReadDir d(*Path);

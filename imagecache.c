@@ -16,16 +16,13 @@
 #include "./displaytracks.h"
 #include "./displayvolume.h"
 
+cImageCache::cImageCache() {}
 
-cImageCache::cImageCache() {
-}
-
-cImageCache::~cImageCache() {
-}
+cImageCache::~cImageCache() {}
 
 void cImageCache::Create(void) {
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
-        CacheImage[i] = NULL;
+        CacheImage[i] = nullptr;
         CacheName[i] = "";
         CacheWidth[i] = -1;
         CacheHeight[i] = -1;
@@ -36,7 +33,7 @@ void cImageCache::Create(void) {
 
 void cImageCache::Clear(void) {
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
-        if (CacheImage[i] != NULL)
+        // if (CacheImage[i] != NULL)  //* 'delete' already checks for NULL
             delete CacheImage[i];
     }
 
@@ -50,7 +47,7 @@ bool cImageCache::RemoveFromCache(std::string Name) {
 
         if (BaseFileName == Name) {
             dsyslog("flatPlus: RemoveFromCache - %s", CacheName[i].c_str());
-            CacheImage[i] = NULL;
+            CacheImage[i] = nullptr;
             CacheName[i] = "";
             CacheWidth[i] = -1;
             CacheHeight[i] = -1;
@@ -72,7 +69,7 @@ cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
 }
 
 void cImageCache::InsertImage(cImage *Image, std::string Name, int Width, int Height) {
-    // if (m_OverFlow) return;  // TODO: Leave cache as is or refill?
+    // if (m_OverFlow) return;  //? Leave cache as is or refill?
 
     CacheImage[m_InsertIndex] = Image;
     CacheName[m_InsertIndex] = Name;

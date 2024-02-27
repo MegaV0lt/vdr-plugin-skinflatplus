@@ -67,6 +67,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuChannelView = 1;
     MenuTimerView = 1;
     MenuEventView = 1;
+    MenuEventRecordingViewJustify = 0;  // Disabled by default
     MenuRecordingView = 1;
 
     MenuEventViewAlwaysWithDate = 1;
@@ -353,7 +354,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuChannelView") == 0)                      MenuChannelView = atoi(Value);
     else if (strcmp(Name, "MenuContentFullSize") == 0)                  MenuContentFullSize = atoi(Value);
     else if (strcmp(Name, "MenuEventView") == 0)                        MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)         MenuEventViewAlwaysWithDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    MenuItemIconsShow = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      MenuItemPadding = atoi(Value);
@@ -362,6 +363,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        MenuEventRecordingViewJustify = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     MenuItemRecordingShowFormatIcons = atoi(Value);
@@ -656,11 +658,11 @@ void cFlatConfig::ThemeInit(void) {
 
 void cFlatConfig::Init(void) {
     if (!strcmp(LogoPath, "")) {
-        LogoPath = cString::sprintf("%s/logos/", PLUGINRESOURCEPATH);
+        LogoPath = cString::sprintf("%s/logos", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: LogoPath: %s", *LogoPath);
     }
     if (!strcmp(IconPath, "")) {
-        IconPath = cString::sprintf("%s/icons/", PLUGINRESOURCEPATH);
+        IconPath = cString::sprintf("%s/icons", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: IconPath: %s", *IconPath);
     }
     if (!strcmp(RecordingOldConfigFile, "")) {
@@ -910,7 +912,7 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
 
 int cFlatConfig::GetRecordingOldValue(std::string folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (unsigned i = 0; i < sz; ++i) {
+    for (unsigned i {0}; i < sz; ++i) {
         if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
@@ -923,8 +925,8 @@ void cFlatConfig::SetLogoPath(cString path) {
 
 cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     try {
-        if (!(path.at(path.size() - 1) == '/'))
-            return cString::sprintf("%s/", path.c_str());  // Add '/' to path if not found
+        if (!path.empty() && (path.at(path.size() - 1) == '/'))
+            return cString::sprintf("%s", path.erase(path.size() - 1).c_str());  // Remove '/' of path if found at end
     } catch (...) {
         return cString::sprintf("%s", path.c_str());
     }

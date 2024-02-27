@@ -1,5 +1,17 @@
 VDR Plugin 'skin flatPlus' Revision History
 ---------------------------------------
+2024-02-27: Version 1.0.2
+ - [fix] New try to fix wrong line breaks in '...'
+ - [add] Search for manual poster also in replay
+ - [add] Option to show the wrapped text in event and recording view justified
+         Default disabled. To activate go to menu - menu settings
+ - [add] Make the precipitation % locale-agnostic and add a new script
+         for new subscribers of the Open Weather (API 3.0) Thanks to JTe-git
+ - [update] Merge InsertSeriesInfos() and InsertMovieInfos()
+ - [update] Update eventsview-MV.sql to extract Season and Episode from
+            shorttext
+ - [update] Some internal optimizations
+
 2024-01-31: Version 1.0.1
  - [fix] Fix scrollbar in timer short view
  - [fix] Try to fix wrong line breaks in '...'

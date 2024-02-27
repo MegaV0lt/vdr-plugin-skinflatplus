@@ -101,7 +101,7 @@ class cSimpleContent {
             return m_Position.Top() + m_Font->Height();
 
         if (m_ContentType == CT_TextMultiline) {
-            /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
+            cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
         }
@@ -122,7 +122,7 @@ class cSimpleContent {
             Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top()), m_Text.c_str(), m_ColorFg, m_ColorBg, m_Font,
                              m_TextWidth, m_TextHeight, m_TextAlignment);
         } else if (m_ContentType == CT_TextMultiline) {
-            /* cTextWrapper */ cTextFloatingWrapper Wrapper;  // Use modified wrapper
+            cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             int Lines = Wrapper.Lines();
             int FontHeight = m_Font->Height();
