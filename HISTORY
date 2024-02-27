@@ -3,6 +3,8 @@ VDR Plugin 'skin flatPlus' Revision History
 2024-02-xx: Version 1.0.2
  - [fix] New try to fix wrong line breaks in '...'
  - [add] Search for manual poster also in replay
+ - [add] Option to show the wrapped text in event and recording view justified
+         Default disabled. To activate go to menu - menu settings
  - [update] Merge InsertSeriesInfos() and InsertMovieInfos()
  - [update] Update eventsview-MV.sql to extract Season and Episode from
             shorttext

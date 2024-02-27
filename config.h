@@ -248,6 +248,7 @@ class cFlatConfig {
         int MenuChannelView;
         int MenuTimerView;
         int MenuEventView;
+        int MenuEventRecordingViewJustify;  // 0 = disable, 1 = Justify wrapped text
         int MenuRecordingView;
         int MenuFullOsd;
         int MenuEventViewAlwaysWithDate;

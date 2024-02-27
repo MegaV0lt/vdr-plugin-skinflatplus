@@ -67,6 +67,7 @@ cFlatConfig::cFlatConfig(void) {
     MenuChannelView = 1;
     MenuTimerView = 1;
     MenuEventView = 1;
+    MenuEventRecordingViewJustify = 0;  // Disabled by default
     MenuRecordingView = 1;
 
     MenuEventViewAlwaysWithDate = 1;
@@ -353,7 +354,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuChannelView") == 0)                      MenuChannelView = atoi(Value);
     else if (strcmp(Name, "MenuContentFullSize") == 0)                  MenuContentFullSize = atoi(Value);
     else if (strcmp(Name, "MenuEventView") == 0)                        MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)         MenuEventViewAlwaysWithDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    MenuItemIconsShow = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      MenuItemPadding = atoi(Value);
@@ -362,6 +363,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
+    else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        MenuEventRecordingViewJustify = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0)      MenuItemRecordingShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0)      MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     MenuItemRecordingShowFormatIcons = atoi(Value);

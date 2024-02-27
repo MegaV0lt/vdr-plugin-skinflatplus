@@ -493,6 +493,99 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return std::string();  // Empty string
 }
 
+void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
+    if (isempty(Line.c_str())) {  // Check for empty line
+        // dsyslog("flatPlus: JustifyLine() ---Empty line---");
+        return;
+    }
+
+    int LineSpaces {0};
+    for (auto &ch : Line)  // Count spaces in 'Line'
+        if (ch == ' ') ++LineSpaces;
+
+    // Hair Space is a very small space: https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
+    const char *FillChar = " ";  // u8"\U00002009";  // Hair space U+200A (Decimal 8202), Thin space: U+2009 (thinsp)
+    int FillCharWidth = Font->Width(FillChar);
+    size_t FillCharLength = strlen(FillChar);
+
+    int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
+    if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one fill char fits in to the line
+        // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
+        return;
+    }
+
+    if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid div/0 with lines without space
+        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces, FillCharWidth);
+        return;
+    }
+
+    int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many fill char we need?
+    int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'
+    int FillCharRemainder = NeedFillChar % LineSpaces;  // Just for logging
+    std::string FillChars("");
+    for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+        FillChars.append(FillChar);
+    }
+    size_t FillCharsLength = FillChars.size();
+
+    if (LineWidth > (LineMaxWidth * 0.7)) {  // Lines shorter than 70% looking bad when justified
+        int InsertedFillChar {0};
+        size_t LineLength = Line.size(), pos = Line.find_first_of(".,?!;");
+        /* dsyslog("flatPlus: JustifyLine() [Line: %d Space, %d width, %ld length]"
+                " [FillChar: %d needed, %d blocksize, %d remainder, %d width]"
+                " [FillChars: %ld length]",
+                LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, FillCharRemainder, FillCharWidth,
+                FillCharsLength); */
+
+        if (FillCharBlock > 0) {  // Insert multiple 'FillChar'
+            while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) < NeedFillChar)) {
+                if (pos < (LineLength - FillCharBlock - 1)) {
+                    // dsyslog("flatPlus:  Insert block at %ld", pos);
+                    Line.insert(pos + 1, FillChars);  // Insert after pos!
+                    pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1);
+                    InsertedFillChar += FillCharBlock;
+                    LineLength = Line.size();
+                } else {
+                    // dsyslog("flatPlus:  End of line reached: %ld", pos);
+                    break;
+                }
+            }
+            dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (.,?!;): %d", InsertedFillChar);
+
+            // Is space for blocks left?
+            if (InsertedFillChar <= (NeedFillChar - FillCharBlock)) {
+                pos = Line.find_first_of(' ');
+                while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) < NeedFillChar)) {
+                    if (!(isspace(Line[pos - 1]))) {
+                        // dsyslog("flatPlus:  Insert block at %ld", pos);
+                        Line.insert(pos, FillChars);
+                        InsertedFillChar += FillCharBlock;
+                    }
+                    pos = Line.find_first_of(' ', pos + FillCharsLength + 1);  // Add inserted chars plus one
+                }
+                // dsyslog("flatPlus: JustifyLine() InsertedFillChar after second loop (' '): %d", InsertedFillChar);
+            }
+        }  // 'FillCharBlock' > 0
+
+        // Insert the remainder of 'NeedFillChar'
+        if (InsertedFillChar <= (NeedFillChar - 1)) {
+            pos = Line.find_first_of(' ');
+            while (pos != std::string::npos && (InsertedFillChar < NeedFillChar)) {
+                if (!(isspace(Line[pos - 1]))) {
+                    // dsyslog("flatPlus: Insert char at %ld", pos);
+                    Line.insert(pos, FillChar);
+                    ++InsertedFillChar;
+                }
+                pos = Line.find_first_of(' ', pos + FillCharLength + 1);  // 'FillChar' plus one
+            }
+            // dsyslog("flatPlus: JustifyLine() InsertedFillChar after third loop (' '): %d", InsertedFillChar);
+        }
+    } else {
+        // dsyslog("flatPlus: JustifyLine() Line too short for justifying: %.0f/%d", LineMaxWidth * 0.6, LineMaxWidth);
+        // return;
+    }
+}
+
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
 cTextFloatingWrapper::cTextFloatingWrapper(void) {}
