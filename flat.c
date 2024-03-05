@@ -346,11 +346,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 int GetEpgsearchConflicts(void) {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
-        Epgsearch_lastconflictinfo_v1_0 ServiceData {
-            .nextConflict = 0,
-            .relevantConflicts = 0,
-            .totalConflicts = 0
-        };
+        Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
         if (ServiceData.relevantConflicts > 0)
             return ServiceData.relevantConflicts;
@@ -361,28 +357,30 @@ int GetEpgsearchConflicts(void) {
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     cMarks Marks;
     bool HasMarks = false;
+    bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
+    double FramesPerSecond = Recording->FramesPerSecond();
+    const char *RecordingFileName = Recording->FileName();
     cIndexFile *index {nullptr};
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
-        HasMarks = Marks.Load(Recording->FileName(), Recording->FramesPerSecond(), Recording->IsPesRecording()) &&
-                   Marks.Count();
-        index = new cIndexFile(Recording->FileName(), false, Recording->IsPesRecording());
-        // cIndexFile index(Recording->FileName(), false, Recording->IsPesRecording());
+        HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
+        index = new cIndexFile(RecordingFileName, false, IsPesRecording);
+        // cIndexFile index(RecordingFileName, false, IsPesRecording);
     }
 
     bool FsErr = false, IsCutted = false;
     uint64_t FileSize[65535];
     FileSize[0] = 0;
-    uint16_t MaxFiles = (Recording->IsPesRecording()) ? 999 : 65535;
+    uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName("");
     do {
         ++i;
-        if (Recording->IsPesRecording())
-            FileName = cString::sprintf("%s/%03d.vdr", Recording->FileName(), i);
+        if (IsPesRecording)
+            FileName = cString::sprintf("%s/%03d.vdr", RecordingFileName, i);
         else
-            FileName = cString::sprintf("%s/%05d.ts", Recording->FileName(), i);
+            FileName = cString::sprintf("%s/%05d.ts", RecordingFileName, i);
         rc = stat(*FileName, &FileBuf);
         if (rc == 0) {
             FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
@@ -421,7 +419,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
             RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
-        Cutted = IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond());
+        Cutted = IndexToHMSF(CuttedLength, false, FramesPerSecond);
         IsCutted = true;
     }
 
@@ -429,10 +427,10 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     if (AddText && index) {
         LastIndex = index->Last();
         Text.Append(
-            cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, Recording->FramesPerSecond())));
+            cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
         if (HasMarks)
             Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
-                                         *IndexToHMSF(CuttedLength, false, Recording->FramesPerSecond())));
+                                         *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
     delete index;
@@ -448,9 +446,8 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
         if (HasMarks) {
             if (RecSize > MEGABYTE(1023))
-                Text.Append(
-                    cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
-                                     static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+                Text.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
+                                             static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
             else
                 Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
         }
@@ -461,10 +458,10 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
         #if APIVERSNUM >= 20605
         const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
         if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
-            Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS"),
-                        RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-            if (RecInfo->FramesPerSecond() > 0) {
-                Text.Append(cString::sprintf("@%.2g", RecInfo->FramesPerSecond()));
+            Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
+                                         RecInfo->FrameWidth(), RecInfo->FrameHeight()));
+            if (FramesPerSecond > 0) {
+                Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
                 if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
                     Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
             }
@@ -473,15 +470,15 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
             if (LastIndex)  //* Bitrate in new line
                 Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                            static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+                            static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
         } else  // NOLINT
         #endif
         {
-            Text.Append(cString::sprintf("\n%s: %s", tr("format"), (Recording->IsPesRecording() ? "PES" : "TS")));
+            Text.Append(cString::sprintf("\n%s: %s", tr("format"), (IsPesRecording) ? "PES" : "TS"));
 
             if (LastIndex)  //* Bitrate at same line
                 Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                            static_cast<float>(RecSize) / LastIndex * Recording->FramesPerSecond() * 8 / MEGABYTE(1)));
+                            static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
         }
     }  // AddText
     return IsCutted;
@@ -549,7 +546,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         FillChar = " ";  // White space U+0020 (Decimal 32)
     } */
     //* Workaround for not working 'FT_Get_Char_Index'
-    // Assume that 'tofu' char is bigger in size than and space
+    // Assume that 'tofu' char (Char not found) is bigger in size than and space
     const char *HairSpace = u8"\U0000200A", *Space = " ";
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
