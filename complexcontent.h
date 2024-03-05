@@ -124,10 +124,15 @@ class cSimpleContent {
         } else if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
+            std::string Line("");
+            Line.reserve(128);
             int Lines = Wrapper.Lines();
             int FontHeight = m_Font->Height();
-            for (int i {0}; i < Lines; ++i) {
-                Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)), Wrapper.GetLine(i),
+            for (int i {0}; i < Lines; ++i) {  // Justify line by line
+                Line = Wrapper.GetLine(i);
+                if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified
+                    JustifyLine(Line, m_Font, m_Position.Width());
+                Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)), Line.c_str(),
                                  m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight, m_TextAlignment);
             }
         } else if (m_ContentType == CT_Rect) {

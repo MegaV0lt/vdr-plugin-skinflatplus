@@ -139,20 +139,17 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     //         FloatLines, Lines, TextWidthLeft, TextWidthFull);
 
     std::string Line("");
+    Line.reserve(128);
     cRect FloatedTextPos(TextPos.Left(), TextPos.Top(), TextPos.Width(), TextPos.Height());
-    for (int i {0}; i < (Lines - 1); ++i) {  // Add text line by line; excluding the last one
-        FloatedTextPos.SetTop(TextPos.Top() + i * m_ScrollSize);
+    for (int i {0}; i < Lines; ++i) {  // Add text line by line
+        FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
-            if (Config.MenuEventRecordingViewJustify != 0) {
-                JustifyLine(Line, Font, (i <= FloatLines) ? TextWidthLeft : TextWidthFull);
+            if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1)) {  // Last line is not justified
+                JustifyLine(Line, Font, (i < FloatLines) ? TextWidthLeft : TextWidthFull);
             }
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
-        // dsyslog("flatPlus: Adding Floatline (%d): %s", i, WrapperFloat.GetLine(i));
+        // dsyslog("flatPlus: Adding floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
-    // Add the last line
-    FloatedTextPos.SetTop(FloatedTextPos.Top() + m_ScrollSize);
-    Line = WrapperFloat.GetLine(Lines -1);
-    AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
 
     cRect ImagePos(TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height());
     AddImage(image, ImagePos);
