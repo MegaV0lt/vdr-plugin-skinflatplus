@@ -41,9 +41,6 @@ class cImageCache ImgCache;
 cTheme Theme;
 static bool m_MenuActive = false;
 time_t m_RemoteTimersLastRefresh = 0;
-const char *FillChar {nullptr};  // For justifying text
-int FillCharWidth {0};
-size_t FillCharLength {0};
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
     Display_Menu = NULL;
@@ -546,6 +543,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         FillChar = " ";  // White space U+0020 (Decimal 32)
     } */
     //* Workaround for not working 'FT_Get_Char_Index'
+    const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than and space
     const char *HairSpace = u8"\U0000200A", *Space = " ";
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
@@ -555,8 +553,8 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         FillChar = HairSpace;
         // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
     }
-    FillCharWidth = Font->Width(FillChar);  // Width in pixel
-    FillCharLength = strlen(FillChar);      // Length in chars
+    int FillCharWidth = Font->Width(FillChar);  // Width in pixel
+    size_t FillCharLength = strlen(FillChar);   // Length in chars
 
     int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
