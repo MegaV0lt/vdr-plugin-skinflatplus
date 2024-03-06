@@ -588,23 +588,23 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
                 FillCharWidth, FillCharsLength);
 
         //* Insert blocks at spaces
-        size_t pos = Line.find_first_of(' ');
+        size_t pos = Line.find(' ');
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
                 Line.insert(pos, FillChars);
                 InsertedFillChar += FillCharBlock;
             }
-            pos = Line.find_first_of(' ', pos + FillCharsLength + 1);  // Add inserted chars plus one
+            pos = Line.find(' ', pos + FillCharsLength + 1);  // Add inserted chars plus one
         }
         dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (' '): %d", InsertedFillChar);
 
-        pos = Line.find_first_of(".,?!;");  //* Insert blocks at (.,?!;)
+        pos = Line.find(".,?!;");  //* Insert blocks at (.,?!;)
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (pos < (LineLength - FillCharBlock - 1)) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
                 Line.insert(pos + 1, FillChars);  // Insert after pos!
-                pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1);
+                pos = Line.find(".,?!;", pos + FillCharsLength + 1);
                 InsertedFillChar += FillCharBlock;
                 LineLength = Line.size();
             } else {

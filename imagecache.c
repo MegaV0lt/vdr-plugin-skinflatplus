@@ -43,7 +43,7 @@ void cImageCache::Clear(void) {
 bool cImageCache::RemoveFromCache(std::string Name) {
     std::string BaseFileName("");
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
-        BaseFileName = CacheName[i].substr(CacheName[i].find_last_of("/") + 1);  // Part after the last '/'
+        BaseFileName = CacheName[i].substr(CacheName[i].find_last_of('/') + 1);  // Part after the last '/'
 
         if (BaseFileName == Name) {
             dsyslog("flatPlus: RemoveFromCache - %s", CacheName[i].c_str());
