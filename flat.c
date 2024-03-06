@@ -548,7 +548,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     const char *HairSpace = u8"\U0000200A", *Space = " ";
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
-        dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
+        // dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
     } else {
         FillChar = HairSpace;
         // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
@@ -558,7 +558,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
 
     int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
-        dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
+        // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
         return;
     }
 
@@ -602,11 +602,17 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         pos = Line.find(".,?!;");  //* Insert blocks at (.,?!;)
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (pos < (LineLength - FillCharBlock - 1)) {
-                // dsyslog("flatPlus:  Insert block at %ld", pos);
-                Line.insert(pos + 1, FillChars);  // Insert after pos!
-                pos = Line.find(".,?!;", pos + FillCharsLength + 1);
-                InsertedFillChar += FillCharBlock;
-                LineLength = Line.size();
+                // Check for repeating '.'
+                if (Line[pos] != Line[pos + 1]) {  // Next char is different
+                    // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
+                    Line.insert(pos + 1, FillChars);  // Insert after pos!
+                    pos = Line.find(".,?!;", pos + FillCharsLength + 1);
+                    InsertedFillChar += FillCharBlock;
+                    LineLength = Line.size();
+                } else {
+                    dsyslog("flatPlus:  Double '.' found");
+                    ++pos;
+                }
             } else {
                 dsyslog("flatPlus: No space for blocks left or end of line reached: %ld", pos);
                 break;
