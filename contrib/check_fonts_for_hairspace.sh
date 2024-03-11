@@ -6,6 +6,7 @@
 echo -e 'Schriften, die das Zeichen "HairPace" enthalten:\n'
 mapfile -t < <(fc-list ":charset=0x200A" | sort -u)
 for font in "${MAPFILE[@]}" ; do
-  file="${font%%: *}" ; name=""${font#* }
-  echo "Font: ${name%%,*} (${file##*/})"  # FreeMono:style=standard (FreeMono.ttf)
+  : "${font%%: *}" ; file="${_##*/}"
+  : "${font##*: }" ; name="${_%%,*}"
+  echo "Font: $name (${file})"  # FreeMono:style=standard (FreeMono.ttf)
 done
