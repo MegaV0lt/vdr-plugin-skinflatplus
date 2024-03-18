@@ -491,7 +491,7 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
 
     return std::string();  // Empty string
 }
-u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {  //! Not working for U+200A, U+2009
+u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {
     FT_Library library;
     FT_Face face;
     FT_UInt glyph_index {0};
@@ -522,10 +522,8 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     if (isempty(Line.c_str()))  // Check for empty line
         return;
 
-    if (Font->Width("M") == Font->Width("i")) {  // Check for fixed font
-        dsyslog("flatPlus: JustifyLine() Looks like a fixed font");
+    if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
         return;
-    }
 
     int LineSpaces {0};
     for (auto &ch : Line)  // Count spaces in 'Line'
@@ -535,14 +533,14 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
     /* FT_ULong HairSpaceCode = 0x0000200A;  // HairSpace: U+200A
     FT_ULong ThinSpaceCode = 0x00002009;  // ThinSpace: U+2009
-    if (GetCharIndex(Setup.FontOsd, HairSpaceCode) > 0) {  //! Not working for U+200A, U+2009
+    if (GetCharIndex(Setup.FontOsd, HairSpaceCode) > 0) {
         FillChar = u8"\U0000200A";
     } else if (GetCharIndex(Setup.FontOsd, ThinSpaceCode) > 0) {
         FillChar = u8"\U00002009";
     } else {
         FillChar = " ";  // White space U+0020 (Decimal 32)
     } */
-    //* Workaround for not working 'FT_Get_Char_Index'
+    //* Workaround for detecting 'HairSpace'
     const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than and space
     const char *HairSpace = u8"\U0000200A", *Space = " ";
@@ -580,12 +578,12 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
 
         size_t LineLength = Line.size();
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
-        int InsertedFillChar{0};
-        dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
+        int InsertedFillChar {0};
+        /* dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
                 "[FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
                 "[FillChars: length %ld]",
                 LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, NeedFillChar % LineSpaces,
-                FillCharWidth, FillCharsLength);
+                FillCharWidth, FillCharsLength); */
 
         //* Insert blocks at spaces
         size_t pos = Line.find(' ');
@@ -595,9 +593,9 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
                 Line.insert(pos, FillChars);
                 InsertedFillChar += FillCharBlock;
             }
-            pos = Line.find(' ', pos + FillCharsLength + 1);  // Add inserted chars plus one
+            pos = Line.find(' ', pos + FillCharsLength + 1);  // Inserted chars plus one
         }
-        dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (' '): %d", InsertedFillChar);
+        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (' '): %d", InsertedFillChar);
 
         pos = Line.find(".,?!;");  //* Insert blocks at (.,?!;)
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
@@ -610,15 +608,15 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
                     InsertedFillChar += FillCharBlock;
                     LineLength = Line.size();
                 } else {
-                    dsyslog("flatPlus:  Double '.' found");
+                    // dsyslog("flatPlus:  Double '.' found");
                     ++pos;
                 }
             } else {
-                dsyslog("flatPlus: No space for blocks left or end of line reached: %ld", pos);
+                // dsyslog("flatPlus: No space for blocks left or end of line reached: %ld", pos);
                 break;
             }
         }
-        dsyslog("flatPlus: JustifyLine() InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
+        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
 
         //* Insert the remainder of 'NeedFillChar' left to right
         pos = Line.find_last_of(' ');
@@ -630,7 +628,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
             }
             pos = Line.find_last_of(' ', pos - FillCharLength);  // 'FillChar' can be more than one byte in length
         }
-        dsyslog("flatPlus: JustifyLine() InsertedFillChar after third loop (' '): %d", InsertedFillChar);
+        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after third loop (' '): %d", InsertedFillChar);
     } else {
         // dsyslog("flatPlus: JustifyLine() Line too short for justifying: LineWidth %d, LineMaxWidth * 0.8: %.0f",
         //        LineWidth, LineMaxWidth * 0.8);
