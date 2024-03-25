@@ -53,8 +53,8 @@ Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
 Schriften
 -------------------------------
-Im Ordner contrib/Fonts sind vershiedene Schriften abgelegt, welche einfach nach /user/share/fonts kopiert werden können.
-Ich empfehle DroidSans für dei anzeige zu verwenden.
+Im Ordner contrib/Fonts sind verschiedene Schriften abgelegt, welche einfach nach /usr/share/fonts kopiert werden können.
+Ich empfehle DroidSans für die Anzeige zu verwenden.
 
 Versteckte Einstellungen
 -------------------------------

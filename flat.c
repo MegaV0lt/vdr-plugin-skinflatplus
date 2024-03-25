@@ -491,6 +491,7 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
 
     return std::string();  // Empty string
 }
+
 u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {
     FT_Library library;
     FT_Face face;
