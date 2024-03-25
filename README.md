@@ -34,7 +34,7 @@ Auf das git kann mittels
 git clone https://github.com/MegaV0lt/vdr-plugin-skinflatplus.git/
 
 zugegriffen werden.
-Fehler können nicht ausgeschlossen werden ;-) (Läuft aber bei mir stablil)
+Fehler können nicht ausgeschlossen werden ;-) (Läuft aber bei mir stabil)
 
 
 Installation
@@ -53,6 +53,10 @@ Die Logos müssen im folgenden Ordner zur Verfügung gestellt werden:
 
 Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
+Schriften
+-------------------------------
+Im Ordner contrib/Fonts sind verschiedene Schriften abgelegt, welche einfach nach /usr/share/fonts kopiert werden können.
+Ich empfehle DroidSans für die Anzeige zu verwenden.
 
 Versteckte Einstellungen
 -------------------------------

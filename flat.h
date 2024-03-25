@@ -11,6 +11,9 @@
 #include <vdr/skins.h>
 #include <vdr/videodir.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -201,7 +204,7 @@ THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
  private:
-        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid nameconflict with DisplayMenu()
+        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
  public:
         cFlat(void);
         virtual const char *Description(void);
@@ -262,6 +265,7 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 }
 
 void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth);  // NOLINT
+u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode);
 
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);

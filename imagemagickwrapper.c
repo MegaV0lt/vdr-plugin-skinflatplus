@@ -92,6 +92,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     w = buffer.columns();
     h = buffer.rows();
     cImage image(cSize(w, h));
+    tColor col {0};
 #ifndef IMAGEMAGICK7
     const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #else
@@ -105,9 +106,9 @@ cImage cImageMagickWrapper::CreateImageCopy() {
             /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
             /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
             /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
-            tColor col = (int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b));
+            /* tColor */ col = (int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b));
 #else
-            tColor col = (~int(pixels->opacity * 255 / MaxRGB) << 24) | (int(pixels->green * 255 / MaxRGB) << 8) |
+            /* tColor */ col = (~int(pixels->opacity * 255 / MaxRGB) << 24) | (int(pixels->green * 255 / MaxRGB) << 8) |
                          (int(pixels->red * 255 / MaxRGB) << 16) | (int(pixels->blue * 255 / MaxRGB));
 #endif
             image.SetPixel(cPoint(ix, iy), col);
