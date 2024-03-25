@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-03-xx: Version 1.0.3
+2024-03-25: Version 1.0.3
 - [fix] Skip justify for fixed font
 - [add] Script 'check_fonts_for_hairspace.sh' to list fonts with 'HairSpace'.
         The script can be found in 'contrib/'
