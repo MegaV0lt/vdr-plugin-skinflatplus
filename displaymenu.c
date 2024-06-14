@@ -309,6 +309,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                 m_LastRecFolder = m_RecFolder;
                 if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
                     std::string RecFolder2("");
+                    RecFolder2.reserve(256);
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
                         RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
@@ -1744,6 +1745,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_LastRecFolder = m_RecFolder;
         if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
             std::string RecFolder2("");
+            RecFolder2.reserve(256);
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
                 RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
@@ -2240,6 +2242,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString Text(""), TextAdditional("");
     std::string Fsk("");
+    Fsk.reserve(4);
     std::list<std::string> GenreIcons;
 
     // Description
@@ -2945,6 +2948,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     const cRecordingInfo *RecInfo = Recording->Info();
     std::list<std::string> GenreIcons;
     std::string Fsk("");
+    Fsk.reserve(4);
     if (!isempty(RecInfo->Description()))
         Text.Append(cString::sprintf("%s", RecInfo->Description()));
         // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
@@ -3601,6 +3605,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
     /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
     std::string RecFolder2("");
+    RecFolder2.reserve(128);
     time_t RecStart = Recording->Start();
     time_t RecStart2 {0};
 
@@ -3626,12 +3631,14 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     if (!Recording) return "";
 
     std::string RecNamePart("");
+    RecNamePart.reserve(64);
     std::string RecName = Recording->Name();
     try {
         std::vector<std::string> tokens;
         tokens.reserve(6);  // Set to at least 6 entry's
         std::istringstream f(RecName.c_str());
         std::string s("");
+        s.reserve(64);
         while (std::getline(f, s, FOLDERDELIMCHAR)) {
             tokens.emplace_back(s);
         }
@@ -3892,6 +3899,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
     std::pair<int, std::string> PairWidget {};
     std::string widget("");
+    widget.reserve(19);  // Size of 'system_information'
     int AddHeight {0};
     while (!widgets.empty()) {
         PairWidget = widgets.back();
@@ -4289,6 +4297,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     int Minutes {0};
     cString DateTime(""), Length("");
     std::string StrRec("");
+    StrRec.reserve(128);
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecStart = rec->Start();
@@ -4380,6 +4389,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     cReadDir d(*ConfigsPath);
     struct dirent *e;
     std::string FileName(""), num("");
+    FileName.reserve(128);
+    num.reserve(16);
     std::size_t found {0};
     while ((e = d.Next()) != NULL) {
         FileName = e->d_name;
@@ -4402,6 +4413,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                               wWidth - m_MarginItem * 2);
     } else {
         std::string item(""), ItemContent("");
+        item.reserve(17);
+        ItemContent.reserve(16);
         cString ItemFilename("");
         for (unsigned i = 0; i < FilesSize; ++i) {
             // Check for height
@@ -4681,10 +4694,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ContentTop += 6;
 
     int updates {0}, SecurityUpdates {0};
+    std::string cont("");
+    cont.reserve(4);
     cString ItemFilename = cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        std::string cont("");
         std::getline(file, cont);
         updates = atoi(cont.c_str());
         file.close();
@@ -4695,7 +4709,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ItemFilename = cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        std::string cont("");
         std::getline(file, cont);
         SecurityUpdates = atoi(cont.c_str());
         file.close();
@@ -4839,6 +4852,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     r += 0;  // Prevent warning for unused variable
 
     std::string Title("");
+    Title.reserve(32);
     cString ItemFilename = cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
@@ -4859,6 +4873,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     ContentTop += 6;
 
     std::string Output("");
+    Output.reserve(32);
     ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
@@ -4886,6 +4901,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         return -1;
 
     std::string Location("");
+    Location.reserve(32);
     cString FileName = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
     std::ifstream file(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -4896,6 +4912,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     }
 
     std::string TempToday("");
+    TempToday.reserve(8);
     FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -4920,6 +4937,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left = m_MarginItem;
     std::string icon(""), summary(""), TempMax(""), TempMin(""), prec("");
+    icon.reserve(8);
+    summary.reserve(32);
+    TempMax.reserve(8);
+    TempMin.reserve(8);
+    prec.reserve(8);
     cString DayName(""), PrecString("0%"), StrWeekDayName(""), WeatherIcon("");
     double p {0.0};
     time_t t = time(NULL), t2 = time(NULL);
@@ -5064,6 +5086,7 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
     cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
     std::string File("");
+    File.reserve(128);
     cString FileName("");
     cReadDir d(*Path);
     struct dirent *e;

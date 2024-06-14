@@ -293,6 +293,8 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
     std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
     std::string Channel(""), Searchtimer("");
+    Channel.reserve(32);
+    Searchtimer.reserve(32);
     if (!Buffer.empty()) {
         Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
         Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
@@ -302,6 +304,8 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
     std::string Causedby(""), Reason("");
+    Causedby.reserve(32);
+    Reason.reserve(16);
     if (!Buffer.empty()) {
         Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
         Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
@@ -309,6 +313,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
     std::string Pattern("");
+    Pattern.reserve(32);
     if (!Buffer.empty()) {
         Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
     }
@@ -572,6 +577,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         if (!FillCharBlock) ++FillCharBlock;                            // Set minimum to one 'FillChar'
 
         std::string FillChars("");
+        FillChars.reserve(16);
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }

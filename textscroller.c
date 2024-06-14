@@ -11,6 +11,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
                           tColor colorExtraTextFg) {
     // if (!m_Osd) return;
 
+    Text.reserve(128);  // Defined in 'textscroller.h'
     Text = text;
     Font = font;
     Position = position;
