@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <cstring>  // string.h
+#include <string_view>
 #include <random>
 
 #include "./config.h"

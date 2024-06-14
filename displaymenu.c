@@ -476,11 +476,11 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         ColorBg, m_Font, AvailableTextWidth - xt - m_MarginItem * 2 - m_FontHeight);
                 } else {
                     if (Config.MenuItemParseTilde) {
-                        std::string tilde = s;
+                        std::string_view tilde(s);
                         std::size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
-                            std::string first = tilde.substr(0, found);
-                            std::string second = tilde.substr(found + 1);  // Default end is npos
+                            std::string first = static_cast<std::string>(tilde.substr(0, found));
+                            std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
                             RightTrim(first);                              // Trim possible space on right side
                             LeftTrim(second);                              // Trim possible space at begin
 
@@ -604,9 +604,9 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
 }
 
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
-    if (strlen(text) > 5 && text[0] == '[' && ((text[1] == '|')
-        || (text[1] == ' ')) && ((text[2] == '|')
-        || (text[2] == ' ')) && text[strlen(text) - 1] == ']')
+    std::size_t TextLength = strlen(text);
+    if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
+        ((text[2] == '|') || (text[2] == ' ')) && text[TextLength - 1] == ']')
         return true;
     return false;
 }
@@ -1214,11 +1214,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 clrTransparent, m_Font, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string tilde = File;
+                std::string_view tilde(File);
                 std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1);  // Default end is npos
+                    std::string first = static_cast<std::string>(tilde.substr(0, found));
+                    std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
                     RightTrim(first);                              // Trim possible space on right side
                     LeftTrim(second);                              // Trim possible space at begin
 
@@ -1250,11 +1250,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string tilde = File;
+                std::string_view tilde(File);
                 std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1);  // Default end is npos
+                    std::string first = static_cast<std::string>(tilde.substr(0, found));
+                    std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
                     RightTrim(first);                              // Trim possible space on right side
                     LeftTrim(second);                              // Trim possible space at begin
 

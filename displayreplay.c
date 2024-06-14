@@ -303,11 +303,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               m_Font, m_Font->Width(*m_Current), m_FontHeight);
     } else {
-        std::string cur = *m_Current;
+        std::string_view cur(*m_Current);
         std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
-            std::string hm = cur.substr(0, found);
-            std::string secs = cur.substr(found, cur.length() - found);
+            std::string hm = static_cast<std::string>(cur.substr(0, found));
+            std::string secs = static_cast<std::string>(cur.substr(found, cur.length() - found));
             secs.append(1, ' ');  // Fix for extra pixel glitch
 
             LabelPixmap->DrawText(cPoint(m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
@@ -418,17 +418,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total) - m_MarginItem - imgWidth -
                     m_Font->Width(' ') - m_Font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
-            std::string tot = *m_Total;
+            std::string_view tot(*m_Total);
             std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
-                std::string hm = tot.substr(0, found);
-                std::string secs = tot.substr(found, tot.length() - found);
+                std::string hm = static_cast<std::string>(tot.substr(0, found));
+                std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));
 
-                std::string cutt = *cutted;
+                std::string_view cutt(*cutted);
                 std::size_t found2 = cutt.find_last_of(':');
                 if (found2 != std::string::npos) {
-                    std::string hm2 = cutt.substr(0, found);
-                    std::string secs2 = cutt.substr(found, cutt.length() - found);
+                    std::string hm2 = static_cast<std::string>(cutt.substr(0, found));
+                    std::string secs2 = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
 
                     right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                             m_FontSecs->Width(secs.c_str()) - m_MarginItem - imgWidth - m_Font->Width(' ') -
@@ -465,11 +465,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         if (Config.TimeSecsScale < 1.0) {
-            std::string cutt = *cutted;
+            std::string_view cutt(*cutted);
             std::size_t found = cutt.find_last_of(':');
             if (found != std::string::npos) {
-                std::string hm = cutt.substr(0, found);
-                std::string secs = cutt.substr(found, cutt.length() - found);
+                std::string hm = static_cast<std::string>(cutt.substr(0, found));
+                std::string secs = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
@@ -488,11 +488,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     } else {  // Not cutted
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total);
         if (Config.TimeSecsScale < 1.0) {
-            std::string tot = *m_Total;
+            std::string_view tot(*m_Total);
             std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
-                std::string hm = tot.substr(0, found);
-                std::string secs = tot.substr(found, tot.length() - found);
+                std::string hm = static_cast<std::string>(tot.substr(0, found));
+                std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));
 
                 right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                         m_FontSecs->Width(secs.c_str());
