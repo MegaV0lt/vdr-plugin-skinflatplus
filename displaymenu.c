@@ -479,10 +479,10 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         std::string_view tilde(s);
                         std::size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
-                            std::string first = static_cast<std::string>(tilde.substr(0, found));
-                            std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
-                            RightTrim(first);                              // Trim possible space on right side
-                            LeftTrim(second);                              // Trim possible space at begin
+                            std::string_view sv1(tilde.substr(0, found));
+                            std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
+                            std::string first(static_cast<std::string>(rtrim(sv1)));   // Trim possible space on right side
+                            std::string second(static_cast<std::string>(ltrim(sv2)));  // Trim possible space at begin
 
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
                                                  ColorBg, m_Font,
@@ -1217,10 +1217,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 std::string_view tilde(File);
                 std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = static_cast<std::string>(tilde.substr(0, found));
-                    std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
-                    RightTrim(first);                              // Trim possible space on right side
-                    LeftTrim(second);                              // Trim possible space at begin
+                    std::string_view sv1(tilde.substr(0, found));
+                    std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
+                    std::string first(static_cast<std::string>(rtrim(sv1)));   // Trim possible space on right side
+                    std::string second(static_cast<std::string>(ltrim(sv2)));  // Trim possible space at begin
 
                     MenuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1253,10 +1253,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 std::string_view tilde(File);
                 std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = static_cast<std::string>(tilde.substr(0, found));
-                    std::string second = static_cast<std::string>(tilde.substr(found + 1));  // Default end is npos
-                    RightTrim(first);                              // Trim possible space on right side
-                    LeftTrim(second);                              // Trim possible space at begin
+                    std::string_view sv1(tilde.substr(0, found));
+                    std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
+                    std::string first(static_cast<std::string>(rtrim(sv1)));   // Trim possible space on right side
+                    std::string second(static_cast<std::string>(ltrim(sv2)));  // Trim possible space at begin
 
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.c_str(), ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
