@@ -25,7 +25,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     m_CurrentIndex = -1;
     m_MaxItemWidth = m_Font->Width(Title) + m_MarginItem * 4;
     for (int i {0}; i < NumTracks; ++i)
-        m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem * 2);
+        m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem2);
 
     int headerWidth = m_Font->Width(Title) + m_Font->Width(' ') + imgWidthMax;
     m_MaxItemWidth = std::max(m_MaxItemWidth, headerWidth);

@@ -9,7 +9,7 @@
 #include "./flat.h"
 
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
-    m_LabelHeight = m_FontHeight + m_MarginItem * 2;
+    m_LabelHeight = m_FontHeight + m_MarginItem2;
 
     CreateFullOsd();
     TopBarCreate();
@@ -78,7 +78,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     left = m_OsdWidth - width - Config.decorBorderVolumeSize;
     left /= 2;
     DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
-                    width + m_MarginItem * 2, Config.decorProgressVolumeSize + m_MarginItem * 2,
+                    width + m_MarginItem2, Config.decorProgressVolumeSize + m_MarginItem2,
                     Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg),
                     Theme.Color(clrTopBarBg));
 }

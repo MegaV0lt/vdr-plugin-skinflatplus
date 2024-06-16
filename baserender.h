@@ -39,7 +39,7 @@ class cFlatBaseRender {
         cOsd *m_Osd {nullptr};
 
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
-        int m_MarginItem {5};
+        const int m_MarginItem {5}, m_MarginItem2 {10};
 
         // Standard fonts
         cFont *m_Font {nullptr};

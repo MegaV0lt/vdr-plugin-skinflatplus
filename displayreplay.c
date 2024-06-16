@@ -234,7 +234,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         img = ImgLoader.LoadIcon(*play, m_FontHeight, m_FontHeight);
         if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 2 + m_MarginItem * 2, 0), *img);
+            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 2 + m_MarginItem2, 0), *img);
 
         img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
         if (img)
@@ -461,7 +461,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
         if (img) {  // Draw 'recording_cuttet_extra' icon
             IconsPixmap->DrawImage(cPoint(right, 0), *img);
-            right += img->Width() + m_MarginItem * 2;
+            right += img->Width() + m_MarginItem2;
         }
 
         if (Config.TimeSecsScale < 1.0) {
@@ -550,7 +550,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem * 2;
+                left -= m_MarginItem2;
             }
 
             IconName = GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);  // Show Resolution
@@ -559,7 +559,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem * 2;
+                left -= m_MarginItem2;
             }
         }
 
@@ -570,7 +570,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 ImageTop = m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem * 2;
+                left -= m_MarginItem2;
             }
         }
     }
