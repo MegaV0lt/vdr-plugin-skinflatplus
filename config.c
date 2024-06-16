@@ -720,7 +720,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     std::sort(files.begin(), files.end(), StringCompare);
     std::string File_Name("");
     cString Desc("");
-    std::size_t FilesSize {files.size()};
+    const std::size_t FilesSize {files.size()};
     for (unsigned i = 0; i < FilesSize; ++i) {
         File_Name = files.at(i);
         Desc = DecorDescription(File_Name.c_str());
@@ -963,7 +963,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
 
     std::sort(files.begin(), files.end(), StringCompare);
     std::string FileName("");
-    std::size_t FilesSize {files.size()};
+    const std::size_t FilesSize {files.size()};
     for (unsigned i = 0; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));

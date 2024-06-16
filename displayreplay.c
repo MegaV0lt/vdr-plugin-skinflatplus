@@ -304,7 +304,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                               m_Font, m_Font->Width(*m_Current), m_FontHeight);
     } else {
         std::string_view cur(*m_Current);
-        std::size_t found = cur.find_last_of(':');
+        const std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
             std::string hm = static_cast<std::string>(cur.substr(0, found));
             std::string secs = static_cast<std::string>(cur.substr(found, cur.length() - found));
@@ -419,13 +419,13 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     m_Font->Width(' ') - m_Font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
             std::string_view tot(*m_Total);
-            std::size_t found = tot.find_last_of(':');
+            const std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
                 std::string hm = static_cast<std::string>(tot.substr(0, found));
                 std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));
 
                 std::string_view cutt(*cutted);
-                std::size_t found2 = cutt.find_last_of(':');
+                const std::size_t found2 = cutt.find_last_of(':');
                 if (found2 != std::string::npos) {
                     std::string hm2 = static_cast<std::string>(cutt.substr(0, found));
                     std::string secs2 = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
@@ -466,7 +466,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
         if (Config.TimeSecsScale < 1.0) {
             std::string_view cutt(*cutted);
-            std::size_t found = cutt.find_last_of(':');
+            const std::size_t found = cutt.find_last_of(':');
             if (found != std::string::npos) {
                 std::string hm = static_cast<std::string>(cutt.substr(0, found));
                 std::string secs = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
@@ -489,7 +489,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total);
         if (Config.TimeSecsScale < 1.0) {
             std::string_view tot(*m_Total);
-            std::size_t found = tot.find_last_of(':');
+            const std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
                 std::string hm = static_cast<std::string>(tot.substr(0, found));
                 std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));

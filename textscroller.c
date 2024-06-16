@@ -50,7 +50,7 @@ void cTextScroll::Draw(void) {
 
     if (ColorExtraTextFg) {
         std::string_view tilde(Text);
-        std::size_t found = tilde.find('~');  // Search for ~
+        const std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string_view sv1(tilde.substr(0, found));
             std::string_view sv2(tilde.substr(found + 1));  // Default end is npos

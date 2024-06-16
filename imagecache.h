@@ -11,9 +11,9 @@
 #include <vdr/skins.h>
 #include <string>
 
-#define MAX_IMAGE_CACHE     999
-#define LOGO_PRE_CACHE      200
-//! Note: LOGO_PRE_CACHE is used twice one for displaychannel and one for menu
+#define MAX_IMAGE_CACHE     1024
+#define LOGO_PRE_CACHE      192
+//! Note: LOGO_PRE_CACHE is used twice! One for 'displaychannel' and one for 'menu'
 //! You must double the value for the real amount of pre cached logos
 
 class cImageCache {
@@ -39,8 +39,8 @@ class cImageCache {
       return m_InsertIndex + 1;
     }
 
-    cImage *GetImage(std::string Name, int Width, int Height);
-    void InsertImage(cImage *Image, std::string Name, int Width, int Height);
+    cImage *GetImage(const std::string &Name, int Width, int Height);
+    void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
 
     void PreLoadImage(void);
 };

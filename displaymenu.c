@@ -38,6 +38,9 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
     m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
 
+    m_RecFolder.reserve(256);  // Defined in 'displaymenu.h'
+    m_LastRecFolder.reserve(256);
+
     m_VideoDiskUsageState = -1;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
@@ -477,7 +480,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 } else {
                     if (Config.MenuItemParseTilde) {
                         std::string_view tilde(s);
-                        std::size_t found = tilde.find('~');  // Search for ~
+                        const std::size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
                             std::string_view sv1(tilde.substr(0, found));
                             std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
@@ -537,8 +540,9 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
     std::string MenuEntry("") /*, MenuNumber("")*/;
     MenuEntry.reserve(13);  // Length of 'Miscellaneous'
     bool found = false, DoBreak = false;
+    const std::size_t TextLength = text.length();
+    unsigned int i {0};
     char s;
-    std::size_t i {0}, TextLength = text.length();
     for (; i < TextLength; ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
@@ -604,7 +608,7 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
 }
 
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
-    std::size_t TextLength = strlen(text);
+    const std::size_t TextLength = strlen(text);
     if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
         ((text[2] == '|') || (text[2] == ' ')) && text[TextLength - 1] == ']')
         return true;
@@ -1215,7 +1219,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         } else {
             if (Config.MenuItemParseTilde) {
                 std::string_view tilde(File);
-                std::size_t found = tilde.find('~');  // Search for ~
+                const std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string_view sv1(tilde.substr(0, found));
                     std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
@@ -1251,7 +1255,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         } else {
             if (Config.MenuItemParseTilde) {
                 std::string_view tilde(File);
-                std::size_t found = tilde.find('~');  // Search for ~
+                const std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
                     std::string_view sv1(tilde.substr(0, found));
                     std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
@@ -1676,7 +1680,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             // Extract date from separator
             std::string sep = Event->Title();
             if (sep.size() > 12) {
-                std::size_t found = sep.find(" -");
+                const std::size_t found = sep.find(" -");
                 if (found >= 10) {
                     std::string date = sep.substr(found - 10, 10);
                     int LineTop = Top + (m_FontHeight - 3) / 2;
@@ -4405,7 +4409,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     int Column {1};
     int ContentLeft = m_MarginItem;
     std::sort(files.begin(), files.end(), StringCompare);
-    std::size_t FilesSize = files.size();
+    const std::size_t FilesSize = files.size();
     if (FilesSize == 0) {
         str = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
         ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -5114,15 +5118,17 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
-    //* Double code? Already in 'displaychannel.c' 'PreLoadImages()'
-    /* int index {0};
+    //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
+    int index {0};
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
-         Channel = Channels->Next(Channel)) {
-        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-        if (img)
-            ++index;
-    } */
+        Channel = Channels->Next(Channel)) {
+        if (!Channel->GroupSep()) {  // Don't cache named channel group logo
+            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            if (img)
+                ++index;
+        }
+    }  // for channel
 
     ImgLoader.LoadIcon("radio", 999, m_TopBarHeight - m_MarginItem2);
     ImgLoader.LoadIcon("changroup", 999, m_TopBarHeight - m_MarginItem2);

@@ -58,7 +58,7 @@ bool cImageCache::RemoveFromCache(std::string Name) {
     return false;
 }
 
-cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
+cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
         // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
@@ -69,7 +69,7 @@ cImage* cImageCache::GetImage(std::string Name, int Width, int Height) {
     return NULL;
 }
 
-void cImageCache::InsertImage(cImage *Image, std::string Name, int Width, int Height) {
+void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {
     // if (m_OverFlow) return;  //? Leave cache as is or refill?
 
     CacheImage[m_InsertIndex] = Image;

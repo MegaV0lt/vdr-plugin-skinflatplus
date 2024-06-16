@@ -488,8 +488,8 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
 
 // Returns the string between start and end or an empty string if not found
 std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
-    std::size_t start = source.find(StrStart);
-    std::size_t end = source.find(StrEnd);
+    const std::size_t start = source.find(StrStart);
+    const std::size_t end = source.find(StrEnd);
 
     if (std::string::npos != start && std::string::npos != end)
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));

@@ -765,7 +765,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         std::string_view tilde(Text);
-        std::size_t found = tilde.find('~');  // Search for ~
+        const std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
             std::string_view sv1(tilde.substr(0, found));
             std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
@@ -1740,7 +1740,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     if (file.is_open()) {
         std::getline(file, TempToday);
         file.close();
-        std::size_t found = TempToday.find("°");
+        const std::size_t found = TempToday.find("°");
         if (found != std::string::npos) {
             TempTodaySign = TempToday.substr(found);
             TempToday = TempToday.substr(0, found);
