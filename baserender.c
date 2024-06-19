@@ -33,6 +33,8 @@ cFlatBaseRender::cFlatBaseRender(void) {
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
+    Borders.reserve(64);
+
     Config.ThemeCheckAndInit();
     Config.DecorCheckAndInit();
 }
@@ -1366,10 +1368,11 @@ int cFlatBaseRender::ScrollBarWidth(void) {
 }
 
 void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
+    int Size2 = Size * 2;
     int TopDecor = Rect.Top() - Size;
     int LeftDecor = Rect.Left() - Size;
-    int WidthDecor = Rect.Width() + Size * 2;
-    int HeightDecor = Rect.Height() + Size * 2;
+    int WidthDecor = Rect.Width() + Size2;
+    int HeightDecor = Rect.Height() + Size2;
     int BottomDecor = Rect.Height() + Size;
 
     if (DecorPixmap) {
@@ -1385,18 +1388,20 @@ void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    std::list<sDecorBorder>::iterator it, end = Borders.end();
+    // vec.erase(std::remove(std::begin(vec), std::end(vec), 3), std::end(vec));
+    std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
             DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);
             it = Borders.erase(it);
+            end = Borders.end();  // Reevaluate to avoid crash.
         } else
             ++it;
     }
 }
 
 void cFlatBaseRender::DecorBorderRedrawAll(void) {
-    std::list<sDecorBorder>::iterator it, end = Borders.end();
+    std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size, (*it).Type, (*it).ColorFg,
                         (*it).ColorBg, (*it).From, false);
@@ -1418,10 +1423,11 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         Borders.emplace_back(f);
     }
 
+    int Size2 = Size * 2;
     int LeftDecor = Left - Size;
     int TopDecor = Top - Size;
-    int WidthDecor = Width + Size * 2;
-    int HeightDecor = Height + Size * 2;
+    int WidthDecor = Width + Size2;
+    int HeightDecor = Height + Size2;
     int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
@@ -1482,14 +1488,14 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         break;
     case 4:  // Rect + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
                              ColorBg);
 
         DecorDrawGlowRectTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg);
@@ -1499,14 +1505,14 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         break;
     case 5:  // Round + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
                              ColorBg);
 
         DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, 2);
@@ -1516,14 +1522,14 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         break;
     case 6:  // Invert round + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size * 2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size * 2, -1 * Size,
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
                              ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size * 2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size * 2,
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
                              ColorBg);
 
         DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, -4);

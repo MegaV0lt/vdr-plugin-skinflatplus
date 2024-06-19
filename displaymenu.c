@@ -99,6 +99,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     MenuItemScroller.SetScrollType(Config.ScrollerType);
 
+    ItemsBorder.reserve(64);
+    
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
     cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
 }
@@ -3557,7 +3559,7 @@ void cFlatDisplayMenu::Flush(void) {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
             (*it).Left = ib.Left;
@@ -3577,7 +3579,7 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width - m_ScrollBarWidth, (*it).Height, (*it).Size, (*it).Type,
                         (*it).ColorFg, (*it).ColorBg, BorderMenuItem);
@@ -3585,7 +3587,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar(void) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width + m_ScrollBarWidth, (*it).Height, (*it).Size, (*it).Type,
                         (*it).ColorFg, (*it).ColorBg, BorderMenuItem);
