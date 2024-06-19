@@ -106,7 +106,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         const char *GetGenreIcon(uchar genre);
         void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
-        void InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons);  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
         void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
         void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);  // NOLINT
 

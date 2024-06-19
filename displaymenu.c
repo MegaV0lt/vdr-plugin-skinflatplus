@@ -2247,7 +2247,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString Text(""), TextAdditional("");
     std::string Fsk("");
     Fsk.reserve(4);
-    std::list<std::string> GenreIcons;
+    std::vector<std::string> GenreIcons;
+    GenreIcons.reserve(8);
 
     // Description
     if (!isempty(Event->Description()))
@@ -2303,8 +2304,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }
     bool IsUnknownDrawn = false;
-    GenreIcons.sort();  // Sort outside of loop
-    GenreIcons.unique();
+    // GenreIcons.sort();  // Sort outside of loop
+    sort(GenreIcons.begin(), GenreIcons.end());
+
+    // GenreIcons.unique();
+    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
@@ -2950,7 +2954,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     // RecAdditional.imbue(std::locale(""));
 
     const cRecordingInfo *RecInfo = Recording->Info();
-    std::list<std::string> GenreIcons;
+    std::vector<std::string> GenreIcons;
+    GenreIcons.reserve(8);
+
     std::string Fsk("");
     Fsk.reserve(4);
     if (!isempty(RecInfo->Description()))
@@ -3036,8 +3042,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }
     bool IsUnknownDrawn = false;
-    GenreIcons.sort();  // Sort outside of loop
-    GenreIcons.unique();
+    // GenreIcons.sort();  // Sort outside of loop
+    sort(GenreIcons.begin(), GenreIcons.end());
+
+    // GenreIcons.unique();
+    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
@@ -3673,7 +3682,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
         }
     }
 }
-void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons) {
+void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
     bool FirstContent = true;
     for (int i{0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
