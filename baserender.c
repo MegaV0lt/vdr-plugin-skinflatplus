@@ -1210,9 +1210,9 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
                                     bool CanScrollUp, bool CanScrollDown) {
     if (!Pixmap) return;
 
-    int ScrollHeight = std::max(static_cast<int>(Height * 1.0f * Shown / Total + 0.5f), 5);
+    int ScrollHeight = std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5);
     int ScrollTop =
-        std::min(static_cast<int>(Top * 1.0f + Height * Offset / Total + 0.5f), Top + Height - ScrollHeight);
+        std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - ScrollHeight);
 
     /* Types
      * 0 = left line + rect bar
@@ -1805,7 +1805,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         std::istringstream istr(PrecToday);
         istr.imbue(std::locale("C"));
         istr >> p;
-        p = p * 100.0f;
+        p = p * 100.0;
         p = RoundUp(p, 10);
         PrecToday = cString::sprintf("%.0f%%", p);
     }
@@ -1818,7 +1818,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         std::istringstream istr(PrecTomorrow);
         istr.imbue(std::locale("C"));
         istr >> p;
-        p = p * 100.0f;
+        p = p * 100.0;
         p = RoundUp(p, 10);
         PrecTomorrow = cString::sprintf("%.0f%%", p);
     }

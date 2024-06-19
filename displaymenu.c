@@ -631,7 +631,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         }
     }
     if (IsProgressbar) {
-        double progress = now * 1.0f / total;
+        double progress = now * 1.0 / total;
         ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -766,13 +766,13 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const cEvent *Event {nullptr};
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
-    float progress {0.0};
+    double progress {0.0};
     cString EventTitle("");
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = roundf((time(NULL) * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
+            progress = round((time(NULL) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
             if (progress < 0) progress = 0.0;
             else if (progress > 100) progress = 100;
 
@@ -1467,7 +1467,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 int total = Event->EndTime() - Event->StartTime();
                 if (total >= 0) {
                     // Calculate progress bar
-                    double progress = roundf((now * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
+                    double progress = round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
                     if (progress < 0) progress = 0.0;
                     else if (progress > 100) progress = 100;
 
@@ -2282,7 +2282,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if Components
     }  // EpgAdditionalInfoShow
 
-    double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0f;
+    double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");
@@ -3015,7 +3015,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
-    double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0f;
+    double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName("");

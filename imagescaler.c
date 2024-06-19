@@ -119,6 +119,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     const unsigned buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     char *p = (char *) malloc(hor_filters_size + ver_filters_size + buffer_size);
+    if (!p) exit(EXIT_FAILURE);  // Unable to allocate memory!
     // Besser std::vector, den vector als Parameter übergeben, falls notwendig
     // std::vector<char> buffer(hor_filters_size + ver_filters_size + buffer_size);
 

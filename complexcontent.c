@@ -106,7 +106,7 @@ bool cComplexContent::Scrollable(int height) {
     if (height == 0) height = m_Position.Height();
 
     int total = ScrollTotal();
-    int shown = ceil(height * 1.0f / m_ScrollSize);
+    int shown = ceil(height * 1.0 / m_ScrollSize);
     if (total > shown) return true;
 
     return false;
@@ -129,7 +129,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     int TextWidthFull = (TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left();
     // int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     int TextWidthLeft = TextWidthFull - image->Width() - 10;
-    int FloatLines = ceil(image->Height() * 1.0f / m_ScrollSize);
+    int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
     WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
@@ -171,11 +171,11 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize(void) {
-    return m_Position.Height() * 1.0f / m_DrawPortHeight;
+    return m_Position.Height() * 1.0 / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal(void) {
-    return ceil(m_DrawPortHeight * 1.0f / m_ScrollSize);
+    return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
 }
 
 int cComplexContent::ScrollShown(void) {
@@ -193,7 +193,7 @@ int cComplexContent::ScrollOffset(void) {
         else
             y = m_DrawPortHeight - m_Position.Height() - 1;
     }
-    double offset = y * 1.0f / m_DrawPortHeight;
+    double offset = y * 1.0 / m_DrawPortHeight;
     return ScrollTotal() * offset;
 }
 
