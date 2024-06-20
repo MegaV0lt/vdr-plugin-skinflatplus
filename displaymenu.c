@@ -2894,7 +2894,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     int x = m_MarginItem;
     int y = ContentTop;
     if (NumActors > 50)
-        dsyslog("flatPlus: Showing %d actor images! First display will probably be slow.", NumActors);
+        dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
     for (int row {0}; row < PicLines; ++row) {
         for (int col {0}; col < PicsPerLine; ++col) {

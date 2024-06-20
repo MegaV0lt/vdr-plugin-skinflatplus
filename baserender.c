@@ -1388,7 +1388,6 @@ void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    // vec.erase(std::remove(std::begin(vec), std::end(vec), 3), std::end(vec));
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {

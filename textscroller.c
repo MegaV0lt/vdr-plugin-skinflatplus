@@ -114,6 +114,7 @@ void cTextScroll::DoStep(void) {
 
 cTextScrollers::cTextScrollers() : cThread("TextScrollers") {
     Layer = 2;
+    Scrollers.reserve(16);
 }
 
 cTextScrollers::~cTextScrollers() {}
