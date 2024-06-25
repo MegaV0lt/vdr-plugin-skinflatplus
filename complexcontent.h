@@ -76,7 +76,7 @@ class cSimpleContent {
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
         m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
-        m_Text.reserve(128);
+        m_Text.reserve(sizeof(Text));
         m_Text = Text;
         m_Font = Font;
 
@@ -127,8 +127,8 @@ class cSimpleContent {
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             std::string Line("");
             Line.reserve(128);
-            int Lines = Wrapper.Lines();
-            int FontHeight = m_Font->Height();
+            const int Lines = Wrapper.Lines();
+            const int FontHeight = m_Font->Height();
             for (int i {0}; i < Lines; ++i) {  // Justify line by line
                 Line = Wrapper.GetLine(i);
                 if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified

@@ -79,8 +79,9 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
 
     ++m_InsertIndex;
     if (m_InsertIndex >= MAX_IMAGE_CACHE) {
-        isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE");
-        m_InsertIndex = 0;
+        isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE (%d)", MAX_IMAGE_CACHE);
+        isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
+        m_InsertIndex = m_InsertIndexBase;  // Keep pre loaded images (Loaded at start)
         m_OverFlow = true;
     }
 }
@@ -101,6 +102,7 @@ void cImageCache::PreLoadImage(void) {
     DisplayVolume.PreLoadImages();
 
     uint32_t tick2 = GetMsTicks();
+    m_InsertIndexBase = GetCacheCount();
     dsyslog("flatPlus: Imagecache pre load images time: %d ms", tick2 - tick1);
-    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", GetCacheCount(), MAX_IMAGE_CACHE);
+    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", m_InsertIndexBase, MAX_IMAGE_CACHE);
 }

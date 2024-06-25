@@ -23,8 +23,9 @@ class cImageCache {
     int CacheWidth[MAX_IMAGE_CACHE];
     int CacheHeight[MAX_IMAGE_CACHE];
 
-    int m_InsertIndex {0};    // Imagecache index
-    bool m_OverFlow = false;  // Set when cache is full
+    int m_InsertIndex {0};      // Imagecache index
+    int m_InsertIndexBase {0};  // Imagecache after first fill at start
+    bool m_OverFlow = false;    // Set when cache is full
 
  public:
     cImageCache();

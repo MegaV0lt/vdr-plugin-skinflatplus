@@ -39,14 +39,14 @@ static float sincf(float x) {
 }
 
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
-    const float fc = dst_size >= src_size ? 1.0f : (dst_size * 1.0 / src_size);
+    const float fc = dst_size >= src_size ? 1.0f : (dst_size * 1.0f / src_size);
 
     for (int i {0}; i < dst_size; ++i) {
         const int    d          = 2 * dst_size;                       // Sample position denominator
         const int    e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         int          offset     =  e / d;                             // Truncated sample position
         const float sub_offset =
-            ((e * 1.0 - offset * d) / d);  // Exact sample position is (float) e/d = offset + sub_offset
+            ((e * 1.0f - offset * d) / d);  // Exact sample position is (float) e/d = offset + sub_offset
             // ((float)(e - offset * d)) / ((float)d);  // Exact sample position is (float) e/d = offset + sub_offset
 
         // Calculate filter coefficients

@@ -1,8 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2024-xx-xx: Version 1.x.x
-- [fix] Enable cache for channellogos in menu
-- [update] Add reserve to some std::string
+- [fix] Enable cache for small channellogos in menu
+- [add] Keep pre loaded images after cache overflow
 - [update] Some internal optimizations
 
 2024-03-25: Version 1.0.3

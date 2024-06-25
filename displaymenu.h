@@ -93,11 +93,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
         // static std::string items[16];
-        const std::string items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                       "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                       "Replay",   "Miscellaneous", "Plugins", "Restart"};
-        std::string MainMenuText(std::string Text);
-        cString GetIconName(std::string element);
+        const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                     "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                     "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        std::string MainMenuText(const std::string &Text);
+        cString GetIconName(const std::string &element);
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
@@ -120,8 +120,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
                                      tColor ColorBarFg, tColor ColorBg);
 
         // static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;  // Unused?
-        void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
-        void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
+        void DrawItemExtraEvent(const cEvent *Event, const cString EmptyText);
+        void DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText);
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent

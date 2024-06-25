@@ -160,7 +160,7 @@ cString GetFormatIcon(int ScreenWidth) {
 cString GetRecordingFormatIcon(const cRecording *Recording) {
     // From skin ElchiHD
     #if APIVERSNUM >= 20605
-        uint16_t FrameHeight = Recording->Info()->FrameHeight();
+        const uint16_t FrameHeight = Recording->Info()->FrameHeight();
         if (FrameHeight > 0) {
             if (FrameHeight >= 2160) return "uhd";  // TODO: Separate images
             if (FrameHeight >= 720) return "hd";
@@ -191,7 +191,7 @@ cString GetRecordingerrorIcon(int RecInfoErrors) {
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
     if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
 
-    int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
+    const int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
     if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
     if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
 
@@ -199,8 +199,8 @@ cString GetRecordingerrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
-    double FrameSeen = FrameResume * 1.0 / FrameTotal;
-    double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    const double FrameSeen = FrameResume * 1.0 / FrameTotal;
+    const double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
@@ -220,7 +220,7 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                                                        // NOLINT
-    int Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
+    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
     //* Aspect of image is preserved in LoadFile()
     if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
@@ -305,7 +305,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
     std::string Causedby(""), Reason("");
     Causedby.reserve(32);
-    Reason.reserve(16);
+    Reason.reserve(32);
     if (!Buffer.empty()) {
         Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
         Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
@@ -359,8 +359,8 @@ int GetEpgsearchConflicts(void) {
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     cMarks Marks;
     bool HasMarks = false;
-    bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
-    double FramesPerSecond = Recording->FramesPerSecond();
+    const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
+    const double FramesPerSecond = Recording->FramesPerSecond();
     const char *RecordingFileName = Recording->FileName();
     cIndexFile *index {nullptr};
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
@@ -373,7 +373,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     bool FsErr = false, IsCutted = false;
     uint64_t FileSize[65535];
     FileSize[0] = 0;
-    uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
+    const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName("");
@@ -501,7 +501,7 @@ u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {
     FT_Library library;
     FT_Face face;
     FT_UInt glyph_index {0};
-    cString FontFileName = cFont::GetFontFileName(Name);
+    const cString FontFileName = cFont::GetFontFileName(Name);
     int rc = FT_Init_FreeType(&library);
     if (!rc) {
         rc = FT_New_Face(library, *FontFileName, 0, &face);
@@ -557,10 +557,10 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         FillChar = HairSpace;
         // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
     }
-    int FillCharWidth = Font->Width(FillChar);  // Width in pixel
-    size_t FillCharLength = strlen(FillChar);   // Length in chars
+    const int FillCharWidth = Font->Width(FillChar);      // Width in pixel
+    const std::size_t FillCharLength = strlen(FillChar);  // Length in chars
 
-    int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
+    const int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
         // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
         return;
@@ -572,7 +572,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     }
 
     if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
-        int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
+        const int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
         int FillCharBlock = NeedFillChar / LineSpaces;                  // For inserting multiple 'FillChar'
         if (!FillCharBlock) ++FillCharBlock;                            // Set minimum to one 'FillChar'
 
@@ -581,9 +581,9 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }
-        size_t FillCharsLength = FillChars.size();
+        const std::size_t FillCharsLength = FillChars.length();
 
-        size_t LineLength = Line.size();
+        std::size_t LineLength = Line.length();
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
         int InsertedFillChar {0};
         /* dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
@@ -593,7 +593,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
                 FillCharWidth, FillCharsLength); */
 
         //* Insert blocks at spaces
-        size_t pos = Line.find(' ');
+        std::size_t pos = Line.find(' ');
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
@@ -613,7 +613,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
                     Line.insert(pos + 1, FillChars);  // Insert after pos!
                     pos = Line.find(".,?!;", pos + FillCharsLength + 1);
                     InsertedFillChar += FillCharBlock;
-                    LineLength = Line.size();
+                    LineLength = Line.length();
                 } else {
                     // dsyslog("flatPlus:  Double '.' found");
                     ++pos;

@@ -27,6 +27,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
     std::string LogoLower("");
     LogoLower.reserve(128);
+    bool success = false;
     cImage *img {nullptr};
     for (int i {0}; i < 3; ++i) {  // Run up to three times (0..2)
         if (i == 1) {  // Second try (Plain logo not found)
@@ -58,7 +59,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             uint32_t tick3 = GetMsTicks();
         #endif
 
-        bool success = LoadImage(*File);  // Try to load image from disk
+        success = LoadImage(*File);  // Try to load image from disk
 
         if (!success) {  // Image not found on disk
             if (i == 2)  // Third try and not found
@@ -177,7 +178,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     if (width == 0 || height == 0) return NULL;
 
-    cString File = cFile;
+    const cString File = cFile;
     #ifdef DEBUGIMAGELOADTIME
         dsyslog("flatPlus: ImageLoader LoadFile %s", *File);
     #endif
@@ -200,7 +201,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         uint32_t tick3 = GetMsTicks();
     #endif
 
-    bool success = LoadImage(*File);
+    const bool success = LoadImage(*File);
 
     if (!success) {
         dsyslog("flatPlus: ImageLoader LoadFile: %s could not be loaded", *File);
