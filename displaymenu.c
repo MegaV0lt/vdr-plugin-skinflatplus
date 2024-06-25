@@ -2871,7 +2871,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
     // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
-    int ShowMaxActors = Config.TVScraperShowMaxActors;
+    const int ShowMaxActors = Config.TVScraperShowMaxActors;
     if (ShowMaxActors == 0) return;  // Do not show actors
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
@@ -2883,13 +2883,17 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
     ContentTop += 6;
 
+    // Smaller font for actors name
+    cFont *FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+    const int FontTinyHeight = FontTiny->Height();
+
     cImage *img {nullptr};
     cString Name(""), Path(""), Role("");  // Actor name, path and role
     int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
-    int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-    int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
-    int PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
-    int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
+    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
+    const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
+    const int PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
+    const int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
     int x = m_MarginItem;
     int y = ContentTop;
     if (NumActors > 50)
@@ -2906,12 +2910,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                 Name = ActorsName[Actor];
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWidth, 0),
-                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
-                                       ActorWidth, m_FontSmlHeight, taCenter);
+                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), FontTiny,
+                                       ActorWidth, FontTinyHeight, taCenter);
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWidth,
-                    m_FontSmlHeight, taCenter);
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), FontTiny, ActorWidth,
+                    FontTinyHeight, taCenter);
             }
             x += ActorWidth + ActorMargin;
             ++Actor;
