@@ -709,7 +709,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     files.reserve(64);  // Set to at least 64 entry's
     Decors.Clear();
 
-    cString FileName("");
+    cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
@@ -718,8 +718,8 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     }
 
     std::sort(files.begin(), files.end(), StringCompare);
-    std::string File_Name("");
-    cString Desc("");
+    std::string File_Name {""};
+    cString Desc {""};
     const std::size_t FilesSize {files.size()};
     for (unsigned i = 0; i < FilesSize; ++i) {
         File_Name = files.at(i);
@@ -729,7 +729,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 }
 
 cString cFlatConfig::DecorDescription(cString File) {
-    cString description("");
+    cString description {""};
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0};
@@ -764,7 +764,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
 
-    cString FileName("");
+    cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
@@ -772,7 +772,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
         files.emplace_back(*FileName);
     }
 
-    std::string FileName2("");
+    std::string FileName2 {""};
     std::sort(files.begin(), files.end(), StringCompare);
     if (DecorIndex >= 0 && DecorIndex < static_cast<int>(files.size())) {
         FileName2 = files.at(DecorIndex);
@@ -962,7 +962,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     }
 
     std::sort(files.begin(), files.end(), StringCompare);
-    std::string FileName("");
+    std::string FileName {""};
     const std::size_t FilesSize {files.size()};
     for (unsigned i = 0; i < FilesSize; ++i) {
         FileName = files.at(i);

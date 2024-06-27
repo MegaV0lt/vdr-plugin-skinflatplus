@@ -74,7 +74,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         cString m_ItemEventLastChannelName{""};
 
-        std::string m_RecFolder{""}, m_LastRecFolder{""};
+        std::string m_RecFolder{""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
         // Icons

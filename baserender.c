@@ -199,8 +199,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     const double AllGB = FreeGB / DiskFreePercent * (1.0 / 100.0);
     const int FreeMinutes = cVideoDiskUsage::FreeMinutes();
     const double AllMinutes = FreeMinutes / DiskFreePercent * (1.0 / 100.0);
-    cString IconName("");
-    cString Extra1(""), Extra2("");
+    cString IconName {""};
+    cString Extra1 {""}, Extra2 {""};
 
     if (Config.DiskUsageFree == 1) {              // Show in free mode
         if (Config.DiskUsageShort == false) {     // Long format
@@ -308,7 +308,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
     if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
         return;
 
-    cString Buffer(""), CurDate = DayDateTime();
+    cString Buffer {""}, CurDate = DayDateTime();
     if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
         const int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
         int MenuIconWidth {0};
@@ -766,13 +766,13 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
-        std::string_view tilde(Text);
+        std::string_view tilde {Text};
         const std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
-            std::string_view sv1(tilde.substr(0, found));
-            std::string_view sv2(tilde.substr(found + 1));  // Default end is npos
-            const std::string first(static_cast<std::string>(rtrim(sv1)));   // Trim possible space at end
-            const std::string second(static_cast<std::string>(ltrim(sv2)));  // Trim possible space at begin
+            std::string_view sv1 {tilde.substr(0, found)};
+            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+            const std::string first {rtrim(sv1)};   // Trim possible space at end
+            const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
@@ -1732,9 +1732,9 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
     std::ifstream file;
-    cString FileName("");
+    cString FileName {""};
 
-    std::string TempToday(""), TempTodaySign("");
+    std::string TempToday {""}, TempTodaySign {""};
     FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -1749,7 +1749,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    std::string IconToday(""), IconTomorrow("");
+    std::string IconToday {""}, IconTomorrow {""};
     FileName = cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -1768,7 +1768,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    std::string TempMaxToday(""), TempMaxTomorrow("");
+    std::string TempMaxToday {""}, TempMaxTomorrow {""};
     FileName = cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -1787,7 +1787,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    std::string TempMinToday(""), TempMinTomorrow("");
+    std::string TempMinToday {""}, TempMinTomorrow {""};
     FileName = cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -1806,7 +1806,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
     } else
         return;
 
-    std::string PrecToday(""), PrecTomorrow("");
+    std::string PrecToday {""}, PrecTomorrow {""};
     double p {0.0};
     FileName = cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);

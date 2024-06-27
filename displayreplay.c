@@ -93,7 +93,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         }
     }
 
-    cString InfoText("");
+    cString InfoText {""};
     if (RecInfo->ShortText()) {
         if (Config.PlaybackShowRecordingDate)  // Date Time - ShortText
             InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(m_Recording->Start()),
@@ -303,11 +303,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         LabelPixmap->DrawText(cPoint(m_MarginItem, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               m_Font, m_Font->Width(*m_Current), m_FontHeight);
     } else {
-        std::string_view cur(*m_Current);
+        std::string_view cur {*m_Current};
         const std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
-            const std::string hm = static_cast<std::string>(cur.substr(0, found));
-            std::string secs = static_cast<std::string>(cur.substr(found, cur.length() - found));
+            const std::string hm {cur.substr(0, found)};
+            std::string secs {cur.substr(found, cur.length() - found)};
             secs.append(1, ' ');  // Fix for extra pixel glitch
 
             LabelPixmap->DrawText(cPoint(m_MarginItem, 0), hm.c_str(), Theme.Color(clrReplayFont),
@@ -323,7 +323,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
     cImage *img {nullptr};
     if (m_Recording) {
-        cString MediaPath("");
+        cString MediaPath {""};
         cSize MediaSize {0, 0};  // Width, Height
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
@@ -343,7 +343,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 series.seriesId = seriesId;
                 series.episodeId = episodeId;
                 if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 0) {  // Use random banner
+                    if (series.banners.size() > 1) {  // Use random banner
                         // Gets 'entropy' from device that generates random numbers itself
                         // to seed a mersenne twister (pseudo) random generator
                         std::mt19937 generator(std::random_device {}());
@@ -352,7 +352,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                         // Range is inclusive (so we need -1 for vector index)
                         std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                        std::size_t number = distribution(generator);
+                        const std::size_t number = distribution(generator);
 
                         MediaPath = series.banners[number].path.c_str();
                         MediaSize.Set(series.banners[number].width, series.banners[number].height);
@@ -360,6 +360,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                             dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
                                     static_cast<int>(number + 1), *MediaPath,
                                     static_cast<int>(series.banners.size()));  // Log result
+                    } else if (series.banners.size() == 1) {                   // Just one banner
+                        MediaPath = series.banners[0].path.c_str();
+                        MediaSize.Set(series.banners[0].width, series.banners[0].height);
                     }
                 }
             } else if (call.type == tMovie) {
@@ -372,8 +375,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-                cString RecPath = cString::sprintf("%s", m_Recording->FileName());
-                cString RecImage("");
+                const cString RecPath = cString::sprintf("%s", m_Recording->FileName());
+                cString RecImage {""};
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
                     MediaPath = RecImage;
                     img = ImgLoader.LoadFile(*MediaPath, m_TVSWidth, m_TVSHeight);
@@ -405,7 +408,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
     }
 
-    cString cutted(""), Dummy("");
+    cString cutted {""}, Dummy {""};
     const bool IsCutted = GetCuttedLengthMarks(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
     if (IsCutted) {
         img = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
@@ -417,17 +420,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total) - m_MarginItem - imgWidth -
                     FontWidthSpace - m_Font->Width(cutted);
         if (Config.TimeSecsScale < 1.0) {
-            std::string_view tot(*m_Total);  // Total length
+            std::string_view tot {*m_Total};  // Total length
             const std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
-                const std::string hm = static_cast<std::string>(tot.substr(0, found));
-                const std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));
+                const std::string hm {tot.substr(0, found)};
+                const std::string secs {tot.substr(found, tot.length() - found)};
 
-                std::string_view cutt(*cutted);  // Cutted length
+                std::string_view cutt {*cutted};  // Cutted length
                 const std::size_t found2 = cutt.find_last_of(':');
                 if (found2 != std::string::npos) {
-                    const std::string hm2 = static_cast<std::string>(cutt.substr(0, found));
-                    const std::string secs2 = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
+                    const std::string hm2 {cutt.substr(0, found)};
+                    const std::string secs2 {cutt.substr(found, cutt.length() - found)};
 
                     right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                             m_FontSecs->Width(secs.c_str()) - m_MarginItem - imgWidth - FontWidthSpace -
@@ -461,11 +464,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         if (Config.TimeSecsScale < 1.0) {
-            std::string_view cutt(*cutted);
+            std::string_view cutt {*cutted};
             const std::size_t found = cutt.find_last_of(':');
             if (found != std::string::npos) {
-                const std::string hm = static_cast<std::string>(cutt.substr(0, found));
-                const std::string secs = static_cast<std::string>(cutt.substr(found, cutt.length() - found));
+                const std::string hm {cutt.substr(0, found)};
+                const std::string secs {cutt.substr(found, cutt.length() - found)};
 
                 LabelPixmap->DrawText(cPoint(right - m_MarginItem, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
@@ -484,11 +487,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     } else {  // Not cutted
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(m_Total);
         if (Config.TimeSecsScale < 1.0) {
-            std::string_view tot(*m_Total);
+            std::string_view tot {*m_Total};
             const std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
-                const std::string hm = static_cast<std::string>(tot.substr(0, found));
-                const std::string secs = static_cast<std::string>(tot.substr(found, tot.length() - found));
+                const std::string hm {tot.substr(0, found)};
+                const std::string secs {tot.substr(found, tot.length() - found)};
 
                 right = m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(hm.c_str()) -
                         m_FontSecs->Width(secs.c_str());
@@ -538,7 +541,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         int left = m_OsdWidth - Config.decorBorderReplaySize * 2;
         int ImageTop {0};
         cImage *img {nullptr};
-        cString IconName("");
+        cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);

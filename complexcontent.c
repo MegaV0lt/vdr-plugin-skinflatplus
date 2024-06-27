@@ -138,7 +138,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     // dsyslog("flatPlus: AddImageWithFloatedText:\nFloatLines %d, Lines %d, TextWithLeft %d, TextWidthFull %d",
     //         FloatLines, Lines, TextWidthLeft, TextWidthFull);
 
-    std::string Line("");
+    std::string Line {""};
     Line.reserve(128);
     cRect FloatedTextPos(TextPos.Left(), TextPos.Top(), TextPos.Width(), TextPos.Height());
     for (int i {0}; i < Lines; ++i) {  // Add text line by line

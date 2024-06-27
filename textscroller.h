@@ -20,7 +20,7 @@ class cTextScroll {
     cRect Position {0, 0, 0, 0};
 
     tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
-    std::string Text{""};
+    std::string Text {""};
     cFont *Font {nullptr};
     cPixmap *Pixmap {nullptr};
     cOsd *m_Osd {nullptr};

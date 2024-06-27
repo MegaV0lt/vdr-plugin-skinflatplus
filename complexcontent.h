@@ -32,7 +32,7 @@ class cSimpleContent {
 
     int m_TextWidth {0}, m_TextHeight {0}, m_TextAlignment {0};
     tColor m_ColorFg {0}, m_ColorBg {0};
-    std::string m_Text{""};
+    std::string m_Text {""};
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
@@ -125,7 +125,7 @@ class cSimpleContent {
         } else if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
-            std::string Line("");
+            std::string Line {""};
             Line.reserve(128);
             const int Lines = Wrapper.Lines();
             const int FontHeight = m_Font->Height();
@@ -155,7 +155,7 @@ class cComplexContent {
 
     bool m_FullFillBackground = false;
     int m_DrawPortHeight {0};
-    int m_ScrollSize  {0};
+    int m_ScrollSize {0};
     bool m_IsShown = false;
     bool m_IsScrollingActive = true;
 

@@ -25,7 +25,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
     // Plain logo without converting to lower including '/'
     cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
-    std::string LogoLower("");
+    std::string LogoLower {""};
     LogoLower.reserve(128);
     bool success = false;
     cImage *img {nullptr};

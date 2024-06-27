@@ -236,7 +236,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                 
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
-    cString AudioType("");
+    cString AudioType {""};
     for (int i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p = Components->Component(i);
         switch (p->stream) {
@@ -291,8 +291,8 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
-    std::string Buffer = XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>");
-    std::string Channel(""), Searchtimer("");
+    std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
+    std::string Channel {""}, Searchtimer {""};
     Channel.reserve(32);
     Searchtimer.reserve(32);
     if (!Buffer.empty()) {
@@ -303,7 +303,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     }
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
-    std::string Causedby(""), Reason("");
+    std::string Causedby {""}, Reason {""};
     Causedby.reserve(32);
     Reason.reserve(32);
     if (!Buffer.empty()) {
@@ -312,7 +312,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     }
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
-    std::string Pattern("");
+    std::string Pattern {""};
     Pattern.reserve(32);
     if (!Buffer.empty()) {
         Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
@@ -376,7 +376,7 @@ bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &C
     const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
     int i {0}, rc {0};
     struct stat FileBuf;
-    cString FileName("");
+    cString FileName {""};
     do {
         ++i;
         if (IsPesRecording)
@@ -576,7 +576,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
         int FillCharBlock = NeedFillChar / LineSpaces;                  // For inserting multiple 'FillChar'
         if (!FillCharBlock) ++FillCharBlock;                            // Set minimum to one 'FillChar'
 
-        std::string FillChars("");
+        std::string FillChars {""};
         FillChars.reserve(16);
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);

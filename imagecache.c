@@ -41,7 +41,7 @@ void cImageCache::Clear(void) {
 }
 
 bool cImageCache::RemoveFromCache(std::string Name) {
-    std::string BaseFileName("");
+    std::string BaseFileName {""};
     BaseFileName.reserve(32);
     for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
         BaseFileName = CacheName[i].substr(CacheName[i].find_last_of('/') + 1);  // Part after the last '/'

@@ -112,7 +112,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanIconsPixmap, clrTransparent);
     m_LastScreenWidth = -1;
 
-    cString ChannelName(""), ChannelNumber("");
+    cString ChannelName {""}, ChannelNumber {""};
     if (Channel) {
         m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         m_IsGroup = Channel->GroupSep();
@@ -186,7 +186,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     }
 
     if (Resolution && !m_IsRadioChannel && m_ScreenWidth > 0) {
-        cString IconName("");
+        cString IconName {""};
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
@@ -224,8 +224,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
-    cString EpgShort("");
-    cString epg("");
+    cString EpgShort {""};
+    cString epg {""};
 
     Scrollers.Clear();
 
@@ -260,7 +260,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         const int dur = Present->Duration() / 60;
         const int sleft = dur - s;
 
-        cString seen("");
+        cString seen {""};
         if (Config.ChannelTimeLeft == 0)
             seen = cString::sprintf("%d-/%d+ %d min", s, sleft, dur);
         else if (Config.ChannelTimeLeft == 1)
@@ -371,7 +371,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.ChannelIconsShow && m_CurChannel)
         ChannelIconsDraw(m_CurChannel, false);
 
-    cString MediaPath("");
+    cString MediaPath {""};
     cSize MediaSize {0, 0};  // Width, Height
 
     static cPlugin *pScraper = GetScraperPlugin();

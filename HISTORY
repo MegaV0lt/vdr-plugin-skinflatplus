@@ -4,6 +4,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [fix] Enable cache for small channel logos in menu
 - [add] Keep pre loaded images after cache overflow
 - [update] Use smaller font fo actor name and role
+- [update] Randomize banner only if more than one
 - [update] Some internal optimizations
 
 2024-03-25: Version 1.0.3
