@@ -52,6 +52,9 @@ class cFlatBaseRender {
         // Font for main menu weather widget
         cFont *m_FontTempSml {nullptr};
 
+        // Very small font for actor name and role
+        cFont *m_FontTiny {nullptr};
+
         // TopBar
         cPixmap *TopBarPixmap {nullptr};
         cPixmap *TopBarIconPixmap {nullptr};

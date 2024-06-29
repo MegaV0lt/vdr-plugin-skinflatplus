@@ -83,7 +83,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     }
 
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
-    return;
+    // return;
 }
 
 void cFlatBaseRender::TopBarCreate(void) {
@@ -911,32 +911,33 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         Pixmap->DrawRectangle(cRect(rect.Left() + rect.Width() - out, rect.Top(), out, big), ColorFg);
 
         if (Current > 0) {
+            const int out2 = out * 2;
             if (IsSignal) {
                 double perc = 100.0 / Total * Current * (1.0 / 100.0);
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out2, big - out2),
                                           Theme.Color(clrButtonGreen));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * 0.666) - out * 2, big - out * 2),
+                                                (rect.Width() * 0.666) - out2, big - out2),
                                           Theme.Color(clrButtonYellow));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * 0.333) - out * 2, big - out * 2),
+                                                (rect.Width() * 0.333) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
                 } else if (perc > 0.333) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out2, big - out2),
                                           Theme.Color(clrButtonYellow));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * 0.333) - out * 2, big - out * 2),
+                                                (rect.Width() * 0.333) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
                 } else
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out * 2, big - out * 2),
+                                                (rect.Width() * PercentLeft) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
             } else
                 Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                            (rect.Width() * PercentLeft) - out * 2, big - out * 2),
+                                            (rect.Width() * PercentLeft) - out2, big - out2),
                                       ColorBarFg);
         }
         break;
@@ -1388,6 +1389,10 @@ void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DecorBorderCleadByFrom()");
+    #endif
+
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
@@ -1413,6 +1418,10 @@ void cFlatBaseRender::DecorBorderClearAll(void) {
 
 void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
                                       tColor ColorBg, int From, bool Store) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DecorBorderDraw()");
+    #endif
+
     if (Size == 0 || Type <= 0) return;
 
     if (Store) {
@@ -1731,6 +1740,10 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
+    #endif
+
     std::ifstream file;
     cString FileName {""};
 

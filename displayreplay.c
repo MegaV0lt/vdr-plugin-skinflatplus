@@ -356,11 +356,10 @@ void cFlatDisplayReplay::UpdateInfo(void) {
 
                         MediaPath = series.banners[number].path.c_str();
                         MediaSize.Set(series.banners[number].width, series.banners[number].height);
-                        if (series.banners.size() > 1)
-                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), *MediaPath,
-                                    static_cast<int>(series.banners.size()));  // Log result
-                    } else if (series.banners.size() == 1) {                   // Just one banner
+                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                static_cast<int>(number + 1), *MediaPath,
+                                static_cast<int>(series.banners.size()));  // Log result
+                    } else if (series.banners.size() == 1) {               // Just one banner
                         MediaPath = series.banners[0].path.c_str();
                         MediaSize.Set(series.banners[0].width, series.banners[0].height);
                     }

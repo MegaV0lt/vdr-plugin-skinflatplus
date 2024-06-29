@@ -351,11 +351,11 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
-                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight*2 + m_FontSmlHeight,
+                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight * 2 + m_FontSmlHeight,
                 m_ChannelWidth - left - MaxWidth, m_FontSmlHeight), Theme.Color(clrChannelFontEpgFollow),
                 clrTransparent, m_FontSml);
         } else {
-            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight*2 + m_FontSmlHeight), *EpgShort,
+            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight * 2 + m_FontSmlHeight), *EpgShort,
                                            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg),
                                            m_FontSml, m_ChannelWidth - left - MaxWidth);
         }

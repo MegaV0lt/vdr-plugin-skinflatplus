@@ -48,7 +48,7 @@ class cFlatConfig {
         void GetConfigFiles(cStringList &Files);  // NOLINT
 
         void RecordingOldLoadConfig(void);
-        int GetRecordingOldValue(std::string folder);
+        int GetRecordingOldValue(const std::string &folder);
 
  public:
         cString ThemeCurrent;

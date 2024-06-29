@@ -31,6 +31,10 @@ static int CompareTimers(const void *a, const void *b) {
 }
 
 cFlatDisplayMenu::cFlatDisplayMenu(void) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
+    #endif
+
     CreateFullOsd();
     TopBarCreate();
     ButtonsCreate();
@@ -44,8 +48,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_VideoDiskUsageState = -1;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-    m_ItemChannelHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-    m_ItemTimerHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
+    m_ItemChannelHeight = m_ItemHeight;
+    m_ItemTimerHeight = m_ItemHeight;
 
     m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
     m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem * 3 +
@@ -56,7 +60,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_MenuTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
     MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuPixmap left: %d top: %d width: %d height: %d", 0, m_MenuTop, m_MenuWidth,
-    // m_ScrollBarHeight);
+    //         m_ScrollBarHeight);
     MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2,
                                      cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsBgPixmap left: %d top: %d width: %d height: %d", 0,
@@ -75,7 +79,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2;
     ContentHeadPixmap = CreatePixmap(m_Osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
     // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
-    // m_chHeight);
+    //         m_chHeight);
     ContentHeadIconsPixmap =
         CreatePixmap(m_Osd, "ContentHeadIconsPixmap", 2, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
 
@@ -109,6 +113,11 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
     if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
         delete m_FontTempSml;
+
+    if (m_FontTiny) {  // Created in 'AddActors'
+        dsyslog("flatPlus: Deleting 'm_FontTiny...'");
+        delete m_FontTiny;
+    }
 
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
@@ -163,6 +172,10 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetScrollbar()");
+    #endif
+
     // dsyslog("flatPlus: Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
     if (!MenuPixmap) return;
 
@@ -310,14 +323,14 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             break;
         case mcRecording:
             if (Config.MenuRecordingShowCount) {
-                int RecCount {0}, RecNewCount {0};
+                uint RecCount {0}, RecNewCount {0};
                 m_LastRecFolder = m_RecFolder;
                 if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
                     std::string RecFolder2 {""};
                     RecFolder2.reserve(256);
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
+                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);  // .c_str()
                         if (m_RecFolder == RecFolder2) {
                             ++RecCount;
                             if (Rec->IsNew())
@@ -423,7 +436,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
     int XOff {0}, xt {0};
     const char *s {nullptr};
-    for (int i {0}; i < MaxTabs; ++i) {
+    for (uint i {0}; i < MaxTabs; ++i) {
         s = GetTabbedText(Text, i);
         if (s) {
             // From skinelchi
@@ -561,7 +574,7 @@ std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
         MenuEntry = skipspace(text.substr(i).c_str());
     } else {
         // MenuNumber = "";
-        MenuEntry = text.c_str();
+        MenuEntry = text;  // .c_str();
     }
     return MenuEntry;
 }
@@ -570,7 +583,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
     // Check for standard menu entries
     std::string s {""};
     s.reserve(32);  // Space for translated menu entry
-    for (int i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
+    for (uint i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(items[i].c_str());
         if (s == element) {
             return cString::sprintf("menuIcons/%s", items[i].c_str());
@@ -590,7 +603,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
     const char *MaimMenuEntry {nullptr};
     std::string PlugMainEntry {""};
     PlugMainEntry.reserve(32);  // Space for menu entry
-    for (int i {0};; ++i) {
+    for (uint i {0};; ++i) {
         cPlugin *p = cPluginManager::GetPlugin(i);
         if (p) {
             MaimMenuEntry = p->MainMenuEntry();
@@ -921,6 +934,10 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 }
 
 void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString EmptyText) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraEvent()");
+    #endif
+
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
         m_cLeft += m_ScrollBarWidth;
@@ -1735,6 +1752,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
+    #endif
+
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
         return false;
 
@@ -1742,21 +1763,21 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         return false;
 
     if (Level > 0)
-        m_RecFolder = GetRecordingName(Recording, Level - 1, true).c_str();
+        m_RecFolder = GetRecordingName(Recording, Level - 1, true);  // .c_str();
     else
         m_RecFolder = "";
 
     m_LastItemRecordingLevel = Level;
 
     if (m_LastRecFolder != m_RecFolder) {
-        int RecCount {0}, RecNewCount {0};
+        uint RecCount {0}, RecNewCount {0};
         m_LastRecFolder = m_RecFolder;
         if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
             std::string RecFolder2 {""};
             RecFolder2.reserve(256);
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
+                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);  // .c_str();
                 if (m_RecFolder == RecFolder2) {
                     ++RecCount;
                     if (Rec->IsNew())
@@ -2221,6 +2242,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
+    #endif
+
     if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
     if (!Event) return;
 
@@ -2445,11 +2470,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             const std::size_t number = distribution(generator);
 
                             MediaPath = series.banners[number].path.c_str();
-                            if (series.banners.size() > 1)
-                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                        static_cast<int>(number + 1), *MediaPath,
-                                        static_cast<int>(series.banners.size()));  // Log result
-                        } else if (series.banners.size() == 1) {                   // Just one banner
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), *MediaPath,
+                                    static_cast<int>(series.banners.size()));  // Log result
+                        } else if (series.banners.size() == 1) {               // Just one banner
                             MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperEPGInfoShowActors) {
@@ -2683,6 +2707,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 }
 
 void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraRecording()");
+    #endif
+
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
         m_cLeft += m_ScrollBarWidth;
@@ -2729,7 +2757,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             // From SkinNopacity
 #if APIVERSNUM >= 20505
             if (RecInfo && RecInfo->Errors() >= 1) {
-                std::ostringstream RecErrors("");
+                std::ostringstream RecErrors {""};
                 RecErrors.imbue(std::locale(""));  // Set to local locale
                 RecErrors << RecInfo->Errors();
                 Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
@@ -2761,7 +2789,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
     cString MediaPath {""};          // \/ Better use content hight
-    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem *2};
+    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};
     int MediaType {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
@@ -2792,11 +2820,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                     const std::size_t number = distribution(generator);
 
                     MediaPath = series.banners[number].path.c_str();
-                    if (series.banners.size() > 1)
-                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                static_cast<int>(number + 1), *MediaPath,
-                                static_cast<int>(series.banners.size()));  // Log result
-                } else if (series.banners.size() == 1) {                   // Just one banner
+                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                            static_cast<int>(number + 1), *MediaPath,
+                            static_cast<int>(series.banners.size()));  // Log result
+                } else if (series.banners.size() == 1) {               // Just one banner
                     MediaPath = series.banners[0].path.c_str();
                 }
                 MediaWidth = m_cWidth - m_MarginItem2;
@@ -2876,6 +2903,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
+    #endif
+
     // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
     const int ShowMaxActors = Config.TVScraperShowMaxActors;
     if (ShowMaxActors == 0) return;  // Do not show actors
@@ -2890,23 +2921,23 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ContentTop += 6;
 
     // Smaller font for actors name
-    cFont *FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
-    const int FontTinyHeight = FontTiny->Height();
+    m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+    const int FontTinyHeight = m_FontTiny->Height();
 
     cImage *img {nullptr};
     cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
     int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
     const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
     const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
-    const int PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
-    const int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
+    const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
+    const uint PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
     int x = m_MarginItem;
     int y = ContentTop;
     if (NumActors > 50)
         dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
-    for (int row {0}; row < PicLines; ++row) {
-        for (int col {0}; col < PicsPerLine; ++col) {
+    for (uint row {0}; row < PicLines; ++row) {
+        for (uint col {0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
             Path = ActorsPath[Actor];
@@ -2916,11 +2947,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                 Name = ActorsName[Actor];
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWidth, 0),
-                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), FontTiny,
+                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
                                        ActorWidth, FontTinyHeight, taCenter);
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), FontTiny, ActorWidth,
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
                     FontTinyHeight, taCenter);
             }
             x += ActorWidth + ActorMargin;
@@ -2929,10 +2960,13 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         x = m_MarginItem;
         y = ComplexContent.BottomContent() + m_FontHeight;
     }  // for row
-    delete FontTiny;
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+    #endif
+
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
     if (!Recording) return;
 
@@ -3143,11 +3177,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             const std::size_t number = distribution(generator);
 
                             MediaPath = series.banners[number].path.c_str();
-                            if (series.banners.size() > 1)
-                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                        static_cast<int>(number + 1), *MediaPath,
-                                        static_cast<int>(series.banners.size()));  // Log result
-                        } else if (series.banners.size() == 1) {                   // Just one banner
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), *MediaPath,
+                                    static_cast<int>(series.banners.size()));  // Log result
+                        } else if (series.banners.size() == 1) {               // Just one banner
                             MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperRecInfoShowActors) {
@@ -3430,6 +3463,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetText()");
+    #endif
+
     if (!Text) return;
 
     m_ShowEvent = false;
@@ -3570,7 +3607,11 @@ void cFlatDisplayMenu::Flush(void) {
     m_Osd->Flush();
 }
 
-void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
+void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::ItemBorderInsertUnique()");
+    #endif
+
     std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
@@ -3611,7 +3652,7 @@ void cFlatDisplayMenu::ItemBorderClear(void) {
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);  // .c_str() not needed
 
     int value = Config.GetRecordingOldValue(m_RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
@@ -3630,7 +3671,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);  // .c_str() not needed
     std::string RecFolder2 {""};
     RecFolder2.reserve(256);
     time_t RecStart = Recording->Start();
@@ -3638,7 +3679,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-        RecFolder2 = GetRecordingName(rec, Level, true).c_str();
+        RecFolder2 = GetRecordingName(rec, Level, true);  // .c_str() not needed
         if (m_RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStart2 = rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
@@ -3655,6 +3696,10 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::GetRecordingName()");
+    #endif
+
     if (!Recording) return "";
 
     std::string RecNamePart {""};
@@ -3671,7 +3716,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
         }
         RecNamePart = tokens.at(Level);
     } catch (...) {
-        RecNamePart = RecName.c_str();
+        RecNamePart = RecName;  // .c_str();
     }
 
     if (Config.MenuItemRecordingClearPercent && IsFolder) {

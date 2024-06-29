@@ -291,6 +291,10 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlat::InsertAuxInfo()");
+    #endif
+
     std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
     std::string Channel {""}, Searchtimer {""};
     Channel.reserve(32);
@@ -357,6 +361,10 @@ int GetEpgsearchConflicts(void) {
 }
 
 bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlat::GetCuttedLenghtMarks()");
+    #endif
+
     cMarks Marks;
     bool HasMarks = false;
     const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
@@ -531,7 +539,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
         return;
 
-    int LineSpaces {0};
+    uint LineSpaces {0};
     for (auto &ch : Line)  // Count spaces in 'Line'
         if (ch == ' ') ++LineSpaces;
 
@@ -560,7 +568,7 @@ void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
     const int FillCharWidth = Font->Width(FillChar);      // Width in pixel
     const std::size_t FillCharLength = strlen(FillChar);  // Length in chars
 
-    const int LineWidth = Font->Width(Line.c_str());  // Width in Pixel
+    const int LineWidth = Font->Width(Line.c_str());   // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
         // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
         return;
@@ -671,7 +679,7 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
     // uint32_t tick0 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: FloatingTextWrapper start. Textlength: %ld", strlen(Text));
+    // dsyslog("flatPlus: TextFloatingWrapper::Set() start. Textlength: %ld", strlen(Text));
 
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;
@@ -730,13 +738,13 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Delim = p;
                 Blank = nullptr;
             } else {
-                // dsyslog("flatPlus: FloatingTextWrapper skipping double delimiter char!");
+                // dsyslog("flatPlus: TextFloatingWrapper::Set() skipping double delimiter char!");
             }
         }
         p += sl;
     }  // for char
     // uint32_t tick1 = GetMsTicks();
-    // dsyslog("flatPlus: FloatingTextWrapper time: %d ms", tick1 - tick0);
+    // dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
 }
 
 const char *cTextFloatingWrapper::Text(void) {

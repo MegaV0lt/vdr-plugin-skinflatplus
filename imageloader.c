@@ -29,7 +29,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     LogoLower.reserve(128);
     bool success = false;
     cImage *img {nullptr};
-    for (int i {0}; i < 3; ++i) {  // Run up to three times (0..2)
+    for (uint i {0}; i < 3; ++i) {  // Run up to three times (0..2)
         if (i == 1) {  // Second try (Plain logo not found)
             LogoLower = logo;
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)

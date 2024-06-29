@@ -86,7 +86,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // cImage *iconNew;
         // Icons
 
-        void ItemBorderInsertUnique(sDecorBorder ib);
+        void ItemBorderInsertUnique(const sDecorBorder &ib);
         void ItemBorderDrawAllWithScrollbar(void);
         void ItemBorderDrawAllWithoutScrollbar(void);
         void ItemBorderClear(void);

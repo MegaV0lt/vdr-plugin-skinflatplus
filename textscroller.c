@@ -161,7 +161,7 @@ void cTextScrollers::StartScrolling(void) {
 
 void cTextScrollers::Action(void) {
     // Wait 1 second so the osd is finished
-    for (int i {0}; i < 100 && Running(); ++i) {
+    for (uint i {0}; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);
     }
 

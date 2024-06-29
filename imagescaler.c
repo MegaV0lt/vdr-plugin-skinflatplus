@@ -51,7 +51,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         // Calculate filter coefficients
         float h[4];
-        for (int j {0}; j < 4; ++j) {
+        for (uint j {0}; j < 4; ++j) {
             const float t = 3.14159265359f * (sub_offset + (1 - j));
             h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
@@ -80,7 +80,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
 
-        for (int j {0}; j < 4; ++j) {
+        for (uint j {0}; j < 4; ++j) {
             const float t = norm * h[j];
             filters[i].m_coeff[(offset + j) & 3] =
                 static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations

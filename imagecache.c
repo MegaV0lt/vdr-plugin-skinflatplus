@@ -21,7 +21,7 @@ cImageCache::cImageCache() {}
 cImageCache::~cImageCache() {}
 
 void cImageCache::Create(void) {
-    for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
         CacheImage[i] = nullptr;
         CacheName[i] = "";
         CacheWidth[i] = -1;
@@ -32,7 +32,7 @@ void cImageCache::Create(void) {
 }
 
 void cImageCache::Clear(void) {
-    for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
         // if (CacheImage[i] != NULL)  //* 'delete' already checks for NULL
             delete CacheImage[i];
     }
@@ -43,7 +43,7 @@ void cImageCache::Clear(void) {
 bool cImageCache::RemoveFromCache(std::string Name) {
     std::string BaseFileName {""};
     BaseFileName.reserve(32);
-    for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
         BaseFileName = CacheName[i].substr(CacheName[i].find_last_of('/') + 1);  // Part after the last '/'
 
         if (BaseFileName == Name) {
@@ -60,7 +60,7 @@ bool cImageCache::RemoveFromCache(std::string Name) {
 
 cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
-    for (int i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
         // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
         //          CacheWidth[i], CacheHeight[i]);
         if (CacheName[i] == Name && CacheWidth[i] == Width && CacheHeight[i] == Height)

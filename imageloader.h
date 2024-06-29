@@ -30,7 +30,7 @@ class cImageLoader : public cImageMagickWrapper {
  private:
     // int epgImageWidthLarge, epgImageHeightLarge;  // Unused?
     // int epgImageWidth, epgImageHeight;
-    cString m_LogoExtension{"png"};
+    const cString m_LogoExtension{"png"};
 
     void ToLowerCase(std::string &str);  // NOLINT
 };
