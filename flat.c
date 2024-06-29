@@ -360,7 +360,7 @@ int GetEpgsearchConflicts(void) {
     return 0;
 }
 
-bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
+bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlat::GetCuttedLenghtMarks()");
     #endif

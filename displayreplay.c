@@ -408,7 +408,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     cString cutted {""}, Dummy {""};
-    const bool IsCutted = GetCuttedLengthMarks(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
+    const bool IsCutted = GetCuttedLengthSize(m_Recording, Dummy, cutted, false);  // Process marks and get cutted time
     if (IsCutted) {
         img = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
         int imgWidth {0};
