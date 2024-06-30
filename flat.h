@@ -301,5 +301,6 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts(void);
+int GetFrameAfterEdit(const cMarks *marks = NULL, int Frame = 0, int LastFrame = 0);
 bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);

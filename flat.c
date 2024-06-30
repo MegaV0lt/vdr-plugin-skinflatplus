@@ -360,6 +360,37 @@ int GetEpgsearchConflicts(void) {
     return 0;
 }
 
+int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From SkinLCARSNG
+    if (LastFrame < 0 || Frame < 0 || Frame > LastFrame) return -1;
+
+    int EditedFrame {0};
+    int p {0}, PrevPos {-1};
+    bool InEdit {false};
+    for (const cMark *mi = marks->First(); mi; mi = marks->Next(mi)) {
+        p = mi->Position();
+        if (InEdit) {
+            EditedFrame += p - PrevPos;
+            InEdit = false;
+            if (Frame <= p) {
+                EditedFrame -= p - Frame;
+                return EditedFrame;
+            }
+        } else {
+            if (Frame <= p)
+                return EditedFrame;
+
+            PrevPos = p;
+            InEdit = true;
+        }
+    }
+    if (InEdit) {
+        EditedFrame += LastFrame - PrevPos;  // The last sequence had no actual "end" mark
+        if (Frame < LastFrame)
+            EditedFrame -= LastFrame - Frame;
+    }
+    return EditedFrame;
+}
+
 bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
     #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlat::GetCuttedLenghtMarks()");
