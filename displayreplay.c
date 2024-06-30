@@ -411,18 +411,18 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     // Simpler calculation for cutted length. No need to get size (MB/GB)
     if (marks && m_Recording->HasMarks()) {
         int FramesAfterEdit {-1};
-        int CurrentFramesAfterEdit {-1};
+        // int CurrentFramesAfterEdit {-1};
 
         const int NumFrames {m_Recording->NumFrames()};  // Total frames in recording
         const double FramesPerSecond {m_Recording->FramesPerSecond()};
 #if (APIVERSNUM >= 20608)
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);;
-        if (FramesAfterEdit >= 0)
-            CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
+        // if (FramesAfterEdit >= 0)
+        //    CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
 #else
         FramesAfterEdit = GetFrameAfterEdit(marks, NumFrames, NumFrames);
-        if (FramesAfterEdit >= 0)
-            CurrentFramesAfterEdit = GetFrameAfterEdit(marks, m_CurrentFrame, NumFrames);
+        // if (FramesAfterEdit >= 0)
+        //    CurrentFramesAfterEdit = GetFrameAfterEdit(marks, m_CurrentFrame, NumFrames);
 #endif
 
         const cString cutted {IndexToHMSF(FramesAfterEdit, false, FramesPerSecond)};
