@@ -434,8 +434,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     int ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
-    int SignalWidth = m_ChannelWidth / 2;
-    int ProgressWidth = SignalWidth / 2 - ProgressLeft - m_MarginItem;
+    const int SignalWidth = m_ChannelWidth / 2;
+    const int ProgressWidth = SignalWidth / 2 - ProgressLeft - m_MarginItem;
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap,
                        cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize),
                        cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize), SignalStrength, 100,
@@ -475,7 +475,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
         .hops = -1
     };
 
-    // int ChannelSid = m_CurChannel->Sid();
+    // const int ChannelSid = m_CurChannel->Sid();
     // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, m_CurChannel->Name());
 
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;

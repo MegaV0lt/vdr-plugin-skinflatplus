@@ -84,7 +84,6 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     }
 
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
-    // return;
 }
 
 void cFlatBaseRender::TopBarCreate(void) {

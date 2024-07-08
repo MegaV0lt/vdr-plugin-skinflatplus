@@ -88,13 +88,13 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
         // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
         //        DrawPort.Size().Height());
         return pixmap;
-    }
+    }  // Everything runs according to the plan
 
     esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i", *Name,
             DrawPort.Size().Width(), DrawPort.Size().Height());
     cRect NewDrawPort = DrawPort;
-    int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
-    int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
+    const int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
+    const int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
         esyslog("flatPlus: Created pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
@@ -219,7 +219,7 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
     return "recording_seen_10";
 }
 
-void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {                                                        // NOLINT
+void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
     //* Aspect of image is preserved in LoadFile()
     if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)

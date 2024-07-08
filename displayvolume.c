@@ -18,7 +18,6 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
     const int top = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
               Config.decorBorderVolumeSize * 2;
     const int left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
-    // left /= 2;
 
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
     MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
@@ -78,7 +77,6 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     const int width = (m_OsdWidth / 4 * 3);
     left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
-    // left /= 2;
     DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
                     width + m_MarginItem2, Config.decorProgressVolumeSize + m_MarginItem2,
                     Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg),

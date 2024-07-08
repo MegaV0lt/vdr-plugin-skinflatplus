@@ -31,7 +31,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     m_MaxItemWidth = std::max(m_MaxItemWidth, headerWidth);
 
     ItemsHeight = (NumTracks + 1) * m_ItemHeight;
-    const int left = (m_OsdWidth - m_MaxItemWidth) / 2;  // left /= 2;
+    const int left = (m_OsdWidth - m_MaxItemWidth) / 2;
     TopBarSetTitle(Title);
 
     TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1,
@@ -76,19 +76,17 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
                                m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
 
     const int left = (m_OsdWidth - m_MaxItemWidth) / 2;
-    //  left /= 2;
-
     const int top = m_OsdHeight - ItemsHeight - m_MarginItem + y;
 
     if (Current)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
-                        Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
+        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
+                        Config.decorBorderTrackType, Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
     else if (Index >= 0)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
-                        Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
+        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
+                        Config.decorBorderTrackType, Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
     else
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize, Config.decorBorderTrackType,
-                        Config.decorBorderTrackFg, Config.decorBorderTrackBg);
+        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
+                        Config.decorBorderTrackType, Config.decorBorderTrackFg, Config.decorBorderTrackBg);
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {

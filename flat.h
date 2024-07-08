@@ -280,22 +280,6 @@ std::string_view ltrim(std::string_view str);
 std::string_view rtrim(std::string_view str);
 std::string_view trim(std::string_view str);
 
-/* inline void LeftTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    s.erase(0, s.find_first_not_of(t));  // Trim from left
-    // return s;  // Only inplace trimming
-}
-
-inline void RightTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    s.erase(s.find_last_not_of(t) + 1);  // Trim from right
-    // return s;  // Only inplace trimming
-}
-
-inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    LeftTrim(s, t);  // Trim from left & right
-    RightTrim(s, t);
-    // return LeftTrim(RightTrim(s, t), t);
-} */
-
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT

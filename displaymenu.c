@@ -328,7 +328,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                     RecFolder2.reserve(256);
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);  // .c_str()
+                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
                         if (m_RecFolder == RecFolder2) {
                             ++RecCount;
                             if (Rec->IsNew())
@@ -572,7 +572,7 @@ std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
         MenuEntry = skipspace(text.substr(i).c_str());
     } else {
         // MenuNumber = "";
-        MenuEntry = text;  // .c_str();
+        MenuEntry = text;
     }
     return MenuEntry;
 }
@@ -1761,7 +1761,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         return false;
 
     if (Level > 0)
-        m_RecFolder = GetRecordingName(Recording, Level - 1, true);  // .c_str();
+        m_RecFolder = GetRecordingName(Recording, Level - 1, true);
     else
         m_RecFolder = "";
 
@@ -1775,7 +1775,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             RecFolder2.reserve(256);
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);  // .c_str();
+                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
                 if (m_RecFolder == RecFolder2) {
                     ++RecCount;
                     if (Rec->IsNew())
@@ -1829,14 +1829,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (2.0 / 3.0));
     }
     if (!ImgRecNew)
         ImgRecNew = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
     if (!ImgRecNewSml)
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (1.0 / 3.0 * 2.0));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (2.0 / 3.0));
 
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
@@ -3650,7 +3650,7 @@ void cFlatDisplayMenu::ItemBorderClear(void) {
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);  // .c_str() not needed
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);
 
     int value = Config.GetRecordingOldValue(m_RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
@@ -3663,13 +3663,11 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     const int days = DiffSecs / (60 * 60 * 24);
     // dsyslog("flatPlus: m_RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
     //          m_RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
-    // if (days > value) return true;
-    // return false;
     return (days > value) ? true : false;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);  // .c_str() not needed
+    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);
     std::string RecFolder2 {""};
     RecFolder2.reserve(256);
     time_t RecStart = Recording->Start();
@@ -3677,7 +3675,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-        RecFolder2 = GetRecordingName(rec, Level, true);  // .c_str() not needed
+        RecFolder2 = GetRecordingName(rec, Level, true);
         if (m_RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStart2 = rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
@@ -3714,7 +3712,7 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
         }
         RecNamePart = tokens.at(Level);
     } catch (...) {
-        RecNamePart = RecName;  // .c_str();
+        RecNamePart = RecName;
     }
 
     if (Config.MenuItemRecordingClearPercent && IsFolder) {
@@ -5219,8 +5217,8 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (1.0 / 3.0 * 2.0));
-    ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (1.0 / 3.0 * 2.0));
+    ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
+    ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
     ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old", ImageHeight, ImageHeight);

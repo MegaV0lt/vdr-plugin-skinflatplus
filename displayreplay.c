@@ -205,7 +205,6 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
     if (Setup.ShowReplayMode) {
         left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem * 3)) / 2;
-        //  left /= 2;
 
         if (m_ModeOnly)
             PixmapFill(LabelPixmap, clrTransparent);
@@ -623,8 +622,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
         PixmapFill(LabelJumpPixmap, clrTransparent);
         return;
     }
-    int left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(Jump)) / 2;
-    // left /= 2;
+    const int left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(Jump)) / 2;
 
     LabelJumpPixmap->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
                               m_Font->Width(Jump), m_FontHeight, taCenter);
