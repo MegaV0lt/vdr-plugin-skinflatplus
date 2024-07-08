@@ -28,6 +28,7 @@ cFlatBaseRender::cFlatBaseRender(void) {
     m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
 
     m_FontHeight = m_Font->Height();
+    m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 

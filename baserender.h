@@ -46,6 +46,7 @@ class cFlatBaseRender {
         cFont *m_FontSml {nullptr};
         cFont *m_FontFixed {nullptr};
         int m_FontHeight {0};
+        int m_FontHeight2 {0};
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
 

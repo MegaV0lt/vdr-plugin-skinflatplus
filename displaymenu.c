@@ -114,10 +114,8 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
     if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
         delete m_FontTempSml;
 
-    if (m_FontTiny) {  // Created in 'AddActors'
-        dsyslog("flatPlus: Deleting 'm_FontTiny...'");
+    if (m_FontTiny)  // Created in 'AddActors'
         delete m_FontTiny;
-    }
 
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
@@ -433,7 +431,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, m_FontHeight), ColorBg);
 
-    int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
+    const int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
     int XOff {0}, xt {0};
     const char *s {nullptr};
     for (uint i {0}; i < MaxTabs; ++i) {
@@ -551,7 +549,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 }
 
 std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
-    std::string text {skipspace(Text.c_str())};
+    const std::string text {skipspace(Text.c_str())};
     std::string MenuEntry {""} /*, MenuNumber {""}*/;
     MenuEntry.reserve(13);  // Length of 'Miscellaneous'
     bool found = false, DoBreak = false;
@@ -788,8 +786,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         if (Event) {
             // Calculate progress bar
             progress = round((time(NULL) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
-            if (progress < 0) progress = 0.0;
-            else if (progress > 100) progress = 100;
+            if (progress < 0.0) progress = 0.0;
+            else if (progress > 100.0) progress = 100.0;
 
             EventTitle = Event->Title();
         }
@@ -1488,8 +1486,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 if (total >= 0) {
                     // Calculate progress bar
                     double progress = round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
-                    if (progress < 0) progress = 0.0;
-                    else if (progress > 100) progress = 100;
+                    if (progress < 0.0) progress = 0.0;
+                    else if (progress > 100.0) progress = 100.0;
 
                     int PBLeft = Left;
                     int PBTop = y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
@@ -1530,7 +1528,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
@@ -1978,10 +1976,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowFolderDate != 0) {
                 Buffer = cString::sprintf("(%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
                 MenuPixmap->DrawText(
-                    cPoint(LeftWidth - m_Font->Width(Buffer) - m_FontHeight * 2 - m_MarginItem2, Top), *Buffer,
+                    cPoint(LeftWidth - m_Font->Width(Buffer) - m_FontHeight2 - m_MarginItem2, Top), *Buffer,
                     ColorExtraTextFg, ColorBg, m_Font);
                 if (IsRecordingOld(Recording, Level)) {
-                    Left = LeftWidth - m_FontHeight * 2 - m_MarginItem2;
+                    Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
                     img = nullptr;
                     if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
@@ -3374,7 +3372,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         Title = Recording->Name();
 
     const cString ShortText = RecInfo->ShortText();
-    const int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
+    const int ShortTextWidth = m_FontSml->Width(*ShortText);                   // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // HeadIconLeft includes right margin
     int left = m_MarginItem;
 
@@ -3587,7 +3585,7 @@ void cFlatDisplayMenu::Flush(void) {
     }
 
     if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
-        int TimerCount {0}, TimerActiveCount {0};
+        uint TimerCount {0}, TimerActiveCount {0};
         LOCK_TIMERS_READ;
         for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
             ++TimerCount;
@@ -5075,7 +5073,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         /* time_t */ t2 = mktime(&tm_r);
 
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
-            if (left + m_FontHeight * 2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
+            if (left + m_FontHeight2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
                     m_MarginItem * 6 >
                 wWidth)
                 break;

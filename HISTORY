@@ -1,9 +1,12 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-xx-xx: Version 1.x.x
+2024-xx-xx: Version 1.0.4
 - [fix] Enable cache for small channel logos in menu
 - [add] Keep pre loaded images after cache overflow
-- [update] Use smaller font fo actor name and role
+- [add] Option to display end time of recording
+- [add] Option to display edited end time of recording
+- [update] Show symbols before current pos wnd length at replay
+- [update] Use smaller font for actor name and role
 - [update] Randomize banner only if more than one
 - [update] Some internal optimizations
 

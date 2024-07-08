@@ -18,7 +18,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_ChannelWidth = m_OsdWidth - Config.decorBorderChannelSize * 2;
     m_ChannelHeight = m_OsdHeight - Config.decorBorderChannelSize * 2;
     // From bottom to top (2 * EPG + 2 * EPGsml)
-    HeightBottom = (m_FontHeight * 2) + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
+    HeightBottom = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
     HeightImageLogo = HeightBottom;
     if (Config.SignalQualityShow)
         HeightBottom += std::max(m_FontSmlHeight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
@@ -351,11 +351,11 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
-                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight * 2 + m_FontSmlHeight,
+                Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight2 + m_FontSmlHeight,
                 m_ChannelWidth - left - MaxWidth, m_FontSmlHeight), Theme.Color(clrChannelFontEpgFollow),
                 clrTransparent, m_FontSml);
         } else {
-            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight * 2 + m_FontSmlHeight), *EpgShort,
+            ChanInfoBottomPixmap->DrawText(cPoint(left, m_FontHeight2 + m_FontSmlHeight), *EpgShort,
                                            Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg),
                                            m_FontSml, m_ChannelWidth - left - MaxWidth);
         }
@@ -428,7 +428,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
     const int left = m_MarginItem2;
-    int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
+    int top = m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem;
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                     - m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
@@ -490,7 +490,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
         return;
 
     int left = m_SignalStrengthRight + m_MarginItem2;
-    int top = m_FontHeight * 2 + m_FontSmlHeight * 2 + m_MarginItem;
+    int top = m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem;
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem2;
 
@@ -554,7 +554,7 @@ void cFlatDisplayChannel::Flush(void) {
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {
-    int height = (m_FontHeight * 2) + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2;
+    int height = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2;
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);
 

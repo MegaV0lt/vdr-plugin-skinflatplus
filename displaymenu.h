@@ -39,7 +39,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        int m_LastTimerCount {0}, m_LastTimerActiveCount {0};
+        uint m_LastTimerCount {0}, m_LastTimerActiveCount {0};
         cString m_LastTitle{""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};

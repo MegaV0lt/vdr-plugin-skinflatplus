@@ -22,6 +22,7 @@ cStringList ScrollBarTypes;
 cStringList DiskUsageFree;
 cStringList ChannelTimeLefts;
 cStringList WeatherTypes;
+cStringList ShowEndTime;  // For replay show end time of recording
 
 int ConfigFileSelection;
 
@@ -119,6 +120,11 @@ void cFlatSetup::Setup(void) {
     WeatherTypes.Clear();
     WeatherTypes.Append(strdup(tr("short")));
     WeatherTypes.Append(strdup(tr("long")));
+
+    ShowEndTime.Clear();
+    ShowEndTime.Append(strdup(tr("do not show")));
+    ShowEndTime.Append(strdup(tr("end of recording")));
+    ShowEndTime.Append(strdup(tr("end of edited recording")));
 
     Add(new cOsdItem(tr("General settings"), osUnknown, true));
     Add(new cOsdItem(tr("Channelinfo settings"), osUnknown, true));
@@ -304,6 +310,7 @@ void cFlatSetup::Store(void) {
     SetupStore("MessageOffset", Config.MessageOffset);
     SetupStore("PlaybackShowRecordingErrors", Config.PlaybackShowRecordingErrors);
     SetupStore("PlaybackShowRecordingDate", Config.PlaybackShowRecordingDate);
+    SetupStore("PlaybackShowEndTime", Config.PlaybackShowEndTime);
     SetupStore("PlaybackWeatherShow", Config.PlaybackWeatherShow);
     SetupStore("RecordingAdditionalInfoShow", Config.RecordingAdditionalInfoShow);
     SetupStore("RecordingDimmOnPause", Config.RecordingDimmOnPause);
@@ -507,6 +514,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageOffset") == 0)                        SetupConfig->MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            SetupConfig->PlaybackShowRecordingDate = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowEndTime") == 0)                  SetupConfig->PlaybackShowEndTime = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  SetupConfig->PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          SetupConfig->RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 SetupConfig->RecordingDimmOnPause = atoi(Value);
@@ -690,6 +698,7 @@ void cFlatSetupGeneral::SaveCurrentSettings(void) {
     Config.Store("MessageOffset", SetupConfig->MessageOffset, *Filename);
     Config.Store("PlaybackShowRecordingErrors", SetupConfig->PlaybackShowRecordingErrors, *Filename);
     Config.Store("PlaybackShowRecordingDate", SetupConfig->PlaybackShowRecordingDate, *Filename);
+    Config.Store("PlaybackShowEndTime", SetupConfig->PlaybackShowEndTime, *Filename);
     Config.Store("PlaybackWeatherShow", SetupConfig->PlaybackWeatherShow, *Filename);
     Config.Store("RecordingAdditionalInfoShow", SetupConfig->RecordingAdditionalInfoShow, *Filename);
     Config.Store("RecordingDimmOnPauseDelay", SetupConfig->RecordingDimmOnPauseDelay, *Filename);
@@ -1122,6 +1131,7 @@ void cFlatSetupReplay::Setup(void) {
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
     Add(new cMenuEditBoolItem(tr("Show shorttext with date in playback"), &SetupConfig->PlaybackShowRecordingDate));
+    Add(new cMenuEditStraItem(tr("Show end time of recording"), &SetupConfig->PlaybackShowEndTime, ShowEndTime.Size(), &ShowEndTime[0]));
 
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
     if (SetupConfig->RecordingDimmOnPause) {

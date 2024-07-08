@@ -275,6 +275,7 @@ class cFlatConfig {
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
         int PlaybackShowRecordingErrors;
         int PlaybackShowRecordingDate;
+        int PlaybackShowEndTime;
         int MenuItemRecordingShowRecordingErrorsThreshold;
         int MenuItemRecordingShowFormatIcons;  // Show format icons (sd/hd/uhd) in menu recordings
 

@@ -654,6 +654,20 @@ msgstr ""
 msgid "Show shorttext with date in playback"
 msgstr ""
 
+# Playback show end time
+msgid "Show end time of recording"
+msgstr ""
+
+msgid "end of recording"
+msgstr ""
+
+msgid "end of edited recording"
+msgstr ""
+
+msgid "ends at"
+msgstr ""
+
+
 msgid "Recording recerrors icon threshold"
 msgstr ""
 
