@@ -2719,7 +2719,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
                        Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    cString Dummy {""}, Text {""};
+    cString Text {""};
     if (Recording) {
         const cRecordingInfo *RecInfo = Recording->Info();
         // Text.imbue(std::locale {""});
@@ -2750,7 +2750,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
-            GetCuttedLengthSize(Recording, Text, Dummy, true);  // Process marks and insert text
+            GetCuttedLengthSize(Recording, Text);  // Process marks and insert text
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
@@ -2992,7 +2992,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     m_MenuItemWidth = m_cWidth;
 
-    cString Dummy {""}, RecAdditional {""}, Text {""}, TextAdditional {""};
+    cString RecAdditional {""}, Text {""}, TextAdditional {""};
     // Text.imbue(std::locale {""});
     // TextAdditional.imbue(std::locale {""});
     // RecAdditional.imbue(std::locale {""});
@@ -3033,7 +3033,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
 
-        GetCuttedLengthSize(Recording, RecAdditional, Dummy, true);  // Process marks and insert text
+        GetCuttedLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505

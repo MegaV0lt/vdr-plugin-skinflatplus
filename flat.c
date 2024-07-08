@@ -391,7 +391,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     return EditedFrame;
 }
 
-bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText) {  // NOLINT
+void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
     #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlat::GetCuttedLenghtMarks()");
     #endif
@@ -409,7 +409,7 @@ bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cu
         // cIndexFile index(RecordingFileName, false, IsPesRecording);
     }
 
-    bool FsErr = false, IsCutted = false;
+    bool FsErr = false /*, IsCutted = false */;
     uint64_t FileSize[65535];
     FileSize[0] = 0;
     const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
@@ -460,12 +460,12 @@ bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cu
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
             RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
-        Cutted = IndexToHMSF(CuttedLength, false, FramesPerSecond);
-        IsCutted = true;
+        // Cutted = IndexToHMSF(CuttedLength, false, FramesPerSecond);
+        // IsCutted = true;
     }
 
     int LastIndex {0};
-    if (AddText && index) {
+    if (/* AddText && */ index) {
         LastIndex = index->Last();
         Text.Append(
             cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
@@ -477,7 +477,7 @@ bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cu
     delete index;
 
     uint64_t RecSize {0};
-    if (AddText) {
+    // if (AddText) {  // Allways add text
         /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
         if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occurred detecting filesize
             Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
@@ -521,8 +521,8 @@ bool GetCuttedLengthSize(const cRecording *Recording, cString &Text, cString &Cu
                 Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
                             static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
         }
-    }  // AddText
-    return IsCutted;
+    // }  // AddText
+    // return IsCutted;
 }
 
 // Returns the string between start and end or an empty string if not found
