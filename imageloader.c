@@ -241,7 +241,7 @@ bool cImageLoader::FileExits(const std::string &name) {
     return (stat(name.c_str(), &Buffer) == 0);
 }
 // TODO: Improve? What images are to expect?
-bool cImageLoader::SearchRecordingPoster(cString RecPath, cString &found) {
+bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) {
     cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
     if (FileSize(*ManualPoster) != -1) {
         dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
