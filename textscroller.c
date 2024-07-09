@@ -17,11 +17,11 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     Position = position;
 
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
-    const cRect DrawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
+    const cRect DrawPort(0, 0, font->Width(text), position.Height());
 
     m_Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, Position, DrawPort);
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, position, DrawPort);
     // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
     //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
     // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
