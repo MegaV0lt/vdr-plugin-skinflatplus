@@ -833,13 +833,10 @@ void cFlatBaseRender::ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer
 
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3,
-                                     cRect(Rect.Left(), m_ProgressBarTop, m_ProgressBarWidth, m_ProgressBarHeight));
+    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3, Rect);
     ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
-                                       cRect(Rect.Left() - m_ProgressBarMarginVer,
-                                             m_ProgressBarTop - m_ProgressBarMarginHor,
-                                             m_ProgressBarWidth + m_ProgressBarMarginVer * 2,
-                                             m_ProgressBarHeight + m_ProgressBarMarginHor * 2));
+                                       cRect(Rect.Left() - MarginVer, Rect.Top() - MarginHor,
+                                             Rect.Width() + MarginVer * 2, Rect.Height() + MarginHor * 2));
     PixmapFill(ProgressBarPixmap, clrTransparent);
     PixmapFill(ProgressBarPixmapBg, clrTransparent);
 }
@@ -1106,10 +1103,9 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
     // Draw last marker vertical line
     if (PosCurrent == PosMark)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
-                                         m_ProgressBarColorMarkCurrent);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight), ColorCurrent);
     else
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
+        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), Color);
 
     if (!Start) {
         // ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast + sml / 2, top - big / 2,
@@ -1125,8 +1121,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
                                          m_ProgressBarColorBarCurFg);
 
         if (PosCurrent > PosMarkLast + sml / 2)
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight),
-                                             m_ProgressBarColorMark);
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight), Color);
     }
 }
 
