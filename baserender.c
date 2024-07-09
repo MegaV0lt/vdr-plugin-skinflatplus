@@ -123,23 +123,19 @@ void cFlatBaseRender::TopBarCreate(void) {
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitle(cString title) {
-    m_TopBarTitle = title;
-    m_TopBarTitleExtra1 = "";
-    m_TopBarTitleExtra2 = "";
-    m_TopBarExtraIcon = "";
-    m_TopBarMenuIcon = "";
-    m_TopBarUpdateTitle = true;
-    m_TopBarExtraIconSet = false;
-    m_TopBarMenuIconSet = false;
-    m_TopBarMenuLogo = "";
-    m_TopBarMenuLogoSet = false;
-    if (Config.DiskUsageShow == 3)
-        TopBarEnableDiskUsage();
-}
+void cFlatBaseRender::TopBarSetTitle(cString Title, bool Clear) {
+    if (Clear) {  // Clear is default
+        m_TopBarTitleExtra1 = "";
+        m_TopBarTitleExtra2 = "";
+        m_TopBarExtraIcon = "";
+        m_TopBarMenuIcon = "";
+        m_TopBarExtraIconSet = false;
+        m_TopBarMenuIconSet = false;
+        m_TopBarMenuLogo = "";
+        m_TopBarMenuLogoSet = false;
+    }
 
-void cFlatBaseRender::TopBarSetTitleWithoutClear(cString title) {
-    m_TopBarTitle = title;
+    m_TopBarTitle = Title;
     m_TopBarUpdateTitle = true;
     if (Config.DiskUsageShow == 3)
         TopBarEnableDiskUsage();

@@ -276,7 +276,6 @@ void cFlatDisplayMenu::Clear(void) {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
-    // TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
@@ -1791,7 +1790,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }  // for
         }
         const cString NewTitle = cString::sprintf("%s (%d*/%d)", *m_LastTitle, RecNewCount, RecCount);
-        TopBarSetTitleWithoutClear(*NewTitle);
+        TopBarSetTitle(*NewTitle, false);  // Do not clear
     }
 
     if (Current)
@@ -3585,7 +3584,7 @@ void cFlatDisplayMenu::Flush(void) {
             m_LastTimerCount = TimerCount;
             m_LastTimerActiveCount = TimerActiveCount;
             const cString NewTitle = cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount);
-            TopBarSetTitleWithoutClear(*NewTitle);
+            TopBarSetTitle(*NewTitle, false);  // Do not clear
         }
     }
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
