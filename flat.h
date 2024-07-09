@@ -270,7 +270,7 @@ u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode);
 
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
-cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingFormatIcon(const cRecording *Recording);
 cString GetRecordingerrorIcon(int RecInfoErrors);

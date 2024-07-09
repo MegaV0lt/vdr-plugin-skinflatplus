@@ -32,9 +32,9 @@ void cComplexContent::Clear(void) {
     }
 }
 
-void cComplexContent::CreatePixmaps(bool fullFillBackground) {
+void cComplexContent::CreatePixmaps(bool FullFillBackground) {
     CalculateDrawPortHeight();
-    m_FullFillBackground = fullFillBackground;
+    m_FullFillBackground = FullFillBackground;
 
     // if (!m_Osd) return;
 
@@ -46,7 +46,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     cRect PositionDraw;
     PositionDraw.SetPoint(0, 0);
     PositionDraw.SetWidth(m_Position.Width());
-    if (m_FullFillBackground && m_DrawPortHeight < m_Position.Height())
+    if (FullFillBackground && m_DrawPortHeight < m_Position.Height())
         PositionDraw.SetHeight(m_Position.Height());
     else
         PositionDraw.SetHeight(m_DrawPortHeight);
@@ -59,7 +59,7 @@ void cComplexContent::CreatePixmaps(bool fullFillBackground) {
     //         m_PositionDraw.Top(), m_PositionDraw.Width(), m_PositionDraw.Height());
 
     if (Pixmap) {
-        if (m_FullFillBackground) {
+        if (FullFillBackground) {
             PixmapFill(Pixmap, m_ColorBg);
         } else {
             Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
@@ -107,9 +107,9 @@ bool cComplexContent::Scrollable(int height) {
 
     const int total = ScrollTotal();
     const int shown = ceil(height * 1.0 / m_ScrollSize);
-    if (total > shown) return true;
-
-    return false;
+    // if (total > shown) return true;
+    // return false;
+    return (total > shown) ? true : false;
 }
 
 void cComplexContent::AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg,

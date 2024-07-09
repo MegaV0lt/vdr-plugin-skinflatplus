@@ -355,11 +355,12 @@ void cFlatBaseRender::TopBarUpdate(void) {
         }
         const int TitleLeft = MenuIconWidth + m_MarginItem2;
 
-        time_t t = time(NULL);
+        const time_t t = time(NULL);
         const cString time = TimeString(t);
-        Buffer = cString::sprintf("%s %s", *time, tr("clock"));
         if (Config.TopBarHideClockText)
             Buffer = cString::sprintf("%s", *time);
+        else
+            Buffer = cString::sprintf("%s %s", *time, tr("clock"));
 
         const int TimeWidth = m_TopBarFontClock->Width(*Buffer) + m_MarginItem2;
         int Right = TopBarWidth - TimeWidth;
@@ -1560,7 +1561,6 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
     uint8_t G = (Color & 0x0000FF00) >> 8;
     uint8_t B = (Color & 0x000000FF);
 
-    // A = A * am;
     return ArgbToColor(A *= am, R, G, B);
 }
 

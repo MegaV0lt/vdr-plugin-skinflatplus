@@ -27,7 +27,7 @@ enum eContentImageAlignment {
 
 class cSimpleContent {
  private:
-    int m_ContentType = CT_None;  // Added to avoid compiler warning
+    int m_ContentType {CT_None};  // Added to avoid compiler warning
     cRect m_Position {0, 0, 0, 0};
 
     int m_TextWidth {0}, m_TextHeight {0}, m_TextAlignment {0};
@@ -172,7 +172,7 @@ class cComplexContent {
     void SetPosition(cRect Position) { m_Position = Position; }
     void SetScrollSize(int ScrollSize) { m_ScrollSize = ScrollSize; }
     void SetBGColor(tColor ColorBg) { m_ColorBg = ColorBg; }
-    void CreatePixmaps(bool fullFillBackground);
+    void CreatePixmaps(bool FullFillBackground);
 
     void Clear(void);
 

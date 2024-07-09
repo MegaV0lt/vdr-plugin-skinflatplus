@@ -118,15 +118,16 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    if (ScreenAspect == 16.0/9.0) return "169";
-    if (ScreenAspect == 4.0/3.0) return "43";
-    if (ScreenAspect == 20.0/11.0 || ScreenAspect == 15.0/11.0) return "169w";
+    if (ScreenAspect == 16.0 / 9.0) return "169";
+    if (ScreenAspect == 4.0 / 3.0) return "43";
+    if (ScreenAspect == 20.0 / 11.0 || ScreenAspect == 15.0 / 11.0) return "169w";
     if (ScreenAspect == 2.21) return "221";
 
+    dsyslog("flatPlus: Unknown screen aspect %.2f", ScreenAspect);
     return "unknown_asp";
 }
 
-cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect) {
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     cString res("unknown_res");
     switch (ScreenWidth) {
         case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
@@ -143,8 +144,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double Screen
         case 480: res = "480x576"; break;     // 480x576 (PAL SVCD)
         case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
         default:
-            dsyslog("flatPlus: Unkown resolution Width: %d Height: %d Aspect: %.2f\n",
-                    ScreenWidth, ScreenHeight, ScreenAspect);
+            dsyslog("flatPlus: Unkown screen resolution: %d x %d", ScreenWidth, ScreenHeight);
             break;
     }
     return res;
@@ -160,10 +160,10 @@ cString GetFormatIcon(int ScreenWidth) {
 cString GetRecordingFormatIcon(const cRecording *Recording) {
     // From skin ElchiHD
     #if APIVERSNUM >= 20605
-        const uint16_t FrameHeight = Recording->Info()->FrameHeight();
-        if (FrameHeight > 0) {
-            if (FrameHeight >= 2160) return "uhd";  // TODO: Separate images
-            if (FrameHeight >= 720) return "hd";
+        const uint16_t FrameWidth = Recording->Info()->FrameWidth();
+        if (FrameWidth > 0) {
+            if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
+            if (FrameWidth > 720) return "hd";
             return "sd";  // 720 and below is considered sd
         }
         else  // NOLINT
