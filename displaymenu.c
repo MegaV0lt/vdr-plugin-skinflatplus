@@ -276,7 +276,7 @@ void cFlatDisplayMenu::Clear(void) {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
-    TopBarSetTitle(Title);
+    // TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
@@ -372,10 +372,11 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         }
         TopBarSetMenuIcon(*icon);
 
-        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
+        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow > 0) {  // DiskUsageShow 1, 2 & 3
             TopBarEnableDiskUsage();
         }
+    } else {
+        TopBarSetTitle(Title);
     }
 }
 
@@ -632,7 +633,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p = bar + 1;
     bool IsProgressbar = true;
-    int now {0}, total {0};
+    uint now {0}, total {0};
     for (; *p != ']'; ++p) {
         if (*p == ' ' || *p == '|') {
             ++total;
@@ -1003,7 +1004,6 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
         if (Config.TVScraperEPGInfoShowPoster && pScraper) {
             ScraperGetPosterBannerV2 call;
             call.event = Event;
-            call.recording = NULL;
             if (pScraper->Service("GetPosterBannerV2", &call)) {
                 if ((call.type == tSeries) && call.banner.path.size() > 0) {
                     MediaWidth = m_cWidth - m_MarginItem2;
@@ -1107,7 +1107,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     cString IconName {""};
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
         IconName = (Current) ? "timerInactive_cur" : "timerInactive";
-
         ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
     } else if (Timer->Recording()) {  // Active timer and recording
         IconName = "timerRecording";
@@ -1329,7 +1328,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch, bool TimerActive) {
-    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return false;
+    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap)
+        return false;
 
     if (Config.MenuEventView == 0)
         return false;
@@ -1836,7 +1836,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (!ImgRecNewSml)
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (2.0 / 3.0));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * (2.0 / 3.0));
 
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
@@ -1931,7 +1931,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                         if (img) {
-                            // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
                             const int ImageTop = Top + m_FontHeight - m_FontAscender;
                             const int ImageLeft = Left + m_FontHeight - img->Width();
                             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
@@ -2331,9 +2330,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }
     bool IsUnknownDrawn = false;
-    // GenreIcons.sort();  // Sort outside of loop
     std::sort(GenreIcons.begin(), GenreIcons.end());
-    // GenreIcons.unique();
     GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
@@ -2415,7 +2412,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0}, NumActors {0};
+    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
     bool FirstRun = true, SecondRun = false;
@@ -2573,7 +2570,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
 #endif
 
-        NumActors = ActorsPath.size();
+        const int NumActors = ActorsPath.size();
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0) {
             //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
@@ -2635,12 +2632,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     PixmapFill(ContentHeadPixmap, clrTransparent);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
-
-    /* cString date = Event->GetDateString();
-    cString StartTime = Event->GetTimeString();
-    cString EndTime = Event->GetEndTimeString();
-
-    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime); */
     const cString StrTime =
         cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
@@ -2924,7 +2915,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 
     cImage *img {nullptr};
     cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
-    int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
+    int Actor {0}, ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
     const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
     const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
@@ -3086,9 +3077,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
     }
     bool IsUnknownDrawn = false;
-    // GenreIcons.sort();  // Sort outside of loop
     std::sort(GenreIcons.begin(), GenreIcons.end());
-    // GenreIcons.unique();
     GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
@@ -3122,7 +3111,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0}, NumActors {0};
+    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
     bool FirstRun = true, SecondRun = false;
@@ -3246,7 +3235,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
                 const uint Aspect = img->Width() / img->Height();
-                if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
+                if (Aspect > 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
                     MediaHeight *= (2.0 / 3.0);  // Size * 0,666 = 2/3
@@ -3300,7 +3289,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
 #endif
 
-        NumActors = ActorsPath.size();
+        const int NumActors = ActorsPath.size();
         if (Config.TVScraperRecInfoShowActors && NumActors > 0) {
             //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
