@@ -276,6 +276,12 @@ void cFlatDisplayMenu::Clear(void) {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetTitle()");
+        dsyslog("flatPlus:   Title: %s", Title);
+    #endif
+
+    TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
@@ -292,7 +298,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcChannel:
             icon = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
-                int ChanCount{0};
+                uint ChanCount{0};
                 LOCK_CHANNELS_READ;
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
                     if (!Channel->GroupSep())
@@ -305,7 +311,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcTimer:
             icon = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
-                int TimerCount{0}, TimerActiveCount{0};
+                uint TimerCount{0}, TimerActiveCount{0};
                 LOCK_TIMERS_READ;
                 for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     ++TimerCount;
@@ -342,12 +348,14 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                             ++RecNewCount;
                     }
                 }
-                cString NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
+                cString NewTitle {""};
                 if (Config.ShortRecordingCount) {
                     if (RecNewCount == 0)  // No new recordings
                         NewTitle = cString::sprintf("%s (%d)", Title, RecCount);
                     else if (RecNewCount == RecCount)  // Only new recordings
                         NewTitle = cString::sprintf("%s (%d*)", Title, RecNewCount);
+                } else {
+                    NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
                 }
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuRecordingShowCount
@@ -371,11 +379,10 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         }
         TopBarSetMenuIcon(*icon);
 
-        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow > 0) {  // DiskUsageShow 1, 2 & 3
+        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
+            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
             TopBarEnableDiskUsage();
         }
-    } else {
-        TopBarSetTitle(Title);
     }
 }
 

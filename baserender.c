@@ -119,11 +119,16 @@ void cFlatBaseRender::TopBarCreate(void) {
     PixmapFill(TopBarIconBgPixmap, clrTransparent);
     PixmapFill(TopBarIconPixmap, clrTransparent);
 
-    if (Config.DiskUsageShow == 3)
+    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitle(cString Title, bool Clear) {
+void cFlatBaseRender::TopBarSetTitle(const cString Title, bool Clear) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: TopBarSetTitle()");
+        if (Clear) dsyslog("flatPlus:   With clear");
+    #endif
+
     if (Clear) {  // Clear is default
         m_TopBarTitleExtra1 = "";
         m_TopBarTitleExtra2 = "";
@@ -137,17 +142,17 @@ void cFlatBaseRender::TopBarSetTitle(cString Title, bool Clear) {
 
     m_TopBarTitle = Title;
     m_TopBarUpdateTitle = true;
-    if (Config.DiskUsageShow == 3)
+    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitleExtra(cString Extra1, cString Extra2) {
+void cFlatBaseRender::TopBarSetTitleExtra(const cString Extra1, const cString Extra2) {
     m_TopBarTitleExtra1 = Extra1;
     m_TopBarTitleExtra2 = Extra2;
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarSetExtraIcon(cString icon) {
+void cFlatBaseRender::TopBarSetExtraIcon(const cString icon) {
     if (!strcmp(*icon, "")) return;
 
     m_TopBarExtraIcon = icon;
@@ -155,7 +160,7 @@ void cFlatBaseRender::TopBarSetExtraIcon(cString icon) {
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarSetMenuIcon(cString icon) {
+void cFlatBaseRender::TopBarSetMenuIcon(const cString icon) {
     if (!strcmp(*icon, "")) return;
 
     m_TopBarMenuIcon = icon;
@@ -163,7 +168,7 @@ void cFlatBaseRender::TopBarSetMenuIcon(cString icon) {
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarSetMenuIconRight(cString icon) {
+void cFlatBaseRender::TopBarSetMenuIconRight(const cString icon) {
     if (!strcmp(*icon, "")) return;
 
     m_TopBarMenuIconRight = icon;
@@ -176,7 +181,7 @@ void cFlatBaseRender::TopBarClearMenuIconRight(void) {
     m_TopBarMenuIconRightSet = false;
 }
 
-void cFlatBaseRender::TopBarSetMenuLogo(cString icon) {
+void cFlatBaseRender::TopBarSetMenuLogo(const cString icon) {
     if (!strcmp(*icon, "")) return;
 
     m_TopBarMenuLogo = icon;
