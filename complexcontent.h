@@ -97,6 +97,7 @@ class cSimpleContent {
     }
 
     int GetContentType(void) { return m_ContentType; }
+
     int GetBottom(void) {
         if (m_ContentType == CT_Text)
             return m_Position.Top() + m_Font->Height();
@@ -153,11 +154,11 @@ class cComplexContent {
 
     tColor m_ColorBg {0};
 
-    bool m_FullFillBackground = false;
+    bool m_FullFillBackground {false};
     int m_DrawPortHeight {0};
     int m_ScrollSize {0};
-    bool m_IsShown = false;
-    bool m_IsScrollingActive = true;
+    bool m_IsShown {false};
+    bool m_IsScrollingActive {true};
 
     cOsd *m_Osd {nullptr};
 

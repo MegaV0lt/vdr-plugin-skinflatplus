@@ -231,7 +231,7 @@ class cTextFloatingWrapper {
     void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline characters into the string.
-    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fin in 'WidthUpper'.
+    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
     const char *Text(void);
     ///< Returns the full wrapped text.
     int Lines(void) { return m_Lines; }

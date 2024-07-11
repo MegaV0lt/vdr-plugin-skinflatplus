@@ -293,7 +293,6 @@ void cFlatDisplayReplay::SetCurrent(const char *Current) {
 void cFlatDisplayReplay::SetTotal(const char *Total) {
     if (m_ModeOnly) return;
 
-    // dsyslog("flatPlus: SetTotal() %s", Total);
     m_Total = Total;
     if (!isempty(*m_Current))  // Do not call 'UpdateInfo()' when 'm_Current' is not set
         UpdateInfo();
@@ -367,7 +366,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     //* Draw end time of recording with symbol for cutted end time
     if (Config.PlaybackShowEndTime > 0) {  // 1 = End time, 2 = End time and cutted end time
         left = m_MarginItem;
-        /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
+        /* //* Image instead of 'ends at:' text
+        img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
         if (img) {
             IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
             left += img->Width() + m_MarginItem;

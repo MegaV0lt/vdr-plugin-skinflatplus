@@ -1436,6 +1436,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     const int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
+        dsyslog("flatPlus: DecorBorderDraw() Creating 'DecorPixmap'");
         DecorPixmap = CreatePixmap(m_Osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 

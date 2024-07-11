@@ -33,7 +33,7 @@ class cImageCache {
 
     void Create(void);
     void Clear(void);
-    bool RemoveFromCache(std::string Name);
+    bool RemoveFromCache(const std::string &Name);
 
     int GetCacheCount(void) {
       // if (m_OverFlow) return MAX_IMAGE_CACHE;

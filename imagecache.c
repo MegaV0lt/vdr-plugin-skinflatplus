@@ -40,7 +40,7 @@ void cImageCache::Clear(void) {
     m_InsertIndex = 0;
 }
 
-bool cImageCache::RemoveFromCache(std::string Name) {
+bool cImageCache::RemoveFromCache(const std::string &Name) {
     std::string BaseFileName {""};
     BaseFileName.reserve(32);
     for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
@@ -81,7 +81,7 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
     if (m_InsertIndex >= MAX_IMAGE_CACHE) {
         isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE (%d)", MAX_IMAGE_CACHE);
         isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
-        m_InsertIndex = m_InsertIndexBase;  // Keep pre loaded images (Loaded at start)
+        m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
         // m_OverFlow = true;
     }
 }

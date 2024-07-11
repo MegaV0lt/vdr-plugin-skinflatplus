@@ -65,7 +65,7 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
         }
     } else {  // Log values and return
-        esyslog("flatPlus: Failed to create ComplexContentPixmap left: %d top: %d width: %d height: %d",
+        esyslog("flatPlus: CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
                 m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
@@ -140,7 +140,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
     std::string Line {""};
     Line.reserve(128);
-    cRect FloatedTextPos(TextPos.Left(), TextPos.Top(), TextPos.Width(), TextPos.Height());
+    cRect FloatedTextPos(TextPos);
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);

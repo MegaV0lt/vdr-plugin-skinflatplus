@@ -393,11 +393,11 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
 
 void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
     #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlat::GetCuttedLenghtMarks()");
+        dsyslog("flatPlus: cFlat::GetCuttedLenghtSize()");
     #endif
 
     cMarks Marks;
-    bool HasMarks = false;
+    bool HasMarks {false};
     const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
     const double FramesPerSecond = Recording->FramesPerSecond();
     const char *RecordingFileName = Recording->FileName();

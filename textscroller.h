@@ -27,8 +27,8 @@ class cTextScroll {
     int Layer {0};
     int PixelsPerStep {0};
     int WAITSTEPS {0}, WaitSteps {0};
-    bool IsReserveStep = false;
-    bool ResetX = false;
+    bool IsReserveStep {false};
+    bool ResetX {false};
     int ScrollType {0};
 
  public:
