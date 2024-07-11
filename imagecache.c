@@ -82,7 +82,7 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
         isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE (%d)", MAX_IMAGE_CACHE);
         isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
         m_InsertIndex = m_InsertIndexBase;  // Keep pre loaded images (Loaded at start)
-        m_OverFlow = true;
+        // m_OverFlow = true;
     }
 }
 

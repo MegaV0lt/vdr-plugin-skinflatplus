@@ -25,7 +25,7 @@ class cImageCache {
 
     int m_InsertIndex {0};      // Imagecache index
     int m_InsertIndexBase {0};  // Imagecache after first fill at start
-    bool m_OverFlow = false;    // Set when cache is full
+    // bool m_OverFlow = false;    // Set when cache is full
 
  public:
     cImageCache();
@@ -36,7 +36,7 @@ class cImageCache {
     bool RemoveFromCache(std::string Name);
 
     int GetCacheCount(void) {
-      if (m_OverFlow) return MAX_IMAGE_CACHE;
+      // if (m_OverFlow) return MAX_IMAGE_CACHE;
       return m_InsertIndex + 1;
     }
 
