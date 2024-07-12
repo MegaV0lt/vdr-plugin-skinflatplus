@@ -366,8 +366,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     //* Draw end time of recording with symbol for cutted end time
     if (Config.PlaybackShowEndTime > 0) {  // 1 = End time, 2 = End time and cutted end time
         left = m_MarginItem;
-        /* //* Image instead of 'ends at:' text
-        img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
+        //* Image instead of 'ends at:' text
+        /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
         if (img) {
             IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
             left += img->Width() + m_MarginItem;

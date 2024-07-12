@@ -123,10 +123,10 @@ void cFlatBaseRender::TopBarCreate(void) {
         TopBarEnableDiskUsage();
 }
 
-void cFlatBaseRender::TopBarSetTitle(const cString Title, bool Clear) {
+void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
     #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: TopBarSetTitle()");
-        if (Clear) dsyslog("flatPlus:   With clear");
+        dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
+        if (Clear) dsyslog("   With clear");
     #endif
 
     if (Clear) {  // Clear is default
@@ -1386,10 +1386,6 @@ void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DecorBorderCleadByFrom()");
-    #endif
-
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
@@ -1415,10 +1411,6 @@ void cFlatBaseRender::DecorBorderClearAll(void) {
 
 void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
                                       tColor ColorBg, int From, bool Store) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DecorBorderDraw()");
-    #endif
-
     if (Size == 0 || Type <= 0) return;
 
     if (Store) {

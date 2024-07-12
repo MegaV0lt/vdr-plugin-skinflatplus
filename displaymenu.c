@@ -277,8 +277,7 @@ void cFlatDisplayMenu::Clear(void) {
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
     #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetTitle()");
-        dsyslog("flatPlus:   Title: %s", Title);
+        dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
     #endif
 
     TopBarSetTitle(Title);
@@ -298,7 +297,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcChannel:
             icon = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
-                uint ChanCount{0};
+                uint ChanCount {0};
                 LOCK_CHANNELS_READ;
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
                     if (!Channel->GroupSep())
@@ -311,7 +310,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcTimer:
             icon = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
-                uint TimerCount{0}, TimerActiveCount{0};
+                uint TimerCount {0}, TimerActiveCount {0};
                 LOCK_TIMERS_READ;
                 for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     ++TimerCount;
@@ -325,9 +324,11 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             }  // Config.MenuTimerShowCount
             break;
         case mcRecording:
-            if (Config.MenuRecordingShowCount) {
+            if (Config.MenuRecordingShowCount) {  // TODO: Merge with version in 'SetItemRecording()'
                 uint RecCount {0}, RecNewCount {0};
                 m_LastRecFolder = m_RecFolder;
+                dsyslog("flatPlus: SetTitle() m_RecFolder, m_LastItemRecordingLevel: '%s', %d",
+                                m_RecFolder.c_str(), m_LastItemRecordingLevel);
                 if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
                     std::string RecFolder2 {""};
                     RecFolder2.reserve(256);
@@ -341,6 +342,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                         }
                     }  // for
                 } else {
+                    dsyslog("flatPlus: SetTitle() Count all!");
                     LOCK_RECORDINGS_READ;
                     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
                         ++RecCount;
@@ -349,14 +351,16 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                     }
                 }
                 cString NewTitle {""};
-                if (Config.ShortRecordingCount) {
-                    if (RecNewCount == 0)  // No new recordings
+                if (Config.ShortRecordingCount) {  // Hidden option. 0 = disable, 1 = enable
+                    if (RecNewCount == 0)          // No new recordings
                         NewTitle = cString::sprintf("%s (%d)", Title, RecCount);
                     else if (RecNewCount == RecCount)  // Only new recordings
                         NewTitle = cString::sprintf("%s (%d*)", Title, RecNewCount);
+                    else
+                        NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
                 } else {
                     NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
-                }
+                }  // Config.ShortRecordingCount
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuRecordingShowCount
             /*
@@ -1758,6 +1762,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                         int Level, int Total, int New) {
     #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
+        dsyslog("   Level: %d, Total: %d, New: %d", Level, Total, New);
     #endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
@@ -1766,22 +1771,19 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Config.MenuRecordingView == 0)
         return false;
 
-    if (Level > 0)
-        m_RecFolder = GetRecordingName(Recording, Level - 1, true);
-    else
-        m_RecFolder = "";
-
+    m_RecFolder = (Level > 0) ? GetRecordingName(Recording, Level - 1, true) : "";
     m_LastItemRecordingLevel = Level;
+    dsyslog("flatPlus: RecFolder: '%s', LastRecFolder: '%s'", m_RecFolder.c_str(), m_LastRecFolder.c_str());
 
     if (m_LastRecFolder != m_RecFolder) {
         uint RecCount {0}, RecNewCount {0};
         m_LastRecFolder = m_RecFolder;
-        if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
+        if (m_RecFolder != "" && Level > 0) {
             std::string RecFolder2 {""};
             RecFolder2.reserve(256);
             LOCK_RECORDINGS_READ;
             for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
+                RecFolder2 = GetRecordingName(Rec, Level - 1, true);
                 if (m_RecFolder == RecFolder2) {
                     ++RecCount;
                     if (Rec->IsNew())
@@ -1797,6 +1799,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }  // for
         }
         const cString NewTitle = cString::sprintf("%s (%d*/%d)", *m_LastTitle, RecNewCount, RecCount);
+        dsyslog("flatPlus: SetItemRecording(): New Title: '%s'", *NewTitle);
         TopBarSetTitle(*NewTitle, false);  // Do not clear
     }
 
@@ -3601,10 +3604,6 @@ void cFlatDisplayMenu::Flush(void) {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::ItemBorderInsertUnique()");
-    #endif
-
     std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
@@ -3645,9 +3644,9 @@ void cFlatDisplayMenu::ItemBorderClear(void) {
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);
+    const std::string RecFolder {GetRecordingName(Recording, Level, true)};
 
-    int value = Config.GetRecordingOldValue(m_RecFolder);
+    int value = Config.GetRecordingOldValue(RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
     if (value < 0) return false;
 
@@ -3656,13 +3655,13 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
 
     const int DiffSecs = now - LastRecTimeFromFolder;
     const int days = DiffSecs / (60 * 60 * 24);
-    // dsyslog("flatPlus: m_RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
-    //          m_RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
+    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
+    //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
     return (days > value) ? true : false;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true);
+    const std::string RecFolder {GetRecordingName(Recording, Level, true)};
     std::string RecFolder2 {""};
     RecFolder2.reserve(256);
     time_t RecStart = Recording->Start();
@@ -3671,7 +3670,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecFolder2 = GetRecordingName(rec, Level, true);
-        if (m_RecFolder == RecFolder2) {  // Recordings must be in the same folder
+        if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStart2 = rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
                 if (RecStart2 > RecStart)
@@ -3687,10 +3686,6 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::GetRecordingName()");
-    #endif
-
     if (!Recording) return "";
 
     std::string RecNamePart {""};

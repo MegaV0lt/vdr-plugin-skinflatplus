@@ -166,7 +166,7 @@ class cFlatBaseRender {
         void CreateOsd(int Left, int Top, int Width, int Height);
 
         void TopBarCreate(void);
-        void TopBarSetTitle(const cString Title, bool Clear = true);
+        void TopBarSetTitle(const cString &Title, bool Clear = true);
         void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
         void TopBarSetMenuIcon(const cString icon);
         void TopBarSetMenuIconRight(const cString icon);
