@@ -324,43 +324,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             }  // Config.MenuTimerShowCount
             break;
         case mcRecording:
-            if (Config.MenuRecordingShowCount) {  // TODO: Merge with version in 'SetItemRecording()'
-                uint RecCount {0}, RecNewCount {0};
-                m_LastRecFolder = m_RecFolder;
-                dsyslog("flatPlus: SetTitle() m_RecFolder, m_LastItemRecordingLevel: '%s', %d",
-                                m_RecFolder.c_str(), m_LastItemRecordingLevel);
-                if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
-                    std::string RecFolder2 {""};
-                    RecFolder2.reserve(256);
-                    LOCK_RECORDINGS_READ;
-                    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
-                        if (m_RecFolder == RecFolder2) {
-                            ++RecCount;
-                            if (Rec->IsNew())
-                                ++RecNewCount;
-                        }
-                    }  // for
-                } else {
-                    dsyslog("flatPlus: SetTitle() Count all!");
-                    LOCK_RECORDINGS_READ;
-                    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        ++RecCount;
-                        if (Rec->IsNew())
-                            ++RecNewCount;
-                    }
-                }
-                cString NewTitle {""};
-                if (Config.ShortRecordingCount) {  // Hidden option. 0 = disable, 1 = enable
-                    if (RecNewCount == 0)          // No new recordings
-                        NewTitle = cString::sprintf("%s (%d)", Title, RecCount);
-                    else if (RecNewCount == RecCount)  // Only new recordings
-                        NewTitle = cString::sprintf("%s (%d*)", Title, RecNewCount);
-                    else
-                        NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
-                } else {
-                    NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
-                }  // Config.ShortRecordingCount
+            if (Config.MenuRecordingShowCount) {
+                const cString NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuRecordingShowCount
             /*
@@ -1773,33 +1738,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     m_RecFolder = (Level > 0) ? GetRecordingName(Recording, Level - 1, true) : "";
     m_LastItemRecordingLevel = Level;
-    dsyslog("flatPlus: RecFolder: '%s', LastRecFolder: '%s'", m_RecFolder.c_str(), m_LastRecFolder.c_str());
 
-    if (m_LastRecFolder != m_RecFolder) {
-        uint RecCount {0}, RecNewCount {0};
-        m_LastRecFolder = m_RecFolder;
-        if (m_RecFolder != "" && Level > 0) {
-            std::string RecFolder2 {""};
-            RecFolder2.reserve(256);
-            LOCK_RECORDINGS_READ;
-            for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                RecFolder2 = GetRecordingName(Rec, Level - 1, true);
-                if (m_RecFolder == RecFolder2) {
-                    ++RecCount;
-                    if (Rec->IsNew())
-                        ++RecNewCount;
-                }
-            }  // for
-        } else {
-            LOCK_RECORDINGS_READ;
-            for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                ++RecCount;
-                if (Rec->IsNew())
-                    ++RecNewCount;
-            }  // for
-        }
-        const cString NewTitle = cString::sprintf("%s (%d*/%d)", *m_LastTitle, RecNewCount, RecCount);
-        dsyslog("flatPlus: SetItemRecording(): New Title: '%s'", *NewTitle);
+    if (Config.MenuRecordingShowCount) {
+        const cString NewTitle = cString::sprintf("%s %s", *m_LastTitle, *GetRecCounts());
         TopBarSetTitle(*NewTitle, false);  // Do not clear
     }
 
@@ -3711,6 +3652,48 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     }
 
     return RecNamePart;
+}
+
+cString cFlatDisplayMenu::GetRecCounts() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d",
+            m_RecFolder.c_str(), m_LastItemRecordingLevel);
+#endif
+
+    uint RecCount {0}, RecNewCount {0};
+    m_LastRecFolder = m_RecFolder;
+    if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
+        std::string RecFolder2 {""};
+        RecFolder2.reserve(256);
+        LOCK_RECORDINGS_READ;
+        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+            RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
+            if (m_RecFolder == RecFolder2) {
+                ++RecCount;
+                if (Rec->IsNew()) ++RecNewCount;
+            }
+        }  // for
+    } else {
+        dsyslog("flatPlus: GetRecCounts() Count all!");
+        LOCK_RECORDINGS_READ;
+        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+            ++RecCount;
+            if (Rec->IsNew()) ++RecNewCount;
+        }
+    }
+    cString RecCounts {""};
+    if (Config.ShortRecordingCount) {  // Hidden option. 0 = disable, 1 = enable
+        if (RecNewCount == 0)          // No new recordings
+            RecCounts = cString::sprintf("(%d)", RecCount);  // (56)
+        else if (RecNewCount == RecCount)  // Only new recordings
+            RecCounts = cString::sprintf("(%d*)", RecNewCount);  // (35*)
+        else
+            RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
+    } else {
+        RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
+    }  // Config.ShortRecordingCount */
+
+    return RecCounts;
 }
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {

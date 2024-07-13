@@ -100,6 +100,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString GetIconName(const std::string &element);
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        cString GetRecCounts(void);  // Get number of recordings and new recordings (35*/53)
         // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
