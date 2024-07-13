@@ -39,7 +39,7 @@ class cFlatConfig Config;
 class cImageCache ImgCache;
 
 cTheme Theme;
-static bool m_MenuActive = false;
+static bool m_MenuActive {false};
 time_t m_RemoteTimersLastRefresh = 0;
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
@@ -409,7 +409,7 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         // cIndexFile index(RecordingFileName, false, IsPesRecording);
     }
 
-    bool FsErr = false /*, IsCutted = false */;
+    bool FsErr {false};
     uint64_t FileSize[65535];
     FileSize[0] = 0;
     const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
@@ -436,7 +436,7 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     if (HasMarks && index) {
         uint16_t FileNumber {0};
         off_t FileOffset {0};
-        bool CutIn = true;
+        bool CutIn {true};
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};
         cMark *Mark = Marks.First();
@@ -460,12 +460,10 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
             RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
-        // Cutted = IndexToHMSF(CuttedLength, false, FramesPerSecond);
-        // IsCutted = true;
     }
 
     int LastIndex {0};
-    if (/* AddText && */ index) {
+    if (index) {
         LastIndex = index->Last();
         Text.Append(
             cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
@@ -476,53 +474,49 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
     delete index;
 
-    uint64_t RecSize {0};
-    // if (AddText) {  // Allways add text
-        /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
-        if (RecSize > MEGABYTE(1023))  // Show a '!' when an error occurred detecting filesize
-            Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
-                                         static_cast<float>(RecSize) / MEGABYTE(1024)));
+    uint64_t RecSize{0};
+    /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
+    if (RecSize > MEGABYTE(1023))                 // Show a '!' when an error occurred detecting filesize
+        Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
+                                     static_cast<float>(RecSize) / MEGABYTE(1024)));
+    else
+        Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
+
+    if (HasMarks) {
+        if (RecSize > MEGABYTE(1023))
+            Text.Append(
+                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
         else
-            Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
+            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+    }
+    Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
+                                 Recording->Lifetime()));
 
-        if (HasMarks) {
-            if (RecSize > MEGABYTE(1023))
-                Text.Append(cString::sprintf(" (%s: %.2f GB)", tr("cutted"),
-                                             static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
-            else
-                Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+    // Add video format information (Format, Resolution, Framerate, …)
+#if APIVERSNUM >= 20605
+    const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
+    if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
+        Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
+                                     RecInfo->FrameWidth(), RecInfo->FrameHeight()));
+        if (FramesPerSecond > 0) {
+            Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
+            if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
+                Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
         }
-        Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
-                                     Recording->Lifetime()));
+        if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
-        // Add video format information (Format, Resolution, Framerate, …)
-        #if APIVERSNUM >= 20605
-        const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
-        if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
-            Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
-                                         RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-            if (FramesPerSecond > 0) {
-                Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
-                if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
-                    Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-            }
-            if (RecInfo->AspectRatio() != arUnknown)
-                Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
+        if (LastIndex)  //* Bitrate in new line
+            Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
+                                         static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
+    } else  // NOLINT
+#endif
+    {
+        Text.Append(cString::sprintf("\n%s: %s", tr("format"), (IsPesRecording) ? "PES" : "TS"));
 
-            if (LastIndex)  //* Bitrate in new line
-                Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                            static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
-        } else  // NOLINT
-        #endif
-        {
-            Text.Append(cString::sprintf("\n%s: %s", tr("format"), (IsPesRecording) ? "PES" : "TS"));
-
-            if (LastIndex)  //* Bitrate at same line
-                Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                            static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
-        }
-    // }  // AddText
-    // return IsCutted;
+        if (LastIndex)  //* Bitrate at same line
+            Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
+                                         static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
+    }
 }
 
 // Returns the string between start and end or an empty string if not found

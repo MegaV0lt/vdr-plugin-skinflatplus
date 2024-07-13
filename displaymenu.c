@@ -280,7 +280,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
     #endif
 
-    TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
@@ -352,7 +351,9 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
             TopBarEnableDiskUsage();
         }
-    }
+    } else {
+        TopBarSetTitle(Title);
+    }  // Config.TopBarMenuIconShow
 }
 
 void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -528,7 +529,7 @@ std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
     const std::string text {skipspace(Text.c_str())};
     std::string MenuEntry {""} /*, MenuNumber {""}*/;
     MenuEntry.reserve(13);  // Length of 'Miscellaneous'
-    bool found = false, DoBreak = false;
+    bool found {false}, DoBreak {false};
     const std::size_t TextLength = text.length();
     uint i {0};  // 'i' used also after loop
     char s;
@@ -607,7 +608,7 @@ bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
 void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p = bar + 1;
-    bool IsProgressbar = true;
+    bool IsProgressbar {true};
     uint now {0}, total {0};
     for (; *p != ']'; ++p) {
         if (*p == ' ' || *p == '|') {
@@ -665,7 +666,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Width {0}, LeftName {0};
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
-    bool DrawProgress = true;
+    bool DrawProgress {true};
 
     m_IsGroup = Channel->GroupSep();  // Also used later
     if (m_IsGroup)
@@ -922,7 +923,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
                        Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    bool IsEmpty = false;
+    bool IsEmpty {false};
     cString Text {""};
     if (Event) {
         // Description
@@ -2279,7 +2280,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
         }
     }
-    bool IsUnknownDrawn = false;
+    bool IsUnknownDrawn {false};
     std::sort(GenreIcons.begin(), GenreIcons.end());
     GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
@@ -2365,8 +2366,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
-    bool FirstRun = true, SecondRun = false;
-    bool Scrollable = false;
+    bool FirstRun {true}, SecondRun {false};
+    bool Scrollable {false};
 
     do {  // Runs up to two times!
         if (FirstRun)
@@ -3026,7 +3027,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
     }
-    bool IsUnknownDrawn = false;
+    bool IsUnknownDrawn {false};
     std::sort(GenreIcons.begin(), GenreIcons.end());
     GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
@@ -3064,8 +3065,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
-    bool FirstRun = true, SecondRun = false;
-    bool Scrollable = false;
+    bool FirstRun {true}, SecondRun {false};
+    bool Scrollable {false};
 
     do {  // Runs up to two times!
         if (FirstRun)
@@ -3090,7 +3091,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
                 ScraperGetEventType call;
                 call.recording = Recording;
-                int seriesId{0}, episodeId{0}, movieId{0};
+                int seriesId {0}, episodeId {0}, movieId {0};
 
                 if (pScraper->Service("GetEventType", &call)) {
                     seriesId = call.seriesId;
@@ -3684,20 +3685,20 @@ cString cFlatDisplayMenu::GetRecCounts() {
     cString RecCounts {""};
     if (Config.ShortRecordingCount) {  // Hidden option. 0 = disable, 1 = enable
         if (RecNewCount == 0)          // No new recordings
-            RecCounts = cString::sprintf("(%d)", RecCount);  // (56)
-        else if (RecNewCount == RecCount)  // Only new recordings
+            RecCounts = cString::sprintf("(%d)", RecCount);      // (56)
+        else if (RecNewCount == RecCount)                        // Only new recordings
             RecCounts = cString::sprintf("(%d*)", RecNewCount);  // (35*)
         else
             RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
     } else {
-        RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
+        RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);      // (35*/56)
     }  // Config.ShortRecordingCount */
 
     return RecCounts;
 }
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
-    bool FirstContent = true;
+    bool FirstContent {true};
     for (int i {0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
@@ -3711,7 +3712,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
     }
 }
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
-    bool FirstContent = true;
+    bool FirstContent {true};
     for (int i{0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)

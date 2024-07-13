@@ -232,7 +232,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
-    bool IsRec = false;
+    bool IsRec {false};
     const int RecWidth = m_FontSml->Width("REC");
 
     int left = HeightBottom * 1.34 + m_MarginItem;

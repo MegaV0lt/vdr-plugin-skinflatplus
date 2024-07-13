@@ -205,7 +205,7 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
     const int ScreenHeight = Pixmap->ViewPort().Height();
     const int LineHeight = m_ScrollSize;
 
-    bool scrolled = false;
+    bool scrolled {false};
     if (Up) {
         if (Page) {
             int NewY = AktHeight + ScreenHeight;

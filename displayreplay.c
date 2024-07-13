@@ -400,7 +400,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     //* Draw total and cutted length with cutted symbol (Right side)
     cImage *ImgTotal = ImgLoader.LoadIcon("recording_total", m_FontHeight, m_FontHeight);
     const int ImgTotalWidth = (ImgTotal) ? ImgTotal->Width() : 0;
-    if (/*m_Recording->HasMarks()*/ FramesAfterEdit > 0) {
+    if (FramesAfterEdit > 0) {
         const cString cutted = cString::sprintf("%s", *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond));
         cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
         const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
@@ -435,9 +435,9 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                     right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), hm.c_str(), Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/ + m_Font->Width(hm.c_str()), TopSecs),
+                LabelPixmap->DrawText(cPoint(right + m_Font->Width(hm.c_str()), TopSecs),
                                       secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
                 right += m_Font->Width(hm.c_str()) + m_FontSecs->Width(secs.c_str()) + FontWidthSpace;
@@ -446,7 +446,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                     right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), m_Total, Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), m_Total, Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
                 right += m_Font->Width(m_Total) + FontWidthSpace;
             }
@@ -455,7 +455,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                 right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
             }
-            LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), m_Total, Theme.Color(clrReplayFont),
+            LabelPixmap->DrawText(cPoint(right, 0), m_Total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
             right += m_Font->Width(m_Total) + FontWidthSpace;
         }  // Config.TimeSecsScale < 1.0
@@ -472,19 +472,19 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 const std::string hm{cutt.substr(0, found)};
                 const std::string secs{cutt.substr(found, cutt.length() - found)};
 
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), hm.c_str(),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
                                       m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/ + m_Font->Width(hm.c_str()), TopSecs),
+                LabelPixmap->DrawText(cPoint(right + m_Font->Width(hm.c_str()), TopSecs),
                                       secs.c_str(), Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg),
                                       m_FontSecs, m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), *cutted,
+                LabelPixmap->DrawText(cPoint(right, 0), *cutted,
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
                                       m_Font->Width(cutted), m_FontHeight);
             }
         } else {
-            LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
+            LabelPixmap->DrawText(cPoint(right, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(cutted), m_FontHeight);
         }
     } else {  // Not cutted
@@ -503,7 +503,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                     right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), hm.c_str(), Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/ + m_Font->Width(hm.c_str()), TopSecs),
                                       secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
@@ -513,7 +513,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                     IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                     right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), *m_Total, Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), *m_Total, Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
             }
         } else {
@@ -521,7 +521,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 IconsPixmap->DrawImage(cPoint(right, 0), *ImgTotal);
                 right += ImgTotalWidth + m_MarginItem;  // 'ImgTotalWidth' is already set
             }
-            LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/, 0), *m_Total, Theme.Color(clrReplayFont),
+            LabelPixmap->DrawText(cPoint(right, 0), *m_Total, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
         }
     }  // HasMarks

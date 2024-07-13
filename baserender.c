@@ -1095,7 +1095,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     // The small line
     ProgressBarPixmap->DrawRectangle(cRect(0, top - sml / 2, m_ProgressBarWidth, sml), m_ProgressBarColorFg);
 
-    bool Start = true;
+    bool Start {true};
 
     for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
         PosMark = ProgressBarMarkPos(m->Position(), Total);

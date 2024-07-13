@@ -32,7 +32,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_MenuTop {0}, m_MenuWidth {0};
         int m_MenuItemWidth {0};
         int m_MenuItemLastHeight {0};
-        bool m_MenuFullOsdIsDrawn = false;
+        bool m_MenuFullOsdIsDrawn {false};
 
         eMenuCategory m_MenuCategory;
 
@@ -58,11 +58,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         std::vector<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool m_IsScrolling = false;
-        bool m_IsGroup = false;
-        bool m_ShowEvent = false;
-        bool m_ShowRecording = false;
-        bool m_ShowText = false;
+        bool m_IsScrolling {false};
+        bool m_IsGroup {false};
+        bool m_ShowEvent {false};
+        bool m_ShowRecording {false};
+        bool m_ShowText {false};
 
         cComplexContent ComplexContent;
 

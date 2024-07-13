@@ -66,15 +66,15 @@ class cFlatBaseRender {
         cString m_TopBarTitle{""};
         cString m_TopBarTitleExtra1{""}, m_TopBarTitleExtra2{""};
         cString m_TopBarExtraIcon{""};
-        bool m_TopBarExtraIconSet = false;
+        bool m_TopBarExtraIconSet {false};
         cString m_TopBarMenuIcon{""};
-        bool m_TopBarMenuIconSet = false;
+        bool m_TopBarMenuIconSet {false};
         cString m_TopBarMenuIconRight{""};
-        bool m_TopBarMenuIconRightSet = false;
+        bool m_TopBarMenuIconRightSet {false};
         cString m_TopBarMenuLogo{""};
-        bool m_TopBarMenuLogoSet = false;
+        bool m_TopBarMenuLogoSet {false};
 
-        bool m_TopBarUpdateTitle = false;
+        bool m_TopBarUpdateTitle {false};
         cString m_TopBarLastDate{""};
         int m_TopBarHeight {0};
         int m_VideoDiskUsageState {-1};
@@ -85,8 +85,8 @@ class cFlatBaseRender {
         int m_ProgressBarHeight {0}, m_ProgressBarTop {0}, m_ProgressBarWidth {0};
         int m_ProgressBarMarginHor {0}, m_ProgressBarMarginVer {0};
         int m_ProgressType {0};
-        bool m_ProgressBarSetBackground = false;
-        bool m_ProgressBarIsSignal = false;
+        bool m_ProgressBarSetBackground {false};
+        bool m_ProgressBarIsSignal {false};
         tColor m_ProgressBarColorFg {0}, m_ProgressBarColorBarFg {0};
         tColor m_ProgressBarColorBarCurFg {0}, m_ProgressBarColorBg {0};
         tColor m_ProgressBarColorMark {0}, m_ProgressBarColorMarkCurrent {0};
@@ -98,7 +98,7 @@ class cFlatBaseRender {
         cPixmap *ButtonsPixmap {nullptr};
         int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
         int m_MarginButtonColor {0}, m_ButtonColorHeight {0};
-        bool m_ButtonsDrawn = false;
+        bool m_ButtonsDrawn {false};
 
         // Message
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
