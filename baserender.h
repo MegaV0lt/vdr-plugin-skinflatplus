@@ -105,6 +105,7 @@ class cFlatBaseRender {
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
         int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // m_MessageWidth is unused
         cTextScrollers MessageScroller;
+        int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 
         // Multiline content with scrollbar
         // cPixmap *ContentPixmap;  //* Content* is unused
@@ -182,6 +183,7 @@ class cFlatBaseRender {
 
         void MessageCreate(void);
         void MessageSet(eMessageType Type, const char *Text);
+        void MessageSetExtraTime(const char *Text);
         void MessageClear(void);
 
         void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,

@@ -680,6 +680,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 }
 
 void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
+    // MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 

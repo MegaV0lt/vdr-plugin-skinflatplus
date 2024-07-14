@@ -722,6 +722,11 @@ void cFlatBaseRender::MessageCreate(void) {
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::MessageSet()");
+        dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
+    #endif
+
     if (!MessagePixmap || !MessageIconPixmap)
         return;
 
@@ -811,6 +816,17 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight,
                     Config.decorBorderMessageSize, Config.decorBorderMessageType, Config.decorBorderMessageFg,
                     Config.decorBorderMessageBg, BorderMessage);
+}
+
+void cFlatBaseRender::MessageSetExtraTime(const char *Text) {
+    // For long messages increase 'MessageTime'  // TODO: Add config options? Treshold, chars for second
+    const std::size_t MessageLength = strlen(Text);
+    if (MessageLength > 80) {                        // Message is longer than 80 char
+      int ExtraTime = (MessageLength - 80) / 15;     // 1 second for each 15 extra char
+      if (ExtraTime > 7) ExtraTime = 7;              // Max. 7 seconds
+      dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+      Setup.OSDMessageTime += ExtraTime;             // Add time of displaying message
+    }
 }
 
 void cFlatBaseRender::MessageClear(void) {

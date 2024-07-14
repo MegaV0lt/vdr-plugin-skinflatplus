@@ -6,6 +6,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] Keep pre loaded images after cache overflow
 - [add] Option to display end time of recording
 - [add] Option to display edited end time of recording
+- [add] Extra time for long messages
 - [update] Show symbols before current pos wnd length at replay
 - [update] Use smaller font for actor name and role
 - [update] Randomize banner only if more than one
