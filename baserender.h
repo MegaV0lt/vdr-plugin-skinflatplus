@@ -62,6 +62,7 @@ class cFlatBaseRender {
         cPixmap *TopBarIconBgPixmap {nullptr};
         cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};
         int m_TopBarFontHeight {0}, m_TopBarFontSmlHeight {0}, m_TopBarFontClockHeight {0};
+        int m_TopBarWidth {0};
 
         cString m_TopBarTitle{""};
         cString m_TopBarTitleExtra1{""}, m_TopBarTitleExtra2{""};

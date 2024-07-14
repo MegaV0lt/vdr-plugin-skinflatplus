@@ -33,6 +33,7 @@ cFlatBaseRender::cFlatBaseRender(void) {
     m_FontFixedHeight = m_FontFixed->Height();
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
+    m_TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
 
     Borders.reserve(64);
 
@@ -102,17 +103,17 @@ void cFlatBaseRender::TopBarCreate(void) {
 
     TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1,
                                 cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                      m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+                                      m_TopBarWidth, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
     //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2,
                                       cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                            m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+                                            m_TopBarWidth, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarIconBgPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
     //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3,
                                     cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                          m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+                                          m_TopBarWidth, m_TopBarHeight));
     // dsyslog("flatPlus: TopBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
     //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     PixmapFill(TopBarPixmap, clrTransparent);
@@ -311,7 +312,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
 
     cString Buffer {""}, CurDate = DayDateTime();
     if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
-        const int TopBarWidth = m_OsdWidth - Config.decorBorderTopBarSize * 2;
+        const int TopBarWidth = m_TopBarWidth;
         int MenuIconWidth {0};
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = CurDate;
@@ -517,7 +518,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
                                Theme.Color(clrTopBarBg), m_TopBarFont, TitleMaxWidth);
 
         DecorBorderDraw(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                        m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight, Config.decorBorderTopBarSize,
+                        TopBarWidth, m_TopBarHeight, Config.decorBorderTopBarSize,
                         Config.decorBorderTopBarType, Config.decorBorderTopBarFg, Config.decorBorderTopBarBg);
     }
 }
