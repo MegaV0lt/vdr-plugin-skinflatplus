@@ -31,6 +31,10 @@ static int CompareTimers(const void *a, const void *b) {
 }
 
 cFlatDisplayMenu::cFlatDisplayMenu(void) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
+    #endif
+
     CreateFullOsd();
     TopBarCreate();
     ButtonsCreate();
@@ -38,11 +42,14 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
 
     m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
 
+    m_RecFolder.reserve(256);  // Defined in 'displaymenu.h'
+    m_LastRecFolder.reserve(256);
+
     m_VideoDiskUsageState = -1;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-    m_ItemChannelHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-    m_ItemTimerHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
+    m_ItemChannelHeight = m_ItemHeight;
+    m_ItemTimerHeight = m_ItemHeight;
 
     m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
     m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem * 3 +
@@ -53,7 +60,7 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_MenuTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
     MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuPixmap left: %d top: %d width: %d height: %d", 0, m_MenuTop, m_MenuWidth,
-    // m_ScrollBarHeight);
+    //         m_ScrollBarHeight);
     MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2,
                                      cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
     // dsyslog("flatPlus: MenuIconsBgPixmap left: %d top: %d width: %d height: %d", 0,
@@ -69,10 +76,10 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     m_chLeft = Config.decorBorderMenuContentHeadSize;
     m_chTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
     m_chWidth = m_MenuWidth - Config.decorBorderMenuContentHeadSize * 2;
-    m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2;
+    m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2;
     ContentHeadPixmap = CreatePixmap(m_Osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
     // dsyslog("flatPlus: ContentHeadPixmap left: %d top: %d width: %d height: %d", m_chLeft, m_chTop, m_chWidth,
-    // m_chHeight);
+    //         m_chHeight);
     ContentHeadIconsPixmap =
         CreatePixmap(m_Osd, "ContentHeadIconsPixmap", 2, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
 
@@ -96,6 +103,8 @@ cFlatDisplayMenu::cFlatDisplayMenu(void) {
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     MenuItemScroller.SetScrollType(Config.ScrollerType);
 
+    ItemsBorder.reserve(64);
+
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
     cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
 }
@@ -104,6 +113,9 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
     if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
         delete m_FontTempSml;
+
+    if (m_FontTiny)  // Created in 'AddActors'
+        delete m_FontTiny;
 
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
@@ -139,7 +151,7 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
         if (Config.MenuEventView == 0 || Config.MenuEventView == 1)
             m_ItemEventHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else if (Config.MenuEventView == 2 || Config.MenuEventView == 3)
-            m_ItemEventHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem * 2 + Config.MenuItemPadding +
+            m_ItemEventHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.MenuItemPadding +
                                 Config.decorBorderMenuItemSize * 2 + Config.decorProgressMenuItemSize / 2;
     } else if (m_MenuCategory == mcRecording) {
         if (Config.MenuRecordingView == 0 || Config.MenuRecordingView == 1)
@@ -158,6 +170,10 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetScrollbar()");
+    #endif
+
     // dsyslog("flatPlus: Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
     if (!MenuPixmap) return;
 
@@ -260,37 +276,41 @@ void cFlatDisplayMenu::Clear(void) {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
+    #endif
+
     TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
-        cString icon("");
+        cString IconName {""};
         switch (m_MenuCategory) {
         case mcMain:
             TopBarSetTitle("");
-            icon = cString::sprintf("menuIcons/%s", VDRLOGO);
+            IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
             break;
         case mcSchedule:
         case mcScheduleNow:
         case mcScheduleNext:
-            icon = "menuIcons/Schedule"; break;
+            IconName = "menuIcons/Schedule"; break;
         case mcChannel:
-            icon = "menuIcons/Channels";
+            IconName = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
-                int ChanCount{0};
+                uint ChanCount {0};
                 LOCK_CHANNELS_READ;
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
                     if (!Channel->GroupSep())
                         ++ChanCount;
                 }  // for
-                cString NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
+                const cString NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuChannelShowCount
             break;
         case mcTimer:
-            icon = "menuIcons/Timers";
+            IconName = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
-                int TimerCount{0}, TimerActiveCount{0};
+                uint TimerCount {0}, TimerActiveCount {0};
                 LOCK_TIMERS_READ;
                 for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     ++TimerCount;
@@ -299,40 +319,13 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                 }  // for
                 m_LastTimerCount = TimerCount;
                 m_LastTimerActiveCount = TimerActiveCount;
-                cString NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
+                const cString NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuTimerShowCount
             break;
         case mcRecording:
             if (Config.MenuRecordingShowCount) {
-                int RecCount {0}, RecNewCount {0};
-                m_LastRecFolder = m_RecFolder;
-                if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
-                    std::string RecFolder2("");
-                    LOCK_RECORDINGS_READ;
-                    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
-                        if (m_RecFolder == RecFolder2) {
-                            ++RecCount;
-                            if (Rec->IsNew())
-                                ++RecNewCount;
-                        }
-                    }  // for
-                } else {
-                    LOCK_RECORDINGS_READ;
-                    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                        ++RecCount;
-                        if (Rec->IsNew())
-                            ++RecNewCount;
-                    }
-                }
-                cString NewTitle = cString::sprintf("%s (%d*/%d)", Title, RecNewCount, RecCount);  // Display (35*/56)
-                if (Config.ShortRecordingCount) {
-                    if (RecNewCount == 0)  // No new recordings
-                        NewTitle = cString::sprintf("%s (%d)", Title, RecCount);
-                    else if (RecNewCount == RecCount)  // Only new recordings
-                        NewTitle = cString::sprintf("%s (%d*)", Title, RecNewCount);
-                }
+                const cString NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
                 TopBarSetTitle(*NewTitle);
             }  // Config.MenuRecordingShowCount
             /*
@@ -341,25 +334,25 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             else if(RecordingsSortMode == rsmTime)
                 TopBarSetMenuIconRight("menuIcons/RecsSortDate");
             */
-            icon = "menuIcons/Recordings"; break;
+            IconName = "menuIcons/Recordings"; break;
         case mcSetup:
-            icon = "menuIcons/Setup"; break;
+            IconName = "menuIcons/Setup"; break;
         case mcCommand:
-            icon = "menuIcons/Commands"; break;
+            IconName = "menuIcons/Commands"; break;
         case mcEvent:
-            icon = "extraIcons/Info"; break;
+            IconName = "extraIcons/Info"; break;
         case mcRecordingInfo:
-            icon = "extraIcons/PlayInfo"; break;
+            IconName = "extraIcons/PlayInfo"; break;
         default:
             break;
         }
-        TopBarSetMenuIcon(*icon);
+        TopBarSetMenuIcon(*IconName);
 
         if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
             Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
             TopBarEnableDiskUsage();
         }
-    }
+    }  // Config.TopBarMenuIconShow
 }
 
 void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -367,6 +360,7 @@ void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char
 }
 
 void cFlatDisplayMenu::SetMessage(eMessageType Type, const char *Text) {
+    // MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
@@ -414,17 +408,17 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, m_FontHeight), ColorBg);
 
-    int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
+    const int AvailableTextWidth = m_MenuItemWidth - m_ScrollBarWidth;
     int XOff {0}, xt {0};
     const char *s {nullptr};
-    for (int i {0}; i < MaxTabs; ++i) {
+    for (uint i {0}; i < MaxTabs; ++i) {
         s = GetTabbedText(Text, i);
         if (s) {
-            // from skinelchi
+            // From skinelchi
             xt = Tab(i);
             XOff = xt + Config.decorBorderMenuItemSize;
 
-            // Check for timer info symbols: " !#>" (EPGSearch searchtimer)
+            // Check for timer info symbols: " !#>" (EPGSearch search timer)
             if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
                 switch (s[0]) {
                 case '>':
@@ -445,48 +439,48 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 default:
                     break;
                 }
-            } else {  // Not EPGsearch timermenu
+            } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
                     cImageLoader ImgLoader;
-                    cString IconName = GetIconName(MainMenuText(s));
+                    const cString IconName = GetIconName(MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
                         cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight - m_MarginItem * 2,
-                                                 m_FontHeight - m_MarginItem * 2);
+                        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight - m_MarginItem2,
+                                                 m_FontHeight - m_MarginItem2);
                     }
                     if (!img)
-                        img = ImgLoader.LoadIcon(*IconName, m_FontHeight - m_MarginItem * 2,
-                                                 m_FontHeight - m_MarginItem * 2);
+                        img = ImgLoader.LoadIcon(*IconName, m_FontHeight - m_MarginItem2,
+                                                 m_FontHeight - m_MarginItem2);
 
                     if (img) {
                         MenuIconsPixmap->DrawImage(
                             cPoint(xt + Config.decorBorderMenuItemSize + m_MarginItem, y + m_MarginItem), *img);
                     } else {
-                        img = ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem * 2,
-                                                 m_FontHeight - m_MarginItem * 2);
+                        img = ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2,
+                                                 m_FontHeight - m_MarginItem2);
                         if (img) {
                             MenuIconsPixmap->DrawImage(
                                 cPoint(xt + Config.decorBorderMenuItemSize + m_MarginItem, y + m_MarginItem), *img);
                         }
                     }
                     MenuPixmap->DrawText(
-                        cPoint(m_FontHeight + m_MarginItem * 2 + xt + Config.decorBorderMenuItemSize, y), s, ColorFg,
-                        ColorBg, m_Font, AvailableTextWidth - xt - m_MarginItem * 2 - m_FontHeight);
+                        cPoint(m_FontHeight + m_MarginItem2 + xt + Config.decorBorderMenuItemSize, y), s, ColorFg,
+                        ColorBg, m_Font, AvailableTextWidth - xt - m_MarginItem2 - m_FontHeight);
                 } else {
                     if (Config.MenuItemParseTilde) {
-                        std::string tilde = s;
-                        std::size_t found = tilde.find('~');  // Search for ~
+                        std::string_view tilde {s};
+                        const std::size_t found = tilde.find('~');  // Search for ~
                         if (found != std::string::npos) {
-                            std::string first = tilde.substr(0, found);
-                            std::string second = tilde.substr(found + 1);  // Default end is npos
-                            RightTrim(first);                              // Trim possible space on right side
-                            LeftTrim(second);                              // Trim possible space at begin
+                            std::string_view sv1 {tilde.substr(0, found)};
+                            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                            const std::string first {rtrim(sv1)};   // Trim possible space at end
+                            const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
                                                  ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
-                            int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
+                            const int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.c_str(),
                                                  ColorExtraTextFg, ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize - l);
@@ -531,13 +525,14 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     SetEditableWidth(m_MenuWidth - Tab(1));
 }
 
-std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
-    std::string text = skipspace(Text.c_str());
-    std::string MenuEntry("") /*, MenuNumber("")*/;
+std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
+    const std::string text {skipspace(Text.c_str())};
+    std::string MenuEntry {""} /*, MenuNumber {""}*/;
     MenuEntry.reserve(13);  // Length of 'Miscellaneous'
-    bool found = false, DoBreak = false;
+    bool found {false}, DoBreak {false};
+    const std::size_t TextLength = text.length();
+    uint i {0};  // 'i' used also after loop
     char s;
-    std::size_t i {0}, TextLength = text.length();
     for (; i < TextLength; ++i) {
         s = text.at(i);
         if (i == 0) {  // If text directly starts with nonnumeric, break
@@ -554,24 +549,24 @@ std::string cFlatDisplayMenu::MainMenuText(std::string Text) {
         MenuEntry = skipspace(text.substr(i).c_str());
     } else {
         // MenuNumber = "";
-        MenuEntry = text.c_str();
+        MenuEntry = text;
     }
     return MenuEntry;
 }
 
-cString cFlatDisplayMenu::GetIconName(std::string element) {
+cString cFlatDisplayMenu::GetIconName(const std::string &element) {
     // Check for standard menu entries
-    std::string s("");
-    s.reserve(16);  // Space for translated menu entry
-    for (int i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
+    std::string s {""};
+    s.reserve(32);  // Space for translated menu entry
+    for (uint i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(items[i].c_str());
         if (s == element) {
             return cString::sprintf("menuIcons/%s", items[i].c_str());
         }
     }
     // Check for special main menu entries "stop recording", "stop replay"
-    std::string StopRecording = skipspace(trVDR(" Stop recording "));
-    std::string StopReplay = skipspace(trVDR(" Stop replaying"));
+    const std::string StopRecording {skipspace(trVDR(" Stop recording "))};
+    const std::string StopReplay {skipspace(trVDR(" Stop replaying"))};
     try {
         if (element.substr(0, StopRecording.size()) == StopRecording)
             return "menuIcons/StopRecording";
@@ -581,9 +576,9 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
     }
     // Check for plugins
     const char *MaimMenuEntry {nullptr};
-    std::string PlugMainEntry("");
-    PlugMainEntry.reserve(16);  // Space for menu entry
-    for (int i {0};; ++i) {
+    std::string PlugMainEntry {""};
+    PlugMainEntry.reserve(32);  // Space for menu entry
+    for (uint i {0};; ++i) {
         cPlugin *p = cPluginManager::GetPlugin(i);
         if (p) {
             MaimMenuEntry = p->MainMenuEntry();
@@ -603,9 +598,9 @@ cString cFlatDisplayMenu::GetIconName(std::string element) {
 }
 
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
-    if (strlen(text) > 5 && text[0] == '[' && ((text[1] == '|')
-        || (text[1] == ' ')) && ((text[2] == '|')
-        || (text[2] == ' ')) && text[strlen(text) - 1] == ']')
+    const std::size_t TextLength = strlen(text);
+    if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
+        ((text[2] == '|') || (text[2] == ' ')) && text[TextLength - 1] == ']')
         return true;
     return false;
 }
@@ -613,8 +608,8 @@ bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
 void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p = bar + 1;
-    bool IsProgressbar = true;
-    int now {0}, total {0};
+    bool IsProgressbar {true};
+    uint now {0}, total {0};
     for (; *p != ']'; ++p) {
         if (*p == ' ' || *p == '|') {
             ++total;
@@ -626,7 +621,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         }
     }
     if (IsProgressbar) {
-        double progress = now * 1.0f / total;
+        const double progress = now * 1.0 / total;
         ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -671,7 +666,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Width {0}, LeftName {0};
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
-    bool DrawProgress = true;
+    bool DrawProgress {true};
 
     m_IsGroup = Channel->GroupSep();  // Also used later
     if (m_IsGroup)
@@ -682,7 +677,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     int w = m_Font->Width("9999");  // At least four digits in channel list because of different sort modes
-    cString Buffer("");
+    cString Buffer {""};
     if (!m_IsGroup) {
         Buffer = cString::sprintf("%d", Channel->Number());
         Width = m_Font->Width(*Buffer);
@@ -717,7 +712,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
 
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        Left += ImageBgWidth + m_MarginItem * 2;
+        Left += ImageBgWidth + m_MarginItem2;
     } else {
         bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
 
@@ -731,7 +726,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem * 2;
+                Left += ImageBgWidth + m_MarginItem2;
             }
         } else if (m_IsGroup) {
             img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
@@ -739,7 +734,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem * 2;
+                Left += ImageBgWidth + m_MarginItem2;
             }
         } else {
             if (Current)
@@ -750,7 +745,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem * 2;
+                Left += ImageBgWidth + m_MarginItem2;
             }
         }
     }
@@ -761,15 +756,15 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const cEvent *Event {nullptr};
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
-    float progress {0.0};
-    cString EventTitle("");
+    double progress {0.0};
+    cString EventTitle {""};
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = roundf((time(NULL) * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
-            if (progress < 0) progress = 0.0;
-            else if (progress > 100) progress = 100;
+            progress = round((time(NULL) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
+            if (progress < 0.0) progress = 0.0;
+            else if (progress > 100.0) progress = 100.0;
 
             EventTitle = Event->Title();
         }
@@ -783,9 +778,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = m_MenuItemWidth - LeftName;
         if (m_IsGroup) {
-            int LineTop = Top + (m_FontHeight - 3) / 2;
+            const int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
-            cString GroupName = cString::sprintf(" %s ", *Buffer);
+            const cString GroupName = cString::sprintf(" %s ", *Buffer);
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
         } else {
@@ -805,9 +800,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             Width = m_MenuItemWidth - LeftName;
 
         if (m_IsGroup) {
-            int LineTop = Top + (m_FontHeight - 3) / 2;
+            const int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
-            cString GroupName = cString::sprintf(" %s ", *Buffer);
+            const cString GroupName = cString::sprintf(" %s ", *Buffer);
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
         } else {
@@ -829,7 +824,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                     Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short + EPG
                     PBTop = Top + m_FontHeight + m_FontSmlHeight;
                     PBLeft = Left - Width - m_MarginItem;
-                    PBWidth = m_MenuItemWidth - LeftName - m_MarginItem * 2 - Config.decorBorderMenuItemSize -
+                    PBWidth = m_MenuItemWidth - LeftName - m_MarginItem2 - Config.decorBorderMenuItemSize -
                               m_ScrollBarWidth;
 
                     if (m_IsScrolling)
@@ -913,7 +908,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     return true;
 }
 
-void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText) {
+void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString EmptyText) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraEvent()");
+    #endif
+
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
         m_cLeft += m_ScrollBarWidth;
@@ -924,8 +923,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
                        Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    bool IsEmpty = false;
-    cString Text("");
+    bool IsEmpty {false};
+    cString Text {""};
     if (Event) {
         // Description
         if (!isempty(Event->Description()))
@@ -942,7 +941,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 
             const cComponents *Components = Event->Components();
             if (Components) {
-                cString Audio(""), Subtitle("");
+                cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
 
                 if (!isempty(*Audio))
@@ -968,23 +967,22 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
         if (img) {
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
             ComplexContent.AddText(*Text, true,
-                                   cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,
-                                         m_cHeight - m_MarginItem * 2),
+                                   cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem2,
+                                         m_cHeight - m_MarginItem2),
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     } else {
-        cString MediaPath("");          // \/ Better use content hight
-        int MediaWidth {0}, MediaHeight {/* 999 */ m_cHeight - m_MarginItem * 2};
+        cString MediaPath {""};          // \/ Better use content hight
+        int MediaWidth {0}, MediaHeight {/* 999 */ m_cHeight - m_MarginItem2};
         int MediaType {0};
 
         static cPlugin *pScraper = GetScraperPlugin();
         if (Config.TVScraperEPGInfoShowPoster && pScraper) {
             ScraperGetPosterBannerV2 call;
             call.event = Event;
-            call.recording = NULL;
             if (pScraper->Service("GetPosterBannerV2", &call)) {
                 if ((call.type == tSeries) && call.banner.path.size() > 0) {
-                    MediaWidth = m_cWidth - m_MarginItem * 2;
+                    MediaWidth = m_cWidth - m_MarginItem2;
                     MediaPath = call.banner.path.c_str();
                     MediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
@@ -1000,24 +998,24 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
             if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
-                    cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             } else if (img && MediaType == 1) {  // Series
                 ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
                 ComplexContent.AddText(*Text, true,
-                                       cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,
-                                             m_cHeight - m_MarginItem * 2),
+                                       cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem2,
+                                             m_cHeight - m_MarginItem2),
                                        Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             } else {
                 ComplexContent.AddText(
                     *Text, true,
-                    cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             }
         } else {
             ComplexContent.AddText(
                 *Text, true,
-                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     }
@@ -1036,7 +1034,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, cString EmptyText
 }
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
-    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap) return false;
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap)
+        return false;
 
     if (Config.MenuTimerView == 0 || !Timer)
         return false;
@@ -1081,10 +1080,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int ImageTop = Top;
     int ImageHeight = m_FontHeight;
 
-    cString IconName("");
+    cString IconName {""};
     if (!(Timer->HasFlags(tfActive))) {  // Inactive timer
         IconName = (Current) ? "timerInactive_cur" : "timerInactive";
-
         ColorFg = Theme.Color(clrMenuTimerItemDisabledFont);
     } else if (Timer->Recording()) {  // Active timer and recording
         IconName = "timerRecording";
@@ -1109,7 +1107,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         }
     }
-    Left += ImageHeight + m_MarginItem * 2;
+    Left += ImageHeight + m_MarginItem2;
 
     /* Disabled because invalid lock sequence
     LOCK_CHANNELS_READ;
@@ -1141,7 +1139,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     } else {
-        bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
+        const bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
 
         if (IsRadioChannel) {
             if (Current)
@@ -1174,9 +1172,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             }
         }
     }
-    Left += ImageBgWidth + m_MarginItem * 2;
+    Left += ImageBgWidth + m_MarginItem2;
 
-    cString day(""), name("");
+    cString day {""}, name {""};
     if (Timer->WeekDays()) {
         day = Timer->PrintDay(0, Timer->WeekDays(), false);
     } else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
@@ -1213,17 +1211,17 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 clrTransparent, m_Font, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string tilde = File;
-                std::size_t found = tilde.find('~');  // Search for ~
+                std::string_view tilde {File};
+                const std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1);  // Default end is npos
-                    RightTrim(first);                              // Trim possible space on right side
-                    LeftTrim(second);                              // Trim possible space at begin
+                    std::string_view sv1 {tilde.substr(0, found)};
+                    std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                    const std::string first {rtrim(sv1)};   // Trim possible space at end
+                    const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
                     MenuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
+                    const int l = m_Font->Width(first.c_str()) + m_Font->Width('X');
                     MenuPixmap->DrawText(cPoint(Left + l, Top), second.c_str(), ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
@@ -1249,17 +1247,17 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string tilde = File;
-                std::size_t found = tilde.find('~');  // Search for ~
+                std::string_view tilde {File};
+                const std::size_t found = tilde.find('~');  // Search for ~
                 if (found != std::string::npos) {
-                    std::string first = tilde.substr(0, found);
-                    std::string second = tilde.substr(found + 1);  // Default end is npos
-                    RightTrim(first);                              // Trim possible space on right side
-                    LeftTrim(second);                              // Trim possible space at begin
+                    std::string_view sv1 {tilde.substr(0, found)};
+                    std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                    const std::string first {rtrim(sv1)};   // Trim possible space at end
+                    const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.c_str(), ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    int l = m_FontSml->Width(first.c_str()) + m_FontSml->Width('X');
+                    const int l = m_FontSml->Width(first.c_str()) + m_FontSml->Width('X');
                     MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.c_str(), ColorExtraTextFg,
                                          ColorBg, m_FontSml, m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
@@ -1306,7 +1304,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                                     const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch, bool TimerActive) {
-    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap) return false;
+    if (!MenuPixmap || !MenuIconsBgPixmap || !MenuIconsPixmap)
+        return false;
 
     if (Config.MenuEventView == 0)
         return false;
@@ -1320,7 +1319,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int Height = m_FontHeight;
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short. flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem * 2 + Config.decorProgressMenuItemSize / 2;
+        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.decorProgressMenuItemSize / 2;
         m_MenuItemWidth *= 0.6;
     }
 
@@ -1353,7 +1352,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (!Channel)
         TopBarSetMenuLogo(m_ItemEventLastChannelName);
 
-    cString Buffer("");
+    cString Buffer {""};
     cImage *img {nullptr};
     if (Channel) {
         if (Current)
@@ -1427,14 +1426,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 }
             }
         }
-        Left += ImageBgWidth + m_MarginItem * 2;
+        Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
 
         w = m_MenuItemWidth / 10 * 2;
         if (!m_IsScrolling)
             w = (m_MenuItemWidth - m_ScrollBarWidth) / 10 * 2;
 
-        cString ChannelName("");
+        cString ChannelName {""};
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
             ChannelName = Channel->Name();
             w = m_Font->Width(*ChannelName);
@@ -1445,12 +1444,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             Left += w / 2;
-            cString GroupName = cString::sprintf(" %s ", *ChannelName);
+            const cString GroupName = cString::sprintf(" %s ", *ChannelName);
             MenuPixmap->DrawText(cPoint(Left, Top), *GroupName, ColorFg, ColorBg, m_Font, 0, 0, taCenter);
         } else
             MenuPixmap->DrawText(cPoint(Left, Top), *ChannelName, ColorFg, ColorBg, m_Font, w);
 
-        Left += w + m_MarginItem * 2;
+        Left += w + m_MarginItem2;
 
         if (Event) {
             int PBWidth = m_MenuItemWidth / 20;
@@ -1459,12 +1458,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
             time_t now = time(NULL);
             if ((now >= (Event->StartTime() - 2 * 60))) {
-                int total = Event->EndTime() - Event->StartTime();
+                const int total = Event->EndTime() - Event->StartTime();
                 if (total >= 0) {
                     // Calculate progress bar
-                    double progress = roundf((now * 1.0f - Event->StartTime()) / Event->Duration() * 100.0f);
-                    if (progress < 0) progress = 0.0;
-                    else if (progress > 100) progress = 100;
+                    double progress = round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
+                    if (progress < 0.0) progress = 0.0;
+                    else if (progress > 100.0) progress = 100.0;
 
                     int PBLeft = Left;
                     int PBTop = y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
@@ -1474,7 +1473,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
                         // flatPlus short, flatPlus short + EPG
                         PBTop = y + m_FontHeight + m_FontSmlHeight + m_MarginItem;
-                        PBWidth = m_MenuItemWidth - LeftSecond - m_ScrollBarWidth - m_MarginItem * 2;
+                        PBWidth = m_MenuItemWidth - LeftSecond - m_ScrollBarWidth - m_MarginItem2;
                         if (m_IsScrolling)
                             PBWidth += m_ScrollBarWidth;
 
@@ -1494,7 +1493,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                                            Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
                 }
             }
-            Left += PBWidth + m_MarginItem * 2;
+            Left += PBWidth + m_MarginItem2;
         }
     }  // if channel
 
@@ -1505,7 +1504,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
@@ -1575,8 +1574,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
         Left += ImageHeight + m_MarginItem;
 
-        cString Title = cString::sprintf("%s", Event->Title());
-        cString ShortText = Event->ShortText() ? cString::sprintf("%s", Event->ShortText()) : "";
+        const cString Title = cString::sprintf("%s", Event->Title());
+        const cString ShortText = Event->ShortText() ? cString::sprintf("%s", Event->ShortText()) : "";
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             if (Current) {
@@ -1673,14 +1672,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     } else if (Event) {
         try {
             // Extract date from separator
-            std::string sep = Event->Title();
-            if (sep.size() > 12) {
-                std::size_t found = sep.find(" -");
+            std::string_view sep {Event->Title()};
+            if (sep.length() > 12) {
+                const std::size_t found = sep.find(" -");
                 if (found >= 10) {
-                    std::string date = sep.substr(found - 10, 10);
-                    int LineTop = Top + (m_FontHeight - 3) / 2;
+                    const std::string date {sep.substr(found - 10, 10)};
+                    const int LineTop = Top + (m_FontHeight - 3) / 2;
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
-                    cString DateSpace = cString::sprintf(" %s ", date.c_str());
+                    const cString DateSpace = cString::sprintf(" %s ", date.c_str());
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else
@@ -1727,42 +1726,23 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap) return false;
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
+        dsyslog("   Level: %d, Total: %d, New: %d", Level, Total, New);
+    #endif
+
+    if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
+        return false;
 
     if (Config.MenuRecordingView == 0)
         return false;
 
-    if (Level > 0)
-        m_RecFolder = GetRecordingName(Recording, Level - 1, true).c_str();
-    else
-        m_RecFolder = "";
-
+    m_RecFolder = (Level > 0) ? GetRecordingName(Recording, Level - 1, true) : "";
     m_LastItemRecordingLevel = Level;
 
-    if (m_LastRecFolder != m_RecFolder) {
-        int RecCount {0}, RecNewCount {0};
-        m_LastRecFolder = m_RecFolder;
-        if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
-            std::string RecFolder2("");
-            LOCK_RECORDINGS_READ;
-            for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true).c_str();
-                if (m_RecFolder == RecFolder2) {
-                    ++RecCount;
-                    if (Rec->IsNew())
-                        ++RecNewCount;
-                }
-            }  // for
-        } else {
-            LOCK_RECORDINGS_READ;
-            for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-                ++RecCount;
-                if (Rec->IsNew())
-                    ++RecNewCount;
-            }  // for
-        }
-        cString NewTitle = cString::sprintf("%s (%d*/%d)", *m_LastTitle, RecNewCount, RecCount);
-        TopBarSetTitleWithoutClear(*NewTitle);
+    if (Config.MenuRecordingShowCount) {
+        const cString NewTitle = cString::sprintf("%s %s", *m_LastTitle, *GetRecCounts());
+        TopBarSetTitle(*NewTitle, false);  // Do not clear
     }
 
     if (Current)
@@ -1800,20 +1780,20 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (2.0 / 3.0));
     }
     if (!ImgRecNew)
         ImgRecNew = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
     if (!ImgRecNewSml)
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight *  (1.0 / 3.0 * 2.0));
+        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * (2.0 / 3.0));
 
     int Left = Config.decorBorderMenuItemSize + m_MarginItem;
     int Top = y;
 
-    cString Buffer(""), IconName("");
-    cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
+    cString Buffer {""}, IconName {""};
+    const cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img {nullptr};
     if (Config.MenuRecordingView == 1) {  // flatPlus long
         int LeftWidth = Left + m_FontHeight + ImgRecNew->Width() + ImgRecCut->Width() + m_MarginItem * 3 +
@@ -1829,8 +1809,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            int Minutes = (Recording->LengthInSeconds() + 30) / 60;
-            cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
+            const int Minutes = (Recording->LengthInSeconds() + 30) / 60;
+            const cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -1840,7 +1820,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += m_Font->Width(*Buffer);
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            int RecordingIsInUse = Recording->IsInUse();
+            const int RecordingIsInUse = Recording->IsInUse();
             if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 img = nullptr;
                 if (Current)
@@ -1881,7 +1861,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
                 img = nullptr;
                 if (Current) {
-                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
                     img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
                 }
                 if (!img)
@@ -1893,18 +1873,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += ImgRecNew->Width() + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut) {
-                int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
+                const int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
                 IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
-                    int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
+                    const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                         if (img) {
-                            // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
-                            int ImageTop = Top + m_FontHeight - m_FontAscender;
-                            int ImageLeft = Left + m_FontHeight - img->Width();
+                            const int ImageTop = Top + m_FontHeight - m_FontAscender;
+                            const int ImageLeft = Left + m_FontHeight - img->Width();
                             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                         }
                 }
@@ -1947,10 +1926,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowFolderDate != 0) {
                 Buffer = cString::sprintf("(%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
                 MenuPixmap->DrawText(
-                    cPoint(LeftWidth - m_Font->Width(Buffer) - m_FontHeight * 2 - m_MarginItem * 2, Top), *Buffer,
+                    cPoint(LeftWidth - m_Font->Width(Buffer) - m_FontHeight2 - m_MarginItem2, Top), *Buffer,
                     ColorExtraTextFg, ColorBg, m_Font);
                 if (IsRecordingOld(Recording, Level)) {
-                    Left = LeftWidth - m_FontHeight * 2 - m_MarginItem * 2;
+                    Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
                     img = nullptr;
                     if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
@@ -1973,7 +1952,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(LeftWidth, Top), *RecName, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - LeftWidth - m_MarginItem);
             }
-            LeftWidth += m_Font->Width(*RecName) + m_MarginItem * 2;
+            LeftWidth += m_Font->Width(*RecName) + m_MarginItem2;
         } else if (Total == -1) {
             img = nullptr;
             if (Current)
@@ -2008,7 +1987,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            int ImagesWidth = ImgRecNew->Width() + ImgRecCut->Width() + m_MarginItem * 2 + m_ScrollBarWidth;
+            int ImagesWidth = ImgRecNew->Width() + ImgRecCut->Width() + m_MarginItem2 + m_ScrollBarWidth;
             if (m_IsScrolling)
                 ImagesWidth -= m_ScrollBarWidth;
 
@@ -2023,8 +2002,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem - ImagesWidth);
             }
 
-            int Minutes = (Recording->LengthInSeconds() + 30) / 60;
-            cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
+            const int Minutes = (Recording->LengthInSeconds() + 30) / 60;
+            const cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -2035,7 +2014,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left = m_MenuItemWidth - ImagesWidth;
             Top -= m_FontHeight;
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            int RecordingIsInUse = Recording->IsInUse();
+            const int RecordingIsInUse = Recording->IsInUse();
             if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
                 img = nullptr;
                 if (Current)
@@ -2076,7 +2055,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
                 img = nullptr;
                 if (Current) {
-                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                    const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
                     img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
                 }
                 if (!img)
@@ -2088,18 +2067,18 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += ImgRecNew->Width() + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut) {
-                int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
+                const int ImageTop = Top + m_FontHeight - ImgRecCut->Height();  // ~ 2/3 height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
                 IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
-                    int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
+                    const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                         if (img) {
                             // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
-                            int ImageTop = Top + m_FontHeight - m_FontAscender;
-                            int ImageLeft = Left + m_FontHeight - img->Width();
+                            const int ImageTop = Top + m_FontHeight - m_FontAscender;
+                            const int ImageLeft = Left + m_FontHeight - img->Width();
                             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                         }
                 }
@@ -2211,6 +2190,10 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
+    #endif
+
     if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
     if (!Event) return;
 
@@ -2238,9 +2221,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
-    cString Text(""), TextAdditional("");
-    std::string Fsk("");
-    std::list<std::string> GenreIcons;
+    cString Text {""}, TextAdditional {""};
+    std::string Fsk {""};
+    Fsk.reserve(4);
+    std::vector<std::string> GenreIcons;
+    GenreIcons.reserve(8);
 
     // Description
     if (!isempty(Event->Description()))
@@ -2259,7 +2244,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         const cComponents *Components = Event->Components();
         if (Components) {
-            cString Audio(""), Subtitle("");
+            cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
             if (!isempty(*Audio)) {
@@ -2275,10 +2260,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if Components
     }  // EpgAdditionalInfoShow
 
-    double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    const double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
-    cString IconName("");
+    cString IconName {""};
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
@@ -2295,9 +2280,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }
         }
     }
-    bool IsUnknownDrawn = false;
-    GenreIcons.sort();  // Sort outside of loop
-    GenreIcons.unique();
+    bool IsUnknownDrawn {false};
+    std::sort(GenreIcons.begin(), GenreIcons.end());
+    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
@@ -2323,7 +2308,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: SetEvent info-text time: %d ms", tick1 - tick0);
 #endif
 
-    cString Reruns("");
+    cString Reruns {""};
     if (Config.EpgRerunsShow) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
@@ -2375,14 +2360,14 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     std::vector<cString> ActorsName;
     std::vector<cString> ActorsRole;
 
-    cString MediaPath("");
-    cString MovieInfo(""), SeriesInfo("");
+    cString MediaPath {""};
+    cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0}, NumActors {0};
+    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
-    bool FirstRun = true, SecondRun = false;
-    bool Scrollable = false;
+    bool FirstRun {true}, SecondRun {false};
+    bool Scrollable {false};
 
     do {  // Runs up to two times!
         if (FirstRun)
@@ -2400,8 +2385,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #ifdef DEBUGEPGTIME
         uint32_t tick3 = GetMsTicks();
 #endif
-        MediaWidth = m_cWidth / 2 - m_MarginItem * 2;
-        MediaHeight = m_cHeight - m_MarginItem * 2 - m_FontHeight - 6;
+        MediaWidth = m_cWidth / 2 - m_MarginItem2;
+        MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
@@ -2419,7 +2404,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     series.seriesId = seriesId;
                     series.episodeId = episodeId;
                     if (pScraper->Service("GetSeries", &series)) {
-                        if (series.banners.size() > 0) {  // Use random banner
+                        if (series.banners.size() > 1) {  // Use random banner
                             // Gets 'entropy' from device that generates random numbers itself
                             // to seed a mersenne twister (pseudo) random generator
                             std::mt19937 generator(std::random_device {}());
@@ -2428,13 +2413,14 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             // Range is inclusive (so we need -1 for vector index)
                             std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                            std::size_t number = distribution(generator);
+                            const std::size_t number = distribution(generator);
 
                             MediaPath = series.banners[number].path.c_str();
-                            if (series.banners.size() > 1)
-                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                        static_cast<int>(number + 1), *MediaPath,
-                                        static_cast<int>(series.banners.size()));  // Log result
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), *MediaPath,
+                                    static_cast<int>(series.banners.size()));  // Log result
+                        } else if (series.banners.size() == 1) {               // Just one banner
+                            MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperEPGInfoShowActors) {
                             ActorsSize = series.actors.size();
@@ -2491,17 +2477,17 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             } else if (!isempty(*Text)) {  // No image; insert text
                 ComplexContent.AddText(
                     *Text, true,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             }
         } else if (!isempty(*Text)) {  // No image; insert text
             ComplexContent.AddText(
-                *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 
@@ -2514,7 +2500,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *MovieInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 
@@ -2527,7 +2513,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *SeriesInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
@@ -2535,7 +2521,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
 #endif
 
-        NumActors = ActorsPath.size();
+        const int NumActors = ActorsPath.size();
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0) {
             //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
@@ -2554,7 +2540,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *Reruns, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 
@@ -2567,10 +2553,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *TextAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
-        Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem * 2);
+        Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
         if (Scrollable || SecondRun)
             break;             // No need for another run (Scrolling content or second run)
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
@@ -2595,28 +2581,22 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
-    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
+    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
-
-    /* cString date = Event->GetDateString();
-    cString StartTime = Event->GetTimeString();
-    cString EndTime = Event->GetEndTimeString();
-
-    cString StrTime = cString::sprintf("%s  %s - %s", *date, *StartTime, *EndTime); */
-    cString StrTime =
+    const cString StrTime =
         cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
-    cString Title = Event->Title();
-    cString ShortText = Event->ShortText();
-    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
-    int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
+    const cString Title = Event->Title();
+    const cString ShortText = Event->ShortText();
+    const int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
+    const int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
     int left = m_MarginItem;
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuEventFontInfo),
-                                Theme.Color(clrMenuEventBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
+                                Theme.Color(clrMenuEventBg), m_FontSml, m_MenuWidth - m_MarginItem2);
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title,
                                 Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font,
-                                m_MenuWidth - m_MarginItem * 2);
+                                m_MenuWidth - m_MarginItem2);
     // Add scroller to long short text
     if (ShortTextWidth > MaxWidth) {  // Short text too long
         if (Config.ScrollerEnable) {
@@ -2626,7 +2606,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                          Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
-            int DotsWidth = m_FontSml->Width("...");
+            const int DotsWidth = m_FontSml->Width("...");
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                         MaxWidth - DotsWidth);
@@ -2666,7 +2646,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #endif
 }
 
-void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cString EmptyText) {
+void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraRecording()");
+    #endif
+
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
         m_cLeft += m_ScrollBarWidth;
@@ -2677,10 +2661,10 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
                        Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
 
-    cString Dummy(""), Text("");
+    cString Text {""};
     if (Recording) {
         const cRecordingInfo *RecInfo = Recording->Info();
-        // Text.imbue(std::locale(""));
+        // Text.imbue(std::locale {""});
 
         if (!isempty(RecInfo->Description()))
             Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
@@ -2708,12 +2692,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
-            GetCuttedLengthMarks(Recording, Text, Dummy, true);  // Process marks and insert text
+            GetCuttedLengthSize(Recording, Text);  // Process marks and insert text
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
             if (RecInfo && RecInfo->Errors() >= 1) {
-                std::ostringstream RecErrors("");
+                std::ostringstream RecErrors {""};
                 RecErrors.imbue(std::locale(""));  // Set to local locale
                 RecErrors << RecInfo->Errors();
                 Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
@@ -2722,7 +2706,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 
             const cComponents *Components = RecInfo->Components();
             if (Components) {
-                cString Audio(""), Subtitle("");
+                cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
 
                 if (!isempty(*Audio))
@@ -2744,8 +2728,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     ComplexContent.SetPosition(cRect(m_cLeft, m_cTop, m_cWidth, m_cHeight));
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
-    cString MediaPath("");          // \/ Better use content hight
-    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem *2};
+    cString MediaPath {""};          // \/ Better use content hight
+    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};
     int MediaType {0};
 
     static cPlugin *pScraper = GetScraperPlugin();
@@ -2764,7 +2748,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
             series.seriesId = seriesId;
             series.episodeId = episodeId;
             if (pScraper->Service("GetSeries", &series)) {
-                if (series.banners.size() > 0) {  // Use random banner
+                if (series.banners.size() > 1) {  // Use random banner
                     // Gets 'entropy' from device that generates random numbers itself
                     // to seed a mersenne twister (pseudo) random generator
                     std::mt19937 generator(std::random_device {}());
@@ -2773,15 +2757,16 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
                     // Range is inclusive (so we need -1 for vector index)
                     std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                    std::size_t number = distribution(generator);
+                    const std::size_t number = distribution(generator);
 
                     MediaPath = series.banners[number].path.c_str();
-                    if (series.banners.size() > 1)
-                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                static_cast<int>(number + 1), *MediaPath,
-                                static_cast<int>(series.banners.size()));  // Log result
+                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                            static_cast<int>(number + 1), *MediaPath,
+                            static_cast<int>(series.banners.size()));  // Log result
+                } else if (series.banners.size() == 1) {               // Just one banner
+                    MediaPath = series.banners[0].path.c_str();
                 }
-                MediaWidth = m_cWidth - m_MarginItem * 2;
+                MediaWidth = m_cWidth - m_MarginItem2;
                 MediaType = 1;
             }
         } else if (call.type == tMovie) {
@@ -2798,18 +2783,18 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
     cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         cString RecPath = cString::sprintf("%s", Recording->FileName());
-        cString RecImage("");
+        cString RecImage {""};
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
             MediaPath = RecImage;
             // Preload image with full width. Get aspect and set parameters accordingly
-            img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem * 2, MediaHeight);
+            img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
             if (img) {
-                int Aspect = img->Width() / img->Height();
+                const uint Aspect = img->Width() / img->Height();
                 if (Aspect < 1) {  //* Poster (For example 680x1000 = 0.68)
                     MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
                     MediaType = 2;
                 } else {           //* Portrait (For example 1920x1080 = 1.77); Banner (Usually 758x140 = 5.41)
-                    MediaWidth = m_cWidth - m_MarginItem * 2;
+                    MediaWidth = m_cWidth - m_MarginItem2;
                     MediaType = 1;
                 }
             }
@@ -2821,23 +2806,23 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, *Text,
-                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         } else if (img && MediaType == 1) {  // Series
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
             ComplexContent.AddText(*Text, true,
-                                   cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem * 2,
-                                         m_cHeight - m_MarginItem * 2),
+                                   cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem2,
+                                         m_cHeight - m_MarginItem2),
                                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         } else {
             ComplexContent.AddText(
                 *Text, true,
-                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         }
     } else {
         ComplexContent.AddText(
-            *Text, true, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+            *Text, true, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
             Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
     }
 
@@ -2858,8 +2843,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, cStri
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
+    #endif
+
     // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
-    int ShowMaxActors = Config.TVScraperShowMaxActors;
+    const int ShowMaxActors = Config.TVScraperShowMaxActors;
     if (ShowMaxActors == 0) return;  // Do not show actors
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;  // Limit to ShowMaxActors (-1 = Show all actors)
@@ -2871,20 +2860,24 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
     ContentTop += 6;
 
+    // Smaller font for actors name
+    m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+    const int FontTinyHeight = m_FontTiny->Height();
+
     cImage *img {nullptr};
-    cString Name(""), Path(""), Role("");  // Actor name, path and role
-    int Actor{0}, ActorsPerLine{6};  // TODO: Config option?
-    int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
-    int ActorMargin = ((m_cWidth - m_MarginItem * 2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
-    int PicsPerLine = (m_cWidth - m_MarginItem * 2) / ActorWidth;
-    int PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
+    cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
+    int Actor {0}, ActorsPerLine {6};  // TODO: Config option?
+    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;
+    const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
+    const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;
+    const uint PicLines = NumActors / PicsPerLine + (NumActors % PicsPerLine != 0);
     int x = m_MarginItem;
     int y = ContentTop;
     if (NumActors > 50)
-        dsyslog("flatPlus: Showing %d actor images! First display will probably be slow.", NumActors);
+        dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
-    for (int row {0}; row < PicLines; ++row) {
-        for (int col {0}; col < PicsPerLine; ++col) {
+    for (uint row {0}; row < PicLines; ++row) {
+        for (uint col {0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
             Path = ActorsPath[Actor];
@@ -2894,12 +2887,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                 Name = ActorsName[Actor];
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWidth, 0),
-                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
-                                       ActorWidth, m_FontSmlHeight, taCenter);
+                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
+                                       ActorWidth, FontTinyHeight, taCenter);
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml, ActorWidth,
-                    m_FontSmlHeight, taCenter);
+                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
+                    FontTinyHeight, taCenter);
             }
             x += ActorWidth + ActorMargin;
             ++Actor;
@@ -2910,6 +2903,10 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+    #endif
+
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
     if (!Recording) return;
 
@@ -2937,14 +2934,17 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     m_MenuItemWidth = m_cWidth;
 
-    cString Dummy(""), RecAdditional(""), Text(""), TextAdditional("");
-    // Text.imbue(std::locale(""));
-    // TextAdditional.imbue(std::locale(""));
-    // RecAdditional.imbue(std::locale(""));
+    cString RecAdditional {""}, Text {""}, TextAdditional {""};
+    // Text.imbue(std::locale {""});
+    // TextAdditional.imbue(std::locale {""});
+    // RecAdditional.imbue(std::locale {""});
 
     const cRecordingInfo *RecInfo = Recording->Info();
-    std::list<std::string> GenreIcons;
-    std::string Fsk("");
+    std::vector<std::string> GenreIcons;
+    GenreIcons.reserve(8);
+
+    std::string Fsk {""};
+    Fsk.reserve(4);
     if (!isempty(RecInfo->Description()))
         Text.Append(cString::sprintf("%s", RecInfo->Description()));
         // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
@@ -2975,13 +2975,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
 
-        GetCuttedLengthMarks(Recording, RecAdditional, Dummy, true);  // Process marks and insert text
+        GetCuttedLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505
         if (RecInfo && RecInfo->Errors() >= 1) {
-            std::ostringstream RecErrors("");
-            RecErrors.imbue(std::locale(""));  // Set to local locale
+            std::ostringstream RecErrors {""};
+            RecErrors.imbue(std::locale {""});  // Set to local locale
             RecErrors << RecInfo->Errors();
             RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
         }
@@ -2989,7 +2989,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         const cComponents *Components = RecInfo->Components();
         if (Components) {
-            cString Audio(""), Subtitle("");
+            cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
             if (!isempty(*Audio)) {
@@ -3007,10 +3007,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
-    double IconHeight = (m_chHeight - (2 * m_MarginItem)) * Config.EpgFskGenreIconSize * 100.0f;
+    const double IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;
     int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
-    cString IconName("");
+    cString IconName {""};
     cImage *img {nullptr};
     if (Fsk.length() > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
@@ -3027,9 +3027,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
     }
-    bool IsUnknownDrawn = false;
-    GenreIcons.sort();  // Sort outside of loop
-    GenreIcons.unique();
+    bool IsUnknownDrawn {false};
+    std::sort(GenreIcons.begin(), GenreIcons.end());
+    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
@@ -3059,14 +3059,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::vector<cString> ActorsName;
     std::vector<cString> ActorsRole;
 
-    cString MediaPath("");
-    cString MovieInfo(""), SeriesInfo("");
+    cString MediaPath {""};
+    cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0}, NumActors {0};
+    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {0};
-    bool FirstRun = true, SecondRun = false;
-    bool Scrollable = false;
+    bool FirstRun {true}, SecondRun {false};
+    bool Scrollable {false};
 
     do {  // Runs up to two times!
         if (FirstRun)
@@ -3084,14 +3084,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGEPGTIME
         uint32_t tick2 = GetMsTicks();
 #endif
-        MediaWidth = m_cWidth / 2 - m_MarginItem * 2;
-        MediaHeight = m_cHeight - m_MarginItem * 2 - m_FontHeight - 6;
+        MediaWidth = m_cWidth / 2 - m_MarginItem2;
+        MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
                 ScraperGetEventType call;
                 call.recording = Recording;
-                int seriesId{0}, episodeId{0}, movieId{0};
+                int seriesId {0}, episodeId {0}, movieId {0};
 
                 if (pScraper->Service("GetEventType", &call)) {
                     seriesId = call.seriesId;
@@ -3103,7 +3103,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     series.seriesId = seriesId;
                     series.episodeId = episodeId;
                     if (pScraper->Service("GetSeries", &series)) {
-                        if (series.banners.size() > 0) {  // Use random banner
+                        if (series.banners.size() > 1) {  // Use random banner
                             // Gets 'entropy' from device that generates random numbers itself
                             // to seed a mersenne twister (pseudo) random generator
                             std::mt19937 generator(std::random_device {}());
@@ -3112,13 +3112,14 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             // Range is inclusive (so we need -1 for vector index)
                             std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                            std::size_t number = distribution(generator);
+                            const std::size_t number = distribution(generator);
 
                             MediaPath = series.banners[number].path.c_str();
-                            if (series.banners.size() > 1)
-                                dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                        static_cast<int>(number + 1), *MediaPath,
-                                        static_cast<int>(series.banners.size()));  // Log result
+                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                                    static_cast<int>(number + 1), *MediaPath,
+                                    static_cast<int>(series.banners.size()));  // Log result
+                        } else if (series.banners.size() == 1) {               // Just one banner
+                            MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperRecInfoShowActors) {
                             ActorsSize = series.actors.size();
@@ -3159,8 +3160,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }  // Scraper plugin
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-                cString RecPath = cString::sprintf("%s", Recording->FileName());
-                cString RecImage("");
+                const cString RecPath = cString::sprintf("%s", Recording->FileName());
+                cString RecImage {""};
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
                     MediaPath = RecImage;
             }
@@ -3184,8 +3185,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
-                int Aspect = img->Width() / img->Height();
-                if (Aspect >= 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
+                const uint Aspect = img->Width() / img->Height();
+                if (Aspect > 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
                     MediaHeight *= (2.0 / 3.0);  // Size * 0,666 = 2/3
@@ -3195,17 +3196,17 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             } else if (!isempty(*Text)) {  // No image; insert text
                 ComplexContent.AddText(
                     *Text, true,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             }
         } else if (!isempty(*Text)) {  // No image; insert text
             ComplexContent.AddText(
-                *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
@@ -3218,7 +3219,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *MovieInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
@@ -3231,7 +3232,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *SeriesInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
@@ -3239,7 +3240,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
 #endif
 
-        NumActors = ActorsPath.size();
+        const int NumActors = ActorsPath.size();
         if (Config.TVScraperRecInfoShowActors && NumActors > 0) {
             //* Add actors to complexcontent for later displaying
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
@@ -3258,7 +3259,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *RecAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
@@ -3271,11 +3272,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ContentTop += 6;
             ComplexContent.AddText(
                 *TextAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem * 2, m_cHeight - m_MarginItem * 2),
+                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
-        Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem * 2);
+        Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
         if (Scrollable || SecondRun)
             break;             // No need for another run (Scrolling content or second run)
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
@@ -3300,18 +3301,18 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
-    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem * 2),
+    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
 
-    cString StrTime = cString::sprintf("%s  %s  %s", *DateString(Recording->Start()), *TimeString(Recording->Start()),
-                                       RecInfo->ChannelName() ? RecInfo->ChannelName() : "");
+    const cString StrTime = cString::sprintf("%s  %s  %s", *DateString(Recording->Start()),
+                                *TimeString(Recording->Start()), RecInfo->ChannelName() ? RecInfo->ChannelName() : "");
 
     cString Title = RecInfo->Title();
     if (isempty(*Title))
         Title = Recording->Name();
 
-    cString ShortText = RecInfo->ShortText();
-    int ShortTextWidth = m_FontSml->Width(*ShortText);                         // Width of short text
+    const cString ShortText = RecInfo->ShortText();
+    const int ShortTextWidth = m_FontSml->Width(*ShortText);                   // Width of short text
     int MaxWidth = m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // HeadIconLeft includes right margin
     int left = m_MarginItem;
 
@@ -3321,9 +3322,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuRecFontInfo),
-                                Theme.Color(clrMenuRecBg), m_FontSml, m_MenuWidth - m_MarginItem * 2);
+                                Theme.Color(clrMenuRecBg), m_FontSml, m_MenuWidth - m_MarginItem2);
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight), *Title, Theme.Color(clrMenuRecFontTitle),
-                                Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem * 2);
+                                Theme.Color(clrMenuRecBg), m_Font, m_MenuWidth - m_MarginItem2);
     // Add scroller to long short text
     if (ShortTextWidth > MaxWidth) {  // Short text too long
         if (Config.ScrollerEnable) {
@@ -3334,7 +3335,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             left += MaxWidth;
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
-            int DotsWidth = m_FontSml->Width("...");
+            const int DotsWidth = m_FontSml->Width("...");
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
                                         MaxWidth - DotsWidth);
@@ -3353,12 +3354,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
-        cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
+        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            int ImageTop = m_MarginItem + m_FontSmlHeight + m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
+            const int ImageTop = m_MarginItem + m_FontSmlHeight + m_FontHeight + (m_FontSmlHeight - img->Height()) / 2;
             ContentHeadIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
         }
     }  // MenuItemRecordingShowRecordingErrors
@@ -3400,6 +3401,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMenu::SetText()");
+    #endif
+
     if (!Text) return;
 
     m_ShowEvent = false;
@@ -3409,8 +3414,9 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
 
-    int Left = Config.decorBorderMenuContentSize;
-    int Top = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
+    const int Left = Config.decorBorderMenuContentSize;
+    const int Top =
+        m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
     int Width = m_MenuWidth - Config.decorBorderMenuContentSize * 2;
     int Height =
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
@@ -3426,28 +3432,28 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     Width -= m_ScrollBarWidth;  // First assume text is with scrollbar and redraw if not
     if (FixedFont) {
         ComplexContent.AddText(Text, true,
-                               cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem * 2, Height - m_MarginItem * 2),
+                               cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
                                Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_FontFixed);
         ComplexContent.SetScrollSize(m_FontFixedHeight);
     } else {
         ComplexContent.AddText(Text, true,
-                               cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem * 2, Height - m_MarginItem * 2),
+                               cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
                                Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_Font);
         ComplexContent.SetScrollSize(m_FontHeight);
     }
 
-    bool Scrollable = ComplexContent.Scrollable(Height - m_MarginItem * 2);
+    const bool Scrollable = ComplexContent.Scrollable(Height - m_MarginItem2);
     if (!Scrollable) {
         Width += m_ScrollBarWidth;  // Readd scrollbar width
         ComplexContent.Clear();
         if (FixedFont) {
             ComplexContent.AddText(
-                Text, true, cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem * 2, Height - m_MarginItem * 2),
+                Text, true, cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
                 Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_FontFixed);
             ComplexContent.SetScrollSize(m_FontFixedHeight);
         } else {
             ComplexContent.AddText(
-                Text, true, cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem * 2, Height - m_MarginItem * 2),
+                Text, true, cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
                 Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_Font);
             ComplexContent.SetScrollSize(m_FontHeight);
         }
@@ -3482,7 +3488,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 }
 
 int cFlatDisplayMenu::GetTextAreaWidth(void) const {
-    return m_MenuWidth - (m_MarginItem * 2);
+    return m_MenuWidth - m_MarginItem2;
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
@@ -3519,7 +3525,7 @@ void cFlatDisplayMenu::Flush(void) {
     }
 
     if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
-        int TimerCount {0}, TimerActiveCount {0};
+        uint TimerCount {0}, TimerActiveCount {0};
         LOCK_TIMERS_READ;
         for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
             ++TimerCount;
@@ -3529,8 +3535,8 @@ void cFlatDisplayMenu::Flush(void) {
         if (m_LastTimerCount != TimerCount || m_LastTimerActiveCount != TimerActiveCount) {
             m_LastTimerCount = TimerCount;
             m_LastTimerActiveCount = TimerActiveCount;
-            cString NewTitle = cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount);
-            TopBarSetTitleWithoutClear(*NewTitle);
+            const cString NewTitle = cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount);
+            TopBarSetTitle(*NewTitle, false);  // Do not clear
         }
     }
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
@@ -3539,8 +3545,8 @@ void cFlatDisplayMenu::Flush(void) {
     m_Osd->Flush();
 }
 
-void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
             (*it).Left = ib.Left;
@@ -3560,7 +3566,7 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(sDecorBorder ib) {
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width - m_ScrollBarWidth, (*it).Height, (*it).Size, (*it).Type,
                         (*it).ColorFg, (*it).ColorBg, BorderMenuItem);
@@ -3568,7 +3574,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar(void) {
-    std::list<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         DecorBorderDraw((*it).Left, (*it).Top, (*it).Width + m_ScrollBarWidth, (*it).Height, (*it).Size, (*it).Type,
                         (*it).ColorFg, (*it).ColorBg, BorderMenuItem);
@@ -3580,34 +3586,33 @@ void cFlatDisplayMenu::ItemBorderClear(void) {
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
+    const std::string RecFolder {GetRecordingName(Recording, Level, true)};
 
-    int value = Config.GetRecordingOldValue(m_RecFolder);
+    int value = Config.GetRecordingOldValue(RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
     if (value < 0) return false;
 
-    int LastRecTimeFromFolder = GetLastRecTimeFromFolder(Recording, Level);
+    const int LastRecTimeFromFolder = GetLastRecTimeFromFolder(Recording, Level);
     time_t now = time(NULL);
 
-    int DiffSecs = now - LastRecTimeFromFolder;
-    int days = DiffSecs / (60 * 60 * 24);
-    // dsyslog("flatPlus: m_RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
-    //          m_RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
-    if (days > value) return true;
-
-    return false;
+    const int DiffSecs = now - LastRecTimeFromFolder;
+    const int days = DiffSecs / (60 * 60 * 24);
+    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
+    //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
+    return (days > value) ? true : false;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    /*std::string*/ m_RecFolder = GetRecordingName(Recording, Level, true).c_str();
-    std::string RecFolder2("");
+    const std::string RecFolder {GetRecordingName(Recording, Level, true)};
+    std::string RecFolder2 {""};
+    RecFolder2.reserve(256);
     time_t RecStart = Recording->Start();
     time_t RecStart2 {0};
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-        RecFolder2 = GetRecordingName(rec, Level, true).c_str();
-        if (m_RecFolder == RecFolder2) {  // Recordings must be in the same folder
+        RecFolder2 = GetRecordingName(rec, Level, true);
+        if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStart2 = rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
                 if (RecStart2 > RecStart)
@@ -3625,19 +3630,21 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
     if (!Recording) return "";
 
-    std::string RecNamePart("");
-    std::string RecName = Recording->Name();
+    std::string RecNamePart {""};
+    RecNamePart.reserve(64);
+    const std::string RecName {Recording->Name()};
     try {
         std::vector<std::string> tokens;
-        tokens.reserve(6);  // Set to at least 6 entry's
+        tokens.reserve(8);  // Set to at least 8 entry's
         std::istringstream f(RecName.c_str());
-        std::string s("");
+        std::string s {""};
+        s.reserve(64);
         while (std::getline(f, s, FOLDERDELIMCHAR)) {
             tokens.emplace_back(s);
         }
         RecNamePart = tokens.at(Level);
     } catch (...) {
-        RecNamePart = RecName.c_str();
+        RecNamePart = RecName;
     }
 
     if (Config.MenuItemRecordingClearPercent && IsFolder) {
@@ -3648,8 +3655,50 @@ std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int 
     return RecNamePart;
 }
 
+cString cFlatDisplayMenu::GetRecCounts() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d",
+            m_RecFolder.c_str(), m_LastItemRecordingLevel);
+#endif
+
+    uint RecCount {0}, RecNewCount {0};
+    m_LastRecFolder = m_RecFolder;
+    if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
+        std::string RecFolder2 {""};
+        RecFolder2.reserve(256);
+        LOCK_RECORDINGS_READ;
+        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+            RecFolder2 = GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
+            if (m_RecFolder == RecFolder2) {
+                ++RecCount;
+                if (Rec->IsNew()) ++RecNewCount;
+            }
+        }  // for
+    } else {
+        // dsyslog("flatPlus: GetRecCounts() Count all!");
+        LOCK_RECORDINGS_READ;
+        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+            ++RecCount;
+            if (Rec->IsNew()) ++RecNewCount;
+        }
+    }
+    cString RecCounts {""};
+    if (Config.ShortRecordingCount) {  // Hidden option. 0 = disable, 1 = enable
+        if (RecNewCount == 0)          // No new recordings
+            RecCounts = cString::sprintf("(%d)", RecCount);      // (56)
+        else if (RecNewCount == RecCount)                        // Only new recordings
+            RecCounts = cString::sprintf("(%d*)", RecNewCount);  // (35*)
+        else
+            RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
+    } else {
+        RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);      // (35*/56)
+    }  // Config.ShortRecordingCount */
+
+    return RecCounts;
+}
+
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
-    bool FirstContent = true;
+    bool FirstContent {true};
     for (int i {0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
@@ -3662,8 +3711,8 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
         }
     }
 }
-void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons) {
-    bool FirstContent = true;
+void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
+    bool FirstContent {true};
     for (int i{0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
@@ -3853,13 +3902,13 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
 void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
     if (!MenuPixmap) return;
 
-    int wLeft = m_OsdWidth * Config.MainMenuItemScale + m_MarginItem + Config.decorBorderMenuContentSize +
+    const int wLeft = m_OsdWidth * Config.MainMenuItemScale + m_MarginItem + Config.decorBorderMenuContentSize +
                 Config.decorBorderMenuItemSize;
-    int wTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
+    const int wTop =
+        m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
 
-    int wWidth = m_OsdWidth - wLeft - Config.decorBorderMenuContentSize;
-    int wHeight = MenuPixmap->ViewPort().Height() - m_MarginItem * 2;
-    int ContentTop {0};
+    const int wWidth = m_OsdWidth - wLeft - Config.decorBorderMenuContentSize;
+    const int wHeight = MenuPixmap->ViewPort().Height() - m_MarginItem2;
 
     ContentWidget.Clear();
     ContentWidget.SetOsd(m_Osd);
@@ -3891,8 +3940,10 @@ void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
 
     std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
     std::pair<int, std::string> PairWidget {};
-    std::string widget("");
+    std::string widget {""};
+    widget.reserve(19);  // Size of 'system_information'
     int AddHeight {0};
+    int ContentTop {0};
     while (!widgets.empty()) {
         PairWidget = widgets.back();
         widgets.pop_back();
@@ -3948,11 +3999,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("DVB Devices"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("DVB Devices"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
@@ -3984,7 +4035,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         }
     }  // for cTimer
     int ActualNumDevices {0};
-    cString ChannelName(""), str(""), StrDevice("");
+    cString ChannelName {""}, str {""}, StrDevice {""};
     for (int i {0}; i < NumDevices; ++i) {
         if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
             continue;
@@ -4036,26 +4087,26 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
 
         int left = m_MarginItem;
-        int FontSmlWidthX = m_FontSml->Width('X');  // Width of one X
+        const int FontSmlWidthX = m_FontSml->Width('X');  // Width of one X
         if (NumDevices <= 9) {
-            ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+            ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
 
             left += FontSmlWidthX * 2;
         } else {
-            ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+            ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   FontSmlWidthX * 2, m_FontSmlHeight, taRight);
 
             left += FontSmlWidthX * 3;
         }
         str = *(device->DeviceType());
-        ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               FontSmlWidthX * 7, m_FontSmlHeight, taLeft);
 
         left += FontSmlWidthX * 8;
-        ContentWidget.AddText(*StrDevice, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*StrDevice, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
 
         ContentTop += m_FontSmlHeight;
@@ -4068,11 +4119,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("Timer"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("Timer"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
@@ -4084,7 +4135,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && (now - m_RemoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
         m_RemoteTimersLastRefresh = now;
-        cString ErrorMsg("");
+        cString ErrorMsg {""};
         pRemoteTimers->Service("RemoteTimers::RefreshTimers-v1.0", &ErrorMsg);
     }
 
@@ -4131,14 +4182,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     else if (TimerRec.Size() == 0 && TimerActive.Size() == 0 && TimerRemoteRec.Size() == 0 &&
              TimerRemoteActive.Size() == 0) {
         ContentWidget.AddText(tr("no active/recording timer"), false,
-                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     } else {
-        int count = -1, RemoteCount = -1;
+        int count {-1}, RemoteCount {-1};
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
-            cString StrTimer("");
+            cString StrTimer {""};
             int TimerRecSize = TimerRec.Size();
             for (int i {0}; i < TimerRecSize; ++i) {
                 ++count;
@@ -4164,16 +4215,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer.Append((TimerRec[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false,
-                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                       Theme.Color(clrTopBarRecordingActiveFg), Theme.Color(clrMenuEventBg), m_FontSml,
-                                      wWidth - m_MarginItem * 2);
+                                      wWidth - m_MarginItem2);
 
                 ContentTop += m_FontSmlHeight;
             }
         }
         if (Config.MainMenuWidgetActiveTimerShowActive) {
-            cString StrTimer("");
-            int TimerActiveSize = TimerActive.Size();
+            cString StrTimer {""};
+            const int TimerActiveSize = TimerActive.Size();
             for (int i {0}; i < TimerActiveSize; ++i) {
                 ++count;
                 if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
@@ -4197,16 +4248,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer.Append((TimerActive[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false,
-                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                       Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                      wWidth - m_MarginItem * 2);
+                                      wWidth - m_MarginItem2);
 
                 ContentTop += m_FontSmlHeight;
             }
         }
         if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
-            cString StrTimer("");
-            int TimerRemoteRecSize = TimerRemoteRec.Size();
+            cString StrTimer {""};
+            const int TimerRemoteRecSize = TimerRemoteRec.Size();
             for (int i {0}; i < TimerRemoteRecSize; ++i) {
                 ++RemoteCount;
                 if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
@@ -4227,16 +4278,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer.Append((TimerRemoteRec[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false,
-                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                       Theme.Color(clrTopBarRecordingActiveFg), Theme.Color(clrMenuEventBg), m_FontSml,
-                                      wWidth - m_MarginItem * 2);
+                                      wWidth - m_MarginItem2);
 
                 ContentTop += m_FontSmlHeight;
             }
         }
         if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
-            cString StrTimer("");
-            int TimerRemoteActiveSize = TimerRemoteActive.Size();
+            cString StrTimer {""};
+            const int TimerRemoteActiveSize = TimerRemoteActive.Size();
             for (int i {0}; i < TimerRemoteActiveSize; ++i) {
                 ++RemoteCount;
                 if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
@@ -4257,9 +4308,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer.Append((TimerRemoteActive[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false,
-                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                      cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                       Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                      wWidth - m_MarginItem * 2);
+                                      wWidth - m_MarginItem2);
 
                 ContentTop += m_FontSmlHeight;
             }
@@ -4273,11 +4324,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("Last Recordings"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("Last Recordings"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
@@ -4287,8 +4338,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
     int Minutes {0};
-    cString DateTime(""), Length("");
-    std::string StrRec("");
+    cString DateTime {""}, Length {""};
+    std::string StrRec {""};
+    StrRec.reserve(128);
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecStart = rec->Start();
@@ -4304,7 +4356,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeStringDesc);
     std::pair<time_t, std::string> PairRec {};
     int index {0};
-    cString Rec("");
+    cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
         if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
             continue;
@@ -4313,9 +4365,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         Recs.pop_back();
         Rec = PairRec.second.c_str();
 
-        ContentWidget.AddText(*Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
         ++index;
     }
@@ -4326,29 +4378,29 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("Timer Conflicts"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("Timer Conflicts"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    int NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
+    const int NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
     if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty) {
         return 0;
     } else if (NumConflicts == 0) {
         ContentWidget.AddText(tr("no timer conflicts"), false,
-                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     } else {
         cString str = cString::sprintf("%s: %d", tr("timer conflicts"), NumConflicts);
-        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     }
 
     return ContentWidget.ContentHeight(false);
@@ -4358,28 +4410,30 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("System Information"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("System Information"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
+    const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
     int r = system(*ExecFile);
     r += 0;  // Prevent warning for unused variable
 
-    cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
+    const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
-    std::string FileName(""), num("");
+    std::string FileName {""}, num {""};
+    FileName.reserve(128);
+    num.reserve(16);
     std::size_t found {0};
     while ((e = d.Next()) != NULL) {
         FileName = e->d_name;
@@ -4390,19 +4444,21 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                 files.emplace_back(e->d_name);
         }
     }
-    cString str("");
+    cString str {""};
     int Column {1};
     int ContentLeft = m_MarginItem;
     std::sort(files.begin(), files.end(), StringCompare);
-    std::size_t FilesSize = files.size();
+    const std::size_t FilesSize = files.size();
     if (FilesSize == 0) {
         str = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
-        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     } else {
-        std::string item(""), ItemContent("");
-        cString ItemFilename("");
+        std::string item {""}, ItemContent {""};
+        item.reserve(17);
+        ItemContent.reserve(16);
+        cString ItemFilename {""};
         for (unsigned i = 0; i < FilesSize; ++i) {
             // Check for height
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
@@ -4428,9 +4484,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                             str = cString::sprintf("%s: %s", tr("System Version"), ItemContent.c_str());
                             ContentWidget.AddText(
                                 *str, false,
-                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             ContentTop += m_FontSmlHeight;
                         } else if (!item.compare("kernel_version")) {
                             if (Column == 2) {
@@ -4441,16 +4497,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                             str = cString::sprintf("%s: %s", tr("Kernel Version"), ItemContent.c_str());
                             ContentWidget.AddText(
                                 *str, false,
-                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             ContentTop += m_FontSmlHeight;
                         } else if (!item.compare("uptime")) {
                             str = cString::sprintf("%s: %s", tr("Uptime"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4462,9 +4518,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("load")) {
                             str = cString::sprintf("%s: %s", tr("Load"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4476,9 +4532,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("processes")) {
                             str = cString::sprintf("%s: %s", tr("Processes"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4490,9 +4546,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("mem_usage")) {
                             str = cString::sprintf("%s: %s", tr("Memory Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4504,9 +4560,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("swap_usage")) {
                             str = cString::sprintf("%s: %s", tr("Swap Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4518,9 +4574,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("root_usage")) {
                             str = cString::sprintf("%s: %s", tr("Root Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4532,9 +4588,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("video_usage")) {
                             str = cString::sprintf("%s: %s", tr("Video Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4546,9 +4602,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("vdr_cpu_usage")) {
                             str = cString::sprintf("%s: %s", tr("VDR CPU Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4560,9 +4616,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("vdr_mem_usage")) {
                             str = cString::sprintf("%s: %s", tr("VDR MEM Usage"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4574,9 +4630,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("cpu")) {
                             str = cString::sprintf("%s: %s", tr("Temp CPU"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4588,9 +4644,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("gpu")) {
                             str = cString::sprintf("%s: %s", tr("Temp GPU"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4602,9 +4658,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("pccase")) {
                             str = cString::sprintf("%s: %s", tr("Temp PC-Case"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4616,9 +4672,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("motherboard")) {
                             str = cString::sprintf("%s: %s", tr("Temp MB"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4630,9 +4686,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("updates")) {
                             str = cString::sprintf("%s: %s", tr("Updates"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4644,9 +4700,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                         } else if (!item.compare("security_updates")) {
                             str = cString::sprintf("%s: %s", tr("Security Updates"), ItemContent.c_str());
                             ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem * 2);
+                                wWidth - m_MarginItem2);
                             if (Column == 1) {
                                 Column = 2;
                                 ContentLeft = wWidth / 2;
@@ -4670,21 +4726,22 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("System Updates"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("System Updates"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
     int updates {0}, SecurityUpdates {0};
+    std::string cont {""};
+    cont.reserve(4);
     cString ItemFilename = cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        std::string cont("");
         std::getline(file, cont);
         updates = atoi(cont.c_str());
         file.close();
@@ -4695,7 +4752,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ItemFilename = cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        std::string cont("");
         std::getline(file, cont);
         SecurityUpdates = atoi(cont.c_str());
         file.close();
@@ -4705,20 +4761,20 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
 
     if (updates == -1 || SecurityUpdates == -1) {
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
-                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     } else if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero) {
         return 0;
     } else {
         cString str = cString::sprintf("%s: %d", tr("Updates"), updates);
-        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
         str = cString::sprintf("%s: %d", tr("Security Updates"), SecurityUpdates);
         ContentWidget.AddText(
-            *str, false, cRect(wWidth / 2 + m_MarginItem, ContentTop, wWidth / 2 - m_MarginItem * 2, m_FontSmlHeight),
-            Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem * 2);
+            *str, false, cRect(wWidth / 2 + m_MarginItem, ContentTop, wWidth / 2 - m_MarginItem2, m_FontSmlHeight),
+            Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
     }
 
     return ContentWidget.ContentHeight(false);
@@ -4728,27 +4784,28 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(tr("Temperatures"), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(tr("Temperatures"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    cString ExecFile =
+    const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
     int r = system(*ExecFile);
     r += 0;  // Prevent warning for unused variable
 
     int CountTemps {0};
 
-    std::string TempCPU(""), TempCase(""), TempMB(""), TempGPU("");
+    std::string TempCPU {""}, TempCase {""}, TempMB {""}, TempGPU {""};
     cString ItemFilename = cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
+        TempCPU.reserve(8);
         std::getline(file, TempCPU);
         file.close();
         ++CountTemps;
@@ -4759,7 +4816,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont("");
+        // std::string cont {""};
+        TempCase.reserve(8);
         std::getline(file, TempCase);
         file.close();
         ++CountTemps;
@@ -4770,7 +4828,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont("");
+        // std::string cont {""};
+        TempMB.reserve(8);
         std::getline(file, TempMB);
         file.close();
         ++CountTemps;
@@ -4780,7 +4839,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont("");
+        // std::string cont {""};
+        TempGPU.reserve(8);
         std::getline(file, TempGPU);
         file.close();
         ++CountTemps;
@@ -4791,39 +4851,39 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     if (!strcmp(TempCPU.c_str(), "-1") && !strcmp(TempCase.c_str(), "-1") && !strcmp(TempMB.c_str(), "-1") &&
         !strcmp(TempGPU.c_str(), "-1")) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
-                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     } else {
+        const int AddLeft = wWidth / (CountTemps);
         int Left = m_MarginItem;
-        int AddLeft = wWidth / (CountTemps);
-        cString str("");
+        cString str {""};
         if (strcmp(TempCPU.c_str(), "-1")) {
             str = cString::sprintf("%s: %s", tr("CPU"), TempCPU.c_str());
-            ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+            ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                  wWidth - m_MarginItem * 2);
+                                  wWidth - m_MarginItem2);
             Left += AddLeft;
         }
         if (strcmp(TempCase.c_str(), "-1")) {
             str = cString::sprintf("%s: %s", tr("PC-Case"), TempCase.c_str());
-            ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem * 2, m_FontSmlHeight),
+            ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                  wWidth - m_MarginItem * 2);
+                                  wWidth - m_MarginItem2);
             Left += AddLeft;
         }
         if (strcmp(TempMB.c_str(), "-1")) {
             str = cString::sprintf("%s: %s", tr("MB"), TempMB.c_str());
             ContentWidget.AddText(
-                *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem * 2, m_FontSmlHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem * 2);
+                *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
             Left += AddLeft;
         }
         if (strcmp(TempGPU.c_str(), "-1")) {
             str = cString::sprintf("%s: %s", tr("GPU"), TempGPU.c_str());
             ContentWidget.AddText(
-                *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem * 2, m_FontSmlHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem * 2);
+                *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         }
     }
 
@@ -4834,11 +4894,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
+    const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
     int r = system(*ExecFile);
     r += 0;  // Prevent warning for unused variable
 
-    std::string Title("");
+    std::string Title {""};
+    Title.reserve(32);
     cString ItemFilename = cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
@@ -4848,17 +4909,18 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
         Title = tr("no title available");
     }
 
-    cImage *img = ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(Title.c_str(), false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(Title.c_str(), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    std::string Output("");
+    std::string Output {""};
+    Output.reserve(32);
     ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
@@ -4866,16 +4928,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
                 break;
             ContentWidget.AddText(
-                Output.c_str(), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem * 2);
+                Output.c_str(), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
             ContentTop += m_FontSmlHeight;
         }
         file.close();
     } else {
         ContentWidget.AddText(tr("no output available"), false,
-                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem * 2, m_FontSmlHeight),
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              wWidth - m_MarginItem * 2);
+                              wWidth - m_MarginItem2);
     }
 
     return ContentWidget.ContentHeight(false);
@@ -4885,7 +4947,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    std::string Location("");
+    std::string Location {""};
+    Location.reserve(32);
     cString FileName = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
     std::ifstream file(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -4895,7 +4958,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         Location = tr("Unknown");
     }
 
-    std::string TempToday("");
+    std::string TempToday {""};
+    TempToday.reserve(8);
     FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
     file.open(*FileName, std::ifstream::in);
     if (file.is_open()) {
@@ -4905,22 +4969,27 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     //* Declared in 'baserender.h'
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
-    int FontTempSmlHeight = m_FontTempSml->Height();
+    const int FontTempSmlHeight = m_FontTempSml->Height();
 
-    cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+    cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2);
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
-    ContentWidget.AddText(*Title, false, cRect(m_MarginItem * 2 + m_FontHeight, ContentTop, 0, 0),
+    const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
+    ContentWidget.AddText(*Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
     int left = m_MarginItem;
-    std::string icon(""), summary(""), TempMax(""), TempMin(""), prec("");
-    cString DayName(""), PrecString("0%"), StrWeekDayName(""), WeatherIcon("");
+    std::string icon {""}, summary {""}, TempMax {""}, TempMin {""}, prec {""};
+    icon.reserve(8);
+    summary.reserve(32);
+    TempMax.reserve(8);
+    TempMin.reserve(8);
+    prec.reserve(8);
+    cString DayName {""}, PrecString("0%"), StrWeekDayName {""}, WeatherIcon {""};
     double p {0.0};
     time_t t = time(NULL), t2 = time(NULL);
     struct tm tm_r;
@@ -4976,23 +5045,23 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         /* time_t */ t2 = mktime(&tm_r);
 
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
-            if (left + m_FontHeight * 2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
+            if (left + m_FontHeight2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
                     m_MarginItem * 6 >
                 wWidth)
                 break;
             if (index > 0) {
                 ContentWidget.AddText("|", false, cRect(left, ContentTop, 0, 0), Theme.Color(clrMenuEventFontInfo),
                                       Theme.Color(clrMenuEventBg), m_Font);
-                left += m_Font->Width('|') + m_MarginItem * 2;
+                left += m_Font->Width('|') + m_MarginItem2;
             }
 
             WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
-            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem * 2);
+            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            int wtemp = MyMax(m_FontTempSml->Width(TempMax.c_str()), m_FontTempSml->Width(TempMin.c_str()));
+            const int wtemp = MyMax(m_FontTempSml->Width(TempMax.c_str()), m_FontTempSml->Width(TempMin.c_str()));
             ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   FontTempSmlHeight, taRight);
@@ -5002,7 +5071,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
             left += wtemp + m_MarginItem;
 
-            img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+            img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
@@ -5010,7 +5079,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             ContentWidget.AddText(*PrecString, false,
                                   cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
-            left += m_FontTempSml->Width(*PrecString) + m_MarginItem * 2;
+            left += m_FontTempSml->Width(*PrecString) + m_MarginItem2;
         } else {  // Long
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
                 break;
@@ -5018,13 +5087,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             left = m_MarginItem;
             StrWeekDayName = WeekDayName(t2);
             DayName = cString::sprintf("%s ", *StrWeekDayName);
-            ContentWidget.AddText(*DayName, false, cRect(left, ContentTop, wWidth - m_MarginItem * 2, m_FontHeight),
+            ContentWidget.AddText(*DayName, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font,
-                                  wWidth - m_MarginItem * 2);
+                                  wWidth - m_MarginItem2);
             left += m_Font->Width("XXXX") + m_MarginItem;
 
             WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
-            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem * 2);
+            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
@@ -5038,7 +5107,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
             left += m_FontTempSml->Width("-99,9°C ") + m_MarginItem;
 
-            img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem * 2);
+            img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
@@ -5062,18 +5131,19 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
 void cFlatDisplayMenu::PreLoadImages(void) {
     // Menu icons
-    cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
-    std::string File("");
-    cString FileName("");
+    const cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
+    std::string File {""};
+    File.reserve(128);
+    cString FileName {""};
     cReadDir d(*Path);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
         File = e->d_name;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
-        ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem * 2, m_FontHeight - m_MarginItem * 2);
+        ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
     }
 
-    ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem * 2, m_FontHeight - m_MarginItem * 2);
+    ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
 
     int ImageHeight = m_FontHeight;
     int ImageBgHeight = ImageHeight;
@@ -5091,19 +5161,21 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
-    //* Double code? Already in 'displaychannel.c' 'PreLoadImages()'
-    /* int index {0};
+    //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
+    int index {0};
     LOCK_CHANNELS_READ;
     for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
-         Channel = Channels->Next(Channel)) {
-        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-        if (img)
-            ++index;
-    } */
+        Channel = Channels->Next(Channel)) {
+        if (!Channel->GroupSep()) {  // Don't cache named channel group logo
+            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            if (img)
+                ++index;
+        }
+    }  // for channel
 
-    ImgLoader.LoadIcon("radio", 999, m_TopBarHeight - m_MarginItem * 2);
-    ImgLoader.LoadIcon("changroup", 999, m_TopBarHeight - m_MarginItem * 2);
-    ImgLoader.LoadIcon("tv", 999, m_TopBarHeight - m_MarginItem * 2);
+    ImgLoader.LoadIcon("radio", 999, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.LoadIcon("changroup", 999, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.LoadIcon("tv", 999, m_TopBarHeight - m_MarginItem2);
 
     ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
@@ -5111,20 +5183,20 @@ void cFlatDisplayMenu::PreLoadImages(void) {
     ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
 
-    ImgLoader.LoadIcon("sd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
-    ImgLoader.LoadIcon("hd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
-    ImgLoader.LoadIcon("uhd", m_FontHeight, m_FontHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("sd", ImageHeight, ImageHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight * (1.0 / 3.0));
 
-    ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
-    ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * (1.0 / 3.0 * 2.0));
-    ImgLoader.LoadIcon("recording", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_old", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
+    ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
+    ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
+    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_old", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_old_cur", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 }

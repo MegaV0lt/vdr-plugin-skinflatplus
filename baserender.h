@@ -39,18 +39,22 @@ class cFlatBaseRender {
         cOsd *m_Osd {nullptr};
 
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
-        int m_MarginItem {5};
+        const int m_MarginItem {5}, m_MarginItem2 {10};
 
         // Standard fonts
         cFont *m_Font {nullptr};
         cFont *m_FontSml {nullptr};
         cFont *m_FontFixed {nullptr};
         int m_FontHeight {0};
+        int m_FontHeight2 {0};
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
 
         // Font for main menu weather widget
         cFont *m_FontTempSml {nullptr};
+
+        // Very small font for actor name and role
+        cFont *m_FontTiny {nullptr};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};
@@ -62,15 +66,15 @@ class cFlatBaseRender {
         cString m_TopBarTitle{""};
         cString m_TopBarTitleExtra1{""}, m_TopBarTitleExtra2{""};
         cString m_TopBarExtraIcon{""};
-        bool m_TopBarExtraIconSet = false;
+        bool m_TopBarExtraIconSet {false};
         cString m_TopBarMenuIcon{""};
-        bool m_TopBarMenuIconSet = false;
+        bool m_TopBarMenuIconSet {false};
         cString m_TopBarMenuIconRight{""};
-        bool m_TopBarMenuIconRightSet = false;
+        bool m_TopBarMenuIconRightSet {false};
         cString m_TopBarMenuLogo{""};
-        bool m_TopBarMenuLogoSet = false;
+        bool m_TopBarMenuLogoSet {false};
 
-        bool m_TopBarUpdateTitle = false;
+        bool m_TopBarUpdateTitle {false};
         cString m_TopBarLastDate{""};
         int m_TopBarHeight {0};
         int m_VideoDiskUsageState {-1};
@@ -81,8 +85,8 @@ class cFlatBaseRender {
         int m_ProgressBarHeight {0}, m_ProgressBarTop {0}, m_ProgressBarWidth {0};
         int m_ProgressBarMarginHor {0}, m_ProgressBarMarginVer {0};
         int m_ProgressType {0};
-        bool m_ProgressBarSetBackground = false;
-        bool m_ProgressBarIsSignal = false;
+        bool m_ProgressBarSetBackground {false};
+        bool m_ProgressBarIsSignal {false};
         tColor m_ProgressBarColorFg {0}, m_ProgressBarColorBarFg {0};
         tColor m_ProgressBarColorBarCurFg {0}, m_ProgressBarColorBg {0};
         tColor m_ProgressBarColorMark {0}, m_ProgressBarColorMarkCurrent {0};
@@ -94,12 +98,13 @@ class cFlatBaseRender {
         cPixmap *ButtonsPixmap {nullptr};
         int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
         int m_MarginButtonColor {0}, m_ButtonColorHeight {0};
-        bool m_ButtonsDrawn = false;
+        bool m_ButtonsDrawn {false};
 
         // Message
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
         int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // m_MessageWidth is unused
         cTextScrollers MessageScroller;
+        int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 
         // Multiline content with scrollbar
         // cPixmap *ContentPixmap;  //* Content* is unused
@@ -122,7 +127,7 @@ class cFlatBaseRender {
         cComplexContent WeatherWidget;
 
         cPixmap *DecorPixmap {nullptr};
-        std::list<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
+        std::vector<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
         /* void ContentDraw(void);  // Unused
         void ContentEventDraw(void); */
@@ -162,14 +167,13 @@ class cFlatBaseRender {
         void CreateOsd(int Left, int Top, int Width, int Height);
 
         void TopBarCreate(void);
-        void TopBarSetTitle(cString title);
-        void TopBarSetTitleWithoutClear(cString title);
-        void TopBarSetTitleExtra(cString Extra1, cString Extra2);
-        void TopBarSetMenuIcon(cString icon);
-        void TopBarSetMenuIconRight(cString icon);
+        void TopBarSetTitle(const cString &Title, bool Clear = true);
+        void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
+        void TopBarSetMenuIcon(const cString icon);
+        void TopBarSetMenuIconRight(const cString icon);
         void TopBarClearMenuIconRight(void);
-        void TopBarSetMenuLogo(cString icon);
-        void TopBarSetExtraIcon(cString icon);
+        void TopBarSetMenuLogo(const cString icon);
+        void TopBarSetExtraIcon(const cString icon);
         void TopBarUpdate(void);
 
         void ButtonsCreate(void);
@@ -178,6 +182,7 @@ class cFlatBaseRender {
 
         void MessageCreate(void);
         void MessageSet(eMessageType Type, const char *Text);
+        void MessageSetExtraTime(const char *Text);
         void MessageClear(void);
 
         void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,

@@ -32,14 +32,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_MenuTop {0}, m_MenuWidth {0};
         int m_MenuItemWidth {0};
         int m_MenuItemLastHeight {0};
-        bool m_MenuFullOsdIsDrawn = false;
+        bool m_MenuFullOsdIsDrawn {false};
 
         eMenuCategory m_MenuCategory;
 
         int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        int m_LastTimerCount {0}, m_LastTimerActiveCount {0};
+        uint m_LastTimerCount {0}, m_LastTimerActiveCount {0};
         cString m_LastTitle{""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
@@ -55,14 +55,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
         int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
-        std::list<sDecorBorder> ItemsBorder;
+        std::vector<sDecorBorder> ItemsBorder;
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
-        bool m_IsScrolling = false;
-        bool m_IsGroup = false;
-        bool m_ShowEvent = false;
-        bool m_ShowRecording = false;
-        bool m_ShowText = false;
+        bool m_IsScrolling {false};
+        bool m_IsGroup {false};
+        bool m_ShowEvent {false};
+        bool m_ShowRecording {false};
+        bool m_ShowText {false};
 
         cComplexContent ComplexContent;
 
@@ -74,7 +74,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         cString m_ItemEventLastChannelName{""};
 
-        std::string m_RecFolder{""}, m_LastRecFolder{""};
+        std::string m_RecFolder{""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
         // Icons
@@ -86,27 +86,28 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // cImage *iconNew;
         // Icons
 
-        void ItemBorderInsertUnique(sDecorBorder ib);
+        void ItemBorderInsertUnique(const sDecorBorder &ib);
         void ItemBorderDrawAllWithScrollbar(void);
         void ItemBorderDrawAllWithoutScrollbar(void);
         void ItemBorderClear(void);
 
         //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
         // static std::string items[16];
-        const std::string items[16] = {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                       "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                       "Replay",   "Miscellaneous", "Plugins", "Restart"};
-        std::string MainMenuText(std::string Text);
-        cString GetIconName(std::string element);
+        const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                     "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                     "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        std::string MainMenuText(const std::string &Text);
+        cString GetIconName(const std::string &element);
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        cString GetRecCounts(void);  // Get number of recordings and new recordings (35*/53)
         // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 
         const char *GetGenreIcon(uchar genre);
         void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
-        void InsertGenreInfo(const cEvent *Event, cString &Text, std::list<std::string> &GenreIcons);  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
         void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
         void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);  // NOLINT
 
@@ -120,8 +121,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
                                      tColor ColorBarFg, tColor ColorBg);
 
         // static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;  // Unused?
-        void DrawItemExtraEvent(const cEvent *Event, cString EmptyText);
-        void DrawItemExtraRecording(const cRecording *Recording, cString EmptyText);
+        void DrawItemExtraEvent(const cEvent *Event, const cString EmptyText);
+        void DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText);
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent

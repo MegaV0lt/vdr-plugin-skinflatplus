@@ -10,6 +10,7 @@
 #include <cstring>  // string.h
 #include <vdr/thread.h>
 #include <list>
+
 #include "./flat.h"
 
 #define WAITDELAY 1000  // In ms
@@ -19,15 +20,15 @@ class cTextScroll {
     cRect Position {0, 0, 0, 0};
 
     tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
-    std::string Text{""};
+    std::string Text {""};
     cFont *Font {nullptr};
     cPixmap *Pixmap {nullptr};
     cOsd *m_Osd {nullptr};
     int Layer {0};
     int PixelsPerStep {0};
     int WAITSTEPS {0}, WaitSteps {0};
-    bool IsReserveStep = false;
-    bool ResetX = false;
+    bool IsReserveStep {false};
+    bool ResetX {false};
     int ScrollType {0};
 
  public:

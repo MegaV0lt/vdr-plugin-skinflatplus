@@ -27,12 +27,12 @@ enum eContentImageAlignment {
 
 class cSimpleContent {
  private:
-    int m_ContentType = CT_None;  // Added to avoid compiler warning
+    int m_ContentType {CT_None};  // Added to avoid compiler warning
     cRect m_Position {0, 0, 0, 0};
 
     int m_TextWidth {0}, m_TextHeight {0}, m_TextAlignment {0};
     tColor m_ColorFg {0}, m_ColorBg {0};
-    std::string m_Text{""};
+    std::string m_Text {""};
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
@@ -76,6 +76,7 @@ class cSimpleContent {
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
         m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
+        m_Text.reserve(sizeof(Text));
         m_Text = Text;
         m_Font = Font;
 
@@ -96,6 +97,7 @@ class cSimpleContent {
     }
 
     int GetContentType(void) { return m_ContentType; }
+
     int GetBottom(void) {
         if (m_ContentType == CT_Text)
             return m_Position.Top() + m_Font->Height();
@@ -124,10 +126,10 @@ class cSimpleContent {
         } else if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
-            std::string Line("");
+            std::string Line {""};
             Line.reserve(128);
-            int Lines = Wrapper.Lines();
-            int FontHeight = m_Font->Height();
+            const int Lines = Wrapper.Lines();
+            const int FontHeight = m_Font->Height();
             for (int i {0}; i < Lines; ++i) {  // Justify line by line
                 Line = Wrapper.GetLine(i);
                 if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified
@@ -152,11 +154,11 @@ class cComplexContent {
 
     tColor m_ColorBg {0};
 
-    bool m_FullFillBackground = false;
+    bool m_FullFillBackground {false};
     int m_DrawPortHeight {0};
-    int m_ScrollSize  {0};
-    bool m_IsShown = false;
-    bool m_IsScrollingActive = true;
+    int m_ScrollSize {0};
+    bool m_IsShown {false};
+    bool m_IsScrollingActive {true};
 
     cOsd *m_Osd {nullptr};
 
@@ -171,7 +173,7 @@ class cComplexContent {
     void SetPosition(cRect Position) { m_Position = Position; }
     void SetScrollSize(int ScrollSize) { m_ScrollSize = ScrollSize; }
     void SetBGColor(tColor ColorBg) { m_ColorBg = ColorBg; }
-    void CreatePixmaps(bool fullFillBackground);
+    void CreatePixmaps(bool FullFillBackground);
 
     void Clear(void);
 

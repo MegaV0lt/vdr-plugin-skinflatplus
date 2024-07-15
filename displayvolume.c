@@ -9,16 +9,15 @@
 #include "./flat.h"
 
 cFlatDisplayVolume::cFlatDisplayVolume(void) {
-    m_LabelHeight = m_FontHeight + m_MarginItem * 2;
+    m_LabelHeight = m_FontHeight + m_MarginItem2;
 
     CreateFullOsd();
     TopBarCreate();
-    int width = m_OsdWidth / 4 * 3;
+    const int width = m_OsdWidth / 4 * 3;
 
-    int top = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
+    const int top = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
               Config.decorBorderVolumeSize * 2;
-    int left = m_OsdWidth - width - Config.decorBorderVolumeSize;
-    left /= 2;
+    const int left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
 
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
     MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
@@ -40,17 +39,19 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     PixmapFill(LabelPixmap, clrTransparent);
     PixmapFill(MuteLogoPixmap, clrTransparent);
 
-    cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
-    cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
-    int MaxLabelWidth = m_Font->Width(*MaxLabel) + m_MarginItem;
+    const cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
+    const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
+    const int MaxLabelWidth = m_Font->Width(*MaxLabel) + m_MarginItem;
     int left = m_OsdWidth / 2 - MaxLabelWidth / 2;
 
     LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight),
                                Theme.Color(clrVolumeBg));
 
-    int DecorTop = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
-    DecorBorderClear(cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight,
-                     m_FontHeight), Config.decorBorderVolumeSize);
+    const int DecorTop =
+        m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
+    DecorBorderClear(
+        cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight),
+        Config.decorBorderVolumeSize);
     DecorBorderClear(cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight),
                      Config.decorBorderVolumeSize);
 
@@ -74,11 +75,10 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     ProgressBarDraw(Current, Total);
 
-    int width = (m_OsdWidth / 4 * 3);
-    left = m_OsdWidth - width - Config.decorBorderVolumeSize;
-    left /= 2;
+    const int width = (m_OsdWidth / 4 * 3);
+    left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
     DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
-                    width + m_MarginItem * 2, Config.decorProgressVolumeSize + m_MarginItem * 2,
+                    width + m_MarginItem2, Config.decorProgressVolumeSize + m_MarginItem2,
                     Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg),
                     Theme.Color(clrTopBarBg));
 }

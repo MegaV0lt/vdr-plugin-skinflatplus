@@ -11,16 +11,17 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
                           tColor colorExtraTextFg) {
     // if (!m_Osd) return;
 
+    Text.reserve(sizeof(text));  // Defined in 'textscroller.h'
     Text = text;
     Font = font;
     Position = position;
 
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
-    cRect DrawPort(0, 0, Font->Width(Text.c_str()), Position.Height());
+    const cRect DrawPort(0, 0, font->Width(text), position.Height());
 
     m_Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, Position, DrawPort);
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, position, DrawPort);
     // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
     //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
     // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
@@ -48,16 +49,16 @@ void cTextScroll::Draw(void) {
     if (!Pixmap) return;
 
     if (ColorExtraTextFg) {
-        std::string tilde = Text;
-        std::size_t found = tilde.find('~');  // Search for ~
+        std::string_view tilde {Text};
+        const std::size_t found = tilde.find('~');  // Search for ~
         if (found != std::string::npos) {
-            std::string first = tilde.substr(0, found);
-            std::string second = tilde.substr(found + 1);  // Default end is npos
-            RightTrim(first);  // Trim possible space on right side
-            LeftTrim(second);  // Trim possible space at begin
+            std::string_view sv1 {tilde.substr(0, found)};
+            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+            const std::string first {rtrim(sv1)};   // Trim possible space at end
+            const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
-            int l = Font->Width(first.c_str()) + Font->Width('X');
+            const int l = Font->Width(first.c_str()) + Font->Width('X');
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
         } else {  // ~ not found
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
@@ -113,6 +114,7 @@ void cTextScroll::DoStep(void) {
 
 cTextScrollers::cTextScrollers() : cThread("TextScrollers") {
     Layer = 2;
+    Scrollers.reserve(16);
 }
 
 cTextScrollers::~cTextScrollers() {}
@@ -137,7 +139,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
         cCondWait::SleepMs(10);
 
     Scrollers.emplace_back(new cTextScroll(m_Osd, ScrollType, ScrollStep,
-        static_cast<int>(WAITDELAY * 1.0f / ScrollDelay), Layer));
+        static_cast<int>(WAITDELAY * 1.0 / ScrollDelay), Layer));
     Scrollers.back()->SetText(text, position, colorFg, colorBg, m_Font, ColorExtraTextFg);
 
     StartScrolling();
@@ -159,7 +161,7 @@ void cTextScrollers::StartScrolling(void) {
 
 void cTextScrollers::Action(void) {
     // Wait 1 second so the osd is finished
-    for (int i {0}; i < 100 && Running(); ++i) {
+    for (uint i {0}; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);
     }
 

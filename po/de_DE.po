@@ -670,6 +670,19 @@ msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
 msgid "Show shorttext with date in playback"
 msgstr "Aufnahmen: Kurztext mit Datum/Zeit anzeigen"
 
+# Playback show end time
+msgid "Show end time of recording"
+msgstr "Wiedergabe: Endzeit der Aufnahme:"
+
+msgid "end of recording"
+msgstr "Gesamte Aufnahme"
+
+msgid "end of edited recording"
+msgstr "Gesamte ung geschnittene Aufnahme"
+
+msgid "ends at"
+msgstr "Endet um"
+
 msgid "Recording recerrors icon threshold"
 msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"
 

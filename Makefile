@@ -27,6 +27,7 @@ SKINFLATPLUS_VDRLOGO = vdrlogo_default
 
 #DEFINES += -DDEBUGIMAGELOADTIME
 #DEFINES += -DDEBUGEPGTIME
+#DEFINES += -DDEBUGFUNCSCALL
 
 # External image lib to use: imagemagick, graphicsmagick
 IMAGELIB ?= graphicsmagick

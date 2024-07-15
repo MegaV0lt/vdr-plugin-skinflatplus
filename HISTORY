@@ -1,5 +1,19 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-07-15: Version 1.0.4
+- [fix] Wrong counting of recordings in subfolder
+- [fix] Enable cache for small channel logos in menu
+- [add] Keep pre loaded images after cache overflow
+- [add] Option to display end time of recording
+- [add] Option to display edited end time of recording
+- [add] Extra time for long messages
+- [update] Show symbols before current pos wnd length at replay
+- [update] Use smaller font for actor name and role
+- [update] Randomize banner only if more than one
+- [update] Faster display of replay status by using new 'GetFrameAfterEdit()'
+- [update] Merge GetRecCounts()
+- [update] Some internal optimizations
+
 2024-03-25: Version 1.0.3
 - [fix] Skip justify for fixed font
 - [add] Script 'check_fonts_for_hairspace.sh' to list fonts with 'HairSpace'.

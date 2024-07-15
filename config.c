@@ -146,6 +146,7 @@ cFlatConfig::cFlatConfig(void) {
 
     PlaybackShowRecordingErrors = true;
     PlaybackShowRecordingDate = true;  // Show date and time with short text
+    PlaybackShowEndTime = 0;           // Show end time of recording
 
     ChannelWeatherShow = 1;
     PlaybackWeatherShow = 1;
@@ -375,6 +376,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageOffset") == 0)                        MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          PlaybackShowRecordingErrors = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            PlaybackShowRecordingDate = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowEndTime") == 0)                  PlaybackShowEndTime = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  PlaybackWeatherShow = atoi(Value);
     else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          RecordingAdditionalInfoShow = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 RecordingDimmOnPause = atoi(Value);
@@ -709,7 +711,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     files.reserve(64);  // Set to at least 64 entry's
     Decors.Clear();
 
-    cString FileName("");
+    cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
@@ -718,10 +720,10 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     }
 
     std::sort(files.begin(), files.end(), StringCompare);
-    std::string File_Name("");
-    cString Desc("");
-    std::size_t FilesSize {files.size()};
-    for (unsigned i = 0; i < FilesSize; ++i) {
+    std::string File_Name {""};
+    cString Desc {""};
+    const std::size_t FilesSize {files.size()};
+    for (uint i = 0; i < FilesSize; ++i) {
         File_Name = files.at(i);
         Desc = DecorDescription(File_Name.c_str());
         Decors.Append(strdup(*Desc));
@@ -729,7 +731,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 }
 
 cString cFlatConfig::DecorDescription(cString File) {
-    cString description("");
+    cString description {""};
     FILE *f = fopen(File, "r");
     if (f) {
         int line {0};
@@ -764,7 +766,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
 
-    cString FileName("");
+    cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
     while ((e = d.Next()) != NULL) {
@@ -772,7 +774,7 @@ void cFlatConfig::DecorLoadCurrent(void) {
         files.emplace_back(*FileName);
     }
 
-    std::string FileName2("");
+    std::string FileName2 {""};
     std::sort(files.begin(), files.end(), StringCompare);
     if (DecorIndex >= 0 && DecorIndex < static_cast<int>(files.size())) {
         FileName2 = files.at(DecorIndex);
@@ -910,9 +912,9 @@ void cFlatConfig::RecordingOldLoadConfig(void) {
     }
 }
 
-int cFlatConfig::GetRecordingOldValue(std::string folder) {
+int cFlatConfig::GetRecordingOldValue(const std::string &folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (unsigned i {0}; i < sz; ++i) {
+    for (uint i {0}; i < sz; ++i) {
         if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
@@ -962,9 +964,9 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     }
 
     std::sort(files.begin(), files.end(), StringCompare);
-    std::string FileName("");
-    std::size_t FilesSize {files.size()};
-    for (unsigned i = 0; i < FilesSize; ++i) {
+    std::string FileName {""};
+    const std::size_t FilesSize {files.size()};
+    for (uint i = 0; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

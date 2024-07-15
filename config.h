@@ -48,7 +48,7 @@ class cFlatConfig {
         void GetConfigFiles(cStringList &Files);  // NOLINT
 
         void RecordingOldLoadConfig(void);
-        int GetRecordingOldValue(std::string folder);
+        int GetRecordingOldValue(const std::string &folder);
 
  public:
         cString ThemeCurrent;
@@ -275,6 +275,7 @@ class cFlatConfig {
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
         int PlaybackShowRecordingErrors;
         int PlaybackShowRecordingDate;
+        int PlaybackShowEndTime;
         int MenuItemRecordingShowRecordingErrorsThreshold;
         int MenuItemRecordingShowFormatIcons;  // Show format icons (sd/hd/uhd) in menu recordings
 

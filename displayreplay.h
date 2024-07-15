@@ -32,11 +32,13 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
 
         // Dimm on pause
-        bool m_DimmActive = false;
+        bool m_DimmActive {false};
         time_t m_DimmStartTime {0};
 
-        bool m_ProgressShown = false;
-        bool m_ModeOnly = false;
+        int m_CurrentFrame {0};
+
+        bool m_ProgressShown {false};
+        bool m_ModeOnly {false};
         void UpdateInfo(void);
         void ResolutionAspectDraw(void);
 

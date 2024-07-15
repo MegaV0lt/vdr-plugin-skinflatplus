@@ -11,16 +11,23 @@ cFlatDisplayMessage::cFlatDisplayMessage(void) {
     CreateFullOsd();
     TopBarCreate();
     MessageCreate();
+
+    m_OSDMessageTime = Setup.OSDMessageTime;  // Save value to be restored later
 }
 
 cFlatDisplayMessage::~cFlatDisplayMessage() {
+    // dsyslog("flatPlus: ~cFlatDisplayMessage() Restoring 'OSDMessageTime' to %d", m_OSDMessageTime);
+    Setup.OSDMessageTime = m_OSDMessageTime;  // Restore original 'OSDMessageTime'
 }
 
 void cFlatDisplayMessage::SetMessage(eMessageType Type, const char *Text) {
-    if (Text)
-        MessageSet(Type, Text);
-    else
-        MessageClear();
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatDisplayMessage::SetMessage()");
+        dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
+    #endif
+
+    MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
+    (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
 void cFlatDisplayMessage::Flush(void) {

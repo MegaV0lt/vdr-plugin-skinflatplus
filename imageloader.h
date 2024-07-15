@@ -26,11 +26,11 @@ class cImageLoader : public cImageMagickWrapper {
     cImage* LoadIcon(const char *cIcon, int width, int height);
     cImage* LoadFile(const char *cFile, int width, int height);
     bool FileExits(const std::string &name);
-    bool SearchRecordingPoster(cString RecPath, cString &found);  // NOLINT
+    bool SearchRecordingPoster(const cString RecPath, cString &found);  // NOLINT
  private:
     // int epgImageWidthLarge, epgImageHeightLarge;  // Unused?
     // int epgImageWidth, epgImageHeight;
-    cString m_LogoExtension{"png"};
+    const cString m_LogoExtension{"png"};
 
     void ToLowerCase(std::string &str);  // NOLINT
 };

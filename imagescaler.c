@@ -39,19 +39,19 @@ static float sincf(float x) {
 }
 
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
-    const float fc = dst_size >= src_size ? 1.0f : (dst_size * 1.0 / src_size);
+    const float fc = dst_size >= src_size ? 1.0f : (dst_size * 1.0f / src_size);
 
     for (int i {0}; i < dst_size; ++i) {
         const int    d          = 2 * dst_size;                       // Sample position denominator
         const int    e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         int          offset     =  e / d;                             // Truncated sample position
         const float sub_offset =
-            ((e * 1.0 - offset * d) / d);  // Exact sample position is (float) e/d = offset + sub_offset
+            ((e * 1.0f - offset * d) / d);  // Exact sample position is (float) e/d = offset + sub_offset
             // ((float)(e - offset * d)) / ((float)d);  // Exact sample position is (float) e/d = offset + sub_offset
 
         // Calculate filter coefficients
         float h[4];
-        for (int j {0}; j < 4; ++j) {
+        for (uint j {0}; j < 4; ++j) {
             const float t = 3.14159265359f * (sub_offset + (1 - j));
             h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
@@ -80,7 +80,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
 
-        for (int j {0}; j < 4; ++j) {
+        for (uint j {0}; j < 4; ++j) {
             const float t = norm * h[j];
             filters[i].m_coeff[(offset + j) & 3] =
                 static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
@@ -119,6 +119,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     const unsigned buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     char *p = (char *) malloc(hor_filters_size + ver_filters_size + buffer_size);
+    if (!p) exit(EXIT_FAILURE);  // Unable to allocate memory!
     // Besser std::vector, den vector als Parameter übergeben, falls notwendig
     // std::vector<char> buffer(hor_filters_size + ver_filters_size + buffer_size);
 

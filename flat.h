@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <cstring>  // string.h
+#include <string_view>
 #include <random>
 
 #include "./config.h"
@@ -230,7 +231,7 @@ class cTextFloatingWrapper {
     void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline characters into the string.
-    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fin in 'WidthUpper'.
+    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
     const char *Text(void);
     ///< Returns the full wrapped text.
     int Lines(void) { return m_Lines; }
@@ -269,32 +270,21 @@ u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode);
 
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
-cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight, double ScreenAspect);
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingFormatIcon(const cRecording *Recording);
 cString GetRecordingerrorIcon(int RecInfoErrors);
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
 
-inline void LeftTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    s.erase(0, s.find_first_not_of(t));  // Trim from left
-    // return s;  // Only inplace trimming
-}
-
-inline void RightTrim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    s.erase(s.find_last_not_of(t) + 1);  // Trim from right
-    // return s;  // Only inplace trimming
-}
-
-inline void trim(std::string &s, const char *t = " \t\n\r\f\v") {  // NOLINT
-    LeftTrim(s, t);  // Trim from left & right
-    RightTrim(s, t);
-    /* return */  // LeftTrim(RightTrim(s, t), t);
-}
+std::string_view ltrim(std::string_view str);
+std::string_view rtrim(std::string_view str);
+std::string_view trim(std::string_view str);
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts(void);
-bool GetCuttedLengthMarks(const cRecording *Recording, cString &Text, cString &Cutted, bool AddText);  // NOLINT
-std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);  // NOLINT
+int GetFrameAfterEdit(const cMarks *marks = NULL, int Frame = 0, int LastFrame = 0);
+void GetCuttedLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
+std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
