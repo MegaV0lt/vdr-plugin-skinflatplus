@@ -280,21 +280,22 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
     #endif
 
+    TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
-        cString icon {""};
+        cString IconName {""};
         switch (m_MenuCategory) {
         case mcMain:
             TopBarSetTitle("");
-            icon = cString::sprintf("menuIcons/%s", VDRLOGO);
+            IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
             break;
         case mcSchedule:
         case mcScheduleNow:
         case mcScheduleNext:
-            icon = "menuIcons/Schedule"; break;
+            IconName = "menuIcons/Schedule"; break;
         case mcChannel:
-            icon = "menuIcons/Channels";
+            IconName = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
                 uint ChanCount {0};
                 LOCK_CHANNELS_READ;
@@ -307,7 +308,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             }  // Config.MenuChannelShowCount
             break;
         case mcTimer:
-            icon = "menuIcons/Timers";
+            IconName = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
                 uint TimerCount {0}, TimerActiveCount {0};
                 LOCK_TIMERS_READ;
@@ -333,26 +334,24 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             else if(RecordingsSortMode == rsmTime)
                 TopBarSetMenuIconRight("menuIcons/RecsSortDate");
             */
-            icon = "menuIcons/Recordings"; break;
+            IconName = "menuIcons/Recordings"; break;
         case mcSetup:
-            icon = "menuIcons/Setup"; break;
+            IconName = "menuIcons/Setup"; break;
         case mcCommand:
-            icon = "menuIcons/Commands"; break;
+            IconName = "menuIcons/Commands"; break;
         case mcEvent:
-            icon = "extraIcons/Info"; break;
+            IconName = "extraIcons/Info"; break;
         case mcRecordingInfo:
-            icon = "extraIcons/PlayInfo"; break;
+            IconName = "extraIcons/PlayInfo"; break;
         default:
             break;
         }
-        TopBarSetMenuIcon(*icon);
+        TopBarSetMenuIcon(*IconName);
 
         if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
             Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
             TopBarEnableDiskUsage();
         }
-    } else {
-        TopBarSetTitle(Title);
     }  // Config.TopBarMenuIconShow
 }
 
