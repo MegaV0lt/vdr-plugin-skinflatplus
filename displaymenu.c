@@ -3675,7 +3675,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
             }
         }  // for
     } else {
-        dsyslog("flatPlus: GetRecCounts() Count all!");
+        // dsyslog("flatPlus: GetRecCounts() Count all!");
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
             ++RecCount;

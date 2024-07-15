@@ -825,7 +825,7 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
             (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
         const int MaxExtraTime = Setup.OSDMessageTime * 3;                     // Max. extra time to add
         if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
-        dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
         Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
     }
 }
@@ -1446,7 +1446,7 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
     const int BottomDecor = Height + Size;
 
     if (!DecorPixmap) {
-        dsyslog("flatPlus: DecorBorderDraw() Creating 'DecorPixmap'");
+        // dsyslog("flatPlus: DecorBorderDraw() Creating 'DecorPixmap'");
         DecorPixmap = CreatePixmap(m_Osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 

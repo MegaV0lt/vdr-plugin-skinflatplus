@@ -16,8 +16,8 @@ cFlatDisplayMessage::cFlatDisplayMessage(void) {
 }
 
 cFlatDisplayMessage::~cFlatDisplayMessage() {
-    dsyslog("flatPlus: ~cFlatDisplayMessage() Restoring 'OSDMessageTime' to %d", m_OSDMessageTime);
-    Setup.OSDMessageTime = m_OSDMessageTime;  // Restore origial 'OSDMessageTime'
+    // dsyslog("flatPlus: ~cFlatDisplayMessage() Restoring 'OSDMessageTime' to %d", m_OSDMessageTime);
+    Setup.OSDMessageTime = m_OSDMessageTime;  // Restore original 'OSDMessageTime'
 }
 
 void cFlatDisplayMessage::SetMessage(eMessageType Type, const char *Text) {
