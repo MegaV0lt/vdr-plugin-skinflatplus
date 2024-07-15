@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-xx-xx: Version 1.0.4
+2024-07-15: Version 1.0.4
 - [fix] Wrong counting of recordings in subfolder
 - [fix] Enable cache for small channel logos in menu
 - [add] Keep pre loaded images after cache overflow
