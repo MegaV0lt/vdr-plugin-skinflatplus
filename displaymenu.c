@@ -280,14 +280,13 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
     #endif
 
-    TopBarSetTitle(Title);
     m_LastTitle = Title;
 
     if (Config.TopBarMenuIconShow) {
-        cString IconName {""};
+        cString IconName {""}, NewTitle = Title;
         switch (m_MenuCategory) {
         case mcMain:
-            TopBarSetTitle("");
+            NewTitle = "";
             IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
             break;
         case mcSchedule:
@@ -303,8 +302,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                     if (!Channel->GroupSep())
                         ++ChanCount;
                 }  // for
-                const cString NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
-                TopBarSetTitle(*NewTitle);
+                NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
             }  // Config.MenuChannelShowCount
             break;
         case mcTimer:
@@ -319,15 +317,13 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
                 }  // for
                 m_LastTimerCount = TimerCount;
                 m_LastTimerActiveCount = TimerActiveCount;
-                const cString NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
-                TopBarSetTitle(*NewTitle);
+                NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
             }  // Config.MenuTimerShowCount
             break;
         case mcRecording:
             if (Config.MenuRecordingShowCount) {
-                const cString NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
-                TopBarSetTitle(*NewTitle);
-            }  // Config.MenuRecordingShowCount
+                NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
+            }
             /*
             if(RecordingsSortMode == rsmName)
                 TopBarSetMenuIconRight("menuIcons/RecsSortName");
@@ -346,12 +342,15 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         default:
             break;
         }
+        TopBarSetTitle(*NewTitle);
         TopBarSetMenuIcon(*IconName);
 
         if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
             Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
             TopBarEnableDiskUsage();
         }
+    } else {
+        TopBarSetTitle(Title);
     }  // Config.TopBarMenuIconShow
 }
 
