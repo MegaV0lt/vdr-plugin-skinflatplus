@@ -43,7 +43,6 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         // TextScroller
         cTextScrollers Scrollers;
 
-        // bool IsRecording;  // Unused?
         bool m_IsRadioChannel {false};
         // bool m_IsGroup {false};
 

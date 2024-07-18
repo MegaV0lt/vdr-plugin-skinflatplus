@@ -96,8 +96,6 @@ int cComplexContent::ContentHeight(bool Full) {
     if (Full) return Height();
 
     CalculateDrawPortHeight();
-    // if (m_DrawPortHeight > Height()) return Height();
-    // return m_DrawPortHeight;
     return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
 }
 
@@ -107,8 +105,6 @@ bool cComplexContent::Scrollable(int height) {
 
     const int total = ScrollTotal();
     const int shown = ceil(height * 1.0 / m_ScrollSize);
-    // if (total > shown) return true;
-    // return false;
     return (total > shown) ? true : false;
 }
 
@@ -193,8 +189,8 @@ int cComplexContent::ScrollOffset(void) {
         else
             y = m_DrawPortHeight - m_Position.Height() - 1;
     }
-    // double offset = y * 1.0 / m_DrawPortHeight;
-    return ScrollTotal() * (y * 1.0 / m_DrawPortHeight);
+
+    return ScrollTotal() * (y * 1.0 / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {

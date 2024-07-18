@@ -466,11 +466,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }
 
         if (Config.TimeSecsScale < 1.0) {
-            std::string_view cutt{*cutted};
+            std::string_view cutt {*cutted};
             const std::size_t found = cutt.find_last_of(':');
             if (found != std::string::npos) {
-                const std::string hm{cutt.substr(0, found)};
-                const std::string secs{cutt.substr(found, cutt.length() - found)};
+                const std::string hm {cutt.substr(0, found)};
+                const std::string secs {cutt.substr(found, cutt.length() - found)};
 
                 LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
@@ -491,11 +491,11 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         int right =
             m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem - m_Font->Width(m_Total);
         if (Config.TimeSecsScale < 1.0) {
-            std::string_view tot{*m_Total};
+            std::string_view tot {*m_Total};
             const std::size_t found = tot.find_last_of(':');
             if (found != std::string::npos) {
-                const std::string hm{tot.substr(0, found)};
-                const std::string secs{tot.substr(found, tot.length() - found)};
+                const std::string hm {tot.substr(0, found)};
+                const std::string secs {tot.substr(found, tot.length() - found)};
 
                 right = m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
                         m_Font->Width(hm.c_str()) - m_FontSecs->Width(secs.c_str());

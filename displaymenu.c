@@ -4815,7 +4815,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont {""};
         TempCase.reserve(8);
         std::getline(file, TempCase);
         file.close();
@@ -4827,7 +4826,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont {""};
         TempMB.reserve(8);
         std::getline(file, TempMB);
         file.close();
@@ -4838,7 +4836,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     ItemFilename = cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH);
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
-        // std::string cont {""};
         TempGPU.reserve(8);
         std::getline(file, TempGPU);
         file.close();

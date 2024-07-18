@@ -108,7 +108,6 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
         return;
 
-    // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
     m_LastScreenWidth = -1;
 
