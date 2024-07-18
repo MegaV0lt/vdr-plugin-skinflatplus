@@ -45,7 +45,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
 
         // bool IsRecording;  // Unused?
         bool m_IsRadioChannel {false};
-        bool m_IsGroup {false};
+        // bool m_IsGroup {false};
 
         void SignalQualityDraw(void);
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);

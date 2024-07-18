@@ -667,8 +667,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Top = y;
     bool DrawProgress {true};
 
-    m_IsGroup = Channel->GroupSep();  // Also used later
-    if (m_IsGroup)
+    bool IsGroup {Channel->GroupSep()};  // Also used later
+    if (IsGroup)
         DrawProgress = false;
 
     /* Disabled because invalid lock sequence
@@ -677,7 +677,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     int w = m_Font->Width("9999");  // At least four digits in channel list because of different sort modes
     cString Buffer {""};
-    if (!m_IsGroup) {
+    if (!IsGroup) {
         Buffer = cString::sprintf("%d", Channel->Number());
         Width = m_Font->Width(*Buffer);
     }
@@ -695,7 +695,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int ImageBgHeight = ImageHeight;
 
     cImage *img {nullptr};
-    if (!m_IsGroup) {
+    if (!IsGroup) {
         img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
         if (img) {
             ImageBgHeight = img->Height();
@@ -727,7 +727,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 Left += ImageBgWidth + m_MarginItem2;
             }
-        } else if (m_IsGroup) {
+        } else if (IsGroup) {
             img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -776,7 +776,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = m_MenuItemWidth - LeftName;
-        if (m_IsGroup) {
+        if (IsGroup) {
             const int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             const cString GroupName = cString::sprintf(" %s ", *Buffer);
@@ -798,7 +798,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
             Width = m_MenuItemWidth - LeftName;
 
-        if (m_IsGroup) {
+        if (IsGroup) {
             const int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             const cString GroupName = cString::sprintf(" %s ", *Buffer);
@@ -1362,8 +1362,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             cString ws = cString::sprintf("%d", Channels->MaxNumber());
             int w = m_Font->Width(ws); */
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-        m_IsGroup = Channel->GroupSep();
-        if (!m_IsGroup) {
+        bool IsGroup {Channel->GroupSep()};
+        if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
             int Width = m_Font->Width(*Buffer);  // w is used here for calculation of width
             if (Width > w)
@@ -1376,7 +1376,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageLeft = Left;
         int ImageBgWidth = m_FontHeight * 1.34;
         int ImageBgHeight = m_FontHeight;
-        if (!m_IsGroup) {
+        if (!IsGroup) {
             img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
             if (img) {
                 ImageBgWidth = img->Width();
@@ -1405,7 +1405,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
-            } else if (m_IsGroup) {
+            } else if (IsGroup) {
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -1439,7 +1439,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         } else
             ChannelName = Channel->ShortName(true);
 
-        if (m_IsGroup) {
+        if (IsGroup) {
             int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             Left += w / 2;

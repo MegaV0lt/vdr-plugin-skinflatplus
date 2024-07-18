@@ -59,7 +59,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
         bool m_IsScrolling {false};
-        bool m_IsGroup {false};
+        // bool m_IsGroup {false};
         bool m_ShowEvent {false};
         bool m_ShowRecording {false};
         bool m_ShowText {false};

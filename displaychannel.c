@@ -112,13 +112,14 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanIconsPixmap, clrTransparent);
     m_LastScreenWidth = -1;
 
+    bool IsGroup {false};
     cString ChannelName {""}, ChannelNumber {""};
     if (Channel) {
         m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
-        m_IsGroup = Channel->GroupSep();
+        IsGroup = Channel->GroupSep();
 
         ChannelName = Channel->Name();
-        if (!m_IsGroup)
+        if (!IsGroup)
             ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
             ChannelNumber = cString::sprintf("%d-", Number);
@@ -136,7 +137,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
-    if (!m_IsGroup) {
+    if (!IsGroup) {
         const int ImageHeight = HeightImageLogo - m_MarginItem2;
         int ImageBgHeight = ImageHeight;
         int ImageBgWidth = ImageHeight;
@@ -154,7 +155,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
             ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
             ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        } else /*if (!m_IsGroup)*/ {  // Draw default logo
+        } else /*if (!IsGroup)*/ {  // Draw default logo
             img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
