@@ -124,10 +124,10 @@ void cFlatBaseRender::TopBarCreate(void) {
 }
 
 void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
-        if (Clear) dsyslog("   With clear");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
+    if (Clear) dsyslog("   With clear");
+#endif
 
     if (Clear) {  // Clear is default
         m_TopBarTitleExtra1 = "";
@@ -721,10 +721,10 @@ void cFlatBaseRender::MessageCreate(void) {
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::MessageSet()");
-        dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::MessageSet()");
+    dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
+#endif
 
     if (!MessagePixmap || !MessageIconPixmap)
         return;
@@ -1747,9 +1747,9 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
+#endif
 
     std::ifstream file;
     cString FileName {""};

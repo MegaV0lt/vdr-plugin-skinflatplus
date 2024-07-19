@@ -277,8 +277,8 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     }
 
     if (m_ModeOnly) return;
+    
     m_CurrentFrame = Current;
-
     m_ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
 }
@@ -299,9 +299,9 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
 }
 
 void cFlatDisplayReplay::UpdateInfo(void) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
+#endif
 
     if (m_ModeOnly) return;
     if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap) return;

@@ -31,9 +31,9 @@ static int CompareTimers(const void *a, const void *b) {
 }
 
 cFlatDisplayMenu::cFlatDisplayMenu(void) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
+#endif
 
     CreateFullOsd();
     TopBarCreate();
@@ -170,11 +170,11 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetScrollbar()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawScrollbar()");
+    dsyslog("   Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
+#endif
 
-    // dsyslog("flatPlus: Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
     if (!MenuPixmap) return;
 
     if (Total > 0 && Total > Shown) {
@@ -276,9 +276,9 @@ void cFlatDisplayMenu::Clear(void) {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
+#endif
 
     m_LastTitle = Title;
 
@@ -908,9 +908,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 }
 
 void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString EmptyText) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraEvent()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraEvent()");
+#endif
 
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
@@ -1725,10 +1725,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
-        dsyslog("   Level: %d, Total: %d, New: %d", Level, Total, New);
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
+    dsyslog("   Level: %d, Total: %d, New: %d", Level, Total, New);
+#endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
         return false;
@@ -2189,9 +2189,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
+#endif
 
     if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
     if (!Event) return;
@@ -2646,9 +2646,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 }
 
 void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraRecording()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawItemExtraRecording()");
+#endif
 
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
@@ -2842,9 +2842,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
                                  int NumActors) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
+#endif
 
     // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
     const int ShowMaxActors = Config.TVScraperShowMaxActors;
@@ -2902,9 +2902,9 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 }
 
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+#endif
 
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
     if (!Recording) return;
@@ -3186,7 +3186,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             if (img) {
                 const uint Aspect = img->Width() / img->Height();
                 if (Aspect > 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
-                    // dsyslog("flatPlus: SetRecording Portrait image %dx%d (%d) found! Setting to 2/3 size.",
+                    // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
                     MediaHeight *= (2.0 / 3.0);  // Size * 0,666 = 2/3
                     img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
@@ -3400,9 +3400,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatDisplayMenu::SetText()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetText()");
+#endif
 
     if (!Text) return;
 

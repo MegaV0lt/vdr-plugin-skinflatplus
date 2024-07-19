@@ -291,9 +291,9 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlat::InsertAuxInfo()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlat::InsertAuxInfo()");
+#endif
 
     std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
     std::string Channel {""}, Searchtimer {""};
@@ -392,9 +392,9 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
 }
 
 void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlat::GetCuttedLenghtSize()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlat::GetCuttedLenghtSize()");
+#endif
 
     cMarks Marks;
     bool HasMarks {false};
@@ -704,7 +704,7 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
     // uint32_t tick0 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: TextFloatingWrapper::Set() start. Textlength: %ld", strlen(Text));
+    // dsyslog("flatPlus: TextFloatingWrapper::Set() Textlength: %ld", strlen(Text));
 
     free(m_Text);
     m_Text = Text ? strdup(Text) : nullptr;

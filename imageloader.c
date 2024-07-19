@@ -40,6 +40,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
                 if (LogoLower[i] == '/')
                     LogoLower[i] = '~';
             }
+            File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
         #ifdef DEBUGIMAGELOADTIME
             dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
@@ -63,8 +64,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
         if (!success) {  // Image not found on disk
             if (i == 2)  // Third try and not found
-                dsyslog("flatPlus: LoadLogo: %s.%s (Also lowercase and ~ for path) could not be loaded",
-                        logo, *m_LogoExtension);
+                dsyslog("flatPlus: LoadLogo: %s.%s could not be loaded", logo, *m_LogoExtension);
             continue;
         }
 
