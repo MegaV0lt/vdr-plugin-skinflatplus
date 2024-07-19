@@ -240,23 +240,24 @@ bool cImageLoader::FileExits(const std::string &name) {
     struct stat Buffer;
     return (stat(name.c_str(), &Buffer) == 0);
 }
+
 // TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) {
     cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
     if (FileSize(*ManualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
+        // dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *RecPath);
     if (FileSize(*ManualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
+        // dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *RecPath);
     if (FileSize(*ManualPoster) != -1) {
-        dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
+        // dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;
     }
