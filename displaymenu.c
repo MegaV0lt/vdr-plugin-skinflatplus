@@ -2427,7 +2427,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
                             for (int i {0}; i < ActorsSize; ++i) {
-                                if (ImgLoader.FileExits(series.actors[i].actorThumb.path)) {
+                                if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
                                     ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     ActorsName.emplace_back(series.actors[i].name.c_str());
                                     ActorsRole.emplace_back(series.actors[i].role.c_str());
@@ -2447,7 +2447,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
                             for (int i {0}; i < ActorsSize; ++i) {
-                                if (ImgLoader.FileExits(movie.actors[i].actorThumb.path)) {
+                                if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
                                     ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
                                     ActorsName.emplace_back(movie.actors[i].name.c_str());
                                     ActorsRole.emplace_back(movie.actors[i].role.c_str());
@@ -3126,7 +3126,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
                             for (int i {0}; i < ActorsSize; ++i) {
-                                if (ImgLoader.FileExits(series.actors[i].actorThumb.path)) {
+                                if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
                                     ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
                                     ActorsName.emplace_back(series.actors[i].name.c_str());
                                     ActorsRole.emplace_back(series.actors[i].role.c_str());
@@ -3146,7 +3146,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
                             for (int i {0}; i < ActorsSize; ++i) {
-                                if (ImgLoader.FileExits(movie.actors[i].actorThumb.path)) {
+                                if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
                                     ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
                                     ActorsName.emplace_back(movie.actors[i].name.c_str());
                                     ActorsRole.emplace_back(movie.actors[i].role.c_str());

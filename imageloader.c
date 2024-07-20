@@ -43,7 +43,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
         #ifdef DEBUGIMAGELOADTIME
-            dsyslog("flatPlus: ImageLoader LoadLogo %s", *File);
+            dsyslog("flatPlus: cImageLoader::LoadLogo() '%s'", *File);
             uint32_t tick1 = GetMsTicks();
         #endif
 
@@ -64,7 +64,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
         if (!success) {  // Image not found on disk
             if (i == 2)  // Third try and not found
-                dsyslog("flatPlus: LoadLogo: %s.%s could not be loaded", logo, *m_LogoExtension);
+                dsyslog("flatPlus: cImageLoadr::LoadLogo() %s.%s could not be loaded", logo, *m_LogoExtension);
             continue;
         }
 
@@ -95,7 +95,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
     #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
+        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
     #endif
 
     cImage *img {nullptr};
@@ -127,7 +127,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if (!success) {  // Search for logo in default folder
         File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
         #ifdef DEBUGIMAGELOADTIME
-            dsyslog("flatPlus: ImageLoader LoadIcon %s", *File);
+            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
             uint32_t tick5 = GetMsTicks();
         #endif
 
@@ -152,7 +152,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         #endif
 
         if (!success) {
-            dsyslog("flatPlus: ImageLoader LoadIcon: %s could not be loaded", *File);
+            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' could not be loaded", *File);
             return NULL;
         }
     }
@@ -167,7 +167,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         dsyslog("   scale logo: %d ms", tick10 - tick9);
     #endif
         if (!img) {
-            dsyslog("flatPlus: ImageLoader LoadIcon: %s 'CreateImage' failed", *File);
+            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File);
             return NULL;
         }
 
@@ -180,7 +180,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     const cString File = cFile;
     #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: ImageLoader LoadFile %s", *File);
+        dsyslog("flatPlus: cImageLoader::LoadFile() '%s'", *File);
     #endif
 
     cImage *img {nullptr};
@@ -204,7 +204,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     const bool success = LoadImage(*File);
 
     if (!success) {
-        dsyslog("flatPlus: ImageLoader LoadFile: %s could not be loaded", *File);
+        dsyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return NULL;
     }
     #ifdef DEBUGIMAGELOADTIME
@@ -236,27 +236,22 @@ void cImageLoader::ToLowerCase(std::string &str) {
     }
 }
 
-bool cImageLoader::FileExits(const std::string &name) {
-    struct stat Buffer;
-    return (stat(name.c_str(), &Buffer) == 0);
-}
-
 // TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) {
     cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
-    if (FileSize(*ManualPoster) != -1) {
+    if (std::filesystem::exists(*ManualPoster)) {
         // dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *RecPath);
-    if (FileSize(*ManualPoster) != -1) {
+    if (std::filesystem::exists(*ManualPoster)) {
         // dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *RecPath);
-    if (FileSize(*ManualPoster) != -1) {
+    if (std::filesystem::exists(*ManualPoster)) {
         // dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
         found = ManualPoster;
         return true;

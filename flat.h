@@ -22,6 +22,7 @@
 #include <cstring>  // string.h
 #include <string_view>
 #include <random>
+#include <filesystem>  // C++17
 
 #include "./config.h"
 #include "./imagecache.h"
