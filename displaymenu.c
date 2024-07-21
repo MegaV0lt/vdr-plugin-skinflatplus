@@ -2075,7 +2075,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
                         if (img) {
-                            // int FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);
                             const int ImageTop = Top + m_FontHeight - m_FontAscender;
                             const int ImageLeft = Left + m_FontHeight - img->Width();
                             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
