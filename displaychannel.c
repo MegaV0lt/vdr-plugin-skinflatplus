@@ -436,7 +436,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
     const int SignalWidth = m_ChannelWidth / 2;
     const int ProgressWidth = SignalWidth / 2 - ProgressLeft - m_MarginItem;
-    const cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
+    cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
@@ -447,7 +447,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
                                    Theme.Color(clrChannelBg), SignalFont);
     ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
     // ProgressWidth = SignalWidth - ProgressLeft - m_MarginItem;
-
+    ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
