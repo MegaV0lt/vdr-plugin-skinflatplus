@@ -102,7 +102,7 @@ class cFlatBaseRender {
 
         // Message
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
-        int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // m_MessageWidth is unused
+        int m_MessageHeight {0};
         cTextScrollers MessageScroller;
         int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 

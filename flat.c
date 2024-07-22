@@ -79,29 +79,29 @@ cSkinDisplayMessage *cFlat::DisplayMessage(void) {
 
 cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
     /* if (!osd) {
-        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
         return NULL;
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
-        // dsyslog("flatPlus: Created pixmap \"%s\" with size %i x %i", *Name, DrawPort.Size().Width(),
+        // dsyslog("flatPlus: Created pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
         //        DrawPort.Size().Height());
         return pixmap;
     }  // Everything runs according to the plan
 
-    esyslog("flatPlus: Could not create pixmap \"%s\" of size %i x %i", *Name,
-            DrawPort.Size().Width(), DrawPort.Size().Height());
+    esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Size().Width(),
+            DrawPort.Size().Height());
     cRect NewDrawPort = DrawPort;
     const int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
     const int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-        esyslog("flatPlus: Created pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
+        esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
         return pixmap;
     }
 
-    esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %i x %i", *Name, width, height);
+    esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
     return NULL;
 }
 
@@ -152,7 +152,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
 
 cString GetFormatIcon(int ScreenWidth) {
     if (ScreenWidth > 1920) return "uhd";
-    if (ScreenWidth > 720) [[likely]] return "hd";
+    if (ScreenWidth > 720) return "hd";
 
     return "sd";  // 720 and below is considered sd
 }
@@ -221,7 +221,7 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
-    //* Aspect of image is preserved in LoadFile()
+    //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
         // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());

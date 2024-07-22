@@ -28,18 +28,18 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
         CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
-    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1,
-                               cRect(Config.decorBorderReplaySize,
-                               m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                               m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
-    IconsPixmap = CreatePixmap(m_Osd, "IconsPixmap", 2,
-                               cRect(Config.decorBorderReplaySize,
-                               m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                               m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
+    LabelPixmap =
+        CreatePixmap(m_Osd, "LabelPixmap", 1,
+                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
+    IconsPixmap =
+        CreatePixmap(m_Osd, "IconsPixmap", 2,
+                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
 
     ProgressBarCreate(cRect(Config.decorBorderReplaySize,
-                            m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize
-                            - m_MarginItem,
+                            m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize -
+                                Config.decorBorderReplaySize - m_MarginItem,
                             m_OsdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize),
                       m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
                       Config.decorProgressReplayBg, Config.decorProgressReplayType);
@@ -277,7 +277,7 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     }
 
     if (m_ModeOnly) return;
-    
+
     m_CurrentFrame = Current;
     m_ProgressShown = true;
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
@@ -392,7 +392,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 EndTime = cString::sprintf("%s", *TimeString(time(0) + (RestCutted / FramesPerSecond)));
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
-                // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is no used anymore from here
+                // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
             // }
         }
     }  // Config.PlaybackShowEndTime

@@ -40,7 +40,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
         uint m_LastTimerCount {0}, m_LastTimerActiveCount {0};
-        cString m_LastTitle{""};
+        cString m_LastTitle {""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
         cPixmap *ContentHeadPixmap {nullptr};

@@ -526,7 +526,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
 std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
     const std::string text {skipspace(Text.c_str())};
-    std::string MenuEntry {""} /*, MenuNumber {""}*/;
+    std::string MenuEntry {""};
     MenuEntry.reserve(13);  // Length of 'Miscellaneous'
     bool found {false}, DoBreak {false};
     const std::size_t TextLength = text.length();
@@ -544,10 +544,8 @@ std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
         if (DoBreak || i > 4) break;
     }
     if (found) {
-        // MenuNumber = skipspace(text.substr(0, i).c_str());  // Unused?
         MenuEntry = skipspace(text.substr(i).c_str());
     } else {
-        // MenuNumber = "";
         MenuEntry = text;
     }
     return MenuEntry;
@@ -667,7 +665,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Top = y;
     bool DrawProgress {true};
 
-    bool IsGroup {Channel->GroupSep()};  // Also used later
+    const bool IsGroup {Channel->GroupSep()};  // Also used later
     if (IsGroup)
         DrawProgress = false;
 
@@ -713,7 +711,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         Left += ImageBgWidth + m_MarginItem2;
     } else {
-        bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
+        const bool IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
 
         if (IsRadioChannel) {
             if (Current)
@@ -753,10 +751,10 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     // Event from channel
     const cEvent *Event {nullptr};
+    cString EventTitle {""};
+    double progress {0.0};
     LOCK_SCHEDULES_READ;
     const cSchedule *Schedule = Schedules->GetSchedule(Channel);
-    double progress {0.0};
-    cString EventTitle {""};
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
@@ -971,8 +969,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     } else {
-        cString MediaPath {""};          // \/ Better use content hight
-        int MediaWidth {0}, MediaHeight {/* 999 */ m_cHeight - m_MarginItem2};
+        cString MediaPath {""};         // \/ Better use content hight
+        int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};
         int MediaType {0};
 
         static cPlugin *pScraper = GetScraperPlugin();
@@ -1362,7 +1360,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             cString ws = cString::sprintf("%d", Channels->MaxNumber());
             int w = m_Font->Width(ws); */
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-        bool IsGroup {Channel->GroupSep()};
+        const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
             int Width = m_Font->Width(*Buffer);  // w is used here for calculation of width
@@ -2311,17 +2309,16 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
-            std::string StrQuery = Event->Title();
+            // const std::string StrQuery = Event->Title();
             Epgsearch_searchresults_v1_0 data {
-                .query = (char *)StrQuery.c_str(),  // Search term
+                // .query = (char *)StrQuery.c_str(),  // Search term
+                .query = const_cast<char *>(Event->Title()),  //? Is this save?
                 .mode = 0,                          // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
                 .channelNr = 0,                     // Channel number to search in (0=any)
                 .useTitle = true,                   // Search in title
                 .useSubTitle = false,               // Search in subtitle
                 .useDescription = false             // Search in description
             };
-            // data.query = reinterpret_cast<char *>(StrQuery.c_str());
-            // error: ‘reinterpret_cast’ from type ‘const char*’ to type ‘char*’ casts away qualifiers
 
             if (pEpgSearchPlugin->Service("Epgsearch-searchresults-v1.0", &data)) {
                 cList<Epgsearch_searchresults_v1_0::cServiceSearchResult> *list = data.pResultList;
@@ -2670,11 +2667,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
             LOCK_CHANNELS_READ;
-            const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
-            // const cChannel *channel =
-            //    Channels->GetByChannelID((reinterpret_cast<cRecordingInfo *>(RecInfo))->ChannelID());
-            // error: ‘reinterpret_cast’ from type ‘const cRecordingInfo*’ to type ‘cRecordingInfo*’
-            //         casts away qualifiers
+            // const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
+            const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
             if (channel)
                 Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
 
@@ -2780,7 +2774,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
     cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-        cString RecPath = cString::sprintf("%s", Recording->FileName());
+        const cString RecPath = cString::sprintf("%s", Recording->FileName());
         cString RecImage {""};
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
             MediaPath = RecImage;
