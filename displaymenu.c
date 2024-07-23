@@ -212,7 +212,7 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
     // Is the menu scrolling or content?
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
-        bool IsScrolled = ComplexContent.Scroll(Up, Page);
+        const bool IsScrolled = ComplexContent.Scroll(Up, Page);
         if (IsScrolled) {
             DrawScrollbar(
                 ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
@@ -770,7 +770,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (WithProvider)
         Buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
     else
-        Buffer = cString::sprintf("%s", Channel->Name());
+        Buffer = Channel->Name();
 
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = m_MenuItemWidth - LeftName;
@@ -1438,7 +1438,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             ChannelName = Channel->ShortName(true);
 
         if (IsGroup) {
-            int LineTop = Top + (m_FontHeight - 3) / 2;
+            const int LineTop = Top + (m_FontHeight - 3) / 2;
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             Left += w / 2;
             const cString GroupName = cString::sprintf(" %s ", *ChannelName);
@@ -1571,8 +1571,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
         Left += ImageHeight + m_MarginItem;
 
-        const cString Title = cString::sprintf("%s", Event->Title());
-        const cString ShortText = Event->ShortText() ? cString::sprintf("%s", Event->ShortText()) : "";
+        const cString Title = Event->Title();
+        const cString ShortText = Event->ShortText() ? Event->ShortText() : "";
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             if (Current) {
@@ -2774,7 +2774,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
     cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-        const cString RecPath = cString::sprintf("%s", Recording->FileName());
+        const cString RecPath = Recording->FileName();
         cString RecImage {""};
         if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
             MediaPath = RecImage;
@@ -2938,7 +2938,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::string Fsk {""};
     Fsk.reserve(4);
     if (!isempty(RecInfo->Description()))
-        Text.Append(cString::sprintf("%s", RecInfo->Description()));
+        Text.Append(RecInfo->Description());
         // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
 
     // Lent from skinelchi
@@ -3152,7 +3152,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }  // Scraper plugin
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-                const cString RecPath = cString::sprintf("%s", Recording->FileName());
+                const cString RecPath = Recording->FileName();
                 cString RecImage {""};
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
                     MediaPath = RecImage;
@@ -5134,7 +5134,7 @@ void cFlatDisplayMenu::PreLoadImages(void) {
 
     ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
 
-    int ImageHeight = m_FontHeight;
+    const int ImageHeight = m_FontHeight;
     int ImageBgHeight = ImageHeight;
     int ImageBgWidth = ImageHeight * 1.34;
     cImage *img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);

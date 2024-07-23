@@ -1,6 +1,7 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2024-xx-xx: Version 1.0.5
+- [fix] Fix for leftover .00 after edit mode
 - [add] New fsk 9 (NL), 14 (IT) and 15 (UK) icons
 - [update] Use std::filesystem to check if file exists
 - [update] Some internal optimizations

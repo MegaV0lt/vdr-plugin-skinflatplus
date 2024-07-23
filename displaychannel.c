@@ -495,7 +495,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 
     cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
 
-    cString DvbapiInfoText = cString::sprintf("DVBAPI: ");
+    cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont,
                                    DvbapiInfoFont->Width(*DvbapiInfoText) * 2);

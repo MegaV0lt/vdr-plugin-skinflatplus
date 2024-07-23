@@ -363,7 +363,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         const time_t t = time(NULL);
         const cString time = TimeString(t);
         if (Config.TopBarHideClockText)
-            Buffer = cString::sprintf("%s", *time);
+            Buffer = *time;
         else
             Buffer = cString::sprintf("%s %s", *time, tr("clock"));
 

@@ -93,7 +93,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
 
         if (img) {
-            int ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+            const int ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left += img->Width() + m_MarginItem;
         }
@@ -105,7 +105,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
             InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()),
                                     *TimeString(Recording->Start()), RecInfo->ShortText());
         else
-            InfoText = cString::sprintf("%s", RecInfo->ShortText());
+            InfoText = RecInfo->ShortText();
     } else {  // No short text
         InfoText = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()),
                                     *TimeString(Recording->Start()));
@@ -284,6 +284,9 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::SetCurrent() '%s'", Current);
+#endif
     if (m_ModeOnly) return;
 
     m_Current = Current;
@@ -319,28 +322,48 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     if (Config.TimeSecsScale == 1.0) {
+        // Fix for leftover .00 when in edit mode
+        int CurrentWidth {m_Font->Width(*m_Current)};
+        if (m_LastCurrentWidth < CurrentWidth)
+            m_LastCurrentWidth = CurrentWidth;
+        else
+            CurrentWidth = m_LastCurrentWidth;  // CurrentWidth smaller or equal m_LastCurrentWidth
+
         LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
-                              m_Font, m_Font->Width(*m_Current), m_FontHeight);
-        left += m_Font->Width(*m_Current);
+                              m_Font, CurrentWidth, m_FontHeight);
+        left += CurrentWidth;
     } else {
         std::string_view cur {*m_Current};
         const std::size_t found = cur.find_last_of(':');
         if (found != std::string::npos) {
             const std::string hm {cur.substr(0, found)};
-            std::string secs {cur.substr(found, cur.length() - found)};
-            secs.append(1, ' ');  // Fix for extra pixel glitch
+            const std::string secs {cur.substr(found, cur.length() - found)};
+            // secs.append(1, ' ');  // Fix for extra pixel glitch
+            // Fix for leftover .00 when in edit mode
+            int FontSecsWidth {m_FontSecs->Width(secs.c_str())};
+            if (m_LastCurrentWidth < FontSecsWidth)
+                m_LastCurrentWidth = FontSecsWidth;
+            else
+                FontSecsWidth = m_LastCurrentWidth;  // FontSecsWidth smaller or equal m_LastCurrentWidth
 
             LabelPixmap->DrawText(cPoint(left, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
             left += m_Font->Width(hm.c_str());
             LabelPixmap->DrawText(cPoint(left, TopSecs), secs.c_str(),
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
-                                  m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
-            left += m_FontSecs->Width(secs.c_str());
+                                  FontSecsWidth, m_FontSecs->Height());
+            left += FontSecsWidth;
         } else {
+            // Fix for leftover .00 when in edit mode
+            int CurrentWidth {m_Font->Width(*m_Current)};
+            if (m_LastCurrentWidth < CurrentWidth)
+                m_LastCurrentWidth = CurrentWidth;
+            else
+                CurrentWidth = m_LastCurrentWidth;  // CurrentWidth smaller or equal m_LastCurrentWidth
+
             LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(*m_Current), m_FontHeight);
-            left += m_Font->Width(*m_Current);
+                                  Theme.Color(clrReplayBg), m_Font, CurrentWidth, m_FontHeight);
+            left += CurrentWidth;
         }
     }
 
@@ -389,7 +412,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 }
 
                 const int RestCutted = FramesAfterEdit - CurrentFramesAfterEdit;
-                EndTime = cString::sprintf("%s", *TimeString(time(0) + (RestCutted / FramesPerSecond)));
+                EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
                 // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
@@ -401,7 +424,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     img = ImgLoader.LoadIcon("recording_total", m_FontHeight, m_FontHeight);
     const int ImgWidth = (img) ? img->Width() : 0;
     if (FramesAfterEdit > 0) {
-        const cString cutted = cString::sprintf("%s", *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond));
+        const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
         cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
         const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
 
@@ -579,7 +602,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
-                const cString RecPath = cString::sprintf("%s", m_Recording->FileName());
+                const cString RecPath = m_Recording->FileName();
                 cString RecImage {""};
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
                     MediaPath = RecImage;
