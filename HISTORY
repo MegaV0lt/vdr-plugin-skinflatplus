@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-xx-xx: Version 1.0.5
+2024-07-24: Version 1.0.5
 - [fix] Fix for leftover .00 after edit mode
 - [fix] Fix typo in german language file
 - [fix] Do not call MessageSetExtraTime() without text
