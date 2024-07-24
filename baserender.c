@@ -124,10 +124,10 @@ void cFlatBaseRender::TopBarCreate(void) {
 }
 
 void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
-        if (Clear) dsyslog("   With clear");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
+    if (Clear) dsyslog("   With clear");
+#endif
 
     if (Clear) {  // Clear is default
         m_TopBarTitleExtra1 = "";
@@ -363,7 +363,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         const time_t t = time(NULL);
         const cString time = TimeString(t);
         if (Config.TopBarHideClockText)
-            Buffer = cString::sprintf("%s", *time);
+            Buffer = *time;
         else
             Buffer = cString::sprintf("%s %s", *time, tr("clock"));
 
@@ -721,10 +721,10 @@ void cFlatBaseRender::MessageCreate(void) {
 }
 
 void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::MessageSet()");
-        dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::MessageSet()");
+    dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
+#endif
 
     if (!MessagePixmap || !MessageIconPixmap)
         return;
@@ -818,6 +818,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 }
 
 void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messages increase 'OSDMessageTime'
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
+#endif
+
     const uint threshold {75};  // TODO: Add config options?
     const std::size_t MessageLength = strlen(Text);
     if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
@@ -825,7 +829,8 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
             (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
         const int MaxExtraTime = Setup.OSDMessageTime * 3;                     // Max. extra time to add
         if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
-        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime,
+        //          m_OSDMessageTime);
         Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
     }
 }
@@ -1747,9 +1752,9 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 }
 
 void cFlatBaseRender::DrawWidgetWeather(void) {
-    #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
-    #endif
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
+#endif
 
     std::ifstream file;
     cString FileName {""};

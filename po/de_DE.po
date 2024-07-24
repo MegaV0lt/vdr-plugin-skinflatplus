@@ -678,7 +678,7 @@ msgid "end of recording"
 msgstr "Gesamte Aufnahme"
 
 msgid "end of edited recording"
-msgstr "Gesamte ung geschnittene Aufnahme"
+msgstr "Gesamte und geschnittene Aufnahme"
 
 msgid "ends at"
 msgstr "Endet um"

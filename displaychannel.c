@@ -108,17 +108,17 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
         return;
 
-    // IsRecording = false;  // Unused?
     PixmapFill(ChanIconsPixmap, clrTransparent);
     m_LastScreenWidth = -1;
 
+    bool IsGroup {false};
     cString ChannelName {""}, ChannelNumber {""};
     if (Channel) {
         m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
-        m_IsGroup = Channel->GroupSep();
+        IsGroup = Channel->GroupSep();
 
         ChannelName = Channel->Name();
-        if (!m_IsGroup)
+        if (!IsGroup)
             ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
         else if (Number)
             ChannelNumber = cString::sprintf("%d-", Number);
@@ -136,7 +136,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
-    if (!m_IsGroup) {
+    if (!IsGroup) {
         const int ImageHeight = HeightImageLogo - m_MarginItem2;
         int ImageBgHeight = ImageHeight;
         int ImageBgWidth = ImageHeight;
@@ -154,7 +154,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
             ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
             ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        } else /*if (!m_IsGroup)*/ {  // Draw default logo
+        } else /*if (!IsGroup)*/ {  // Draw default logo
             img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
@@ -305,7 +305,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, 0), "REC",
                 Theme.Color(clrChannelRecordingPresentFg), Theme.Color(clrChannelRecordingPresentBg), m_FontSml);
         }
-    }
+    }  // Present
 
     if (Following) {
         IsRec = false;
@@ -366,7 +366,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                                            "REC", Theme.Color(clrChannelRecordingFollowFg),
                                            Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
         }
-    }
+    }  // Following
 
     if (Config.ChannelIconsShow && m_CurChannel)
         ChannelIconsDraw(m_CurChannel, false);
@@ -378,7 +378,6 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.TVScraperChanInfoShowPoster && pScraper) {
         ScraperGetPosterBannerV2 call;
         call.event = Present;
-        call.recording = NULL;
         if (pScraper->Service("GetPosterBannerV2", &call)) {
             if ((call.type == tSeries) && call.banner.path.size() > 0) {
                 MediaSize.Set(call.banner.width, call.banner.height);
@@ -437,9 +436,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
     int ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
     const int SignalWidth = m_ChannelWidth / 2;
     const int ProgressWidth = SignalWidth / 2 - ProgressLeft - m_MarginItem;
-    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap,
-                       cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize),
-                       cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize), SignalStrength, 100,
+    cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
+    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
@@ -449,10 +447,8 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
                                    Theme.Color(clrChannelBg), SignalFont);
     ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
     // ProgressWidth = SignalWidth - ProgressLeft - m_MarginItem;
-
-    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap,
-                       cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize),
-                       cRect(ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize), SignalQuality, 100,
+    ProgressBar.SetY(top);
+    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
@@ -464,9 +460,11 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
 void cFlatDisplayChannel::DvbapiInfoDraw(void) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: DvbapiInfoDraw()");
+#endif
     if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
-    // dsyslog("flatPlus: DvbapiInfoDraw");
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi) return;
 
@@ -476,17 +474,17 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
         .hops = -1
     };
 
-    // const int ChannelSid = m_CurChannel->Sid();
-    // dsyslog("flatPlus: ChannelSid: %d Channel: %s", ChannelSid, m_CurChannel->Name());
-
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
-/*
-    dsyslog("flatPlus: caid: %d", ecmInfo.caid);
-    dsyslog("flatPlus: card system: %s", *ecmInfo.cardsystem);
-    dsyslog("flatPlus: reader: %s", *ecmInfo.reader);
-    dsyslog("flatPlus: from: %s", *ecmInfo.from);
-    dsyslog("flatPlus: protocol: %s", *ecmInfo.protocol);
-*/
+
+#ifdef DEBUGFUNCSCALL
+    dsyslog("  ChannelSid: %d Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
+    dsyslog("  CAID: %d", ecmInfo.caid);
+    dsyslog("  Card system: %s", *ecmInfo.cardsystem);
+    dsyslog("  Reader: %s", *ecmInfo.reader);
+    dsyslog("  From: %s", *ecmInfo.from);
+    dsyslog("  Protocol: %s", *ecmInfo.protocol);
+#endif
+
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999)
         return;
 
@@ -497,7 +495,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 
     cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
 
-    cString DvbapiInfoText = cString::sprintf("DVBAPI: ");
+    cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont,
                                    DvbapiInfoFont->Width(*DvbapiInfoText) * 2);

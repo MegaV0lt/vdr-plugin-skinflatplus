@@ -40,7 +40,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
         uint m_LastTimerCount {0}, m_LastTimerActiveCount {0};
-        cString m_LastTitle{""};
+        cString m_LastTitle {""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
         cPixmap *ContentHeadPixmap {nullptr};
@@ -59,7 +59,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
         bool m_IsScrolling {false};
-        bool m_IsGroup {false};
+        // bool m_IsGroup {false};
         bool m_ShowEvent {false};
         bool m_ShowRecording {false};
         bool m_ShowText {false};
@@ -72,9 +72,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // TextScroller
         cTextScrollers MenuItemScroller;
 
-        cString m_ItemEventLastChannelName{""};
+        cString m_ItemEventLastChannelName {""};
 
-        std::string m_RecFolder{""}, m_LastRecFolder {""};
+        std::string m_RecFolder {""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
         // Icons

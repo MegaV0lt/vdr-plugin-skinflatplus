@@ -63,19 +63,19 @@ class cFlatBaseRender {
         cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};
         int m_TopBarFontHeight {0}, m_TopBarFontSmlHeight {0}, m_TopBarFontClockHeight {0};
 
-        cString m_TopBarTitle{""};
-        cString m_TopBarTitleExtra1{""}, m_TopBarTitleExtra2{""};
-        cString m_TopBarExtraIcon{""};
+        cString m_TopBarTitle {""};
+        cString m_TopBarTitleExtra1 {""}, m_TopBarTitleExtra2 {""};
+        cString m_TopBarExtraIcon {""};
         bool m_TopBarExtraIconSet {false};
-        cString m_TopBarMenuIcon{""};
+        cString m_TopBarMenuIcon {""};
         bool m_TopBarMenuIconSet {false};
-        cString m_TopBarMenuIconRight{""};
+        cString m_TopBarMenuIconRight {""};
         bool m_TopBarMenuIconRightSet {false};
-        cString m_TopBarMenuLogo{""};
+        cString m_TopBarMenuLogo {""};
         bool m_TopBarMenuLogoSet {false};
 
         bool m_TopBarUpdateTitle {false};
-        cString m_TopBarLastDate{""};
+        cString m_TopBarLastDate {""};
         int m_TopBarHeight {0};
         int m_VideoDiskUsageState {-1};
 
@@ -102,7 +102,7 @@ class cFlatBaseRender {
 
         // Message
         cPixmap *MessagePixmap {nullptr}, *MessageIconPixmap {nullptr};
-        int /* m_MessageWidth {0}, */ m_MessageHeight {0};  // m_MessageWidth is unused
+        int m_MessageHeight {0};
         cTextScrollers MessageScroller;
         int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 

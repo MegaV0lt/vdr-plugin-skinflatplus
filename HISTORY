@@ -1,5 +1,16 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-07-24: Version 1.0.5
+- [fix] Fix for leftover .00 after edit mode
+- [fix] Fix typo in german language file
+- [fix] Do not call MessageSetExtraTime() without text
+- [add] New fsk 9 (NL), 14 (IT) and 15 (UK) icons
+- [update] Use std::filesystem to check if file exists
+- [update] Adjust size of 'recording_pos.png' and 'recording_total.png'
+- [update] Do not log found poster (cover_vdr.jpg)
+- [update] No extra time for long messages if scroller is disabled
+- [update] Some internal optimizations
+
 2024-07-15: Version 1.0.4
 - [fix] Wrong counting of recordings in subfolder
 - [fix] Enable cache for small channel logos in menu

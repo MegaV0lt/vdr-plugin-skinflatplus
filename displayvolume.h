@@ -16,7 +16,7 @@ class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
         cPixmap *LabelPixmap {nullptr};
         cPixmap *MuteLogoPixmap {nullptr};
 
-        int m_LabelHeight{0};
+        int m_LabelHeight {0};
  public:
         cFlatDisplayVolume(void);
         virtual ~cFlatDisplayVolume();

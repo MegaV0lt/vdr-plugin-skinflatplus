@@ -928,11 +928,11 @@ void cFlatConfig::SetLogoPath(cString path) {
 cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     try {
         if (!path.empty() && (path.at(path.size() - 1) == '/'))
-            return cString::sprintf("%s", path.erase(path.size() - 1).c_str());  // Remove '/' of path if found at end
+            return path.erase(path.size() - 1).c_str();  // Remove '/' of path if found at end
     } catch (...) {
-        return cString::sprintf("%s", path.c_str());
+        return path.c_str();
     }
-    return cString::sprintf("%s", path.c_str());
+    return path.c_str();
 }
 
 void cFlatConfig::Store(const char *Name, int Value, const char *Filename) {

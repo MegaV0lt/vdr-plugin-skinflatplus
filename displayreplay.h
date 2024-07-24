@@ -12,8 +12,9 @@
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  private:
-        cString m_Current{""}, m_Total{""};
-
+        cString m_Current {""}, m_Total {""};
+        int m_LastCurrentWidth {0};
+        
         int m_LabelHeight {0};
         cPixmap *LabelPixmap {nullptr};
         cPixmap *LabelJumpPixmap {nullptr};
