@@ -322,8 +322,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }
 
     if (Config.TimeSecsScale == 1.0) {
-        // Fix for leftover .00 when in edit mode
-        int CurrentWidth {m_Font->Width(*m_Current)};
+        // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+        int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
         if (m_LastCurrentWidth < CurrentWidth)
             m_LastCurrentWidth = CurrentWidth;
         else
@@ -338,9 +338,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (found != std::string::npos) {
             const std::string hm {cur.substr(0, found)};
             const std::string secs {cur.substr(found, cur.length() - found)};
-            // secs.append(1, ' ');  // Fix for extra pixel glitch
-            // Fix for leftover .00 when in edit mode
-            int FontSecsWidth {m_FontSecs->Width(secs.c_str())};
+            // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+            int FontSecsWidth {m_FontSecs->Width(secs.c_str()) + m_MarginItem};
             if (m_LastCurrentWidth < FontSecsWidth)
                 m_LastCurrentWidth = FontSecsWidth;
             else
@@ -354,8 +353,8 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   FontSecsWidth, m_FontSecs->Height());
             left += FontSecsWidth;
         } else {
-            // Fix for leftover .00 when in edit mode
-            int CurrentWidth {m_Font->Width(*m_Current)};
+            // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+            int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
             if (m_LastCurrentWidth < CurrentWidth)
                 m_LastCurrentWidth = CurrentWidth;
             else

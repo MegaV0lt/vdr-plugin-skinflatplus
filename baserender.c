@@ -822,8 +822,6 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    if (!Config.ScrollerEnable) return;  //  Scroller is disabled; so no extra time is needed
-
     const uint threshold {75};  // TODO: Add config options?
     const std::size_t MessageLength = strlen(Text);
     if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen

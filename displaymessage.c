@@ -28,8 +28,14 @@ void cFlatDisplayMessage::SetMessage(eMessageType Type, const char *Text) {
     dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
 #endif
 
-    MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
-    (Text) ? MessageSet(Type, Text) : MessageClear();
+    if (Text) {
+        if (Config.ScrollerEnable)
+            MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
+
+        MessageSet(Type, Text);
+    } else {
+        MessageClear();
+    }
 }
 
 void cFlatDisplayMessage::Flush(void) {
