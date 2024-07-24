@@ -36,7 +36,8 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
         if (i == 2) {  // Third try. Search for lowercase logo with '~' for path '/'
-            for (std::size_t i {0}; i < LogoLower.length(); ++i) {
+            const std::size_t LogoLowerLength {LogoLower.length()};
+            for (std::size_t i {0}; i < LogoLowerLength; ++i) {
                 if (LogoLower[i] == '/')
                     LogoLower[i] = '~';
             }

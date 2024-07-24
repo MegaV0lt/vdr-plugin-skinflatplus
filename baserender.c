@@ -818,6 +818,12 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 }
 
 void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messages increase 'OSDMessageTime'
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
+#endif
+
+    if (!Config.ScrollerEnable) return;  //  Scroller is disabled; so no extra time is needed
+
     const uint threshold {75};  // TODO: Add config options?
     const std::size_t MessageLength = strlen(Text);
     if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
@@ -825,7 +831,8 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
             (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
         const int MaxExtraTime = Setup.OSDMessageTime * 3;                     // Max. extra time to add
         if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
-        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime,
+        //          m_OSDMessageTime);
         Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
     }
 }
