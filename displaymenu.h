@@ -72,9 +72,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // TextScroller
         cTextScrollers MenuItemScroller;
 
-        cString m_ItemEventLastChannelName{""};
+        cString m_ItemEventLastChannelName {""};
 
-        std::string m_RecFolder{""}, m_LastRecFolder {""};
+        std::string m_RecFolder {""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
         // Icons
