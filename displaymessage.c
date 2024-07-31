@@ -17,7 +17,7 @@ cFlatDisplayMessage::cFlatDisplayMessage(void) {
 
 cFlatDisplayMessage::~cFlatDisplayMessage() {
     if (Setup.OSDMessageTime != m_OSDMessageTime) {
-        dsyslog("flatPlus: ~cFlatDisplayMessage() Restoring 'OSDMessageTime' to %d", m_OSDMessageTime);
+        // dsyslog("flatPlus: ~cFlatDisplayMessage() Restoring 'OSDMessageTime' to %d", m_OSDMessageTime);
         Setup.OSDMessageTime = m_OSDMessageTime;  // Restore original 'OSDMessageTime'
     }
 }
