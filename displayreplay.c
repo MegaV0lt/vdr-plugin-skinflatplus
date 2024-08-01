@@ -313,16 +313,26 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     const int FontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
     const int TopSecs = FontAscender - FontSecsAscender;
 
+    const ulong CharCode = 0x00000030;  // Zero: U+0030
+    const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);
+    // const int TopOffset = Setup.FontOsdSize - GlyphSize - (Setup.FontOsdSize - FontAscender);
+    const int TopOffset = FontAscender - GlyphSize;  //? Should be the same
+
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   GlyphSize %d, Setup.FontOsdSize %d, m_FontHeight %d, FontAscender %d",
+             GlyphSize, Setup.FontOsdSize, m_FontHeight, FontAscender);
+#endif
+
     //* Draw current position with symbol
     int left {m_MarginItem};
-    cImage *img = ImgLoader.LoadIcon("recording_pos", m_FontHeight, m_FontHeight);
+    cImage *img = ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
     if (img) {
-        IconsPixmap->DrawImage(cPoint(left, 0), *img);
+        IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
     }
 
     if (Config.TimeSecsScale == 1.0) {
-        // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+        // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
         int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
         if (m_LastCurrentWidth < CurrentWidth)
             m_LastCurrentWidth = CurrentWidth;
@@ -338,7 +348,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (found != std::string::npos) {
             const std::string hm {cur.substr(0, found)};
             const std::string secs {cur.substr(found, cur.length() - found)};
-            // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+            // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
             int FontSecsWidth {m_FontSecs->Width(secs.c_str()) + m_MarginItem};
             if (m_LastCurrentWidth < FontSecsWidth)
                 m_LastCurrentWidth = FontSecsWidth;
@@ -353,7 +363,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   FontSecsWidth, m_FontSecs->Height());
             left += FontSecsWidth;
         } else {
-            // Fix for leftover .00 when in edit mode. Add margin to fix for extra pixel glitch
+            // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
             int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
             if (m_LastCurrentWidth < CurrentWidth)
                 m_LastCurrentWidth = CurrentWidth;
@@ -420,7 +430,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     }  // Config.PlaybackShowEndTime
 
     //* Draw total and cutted length with cutted symbol (Right side)
-    img = ImgLoader.LoadIcon("recording_total", m_FontHeight, m_FontHeight);
+    img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
     const int ImgWidth = (img) ? img->Width() : 0;
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
@@ -454,7 +464,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 }
 
                 if (img) {  // Draw preloaded 'recording_total' icon
-                    IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                    IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
                 LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
@@ -465,7 +475,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 right += m_Font->Width(hm.c_str()) + m_FontSecs->Width(secs.c_str()) + FontWidthSpace;
             } else {
                 if (img) {  // Draw preloaded 'recording_total' icon
-                    IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                    IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
                 LabelPixmap->DrawText(cPoint(right, 0), m_Total, Theme.Color(clrReplayFont),
@@ -474,7 +484,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
         } else {
             if (img) {  // Draw preloaded 'recording_total' icon
-                IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                 right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
             }
             LabelPixmap->DrawText(cPoint(right, 0), m_Total, Theme.Color(clrReplayFont),
@@ -522,7 +532,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 right = m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
                         m_Font->Width(hm.c_str()) - m_FontSecs->Width(secs.c_str());
                 if (img) {  // Draw preloaded 'recording_total' icon
-                    IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                    IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
                 LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
@@ -532,7 +542,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
                 if (img) {  // Draw preloaded 'recording_total' icon
-                    IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                    IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
                 LabelPixmap->DrawText(cPoint(right, 0), *m_Total, Theme.Color(clrReplayFont),
@@ -540,7 +550,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             }
         } else {
             if (img) {  // Draw preloaded 'recording_total' icon
-                IconsPixmap->DrawImage(cPoint(right, 0), *img);
+                IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                 right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
             }
             LabelPixmap->DrawText(cPoint(right, 0), *m_Total, Theme.Color(clrReplayFont),
@@ -730,8 +740,11 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_pos", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_total", m_FontHeight, m_FontHeight);
+
+    const ulong CharCode = 0x00000030;  // Zero: U+0030
+    const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);
+    ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
+    ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
 
     ImgLoader.LoadIcon("recording_untested_replay", 999, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_ok_replay", 999, m_FontSmlHeight);

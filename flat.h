@@ -267,7 +267,8 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 }
 
 void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth);  // NOLINT
-u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode);
+uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode);
+uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
 cPlugin *GetScraperPlugin(void);
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);

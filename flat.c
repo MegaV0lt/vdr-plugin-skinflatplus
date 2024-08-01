@@ -10,6 +10,7 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <freetype/ftglyph.h>  // For glyph metrics
 
 #include "./flat.h"
 
@@ -530,7 +531,7 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return std::string();  // Empty string
 }
 
-u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {
+uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
     FT_Library library;
     FT_Face face;
     FT_UInt glyph_index {0};
@@ -555,6 +556,53 @@ u_int32_t GetCharIndex(const char *Name, FT_ULong CharCode) {
     FT_Done_FreeType(library);
 
     return glyph_index;
+}
+
+uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
+    FT_Library library;
+    FT_Face face;
+    FT_Glyph glyph;  // Handle to glyph image
+    uint32_t GlyphSize {0};
+    FT_BBox bbox;    // The control (bounding) box
+    FT_UInt glyph_index {0};
+    const cString FontFileName = cFont::GetFontFileName(Name);
+    int rc = FT_Init_FreeType(&library);
+    if (!rc) {
+        rc = FT_New_Face(library, *FontFileName, 0, &face);
+        if (!rc) {
+            // FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
+            rc = FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0);
+            if (!rc) {
+                glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
+                rc = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+                if (!rc) {
+                    rc = FT_Get_Glyph(face->glyph, &glyph);
+                    if (!rc) {
+                        // To get the bbox in pixel coordinates, set bbox_mode to FT_GLYPH_BBOX_TRUNCATE.
+                        // To get the bbox in grid-fitted pixel coordinates, set bbox_mode to FT_GLYPH_BBOX_PIXELS
+                        // If yMin is negative, this value gives the glyph's descender. Otherwise, the glyph doesn't
+                        // descend below the baseline. Similarly, if ymax is positive, this value gives the glyph's
+                        // ascender.
+                        FT_Glyph_Get_CBox(glyph, ft_glyph_bbox_subpixels, &bbox);  // In 26.6 pixels (1/64th of pixels)
+                        GlyphSize = (bbox.yMax - bbox.yMin) / 64;
+                        // dsyslog("flatPlus: GetGlyphSize()\n   GlyphSize: %d bbox yMin/yMax: %ld %ld, FontHeight: %d",
+                        //         GlyphSize, bbox.yMin, bbox.yMax, FontHeight);
+                    } else
+                        esyslog("flatPlus: FreeType: error %d during FT_Get_Glyph (font = %s)\n", rc, *FontFileName);
+                } else
+                    esyslog("flatPlus: FreeType: error %d during FT_Load_Glyph (font = %s)\n", rc, *FontFileName);
+            } else
+                esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
+        } else
+            esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
+    } else
+        esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
+
+    FT_Done_Glyph(glyph);
+    FT_Done_Face(face);
+    FT_Done_FreeType(library);
+
+    return GlyphSize;
 }
 
 void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
