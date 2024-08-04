@@ -441,7 +441,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
                     cImageLoader ImgLoader;
-                    const cString IconName = GetIconName(MainMenuText(s));
+                    const cString IconName = *GetIconName(MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
                         cString IconNameCur = cString::sprintf("%s_cur", *IconName);
@@ -1840,7 +1840,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
             } else /* if (!RecordingIsInUse) */ {
-                IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = *GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
                 if (Current) {
@@ -1855,7 +1855,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *RecInfo = Recording->Info();
-                IconName = GetRecordingerrorIcon(RecInfo->Errors());
+                IconName = *GetRecordingerrorIcon(RecInfo->Errors());
 
                 img = nullptr;
                 if (Current) {
@@ -1875,7 +1875,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
-                IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+                IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
@@ -2034,7 +2034,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
             } else {
-                IconName = GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = *GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
                 if (Current) {
@@ -2049,7 +2049,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 const cRecordingInfo *RecInfo = Recording->Info();
-                IconName = GetRecordingerrorIcon(RecInfo->Errors());
+                IconName = *GetRecordingerrorIcon(RecInfo->Errors());
 
                 img = nullptr;
                 if (Current) {
@@ -2069,7 +2069,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
-                IconName = GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+                IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);

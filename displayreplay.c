@@ -679,7 +679,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         cImage *img {nullptr};
         cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
-            IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
+            IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
@@ -688,7 +688,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
                 left -= m_MarginItem2;
             }
 
-            IconName = GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
+            IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
@@ -699,7 +699,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
         }
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
-            IconName = GetFormatIcon(m_ScreenWidth);  // Show Format
+            IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
