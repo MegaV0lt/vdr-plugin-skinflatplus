@@ -2218,9 +2218,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
-    cString Text {""}, TextAdditional {""};
-    std::string Fsk {""};  // TODO: cString?
-    Fsk.reserve(4);
+    cString Fsk {""}, Text {""}, TextAdditional {""};
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
@@ -2236,7 +2234,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // FSK
         if (Event->ParentalRating()) {
             Fsk = *Event->GetParentalRatingString();
-            Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), Fsk.c_str()));
+            Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Fsk));
         }
 
         const cComponents *Components = Event->Components();
@@ -2262,8 +2260,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName {""};
     cImage *img {nullptr};
-    if (Fsk.length() > 0) {
-        IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+    if (strlen(*Fsk) > 0) {
+        IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
@@ -2936,8 +2934,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
-    std::string Fsk {""};  // TODO: cString?
-    Fsk.reserve(4);
+    cString Fsk {""};
     if (!isempty(RecInfo->Description()))
         Text.Append(RecInfo->Description());
         // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
@@ -2964,7 +2961,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             // FSK
             if (Event->ParentalRating()) {
                 Fsk = *Event->GetParentalRatingString();
-                Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), Fsk.c_str()));
+                Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Fsk));
             }
         }
 
@@ -3005,8 +3002,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName {""};
     cImage *img {nullptr};
-    if (Fsk.length() > 0) {
-        IconName = cString::sprintf("EPGInfo/FSK/%s", Fsk.c_str());
+    if (strlen(*Fsk) > 0) {
+        IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (img) {
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
