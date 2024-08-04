@@ -1854,8 +1854,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                const cRecordingInfo *RecInfo = Recording->Info();
-                IconName = *GetRecordingerrorIcon(RecInfo->Errors());
+                // const cRecordingInfo *RecInfo = Recording->Info();  //? Not needed
+                IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
                 if (Current) {
@@ -2048,8 +2048,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                const cRecordingInfo *RecInfo = Recording->Info();
-                IconName = *GetRecordingerrorIcon(RecInfo->Errors());
+                // const cRecordingInfo *RecInfo = Recording->Info();
+                IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
                 if (Current) {
