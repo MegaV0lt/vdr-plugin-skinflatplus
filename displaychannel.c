@@ -179,7 +179,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (Channel) {
         img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHeight);
         if (img) {
-            ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
+            ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
             ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
         }
@@ -191,7 +191,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
+                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;
@@ -200,7 +200,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             IconName = GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
+                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;
@@ -211,7 +211,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             IconName = GetFormatIcon(m_ScreenWidth);  // Show Format
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top + (m_FontSmlHeight - img->Height()) / 2;
+                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;
@@ -468,7 +468,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
     if (!pDVBApi) return;
 
-    sDVBAPIEcmInfo ecmInfo{
+    sDVBAPIEcmInfo ecmInfo {
         .sid = static_cast<uint16_t>(m_CurChannel->Sid()),
         .ecmtime = 0,
         .hops = -1

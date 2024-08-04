@@ -266,7 +266,7 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
 
-void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth);  // NOLINT
+void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode);
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 

@@ -93,7 +93,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
 
         if (img) {
-            const int ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+            const int ImageTop = SmallTop /* + (m_FontSmlHeight - img->Height()) / 2 */;
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left += img->Width() + m_MarginItem;
         }
@@ -158,7 +158,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            const int ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+            const int ImageTop = SmallTop /* + (m_FontSmlHeight - img->Height()) / 2 */;
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
         }
     }  // PlaybackShowRecordingErrors
@@ -672,17 +672,17 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 
     if (m_ScreenWidth > 0) {
         // First line for current, total and cutted length, second line for end time
-        const int SmallTop = (Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight;
+        const int /* SmallTop */ ImageTop = (Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight;
 
         int left = m_OsdWidth - Config.decorBorderReplaySize * 2;
-        int ImageTop {0};
+        // int ImageTop {0};
         cImage *img {nullptr};
         cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
             IconName = GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+                // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;
@@ -691,7 +691,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             IconName = GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+                // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;
@@ -702,7 +702,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             IconName = GetFormatIcon(m_ScreenWidth);  // Show Format
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
+                // ImageTop = SmallTop + (m_FontSmlHeight - img->Height()) / 2;
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
                 left -= m_MarginItem2;

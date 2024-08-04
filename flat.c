@@ -605,7 +605,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     return GlyphSize;
 }
 
-void JustifyLine(std::string &Line, cFont *Font, int LineMaxWidth) {  // NOLINT
+void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
     if (isempty(Line.c_str()))  // Check for empty line
         return;
 

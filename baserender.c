@@ -509,7 +509,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         if (m_TopBarMenuIconRightSet) {
             img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                const int IconTop = (m_TopBarHeight / 2 - img->Height() / 2);
+                const int IconTop = /* (m_TopBarHeight / 2 - img->Height() / 2) */ 0;
                 TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, IconTop), *img);
             }
         }
