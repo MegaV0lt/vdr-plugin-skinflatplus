@@ -154,7 +154,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
             ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
             ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        } else /*if (!IsGroup)*/ {  // Draw default logo
+        } else {  // Draw default logo
             img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
@@ -172,15 +172,13 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         PixmapFill(ChanIconsPixmap, clrTransparent);
 
     const int top = HeightBottom - m_FontSmlHeight - m_MarginItem;
-    int ImageTop {0};
     int left = m_ChannelWidth - m_FontSmlHeight - m_MarginItem2;
 
     cImage *img {nullptr};
     if (Channel) {
         img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHeight);
         if (img) {
-            ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
-            ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left -= m_MarginItem2;
         }
     }
@@ -191,18 +189,16 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
-                ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+                ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
                 left -= m_MarginItem2;
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
-                ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+                ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
                 left -= m_MarginItem2;
             }
         }
@@ -211,9 +207,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
-                ImageTop = top /* + (m_FontSmlHeight - img->Height()) / 2 */;
                 left -= img->Width();
-                ChanIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+                ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
                 left -= m_MarginItem2;
             }
         }

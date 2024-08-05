@@ -970,7 +970,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     } else {
-        cString MediaPath {""};         // \/ Better use content hight
+        cString MediaPath {""};
         int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};
         int MediaType {0};
 
@@ -1854,7 +1854,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                // const cRecordingInfo *RecInfo = Recording->Info();  //? Not needed
                 IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
@@ -2048,7 +2047,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                // const cRecordingInfo *RecInfo = Recording->Info();
                 IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
@@ -2934,11 +2932,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
-    cString Fsk {""};
     if (!isempty(RecInfo->Description()))
         Text.Append(RecInfo->Description());
         // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
 
+    cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
         auto channelFuture = std::async(
@@ -3349,7 +3347,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            const int ImageTop = m_MarginItem + m_FontSmlHeight + m_FontHeight /* + (m_FontSmlHeight - img->Height()) / 2 */;
+            const int ImageTop = m_MarginItem + m_FontSmlHeight + m_FontHeight;
             ContentHeadIconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
         }
     }  // MenuItemRecordingShowRecordingErrors

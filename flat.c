@@ -476,7 +476,7 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     delete index;
 
     uint64_t RecSize{0};
-    /* if (!FsErr) */ RecSize = FileSize[i - 1];  //? 0 when error opening file / Show partial size
+    RecSize = FileSize[i - 1];  // In case of error show partial size
     if (RecSize > MEGABYTE(1023))                 // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
