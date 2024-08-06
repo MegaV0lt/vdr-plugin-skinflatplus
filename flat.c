@@ -394,7 +394,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
 
 void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlat::GetCuttedLenghtSize()");
+    dsyslog("flatPlus: cFlat::GetCuttedLengthSize()");
 #endif
 
     cMarks Marks;
@@ -544,7 +544,8 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
             rc = FT_Set_Char_Size(face, 8 * 64, 8 * 64, 0, 0);  // TODO: Is that needed?
             if (!rc) {
                 glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
-                // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode, glyph_index);
+                // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode,
+                //          glyph_index);
             } else
                 esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
         } else
@@ -606,7 +607,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 }
 
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
-    if (isempty(Line.c_str()))  // Check for empty line
+    if (Line.empty())  // Check for empty line
         return;
 
     if (Font->Width("M") == Font->Width("i"))  // Check for fixed font

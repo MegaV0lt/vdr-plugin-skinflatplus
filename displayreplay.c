@@ -323,7 +323,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
              GlyphSize, Setup.FontOsdSize, m_FontHeight, FontAscender);
 #endif
 
-    //* Draw current position with symbol
+    //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
     cImage *img = ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
     if (img) {
@@ -395,46 +395,12 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     const int FontWidthSpace = m_Font->Width(' ');
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
 
-    //* Draw end time of recording with symbol for cutted end time
-    if (Config.PlaybackShowEndTime > 0) {  // 1 = End time, 2 = End time and cutted end time
-        left = m_MarginItem;
-        //* Image instead of 'ends at:' text
-        /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
-        if (img) {
-            IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
-            left += img->Width() + m_MarginItem;
-        } */
-
-        const int Rest = NumFrames - m_CurrentFrame;
-        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeString(time(0) + (Rest / FramesPerSecond)));
-        LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
-                              Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
-        left += m_Font->Width(*EndTime) + FontWidthSpace;
-
-        //* Draw end time of cutted recording with cutted symbol
-        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {
-            // if (CurrentFramesAfterEdit >= FramesAfterEdit) {  // Only if greater than '00:00'
-                img = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
-                if (img) {
-                    IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
-                    left += img->Width() + m_MarginItem;
-                }
-
-                const int RestCutted = FramesAfterEdit - CurrentFramesAfterEdit;
-                EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));
-                LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
-                // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
-            // }
-        }
-    }  // Config.PlaybackShowEndTime
-
-    //* Draw total and cutted length with cutted symbol (Right side)
+    //* Draw total and cutted length with cutted symbol (Right side, 1. line)
     img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
     const int ImgWidth = (img) ? img->Width() : 0;
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
-        cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
+        cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
         const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
 
         int right = m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
@@ -493,7 +459,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         }  // Config.TimeSecsScale < 1.0
 
         if (ImgCutted) {  // Draw preloaded 'recording_cutted_extra' icon
-            IconsPixmap->DrawImage(cPoint(right, 0), *ImgCutted);
+            IconsPixmap->DrawImage(cPoint(right, TopOffset), *ImgCutted);
             right += ImgCuttedWidth + m_MarginItem;  // 'ImgCuttedWidth' is already set
         }
 
@@ -557,6 +523,40 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(m_Total), m_FontHeight);
         }
     }  // HasMarks
+
+    //* Draw end time of recording with symbol for cutted end time (2. line)
+    if (Config.PlaybackShowEndTime > 0) {  // 1 = End time, 2 = End time and cutted end time
+        left = m_MarginItem;
+        //* Image instead of 'ends at:' text
+        /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
+        if (img) {
+            IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
+            left += img->Width() + m_MarginItem;
+        } */
+
+        const int Rest = NumFrames - m_CurrentFrame;
+        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeString(time(0) + (Rest / FramesPerSecond)));
+        LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
+                              Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
+        left += m_Font->Width(*EndTime) + FontWidthSpace;
+
+        //* Draw end time of cutted recording with cutted symbol
+        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {
+            // if (CurrentFramesAfterEdit >= FramesAfterEdit) {  // Only if greater than '00:00'
+                img = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
+                if (img) {
+                    IconsPixmap->DrawImage(cPoint(left, m_FontHeight + TopOffset), *img);
+                    left += img->Width() + m_MarginItem;
+                }
+
+                const int RestCutted = FramesAfterEdit - CurrentFramesAfterEdit;
+                EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));
+                LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
+                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
+                // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
+            // }
+        }
+    }  // Config.PlaybackShowEndTime
 
     //* Draw Banner/Poster
     if (m_Recording) {
@@ -736,12 +736,12 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     ImgLoader.LoadIcon("pause_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("recording_cutted_extra", m_FontHeight, m_FontHeight);
 
     const ulong CharCode = 0x00000030;  // Zero: U+0030
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);
     ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
     ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
+    ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
 
     ImgLoader.LoadIcon("recording_untested_replay", 999, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_ok_replay", 999, m_FontSmlHeight);
