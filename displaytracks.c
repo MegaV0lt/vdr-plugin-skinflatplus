@@ -104,12 +104,12 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     // From skinnopacity: -1 ac3, else stereo
     if (AudioChannel == -1 && img_ac3) {
         const int IconLeft = m_MaxItemWidth - img_ac3->Width() - m_MarginItem;
-        const int IconTop = (m_FontHeight - img_ac3->Height()) / 2;
-        TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_ac3);
+        // const int IconTop = (m_FontHeight - img_ac3->Height()) / 2;
+        TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_ac3);
     } else if (img_stereo) {
         const int IconLeft = m_MaxItemWidth - img_stereo->Width() - m_MarginItem;
-        const int IconTop = (m_FontHeight - img_stereo->Height()) / 2;
-        TracksLogoPixmap->DrawImage(cPoint(IconLeft, IconTop), *img_stereo);
+        // const int IconTop = (m_FontHeight - img_stereo->Height()) / 2;
+        TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_stereo);
     }
     return;
 }

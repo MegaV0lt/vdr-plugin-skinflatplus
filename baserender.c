@@ -304,7 +304,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
 }
-// Should be called with every "Flush"!
+//* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate(void) {
     if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
         return;
@@ -509,8 +509,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         if (m_TopBarMenuIconRightSet) {
             img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                const int IconTop = (m_TopBarHeight / 2 - img->Height() / 2);
-                TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, IconTop), *img);
+                TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *img);
             }
         }
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
