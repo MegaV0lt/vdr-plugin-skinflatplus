@@ -1,8 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-xx-xx: Version 1.0.6
+2024-08-08: Version 1.0.6
 - [update] Calculate image high and position depending on font for
-           recording_pos and recording_total
+           recording_extra_cutted, recording_pos and recording_total
 - [update] Disable log in ~cFlatDisplayMessage
 - [update] Some internal optimizations
 
