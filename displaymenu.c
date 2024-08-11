@@ -2227,7 +2227,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (Config.EpgAdditionalInfoShow) {
         Text.Append("\n");
         // Genre
-        InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
+        InsertGenreInfoIcon(Event, Text, GenreIcons);  // Add genre info
 
         // FSK
         if (Event->ParentalRating()) {
@@ -2952,7 +2952,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
-            InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
+            InsertGenreInfoIcon(Event, Text, GenreIcons);  // Add genre info
 
             if (Event->Contents(0))
                 Text.Append("\n");
@@ -3699,7 +3699,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
         }
     }
 }
-void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
+void cFlatDisplayMenu::InsertGenreInfoIcon(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
     bool FirstContent {true};
     for (int i{0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
