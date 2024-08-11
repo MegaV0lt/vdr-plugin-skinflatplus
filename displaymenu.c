@@ -2681,7 +2681,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
-            GetCuttedLengthSize(Recording, Text);  // Process marks and insert text
+            InsertCuttedLengthSize(Recording, Text);  // Process marks and insert text
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
@@ -2963,7 +2963,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
 
-        GetCuttedLengthSize(Recording, RecAdditional);  // Process marks and insert text
+        InsertCuttedLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505

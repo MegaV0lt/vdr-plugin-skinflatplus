@@ -288,5 +288,5 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts(void);
 int GetFrameAfterEdit(const cMarks *marks = NULL, int Frame = 0, int LastFrame = 0);
-void GetCuttedLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
+void InsertCuttedLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);

@@ -392,9 +392,9 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     return EditedFrame;
 }
 
-void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
+void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlat::GetCuttedLengthSize()");
+    dsyslog("flatPlus: cFlat::InsertCuttedLengthSize()");
 #endif
 
     cMarks Marks;
