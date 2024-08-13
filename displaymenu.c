@@ -359,7 +359,6 @@ void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char
 }
 
 void cFlatDisplayMenu::SetMessage(eMessageType Type, const char *Text) {
-    // MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 

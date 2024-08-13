@@ -91,8 +91,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar(void);
         void ItemBorderClear(void);
 
-        //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
-        // static std::string items[16];
         const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                      "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                      "Replay",   "Miscellaneous", "Plugins", "Restart"};
@@ -101,7 +99,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts(void);  // Get number of recordings and new recordings (35*/53)
-        // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 
