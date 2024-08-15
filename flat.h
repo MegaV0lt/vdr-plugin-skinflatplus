@@ -19,6 +19,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <memory>   // For 'unique_ptr<T>()' ...
 #include <cstring>  // string.h
 #include <string_view>
 #include <random>

@@ -4408,8 +4408,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     ContentTop += 6;
 
     const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
-    int r = system(*ExecFile);
-    r += 0;  // Prevent warning for unused variable
+    [[maybe_unused]] int r = system(*ExecFile);  // Prevent warning for unused variable
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
@@ -4783,8 +4782,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
-    int r = system(*ExecFile);
-    r += 0;  // Prevent warning for unused variable
+    [[maybe_unused]] int r = system(*ExecFile);  // Prevent warning for unused variable
 
     int CountTemps {0};
 
@@ -4879,8 +4877,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
         return -1;
 
     const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
-    int r = system(*ExecFile);
-    r += 0;  // Prevent warning for unused variable
+    [[maybe_unused]] int r = system(*ExecFile);  // Prevent warning for unused variable
 
     std::string Title {""};
     Title.reserve(32);

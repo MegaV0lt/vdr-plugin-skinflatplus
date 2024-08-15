@@ -313,7 +313,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
     const int FontSecsAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
     const int TopSecs = FontAscender - FontSecsAscender;
 
-    const ulong CharCode = 0x00000030;  // Zero: U+0030
+    constexpr ulong CharCode = 0x00000030;  // Zero: U+0030
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);
     // const int TopOffset = Setup.FontOsdSize - GlyphSize - (Setup.FontOsdSize - FontAscender);
     const int TopOffset = FontAscender - GlyphSize;  //? Should be the same
@@ -709,7 +709,6 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
 }
 
 void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
-    // MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
@@ -737,7 +736,7 @@ void cFlatDisplayReplay::PreLoadImages(void) {
     ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
 
-    const ulong CharCode = 0x00000030;  // Zero: U+0030
+    constexpr ulong CharCode = 0x00000030;  // Zero: U+0030
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);
     ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
     ImgLoader.LoadIcon("recording_total", 999, GlyphSize);

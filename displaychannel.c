@@ -405,7 +405,6 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
-    // MessageSetExtraTime(Text);  // For long messages increase 'MessageTime'
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 

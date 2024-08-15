@@ -402,12 +402,15 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
     const double FramesPerSecond = Recording->FramesPerSecond();
     const char *RecordingFileName = Recording->FileName();
-    cIndexFile *index {nullptr};
+    // cIndexFile *index {nullptr};
+    std::unique_ptr<cIndexFile> index;  // No leek because must not be deleted
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
-        index = new cIndexFile(RecordingFileName, false, IsPesRecording);
+        // index = new cIndexFile(RecordingFileName, false, IsPesRecording);  // Possible leak
         // cIndexFile index(RecordingFileName, false, IsPesRecording);
+        // Assign unique ptr object
+        index = std::unique_ptr<cIndexFile>(new cIndexFile(RecordingFileName, false, IsPesRecording));
     }
 
     bool FsErr {false};
@@ -473,18 +476,17 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
                                          *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
-    delete index;
+    // delete index;  //* Not for 'unique_ptr<T>()'
 
-    uint64_t RecSize{0};
-    RecSize = FileSize[i - 1];  // In case of error show partial size
+    uint64_t RecSize = FileSize[i - 1];  // In case of error show partial size
     if (RecSize > MEGABYTE(1023))                 // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
         Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
 
-    if (HasMarks) {
-        if (RecSize > MEGABYTE(1023))
+    if (HasMarks && (RecSizeCutted > 0)) {  // Do not show zero value
+        if (RecSizeCutted > MEGABYTE(1023))
             Text.Append(
                 cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
         else
