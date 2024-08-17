@@ -19,13 +19,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     TopBarCreate();
     MessageCreate();
 
-    m_TVSLeft = 20 + Config.decorBorderChannelEPGSize;
-    m_TVSTop = m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize;
-    m_TVSWidth = m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2;
-    m_TVSHeight = m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2;
-
-    ChanEpgImagesPixmap =
-        CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, cRect(m_TVSLeft, m_TVSTop, m_TVSWidth, m_TVSHeight));
+    TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
+                m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
+                m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2,
+                m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, TVSRect);
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     LabelPixmap =
@@ -615,7 +613,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 cString RecImage {""};
                 if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
                     MediaPath = RecImage;
-                    img = ImgLoader.LoadFile(*MediaPath, m_TVSWidth, m_TVSHeight);
+                    img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
                     else
@@ -628,7 +626,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
-            SetMediaSize(MediaSize, cSize(m_TVSWidth, m_TVSHeight));  // Check for too big images
+            SetMediaSize(MediaSize, TVSRect.Size());  // Check for too big images
             MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
             MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
             img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());

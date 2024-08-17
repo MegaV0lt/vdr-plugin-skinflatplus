@@ -27,9 +27,9 @@ enum eBorder {
 };
 
 struct sDecorBorder {
-    int Left, Top, Width, Height, Size, Type;
-    tColor ColorFg, ColorBg;
-    int From;
+    int Left {0}, Top {0}, Width {0}, Height {0}, Size {0}, Type {0};
+    tColor ColorFg {clrTransparent}, ColorBg {clrTransparent};
+    int From {0};
 };
 
 class cFlatBaseRender {

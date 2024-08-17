@@ -14,7 +14,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
  private:
         cString m_Current {""}, m_Total {""};
         int m_LastCurrentWidth {0};
-        
+
         int m_LabelHeight {0};
         cPixmap *LabelPixmap {nullptr};
         cPixmap *LabelJumpPixmap {nullptr};
@@ -30,8 +30,8 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         double m_ScreenAspect {0.0};
 
         // TVScraper
-        int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
-
+        cRect TVSRect {0, 0, 0, 0};
+        
         // Dimm on pause
         bool m_DimmActive {false};
         time_t m_DimmStartTime {0};

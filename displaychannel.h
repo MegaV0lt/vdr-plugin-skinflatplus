@@ -38,7 +38,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int m_SignalStrengthRight {0};
 
         // TVScraper
-        int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
+        cRect TVSRect {0, 0, 0, 0};
 
         // TextScroller
         cTextScrollers Scrollers;

@@ -93,9 +93,9 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
 
     esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Size().Width(),
             DrawPort.Size().Height());
-    cRect NewDrawPort = DrawPort;
     const int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
     const int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
+    cRect NewDrawPort = DrawPort;
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
         esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
@@ -166,8 +166,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
             if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
             if (FrameWidth > 720) return "hd";
             return "sd";  // 720 and below is considered sd
-        }
-        else  // NOLINT
+        } else  // NOLINT
     #endif
         {   // Find radio and H.264/H.265 streams.
             //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
@@ -402,15 +401,12 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
     const double FramesPerSecond = Recording->FramesPerSecond();
     const char *RecordingFileName = Recording->FileName();
-    // cIndexFile *index {nullptr};
-    std::unique_ptr<cIndexFile> index;  // No leek because must not be deleted
+    std::unique_ptr<cIndexFile> index;  // Automaticly be deleted; no need for 'new'
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
-        // index = new cIndexFile(RecordingFileName, false, IsPesRecording);  // Possible leak
-        // cIndexFile index(RecordingFileName, false, IsPesRecording);
         // Assign unique ptr object
-        index = std::unique_ptr<cIndexFile>(new cIndexFile(RecordingFileName, false, IsPesRecording));
+        index = std::make_unique<cIndexFile>(RecordingFileName, false, IsPesRecording);
     }
 
     bool FsErr {false};
@@ -476,10 +472,9 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
                                          *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
-    // delete index;  //* Not for 'unique_ptr<T>()'
 
     uint64_t RecSize = FileSize[i - 1];  // In case of error show partial size
-    if (RecSize > MEGABYTE(1023))                 // Show a '!' when an error occurred detecting filesize
+    if (RecSize > MEGABYTE(1023))        // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
