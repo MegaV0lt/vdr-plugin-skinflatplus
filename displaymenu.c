@@ -1185,7 +1185,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         strftime(Buffer, sizeof(Buffer), "%Y%m%d", &tm_r);
         day = Buffer;
     }
-    const char *File {Setup.FoldersInTimerMenu ? NULL : strrchr(Timer->File(), FOLDERDELIMCHAR)};
+    const char *File {(Setup.FoldersInTimerMenu) ? NULL : strrchr(Timer->File(), FOLDERDELIMCHAR)};
     if (File && strcmp(File + 1, TIMERMACRO_TITLE) && strcmp(File + 1, TIMERMACRO_EPISODE))
         ++File;
     else
@@ -1572,7 +1572,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += ImageHeight + m_MarginItem;
 
         const cString Title = Event->Title();
-        const cString ShortText = Event->ShortText() ? Event->ShortText() : "";
+        const cString ShortText = (Event->ShortText()) ? Event->ShortText() : "";
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             if (Current) {
@@ -2252,9 +2252,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // if Components
     }  // EpgAdditionalInfoShow
 
-    const double IconHeight {(m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0};
-    int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;  // Narrowing conversion
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image. Narrowing conversion
+    const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
+    int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
+    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
     cString IconName {""};
     cImage *img {nullptr};
     if (strlen(*Fsk) > 0) {
@@ -3292,8 +3292,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
 
-    const cString StrTime = cString::sprintf("%s  %s  %s", *DateString(Recording->Start()),
-                                *TimeString(Recording->Start()), RecInfo->ChannelName() ? RecInfo->ChannelName() : "");
+    const cString StrTime =
+        cString::sprintf("%s  %s  %s", *DateString(Recording->Start()), *TimeString(Recording->Start()),
+                         (RecInfo->ChannelName()) ? RecInfo->ChannelName() : "");
 
     cString Title = RecInfo->Title();
     if (isempty(*Title))
@@ -3479,7 +3480,7 @@ int cFlatDisplayMenu::GetTextAreaWidth(void) const {
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
-    const cFont *font = FixedFont ? m_FontFixed : m_Font;
+    const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
     return font;
 }
 
@@ -3579,12 +3580,12 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
     if (value < 0) return false;
 
-    const int LastRecTimeFromFolder = GetLastRecTimeFromFolder(Recording, Level);  // Narrowing conversion
-    time_t now = time(NULL);
+    const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
+    const time_t now {time(NULL)};
 
     const int DiffSecs = now - LastRecTimeFromFolder;  // Narrowing conversion
     const int days {DiffSecs / (60 * 60 * 24)};
-    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %d time: %d value: %d diff: %d days: %d",
+    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %ld time: %d value: %d diff: %d days: %d",
     //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
     return (days > value) ? true : false;
 }

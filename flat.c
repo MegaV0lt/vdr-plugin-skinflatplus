@@ -412,7 +412,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     bool FsErr {false};
     uint64_t FileSize[65535];
     FileSize[0] = 0;
-    const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;  // Narrowing conversion
+    const uint16_t MaxFiles = (IsPesRecording) ? 999 : 65535;  // Narrowing conversion
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName {""};
@@ -543,13 +543,15 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
                 glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
                 // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode,
                 //          glyph_index);
-            } else
+            } else {
                 esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-        } else
+            }
+        } else {
             esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
-    } else
+        }
+    } else {
         esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-
+    }
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 
@@ -585,17 +587,21 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                         GlyphSize = (bbox.yMax - bbox.yMin) / 64;
                         // dsyslog("flatPlus: GetGlyphSize()\n   GlyphSize: %d bbox yMin/yMax: %ld %ld, FontHeight: %d",
                         //         GlyphSize, bbox.yMin, bbox.yMax, FontHeight);
-                    } else
+                    } else {
                         esyslog("flatPlus: FreeType: error %d during FT_Get_Glyph (font = %s)\n", rc, *FontFileName);
-                } else
+                    }
+                } else {
                     esyslog("flatPlus: FreeType: error %d during FT_Load_Glyph (font = %s)\n", rc, *FontFileName);
-            } else
+                }
+            } else {
                 esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-        } else
+            }
+        } else {
             esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
-    } else
+        }
+    } else {
         esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-
+    }
     FT_Done_Glyph(glyph);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
@@ -750,8 +756,10 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    // uint32_t tick0 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: TextFloatingWrapper::Set() Textlength: %ld", strlen(Text));
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextFloatingWrapper::Set() Text length: %ld", strlen(Text));
+    uint32_t tick0 {GetMsTicks()};
+#endif
 
     free(m_Text);
     m_Text = (Text) ? strdup(Text) : nullptr;
@@ -815,8 +823,10 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         }
         p += sl;
     }  // for char
-    // uint32_t tick1 = GetMsTicks();
-    // dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+#ifdef DEBUGFUNCSCALL
+    uint32_t tick1 {GetMsTicks()};
+    dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+#endif
 }
 
 const char *cTextFloatingWrapper::Text(void) {

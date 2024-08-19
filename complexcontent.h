@@ -121,8 +121,8 @@ class cSimpleContent {
         if (!Pixmap) return;
 
         if (m_ContentType == CT_Text) {
-            Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top()), m_Text.c_str(), m_ColorFg, m_ColorBg, m_Font,
-                             m_TextWidth, m_TextHeight, m_TextAlignment);
+            Pixmap->DrawText(m_Position.Point(), m_Text.c_str(), m_ColorFg, m_ColorBg, m_Font, m_TextWidth,
+                             m_TextHeight, m_TextAlignment);
         } else if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
@@ -140,7 +140,7 @@ class cSimpleContent {
         } else if (m_ContentType == CT_Rect) {
             Pixmap->DrawRectangle(m_Position, m_ColorBg);
         } else if (m_ContentType == CT_Image) {
-            Pixmap->DrawImage(cPoint(m_Position.Left(), m_Position.Top()), *m_Image);
+            Pixmap->DrawImage(m_Position.Point(), *m_Image);
         }
     }
 };

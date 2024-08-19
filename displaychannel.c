@@ -118,14 +118,14 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
         ChannelName = Channel->Name();
         if (!IsGroup)
-            ChannelNumber = cString::sprintf("%d%s", Channel->Number(), Number ? "-" : "");
+            ChannelNumber = cString::sprintf("%d%s", Channel->Number(), (Number) ? "-" : "");
         else if (Number)
             ChannelNumber = cString::sprintf("%d-", Number);
 
         m_CurChannel = Channel;
-    } else
+    } else {
         ChannelName = ChannelString(NULL, 0);
-
+    }
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
 
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
@@ -236,7 +236,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         left += m_Font->Width("00:00  ");
 
     if (Present) {
-        const cString StartTime = Present->GetTimeString();
+        const cString StartTime = *Present->GetTimeString();
         const cString StrTime = cString::sprintf("%s - %s", *StartTime, *Present->GetEndTimeString());
         const int StrTimeWidth {m_FontSml->Width(*StrTime) + m_FontSml->Width("  ")};
 
@@ -277,7 +277,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if ((EpgWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*epg, cRect(Config.decorBorderChannelSize + left,
-                                              Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom,
+                                              Config.decorBorderChannelSize + m_ChannelHeight - HeightBottom,
                                               m_ChannelWidth - left - MaxWidth,
                                               m_FontHeight), Theme.Color(clrChannelFontEpg), clrTransparent, m_Font);
         } else {
@@ -287,7 +287,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if ((EpgShortWidth > m_ChannelWidth - left - MaxWidth) && Config.ScrollerEnable) {
             Scrollers.AddScroller(*EpgShort, cRect(Config.decorBorderChannelSize + left,
-                                  Config.decorBorderChannelSize+m_ChannelHeight - HeightBottom + m_FontHeight,
+                                  Config.decorBorderChannelSize + m_ChannelHeight - HeightBottom + m_FontHeight,
                                   m_ChannelWidth - left - MaxWidth,
                                   m_FontSmlHeight), Theme.Color(clrChannelFontEpg), clrTransparent, m_FontSml);
         } else {
@@ -303,7 +303,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     if (Following) {
         IsRec = false;
-        const cString StartTime = Following->GetTimeString();
+        const cString StartTime = *Following->GetTimeString();
         const cString StrTime = cString::sprintf("%s - %s", *StartTime, *Following->GetEndTimeString());
         const int StrTimeWidth {m_FontSml->Width(*StrTime) + m_FontSml->Width("  ")};
 

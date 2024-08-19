@@ -77,7 +77,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_OsdHeight = Height;
 
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
-    tArea Area = {0, 0, Width, Height, 32};
+    tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) {
         // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
         return;
@@ -309,7 +309,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
     if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
         return;
 
-    cString Buffer {""}, CurDate = DayDateTime();
+    cString Buffer {""}, CurDate = *DayDateTime();
     if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
@@ -361,7 +361,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
         const time_t t {time(NULL)};
-        const cString time = TimeString(t);
+        const cString time {*TimeString(t)};
         if (Config.TopBarHideClockText)
             Buffer = *time;
         else
@@ -372,10 +372,10 @@ void cFlatBaseRender::TopBarUpdate(void) {
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString weekday {WeekDayNameFull(t)};
+        const cString weekday {*WeekDayNameFull(t)};
         const int WeekdayWidth {m_TopBarFontSml->Width(*weekday)};
 
-        const cString date = ShortDateString(t);
+        const cString date {*ShortDateString(t)};
         const int DateWidth {m_TopBarFontSml->Width(*date)};
 
         Right = TopBarWidth - TimeWidth - std::max(WeekdayWidth, DateWidth) - m_MarginItem;
@@ -406,7 +406,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
             }
         }  // Config.TopBarRecConflictsShow
 
-        int NumRec {0};
+        uint NumRec {0};
         if (Config.TopBarRecordingShow) {
             // Look for timers
             auto recCounterFuture = std::async([&NumRec]() {
@@ -475,8 +475,8 @@ void cFlatBaseRender::TopBarUpdate(void) {
         if (m_TopBarExtraIconSet) {
             img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
             if (img) {
-                const int IconTop {0};
-                TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *img);
+                // const int IconTop {0};
+                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *img);
                 Right += img->Width() + m_MarginItem;
             }
         }
@@ -822,12 +822,12 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
 #endif
 
     const uint threshold {75};  // TODO: Add config options?
-    const std::size_t MessageLength = strlen(Text);
+    const std::size_t MessageLength {strlen(Text)};
     if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
         // Narrowing conversion
         int ExtraTime =
             (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
-        const int MaxExtraTime {Setup.OSDMessageTime * 3};                      // Max. extra time to add
+        const int MaxExtraTime {Setup.OSDMessageTime * 3};                     // Max. extra time to add
         if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
         // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime,
         //          m_OSDMessageTime);
@@ -1177,10 +1177,10 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
         ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
 
     if (Start) {
-        if (PosCurrent > PosMark)
+        if (PosCurrent > PosMark) {
             ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosMark - PosMarkLast, sml),
                                              m_ProgressBarColorBarCurFg);
-        else {
+        } else {
             // Marker
             ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - big / 2, top - big / 2, big, big),
                                              m_ProgressBarColorBarCurFg);
@@ -1737,14 +1737,16 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
                 rc = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
                 if (!rc) {
                     Ascender = face->size->metrics.ascender / 64;
-                } else
+                } else {
                     esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
+                }
             }
-        } else
+        } else {
             esyslog("ERROR: FreeType: load error %d (font = %s)", rc, *FontFileName);
-    } else
+        }
+    } else {
         esyslog("ERROR: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-
+    }
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 
@@ -1842,8 +1844,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         std::istringstream istr(PrecToday);
         istr.imbue(std::locale("C"));
         istr >> p;
-        p = p * 100.0;
-        p = RoundUp(p, 10);
+        p = RoundUp(p * 100.0, 10);
         PrecToday = cString::sprintf("%.0f%%", p);
     }
 
@@ -1856,8 +1857,7 @@ void cFlatBaseRender::DrawWidgetWeather(void) {
         std::istringstream istr(PrecTomorrow);
         istr.imbue(std::locale("C"));
         istr >> p;
-        p = p * 100.0;
-        p = RoundUp(p, 10);
+        p = RoundUp(p * 100.0, 10);
         PrecTomorrow = cString::sprintf("%.0f%%", p);
     }
 
