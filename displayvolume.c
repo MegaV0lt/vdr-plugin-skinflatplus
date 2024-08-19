@@ -13,11 +13,11 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
 
     CreateFullOsd();
     TopBarCreate();
-    const int width = m_OsdWidth / 4 * 3;
+    const int width {m_OsdWidth / 4 * 3};
 
-    const int top = m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
-              Config.decorBorderVolumeSize * 2;
-    const int left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
+    const int top {m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
+              Config.decorBorderVolumeSize * 2};
+    const int left {(m_OsdWidth - width - Config.decorBorderVolumeSize) / 2};
 
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
     MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
@@ -41,14 +41,14 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     const cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
     const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
-    const int MaxLabelWidth = m_Font->Width(*MaxLabel) + m_MarginItem;
-    int left = m_OsdWidth / 2 - MaxLabelWidth / 2;
+    const int MaxLabelWidth {m_Font->Width(*MaxLabel) + m_MarginItem};
+    int left {m_OsdWidth / 2 - MaxLabelWidth / 2};
 
     LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight),
                                Theme.Color(clrVolumeBg));
 
-    const int DecorTop =
-        m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2;
+    const int DecorTop {
+        m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - Config.decorBorderVolumeSize * 2};
     DecorBorderClear(
         cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight),
         Config.decorBorderVolumeSize);
@@ -75,7 +75,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
 
     ProgressBarDraw(Current, Total);
 
-    const int width = (m_OsdWidth / 4 * 3);
+    const int width {(m_OsdWidth / 4 * 3)};
     left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
     DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
                     width + m_MarginItem2, Config.decorProgressVolumeSize + m_MarginItem2,

@@ -41,7 +41,7 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive {false};
-time_t m_RemoteTimersLastRefresh = 0;
+time_t m_RemoteTimersLastRefresh {0};
 
 cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
     Display_Menu = NULL;
@@ -93,9 +93,9 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
 
     esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Size().Width(),
             DrawPort.Size().Height());
-    const int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
-    const int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
-    cRect NewDrawPort = DrawPort;
+    const int width {std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width())};
+    const int height {std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height())};
+    cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
         esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
@@ -161,7 +161,7 @@ cString GetFormatIcon(int ScreenWidth) {
 cString GetRecordingFormatIcon(const cRecording *Recording) {
     // From skin ElchiHD
     #if APIVERSNUM >= 20605
-        const uint16_t FrameWidth = Recording->Info()->FrameWidth();
+        const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
         if (FrameWidth > 0) {
             if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
             if (FrameWidth > 720) return "hd";
@@ -199,8 +199,8 @@ cString GetRecordingerrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
-    const double FrameSeen = FrameResume * 1.0 / FrameTotal;
-    const double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
+    const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
@@ -398,10 +398,10 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
     cMarks Marks;
     bool HasMarks {false};
-    const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
-    const double FramesPerSecond = Recording->FramesPerSecond();
-    const char *RecordingFileName = Recording->FileName();
-    std::unique_ptr<cIndexFile> index;  // Automaticly be deleted; no need for 'new'
+    const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
+    const double FramesPerSecond {Recording->FramesPerSecond()};
+    const char *RecordingFileName {Recording->FileName()};
+    std::unique_ptr<cIndexFile> index;  // Automatically be deleted; no need for 'new'
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
@@ -412,7 +412,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     bool FsErr {false};
     uint64_t FileSize[65535];
     FileSize[0] = 0;
-    const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
+    const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;  // Narrowing conversion
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName {""};
@@ -473,7 +473,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
         Text.Append("\n");
     }
 
-    uint64_t RecSize = FileSize[i - 1];  // In case of error show partial size
+    uint64_t RecSize {FileSize[i - 1]};  // In case of error show partial size
     if (RecSize > MEGABYTE(1023))        // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
@@ -519,8 +519,8 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
 // Returns the string between start and end or an empty string if not found
 std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
-    const std::size_t start = source.find(StrStart);
-    const std::size_t end = source.find(StrEnd);
+    const std::size_t start {source.find(StrStart)};
+    const std::size_t end {source.find(StrEnd)};
 
     if (std::string::npos != start && std::string::npos != end)
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
@@ -533,7 +533,7 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
     FT_Face face;
     FT_UInt glyph_index {0};
     const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc = FT_Init_FreeType(&library);
+    int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
@@ -564,7 +564,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     FT_BBox bbox;    // The control (bounding) box
     FT_UInt glyph_index {0};
     const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc = FT_Init_FreeType(&library);
+    int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
@@ -628,7 +628,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     //* Workaround for detecting 'HairSpace'
     const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than and space
-    const char *HairSpace = u8"\U0000200A", *Space = " ";
+    const char *HairSpace {u8"\U0000200A"}, *Space {" "};
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
         // dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
@@ -636,33 +636,34 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         FillChar = HairSpace;
         // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
     }
-    const int FillCharWidth = Font->Width(FillChar);      // Width in pixel
-    const std::size_t FillCharLength = strlen(FillChar);  // Length in chars
+    const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
+    const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
-    const int LineWidth = Font->Width(Line.c_str());   // Width in Pixel
+    const int LineWidth {Font->Width(Line.c_str())};   // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
         // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
         return;
     }
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid div/0 with lines without space
-        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces, FillCharWidth);
+        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
+        //          FillCharWidth);
         return;
     }
 
     if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
-        const int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-        int FillCharBlock = NeedFillChar / LineSpaces;                  // For inserting multiple 'FillChar'
-        if (!FillCharBlock) ++FillCharBlock;                            // Set minimum to one 'FillChar'
+        const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
+        int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'. Narrowing conversion
+        if (!FillCharBlock) ++FillCharBlock;            // Set minimum to one 'FillChar'
 
         std::string FillChars {""};
         FillChars.reserve(16);
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }
-        const std::size_t FillCharsLength = FillChars.length();
+        const std::size_t FillCharsLength {FillChars.length()};
 
-        std::size_t LineLength = Line.length();
+        std::size_t LineLength {Line.length()};
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
         int InsertedFillChar {0};
         /* dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
@@ -672,7 +673,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                 FillCharWidth, FillCharsLength); */
 
         //* Insert blocks at spaces
-        std::size_t pos = Line.find(' ');
+        std::size_t pos {Line.find(' ')};
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
@@ -753,7 +754,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     // dsyslog("flatPlus: TextFloatingWrapper::Set() Textlength: %ld", strlen(Text));
 
     free(m_Text);
-    m_Text = Text ? strdup(Text) : nullptr;
+    m_Text = (Text) ? strdup(Text) : nullptr;
     if (!m_Text)
         return;
     m_Lines = 1;
@@ -762,11 +763,11 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 
     char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
     int cw {0}, l {0}, sl {0}, w {0};
-    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
+    int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
 
-    for (char *p = m_Text; *p;) {
+    for (char *p {m_Text}; *p;) {
         /* int */ sl = Utf8CharLen(p);
         /* uint */ sym = Utf8CharGet(p, sl);
         if (sym == '\n') {

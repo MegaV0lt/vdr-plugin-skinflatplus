@@ -128,8 +128,8 @@ class cSimpleContent {
             Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
             std::string Line {""};
             Line.reserve(128);
-            const int Lines = Wrapper.Lines();
-            const int FontHeight = m_Font->Height();
+            const int Lines {Wrapper.Lines()};
+            const int FontHeight {m_Font->Height()};
             for (int i {0}; i < Lines; ++i) {  // Justify line by line
                 Line = Wrapper.GetLine(i);
                 if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified

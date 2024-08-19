@@ -33,7 +33,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 void cTextScroll::UpdateViewPortWidth(int w) {
     if (!Pixmap) return;
 
-    cRect ViewPort = Pixmap->ViewPort();
+    cRect ViewPort {Pixmap->ViewPort()};
     ViewPort.SetWidth(ViewPort.Width() - w);
     Pixmap->SetViewPort(ViewPort);
 }
@@ -50,7 +50,7 @@ void cTextScroll::Draw(void) {
 
     if (ColorExtraTextFg) {
         std::string_view tilde {Text};
-        const std::size_t found = tilde.find('~');  // Search for ~
+        const std::size_t found {tilde.find('~')};  // Search for ~
         if (found != std::string::npos) {
             std::string_view sv1 {tilde.substr(0, found)};
             std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
@@ -58,7 +58,7 @@ void cTextScroll::Draw(void) {
             const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
             Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
-            const int l = Font->Width(first.c_str()) + Font->Width('X');
+            const int l {Font->Width(first.c_str()) + Font->Width('X')};
             Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
         } else {  // ~ not found
             Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
@@ -83,14 +83,14 @@ void cTextScroll::DoStep(void) {
         return;
     }
 
-    int DrawPortX = Pixmap->DrawPort().X();
+    int DrawPortX {Pixmap->DrawPort().X()};
 
     if (IsReserveStep)
         DrawPortX += PixelsPerStep;
     else
         DrawPortX -= PixelsPerStep;
 
-    int maxX = Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width();
+    int maxX {Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width()};
     maxX *= -1;
 
     if (ScrollType == 0) {

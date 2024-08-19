@@ -25,9 +25,9 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     else if (Config.ChannelIconsShow)
         HeightBottom += m_FontSmlHeight + m_MarginItem;
 
-    const int HeightTop = m_FontHeight;
+    const int HeightTop {m_FontHeight};
 
-    int height = HeightBottom;
+    int height {HeightBottom};
     ChanInfoBottomPixmap =
         CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
@@ -136,11 +136,11 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
     if (!IsGroup) {
-        const int ImageHeight = HeightImageLogo - m_MarginItem2;
-        int ImageBgHeight = ImageHeight;
-        int ImageBgWidth = ImageHeight;
-        int ImageLeft = m_MarginItem2;
-        int ImageTop = m_MarginItem;
+        const int ImageHeight {HeightImageLogo - m_MarginItem2};
+        int ImageBgHeight {ImageHeight};
+        int ImageBgWidth {ImageHeight};
+        int ImageLeft {m_MarginItem2};
+        int ImageTop {m_MarginItem};
         cImage *img = ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
         if (img) {
             ImageBgHeight = img->Height();
@@ -170,8 +170,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     // if (!Resolution)
         PixmapFill(ChanIconsPixmap, clrTransparent);
 
-    const int top = HeightBottom - m_FontSmlHeight - m_MarginItem;
-    int left = m_ChannelWidth - m_FontSmlHeight - m_MarginItem2;
+    const int top {HeightBottom - m_FontSmlHeight - m_MarginItem};
+    int left {m_ChannelWidth - m_FontSmlHeight - m_MarginItem2};
 
     cImage *img {nullptr};
     if (Channel) {
@@ -227,10 +227,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
     bool IsRec {false};
-    const int RecWidth = m_FontSml->Width("REC");
+    const int RecWidth {m_FontSml->Width("REC")};
 
-    int left = HeightBottom * 1.34 + m_MarginItem;
-    const int StartTimeLeft = left;
+    int left = HeightBottom * 1.34 + m_MarginItem;  // Narrowing conversion
+    const int StartTimeLeft {left};
 
     if (Config.ChannelShowStartTime)
         left += m_Font->Width("00:00  ");
@@ -238,21 +238,21 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Present) {
         const cString StartTime = Present->GetTimeString();
         const cString StrTime = cString::sprintf("%s - %s", *StartTime, *Present->GetEndTimeString());
-        const int StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
+        const int StrTimeWidth {m_FontSml->Width(*StrTime) + m_FontSml->Width("  ")};
 
         epg = Present->Title();
         EpgShort = Present->ShortText();
-        int EpgWidth = m_Font->Width(*epg) + m_MarginItem2;
-        const int EpgShortWidth = m_FontSml->Width(*EpgShort) + m_MarginItem2;
+        int EpgWidth {m_Font->Width(*epg) + m_MarginItem2};
+        const int EpgShortWidth {m_FontSml->Width(*EpgShort) + m_MarginItem2};
 
         if (Present->HasTimer()) {
             IsRec = true;
             EpgWidth += m_MarginItem + RecWidth;
         }
 
-        const int s = (time(NULL) - Present->StartTime()) / 60;
-        const int dur = Present->Duration() / 60;
-        const int sleft = dur - s;
+        const int s = (time(NULL) - Present->StartTime()) / 60;  // Narrowing conversion
+        const int dur {Present->Duration() / 60};
+        const int sleft {dur - s};
 
         cString seen {""};
         if (Config.ChannelTimeLeft == 0)
@@ -262,8 +262,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         else if (Config.ChannelTimeLeft == 2)
             seen = cString::sprintf("%d+ %d min", sleft, dur);
 
-        const int SeenWidth = m_FontSml->Width(*seen) + m_FontSml->Width("  ");
-        const int MaxWidth = std::max(StrTimeWidth, SeenWidth);
+        const int SeenWidth {m_FontSml->Width(*seen) + m_FontSml->Width("  ")};
+        const int MaxWidth {std::max(StrTimeWidth, SeenWidth)};
 
         ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem2, 0), *StrTime,
             Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_FontSml, StrTimeWidth, 0, taRight);
@@ -305,12 +305,12 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         IsRec = false;
         const cString StartTime = Following->GetTimeString();
         const cString StrTime = cString::sprintf("%s - %s", *StartTime, *Following->GetEndTimeString());
-        const int StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
+        const int StrTimeWidth {m_FontSml->Width(*StrTime) + m_FontSml->Width("  ")};
 
         epg = Following->Title();
         EpgShort = Following->ShortText();
-        int EpgWidth = m_Font->Width(*epg) + m_MarginItem2;
-        const int EpgShortWidth = m_FontSml->Width(*EpgShort) + m_MarginItem2;
+        int EpgWidth {m_Font->Width(*epg) + m_MarginItem2};
+        const int EpgShortWidth {m_FontSml->Width(*EpgShort) + m_MarginItem2};
 
         if (Following->HasTimer()) {
             EpgWidth += m_MarginItem + RecWidth;
@@ -318,8 +318,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         const cString dur = cString::sprintf("%d min", Following->Duration() / 60);
-        const int DurWidth = m_FontSml->Width(*dur) + m_FontSml->Width("  ");
-        const int MaxWidth = std::max(StrTimeWidth, DurWidth);
+        const int DurWidth {m_FontSml->Width(*dur) + m_FontSml->Width("  ")};
+        const int MaxWidth {std::max(StrTimeWidth, DurWidth)};
 
         ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem2,
                                        m_FontHeight + m_FontSmlHeight), *StrTime, Theme.Color(clrChannelFontEpgFollow),
@@ -410,8 +410,8 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
 void cFlatDisplayChannel::SignalQualityDraw(void) {
     if (!ChanInfoBottomPixmap) return;
 
-    const int SignalStrength = cDevice::ActualDevice()->SignalStrength();
-    const int SignalQuality = cDevice::ActualDevice()->SignalQuality();
+    const int SignalStrength {cDevice::ActualDevice()->SignalStrength()};
+    const int SignalQuality {cDevice::ActualDevice()->SignalQuality()};
     if (m_LastSignalStrength == SignalStrength && m_LastSignalQuality == SignalQuality)
         return;
 
@@ -420,15 +420,15 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
     cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
-    const int left = m_MarginItem2;
-    int top = m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem;
+    const int left {m_MarginItem2};
+    int top {m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem};
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                     - m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
-    int ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
-    const int SignalWidth = m_ChannelWidth / 2;
-    const int ProgressWidth = SignalWidth / 2 - ProgressLeft - m_MarginItem;
+    int ProgressLeft {left + SignalFont->Width("STR ") + m_MarginItem};
+    const int SignalWidth {m_ChannelWidth / 2};
+    const int ProgressWidth {SignalWidth / 2 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
@@ -481,8 +481,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999)
         return;
 
-    int left = m_SignalStrengthRight + m_MarginItem2;
-    int top = m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem;
+    int left {m_SignalStrengthRight + m_MarginItem2};
+    int top {m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem};
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem2;
 
@@ -518,12 +518,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
 
 void cFlatDisplayChannel::Flush(void) {
     if (m_Present) {
-        time_t t = time(NULL);
+        time_t t {time(NULL)};
         int Current {0};
         if (t > m_Present->StartTime())
             Current = t - m_Present->StartTime();
 
-        const int Total = m_Present->Duration();
+        const int Total {m_Present->Duration()};
         ProgressBarDraw(Current, Total);
     }
 
@@ -546,7 +546,7 @@ void cFlatDisplayChannel::Flush(void) {
 }
 
 void cFlatDisplayChannel::PreLoadImages(void) {
-    int height = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2;
+    int height {m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2};
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);
 

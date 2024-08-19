@@ -51,7 +51,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void DvbapiInfoDraw(void);
 
  public:
-        cFlatDisplayChannel(bool WithInfo);
+        explicit cFlatDisplayChannel(bool WithInfo);
         virtual ~cFlatDisplayChannel();
         virtual void SetChannel(const cChannel *Channel, int Number);
         virtual void SetEvents(const cEvent *Present, const cEvent *Following);

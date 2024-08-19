@@ -31,7 +31,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
 
         // TVScraper
         cRect TVSRect {0, 0, 0, 0};
-        
+
         // Dimm on pause
         bool m_DimmActive {false};
         time_t m_DimmStartTime {0};
@@ -46,7 +46,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         virtual void Action(void);
 
  public:
-        cFlatDisplayReplay(bool ModeOnly);
+        explicit cFlatDisplayReplay(bool ModeOnly);
         virtual ~cFlatDisplayReplay();
         virtual void SetRecording(const cRecording *Recording);
         virtual void SetTitle(const char *Title);
