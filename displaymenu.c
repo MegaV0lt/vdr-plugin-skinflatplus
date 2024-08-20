@@ -571,15 +571,15 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
     } catch (...) {
     }
     // Check for plugins
-    const char *MaimMenuEntry {nullptr};
+    const char *MainMenuEntry {nullptr};
     std::string PlugMainEntry {""};
     PlugMainEntry.reserve(32);  // Space for menu entry
     for (uint i {0};; ++i) {
         cPlugin *p = cPluginManager::GetPlugin(i);
         if (p) {
-            MaimMenuEntry = p->MainMenuEntry();
-            if (MaimMenuEntry) {
-                PlugMainEntry = MaimMenuEntry;
+            MainMenuEntry = p->MainMenuEntry();
+            if (MainMenuEntry) {
+                PlugMainEntry = MainMenuEntry;
                 try {
                     if (element.substr(0, PlugMainEntry.size()) == PlugMainEntry) {
                         return cString::sprintf("pluginIcons/%s", p->Name());
@@ -604,7 +604,7 @@ bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
 void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p {bar + 1};
-    bool IsProgressbar {true};
+    bool IsProgressBar {true};
     uint now {0}, total {0};
     for (; *p != ']'; ++p) {
         if (*p == ' ' || *p == '|') {
@@ -612,11 +612,11 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
             if (*p == '|')
                 ++now;
         } else {
-            IsProgressbar = false;
+            IsProgressBar = false;
             break;
         }
     }
-    if (IsProgressbar) {
+    if (IsProgressBar) {
         const double progress {now * 1.0 / total};
         ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
@@ -1839,7 +1839,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
             } else /* if (!RecordingIsInUse) */ {
-                IconName = *GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
                 if (Current) {
@@ -1853,7 +1853,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
+                IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
                 if (Current) {
@@ -2032,7 +2032,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (ImgRecNew)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
             } else {
-                IconName = *GetRecordingseenIcon(Recording->NumFrames(), Recording->GetResume());
+                IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
 
                 img = nullptr;
                 if (Current) {
@@ -2046,7 +2046,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                IconName = *GetRecordingerrorIcon(Recording->Info()->Errors());
+                IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
 
                 img = nullptr;
                 if (Current) {
@@ -3343,7 +3343,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
-        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
+        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
@@ -4966,11 +4966,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left {m_MarginItem};
     std::string icon {""}, summary {""}, TempMax {""}, TempMin {""}, prec {""};
-    icon.reserve(8);
-    summary.reserve(32);
-    TempMax.reserve(8);
-    TempMin.reserve(8);
-    prec.reserve(8);
+    icon.reserve(8); summary.reserve(32); TempMax.reserve(8); TempMin.reserve(8); prec.reserve(8);
     cString DayName {""}, PrecString("0%"), StrWeekDayName {""}, WeatherIcon {""};
     double p {0.0};
     time_t t {time(NULL)}, t2 {time(NULL)};

@@ -16,7 +16,7 @@ cFlatDisplayVolume::cFlatDisplayVolume(void) {
     const int width {m_OsdWidth / 4 * 3};
 
     const int top {m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_LabelHeight - m_MarginItem -
-              Config.decorBorderVolumeSize * 2};
+                   Config.decorBorderVolumeSize * 2};
     const int left {(m_OsdWidth - width - Config.decorBorderVolumeSize) / 2};
 
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));

@@ -43,13 +43,13 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
     m_Osd->DestroyPixmap(PixmapImage);
     PixmapImage = nullptr;
 
-    cRect PositionDraw;
-    PositionDraw.SetPoint(0, 0);
-    PositionDraw.SetWidth(m_Position.Width());
+    cRect PositionDraw {0, 0, m_Position.Width(), m_DrawPortHeight};
+    // PositionDraw.SetPoint(0, 0);
+    // PositionDraw.SetWidth(m_Position.Width());
     if (FullFillBackground && m_DrawPortHeight < m_Position.Height())
         PositionDraw.SetHeight(m_Position.Height());
-    else
-        PositionDraw.SetHeight(m_DrawPortHeight);
+    // else
+    //    PositionDraw.SetHeight(m_DrawPortHeight);
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, m_Position, PositionDraw);
     PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, m_Position, PositionDraw);
@@ -136,17 +136,18 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
     std::string Line {""};
     Line.reserve(128);
-    cRect FloatedTextPos(TextPos);
+    cRect FloatedTextPos {TextPos};
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
         if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified
             JustifyLine(Line, Font, (i < FloatLines) ? TextWidthLeft : TextWidthFull);
+
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
         // dsyslog("flatPlus: Adding floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
 
-    const cRect ImagePos(TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height());
+    const cRect ImagePos {TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height()};
     AddImage(image, ImagePos);
 }
 

@@ -276,8 +276,8 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingFormatIcon(const cRecording *Recording);
-cString GetRecordingerrorIcon(int RecInfoErrors);
-cString GetRecordingseenIcon(int FrameTotal, int FrameResume);
+cString GetRecordingErrorIcon(int RecInfoErrors);
+cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
 
 std::string_view ltrim(std::string_view str);
 std::string_view rtrim(std::string_view str);

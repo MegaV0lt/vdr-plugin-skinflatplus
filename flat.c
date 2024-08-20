@@ -187,7 +187,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     return "";  // Nothing found
 }
 
-cString GetRecordingerrorIcon(int RecInfoErrors) {
+cString GetRecordingErrorIcon(int RecInfoErrors) {
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
     if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
 
@@ -198,7 +198,7 @@ cString GetRecordingerrorIcon(int RecInfoErrors) {
     return "";
 }
 
-cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
+cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     const double FrameSeen {FrameResume * 1.0 / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
@@ -220,18 +220,27 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
-    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
+            ContentSize.Width(), ContentSize.Height());
+#endif
+    // TODO: Set to max size by default or also allow smaller media site?
+    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
-        // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else if (Aspect < 4) {                              //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 1/3 of pixmap width
-        // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else {                                              //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(ContentSize.Width() * (1.0 / (1920.0 / 758)));  // To get 758 width @ 1920
-        // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
+        MediaSize.SetHeight(
+            std::min(MediaSize.Height(), static_cast<int>(ContentSize.Height() * 0.7)));  // Max 70% of pixmap height
+    } else if (Aspect < 4) {  //* Portrait (For example 1920x1080 = 1.77)
+        MediaSize.SetWidth(
+            std::min(MediaSize.Width(), static_cast<int>(ContentSize.Width() / 3)));      // Max 1/3 of pixmap width
+    } else {                  //* Banner (Usually 758x140 = 5.41)
+        MediaSize.SetWidth(
+            std::min(MediaSize.Width(),
+                     static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   New MediaSize %dx%d", MediaSize.Width(), MediaSize.Height());
+#endif
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT

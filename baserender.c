@@ -575,6 +575,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
                                          Theme.Color(clrButtonBlue));
             break;
         }
+
         DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
                         Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
                         Config.decorBorderButtonBg, BorderButton);
@@ -810,7 +811,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
     }
 
-    int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
+    const int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
     DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight,
                     Config.decorBorderMessageSize, Config.decorBorderMessageType, Config.decorBorderMessageFg,
                     Config.decorBorderMessageBg, BorderMessage);

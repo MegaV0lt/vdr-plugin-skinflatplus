@@ -99,7 +99,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     cString InfoText {""};
     if (RecInfo->ShortText()) {
-        if (Config.PlaybackShowRecordingDate)  // Date Time - ShortText
+        if (Config.PlaybackShowRecordingDate)  // Date  Time - ShortText
             InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()),
                                     *TimeString(Recording->Start()), RecInfo->ShortText());
         else
@@ -151,7 +151,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
-        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingerrorIcon(RecInfo->Errors()));
+        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
         img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
         if (img) {
@@ -188,7 +188,6 @@ void cFlatDisplayReplay::Action(void) {
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     if (!LabelPixmap || !IconsPixmap) return;
 
-    int left {0};
     if (Play == false && Config.RecordingDimmOnPause) {
         time(&m_DimmStartTime);
         Start();
@@ -201,6 +200,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             Flush();
         }
     }
+    int left {0};
     if (Setup.ShowReplayMode) {
         left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem * 3)) / 2;
 
@@ -564,9 +564,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
         if (Config.TVScraperReplayInfoShowPoster && pScraper) {
             ScraperGetEventType call;
             call.recording = m_Recording;
-            int seriesId {0};
-            int episodeId {0};
-            int movieId {0};
+            int seriesId {0}, episodeId {0}, movieId {0};
 
             if (pScraper->Service("GetEventType", &call)) {
                 seriesId = call.seriesId;
@@ -699,7 +697,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw(void) {
             if (img) {
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
+                // left -= m_MarginItem2;
             }
         }
     }
