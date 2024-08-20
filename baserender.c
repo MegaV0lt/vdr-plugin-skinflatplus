@@ -515,9 +515,15 @@ void cFlatBaseRender::TopBarUpdate(void) {
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
                                Theme.Color(clrTopBarBg), m_TopBarFont, TitleMaxWidth);
 
-        DecorBorderDraw(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                        m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight, Config.decorBorderTopBarSize,
-                        Config.decorBorderTopBarType, Config.decorBorderTopBarFg, Config.decorBorderTopBarBg);
+        const sDecorBorder ib {Config.decorBorderTopBarSize,
+                               Config.decorBorderTopBarSize,
+                               m_OsdWidth - Config.decorBorderTopBarSize * 2,
+                               m_TopBarHeight,
+                               Config.decorBorderTopBarSize,
+                               Config.decorBorderTopBarType,
+                               Config.decorBorderTopBarFg,
+                               Config.decorBorderTopBarBg};
+        DecorBorderDraw(ib);
     }
 }
 
@@ -576,9 +582,16 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
-                        Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
-                        Config.decorBorderButtonBg, BorderButton);
+        const sDecorBorder ib {x + Config.decorBorderButtonSize,
+                               m_ButtonsTop,
+                               ButtonWidth,
+                               m_ButtonsHeight,
+                               Config.decorBorderButtonSize,
+                               Config.decorBorderButtonType,
+                               Config.decorBorderButtonFg,
+                               Config.decorBorderButtonBg,
+                               BorderButton};
+        DecorBorderDraw(ib);
         m_ButtonsDrawn = true;
     }
 
@@ -611,9 +624,16 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
-                        Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
-                        Config.decorBorderButtonBg, BorderButton);
+        const sDecorBorder ib {x + Config.decorBorderButtonSize,
+                               m_ButtonsTop,
+                               ButtonWidth,
+                               m_ButtonsHeight,
+                               Config.decorBorderButtonSize,
+                               Config.decorBorderButtonType,
+                               Config.decorBorderButtonFg,
+                               Config.decorBorderButtonBg,
+                               BorderButton};
+        DecorBorderDraw(ib);
         m_ButtonsDrawn = true;
     }
 
@@ -646,9 +666,16 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
-                        Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
-                        Config.decorBorderButtonBg, BorderButton);
+        const sDecorBorder ib {x + Config.decorBorderButtonSize,
+                               m_ButtonsTop,
+                               ButtonWidth,
+                               m_ButtonsHeight,
+                               Config.decorBorderButtonSize,
+                               Config.decorBorderButtonType,
+                               Config.decorBorderButtonFg,
+                               Config.decorBorderButtonBg,
+                               BorderButton};
+        DecorBorderDraw(ib);
         m_ButtonsDrawn = true;
     }
 
@@ -683,9 +710,16 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             break;
         }
 
-        DecorBorderDraw(x + Config.decorBorderButtonSize, m_ButtonsTop, ButtonWidth, m_ButtonsHeight,
-                        Config.decorBorderButtonSize, Config.decorBorderButtonType, Config.decorBorderButtonFg,
-                        Config.decorBorderButtonBg, BorderButton);
+        const sDecorBorder ib {x + Config.decorBorderButtonSize,
+                               m_ButtonsTop,
+                               ButtonWidth,
+                               m_ButtonsHeight,
+                               Config.decorBorderButtonSize,
+                               Config.decorBorderButtonType,
+                               Config.decorBorderButtonFg,
+                               Config.decorBorderButtonBg,
+                               BorderButton};
+        DecorBorderDraw(ib);
         m_ButtonsDrawn = true;
     }
 }
@@ -812,9 +846,16 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     }
 
     const int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
-    DecorBorderDraw(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight,
-                    Config.decorBorderMessageSize, Config.decorBorderMessageType, Config.decorBorderMessageFg,
-                    Config.decorBorderMessageBg, BorderMessage);
+    const sDecorBorder ib {Config.decorBorderMessageSize,
+                           top,
+                           m_OsdWidth - Config.decorBorderMessageSize * 2,
+                           m_MessageHeight,
+                           Config.decorBorderMessageSize,
+                           Config.decorBorderMessageType,
+                           Config.decorBorderMessageFg,
+                           Config.decorBorderMessageBg,
+                           BorderMessage};
+    DecorBorderDraw(ib);
 }
 
 void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messages increase 'OSDMessageTime'
@@ -1424,8 +1465,9 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
 void cFlatBaseRender::DecorBorderRedrawAll(void) {
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end; ++it) {
-        DecorBorderDraw((*it).Left, (*it).Top, (*it).Width, (*it).Height, (*it).Size, (*it).Type, (*it).ColorFg,
-                        (*it).ColorBg, (*it).From, false);
+        const sDecorBorder ib {(*it).Left, (*it).Top,     (*it).Width,   (*it).Height, (*it).Size,
+                         (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
+        DecorBorderDraw(ib, false);
     }
 }
 
@@ -1433,23 +1475,18 @@ void cFlatBaseRender::DecorBorderClearAll(void) {
     PixmapFill(DecorPixmap, clrTransparent);
 }
 
-void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type, tColor ColorFg,
-                                      tColor ColorBg, int From, bool Store) {
-    if (Size == 0 || Type <= 0) return;
+void cFlatBaseRender::DecorBorderDraw(const sDecorBorder &ib, bool Store) {
+    if (ib.Size == 0 || ib.Type <= 0) return;
 
-    if (Store) {
-        sDecorBorder f {
-            Left, Top, Width, Height, Size, Type, ColorFg, ColorBg, From
-        };
-        Borders.emplace_back(f);
-    }
+    if (Store)
+        Borders.emplace_back(ib);
 
-    const int Size2 {Size * 2};
-    const int LeftDecor {Left - Size};
-    const int TopDecor {Top - Size};
-    const int WidthDecor {Width + Size2};
-    const int HeightDecor {Height + Size2};
-    const int BottomDecor {Height + Size};
+    const int Size2 {ib.Size * 2};
+    const int LeftDecor {ib.Left - ib.Size};
+    const int TopDecor {ib.Top - ib.Size};
+    const int WidthDecor {ib.Width + Size2};
+    const int HeightDecor {ib.Height + Size2};
+    const int BottomDecor {ib.Height + ib.Size};
 
     if (!DecorPixmap) {
         // dsyslog("flatPlus: DecorBorderDraw() Creating 'DecorPixmap'");
@@ -1459,106 +1496,113 @@ void cFlatBaseRender::DecorBorderDraw(int Left, int Top, int Width, int Height, 
         PixmapFill(DecorPixmap, clrTransparent);
     }
 
-    switch (Type) {
+    switch (ib.Type) {
     case 1:  // Rect
         // Top
-        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, WidthDecor, ib.Size), ib.ColorBg);
         // Right
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor, Size, HeightDecor), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, HeightDecor), ib.ColorBg);
         // Bottom
-        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + BottomDecor, WidthDecor, ib.Size), ib.ColorBg);
         // Left
-        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, Size, HeightDecor), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor, ib.Size, HeightDecor), ib.ColorBg);
         break;
     case 2:  // Round
         // Top
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size, TopDecor, ib.Width, ib.Size), ib.ColorBg);
         // Right
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size, ib.Size, ib.Height),
+                                   ib.ColorBg);
         // Bottom
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size, TopDecor + BottomDecor, ib.Width, ib.Size), ib.ColorBg);
         // Left
-        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + ib.Size, ib.Size, ib.Height), ib.ColorBg);
 
         // Top,left corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, 2);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, ib.Size, ib.Size), ib.ColorBg, 2);
         // Top,right corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, 1);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, ib.Size), ib.ColorBg, 1);
         // Bottom,left corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, 3);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, ib.Size, ib.Size), ib.ColorBg, 3);
         // Bottom,right corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, 4);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + ib.Size + ib.Width, TopDecor + BottomDecor, ib.Size, ib.Size),
+                                 ib.ColorBg, 4);
         break;
     case 3:  // Invert round
         // Top
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size, TopDecor, ib.Width, ib.Size), ib.ColorBg);
         // Right
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size + Width, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size, ib.Size, ib.Height),
+                                   ib.ColorBg);
         // Bottom
-        DecorPixmap->DrawRectangle(cRect(LeftDecor + Size, TopDecor + BottomDecor, Width, Size), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor + ib.Size, TopDecor + BottomDecor, ib.Width, ib.Size), ib.ColorBg);
         // Left
-        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + Size, Size, Height), ColorBg);
+        DecorPixmap->DrawRectangle(cRect(LeftDecor, TopDecor + ib.Size, ib.Size, ib.Width), ib.ColorBg);
 
         // Top,left corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, Size, Size), ColorBg, -4);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor, ib.Size, ib.Size), ib.ColorBg, -4);
         // Top,right corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor, Size, Size), ColorBg, -3);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, ib.Size), ib.ColorBg, -3);
         // Bottom,left corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, Size, Size), ColorBg, -1);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor, TopDecor + BottomDecor, ib.Size, ib.Size), ib.ColorBg, -1);
         // Bottom,right corner
-        DecorPixmap->DrawEllipse(cRect(LeftDecor + Size + Width, TopDecor + BottomDecor, Size, Size), ColorBg, -2);
+        DecorPixmap->DrawEllipse(cRect(LeftDecor + ib.Size + ib.Width, TopDecor + BottomDecor, ib.Size, ib.Size),
+                                 ib.ColorBg, -2);
         break;
     case 4:  // Rect + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor, WidthDecor - Size2, ib.Size, ib.ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
-                             ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * ib.Size,
+                             ib.ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + ib.Size, ib.Size, HeightDecor - Size2, ib.ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
-                             ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size, -1 * ib.Size,
+                             HeightDecor - Size2, ib.ColorBg);
 
-        DecorDrawGlowRectTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg);
-        DecorDrawGlowRectTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg);
-        DecorDrawGlowRectBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg);
-        DecorDrawGlowRectBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg);
+        DecorDrawGlowRectTL(DecorPixmap, LeftDecor, TopDecor, ib.Size, ib.Size, ib.ColorBg);
+        DecorDrawGlowRectTR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, ib.Size, ib.ColorBg);
+        DecorDrawGlowRectBL(DecorPixmap, LeftDecor, TopDecor + ib.Size + ib.Height, ib.Size, ib.Size, ib.ColorBg);
+        DecorDrawGlowRectBR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size + ib.Height, ib.Size,
+                            ib.Size, ib.ColorBg);
         break;
     case 5:  // Round + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor, WidthDecor - Size2, ib.Size, ib.ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
-                             ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * ib.Size,
+                             ib.ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + ib.Size, ib.Size, HeightDecor - Size2, ib.ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
-                             ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size, -1 * ib.Size,
+                             HeightDecor - Size2, ib.ColorBg);
 
-        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, 2);
-        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, 1);
-        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, 3);
-        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg, 4);
+        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, ib.Size, ib.Size, ib.ColorBg, 2);
+        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, ib.Size, ib.ColorBg, 1);
+        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + ib.Size + ib.Height, ib.Size, ib.Size, ib.ColorBg, 3);
+        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size + ib.Height, ib.Size,
+                               ib.Size, ib.ColorBg, 4);
         break;
     case 6:  // Invert round + alpha blend
         // Top
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor, WidthDecor - Size2, Size, ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor, WidthDecor - Size2, ib.Size, ib.ColorBg);
         // Bottom
-        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * Size,
-                             ColorBg);
+        DecorDrawGlowRectHor(DecorPixmap, LeftDecor + ib.Size, TopDecor + BottomDecor, WidthDecor - Size2, -1 * ib.Size,
+                             ib.ColorBg);
         // Left
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + Size, Size, HeightDecor - Size2, ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor, TopDecor + ib.Size, ib.Size, HeightDecor - Size2, ib.ColorBg);
         // Right
-        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size, -1 * Size, HeightDecor - Size2,
-                             ColorBg);
+        DecorDrawGlowRectVer(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size, -1 * ib.Size,
+                             HeightDecor - Size2, ib.ColorBg);
 
-        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, Size, Size, ColorBg, -4);
-        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + Size + Width, TopDecor, Size, Size, ColorBg, -3);
-        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + Size + Height, Size, Size, ColorBg, -1);
-        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + Size + Width, TopDecor + Size + Height, Size, Size, ColorBg,
-                               -2);
+        DecorDrawGlowEllipseTL(DecorPixmap, LeftDecor, TopDecor, ib.Size, ib.Size, ib.ColorBg, -4);
+        DecorDrawGlowEllipseTR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor, ib.Size, ib.Size, ib.ColorBg, -3);
+        DecorDrawGlowEllipseBL(DecorPixmap, LeftDecor, TopDecor + ib.Size + ib.Height, ib.Size, ib.Size, ib.ColorBg,
+                               -1);
+        DecorDrawGlowEllipseBR(DecorPixmap, LeftDecor + ib.Size + ib.Width, TopDecor + ib.Size + ib.Height, ib.Size,
+                               ib.Size, ib.ColorBg, -2);
         break;
     }
 }

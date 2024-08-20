@@ -55,32 +55,33 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     DecorBorderClear(cRect(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight),
                      Config.decorBorderVolumeSize);
 
+    sDecorBorder ib {left - m_MarginItem,          DecorTop,
+                     MaxLabelWidth + m_MarginItem, m_FontHeight,
+                     Config.decorBorderVolumeSize, Config.decorBorderVolumeType,
+                     Config.decorBorderVolumeFg,   Config.decorBorderVolumeBg};
     if (Mute) {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
             m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHeight, taLeft);
         cImage *img = ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
-        if (img) {
+        if (img)
             MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + m_MarginItem, m_MarginItem), *img);
-        }
-        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem * 4 + m_FontHeight, m_FontHeight,
-                        Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
-                        Config.decorBorderVolumeBg);
+
+        ib.Width = MaxLabelWidth + m_MarginItem * 4 + m_FontHeight;
     } else {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
-            m_Font, MaxLabelWidth, m_FontHeight, taLeft);
-        DecorBorderDraw(left - m_MarginItem, DecorTop, MaxLabelWidth + m_MarginItem, m_FontHeight,
-                        Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Config.decorBorderVolumeFg,
-                        Config.decorBorderVolumeBg);
+                              m_Font, MaxLabelWidth, m_FontHeight, taLeft);
     }
-
+    DecorBorderDraw(ib);
     ProgressBarDraw(Current, Total);
 
     const int width {(m_OsdWidth / 4 * 3)};
     left = (m_OsdWidth - width - Config.decorBorderVolumeSize) / 2;
-    DecorBorderDraw(left - m_MarginItem, m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
-                    width + m_MarginItem2, Config.decorProgressVolumeSize + m_MarginItem2,
-                    Config.decorBorderVolumeSize, Config.decorBorderVolumeType, Theme.Color(clrTopBarBg),
-                    Theme.Color(clrTopBarBg));
+    const sDecorBorder ibVolume {
+        left - m_MarginItem,          m_OsdHeight - 50 - Config.decorProgressVolumeSize - m_MarginItem,
+        width + m_MarginItem2,        Config.decorProgressVolumeSize + m_MarginItem2,
+        Config.decorBorderVolumeSize, Config.decorBorderVolumeType,
+        Theme.Color(clrTopBarBg),     Theme.Color(clrTopBarBg)};
+    DecorBorderDraw(ibVolume);
 }
 
 void cFlatDisplayVolume::Flush(void) {

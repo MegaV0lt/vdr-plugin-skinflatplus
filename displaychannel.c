@@ -85,10 +85,15 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (Config.ChannelWeatherShow)
         DrawWidgetWeather();
 
-    DecorBorderDraw(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                    m_ChannelWidth, HeightTop + HeightBottom + Config.decorProgressChannelSize + m_MarginItem2,
-                    Config.decorBorderChannelSize, Config.decorBorderChannelType, Config.decorBorderChannelFg,
-                    Config.decorBorderChannelBg);
+    const sDecorBorder ib {Config.decorBorderChannelSize,
+                           Config.decorBorderChannelSize + m_ChannelHeight - height,
+                           m_ChannelWidth,
+                           HeightTop + HeightBottom + Config.decorProgressChannelSize + m_MarginItem2,
+                           Config.decorBorderChannelSize,
+                           Config.decorBorderChannelType,
+                           Config.decorBorderChannelFg,
+                           Config.decorBorderChannelBg};
+    DecorBorderDraw(ib);
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
@@ -394,11 +399,17 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         if (img) {
             ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-            DecorBorderDraw(20 + Config.decorBorderChannelEPGSize,
-                            m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
-                            img->Width(), img->Height(), Config.decorBorderChannelEPGSize,
-                            Config.decorBorderChannelEPGType, Config.decorBorderChannelEPGFg,
-                            Config.decorBorderChannelEPGBg, BorderTVSPoster);
+            const sDecorBorder ib {20 + Config.decorBorderChannelEPGSize,
+                                   m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 +
+                                        Config.decorBorderChannelEPGSize,
+                                   img->Width(),
+                                   img->Height(),
+                                   Config.decorBorderChannelEPGSize,
+                                   Config.decorBorderChannelEPGType,
+                                   Config.decorBorderChannelEPGFg,
+                                   Config.decorBorderChannelEPGBg,
+                                   BorderTVSPoster};
+            DecorBorderDraw(ib);
         }
     }
 }

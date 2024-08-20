@@ -245,26 +245,39 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
 
     if (m_ProgressShown) {
-        DecorBorderDraw(Config.decorBorderReplaySize,
-                        m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize - Config.decorBorderReplaySize -
-                            m_MarginItem,
-                        m_OsdWidth - Config.decorBorderReplaySize * 2,
-                        m_LabelHeight + Config.decorProgressReplaySize + m_MarginItem, Config.decorBorderReplaySize,
-                        Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
+        const sDecorBorder ib {Config.decorBorderReplaySize,
+                               m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize -
+                                   Config.decorBorderReplaySize - m_MarginItem,
+                               m_OsdWidth - Config.decorBorderReplaySize * 2,
+                               m_LabelHeight + Config.decorProgressReplaySize + m_MarginItem,
+                               Config.decorBorderReplaySize,
+                               Config.decorBorderReplayType,
+                               Config.decorBorderReplayFg,
+                               Config.decorBorderReplayBg};
+        DecorBorderDraw(ib);
     } else {
         if (m_ModeOnly) {
-            DecorBorderDraw(left - m_Font->Width("99") - m_MarginItem + Config.decorBorderReplaySize,
-                            m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                            m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight,
-                            Config.decorBorderReplaySize, Config.decorBorderReplayType, Config.decorBorderReplayFg,
-                            Config.decorBorderReplayBg);
-        } else {
-            DecorBorderDraw(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                            m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight, Config.decorBorderReplaySize,
-                            Config.decorBorderReplayType, Config.decorBorderReplayFg, Config.decorBorderReplayBg);
-        }
+            const sDecorBorder ib {left - m_Font->Width("99") - m_MarginItem + Config.decorBorderReplaySize,
+                                   m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                                   m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2,
+                                   m_FontHeight,
+                                   Config.decorBorderReplaySize,
+                                   Config.decorBorderReplayType,
+                                   Config.decorBorderReplayFg,
+                                   Config.decorBorderReplayBg};
+            DecorBorderDraw(ib);
+    } else {
+            const sDecorBorder ib {Config.decorBorderReplaySize,
+                                   m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                                   m_OsdWidth - Config.decorBorderReplaySize * 2,
+                                   m_LabelHeight,
+                                   Config.decorBorderReplaySize,
+                                   Config.decorBorderReplayType,
+                                   Config.decorBorderReplayFg,
+                                   Config.decorBorderReplayBg};
+            DecorBorderDraw(ib);
     }
-
+    }
     ResolutionAspectDraw();
 }
 
@@ -631,11 +644,17 @@ void cFlatDisplayReplay::UpdateInfo(void) {
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-                DecorBorderDraw(
-                    20 + Config.decorBorderChannelEPGSize,
-                    m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
-                    img->Width(), img->Height(), Config.decorBorderChannelEPGSize, Config.decorBorderChannelEPGType,
-                    Config.decorBorderChannelEPGFg, Config.decorBorderChannelEPGBg, BorderTVSPoster);
+                const sDecorBorder ib {20 + Config.decorBorderChannelEPGSize,
+                                       m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 +
+                                           Config.decorBorderChannelEPGSize,
+                                       img->Width(),
+                                       img->Height(),
+                                       Config.decorBorderChannelEPGSize,
+                                       Config.decorBorderChannelEPGType,
+                                       Config.decorBorderChannelEPGFg,
+                                       Config.decorBorderChannelEPGBg,
+                                       BorderTVSPoster};
+                DecorBorderDraw(ib);
             }
         }
     }
@@ -655,11 +674,17 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     LabelJumpPixmap->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
                               m_Font->Width(Jump), m_FontHeight, taCenter);
 
-    DecorBorderDraw(left + Config.decorBorderReplaySize,
-                    m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 - m_FontHeight -
-                        Config.decorBorderReplaySize * 2,
-                    m_Font->Width(Jump), m_FontHeight, Config.decorBorderReplaySize, Config.decorBorderReplayType,
-                    Config.decorBorderReplayFg, Config.decorBorderReplayBg, BorderRecordJump);
+    const sDecorBorder ib {left + Config.decorBorderReplaySize,
+                           m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 -
+                               m_FontHeight - Config.decorBorderReplaySize * 2,
+                           m_Font->Width(Jump),
+                           m_FontHeight,
+                           Config.decorBorderReplaySize,
+                           Config.decorBorderReplayType,
+                           Config.decorBorderReplayFg,
+                           Config.decorBorderReplayBg,
+                           BorderRecordJump};
+    DecorBorderDraw(ib);
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw(void) {

@@ -78,15 +78,22 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
     const int top {m_OsdHeight - ItemsHeight - m_MarginItem + y};
 
-    if (Current)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
-    else if (Index >= 0)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
-    else
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackFg, Config.decorBorderTrackBg);
+    sDecorBorder ib {left,
+                     top,
+                     m_MaxItemWidth,
+                     m_FontHeight,
+                     Config.decorBorderTrackSize,
+                     Config.decorBorderTrackType,
+                     Config.decorBorderTrackFg,
+                     Config.decorBorderTrackBg};
+    if (Current) {
+        ib.ColorFg = Config.decorBorderTrackCurFg;
+        ib.ColorBg = Config.decorBorderTrackCurBg;
+    } else if (Index >= 0) {
+        ib.ColorFg = Config.decorBorderTrackSelFg;
+        ib.ColorBg = Config.decorBorderTrackSelBg;
+    }
+    DecorBorderDraw(ib);
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {

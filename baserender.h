@@ -196,8 +196,7 @@ class cFlatBaseRender {
                            int Shown, bool CanScrollUp, bool CanScrollDown);
         int ScrollBarWidth(void);
 
-        void DecorBorderDraw(int Left, int Top, int Width, int Height, int Size, int Type,
-                             tColor ColorFg, tColor ColorBg, int From = 0, bool Store = true);
+        void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
         void DecorBorderClear(cRect Rect, int Size);
         void DecorBorderClearAll(void);
         void DecorBorderRedrawAll(void);
