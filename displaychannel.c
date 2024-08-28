@@ -571,7 +571,7 @@ void cFlatDisplayChannel::PreLoadImages(void) {
 
     int index {0};
     LOCK_CHANNELS_READ;
-    for (const cChannel *Channel = Channels->First(); Channel && index < LOGO_PRE_CACHE;
+    for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);

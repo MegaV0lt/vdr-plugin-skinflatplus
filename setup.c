@@ -851,7 +851,7 @@ void cFlatSetupGeneral::Setup(void) {
         Add(new cMenuEditIntItem(tr("Button border size"), &SetupConfig->decorBorderButtonSizeUser));
     }
 
-    cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), ImgCache.GetCacheCount(), MAX_IMAGE_CACHE);
+    cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), ImgCache.GetCacheCount(), MaxImageCache);
     Add(new cOsdItem(ImageCache, osUnknown, true));
 
     if (ItemLastSel >= 0) {

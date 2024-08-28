@@ -11,17 +11,17 @@
 #include <vdr/skins.h>
 #include <string>
 
-#define MAX_IMAGE_CACHE     1024  // Image cache including two times 'LOGO_PRE_CACHE'
-#define LOGO_PRE_CACHE      192   // First x channel logos
-//! Note: LOGO_PRE_CACHE is used twice! One for 'displaychannel' and one for 'menu'
+constexpr int MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
+constexpr int LogoPreCache {192};    // First x channel logos
+//! Note: 'LogoPreCache' is used twice! One for 'displaychannel' and one for 'menu'
 //! You must double the value for the real amount of pre cached logos
 
 class cImageCache {
  private:
-    cImage *CacheImage[MAX_IMAGE_CACHE];
-    std::string CacheName[MAX_IMAGE_CACHE];
-    int CacheWidth[MAX_IMAGE_CACHE];
-    int CacheHeight[MAX_IMAGE_CACHE];
+    cImage *CacheImage[MaxImageCache];
+    std::string CacheName[MaxImageCache];  // Including full path
+    int CacheWidth[MaxImageCache];
+    int CacheHeight[MaxImageCache];
 
     uint m_InsertIndex {0};      // Imagecache index
     uint m_InsertIndexBase {0};  // Imagecache after first fill at start
