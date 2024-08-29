@@ -410,7 +410,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
     const double FramesPerSecond {Recording->FramesPerSecond()};
     const char *RecordingFileName {Recording->FileName()};
-    std::unique_ptr<cIndexFile> index;  // Automatically be deleted; no need for 'new'
+    std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();

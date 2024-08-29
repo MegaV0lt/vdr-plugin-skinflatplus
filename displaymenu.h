@@ -79,12 +79,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         // Icons
         cImage *IconTimerFull {nullptr};
-        // cImage *IconTimerPartial;
         cImage *IconArrowTurn {nullptr};
         cImage *IconRec {nullptr};
-        // cImage *iconVps;
-        // cImage *iconNew;
-        // Icons
 
         void ItemBorderInsertUnique(const sDecorBorder &ib);
         void ItemBorderDrawAllWithScrollbar(void);

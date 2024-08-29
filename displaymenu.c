@@ -2674,7 +2674,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
             LOCK_CHANNELS_READ;
-            // const cChannel *channel = Channels->GetByChannelID(((cRecordingInfo *)RecInfo)->ChannelID());
             const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
             if (channel)
                 Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));

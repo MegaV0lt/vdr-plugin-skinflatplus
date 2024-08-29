@@ -514,7 +514,7 @@ void cFlatDisplayReplay::UpdateInfo(void) {
                 }
                 LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
-                LabelPixmap->DrawText(cPoint(right /*- m_MarginItem*/ + m_Font->Width(hm.c_str()), TopSecs),
+                LabelPixmap->DrawText(cPoint(right + m_Font->Width(hm.c_str()), TopSecs),
                                       secs.c_str(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                       m_FontSecs->Width(secs.c_str()), m_FontSecs->Height());
             } else {
