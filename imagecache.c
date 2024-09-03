@@ -71,6 +71,7 @@ cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
 
 void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {
     CacheImage[m_InsertIndex] = Image;
+    CacheName[m_InsertIndex].reserve(Name.length());
     CacheName[m_InsertIndex] = Name;
     CacheWidth[m_InsertIndex] = Width;
     CacheHeight[m_InsertIndex] = Height;
