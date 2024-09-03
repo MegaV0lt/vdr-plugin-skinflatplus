@@ -260,12 +260,25 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         const int sleft {dur - s};
 
         cString seen {""};
-        if (Config.ChannelTimeLeft == 0)
+        /* if (Config.ChannelTimeLeft == 0)
             seen = cString::sprintf("%d-/%d+ %d min", s, sleft, dur);
         else if (Config.ChannelTimeLeft == 1)
             seen = cString::sprintf("%d- %d min", s, dur);
         else if (Config.ChannelTimeLeft == 2)
+            seen = cString::sprintf("%d+ %d min", sleft, dur); */
+
+        switch (Config.ChannelTimeLeft) {
+        case 0:
+            seen = cString::sprintf("%d-/%d+ %d min", s, sleft, dur);
+            break;
+        case 1:
+            seen = cString::sprintf("%d- %d min", s, dur);
+            break;
+        case 2:
             seen = cString::sprintf("%d+ %d min", sleft, dur);
+            break;
+        }
+
 
         const int SeenWidth {m_FontSml->Width(*seen) + m_FontSml->Width("  ")};
         const int MaxWidth {std::max(StrTimeWidth, SeenWidth)};

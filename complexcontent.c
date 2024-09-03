@@ -140,7 +140,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
-        if (Config.MenuEventRecordingViewJustify != 0 && i < (Lines - 1))  // Last line is not justified
+        if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))  // Last line is not justified
             JustifyLine(Line, Font, (i < FloatLines) ? TextWidthLeft : TextWidthFull);
 
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);

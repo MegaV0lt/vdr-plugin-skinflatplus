@@ -135,32 +135,43 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
     m_ShowRecording = m_ShowEvent = m_ShowText = false;
 
     m_MenuCategory = MenuCategory;
-    if (m_MenuCategory == mcChannel) {
+    switch (MenuCategory) {
+    case mcChannel:
         if (Config.MenuChannelView == 0 || Config.MenuChannelView == 1 || Config.MenuChannelView == 2)
             m_ItemChannelHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)
             m_ItemChannelHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize +
                                   Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-    } else if (m_MenuCategory == mcTimer) {
+        break;
+    case mcTimer:
         if (Config.MenuTimerView == 0 || Config.MenuTimerView == 1)
             m_ItemTimerHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3)
             m_ItemTimerHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                 Config.decorBorderMenuItemSize * 2;
-    } else if (m_MenuCategory == mcSchedule || m_MenuCategory == mcScheduleNow || m_MenuCategory == mcScheduleNext) {
+        break;
+    case mcSchedule:
+    case mcScheduleNow:
+    case mcScheduleNext:
         if (Config.MenuEventView == 0 || Config.MenuEventView == 1)
             m_ItemEventHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else if (Config.MenuEventView == 2 || Config.MenuEventView == 3)
             m_ItemEventHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.MenuItemPadding +
                                 Config.decorBorderMenuItemSize * 2 + Config.decorProgressMenuItemSize / 2;
-    } else if (m_MenuCategory == mcRecording) {
+        break;
+    case mcRecording:
         if (Config.MenuRecordingView == 0 || Config.MenuRecordingView == 1)
             m_ItemRecordingHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3)
             m_ItemRecordingHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                     Config.decorBorderMenuItemSize * 2;
-    } else if (m_MenuCategory == mcMain && Config.MainMenuWidgetsEnable) {
-        DrawMainMenuWidgets();
+        break;
+    case mcMain:
+        if (Config.MainMenuWidgetsEnable)
+            DrawMainMenuWidgets();
+        break;
+    default:
+        break;
     }
 }
 
@@ -225,29 +236,37 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 }
 
 int cFlatDisplayMenu::MaxItems(void) {
-    if (m_MenuCategory == mcChannel)
+    switch (m_MenuCategory) {
+    case mcChannel:
         return m_ScrollBarHeight / m_ItemChannelHeight;
-    if (m_MenuCategory == mcTimer)
+    case mcTimer:
         return m_ScrollBarHeight / m_ItemTimerHeight;
-    if (m_MenuCategory == mcSchedule || m_MenuCategory == mcScheduleNow || m_MenuCategory == mcScheduleNext)
+    case mcSchedule:
+    case mcScheduleNow:
+    case mcScheduleNext:
         return m_ScrollBarHeight / m_ItemEventHeight;
-    if (m_MenuCategory == mcRecording)
+    case mcRecording:
         return m_ScrollBarHeight / m_ItemRecordingHeight;
-
-    return m_ScrollBarHeight / m_ItemHeight;
+    default:
+        return m_ScrollBarHeight / m_ItemHeight;
+    }
 }
 
 int cFlatDisplayMenu::ItemsHeight(void) {
-    if (m_MenuCategory == mcChannel)
+    switch (m_MenuCategory) {
+    case mcChannel:
         return MaxItems() * m_ItemChannelHeight - Config.MenuItemPadding;
-    if (m_MenuCategory == mcTimer)
+    case mcTimer:
         return MaxItems() * m_ItemTimerHeight - Config.MenuItemPadding;
-    if (m_MenuCategory == mcSchedule || m_MenuCategory == mcScheduleNow || m_MenuCategory == mcScheduleNext)
+    case mcSchedule:
+    case mcScheduleNow:
+    case mcScheduleNext:
         return MaxItems() * m_ItemEventHeight - Config.MenuItemPadding;
-    if (m_MenuCategory == mcRecording)
+    case mcRecording:
         return MaxItems() * m_ItemRecordingHeight - Config.MenuItemPadding;
-
-    return MaxItems() * m_ItemHeight - Config.MenuItemPadding;
+    default:
+        return MaxItems() * m_ItemHeight - Config.MenuItemPadding;
+    }
 }
 
 void cFlatDisplayMenu::Clear(void) {

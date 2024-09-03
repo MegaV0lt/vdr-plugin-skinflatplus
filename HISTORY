@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-08-08: Version 1.0.6
+2024-09-xx: Version 1.0.7
 - [fix] Allow smaller images in SetMediaSize()
 - [update] Some internal optimizations
 
