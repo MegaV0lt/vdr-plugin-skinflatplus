@@ -2359,7 +2359,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
     bool FirstRun {true}, SecondRun {false};
@@ -2419,7 +2418,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperEPGInfoShowActors) {
-                            ActorsSize = series.actors.size();
+                            const int ActorsSize = series.actors.size();
                             ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
@@ -2439,7 +2438,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                     if (pScraper->Service("GetMovie", &movie)) {
                         MediaPath = movie.poster.path.c_str();
                         if (Config.TVScraperEPGInfoShowActors) {
-                            ActorsSize = movie.actors.size();
+                            const int ActorsSize = movie.actors.size();
                             ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
@@ -3064,7 +3063,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
 
-    int ActorsSize {0};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
     bool FirstRun {true}, SecondRun {false};
@@ -3124,7 +3122,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                             MediaPath = series.banners[0].path.c_str();
                         }
                         if (Config.TVScraperRecInfoShowActors) {
-                            ActorsSize = series.actors.size();
+                            const int ActorsSize = series.actors.size();
                             ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
@@ -3144,7 +3142,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     if (pScraper->Service("GetMovie", &movie)) {
                         MediaPath = movie.poster.path.c_str();
                         if (Config.TVScraperRecInfoShowActors) {
-                            ActorsSize = movie.actors.size();
+                            const int ActorsSize = movie.actors.size();
                             ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                             ActorsName.reserve(ActorsSize);
                             ActorsRole.reserve(ActorsSize);
