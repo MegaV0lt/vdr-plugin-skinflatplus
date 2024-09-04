@@ -21,7 +21,7 @@ cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
 cComplexContent::~cComplexContent() {
 }
 
-void cComplexContent::Clear(void) {
+void cComplexContent::Clear() {
     m_IsShown = false;
     Contents.clear();
     if (m_Osd) {  //! Check because Clear() is called before SetOsd()
@@ -68,7 +68,7 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
     PixmapFill(PixmapImage, clrTransparent);
 }
 
-void cComplexContent::CalculateDrawPortHeight(void) {
+void cComplexContent::CalculateDrawPortHeight() {
     m_DrawPortHeight = 0;
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
@@ -78,7 +78,7 @@ void cComplexContent::CalculateDrawPortHeight(void) {
     if (m_IsScrollingActive)
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;}
 
-int cComplexContent::BottomContent(void) {
+int cComplexContent::BottomContent() {
     int bottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
@@ -163,20 +163,20 @@ void cComplexContent::Draw() {
     }
 }
 
-double cComplexContent::ScrollbarSize(void) {
+double cComplexContent::ScrollbarSize() {
     return m_Position.Height() * 1.0 / m_DrawPortHeight;
 }
 
-int cComplexContent::ScrollTotal(void) {
+int cComplexContent::ScrollTotal() {
     return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
 }
 
-int cComplexContent::ScrollShown(void) {
+int cComplexContent::ScrollShown() {
     // return ceil(m_Position.Height() * 1.0 / m_ScrollSize);
     return m_Position.Height() / m_ScrollSize;
 }
 
-int cComplexContent::ScrollOffset(void) {
+int cComplexContent::ScrollOffset() {
     if (!Pixmap) return 0;
 
     int y {Pixmap->DrawPort().Point().Y() * -1};

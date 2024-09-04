@@ -15,7 +15,7 @@ class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
         virtual ~cFlatDisplayTracks();
         virtual void SetTrack(int Index, const char * const *Tracks);
         virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush(void);
+        virtual void Flush();
 
  private:
         cPixmap *TracksPixmap {nullptr};

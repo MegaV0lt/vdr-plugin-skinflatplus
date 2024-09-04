@@ -8,7 +8,7 @@
 #include "./displayvolume.h"
 #include "./flat.h"
 
-cFlatDisplayVolume::cFlatDisplayVolume(void) {
+cFlatDisplayVolume::cFlatDisplayVolume() {
     m_LabelHeight = m_FontHeight + m_MarginItem2;
 
     CreateFullOsd();
@@ -84,11 +84,11 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     DecorBorderDraw(ibVolume);
 }
 
-void cFlatDisplayVolume::Flush(void) {
+void cFlatDisplayVolume::Flush() {
     TopBarUpdate();
     m_Osd->Flush();
 }
 
-void cFlatDisplayVolume::PreLoadImages(void) {
+void cFlatDisplayVolume::PreLoadImages() {
     ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
 }

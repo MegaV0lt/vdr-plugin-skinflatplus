@@ -21,18 +21,18 @@ class cImageCache {
     cImageCache();
     ~cImageCache();
 
-    void Create(void);
-    void Clear(void);
+    void Create();
+    void Clear();
     bool RemoveFromCache(const std::string &Name);
 
-    int GetCacheCount(void) {
+    int GetCacheCount() {
       return m_InsertIndex + 1;
     }
 
     cImage *GetImage(const std::string &Name, int Width, int Height);
     void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
 
-    void PreLoadImage(void);
+    void PreLoadImage();
 
  private:
     cImage *CacheImage[MaxImageCache];

@@ -119,7 +119,7 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     return;
 }
 
-void cFlatDisplayTracks::Flush(void) {
+void cFlatDisplayTracks::Flush() {
     TopBarUpdate();
     m_Osd->Flush();
 }

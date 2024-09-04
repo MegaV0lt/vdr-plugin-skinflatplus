@@ -11,10 +11,10 @@
 
 class cFlatDisplayMessage : public cFlatBaseRender, public cSkinDisplayMessage {
  public:
-        cFlatDisplayMessage(void);
+        cFlatDisplayMessage();
         virtual ~cFlatDisplayMessage();
         virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush(void);
+        virtual void Flush();
 
  private:
 };

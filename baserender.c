@@ -22,7 +22,7 @@
 
 #include "./flat.h"
 
-cFlatBaseRender::cFlatBaseRender(void) {
+cFlatBaseRender::cFlatBaseRender() {
     m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
@@ -40,7 +40,7 @@ cFlatBaseRender::cFlatBaseRender(void) {
     Config.DecorCheckAndInit();
 }
 
-cFlatBaseRender::~cFlatBaseRender(void) {
+cFlatBaseRender::~cFlatBaseRender() {
     delete m_Font;
     delete m_FontSml;
     delete m_FontFixed;
@@ -65,7 +65,7 @@ cFlatBaseRender::~cFlatBaseRender(void) {
     // }
 }
 
-void cFlatBaseRender::CreateFullOsd(void) {
+void cFlatBaseRender::CreateFullOsd() {
     CreateOsd(cOsd::OsdLeft() + Config.marginOsdHor, cOsd::OsdTop() + Config.marginOsdVer,
               cOsd::OsdWidth() - Config.marginOsdHor * 2, cOsd::OsdHeight() - Config.marginOsdVer * 2);
 }
@@ -86,7 +86,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
 }
 
-void cFlatBaseRender::TopBarCreate(void) {
+void cFlatBaseRender::TopBarCreate() {
     const int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);  // Narrowing conversion
     m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
@@ -176,7 +176,7 @@ void cFlatBaseRender::TopBarSetMenuIconRight(const cString icon) {
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarClearMenuIconRight(void) {
+void cFlatBaseRender::TopBarClearMenuIconRight() {
     m_TopBarMenuIconRight = "";
     m_TopBarMenuIconRightSet = false;
 }
@@ -189,7 +189,7 @@ void cFlatBaseRender::TopBarSetMenuLogo(const cString icon) {
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarEnableDiskUsage(void) {
+void cFlatBaseRender::TopBarEnableDiskUsage() {
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {(100 - DiskUsagePercent)};         // Free %
@@ -305,7 +305,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage(void) {
     TopBarSetExtraIcon(*IconName);
 }
 //* Should be called with every "Flush"!
-void cFlatBaseRender::TopBarUpdate(void) {
+void cFlatBaseRender::TopBarUpdate() {
     if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
         return;
 
@@ -527,7 +527,7 @@ void cFlatBaseRender::TopBarUpdate(void) {
     }
 }
 
-void cFlatBaseRender::ButtonsCreate(void) {
+void cFlatBaseRender::ButtonsCreate() {
     m_MarginButtonColor = 10;
     m_ButtonColorHeight = 8;
     m_ButtonsHeight = m_FontHeight + m_MarginButtonColor + m_ButtonColorHeight;
@@ -724,11 +724,11 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
     }
 }
 
-bool cFlatBaseRender::ButtonsDrawn(void) {
+bool cFlatBaseRender::ButtonsDrawn() {
     return m_ButtonsDrawn;
 }
 
-void cFlatBaseRender::MessageCreate(void) {
+void cFlatBaseRender::MessageCreate() {
     m_MessageHeight = m_FontHeight + m_MarginItem2;
     if (Config.MessageColorPosition == 1)
         m_MessageHeight += 8;
@@ -877,7 +877,7 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     }
 }
 
-void cFlatBaseRender::MessageClear(void) {
+void cFlatBaseRender::MessageClear() {
     PixmapFill(MessagePixmap, clrTransparent);
     PixmapFill(MessageIconPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderMessage);
@@ -919,7 +919,7 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
         m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
-void cFlatBaseRender::ProgressBarDrawBgColor(void) {
+void cFlatBaseRender::ProgressBarDrawBgColor() {
     PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
 }
 
@@ -1426,7 +1426,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
     }
 }
 
-int cFlatBaseRender::ScrollBarWidth(void) {
+int cFlatBaseRender::ScrollBarWidth() {
     return m_ScrollBarWidth;
 }
 
@@ -1462,7 +1462,7 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
     }
 }
 
-void cFlatBaseRender::DecorBorderRedrawAll(void) {
+void cFlatBaseRender::DecorBorderRedrawAll() {
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end; ++it) {
         const sDecorBorder ib {(*it).Left, (*it).Top,     (*it).Width,   (*it).Height, (*it).Size,
@@ -1471,7 +1471,7 @@ void cFlatBaseRender::DecorBorderRedrawAll(void) {
     }
 }
 
-void cFlatBaseRender::DecorBorderClearAll(void) {
+void cFlatBaseRender::DecorBorderClearAll() {
     PixmapFill(DecorPixmap, clrTransparent);
 }
 
@@ -1798,7 +1798,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
     return Ascender;
 }
 
-void cFlatBaseRender::DrawWidgetWeather(void) {
+void cFlatBaseRender::DrawWidgetWeather() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
 #endif

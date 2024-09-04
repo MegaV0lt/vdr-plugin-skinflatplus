@@ -43,11 +43,11 @@ cTheme Theme;
 static bool m_MenuActive {false};
 time_t m_RemoteTimersLastRefresh {0};
 
-cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
+cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
     Display_Menu = NULL;
 }
 
-const char *cFlat::Description(void) {
+const char *cFlat::Description() {
     return "flatPlus";
 }
 
@@ -55,7 +55,7 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
     return new cFlatDisplayChannel(WithInfo);
 }
 
-cSkinDisplayMenu *cFlat::DisplayMenu(void) {
+cSkinDisplayMenu *cFlat::DisplayMenu() {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
     Display_Menu = menu;
     m_MenuActive = true;
@@ -66,7 +66,7 @@ cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) {
     return new cFlatDisplayReplay(ModeOnly);
 }
 
-cSkinDisplayVolume *cFlat::DisplayVolume(void) {
+cSkinDisplayVolume *cFlat::DisplayVolume() {
     return new cFlatDisplayVolume;
 }
 
@@ -74,7 +74,7 @@ cSkinDisplayTracks *cFlat::DisplayTracks(const char *Title, int NumTracks, const
     return new cFlatDisplayTracks(Title, NumTracks, Tracks);
 }
 
-cSkinDisplayMessage *cFlat::DisplayMessage(void) {
+cSkinDisplayMessage *cFlat::DisplayMessage() {
     return new cFlatDisplayMessage;
 }
 
@@ -108,7 +108,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
 
 // void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
 
-cPlugin *GetScraperPlugin(void) {
+cPlugin *GetScraperPlugin() {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
     if (!pScraper)  // If it doesn't exit, try scraper2vdr
         pScraper = cPluginManager::GetPlugin("scraper2vdr");
@@ -358,7 +358,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
 }
 
-int GetEpgsearchConflicts(void) {
+int GetEpgsearchConflicts() {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
@@ -758,7 +758,7 @@ std::string_view trim(std::string_view str) {
 
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {}
+cTextFloatingWrapper::cTextFloatingWrapper() {}
 
 cTextFloatingWrapper::~cTextFloatingWrapper() {
     free(m_Text);
@@ -838,7 +838,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 #endif
 }
 
-const char *cTextFloatingWrapper::Text(void) {
+const char *cTextFloatingWrapper::Text() {
     if (m_EoL) {
         *m_EoL = '\n';
         m_EoL = nullptr;

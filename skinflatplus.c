@@ -22,38 +22,38 @@ static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
  public:
-        cPluginFlat(void);
+        cPluginFlat();
         virtual ~cPluginFlat();
-        virtual const char *Version(void) { return VERSION; }
-        virtual const char *Description(void) { return DESCRIPTION; }
-        virtual const char *CommandLineHelp(void);
+        virtual const char *Version() { return VERSION; }
+        virtual const char *Description() { return DESCRIPTION; }
+        virtual const char *CommandLineHelp();
         virtual bool ProcessArgs(int argc, char *argv[]);
-        virtual bool Initialize(void);
-        virtual bool Start(void);
-        virtual void Stop(void);
-        virtual void Housekeeping(void);
-        virtual void MainThreadHook(void);
-        virtual cString Active(void);
-        virtual time_t WakeupTime(void);
-        virtual const char *MainMenuEntry(void) { return NULL; }
-        virtual cOsdObject *MainMenuAction(void);
-        virtual cMenuSetupPage *SetupMenu(void);
+        virtual bool Initialize();
+        virtual bool Start();
+        virtual void Stop();
+        virtual void Housekeeping();
+        virtual void MainThreadHook();
+        virtual cString Active();
+        virtual time_t WakeupTime();
+        virtual const char *MainMenuEntry() { return NULL; }
+        virtual cOsdObject *MainMenuAction();
+        virtual cMenuSetupPage *SetupMenu();
         virtual bool SetupParse(const char *Name, const char *Value);
         virtual bool Service(const char *Id, void *Data = NULL);
-        virtual const char **SVDRPHelpPages(void);
+        virtual const char **SVDRPHelpPages();
         virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);  // NOLINT
 
  private:
         cFlat *flat;
 };
 
-cPluginFlat::cPluginFlat(void) {
+cPluginFlat::cPluginFlat() {
     flat = NULL;
 }
 
 cPluginFlat::~cPluginFlat() {}
 
-const char *cPluginFlat::CommandLineHelp(void) {
+const char *cPluginFlat::CommandLineHelp() {
     return "  -l <LOGOPATH>, --logopath=<LOGOPATH>       Set directory where Channel Logos are stored.\n";
 }
 
@@ -77,7 +77,7 @@ bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
     return true;
 }
 
-__attribute__((constructor)) static void init(void) {
+__attribute__((constructor)) static void init() {
 #ifndef IMAGEMAGICK
     // From skin nopacity: Prevents *magick from occupying segfaults
     MagickLib::InitializeMagickEx(NULL, MAGICK_OPT_NO_SIGNAL_HANDER, NULL);
@@ -86,12 +86,12 @@ __attribute__((constructor)) static void init(void) {
 #endif
 }
 
-bool cPluginFlat::Initialize(void) {
+bool cPluginFlat::Initialize() {
     Config.Init();
     return true;
 }
 
-bool cPluginFlat::Start(void) {
+bool cPluginFlat::Start() {
     if (!cOsdProvider::SupportsTrueColor()) {
         esyslog("flatPlus: No TrueColor OSD found! Aborting!");
         return false;
@@ -106,29 +106,29 @@ bool cPluginFlat::Start(void) {
     return flat;
 }
 
-void cPluginFlat::Stop(void) {
+void cPluginFlat::Stop() {
     ImgCache.Clear();
 }
 
-void cPluginFlat::Housekeeping(void) {
+void cPluginFlat::Housekeeping() {
 }
 
-void cPluginFlat::MainThreadHook(void) {
+void cPluginFlat::MainThreadHook() {
 }
 
-cString cPluginFlat::Active(void) {
+cString cPluginFlat::Active() {
     return NULL;
 }
 
-time_t cPluginFlat::WakeupTime(void) {
+time_t cPluginFlat::WakeupTime() {
     return 0;
 }
 
-cOsdObject *cPluginFlat::MainMenuAction(void) {
+cOsdObject *cPluginFlat::MainMenuAction() {
     return NULL;
 }
 
-cMenuSetupPage *cPluginFlat::SetupMenu(void) {
+cMenuSetupPage *cPluginFlat::SetupMenu() {
     return new cFlatSetup();
 }
 
@@ -140,7 +140,7 @@ bool cPluginFlat::Service(const char *Id, void *Data) {
     return false;
 }
 
-const char **cPluginFlat::SVDRPHelpPages(void) {
+const char **cPluginFlat::SVDRPHelpPages() {
     static const char *HelpPages[] = {
         "RLFC\n"
         "    Remove Logo From Cache.\n"

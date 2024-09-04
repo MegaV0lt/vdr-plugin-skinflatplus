@@ -30,7 +30,7 @@ static int CompareTimers(const void *a, const void *b) {
     return (*(const cTimer **)a)->Compare(**(const cTimer **)b);
 }
 
-cFlatDisplayMenu::cFlatDisplayMenu(void) {
+cFlatDisplayMenu::cFlatDisplayMenu() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
 #endif
@@ -235,7 +235,7 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
     }
 }
 
-int cFlatDisplayMenu::MaxItems(void) {
+int cFlatDisplayMenu::MaxItems() {
     switch (m_MenuCategory) {
     case mcChannel:
         return m_ScrollBarHeight / m_ItemChannelHeight;
@@ -252,7 +252,7 @@ int cFlatDisplayMenu::MaxItems(void) {
     }
 }
 
-int cFlatDisplayMenu::ItemsHeight(void) {
+int cFlatDisplayMenu::ItemsHeight() {
     switch (m_MenuCategory) {
     case mcChannel:
         return MaxItems() * m_ItemChannelHeight - Config.MenuItemPadding;
@@ -269,7 +269,7 @@ int cFlatDisplayMenu::ItemsHeight(void) {
     }
 }
 
-void cFlatDisplayMenu::Clear(void) {
+void cFlatDisplayMenu::Clear() {
     MenuItemScroller.Clear();
     PixmapFill(MenuPixmap, clrTransparent);
     PixmapFill(MenuIconsPixmap, clrTransparent);
@@ -3512,7 +3512,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     DecorBorderDraw(ib);
 }
 
-int cFlatDisplayMenu::GetTextAreaWidth(void) const {
+int cFlatDisplayMenu::GetTextAreaWidth() const {
     return m_MenuWidth - m_MarginItem2;
 }
 
@@ -3535,7 +3535,7 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     TopBarSetMenuIconRight(*SortIcon);
 }
 
-void cFlatDisplayMenu::Flush(void) {
+void cFlatDisplayMenu::Flush() {
     if (!MenuPixmap) return;
     TopBarUpdate();
 
@@ -3590,7 +3590,7 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
     ItemsBorder.emplace_back(ib);
 }
 
-void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
+void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
     std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         const sDecorBorder ib {(*it).Left,    (*it).Top,     (*it).Width - m_ScrollBarWidth,
@@ -3600,7 +3600,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar(void) {
     }
 }
 
-void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar(void) {
+void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
     std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         const sDecorBorder ib {(*it).Left,    (*it).Top,     (*it).Width + m_ScrollBarWidth,
@@ -3610,7 +3610,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar(void) {
     }
 }
 
-void cFlatDisplayMenu::ItemBorderClear(void) {
+void cFlatDisplayMenu::ItemBorderClear() {
     ItemsBorder.clear();
 }
 
@@ -3928,7 +3928,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
 }
 
 /* Widgets */
-void cFlatDisplayMenu::DrawMainMenuWidgets(void) {
+void cFlatDisplayMenu::DrawMainMenuWidgets() {
     if (!MenuPixmap) return;
 
     const int wLeft = m_OsdWidth * Config.MainMenuItemScale + m_MarginItem + Config.decorBorderMenuContentSize +
@@ -5156,7 +5156,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     return ContentWidget.ContentHeight(false);
 }
 
-void cFlatDisplayMenu::PreLoadImages(void) {
+void cFlatDisplayMenu::PreLoadImages() {
     // Menu icons
     const cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
     std::string File {""};

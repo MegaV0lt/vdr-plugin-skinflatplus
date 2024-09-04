@@ -20,7 +20,7 @@ cImageCache::cImageCache() {}
 
 cImageCache::~cImageCache() {}
 
-void cImageCache::Create(void) {
+void cImageCache::Create() {
     for (uint i {0}; i < MaxImageCache; ++i) {
         CacheImage[i] = nullptr;
         CacheName[i] = "";
@@ -31,7 +31,7 @@ void cImageCache::Create(void) {
     m_InsertIndex = 0;
 }
 
-void cImageCache::Clear(void) {
+void cImageCache::Clear() {
     for (uint i {0}; i < MaxImageCache; ++i) {
         // if (CacheImage[i] != NULL)  //* 'delete' already checks for NULL
             delete CacheImage[i];
@@ -84,7 +84,7 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
     }
 }
 
-void cImageCache::PreLoadImage(void) {
+void cImageCache::PreLoadImage() {
     uint32_t tick1 {GetMsTicks()};
 
     cFlatDisplayChannel DisplayChannel(false);

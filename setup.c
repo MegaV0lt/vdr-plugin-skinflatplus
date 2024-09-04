@@ -26,7 +26,7 @@ cStringList ShowEndTime;  // For replay show end time of recording
 
 int ConfigFileSelection;
 
-cFlatSetup::cFlatSetup(void) {
+cFlatSetup::cFlatSetup() {
     SetupConfig = Config;
     ItemLastSel = -1;
     Setup();
@@ -35,7 +35,7 @@ cFlatSetup::cFlatSetup(void) {
 cFlatSetup::~cFlatSetup() {
 }
 
-void cFlatSetup::Setup(void) {
+void cFlatSetup::Setup() {
     Clear();
 
     Bordertypes.Clear();
@@ -178,7 +178,7 @@ eOSState cFlatSetup::ProcessKey(eKeys Key) {
     return state;
 }
 
-void cFlatSetup::Store(void) {
+void cFlatSetup::Store() {
     Config = SetupConfig;
     SetupStore("decorBorderChannelByTheme", Config.decorBorderChannelByTheme);
     SetupStore("decorBorderChannelTypeUser", Config.decorBorderChannelTypeUser);
@@ -349,7 +349,7 @@ void cFlatSetup::Store(void) {
     Config.Init();
 }
 
-void cFlatSetupGeneral::LoadConfigFile(void) {
+void cFlatSetupGeneral::LoadConfigFile() {
     cString Filename =
         cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), ConfigFiles[ConfigFileSelection]);
 
@@ -555,7 +555,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     return true;
 }
 
-void cFlatSetupGeneral::SaveCurrentSettings(void) {
+void cFlatSetupGeneral::SaveCurrentSettings() {
     time_t t = time(NULL);
     struct tm tm_r;
     localtime_r(&t, &tm_r);
@@ -756,7 +756,7 @@ cFlatSetupGeneral::cFlatSetupGeneral(cFlatConfig* data) : cMenuSetupSubMenu(tr("
     Setup();
 }
 
-void cFlatSetupGeneral::Setup(void) {
+void cFlatSetupGeneral::Setup() {
     Clear();
 
     DecorDescriptions.Clear();
@@ -901,7 +901,7 @@ cFlatSetupChannelInfo::cFlatSetupChannelInfo(cFlatConfig* data) : cMenuSetupSubM
     Setup();
 }
 
-void cFlatSetupChannelInfo::Setup(void) {
+void cFlatSetupChannelInfo::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Show Channelinfo icons"), &SetupConfig->ChannelIconsShow));
@@ -1001,7 +1001,7 @@ cFlatSetupMenu::cFlatSetupMenu(cFlatConfig* data) : cMenuSetupSubMenu(tr("Menu s
     Setup();
 }
 
-void cFlatSetupMenu::Setup(void) {
+void cFlatSetupMenu::Setup() {
     Clear();
 
     Add(new cMenuEditIntItem(tr("Menuitem padding"), &SetupConfig->MenuItemPadding));
@@ -1121,7 +1121,7 @@ cFlatSetupReplay::cFlatSetupReplay(cFlatConfig* data) : cMenuSetupSubMenu(tr("Re
     Setup();
 }
 
-void cFlatSetupReplay::Setup(void) {
+void cFlatSetupReplay::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Show resolution & aspect"), &SetupConfig->RecordingResolutionAspectShow));
@@ -1197,7 +1197,7 @@ cFlatSetupVolume::cFlatSetupVolume(cFlatConfig* data) : cMenuSetupSubMenu(tr("Vo
     Setup();
 }
 
-void cFlatSetupVolume::Setup(void) {
+void cFlatSetupVolume::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Volume border by decor-file?"), &SetupConfig->decorBorderVolumeByTheme));
@@ -1256,7 +1256,7 @@ cFlatSetupTracks::cFlatSetupTracks(cFlatConfig* data) : cMenuSetupSubMenu(tr("Tr
     Setup();
 }
 
-void cFlatSetupTracks::Setup(void) {
+void cFlatSetupTracks::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Tracks border by decor-file?"), &SetupConfig->decorBorderTrackByTheme));
@@ -1303,7 +1303,7 @@ cFlatSetupTVScraper::cFlatSetupTVScraper(cFlatConfig* data) : cMenuSetupSubMenu(
     Setup();
 }
 
-void cFlatSetupTVScraper::Setup(void) {
+void cFlatSetupTVScraper::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Channelinfo show poster?"), &SetupConfig->TVScraperChanInfoShowPoster));
@@ -1343,7 +1343,7 @@ cFlatSetupMMWidget::cFlatSetupMMWidget(cFlatConfig* data) : cMenuSetupSubMenu(tr
     Setup();
 }
 
-void cFlatSetupMMWidget::Setup(void) {
+void cFlatSetupMMWidget::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Enable main menu widgets"), &SetupConfig->MainMenuWidgetsEnable));

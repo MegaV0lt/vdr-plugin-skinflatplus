@@ -38,14 +38,14 @@ void cTextScroll::UpdateViewPortWidth(int w) {
     Pixmap->SetViewPort(ViewPort);
 }
 
-void cTextScroll::Reset(void) {
+void cTextScroll::Reset() {
     if (!Pixmap) return;
 
     Pixmap->SetDrawPortPoint(cPoint(0, 0));
     WaitSteps = WAITSTEPS;
 }
 
-void cTextScroll::Draw(void) {
+void cTextScroll::Draw() {
     if (!Pixmap) return;
 
     if (ColorExtraTextFg) {
@@ -68,7 +68,7 @@ void cTextScroll::Draw(void) {
     }
 }
 
-void cTextScroll::DoStep(void) {
+void cTextScroll::DoStep() {
     if (!Pixmap) return;
 
     if (WaitSteps > 0) {  // Wait at the beginning for better read
@@ -119,7 +119,7 @@ cTextScrollers::cTextScrollers() {
 
 cTextScrollers::~cTextScrollers() {}
 
-void cTextScrollers::Clear(void) {
+void cTextScrollers::Clear() {
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
@@ -154,12 +154,12 @@ void cTextScrollers::UpdateViewPortWidth(int w) {
     }
 }
 
-void cTextScrollers::StartScrolling(void) {
+void cTextScrollers::StartScrolling() {
     if (!Running() && Scrollers.size() > 0)
         Start();
 }
 
-void cTextScrollers::Action(void) {
+void cTextScrollers::Action() {
     // Wait 1 second so the osd is finished
     for (uint i {0}; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);

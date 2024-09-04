@@ -37,7 +37,7 @@ class cSimpleContent {
     cFont *m_Font {nullptr};
 
  public:
-    cSimpleContent(void) {
+    cSimpleContent() {
     }
 
     cSimpleContent(const cSimpleContent& rhs) {  // Added to avoid compiler warning
@@ -96,9 +96,9 @@ class cSimpleContent {
         m_ColorBg = ColorBg;
     }
 
-    int GetContentType(void) { return m_ContentType; }
+    int GetContentType() { return m_ContentType; }
 
-    int GetBottom(void) {
+    int GetBottom() {
         if (m_ContentType == CT_Text)
             return m_Position.Top() + m_Font->Height();
 
@@ -147,7 +147,7 @@ class cSimpleContent {
 
 class cComplexContent {
  public:
-    cComplexContent(void);
+    cComplexContent();
     cComplexContent(cOsd *osd, int ScrollSize);
     ~cComplexContent();
 
@@ -157,7 +157,7 @@ class cComplexContent {
     void SetBGColor(tColor ColorBg) { m_ColorBg = ColorBg; }
     void CreatePixmaps(bool FullFillBackground);
 
-    void Clear(void);
+    void Clear();
 
     void AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
@@ -167,22 +167,22 @@ class cComplexContent {
                                  int TextAlignment = taDefault);
     void AddRect(cRect Position, tColor ColorBg);
     bool Scrollable(int height = 0);
-     int ScrollTotal(void);
-     int ScrollOffset(void);
-     int ScrollShown(void);
+     int ScrollTotal();
+     int ScrollOffset();
+     int ScrollShown();
     bool Scroll(bool Up, bool Page);
-    double ScrollbarSize(void);
+    double ScrollbarSize();
     void SetScrollingActive(bool active) { m_IsScrollingActive = active; }
 
-    int Height(void) { return m_Position.Height(); }
+    int Height() { return m_Position.Height(); }
     int ContentHeight(bool Full);
 
-    int BottomContent(void);
+    int BottomContent();
 
-    int Top(void) { return m_Position.Top(); }
+    int Top() { return m_Position.Top(); }
     void Draw();
-    bool IsShown(void) { return m_IsShown; }
-    bool IsScrollingActive(void) { return m_IsScrollingActive; }
+    bool IsShown() { return m_IsShown; }
+    bool IsScrollingActive() { return m_IsScrollingActive; }
 
  private:
     std::vector<cSimpleContent> Contents;
@@ -200,5 +200,5 @@ class cComplexContent {
 
     cOsd *m_Osd {nullptr};
 
-    void CalculateDrawPortHeight(void);
+    void CalculateDrawPortHeight();
 };

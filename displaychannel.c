@@ -431,7 +431,7 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
-void cFlatDisplayChannel::SignalQualityDraw(void) {
+void cFlatDisplayChannel::SignalQualityDraw() {
     if (!ChanInfoBottomPixmap) return;
 
     const int SignalStrength {cDevice::ActualDevice()->SignalStrength()};
@@ -476,7 +476,7 @@ void cFlatDisplayChannel::SignalQualityDraw(void) {
 
 // You need oscam min rev 10653
 // You need dvbapi min commit 85da7b2
-void cFlatDisplayChannel::DvbapiInfoDraw(void) {
+void cFlatDisplayChannel::DvbapiInfoDraw() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DvbapiInfoDraw()");
 #endif
@@ -540,7 +540,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw(void) {
     delete DvbapiInfoFont;
 }
 
-void cFlatDisplayChannel::Flush(void) {
+void cFlatDisplayChannel::Flush() {
     if (m_Present) {
         time_t t {time(NULL)};
         int Current {0};
@@ -569,7 +569,7 @@ void cFlatDisplayChannel::Flush(void) {
     m_Osd->Flush();
 }
 
-void cFlatDisplayChannel::PreLoadImages(void) {
+void cFlatDisplayChannel::PreLoadImages() {
     int height {m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2};
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);

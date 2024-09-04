@@ -14,18 +14,18 @@
 
 class cFlatSetup : public cMenuSetupPage {
  public:
-        cFlatSetup(void);
+        cFlatSetup();
         virtual ~cFlatSetup();
 
  protected:
-        virtual void Store(void);
+        virtual void Store();
         virtual eOSState ProcessKey(eKeys Key);
 
  private:
         cFlatConfig SetupConfig;
 
         int ItemLastSel;
-        void Setup(void);
+        void Setup();
 };
 
 class cMenuSetupSubMenu : public cOsdMenu {
@@ -34,7 +34,7 @@ class cMenuSetupSubMenu : public cOsdMenu {
 
  protected:
         cFlatConfig *SetupConfig;
-        virtual void Setup(void) = 0;
+        virtual void Setup() = 0;
         cOsdItem *InfoItem(const char *label, const char *value);
         int ItemLastSel;
 };
@@ -45,9 +45,9 @@ class cFlatSetupGeneral : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
-        void SaveCurrentSettings(void);
-        void LoadConfigFile(void);
+        void Setup();
+        void SaveCurrentSettings();
+        void LoadConfigFile();
         bool SetupParse(const char *Name, const char *Value);
 
  private:
@@ -59,7 +59,7 @@ class cFlatSetupChannelInfo : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
  
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupMenu : public cMenuSetupSubMenu {
@@ -68,7 +68,7 @@ class cFlatSetupMenu : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupReplay : public cMenuSetupSubMenu {
@@ -77,7 +77,7 @@ class cFlatSetupReplay : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupVolume : public cMenuSetupSubMenu {
@@ -86,7 +86,7 @@ class cFlatSetupVolume : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupTracks : public cMenuSetupSubMenu {
@@ -95,7 +95,7 @@ class cFlatSetupTracks : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupTVScraper : public cMenuSetupSubMenu {
@@ -104,7 +104,7 @@ class cFlatSetupTVScraper : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };
 
 class cFlatSetupMMWidget : public cMenuSetupSubMenu {
@@ -113,5 +113,5 @@ class cFlatSetupMMWidget : public cMenuSetupSubMenu {
         virtual eOSState ProcessKey(eKeys Key);
 
  protected:
-        void Setup(void);
+        void Setup();
 };

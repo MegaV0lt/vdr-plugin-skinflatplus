@@ -7,7 +7,7 @@
  */
 #include "./displaymessage.h"
 
-cFlatDisplayMessage::cFlatDisplayMessage(void) {
+cFlatDisplayMessage::cFlatDisplayMessage() {
     CreateFullOsd();
     TopBarCreate();
     MessageCreate();
@@ -40,7 +40,7 @@ void cFlatDisplayMessage::SetMessage(eMessageType Type, const char *Text) {
     }
 }
 
-void cFlatDisplayMessage::Flush(void) {
+void cFlatDisplayMessage::Flush() {
     TopBarUpdate();
     m_Osd->Flush();
 }

@@ -27,11 +27,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 #ifdef DEPRECATED_SKIN_SETITEMEVENT
     using cSkinDisplayMenu::SetItemEvent;
 #endif
-        cFlatDisplayMenu(void);
+        cFlatDisplayMenu();
         virtual ~cFlatDisplayMenu();
         virtual void Scroll(bool Up, bool Page);
-        virtual int MaxItems(void);
-        virtual void Clear(void);
+        virtual int MaxItems();
+        virtual void Clear();
 
         virtual void SetMenuCategory(eMenuCategory MenuCategory);
         // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
@@ -57,11 +57,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         virtual void SetEvent(const cEvent *Event);
         virtual void SetRecording(const cRecording *Recording);
         virtual void SetText(const char *Text, bool FixedFont);
-        virtual int GetTextAreaWidth(void) const;
+        virtual int GetTextAreaWidth() const;
         virtual const cFont *GetTextAreaFont(bool FixedFont) const;
-        virtual void Flush(void);
+        virtual void Flush();
 
-        void PreLoadImages(void);
+        void PreLoadImages();
 
  private:
         cPixmap *MenuPixmap {nullptr};
@@ -123,9 +123,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cImage *IconRec {nullptr};
 
         void ItemBorderInsertUnique(const sDecorBorder &ib);
-        void ItemBorderDrawAllWithScrollbar(void);
-        void ItemBorderDrawAllWithoutScrollbar(void);
-        void ItemBorderClear(void);
+        void ItemBorderDrawAllWithScrollbar();
+        void ItemBorderDrawAllWithoutScrollbar();
+        void ItemBorderClear();
 
         const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                      "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
@@ -134,7 +134,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString GetIconName(const std::string &element);
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
-        cString GetRecCounts(void);  // Get number of recordings and new recordings (35*/53)
+        cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 
@@ -149,7 +149,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                            bool CanScrollDown, bool IsContent = false);
-        int ItemsHeight(void);
+        int ItemsHeight();
         bool CheckProgressBar(const char *text);
         void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                      tColor ColorBarFg, tColor ColorBg);
@@ -160,7 +160,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
-        void DrawMainMenuWidgets(void);
+        void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop);

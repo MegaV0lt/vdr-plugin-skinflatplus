@@ -31,12 +31,12 @@ class cTextScroll {
     }
 
     void UpdateViewPortWidth(int w);
-    void Reset(void);
+    void Reset();
 
     void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg,
                  cFont *font, tColor ColorExtraTextFg = 0);
-    void DoStep(void);
-    void Draw(void);
+    void DoStep();
+    void Draw();
 
  private:
     cRect Position {0, 0, 0, 0};
@@ -59,7 +59,7 @@ class cTextScrollers : public cThread {
     cTextScrollers();
     ~cTextScrollers();
 
-    void Clear(void);
+    void Clear();
     void SetOsd(cOsd *osd) { m_Osd = osd;}
     void SetPixmapLayer(int layer) { Layer = layer; }
     void SetScrollStep(int step) { ScrollStep = step; }
@@ -68,7 +68,7 @@ class cTextScrollers : public cThread {
     void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg,
                      cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
-    bool isActive(void) { return Active(); }
+    bool isActive() { return Active(); }
 
  private:
     std::vector<cTextScroll *> Scrollers;
@@ -77,6 +77,6 @@ class cTextScrollers : public cThread {
     int ScrollStep {0}, ScrollDelay {0};
     int ScrollType {0};
     int Layer {0};
-    virtual void Action(void);
-    void StartScrolling(void);
+    virtual void Action();
+    void StartScrolling();
 };

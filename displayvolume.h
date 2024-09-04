@@ -11,13 +11,13 @@
 
 class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
  public:
-        cFlatDisplayVolume(void);
+        cFlatDisplayVolume();
         virtual ~cFlatDisplayVolume();
         virtual void SetVolume(int Current, int Total, bool Mute);
         // virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush(void);
+        virtual void Flush();
 
-        void PreLoadImages(void);
+        void PreLoadImages();
 
  private:
         // bool Muted;  // Unused?

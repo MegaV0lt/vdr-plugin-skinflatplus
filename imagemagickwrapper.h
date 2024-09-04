@@ -23,6 +23,6 @@ class cImageMagickWrapper {
     Image buffer;
     Color Argb2Color(tColor col);
     cImage *CreateImage(int width, int height, bool PreserveAspect = true);
-    cImage CreateImageCopy(void);
+    cImage CreateImageCopy();
     bool LoadImage(const char *fullpath);
 };

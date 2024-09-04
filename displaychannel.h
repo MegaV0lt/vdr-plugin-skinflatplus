@@ -20,9 +20,9 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         virtual void SetChannel(const cChannel *Channel, int Number);
         virtual void SetEvents(const cEvent *Present, const cEvent *Following);
         virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush(void);
+        virtual void Flush();
 
-        void PreLoadImages(void);
+        void PreLoadImages();
 
  private:
         const cEvent *m_Present {nullptr};
@@ -56,7 +56,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         bool m_IsRadioChannel {false};
         // bool m_IsGroup {false};
 
-        void SignalQualityDraw(void);
+        void SignalQualityDraw();
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);
-        void DvbapiInfoDraw(void);
+        void DvbapiInfoDraw();
 };

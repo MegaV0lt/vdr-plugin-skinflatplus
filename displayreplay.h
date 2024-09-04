@@ -22,9 +22,9 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         virtual void SetTotal(const char *Total);
         virtual void SetJump(const char *Jump);
         virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush(void);
+        virtual void Flush();
 
-        void PreLoadImages(void);
+        void PreLoadImages();
 
  private:
         cString m_Current {""}, m_Total {""};
@@ -55,8 +55,8 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
 
         bool m_ProgressShown {false};
         bool m_ModeOnly {false};
-        void UpdateInfo(void);
-        void ResolutionAspectDraw(void);
+        void UpdateInfo();
+        void ResolutionAspectDraw();
 
-        virtual void Action(void);
+        virtual void Action();
 };

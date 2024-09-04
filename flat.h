@@ -207,14 +207,14 @@ THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
  public:
-        cFlat(void);
-        virtual const char *Description(void);
+        cFlat();
+        virtual const char *Description();
         virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
-        virtual cSkinDisplayMenu *DisplayMenu(void);
+        virtual cSkinDisplayMenu *DisplayMenu();
         virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
-        virtual cSkinDisplayVolume *DisplayVolume(void);
+        virtual cSkinDisplayVolume *DisplayVolume();
         virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-        virtual cSkinDisplayMessage *DisplayMessage(void);
+        virtual cSkinDisplayMessage *DisplayMessage();
 
  private:
         cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
@@ -223,15 +223,15 @@ class cFlat : public cSkin {
 // Based on VDR's cTextWrapper
 class cTextFloatingWrapper {
  public:
-    cTextFloatingWrapper(void);
+    cTextFloatingWrapper();
     ~cTextFloatingWrapper();
     void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline characters into the string.
     ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
-    const char *Text(void);
+    const char *Text();
     ///< Returns the full wrapped text.
-    int Lines(void) { return m_Lines; }
+    int Lines() { return m_Lines; }
     ///< Returns the actual number of lines needed to display the full wrapped text.
     const char *GetLine(int Line);
     ///< Returns the given Line. The first line is numbered 0.
@@ -243,7 +243,7 @@ class cTextFloatingWrapper {
     int m_LastLine {-1};
 };
 
-static inline uint32_t GetMsTicks(void) {
+static inline uint32_t GetMsTicks() {
 #ifdef CLOCK_MONOTONIC
     struct timespec tspec;
 
@@ -272,7 +272,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth); 
 uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode);
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
-cPlugin *GetScraperPlugin(void);
+cPlugin *GetScraperPlugin();
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
@@ -288,7 +288,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
-int GetEpgsearchConflicts(void);
+int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = NULL, int Frame = 0, int LastFrame = 0);
 void InsertCuttedLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);

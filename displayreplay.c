@@ -168,7 +168,7 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
     TopBarSetMenuIcon("extraIcons/Playing");
 }
 
-void cFlatDisplayReplay::Action(void) {
+void cFlatDisplayReplay::Action() {
     time_t CurTime;
     while (Running()) {
         time(&CurTime);
@@ -312,7 +312,7 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
         UpdateInfo();
 }
 
-void cFlatDisplayReplay::UpdateInfo(void) {
+void cFlatDisplayReplay::UpdateInfo() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
 #endif
@@ -687,7 +687,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     DecorBorderDraw(ib);
 }
 
-void cFlatDisplayReplay::ResolutionAspectDraw(void) {
+void cFlatDisplayReplay::ResolutionAspectDraw() {
     if (m_ModeOnly) return;
     if (!IconsPixmap) return;
 
@@ -732,7 +732,7 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
     (Text) ? MessageSet(Type, Text) : MessageClear();
 }
 
-void cFlatDisplayReplay::Flush(void) {
+void cFlatDisplayReplay::Flush() {
     TopBarUpdate();
 
     if (Config.RecordingResolutionAspectShow) {
@@ -746,7 +746,7 @@ void cFlatDisplayReplay::Flush(void) {
     m_Osd->Flush();
 }
 
-void cFlatDisplayReplay::PreLoadImages(void) {
+void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("rewind", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("pause", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
