@@ -24,11 +24,6 @@ bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<i
 int RoundUp(int NumToRound, int multiple);
 
 class cFlatConfig {
- private:
-        cString CheckSlashAtEnd(std::string path);
-
-        int m_DecorCurrent {-1};
-
  public:
         cFlatConfig(void);
         ~cFlatConfig(void);
@@ -50,7 +45,6 @@ class cFlatConfig {
         void RecordingOldLoadConfig(void);
         int GetRecordingOldValue(const std::string &folder);
 
- public:
         cString ThemeCurrent;
         cString LogoPath;
         cString IconPath;
@@ -351,4 +345,9 @@ class cFlatConfig {
         void Store(const char *Name, const char *Value, const char *Filename);
         void Store(const char *Name, int Value, const char *Filename);
         void Store(const char *Name, double &Value, const char *Filename);  // NOLINT
+
+ private:
+        cString CheckSlashAtEnd(std::string path);
+
+        int m_DecorCurrent {-1};
 };

@@ -146,24 +146,6 @@ class cSimpleContent {
 };
 
 class cComplexContent {
- private:
-    std::vector<cSimpleContent> Contents;
-
-    cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
-    cRect m_Position {0, 0, 0, 0};
-
-    tColor m_ColorBg {0};
-
-    bool m_FullFillBackground {false};
-    int m_DrawPortHeight {0};
-    int m_ScrollSize {0};
-    bool m_IsShown {false};
-    bool m_IsScrollingActive {true};
-
-    cOsd *m_Osd {nullptr};
-
-    void CalculateDrawPortHeight(void);
-
  public:
     cComplexContent(void);
     cComplexContent(cOsd *osd, int ScrollSize);
@@ -201,4 +183,22 @@ class cComplexContent {
     void Draw();
     bool IsShown(void) { return m_IsShown; }
     bool IsScrollingActive(void) { return m_IsScrollingActive; }
+
+ private:
+    std::vector<cSimpleContent> Contents;
+
+    cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
+    cRect m_Position {0, 0, 0, 0};
+
+    tColor m_ColorBg {0};
+
+    bool m_FullFillBackground {false};
+    int m_DrawPortHeight {0};
+    int m_ScrollSize {0};
+    bool m_IsShown {false};
+    bool m_IsScrollingActive {true};
+
+    cOsd *m_Osd {nullptr};
+
+    void CalculateDrawPortHeight(void);
 };

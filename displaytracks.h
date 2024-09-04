@@ -10,6 +10,13 @@
 #include "./baserender.h"
 
 class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
+ public:
+        cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
+        virtual ~cFlatDisplayTracks();
+        virtual void SetTrack(int Index, const char * const *Tracks);
+        virtual void SetAudioChannel(int AudioChannel);
+        virtual void Flush(void);
+
  private:
         cPixmap *TracksPixmap {nullptr};
         cPixmap *TracksLogoPixmap {nullptr};
@@ -23,10 +30,4 @@ class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
         int m_CurrentIndex {0};
 
         void SetItem(const char *Text, int Index, bool Current);
- public:
-        cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-        virtual ~cFlatDisplayTracks();
-        virtual void SetTrack(int Index, const char * const *Tracks);
-        virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush(void);
 };

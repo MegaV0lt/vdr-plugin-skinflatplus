@@ -17,15 +17,6 @@ constexpr int LogoPreCache {192};    // First x channel logos
 //! You must double the value for the real amount of pre cached logos
 
 class cImageCache {
- private:
-    cImage *CacheImage[MaxImageCache];
-    std::string CacheName[MaxImageCache];  // Including full path
-    int CacheWidth[MaxImageCache];
-    int CacheHeight[MaxImageCache];
-
-    uint m_InsertIndex {0};      // Imagecache index
-    uint m_InsertIndexBase {0};  // Imagecache after first fill at start
-
  public:
     cImageCache();
     ~cImageCache();
@@ -42,4 +33,13 @@ class cImageCache {
     void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
 
     void PreLoadImage(void);
+
+ private:
+    cImage *CacheImage[MaxImageCache];
+    std::string CacheName[MaxImageCache];  // Including full path
+    int CacheWidth[MaxImageCache];
+    int CacheHeight[MaxImageCache];
+
+    uint m_InsertIndex {0};      // Imagecache index
+    uint m_InsertIndexBase {0};  // Imagecache after first fill at start
 };

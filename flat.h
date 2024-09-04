@@ -206,8 +206,6 @@ THEME_CLR(Theme, clrVolumeBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 class cFlat : public cSkin {
- private:
-        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
  public:
         cFlat(void);
         virtual const char *Description(void);
@@ -217,16 +215,13 @@ class cFlat : public cSkin {
         virtual cSkinDisplayVolume *DisplayVolume(void);
         virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
         virtual cSkinDisplayMessage *DisplayMessage(void);
+
+ private:
+        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
 };
 
 // Based on VDR's cTextWrapper
 class cTextFloatingWrapper {
- private:
-    char *m_Text {nullptr};
-    char *m_EoL {nullptr};
-    int m_Lines {0};
-    int m_LastLine {-1};
-
  public:
     cTextFloatingWrapper(void);
     ~cTextFloatingWrapper();
@@ -240,6 +235,12 @@ class cTextFloatingWrapper {
     ///< Returns the actual number of lines needed to display the full wrapped text.
     const char *GetLine(int Line);
     ///< Returns the given Line. The first line is numbered 0.
+
+ private:
+    char *m_Text {nullptr};
+    char *m_EoL {nullptr};
+    int m_Lines {0};
+    int m_LastLine {-1};
 };
 
 static inline uint32_t GetMsTicks(void) {

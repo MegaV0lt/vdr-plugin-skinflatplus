@@ -33,6 +33,57 @@ struct sDecorBorder {
 };
 
 class cFlatBaseRender {
+ public:
+        cImageLoader ImgLoader;
+
+        cFlatBaseRender(void);
+        ~cFlatBaseRender(void);
+
+        void CreateFullOsd(void);
+        void CreateOsd(int Left, int Top, int Width, int Height);
+
+        void TopBarCreate(void);
+        void TopBarSetTitle(const cString &Title, bool Clear = true);
+        void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
+        void TopBarSetMenuIcon(const cString icon);
+        void TopBarSetMenuIconRight(const cString icon);
+        void TopBarClearMenuIconRight(void);
+        void TopBarSetMenuLogo(const cString icon);
+        void TopBarSetExtraIcon(const cString icon);
+        void TopBarUpdate(void);
+
+        void ButtonsCreate(void);
+        void ButtonsSet(const char *Red, const char *Green = NULL, const char *Yellow = NULL, const char *Blue = NULL);
+        bool ButtonsDrawn(void);
+
+        void MessageCreate(void);
+        void MessageSet(eMessageType Type, const char *Text);
+        void MessageSetExtraTime(const char *Text);
+        void MessageClear(void);
+
+        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
+                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
+                                int Type, bool SetBackground, bool IsSignal = false);
+        void ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
+                               tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
+        void ProgressBarDrawBgColor(void);
+        void ProgressBarDraw(int Current, int Total);
+        void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
+
+        void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
+                           int Shown, bool CanScrollUp, bool CanScrollDown);
+        int ScrollBarWidth(void);
+
+        void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
+        void DecorBorderClear(cRect Rect, int Size);
+        void DecorBorderClearAll(void);
+        void DecorBorderRedrawAll(void);
+        void DecorBorderClearByFrom(int From);
+
+        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
+
+        void DrawWidgetWeather(void);
+
  protected:
         cOsd *m_Osd {nullptr};
 
@@ -154,55 +205,4 @@ class cFlatBaseRender {
         void TopBarEnableDiskUsage(void);
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
-
- public:
-        cImageLoader ImgLoader;
-
-        cFlatBaseRender(void);
-        ~cFlatBaseRender(void);
-
-        void CreateFullOsd(void);
-        void CreateOsd(int Left, int Top, int Width, int Height);
-
-        void TopBarCreate(void);
-        void TopBarSetTitle(const cString &Title, bool Clear = true);
-        void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
-        void TopBarSetMenuIcon(const cString icon);
-        void TopBarSetMenuIconRight(const cString icon);
-        void TopBarClearMenuIconRight(void);
-        void TopBarSetMenuLogo(const cString icon);
-        void TopBarSetExtraIcon(const cString icon);
-        void TopBarUpdate(void);
-
-        void ButtonsCreate(void);
-        void ButtonsSet(const char *Red, const char *Green = NULL, const char *Yellow = NULL, const char *Blue = NULL);
-        bool ButtonsDrawn(void);
-
-        void MessageCreate(void);
-        void MessageSet(eMessageType Type, const char *Text);
-        void MessageSetExtraTime(const char *Text);
-        void MessageClear(void);
-
-        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
-                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
-                                int Type, bool SetBackground, bool IsSignal = false);
-        void ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
-                               tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
-        void ProgressBarDrawBgColor(void);
-        void ProgressBarDraw(int Current, int Total);
-        void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
-
-        void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
-                           int Shown, bool CanScrollUp, bool CanScrollDown);
-        int ScrollBarWidth(void);
-
-        void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
-        void DecorBorderClear(cRect Rect, int Size);
-        void DecorBorderClearAll(void);
-        void DecorBorderRedrawAll(void);
-        void DecorBorderClearByFrom(int From);
-
-        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
-
-        void DrawWidgetWeather(void);
 };

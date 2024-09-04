@@ -18,6 +18,7 @@ class cImageMagickWrapper {
  public:
     cImageMagickWrapper();
     ~cImageMagickWrapper();
+
  protected:
     Image buffer;
     Color Argb2Color(tColor col);

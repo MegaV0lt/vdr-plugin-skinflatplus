@@ -16,21 +16,6 @@
 #define WAITDELAY 1000  // In ms
 
 class cTextScroll {
- private:
-    cRect Position {0, 0, 0, 0};
-
-    tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
-    std::string Text {""};
-    cFont *Font {nullptr};
-    cPixmap *Pixmap {nullptr};
-    cOsd *m_Osd {nullptr};
-    int Layer {0};
-    int PixelsPerStep {0};
-    int WAITSTEPS {0}, WaitSteps {0};
-    bool IsReserveStep {false};
-    bool ResetX {false};
-    int ScrollType {0};
-
  public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer = 2) {
         m_Osd = osd;
@@ -52,18 +37,24 @@ class cTextScroll {
                  cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep(void);
     void Draw(void);
+
+ private:
+    cRect Position {0, 0, 0, 0};
+
+    tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
+    std::string Text {""};
+    cFont *Font {nullptr};
+    cPixmap *Pixmap {nullptr};
+    cOsd *m_Osd {nullptr};
+    int Layer {0};
+    int PixelsPerStep {0};
+    int WAITSTEPS {0}, WaitSteps {0};
+    bool IsReserveStep {false};
+    bool ResetX {false};
+    int ScrollType {0};
 };
 
 class cTextScrollers : public cThread {
- private:
-    std::vector<cTextScroll *> Scrollers;
-
-    cOsd *m_Osd {nullptr};
-    int ScrollStep {0}, ScrollDelay {0};
-    int ScrollType {0};
-    int Layer {0};
-    virtual void Action(void);
-    void StartScrolling(void);
  public:
     cTextScrollers();
     ~cTextScrollers();
@@ -78,4 +69,14 @@ class cTextScrollers : public cThread {
                      cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive(void) { return Active(); }
+
+ private:
+    std::vector<cTextScroll *> Scrollers;
+
+    cOsd *m_Osd {nullptr};
+    int ScrollStep {0}, ScrollDelay {0};
+    int ScrollType {0};
+    int Layer {0};
+    virtual void Action(void);
+    void StartScrolling(void);
 };

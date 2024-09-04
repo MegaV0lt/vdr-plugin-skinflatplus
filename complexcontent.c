@@ -44,12 +44,8 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
     PixmapImage = nullptr;
 
     cRect PositionDraw {0, 0, m_Position.Width(), m_DrawPortHeight};
-    // PositionDraw.SetPoint(0, 0);
-    // PositionDraw.SetWidth(m_Position.Width());
     if (FullFillBackground && m_DrawPortHeight < m_Position.Height())
         PositionDraw.SetHeight(m_Position.Height());
-    // else
-    //    PositionDraw.SetHeight(m_DrawPortHeight);
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, m_Position, PositionDraw);
     PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, m_Position, PositionDraw);

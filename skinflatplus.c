@@ -21,8 +21,6 @@ static const char *VERSION        = "1.0.6";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
- private:
-        cFlat *flat;
  public:
         cPluginFlat(void);
         virtual ~cPluginFlat();
@@ -44,6 +42,9 @@ class cPluginFlat : public cPlugin {
         virtual bool Service(const char *Id, void *Data = NULL);
         virtual const char **SVDRPHelpPages(void);
         virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);  // NOLINT
+
+ private:
+        cFlat *flat;
 };
 
 cPluginFlat::cPluginFlat(void) {
