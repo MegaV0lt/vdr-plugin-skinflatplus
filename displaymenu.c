@@ -137,32 +137,32 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
     m_MenuCategory = MenuCategory;
     switch (MenuCategory) {
     case mcChannel:
-        if (Config.MenuChannelView == 0 || Config.MenuChannelView == 1 || Config.MenuChannelView == 2)
+        if (Config.MenuChannelView <= 2)  // 0 = VDR default, 1 = flatPlus long, 2 = flatPlus long + EPG
             m_ItemChannelHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-        else if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)
+        else  // 3 = flatPlus short, 4 = flatPlus short + EPG
             m_ItemChannelHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize +
                                   Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         break;
     case mcTimer:
-        if (Config.MenuTimerView == 0 || Config.MenuTimerView == 1)
+        if (Config.MenuTimerView <= 1)  // 0 = VDR default, 1 = flatPlus long
             m_ItemTimerHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-        else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3)
+        else  // 2 = flatPlus short, 3 = flatPlus short + EPG
             m_ItemTimerHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                 Config.decorBorderMenuItemSize * 2;
         break;
     case mcSchedule:
     case mcScheduleNow:
     case mcScheduleNext:
-        if (Config.MenuEventView == 0 || Config.MenuEventView == 1)
+        if (Config.MenuEventView <= 1)  // 0 = VDR default, 1 = flatPlus long
             m_ItemEventHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-        else if (Config.MenuEventView == 2 || Config.MenuEventView == 3)
+        else  // 2 = flatPlus short, 3 = flatPlus short + EPG
             m_ItemEventHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.MenuItemPadding +
                                 Config.decorBorderMenuItemSize * 2 + Config.decorProgressMenuItemSize / 2;
         break;
     case mcRecording:
-        if (Config.MenuRecordingView == 0 || Config.MenuRecordingView == 1)
+        if (Config.MenuRecordingView <= 1)  // 0 = VDR default, 1 = flatPlus long
             m_ItemRecordingHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
-        else if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3)
+        else  // 2 = flatPlus short, 3 = flatPlus short + EPG
             m_ItemRecordingHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                     Config.decorBorderMenuItemSize * 2;
         break;
