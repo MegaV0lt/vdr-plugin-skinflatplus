@@ -20,18 +20,18 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     if (img_stereo)
         m_StereoWidth = img_stereo->Width();
 
-    const int imgWidthMax = std::max(m_Ac3Width, m_StereoWidth);
+    const int imgWidthMax {std::max(m_Ac3Width, m_StereoWidth)};
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     m_CurrentIndex = -1;
     m_MaxItemWidth = m_Font->Width(Title) + m_MarginItem * 4;
     for (int i {0}; i < NumTracks; ++i)
         m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem2);
 
-    const int headerWidth = m_Font->Width(Title) + m_Font->Width(' ') + imgWidthMax;
+    const int headerWidth {m_Font->Width(Title) + m_Font->Width(' ') + imgWidthMax};
     m_MaxItemWidth = std::max(m_MaxItemWidth, headerWidth);
 
     ItemsHeight = (NumTracks + 1) * m_ItemHeight;
-    const int left = (m_OsdWidth - m_MaxItemWidth) / 2;
+    const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
     TopBarSetTitle(Title);
 
     TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1,
@@ -56,7 +56,7 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     if (!TracksPixmap) return;
 
-    const int y = (Index + 1) * m_ItemHeight;
+    const int y {(Index + 1) * m_ItemHeight};
     tColor ColorFg = Theme.Color(clrTrackItemFont);
     tColor ColorBg = Theme.Color(clrTrackItemBg);
     if (Current) {
@@ -75,18 +75,25 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
         TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
                                m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
 
-    const int left = (m_OsdWidth - m_MaxItemWidth) / 2;
-    const int top = m_OsdHeight - ItemsHeight - m_MarginItem + y;
+    const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
+    const int top {m_OsdHeight - ItemsHeight - m_MarginItem + y};
 
-    if (Current)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackCurFg, Config.decorBorderTrackCurBg);
-    else if (Index >= 0)
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackSelFg, Config.decorBorderTrackSelBg);
-    else
-        DecorBorderDraw(left, top, m_MaxItemWidth, m_FontHeight, Config.decorBorderTrackSize,
-                        Config.decorBorderTrackType, Config.decorBorderTrackFg, Config.decorBorderTrackBg);
+    sDecorBorder ib {left,
+                     top,
+                     m_MaxItemWidth,
+                     m_FontHeight,
+                     Config.decorBorderTrackSize,
+                     Config.decorBorderTrackType,
+                     Config.decorBorderTrackFg,
+                     Config.decorBorderTrackBg};
+    if (Current) {
+        ib.ColorFg = Config.decorBorderTrackCurFg;
+        ib.ColorBg = Config.decorBorderTrackCurBg;
+    } else if (Index >= 0) {
+        ib.ColorFg = Config.decorBorderTrackSelFg;
+        ib.ColorBg = Config.decorBorderTrackSelBg;
+    }
+    DecorBorderDraw(ib);
 }
 
 void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
@@ -103,18 +110,16 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
     if (AudioChannel == -1 && img_ac3) {
-        const int IconLeft = m_MaxItemWidth - img_ac3->Width() - m_MarginItem;
-        // const int IconTop = (m_FontHeight - img_ac3->Height()) / 2;
+        const int IconLeft {m_MaxItemWidth - img_ac3->Width() - m_MarginItem};
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_ac3);
     } else if (img_stereo) {
-        const int IconLeft = m_MaxItemWidth - img_stereo->Width() - m_MarginItem;
-        // const int IconTop = (m_FontHeight - img_stereo->Height()) / 2;
+        const int IconLeft {m_MaxItemWidth - img_stereo->Width() - m_MarginItem};
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_stereo);
     }
     return;
 }
 
-void cFlatDisplayTracks::Flush(void) {
+void cFlatDisplayTracks::Flush() {
     TopBarUpdate();
     m_Osd->Flush();
 }

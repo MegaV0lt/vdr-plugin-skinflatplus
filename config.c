@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <algorithm>
-cFlatConfig::cFlatConfig(void) {
+cFlatConfig::cFlatConfig() {
     LogoPath = "";
     IconPath = "";
     RecordingOldConfigFile = "";
@@ -242,7 +242,7 @@ cFlatConfig::cFlatConfig(void) {
     ThemeCurrent = "";
 }
 
-cFlatConfig::~cFlatConfig(void) {
+cFlatConfig::~cFlatConfig() {
 }
 
 bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
@@ -417,7 +417,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     return true;
 }
 
-void cFlatConfig::ThemeCheckAndInit(void) {
+void cFlatConfig::ThemeCheckAndInit() {
     if (strcmp(Theme.Name(), *ThemeCurrent) != 0) {
         dsyslog("flatPlus: Load theme: %s", *ThemeCurrent);
         ThemeCurrent = Theme.Name();
@@ -425,7 +425,7 @@ void cFlatConfig::ThemeCheckAndInit(void) {
     }
 }
 
-void cFlatConfig::DecorCheckAndInit(void) {
+void cFlatConfig::DecorCheckAndInit() {
     if (m_DecorCurrent != DecorIndex) {
         m_DecorCurrent = DecorIndex;
         DecorLoadCurrent();
@@ -588,7 +588,7 @@ void cFlatConfig::DecorCheckAndInit(void) {
         decorBorderButtonSize = 0;
 }
 
-void cFlatConfig::ThemeInit(void) {
+void cFlatConfig::ThemeInit() {
     decorBorderChannelFg = Theme.Color(clrChannelBorderFg);
     decorBorderChannelBg = Theme.Color(clrChannelBorderBg);
 
@@ -658,7 +658,7 @@ void cFlatConfig::ThemeInit(void) {
     decorScrollBarBg = Theme.Color(clrScrollbarBg);
 }
 
-void cFlatConfig::Init(void) {
+void cFlatConfig::Init() {
     if (!strcmp(LogoPath, "")) {
         LogoPath = cString::sprintf("%s/logos", PLUGINRESOURCEPATH);
         dsyslog("flatPlus: LogoPath: %s", *LogoPath);
@@ -761,7 +761,7 @@ cString cFlatConfig::DecorDescription(cString File) {
     return description;
 }
 
-void cFlatConfig::DecorLoadCurrent(void) {
+void cFlatConfig::DecorLoadCurrent() {
     cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
@@ -879,7 +879,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-void cFlatConfig::RecordingOldLoadConfig(void) {
+void cFlatConfig::RecordingOldLoadConfig() {
     dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
     RecordingOldFolder.clear();
     RecordingOldValue.clear();

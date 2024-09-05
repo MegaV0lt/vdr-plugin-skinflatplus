@@ -20,8 +20,8 @@ cImageCache::cImageCache() {}
 
 cImageCache::~cImageCache() {}
 
-void cImageCache::Create(void) {
-    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
+void cImageCache::Create() {
+    for (uint i {0}; i < MaxImageCache; ++i) {
         CacheImage[i] = nullptr;
         CacheName[i] = "";
         CacheWidth[i] = -1;
@@ -31,8 +31,8 @@ void cImageCache::Create(void) {
     m_InsertIndex = 0;
 }
 
-void cImageCache::Clear(void) {
-    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
+void cImageCache::Clear() {
+    for (uint i {0}; i < MaxImageCache; ++i) {
         // if (CacheImage[i] != NULL)  //* 'delete' already checks for NULL
             delete CacheImage[i];
     }
@@ -43,7 +43,7 @@ void cImageCache::Clear(void) {
 bool cImageCache::RemoveFromCache(const std::string &Name) {
     std::string BaseFileName {""};
     BaseFileName.reserve(32);
-    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MaxImageCache; ++i) {
         BaseFileName = CacheName[i].substr(CacheName[i].find_last_of('/') + 1);  // Part after the last '/'
 
         if (BaseFileName == Name) {
@@ -60,7 +60,7 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
 
 cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
-    for (uint i {0}; i < MAX_IMAGE_CACHE; ++i) {
+    for (uint i {0}; i < MaxImageCache; ++i) {
         // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
         //          CacheWidth[i], CacheHeight[i]);
         if (CacheName[i] == Name && CacheWidth[i] == Width && CacheHeight[i] == Height)
@@ -71,20 +71,21 @@ cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
 
 void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {
     CacheImage[m_InsertIndex] = Image;
+    CacheName[m_InsertIndex].reserve(Name.length());
     CacheName[m_InsertIndex] = Name;
     CacheWidth[m_InsertIndex] = Width;
     CacheHeight[m_InsertIndex] = Height;
 
     ++m_InsertIndex;
-    if (m_InsertIndex >= MAX_IMAGE_CACHE) {
-        isyslog("flatPlus: Imagecache overflow, increase MAX_IMAGE_CACHE (%d)", MAX_IMAGE_CACHE);
+    if (m_InsertIndex >= MaxImageCache) {
+        isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%d)", MaxImageCache);
         isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
         m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
     }
 }
 
-void cImageCache::PreLoadImage(void) {
-    uint32_t tick1 = GetMsTicks();
+void cImageCache::PreLoadImage() {
+    uint32_t tick1 {GetMsTicks()};
 
     cFlatDisplayChannel DisplayChannel(false);
     DisplayChannel.PreLoadImages();
@@ -98,8 +99,8 @@ void cImageCache::PreLoadImage(void) {
     cFlatDisplayVolume DisplayVolume;
     DisplayVolume.PreLoadImages();
 
-    uint32_t tick2 = GetMsTicks();
+    uint32_t tick2 {GetMsTicks()};
     m_InsertIndexBase = GetCacheCount();
     dsyslog("flatPlus: Imagecache pre load images time: %d ms", tick2 - tick1);
-    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", m_InsertIndexBase, MAX_IMAGE_CACHE);
+    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", m_InsertIndexBase, MaxImageCache);
 }

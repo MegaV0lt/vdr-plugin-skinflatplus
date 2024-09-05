@@ -14,6 +14,16 @@
 #include "./services/scraper2vdr.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
+ public:
+        explicit cFlatDisplayChannel(bool WithInfo);
+        virtual ~cFlatDisplayChannel();
+        virtual void SetChannel(const cChannel *Channel, int Number);
+        virtual void SetEvents(const cEvent *Present, const cEvent *Following);
+        virtual void SetMessage(eMessageType Type, const char *Text);
+        virtual void Flush();
+
+        void PreLoadImages();
+
  private:
         const cEvent *m_Present {nullptr};
 
@@ -38,7 +48,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int m_SignalStrengthRight {0};
 
         // TVScraper
-        int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
+        cRect TVSRect {0, 0, 0, 0};
 
         // TextScroller
         cTextScrollers Scrollers;
@@ -46,17 +56,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         bool m_IsRadioChannel {false};
         // bool m_IsGroup {false};
 
-        void SignalQualityDraw(void);
+        void SignalQualityDraw();
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);
-        void DvbapiInfoDraw(void);
-
- public:
-        cFlatDisplayChannel(bool WithInfo);
-        virtual ~cFlatDisplayChannel();
-        virtual void SetChannel(const cChannel *Channel, int Number);
-        virtual void SetEvents(const cEvent *Present, const cEvent *Following);
-        virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush(void);
-
-        void PreLoadImages(void);
+        void DvbapiInfoDraw();
 };

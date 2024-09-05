@@ -41,13 +41,13 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive {false};
-time_t m_RemoteTimersLastRefresh = 0;
+time_t m_RemoteTimersLastRefresh {0};
 
-cFlat::cFlat(void) : cSkin("flatPlus", &::Theme) {
+cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
     Display_Menu = NULL;
 }
 
-const char *cFlat::Description(void) {
+const char *cFlat::Description() {
     return "flatPlus";
 }
 
@@ -55,7 +55,7 @@ cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
     return new cFlatDisplayChannel(WithInfo);
 }
 
-cSkinDisplayMenu *cFlat::DisplayMenu(void) {
+cSkinDisplayMenu *cFlat::DisplayMenu() {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
     Display_Menu = menu;
     m_MenuActive = true;
@@ -66,7 +66,7 @@ cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) {
     return new cFlatDisplayReplay(ModeOnly);
 }
 
-cSkinDisplayVolume *cFlat::DisplayVolume(void) {
+cSkinDisplayVolume *cFlat::DisplayVolume() {
     return new cFlatDisplayVolume;
 }
 
@@ -74,7 +74,7 @@ cSkinDisplayTracks *cFlat::DisplayTracks(const char *Title, int NumTracks, const
     return new cFlatDisplayTracks(Title, NumTracks, Tracks);
 }
 
-cSkinDisplayMessage *cFlat::DisplayMessage(void) {
+cSkinDisplayMessage *cFlat::DisplayMessage() {
     return new cFlatDisplayMessage;
 }
 
@@ -93,9 +93,9 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
 
     esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Size().Width(),
             DrawPort.Size().Height());
-    cRect NewDrawPort = DrawPort;
-    const int width = std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width());
-    const int height = std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height());
+    const int width {std::min(DrawPort.Size().Width(), osd->MaxPixmapSize().Width())};
+    const int height {std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height())};
+    cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
         esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
@@ -108,7 +108,7 @@ cPixmap *CreatePixmap(cOsd *osd, cString Name, int Layer, const cRect &ViewPort,
 
 // void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
 
-cPlugin *GetScraperPlugin(void) {
+cPlugin *GetScraperPlugin() {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
     if (!pScraper)  // If it doesn't exit, try scraper2vdr
         pScraper = cPluginManager::GetPlugin("scraper2vdr");
@@ -161,13 +161,12 @@ cString GetFormatIcon(int ScreenWidth) {
 cString GetRecordingFormatIcon(const cRecording *Recording) {
     // From skin ElchiHD
     #if APIVERSNUM >= 20605
-        const uint16_t FrameWidth = Recording->Info()->FrameWidth();
+        const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
         if (FrameWidth > 0) {
             if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
             if (FrameWidth > 720) return "hd";
             return "sd";  // 720 and below is considered sd
-        }
-        else  // NOLINT
+        } else  // NOLINT
     #endif
         {   // Find radio and H.264/H.265 streams.
             //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
@@ -188,7 +187,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     return "";  // Nothing found
 }
 
-cString GetRecordingerrorIcon(int RecInfoErrors) {
+cString GetRecordingErrorIcon(int RecInfoErrors) {
     if (RecInfoErrors == 0) return "recording_ok";       // No errors
     if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
 
@@ -199,9 +198,9 @@ cString GetRecordingerrorIcon(int RecInfoErrors) {
     return "";
 }
 
-cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
-    const double FrameSeen = FrameResume * 1.0 / FrameTotal;
-    const double SeenThreshold = Config.MenuItemRecordingSeenThreshold * 100.0;
+cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
+    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
+    const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
@@ -221,18 +220,27 @@ cString GetRecordingseenIcon(int FrameTotal, int FrameResume) {
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
-    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >5 = Banner
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
+            ContentSize.Width(), ContentSize.Height());
+#endif
+    // TODO: Set to max size by default or also allow smaller media site?
+    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < 1) {                                     //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(ContentSize.Height() * 0.7);  // Max 70% of pixmap height
-        // dsyslog("flatPlus: New poster max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else if (Aspect < 4) {                              //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(ContentSize.Width() / 3);      // Max 1/3 of pixmap width
-        // dsyslog("flatPlus: New portrait max size %d x %d", MediaSize.Width(), MediaSize.Height());
-    } else {                                              //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(ContentSize.Width() * (1.0 / (1920.0 / 758)));  // To get 758 width @ 1920
-        // dsyslog("flatPlus: New banner max size %d x %d", MediaSize.Width(), MediaSize.Height());
+    if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
+        MediaSize.SetHeight(
+            std::min(MediaSize.Height(), static_cast<int>(ContentSize.Height() * 0.7)));  // Max 70% of pixmap height
+    } else if (Aspect < 4) {  //* Portrait (For example 1920x1080 = 1.77)
+        MediaSize.SetWidth(
+            std::min(MediaSize.Width(), static_cast<int>(ContentSize.Width() / 3)));      // Max 1/3 of pixmap width
+    } else {                  //* Banner (Usually 758x140 = 5.41)
+        MediaSize.SetWidth(
+            std::min(MediaSize.Width(),
+                     static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   New MediaSize %dx%d", MediaSize.Width(), MediaSize.Height());
+#endif
 }
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
@@ -350,7 +358,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
 }
 
-int GetEpgsearchConflicts(void) {
+int GetEpgsearchConflicts() {
     cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
@@ -392,28 +400,28 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     return EditedFrame;
 }
 
-void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
+void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlat::GetCuttedLengthSize()");
+    dsyslog("flatPlus: cFlat::InsertCuttedLengthSize()");
 #endif
 
     cMarks Marks;
     bool HasMarks {false};
-    const bool IsPesRecording = (Recording->IsPesRecording()) ? true : false;
-    const double FramesPerSecond = Recording->FramesPerSecond();
-    const char *RecordingFileName = Recording->FileName();
-    cIndexFile *index {nullptr};
+    const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
+    const double FramesPerSecond {Recording->FramesPerSecond()};
+    const char *RecordingFileName {Recording->FileName()};
+    std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
-        index = new cIndexFile(RecordingFileName, false, IsPesRecording);
-        // cIndexFile index(RecordingFileName, false, IsPesRecording);
+        // Assign unique ptr object
+        index = std::make_unique<cIndexFile>(RecordingFileName, false, IsPesRecording);
     }
 
     bool FsErr {false};
     uint64_t FileSize[65535];
     FileSize[0] = 0;
-    const uint16_t MaxFiles = IsPesRecording ? 999 : 65535;
+    const uint16_t MaxFiles = (IsPesRecording) ? 999 : 65535;  // Narrowing conversion
     int i {0}, rc {0};
     struct stat FileBuf;
     cString FileName {""};
@@ -473,18 +481,16 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
                                          *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
-    delete index;
 
-    uint64_t RecSize{0};
-    RecSize = FileSize[i - 1];  // In case of error show partial size
-    if (RecSize > MEGABYTE(1023))                 // Show a '!' when an error occurred detecting filesize
+    uint64_t RecSize {FileSize[i - 1]};  // In case of error show partial size
+    if (RecSize > MEGABYTE(1023))        // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
         Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
 
-    if (HasMarks) {
-        if (RecSize > MEGABYTE(1023))
+    if (HasMarks && (RecSizeCutted > 0)) {  // Do not show zero value
+        if (RecSizeCutted > MEGABYTE(1023))
             Text.Append(
                 cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
         else
@@ -522,8 +528,8 @@ void GetCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
 
 // Returns the string between start and end or an empty string if not found
 std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
-    const std::size_t start = source.find(StrStart);
-    const std::size_t end = source.find(StrEnd);
+    const std::size_t start {source.find(StrStart)};
+    const std::size_t end {source.find(StrEnd)};
 
     if (std::string::npos != start && std::string::npos != end)
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
@@ -536,7 +542,7 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
     FT_Face face;
     FT_UInt glyph_index {0};
     const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc = FT_Init_FreeType(&library);
+    int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
@@ -546,13 +552,15 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
                 glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
                 // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode,
                 //          glyph_index);
-            } else
+            } else {
                 esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-        } else
+            }
+        } else {
             esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
-    } else
+        }
+    } else {
         esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-
+    }
     FT_Done_Face(face);
     FT_Done_FreeType(library);
 
@@ -567,7 +575,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     FT_BBox bbox;    // The control (bounding) box
     FT_UInt glyph_index {0};
     const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc = FT_Init_FreeType(&library);
+    int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, *FontFileName, 0, &face);
         if (!rc) {
@@ -588,17 +596,21 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                         GlyphSize = (bbox.yMax - bbox.yMin) / 64;
                         // dsyslog("flatPlus: GetGlyphSize()\n   GlyphSize: %d bbox yMin/yMax: %ld %ld, FontHeight: %d",
                         //         GlyphSize, bbox.yMin, bbox.yMax, FontHeight);
-                    } else
+                    } else {
                         esyslog("flatPlus: FreeType: error %d during FT_Get_Glyph (font = %s)\n", rc, *FontFileName);
-                } else
+                    }
+                } else {
                     esyslog("flatPlus: FreeType: error %d during FT_Load_Glyph (font = %s)\n", rc, *FontFileName);
-            } else
+                }
+            } else {
                 esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-        } else
+            }
+        } else {
             esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
-    } else
+        }
+    } else {
         esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-
+    }
     FT_Done_Glyph(glyph);
     FT_Done_Face(face);
     FT_Done_FreeType(library);
@@ -631,7 +643,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     //* Workaround for detecting 'HairSpace'
     const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than and space
-    const char *HairSpace = u8"\U0000200A", *Space = " ";
+    const char *HairSpace {u8"\U0000200A"}, *Space {" "};
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
         // dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
@@ -639,33 +651,34 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         FillChar = HairSpace;
         // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
     }
-    const int FillCharWidth = Font->Width(FillChar);      // Width in pixel
-    const std::size_t FillCharLength = strlen(FillChar);  // Length in chars
+    const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
+    const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
-    const int LineWidth = Font->Width(Line.c_str());   // Width in Pixel
+    const int LineWidth {Font->Width(Line.c_str())};   // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
         // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
         return;
     }
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid div/0 with lines without space
-        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces, FillCharWidth);
+        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
+        //          FillCharWidth);
         return;
     }
 
     if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
-        const int NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-        int FillCharBlock = NeedFillChar / LineSpaces;                  // For inserting multiple 'FillChar'
-        if (!FillCharBlock) ++FillCharBlock;                            // Set minimum to one 'FillChar'
+        const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
+        int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'. Narrowing conversion
+        if (!FillCharBlock) ++FillCharBlock;            // Set minimum to one 'FillChar'
 
         std::string FillChars {""};
         FillChars.reserve(16);
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }
-        const std::size_t FillCharsLength = FillChars.length();
+        const std::size_t FillCharsLength {FillChars.length()};
 
-        std::size_t LineLength = Line.length();
+        std::size_t LineLength {Line.length()};
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
         int InsertedFillChar {0};
         /* dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
@@ -675,7 +688,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                 FillCharWidth, FillCharsLength); */
 
         //* Insert blocks at spaces
-        std::size_t pos = Line.find(' ');
+        std::size_t pos {Line.find(' ')};
         while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
@@ -745,18 +758,20 @@ std::string_view trim(std::string_view str) {
 
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
-cTextFloatingWrapper::cTextFloatingWrapper(void) {}
+cTextFloatingWrapper::cTextFloatingWrapper() {}
 
 cTextFloatingWrapper::~cTextFloatingWrapper() {
     free(m_Text);
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
-    // uint32_t tick0 = GetMsTicks();  //! For testing
-    // dsyslog("flatPlus: TextFloatingWrapper::Set() Textlength: %ld", strlen(Text));
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextFloatingWrapper::Set() Text length: %ld", strlen(Text));
+    uint32_t tick0 {GetMsTicks()};
+#endif
 
     free(m_Text);
-    m_Text = Text ? strdup(Text) : nullptr;
+    m_Text = (Text) ? strdup(Text) : nullptr;
     if (!m_Text)
         return;
     m_Lines = 1;
@@ -765,11 +780,11 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 
     char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
     int cw {0}, l {0}, sl {0}, w {0};
-    int Width = UpperLines > 0 ? WidthUpper : WidthLower;
+    int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
 
-    for (char *p = m_Text; *p;) {
+    for (char *p {m_Text}; *p;) {
         /* int */ sl = Utf8CharLen(p);
         /* uint */ sym = Utf8CharGet(p, sl);
         if (sym == '\n') {
@@ -817,11 +832,13 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         }
         p += sl;
     }  // for char
-    // uint32_t tick1 = GetMsTicks();
-    // dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+#ifdef DEBUGFUNCSCALL
+    uint32_t tick1 {GetMsTicks()};
+    dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+#endif
 }
 
-const char *cTextFloatingWrapper::Text(void) {
+const char *cTextFloatingWrapper::Text() {
     if (m_EoL) {
         *m_EoL = '\n';
         m_EoL = nullptr;

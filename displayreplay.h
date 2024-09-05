@@ -11,10 +11,25 @@
 #include "./services/scraper2vdr.h"
 
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
+ public:
+        explicit cFlatDisplayReplay(bool ModeOnly);
+        virtual ~cFlatDisplayReplay();
+        virtual void SetRecording(const cRecording *Recording);
+        virtual void SetTitle(const char *Title);
+        virtual void SetMode(bool Play, bool Forward, int Speed);
+        virtual void SetProgress(int Current, int Total);
+        virtual void SetCurrent(const char *Current);
+        virtual void SetTotal(const char *Total);
+        virtual void SetJump(const char *Jump);
+        virtual void SetMessage(eMessageType Type, const char *Text);
+        virtual void Flush();
+
+        void PreLoadImages();
+
  private:
         cString m_Current {""}, m_Total {""};
         int m_LastCurrentWidth {0};
-        
+
         int m_LabelHeight {0};
         cPixmap *LabelPixmap {nullptr};
         cPixmap *LabelJumpPixmap {nullptr};
@@ -30,7 +45,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         double m_ScreenAspect {0.0};
 
         // TVScraper
-        int m_TVSLeft {0}, m_TVSTop {0}, m_TVSWidth {0}, m_TVSHeight {0};
+        cRect TVSRect {0, 0, 0, 0};
 
         // Dimm on pause
         bool m_DimmActive {false};
@@ -40,23 +55,8 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
 
         bool m_ProgressShown {false};
         bool m_ModeOnly {false};
-        void UpdateInfo(void);
-        void ResolutionAspectDraw(void);
+        void UpdateInfo();
+        void ResolutionAspectDraw();
 
-        virtual void Action(void);
-
- public:
-        cFlatDisplayReplay(bool ModeOnly);
-        virtual ~cFlatDisplayReplay();
-        virtual void SetRecording(const cRecording *Recording);
-        virtual void SetTitle(const char *Title);
-        virtual void SetMode(bool Play, bool Forward, int Speed);
-        virtual void SetProgress(int Current, int Total);
-        virtual void SetCurrent(const char *Current);
-        virtual void SetTotal(const char *Total);
-        virtual void SetJump(const char *Jump);
-        virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush(void);
-
-        void PreLoadImages(void);
+        virtual void Action();
 };

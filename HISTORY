@@ -1,11 +1,14 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-09-05: Version 1.0.7
+- [fix] Allow smaller images in SetMediaSize()
+- [update] Some internal optimizations
+
 2024-08-08: Version 1.0.6
 - [update] Calculate image high and position depending on font for
            recording_extra_cutted, recording_pos and recording_total
 - [update] Disable log in ~cFlatDisplayMessage
 - [update] Some internal optimizations
-
 
 2024-07-24: Version 1.0.5
 - [fix] Fix for leftover .00 after edit mode

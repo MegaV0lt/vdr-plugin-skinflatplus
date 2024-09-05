@@ -23,6 +23,46 @@
 #include "./complexcontent.h"
 
 class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
+ public:
+#ifdef DEPRECATED_SKIN_SETITEMEVENT
+    using cSkinDisplayMenu::SetItemEvent;
+#endif
+        cFlatDisplayMenu();
+        virtual ~cFlatDisplayMenu();
+        virtual void Scroll(bool Up, bool Page);
+        virtual int MaxItems();
+        virtual void Clear();
+
+        virtual void SetMenuCategory(eMenuCategory MenuCategory);
+        // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
+
+        virtual void SetTitle(const char *Title);
+        virtual void SetButtons(const char *Red, const char *Green = NULL,
+                                const char *Yellow = NULL, const char *Blue = NULL);
+        virtual void SetMessage(eMessageType Type, const char *Text);
+        virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
+
+        virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
+                                  const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
+                                  bool TimerActive);
+        virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
+        virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
+                                    bool WithProvider);
+        virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
+                                      int Level, int Total, int New);
+
+        virtual void SetMenuSortMode(eMenuSortMode MenuSortMode);
+
+        virtual void SetScrollbar(int Total, int Offset);
+        virtual void SetEvent(const cEvent *Event);
+        virtual void SetRecording(const cRecording *Recording);
+        virtual void SetText(const char *Text, bool FixedFont);
+        virtual int GetTextAreaWidth() const;
+        virtual const cFont *GetTextAreaFont(bool FixedFont) const;
+        virtual void Flush();
+
+        void PreLoadImages();
+
  private:
         cPixmap *MenuPixmap {nullptr};
         cPixmap *MenuIconsPixmap {nullptr};
@@ -79,20 +119,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         // Icons
         cImage *IconTimerFull {nullptr};
-        // cImage *IconTimerPartial;
         cImage *IconArrowTurn {nullptr};
         cImage *IconRec {nullptr};
-        // cImage *iconVps;
-        // cImage *iconNew;
-        // Icons
 
         void ItemBorderInsertUnique(const sDecorBorder &ib);
-        void ItemBorderDrawAllWithScrollbar(void);
-        void ItemBorderDrawAllWithoutScrollbar(void);
-        void ItemBorderClear(void);
+        void ItemBorderDrawAllWithScrollbar();
+        void ItemBorderDrawAllWithoutScrollbar();
+        void ItemBorderClear();
 
-        //! Fix Static/global string variables are not permitted.  cpplint(warning:runtime/string)
-        // static std::string items[16];
         const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                      "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                      "Replay",   "Miscellaneous", "Plugins", "Restart"};
@@ -100,14 +134,14 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString GetIconName(const std::string &element);
 
         std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
-        cString GetRecCounts(void);  // Get number of recordings and new recordings (35*/53)
-        // std::string XmlSubstring(std::string source, const char* StrStart, const char* StrEnd);  // Moved to flat.h
+        cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 
         const char *GetGenreIcon(uchar genre);
         void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
-        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
+        // TODO: Eliminate double functions
+        void InsertGenreInfoIcon(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
         void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
         void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);  // NOLINT
 
@@ -115,7 +149,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                            bool CanScrollDown, bool IsContent = false);
-        int ItemsHeight(void);
+        int ItemsHeight();
         bool CheckProgressBar(const char *text);
         void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                      tColor ColorBarFg, tColor ColorBg);
@@ -126,7 +160,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
-        void DrawMainMenuWidgets(void);
+        void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop);
@@ -136,44 +170,4 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
-
- public:
-#ifdef DEPRECATED_SKIN_SETITEMEVENT
-    using cSkinDisplayMenu::SetItemEvent;
-#endif
-        cFlatDisplayMenu(void);
-        virtual ~cFlatDisplayMenu();
-        virtual void Scroll(bool Up, bool Page);
-        virtual int MaxItems(void);
-        virtual void Clear(void);
-
-        virtual void SetMenuCategory(eMenuCategory MenuCategory);
-        // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
-
-        virtual void SetTitle(const char *Title);
-        virtual void SetButtons(const char *Red, const char *Green = NULL,
-                                const char *Yellow = NULL, const char *Blue = NULL);
-        virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
-
-        virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                                  const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
-                                  bool TimerActive);
-        virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
-        virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
-                                    bool WithProvider);
-        virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
-                                      int Level, int Total, int New);
-
-        virtual void SetMenuSortMode(eMenuSortMode MenuSortMode);
-
-        virtual void SetScrollbar(int Total, int Offset);
-        virtual void SetEvent(const cEvent *Event);
-        virtual void SetRecording(const cRecording *Recording);
-        virtual void SetText(const char *Text, bool FixedFont);
-        virtual int GetTextAreaWidth(void) const;
-        virtual const cFont *GetTextAreaFont(bool FixedFont) const;
-        virtual void Flush(void);
-
-        void PreLoadImages(void);
 };

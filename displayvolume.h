@@ -10,6 +10,15 @@
 #include "./baserender.h"
 
 class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
+ public:
+        cFlatDisplayVolume();
+        virtual ~cFlatDisplayVolume();
+        virtual void SetVolume(int Current, int Total, bool Mute);
+        // virtual void SetAudioChannel(int AudioChannel);
+        virtual void Flush();
+
+        void PreLoadImages();
+
  private:
         // bool Muted;  // Unused?
 
@@ -17,12 +26,4 @@ class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
         cPixmap *MuteLogoPixmap {nullptr};
 
         int m_LabelHeight {0};
- public:
-        cFlatDisplayVolume(void);
-        virtual ~cFlatDisplayVolume();
-        virtual void SetVolume(int Current, int Total, bool Mute);
-        // virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush(void);
-
-        void PreLoadImages(void);
 };
