@@ -528,8 +528,6 @@ void cFlatBaseRender::TopBarUpdate() {
 }
 
 void cFlatBaseRender::ButtonsCreate() {
-    m_MarginButtonColor = 10;
-    m_ButtonColorHeight = 8;
     m_ButtonsHeight = m_FontHeight + m_MarginButtonColor + m_ButtonColorHeight;
     m_ButtonsWidth = m_OsdWidth;
     m_ButtonsTop = m_OsdHeight - m_ButtonsHeight - Config.decorBorderButtonSize;
@@ -788,11 +786,11 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     if (img)
         MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
-    if (Config.MessageColorPosition == 0) {
+    if (Config.MessageColorPosition == 0) {  // Vertical
         MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
         MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight),
                                      Col);
-    } else {
+    } else {  // Horizontal
         MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
     }
 

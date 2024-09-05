@@ -146,7 +146,7 @@ class cFlatBaseRender {
         // Buttons red, green, yellow, blue
         cPixmap *ButtonsPixmap {nullptr};
         int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
-        int m_MarginButtonColor {0}, m_ButtonColorHeight {0};
+        const int m_MarginButtonColor {10}, m_ButtonColorHeight {8};
         bool m_ButtonsDrawn {false};
 
         // Message
