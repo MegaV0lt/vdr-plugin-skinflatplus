@@ -6,14 +6,13 @@
 # Skript zum laden von Wetterdaten für Skin FlatPlus
 # Daten werden von openweathermap.org geladen. Dazu wird ein API-Key benötigt,
 # der kostenlos bezogen werden kann (https://openweathermap.org/price)
-# API 3.0 benötigt extra Abo (1.000 Abrufe/Tag frei)
 #
 # Wettersymbole von harmattan: https://github.com/zagortenay333/Harmattan
 # Das Skript verwendet 'jq' zum verarbeiten der .json-Dateien
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=240908
+#VERSION=240129
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -22,7 +21,7 @@ CONF="${SELF%.*}.conf"                           # Konfiguration
 DATA_DIR='/tmp/skinflatplus/widgets/weather'     # Verzeichnis für die Daten
 WEATHER_JSON="${DATA_DIR}/weather.json"          # Wetterdaten im json-Format
 LC_NUMERIC='C'
-API_URL='https://api.openweathermap.org/data/3.0/onecall'  # API 3.0 benötigt extra Abo (1.000 Abrufe/Tag frei)
+API_URL='https://api.openweathermap.org/data/2.5/onecall'  # API 3.0 benötigt extra Abo (1.000 Abrufe/Tag frei)
 
 ### Funktionen ###
 f_log(){
@@ -43,9 +42,9 @@ f_write_temp(){  # Temperaturwert aufbereiten und schreiben ($1 Temperatur, $2 A
 f_get_weather(){
   local jqdata jqdata2
 
-  # Wetterdaten laden (API 3.0)
+  # Wetterdaten laden (One Call API)
   curl --silent --retry 5 --retry-delay 15 --output "$WEATHER_JSON" \
-    "${API_URL}?lat=${LATITUDE}&lon=${LONGITUDE}&appid=${API_KEY}&units=${UNITS}&lang=${L}"
+    "${API_URL}?lat=${LATITUDE}&lon=${LONGITUDE}&exclude=minutely,hourly,alerts&units=${UNITS}&lang=${L}&appid=${API_KEY}"
 
   [[ ! -e "$WEATHER_JSON" ]] && { f_log "Download of $WEATHER_JSON failed!" ; exit 1 ;}
 
@@ -62,26 +61,26 @@ f_get_weather(){
     801) [[ $(jq -r .current.weather[0].icon "$WEATHER_JSON") =~ n ]] && jqdata='partly-cloudy-night' ;;
     *) ;;
   esac
-  printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.0.icon-act"          # Symbol für 'Jetzt'
+  printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.0.icon-act"       # Symbol für 'Jetzt'
 
   # x-Tage Vorhersage
   while [[ ${cnt:=0} -lt $FORECAST_DAYS ]] ; do
-    jqdata=$(jq -r .daily["$cnt"].temp.night "$WEATHER_JSON")         # Temperatur (Min./Nacht)
+    jqdata=$(jq -r .daily[${cnt}].temp.night "$WEATHER_JSON")      # Temperatur (Min./Nacht)
     f_write_temp "$jqdata" "${DATA_DIR}/weather.${cnt}.tempMin"
 
-    jqdata=$(jq -r .daily["$cnt"].temp.day "$WEATHER_JSON")           # Temperatur (Max./Tag)
+    jqdata=$(jq -r .daily[${cnt}].temp.day "$WEATHER_JSON")        # Temperatur (Max./Tag)
     f_write_temp "$jqdata" "${DATA_DIR}/weather.${cnt}.tempMax"
 
-    jq -r .daily["$cnt"].pop "$WEATHER_JSON" \
-      > "${DATA_DIR}/weather.${cnt}.precipitation"                    # Niederschlagswahrscheinlichkeit
+    jq -r .daily[${cnt}].pop "$WEATHER_JSON" \
+      > "${DATA_DIR}/weather.${cnt}.precipitation"                 # Niederschlagswahrscheinlichkeit
 
-    jqdata=$(jq -r .daily["$cnt"].weather[0].description "$WEATHER_JSON")
+    jqdata=$(jq -r .daily[${cnt}].weather[0].description "$WEATHER_JSON")
     if [[ "$cnt" -eq 0 ]] ; then
-      [[ "$jqdata" != "$jqdata2" ]] && jqdata+=" / $jqdata2"          # Beschreibung / Aktuell
+      [[ "$jqdata" != "$jqdata2" ]] && jqdata+=" / $jqdata2"       # Beschreibung / Aktuell
     fi
-    printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.summary"    # Beschreibung
+    printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.summary" # Beschreibung
 
-    jqdata=$(jq -r .daily["$cnt"].weather[0].id "$WEATHER_JSON")      # Wettersymbol
+    jqdata=$(jq -r .daily[${cnt}].weather[0].id "$WEATHER_JSON")   # Wettersymbol
     printf '%s\n' "$jqdata" > "${DATA_DIR}/weather.${cnt}.icon"
     ((cnt++))
   done

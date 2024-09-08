@@ -13,4 +13,4 @@ LONGITUDE='8.682127'
 _LANG='de_DE.UTF-8'                     # Sprache
 UNITS='metric'                          # Einheit (Standard [°K], Metric [°C], Imperial [°F])
 
-FORECAST_DAYS=5                         # Anzahl der Tage für die Vorschau (Max. 5)
+FORECAST_DAYS=5                         # Anzahl der Tage für die Vorschau (Max. 8)
