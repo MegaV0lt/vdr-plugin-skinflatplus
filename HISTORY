@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-09-09: Version 1.0.8
+- [update] Use API 3.0 in 'update_weather.sh' because of deprecation of API 2.5
+
 2024-09-05: Version 1.0.7
 - [fix] Allow smaller images in SetMediaSize()
 - [update] Some internal optimizations
