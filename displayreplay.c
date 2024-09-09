@@ -227,7 +227,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), m_Font);
             }
         }
-        cImage *img = ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight);
+        cImage *img {ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight)};
         if (img)
             IconsPixmap->DrawImage(cPoint(left, 0), *img);
 
@@ -336,7 +336,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img = ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
+    cImage *img {ImgLoader.LoadIcon("recording_pos", 999, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -411,7 +411,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int ImgWidth = (img) ? img->Width() : 0;
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
-        cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
+        cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize)};
         const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
 
         int right {m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -

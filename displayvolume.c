@@ -62,7 +62,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     if (Mute) {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
             m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHeight, taLeft);
-        cImage *img = ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
+        cImage *img {ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight)};
         if (img)
             MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + m_MarginItem, m_MarginItem), *img);
 

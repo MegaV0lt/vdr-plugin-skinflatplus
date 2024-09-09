@@ -782,7 +782,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img = ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight);
+    cImage *img {ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight)};
     if (img)
         MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
@@ -1946,7 +1946,7 @@ void cFlatBaseRender::DrawWidgetWeather() {
     left += WeatherFontSign->Width(TempTodaySign.c_str()) + m_MarginItem2;
 
     cString WeatherIcon = cString::sprintf("widgets/%s", IconToday.c_str());
-    cImage *img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
