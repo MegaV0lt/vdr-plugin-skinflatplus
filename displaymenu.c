@@ -2136,7 +2136,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Buffer = cString::sprintf("%d", New);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
                                  m_MenuItemWidth - Left - m_MarginItem);
-            Left += m_FontSml->Width(" 999 ");
+            Left += m_FontSml->Width(" 999 ");  // TODO: Add more space
 
             if (Config.MenuItemRecordingShowFolderDate != 0) {
                 Buffer = cString::sprintf("  (%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
@@ -2277,8 +2277,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }  // EpgAdditionalInfoShow
 
     const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
-    int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
+    int HeadIconLeft {m_chWidth - IconHeight - m_MarginItem};
+    int HeadIconTop {m_chHeight - IconHeight - m_MarginItem};  // Position for fsk/genre image
     cString IconName {""};
     cImage *img {nullptr};
     if (strlen(*Fsk) > 0) {
@@ -3517,8 +3517,9 @@ int cFlatDisplayMenu::GetTextAreaWidth() const {
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
-    const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
-    return font;
+    // const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
+    // return font;
+    return (FixedFont) ? m_FontFixed : m_Font;
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
@@ -4886,7 +4887,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        const int AddLeft {wWidth / (CountTemps)};
+        const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
         if (strcmp(TempCPU.c_str(), "-1")) {
