@@ -944,8 +944,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 0:  // Small line + big line
     {
         const int big {rect.Height()};
-        int sml {big / 10 * 2};
-        if (sml <= 1) sml = 2;
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1011,8 +1010,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 3:  // Small line + big line + dot
     {
         const int big {rect.Height()};
-        int sml {big / 10 * 2};
-        if (sml <= 1) sml = 2;
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1063,8 +1061,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 6:  // Small line + dot
     {
         const int big {rect.Height()};
-        int sml {big / 10 * 2};
-        if (sml <= 1) sml = 2;
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1097,8 +1094,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 8:  // Small line + big line + alpha blend
     {
-        int sml {rect.Height() / 10 * 2};
-        if (sml <= 1) sml = 2;
+        const int sml {std::max(rect.Height() / 10 * 2, 2)};
         const int big {rect.Height() / 2 - (sml / 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1224,9 +1220,7 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
     // if (!ProgressBarPixmap || !ProgressBarMarkerPixmap)  // Checked in calling function 'ProgressBarDrawMarks'
     //    return;
 
-    int sml {m_ProgressBarHeight / 10 * 2};
-    if (sml <= 4) sml = 4;
-
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     // Mark vertical line
     if (PosCurrent == PosMark)
         ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
