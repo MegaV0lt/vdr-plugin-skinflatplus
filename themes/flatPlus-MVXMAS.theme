@@ -95,6 +95,7 @@ clrReplayProgressBarCurFg = FFCC1111
 clrReplayProgressBg = C5114511
 clrReplayMarkFg = FFEEEEEE
 clrReplayMarkCurrentFg = FFCC1111
+clrReplayErrorMark = FFCC2222
 clrReplayBorderFg = C5114511
 clrReplayBorderBg = C5114511
 clrTrackItemBg = C5555555

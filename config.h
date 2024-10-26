@@ -268,6 +268,7 @@ class cFlatConfig {
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
         int PlaybackShowRecordingErrors;
+        int PlaybackShowErrorMarks;                // 1 = Show error marks on replay progressbar
         int PlaybackShowRecordingDate;
         int PlaybackShowEndTime;
         int MenuItemRecordingShowRecordingErrorsThreshold;

@@ -651,6 +651,10 @@ msgstr ""
 msgid "Show recerrors icon in playback"
 msgstr ""
 
+# Playback show error marks
+msgid "Show error marks in playback"
+msgstr ""
+
 msgid "Show shorttext with date in playback"
 msgstr ""
 

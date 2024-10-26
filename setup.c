@@ -309,6 +309,7 @@ void cFlatSetup::Store() {
     SetupStore("MessageColorPosition", Config.MessageColorPosition);
     SetupStore("MessageOffset", Config.MessageOffset);
     SetupStore("PlaybackShowRecordingErrors", Config.PlaybackShowRecordingErrors);
+    SetupStore("PlaybackShowErrorMarks", Config.PlaybackShowErrorMarks);
     SetupStore("PlaybackShowRecordingDate", Config.PlaybackShowRecordingDate);
     SetupStore("PlaybackShowEndTime", Config.PlaybackShowEndTime);
     SetupStore("PlaybackWeatherShow", Config.PlaybackWeatherShow);
@@ -513,6 +514,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MessageColorPosition") == 0)                 SetupConfig->MessageColorPosition = atoi(Value);
     else if (strcmp(Name, "MessageOffset") == 0)                        SetupConfig->MessageOffset = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
+    else if (strcmp(Name, "PlaybackShowErrorMarks") == 0)               SetupConfig->PlaybackShowErrorMarks = atoi(Value);
     else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            SetupConfig->PlaybackShowRecordingDate = atoi(Value);
     else if (strcmp(Name, "PlaybackShowEndTime") == 0)                  SetupConfig->PlaybackShowEndTime = atoi(Value);
     else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  SetupConfig->PlaybackWeatherShow = atoi(Value);
@@ -697,6 +699,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("MessageColorPosition", SetupConfig->MessageColorPosition, *Filename);
     Config.Store("MessageOffset", SetupConfig->MessageOffset, *Filename);
     Config.Store("PlaybackShowRecordingErrors", SetupConfig->PlaybackShowRecordingErrors, *Filename);
+    Config.Store("PlaybackShowErrorMarks", SetupConfig->PlaybackShowErrorMarks, *Filename);
     Config.Store("PlaybackShowRecordingDate", SetupConfig->PlaybackShowRecordingDate, *Filename);
     Config.Store("PlaybackShowEndTime", SetupConfig->PlaybackShowEndTime, *Filename);
     Config.Store("PlaybackWeatherShow", SetupConfig->PlaybackWeatherShow, *Filename);
@@ -1130,6 +1133,7 @@ void cFlatSetupReplay::Setup() {
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
+    Add(new cMenuEditBoolItem(tr("Show error marks in playback"), &SetupConfig->PlaybackShowErrorMarks));
     Add(new cMenuEditBoolItem(tr("Show shorttext with date in playback"), &SetupConfig->PlaybackShowRecordingDate));
     Add(new cMenuEditStraItem(tr("Show end time of recording"), &SetupConfig->PlaybackShowEndTime, ShowEndTime.Size(), &ShowEndTime[0]));
 

@@ -667,6 +667,10 @@ msgstr "Aufnahmen: Zeige Formatsymbole (sd/hd/uhd)"
 msgid "Show recerrors icon in playback"
 msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
 
+# Playback show error marks
+msgid "Show error marks in playback"
+msgstr "Wiedergabe: Zeige Fehler in Fortschrittsleiste"
+
 msgid "Show shorttext with date in playback"
 msgstr "Aufnahmen: Kurztext mit Datum/Zeit anzeigen"
 
