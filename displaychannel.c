@@ -146,7 +146,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
         int ImageTop {m_MarginItem};
-        cImage *img = ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight);
+        cImage *img {ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight)};
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -401,7 +401,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         SetMediaSize(MediaSize, TVSRect.Size());  // Check for too big images
         MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperChanInfoPosterSize * 100);
         MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperChanInfoPosterSize * 100);
-        cImage *img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
+        cImage *img {ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
         if (img) {
             ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -435,7 +435,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalStrength = SignalStrength;
     m_LastSignalQuality = SignalQuality;
 
-    cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
+    const cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
     const int left {m_MarginItem2};
     int top {m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem};
@@ -503,7 +503,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
                      - m_MarginItem2;
 
-    cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
+    const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
 
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
@@ -512,7 +512,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img = ImgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height());
+    cImage *img {ImgLoader.LoadIcon(*IconName, 999, DvbapiInfoFont->Height())};
     if (img) {
         ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + m_MarginItem;
@@ -567,7 +567,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);
 
-    cImage *img = ImgLoader.LoadIcon("logo_background", height * 1.34, height);
+    cImage *img {ImgLoader.LoadIcon("logo_background", height * 1.34, height)};
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();

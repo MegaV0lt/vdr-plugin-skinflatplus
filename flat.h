@@ -176,6 +176,7 @@ THEME_CLR(Theme, clrReplayProgressBarCurFg, 0xFF03A9F4);
 THEME_CLR(Theme, clrReplayProgressBg,       0xF0202020);
 THEME_CLR(Theme, clrReplayMarkFg,           0xFFEEEEEE);
 THEME_CLR(Theme, clrReplayMarkCurrentFg,    0xFF03A9F4);
+THEME_CLR(Theme, clrReplayErrorMark,            clrRed);  // Alternativ 0xFFBB0000
 
 THEME_CLR(Theme, clrReplayBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrReplayBorderBg,         0xF0202020);
@@ -258,7 +259,7 @@ static inline uint32_t GetMsTicks() {
 #endif
 }
 
-cPixmap *CreatePixmap(cOsd *osd, cString Name = "", int Layer = 0, const cRect &ViewPort = cRect::Null,
+cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
 inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
     if (Pixmap) Pixmap->Fill(Color);

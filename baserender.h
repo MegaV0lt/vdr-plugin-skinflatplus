@@ -68,8 +68,12 @@ class cFlatBaseRender {
                                tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
         void ProgressBarDrawBgColor();
         void ProgressBarDraw(int Current, int Total);
+#if APIVERSNUM >= 30004
+        void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, const cErrors *Errors, tColor Color,
+                                  tColor ColorCurrent);
+#else
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
-
+#endif
         void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
                            int Shown, bool CanScrollUp, bool CanScrollDown);
         int ScrollBarWidth();
@@ -129,7 +133,8 @@ class cFlatBaseRender {
         int m_VideoDiskUsageState {-1};
 
         // Progressbar
-        cPixmap *ProgressBarPixmap {nullptr};
+        cPixmap *ProgressBarMarkerPixmap {nullptr};  // Draw marker on top
+        cPixmap *ProgressBarPixmap {nullptr};        // Draw errors here
         cPixmap *ProgressBarPixmapBg {nullptr};
         int m_ProgressBarHeight {0}, m_ProgressBarTop {0}, m_ProgressBarWidth {0};
         int m_ProgressBarMarginHor {0}, m_ProgressBarMarginVer {0};
@@ -183,6 +188,9 @@ class cFlatBaseRender {
         double ScrollbarSize();
 
         void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
+#if APIVERSNUM >= 30004
+        void ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent);
+#endif
         int ProgressBarMarkPos(int P, int Total);
 
         void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);

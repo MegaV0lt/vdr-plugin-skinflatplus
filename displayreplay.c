@@ -24,7 +24,6 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                 m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2,
                 m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, TVSRect);
-    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
     LabelPixmap =
         CreatePixmap(m_Osd, "LabelPixmap", 1,
@@ -35,19 +34,26 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                      cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
                            m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
 
-    ProgressBarCreate(cRect(Config.decorBorderReplaySize,
-                            m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize -
-                                Config.decorBorderReplaySize - m_MarginItem,
-                            m_OsdWidth - Config.decorBorderReplaySize * 2, Config.decorProgressReplaySize),
-                      m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg,
-                      Config.decorProgressReplayBg, Config.decorProgressReplayType);
+    /* Make Config.decorProgressReplaySize even
+    https://stackoverflow.com/questions/4739388/make-an-integer-even
+    number = (number / 2) * 2; */
+    const int ProgressBarHeight = ((Config.decorProgressReplaySize + 1) / 2) * 2;  // Make it even (And round up)
+    ProgressBarCreate(
+        cRect(Config.decorBorderReplaySize,
+              m_OsdHeight - m_LabelHeight - ProgressBarHeight - Config.decorBorderReplaySize - m_MarginItem,
+              m_OsdWidth - Config.decorBorderReplaySize * 2, ProgressBarHeight),
+        m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg, Config.decorProgressReplayBg,
+        Config.decorProgressReplayType);
 
-    LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1, cRect(Config.decorBorderReplaySize,
-        m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 - m_FontHeight
-         - Config.decorBorderReplaySize * 2, m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
+    LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1,
+                                   cRect(Config.decorBorderReplaySize,
+                                         m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem * 3 -
+                                             m_FontHeight - Config.decorBorderReplaySize * 2,
+                                         m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
 
     DimmPixmap = CreatePixmap(m_Osd, "DimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
 
+    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
     PixmapFill(LabelPixmap, Theme.Color(clrReplayBg));
     PixmapFill(LabelJumpPixmap, clrTransparent);
     PixmapFill(IconsPixmap, clrTransparent);
@@ -82,7 +88,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(RecInfo->Title());
 
     // First line for current, total and cutted length, second for end time
-    const int SmallTop = (Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight;
+    const int SmallTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
 
     // Show if still recording
     int left {m_MarginItem};  // Position for recording symbol/short text/date
@@ -227,7 +233,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), m_Font);
             }
         }
-        cImage *img = ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight);
+        cImage *img {ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight)};
         if (img)
             IconsPixmap->DrawImage(cPoint(left, 0), *img);
 
@@ -246,10 +252,10 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
     if (m_ProgressShown) {
         const sDecorBorder ib {Config.decorBorderReplaySize,
-                               m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize -
+                               m_OsdHeight - m_LabelHeight - m_ProgressBarHeight -
                                    Config.decorBorderReplaySize - m_MarginItem,
                                m_OsdWidth - Config.decorBorderReplaySize * 2,
-                               m_LabelHeight + Config.decorProgressReplaySize + m_MarginItem,
+                               m_LabelHeight + m_ProgressBarHeight + m_MarginItem,
                                Config.decorBorderReplaySize,
                                Config.decorBorderReplayType,
                                Config.decorBorderReplayFg,
@@ -266,7 +272,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                    Config.decorBorderReplayFg,
                                    Config.decorBorderReplayBg};
             DecorBorderDraw(ib);
-    } else {
+        } else {
             const sDecorBorder ib {Config.decorBorderReplaySize,
                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
                                    m_OsdWidth - Config.decorBorderReplaySize * 2,
@@ -276,7 +282,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                    Config.decorBorderReplayFg,
                                    Config.decorBorderReplayBg};
             DecorBorderDraw(ib);
-    }
+        }
     }
     ResolutionAspectDraw();
 }
@@ -291,7 +297,13 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 
     m_CurrentFrame = Current;
     m_ProgressShown = true;
+
+#if APIVERSNUM >= 30004
+    ProgressBarDrawMarks(Current, Total, marks, errors, Theme.Color(clrReplayMarkFg),
+                         Theme.Color(clrReplayMarkCurrentFg));
+#else
     ProgressBarDrawMarks(Current, Total, marks, Theme.Color(clrReplayMarkFg), Theme.Color(clrReplayMarkCurrentFg));
+#endif
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
@@ -336,7 +348,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img = ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
+    cImage *img {ImgLoader.LoadIcon("recording_pos", 999, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -411,7 +423,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int ImgWidth = (img) ? img->Width() : 0;
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
-        cImage *ImgCutted = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
+        cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize)};
         const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
 
         int right {m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
@@ -621,9 +633,9 @@ void cFlatDisplayReplay::UpdateInfo() {
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
-                cString RecImage {""};
-                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-                    MediaPath = RecImage;
+                // cString RecImage {""};
+                if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
+                    // MediaPath = RecImage;
                     img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
@@ -675,7 +687,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
                               m_Font->Width(Jump), m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
-                           m_OsdHeight - m_LabelHeight - Config.decorProgressReplaySize * 2 - m_MarginItem * 3 -
+                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem * 3 -
                                m_FontHeight - Config.decorBorderReplaySize * 2,
                            m_Font->Width(Jump),
                            m_FontHeight,
@@ -693,9 +705,9 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
 
     if (m_ScreenWidth > 0) {
         // First line for current, total and cutted length, second line for end time
-        const int ImageTop = (Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight;
+        const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
 
-        int left = m_OsdWidth - Config.decorBorderReplaySize * 2;
+        int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
         cImage *img {nullptr};
         cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect

@@ -1,5 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-10-28: Version 1.0.9
+- [fix] Set scripts executable flag
+- [add] Show recording errors in progressbar at replay
+- [add] Config option to disable showing errors on progressbar
+- [update] Search for more images for recordings
+- [update] Same width for number of recordings and new recordings
+- [update] Some internal optimizations
+
 2024-09-09: Version 1.0.8
 - [update] Use API 3.0 in 'update_weather.sh' because of deprecation of API 2.5
 

@@ -981,7 +981,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     ComplexContent.SetBGColor(Theme.Color(clrMenuEventBg));
 
     if (IsEmpty) {
-        cImage *img = ImgLoader.LoadIcon("timerInactiveBig", 256, 256);
+        cImage *img {ImgLoader.LoadIcon("timerInactiveBig", 256, 256)};
         if (img) {
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
             ComplexContent.AddText(*Text, true,
@@ -1012,7 +1012,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
         }
 
         if (!isempty(*MediaPath)) {
-            cImage *img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            cImage *img {ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight)};
             if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
@@ -1110,7 +1110,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else  // Active timer
         IconName = "timerActive";
 
-    cImage *img = ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight);
+    cImage *img {ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight)};
     if (img) {
         ImageTop = Top + (m_FontHeight - img->Height()) / 2;
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
@@ -1816,10 +1816,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     const cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img {nullptr};
     if (Config.MenuRecordingView == 1) {  // flatPlus long
-        int LeftWidth {Left + m_FontHeight + ImgRecNew->Width() + ImgRecCut->Width() + m_MarginItem * 3 +
-                       m_Font->Width("99.99.99  99:99   99:99 ")};
-
-        if (Total == 0) {
+        if (Total == 0) {  // Recording
             if (Current)
                 img = ImgLoader.LoadIcon("recording_cur", m_FontHeight, m_FontHeight);
             if (!img)
@@ -1918,7 +1915,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(Left, Top), *RecName, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
-        } else if (Total > 0) {  // Folder
+        } else if (Total > 0) {  // Folder with recordings
             img = nullptr;
             if (Current)
                 img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
@@ -1929,36 +1926,46 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += img->Width() + m_MarginItem;
             }
 
-            Buffer = cString::sprintf("%d  ", Total);
-            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, m_Font->Width("  999"),
-                                 m_FontHeight, taLeft);
-            Left += m_Font->Width("  999 ");
+            const int DigitsMaxWidth {m_Font->Width("9999") + m_MarginItem};  // Use same width for recs and new recs
+            Buffer = cString::sprintf("%d", Total);
+            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight,
+                                 taLeft);
+            Left += DigitsMaxWidth;  // m_Font->Width("9999  ");
 
             if (ImgRecNew)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
 
             Left += ImgRecNew->Width() + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
+            // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
+            //                     m_MenuItemWidth - Left - m_MarginItem);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
-                                 m_MenuItemWidth - Left - m_MarginItem);
-            Left += m_Font->Width(" 999 ");
-            if (Config.MenuItemRecordingShowFolderDate != 0) {
-                Buffer = cString::sprintf("(%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
-                MenuPixmap->DrawText(
-                    cPoint(LeftWidth - m_Font->Width(Buffer) - m_FontHeight2 - m_MarginItem2, Top), *Buffer,
-                    ColorExtraTextFg, ColorBg, m_Font);
+                                 DigitsMaxWidth, m_FontHeight);
+
+            Left += DigitsMaxWidth;  // m_Font->Width(" 9999 ");
+            int LeftWidth {Config.decorBorderMenuItemSize + m_FontHeight + (m_Font->Width("9999") * 2) +
+                           ImgRecNew->Width() + m_MarginItem * 5};  // For folder with recordings
+
+            if (Config.MenuItemRecordingShowFolderDate > 0) {
+                LeftWidth += m_Font->Width("(99.99.99)") + m_FontHeight + m_MarginItem2;
+                Buffer = cString::sprintf("(%s)", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+                // MenuPixmap->DrawText(
+                //    cPoint(LeftWidth - m_Font->Width(*Buffer) - m_FontHeight2 - m_MarginItem2, Top), *Buffer,
+                //    ColorExtraTextFg, ColorBg, m_Font);
+                MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
+                Left += m_Font->Width(*Buffer) + m_MarginItem;
                 if (IsRecordingOld(Recording, Level)) {
-                    Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
-                    img = nullptr;
+                    // Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
+                    // img = nullptr;
                     if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
                     else
                         img = ImgLoader.LoadIcon("recording_old", m_FontHeight, m_FontHeight);
                     if (img) {
                         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                        Left += img->Width() + m_MarginItem;
                     }
                 }
+                Left += m_FontHeight + m_MarginItem;  // Increase 'Left' even if no image is drawn
             }
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - LeftWidth - m_MarginItem) &&
@@ -1971,8 +1978,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(LeftWidth, Top), *RecName, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - LeftWidth - m_MarginItem);
             }
-            LeftWidth += m_Font->Width(*RecName) + m_MarginItem2;
-        } else if (Total == -1) {
+            // LeftWidth += m_Font->Width(*RecName) + m_MarginItem2;  //* Unused from here
+        } else if (Total == -1) {  // Folder without recordings
             img = nullptr;
             if (Current)
                 img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
@@ -2103,7 +2110,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
-        } else if (Total > 0) {
+        } else if (Total > 0) {  // Folder with recordings
             img = nullptr;
             if (Current)
                 img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
@@ -2124,26 +2131,29 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 
             Top += m_FontHeight;
-            Buffer = cString::sprintf("  %d", Total);
-            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, m_FontSml->Width("  9999"),
+            const int DigitsMaxWidth {m_FontSml->Width("9999") + m_MarginItem};  // Use same width for recs and new recs
+            Buffer = cString::sprintf("%d", Total);
+            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
                                  m_FontSmlHeight, taRight);
-            Left += m_FontSml->Width("  9999 ");
+            Left += DigitsMaxWidth;
 
             if (ImgRecNewSml)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNewSml);
 
             Left += ImgRecNewSml->Width() + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
+            // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
+            //                     m_MenuItemWidth - Left - m_MarginItem);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
-                                 m_MenuItemWidth - Left - m_MarginItem);
-            Left += m_FontSml->Width(" 999 ");
+                                 DigitsMaxWidth, m_FontSmlHeight);
+            Left += DigitsMaxWidth;
 
-            if (Config.MenuItemRecordingShowFolderDate != 0) {
-                Buffer = cString::sprintf("  (%s) ", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+            if (Config.MenuItemRecordingShowFolderDate > 0) {
+                Buffer = cString::sprintf("(%s)", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_FontSml);
                 if (IsRecordingOld(Recording, Level)) {
                     Left += m_FontSml->Width(*Buffer);
-                    img = nullptr;
+                    // img = nullptr;
                     if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
                     else
@@ -2152,7 +2162,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
                 }
             }
-        } else if (Total == -1) {
+        } else if (Total == -1) {  // Folder without recordings
             img = nullptr;
             if (Current)
                 img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
@@ -2277,8 +2287,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }  // EpgAdditionalInfoShow
 
     const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
-    int HeadIconLeft = m_chWidth - IconHeight - m_MarginItem;
-    int HeadIconTop = m_chHeight - IconHeight - m_MarginItem;  // Position for fsk/genre image
+    int HeadIconLeft {m_chWidth - IconHeight - m_MarginItem};
+    int HeadIconTop {m_chHeight - IconHeight - m_MarginItem};  // Position for fsk/genre image
     cString IconName {""};
     cImage *img {nullptr};
     if (strlen(*Fsk) > 0) {
@@ -2799,9 +2809,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         const cString RecPath = Recording->FileName();
-        cString RecImage {""};
-        if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-            MediaPath = RecImage;
+        // cString RecImage {""};
+        if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
+            // MediaPath = RecImage;
             // Preload image with full width. Get aspect and set parameters accordingly
             img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
             if (img) {
@@ -3180,9 +3190,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
-                cString RecImage {""};
-                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
-                    MediaPath = RecImage;
+                ImgLoader.SearchRecordingPoster(*RecPath, MediaPath);
+                // cString RecImage {""};
+                // if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
+                    // MediaPath = RecImage;
             }
         }  // FirstRun
 
@@ -3517,8 +3528,9 @@ int cFlatDisplayMenu::GetTextAreaWidth() const {
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
-    const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
-    return font;
+    // const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
+    // return font;
+    return (FixedFont) ? m_FontFixed : m_Font;
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
@@ -4035,7 +4047,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4155,7 +4167,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4360,7 +4372,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4414,7 +4426,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4446,7 +4458,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4761,7 +4773,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4819,7 +4831,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    cImage *img = ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -4886,7 +4898,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        const int AddLeft {wWidth / (CountTemps)};
+        const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
         if (strcmp(TempCPU.c_str(), "-1")) {
@@ -4939,7 +4951,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
         Title = tr("no title available");
     }
 
-    cImage *img = ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -5001,7 +5013,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
     const int FontTempSmlHeight {m_FontTempSml->Height()};
 
-    cImage *img = ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
@@ -5175,7 +5187,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     const int ImageHeight {m_FontHeight};
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34;  // Narrowing conversion
-    cImage *img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
+    cImage *img {ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight)};
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();

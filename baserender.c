@@ -782,7 +782,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img = ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight);
+    cImage *img {ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight)};
     if (img)
         MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
@@ -901,10 +901,12 @@ void cFlatBaseRender::ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer
 
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3, Rect);
+    ProgressBarMarkerPixmap = CreatePixmap(m_Osd, "ProgressBarMarkerPixmap", 4, Rect);  // Keep marker on top of errors
+    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3, Rect);              // Also used for error marks
     ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
                                        cRect(Rect.Left() - MarginVer, Rect.Top() - MarginHor,
                                              Rect.Width() + MarginVer * 2, Rect.Height() + MarginHor * 2));
+    PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
     PixmapFill(ProgressBarPixmap, clrTransparent);
     PixmapFill(ProgressBarPixmapBg, clrTransparent);
 }
@@ -926,9 +928,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                                          bool SetBackground, bool IsSignal) {
     if (!Pixmap) return;
 
-    const int Middle {rect.Height() / 2};
-    const double PercentLeft {Current * 1.0 / Total};
-
     if (PixmapBg && SetBackground)
         PixmapBg->DrawRectangle(rectBg, ColorBg);
 
@@ -938,12 +937,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         else
             Pixmap->DrawRectangle(rect, clrTransparent);
     }
+
+    const int Middle {rect.Height() / 2};
+    const double PercentLeft {Current * 1.0 / Total};
     switch (Type) {
     case 0:  // Small line + big line
     {
-        int sml {rect.Height() / 10 * 2};
-        if (sml <= 1) sml = 2;
         const int big {rect.Height()};
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -975,7 +976,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             const int out2 {out * 2};
             if (IsSignal) {
-                double perc {100.0 / Total * Current * (1.0 / 100.0)};
+                const double perc {100.0 / Total * Current * (1.0 / 100.0)};
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * PercentLeft) - out2, big - out2),
@@ -993,22 +994,23 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.333) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
-                } else
+                } else {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * PercentLeft) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
-            } else
+                }
+            } else {
                 Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                             (rect.Width() * PercentLeft) - out2, big - out2),
                                       ColorBarFg);
+            }
         }
         break;
     }
     case 3:  // Small line + big line + dot
     {
-        int sml {rect.Height() / 10 * 2};
-        if (sml <= 1) sml = 2;
         const int big {rect.Height()};
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1058,9 +1060,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 6:  // Small line + dot
     {
-        int sml {rect.Height() / 10 * 2};
-        if (sml <= 1) sml = 2;
         const int big {rect.Height()};
+        const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1093,15 +1094,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 8:  // Small line + big line + alpha blend
     {
-        int sml {rect.Height() / 10 * 2};
-        if (sml <= 1) sml = 2;
-        const int big {rect.Height() / 2 - sml / 2};
+        const int sml {std::max(rect.Height() / 10 * 2, 2)};
+        const int big {rect.Height() / 2 - (sml / 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
         if (Current > 0) {
             DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), (rect.Width() * PercentLeft), big, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + sml / 2, (rect.Width() * PercentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + (sml / 2), (rect.Width() * PercentLeft),
                                  big * -1, ColorBarFg);
         }
         break;
@@ -1110,9 +1110,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         const int big {rect.Height()};
         if (Current > 0) {
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - big / 2, (rect.Width() * PercentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft),
                                  big / 2, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, (rect.Width() * PercentLeft), big / -2,
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, (rect.Width() * PercentLeft), (big / -2),
                                  ColorBarFg);
         }
         break;
@@ -1120,14 +1120,18 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
 }
 
+#if APIVERSNUM >= 30004
+void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, const cErrors *Errors,
+                                           tColor Color, tColor ColorCurrent) {
+#else
 void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color,
                                            tColor ColorCurrent) {
-    if (!ProgressBarPixmap) return;
+#endif
+    if (!ProgressBarPixmap || !ProgressBarMarkerPixmap)
+        return;
 
     m_ProgressBarColorMark = Color;
     m_ProgressBarColorMarkCurrent = ColorCurrent;
-    int PosMark {0}, PosMarkLast {0}, PosCurrent {0};
-    const int top {m_ProgressBarHeight / 2};
 
     if (ProgressBarPixmapBg)
         ProgressBarPixmapBg->DrawRectangle(
@@ -1135,139 +1139,169 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
             m_ProgressBarColorBg);
 
     PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
+    PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
+    // Test
+    // PixmapSetAlpha(ProgressBarMarkerPixmap, 128);  // Make pixmap 50% transparent
 
-    int sml {Config.decorProgressReplaySize / 10 * 2};
-    if (sml <= 4) sml = 4;
-    const int big {Config.decorProgressReplaySize - sml * 2 - 2};
-
-    if (!Marks) {
-        // m_ProgressBarColorFg = m_ProgressBarColorBarFg;
+    bool HasMarks {true};
+    if (!Marks || !Marks->First()) {
+        // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
         m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
 
         ProgressBarDraw(Current, Total);
-        return;
-    }
-    if (!Marks->First()) {
-        // m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
-        m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
-
-        ProgressBarDraw(Current, Total);
-        return;
+        HasMarks = false;
     }
 
-    // The small line
-    ProgressBarPixmap->DrawRectangle(cRect(0, top - sml / 2, m_ProgressBarWidth, sml), m_ProgressBarColorFg);
+    const int PosCurrent {ProgressBarMarkPos(Current, Total)};
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  //? Why 4 instead of 2
+    if (HasMarks) {
+        const int top {m_ProgressBarHeight / 2};
+        // The small line
+        ProgressBarPixmap->DrawRectangle(cRect(0, top - (sml / 2), m_ProgressBarWidth, sml), m_ProgressBarColorFg);
 
-    bool Start {true};
+        int PosMark {0}, PosMarkLast {0};
+        bool Start {true};
+        for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
+            PosMark = ProgressBarMarkPos(m->Position(), Total);
+            // PosCurrent = ProgressBarMarkPos(Current, Total);  // Not needed to calculate for every mark
 
-    for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
-        PosMark = ProgressBarMarkPos(m->Position(), Total);
-        PosCurrent = ProgressBarMarkPos(Current, Total);
+            ProgressBarDrawMark(PosMark, PosMarkLast, PosCurrent, Start, m->Position() == Current);
+            PosMarkLast = PosMark;
+            Start = !Start;
+        }
 
-        ProgressBarDrawMark(PosMark, PosMarkLast, PosCurrent, Start, m->Position() == Current);
-        PosMarkLast = PosMark;
-        Start = !Start;
-    }
+        // Draw last mark vertical line
+        if (PosCurrent == PosMark)
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight), ColorCurrent);
+        else
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (sml / 2), 0, sml, m_ProgressBarHeight), Color);
 
-    // Draw last marker vertical line
-    if (PosCurrent == PosMark)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight), ColorCurrent);
-    else
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), Color);
-
-    if (!Start) {
-        // ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast + sml / 2, top - big / 2,
-        //                                  m_ProgressBarWidth - PosMarkLast, big), m_ProgressBarColorBarFg);
-        if (PosCurrent > PosMarkLast)
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast + sml / 2, top - big / 2, PosCurrent - PosMarkLast, big),
+        const int big {m_ProgressBarHeight - (sml * 2) - 2};
+        if (Start) {
+            // Marker (Position)
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - (sml / 2), PosCurrent - PosMarkLast, sml),
                                              m_ProgressBarColorBarCurFg);
-    } else {
-        // Marker
-        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosCurrent - PosMarkLast, sml),
-                                         m_ProgressBarColorBarCurFg);
-        ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - big / 2, top - big / 2, big, big),
-                                         m_ProgressBarColorBarCurFg);
+            ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - (big / 2), top - (big / 2), big, big),
+                                             m_ProgressBarColorBarCurFg);
 
-        if (PosCurrent > PosMarkLast + sml / 2)
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight), Color);
+            if (PosCurrent > PosMarkLast + (sml / 2))
+                ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast - (sml / 2), 0, sml, m_ProgressBarHeight),
+                                                       Color);
+        } else {
+            // ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast + (sml / 2), top - (big / 2),
+            //                                        m_ProgressBarWidth - PosMarkLast, big), m_ProgressBarColorBarFg);
+            if (PosCurrent > PosMarkLast)
+                ProgressBarPixmap->DrawRectangle(
+                    cRect(PosMarkLast + (sml / 2), top - (big / 2), PosCurrent - PosMarkLast, big),
+                    m_ProgressBarColorBarCurFg);
+        }
     }
+
+#if APIVERSNUM >= 30004
+    if (Config.PlaybackShowErrorMarks && Errors) {  // Draw error marks
+        int LastPos {-1}, Pos {0};
+        const int ErrorsSize {Errors->Size()};
+        for (int i {0}; i < ErrorsSize; ++i) {
+            Pos = ProgressBarMarkPos(Errors->At(i), Total);  // Position on progressbar in pixel
+            if (Pos != LastPos) {                            // Draw mark if pos is not the same as the last one
+                ProgressBarDrawError(Pos, sml, Theme.Color(clrReplayErrorMark), Pos == PosCurrent);
+                LastPos = Pos;
+            }
+        }
+    }
+#endif
 }
 
 int cFlatBaseRender::ProgressBarMarkPos(int P, int Total) {
-    return (int64_t)P * m_ProgressBarWidth / Total;
+    return static_cast<int64_t>(P) * m_ProgressBarWidth / Total;
 }
 
 void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent) {
-    if (!ProgressBarPixmap) return;
+    // if (!ProgressBarPixmap || !ProgressBarMarkerPixmap)  // Checked in calling function 'ProgressBarDrawMarks'
+    //    return;
 
-    const int top {m_ProgressBarHeight / 2};
-    int sml {Config.decorProgressReplaySize / 10 * 2};
-    if (sml <= 4) sml = 4;
-    const int big {Config.decorProgressReplaySize - sml * 2 - 2};
-
-    int mbig {Config.decorProgressReplaySize * 2};
-    if (Config.decorProgressReplaySize > 15)
-        mbig = Config.decorProgressReplaySize;
-
-    // Marker vertical line
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
+    // Mark vertical line
     if (PosCurrent == PosMark)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
                                          m_ProgressBarColorMarkCurrent);
     else
-        ProgressBarPixmap->DrawRectangle(cRect(PosMark - sml / 2, 0, sml, m_ProgressBarHeight), m_ProgressBarColorMark);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (sml / 2), 0, sml, m_ProgressBarHeight),
+                                               m_ProgressBarColorMark);
 
+    const int top {m_ProgressBarHeight / 2};
+    const int big {m_ProgressBarHeight - (sml * 2) - 2};
+    const int mbig {(m_ProgressBarHeight > 15) ? m_ProgressBarHeight : m_ProgressBarHeight * 2};
     if (Start) {
         if (PosCurrent > PosMark) {
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosMark - PosMarkLast, sml),
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - (sml / 2), PosMark - PosMarkLast, sml),
                                              m_ProgressBarColorBarCurFg);
         } else {
-            // Marker
-            ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - big / 2, top - big / 2, big, big),
+            // Marker (Position)
+            ProgressBarPixmap->DrawRectangle(cRect(PosCurrent - (big / 2), top - (big / 2), big, big),
                                              m_ProgressBarColorBarCurFg);
             if (PosCurrent > PosMarkLast)
-                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - sml / 2, PosCurrent - PosMarkLast, sml),
+                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - (sml / 2), PosCurrent - PosMarkLast, sml),
                                                  m_ProgressBarColorBarCurFg);
         }
-        // Marker top
+        // Mark top
         if (IsCurrent)
-            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, 0, mbig, sml), m_ProgressBarColorMarkCurrent);
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), 0, mbig, sml),
+                                                   m_ProgressBarColorMarkCurrent);
         else
-            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, 0, mbig, sml), m_ProgressBarColorMark);
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), 0, mbig, sml), m_ProgressBarColorMark);
     } else {
         // Big line
         if (PosCurrent > PosMark) {
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosMark - PosMarkLast, big),
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - (big / 2), PosMark - PosMarkLast, big),
                                              m_ProgressBarColorBarCurFg);
-            // Draw last marker top
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - mbig / 2, 0, mbig, m_MarginItem / 2),
+            // Draw last mark top
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast - (mbig / 2), 0, mbig, m_MarginItem / 2),
                                              m_ProgressBarColorMark);
         } else {
-            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosMark - PosMarkLast, big),
+            ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - (big / 2), PosMark - PosMarkLast, big),
                                              m_ProgressBarColorBarFg);
             if (PosCurrent > PosMarkLast) {
                 ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast, top - big / 2, PosCurrent - PosMarkLast, big),
                                                  m_ProgressBarColorBarCurFg);
-                // Draw last marker top
-                ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - mbig / 2, 0, mbig, m_MarginItem / 2),
+                // Draw last mark top
+                ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast - (mbig / 2), 0, mbig, m_MarginItem / 2),
                                                  m_ProgressBarColorMark);
             }
         }
-        // Marker bottom
+        // Mark bottom
         if (IsCurrent)
-            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, m_ProgressBarHeight - sml, mbig, sml),
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), m_ProgressBarHeight - sml, mbig, sml),
                                              m_ProgressBarColorMarkCurrent);
         else
-            ProgressBarPixmap->DrawRectangle(cRect(PosMark - mbig / 2, m_ProgressBarHeight - sml, mbig, sml),
+            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), m_ProgressBarHeight - sml, mbig, sml),
                                              m_ProgressBarColorMark);
     }
 
     if (PosCurrent == PosMarkLast && PosMarkLast != 0)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml, 0, sml * 2, m_ProgressBarHeight),
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast - sml, 0, sml * 2, m_ProgressBarHeight),
                                          m_ProgressBarColorMarkCurrent);
     else if (PosMarkLast != 0)
-        ProgressBarPixmap->DrawRectangle(cRect(PosMarkLast - sml / 2, 0, sml, m_ProgressBarHeight),
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMarkLast - (sml / 2), 0, sml, m_ProgressBarHeight),
                                          m_ProgressBarColorMark);
 }
+
+#if APIVERSNUM >= 30004
+void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent) {
+    // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks'
+
+    if (IsCurrent) {  //* Draw current pos marker in different color
+        const int top {m_ProgressBarHeight / 2};
+        const int big {m_ProgressBarHeight - (SmallLine * 2) - 2};
+        //! Marker (Position) at ProgressBarMarkerPixmap to be visible!
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (big / 2), top - (big / 2), big, big), ColorError);
+    } else {          //* Small vertical line. 50 percent higher than the small line
+        const int MarkerTop {(m_ProgressBarHeight / 2) - (SmallLine / 4 * 3)};
+        const int MarkerWidth {1};
+        ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine + (SmallLine / 2)), ColorError);
+    }
+}
+#endif
 
 void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
                                     bool CanScrollUp, bool CanScrollDown) {
@@ -1946,7 +1980,7 @@ void cFlatBaseRender::DrawWidgetWeather() {
     left += WeatherFontSign->Width(TempTodaySign.c_str()) + m_MarginItem2;
 
     cString WeatherIcon = cString::sprintf("widgets/%s", IconToday.c_str());
-    cImage *img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
+    cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;

@@ -239,23 +239,27 @@ void cImageLoader::ToLowerCase(std::string &str) {
 
 // TODO: Improve? What images are to expect?
 bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) {
-    cString ManualPoster = cString::sprintf("%s/cover_vdr.jpg", *RecPath);
-    if (std::filesystem::exists(*ManualPoster)) {
-        // dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
-        found = ManualPoster;
-        return true;
+    // Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
+    for (const cString &Image : RecordingImages) {
+        cString ManualPoster = cString::sprintf("%s/Image", *RecPath);
+        if (std::filesystem::exists(*ManualPoster)) {
+            // dsyslog("flatPlus: Poster found in %s/cover_vdr.jpg", *RecPath);
+            found = ManualPoster;
+            return true;
+        }
+        ManualPoster = cString::sprintf("%s/../../../Image", *RecPath);
+        if (std::filesystem::exists(*ManualPoster)) {
+            // dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
+            found = ManualPoster;
+            return true;
+        }
+        ManualPoster = cString::sprintf("%s/../../Image", *RecPath);
+        if (std::filesystem::exists(*ManualPoster)) {
+            // dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
+            found = ManualPoster;
+            return true;
+        }
     }
-    ManualPoster = cString::sprintf("%s/../../../cover_vdr.jpg", *RecPath);
-    if (std::filesystem::exists(*ManualPoster)) {
-        // dsyslog("flatPlus: Poster found in %s/../../../cover_vdr.jpg", *RecPath);
-        found = ManualPoster;
-        return true;
-    }
-    ManualPoster = cString::sprintf("%s/../../cover_vdr.jpg", *RecPath);
-    if (std::filesystem::exists(*ManualPoster)) {
-        // dsyslog("flatPlus: Poster found in %s/../../cover_vdr.jpg", *RecPath);
-        found = ManualPoster;
-        return true;
-    }
+    dsyslog("flatPlus: cImageLoader() No image found in %s and above.", *RecPath);
     return false;
 }
