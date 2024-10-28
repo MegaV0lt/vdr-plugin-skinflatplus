@@ -31,6 +31,6 @@ class cImageLoader : public cImageMagickWrapper {
     // int epgImageWidthLarge, epgImageHeightLarge;  // Unused?
     // int epgImageWidth, epgImageHeight;
     const cString m_LogoExtension {"png"};
-
+    const std::list<cString> RecordingImages {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     void ToLowerCase(std::string &str);  // NOLINT
 };

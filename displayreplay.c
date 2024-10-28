@@ -633,9 +633,9 @@ void cFlatDisplayReplay::UpdateInfo() {
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
-                cString RecImage {""};
-                if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage)) {
-                    MediaPath = RecImage;
+                // cString RecImage {""};
+                if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
+                    // MediaPath = RecImage;
                     img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
@@ -707,7 +707,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         // First line for current, total and cutted length, second line for end time
         const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
 
-        int left = m_OsdWidth - Config.decorBorderReplaySize * 2;
+        int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
         cImage *img {nullptr};
         cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect
