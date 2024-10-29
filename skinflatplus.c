@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.0.9";
+static const char *VERSION        = "1.1.0";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -35,11 +35,11 @@ class cPluginFlat : public cPlugin {
         virtual void MainThreadHook();
         virtual cString Active();
         virtual time_t WakeupTime();
-        virtual const char *MainMenuEntry() { return NULL; }
+        virtual const char *MainMenuEntry() { return nullptr; }
         virtual cOsdObject *MainMenuAction();
         virtual cMenuSetupPage *SetupMenu();
         virtual bool SetupParse(const char *Name, const char *Value);
-        virtual bool Service(const char *Id, void *Data = NULL);
+        virtual bool Service(const char *Id, void *Data = nullptr);
         virtual const char **SVDRPHelpPages();
         virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);  // NOLINT
 
@@ -48,7 +48,7 @@ class cPluginFlat : public cPlugin {
 };
 
 cPluginFlat::cPluginFlat() {
-    flat = NULL;
+    flat = nullptr;
 }
 
 cPluginFlat::~cPluginFlat() {}
@@ -125,7 +125,7 @@ time_t cPluginFlat::WakeupTime() {
 }
 
 cOsdObject *cPluginFlat::MainMenuAction() {
-    return NULL;
+    return nullptr;
 }
 
 cMenuSetupPage *cPluginFlat::SetupMenu() {

@@ -33,7 +33,7 @@ void cImageCache::Create() {
 
 void cImageCache::Clear() {
     for (uint i {0}; i < MaxImageCache; ++i) {
-        // if (CacheImage[i] != NULL)  //* 'delete' already checks for NULL
+        // if (CacheImage[i] != nullptr)  //* 'delete' already checks for nullptr
             delete CacheImage[i];
     }
 
@@ -66,7 +66,7 @@ cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
         if (CacheName[i] == Name && CacheWidth[i] == Width && CacheHeight[i] == Height)
             return CacheImage[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {

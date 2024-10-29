@@ -37,8 +37,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
 
         virtual void SetTitle(const char *Title);
-        virtual void SetButtons(const char *Red, const char *Green = NULL,
-                                const char *Yellow = NULL, const char *Blue = NULL);
+        virtual void SetButtons(const char *Red, const char *Green = nullptr,
+                                const char *Yellow = nullptr, const char *Blue = nullptr);
         virtual void SetMessage(eMessageType Type, const char *Text);
         virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
 

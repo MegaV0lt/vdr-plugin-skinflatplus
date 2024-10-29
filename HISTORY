@@ -1,9 +1,14 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-10-29: Version 1.1.0
+- [fix] Fix bug in 'SearchRecordingPoster'
+- [update] Disable setup entry for error marks for API < 30003
+- [update] Use more 'nullptr' instead of 'NULL'
+
 2024-10-28: Version 1.0.9
 - [fix] Set scripts executable flag
-- [add] Show recording errors in progressbar at replay
-- [add] Config option to disable showing errors on progressbar
+- [add] Show recording errors in progress bar at replay
+- [add] Config option to disable showing errors on progress bar
 - [update] Search for more images for recordings
 - [update] Same width for number of recordings and new recordings
 - [update] Some internal optimizations
@@ -141,7 +146,7 @@ VDR Plugin 'skin flatPlus' Revision History
  - [fix] Fix display of channel number in event view (epgSearch)
 
 2023-10-30: Version 0.7.7
-- [update] Log when more then 10 Lines of actor images fond
+- [update] Log when more then 10 Lines of actor images found
 - [update] Min with for channel number: 3
 - [update] Try to fix invalid lock sequence with scraper2vdr - Program
 - [update] Remove extra '/' in LoadLogo

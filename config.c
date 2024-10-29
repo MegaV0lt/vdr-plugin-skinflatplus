@@ -716,7 +716,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
-    while ((e = d.Next()) != NULL) {
+    while ((e = d.Next()) != nullptr) {
         FileName = AddDirectory(*DecorPath, e->d_name);
         files.emplace_back(*FileName);
     }
@@ -739,7 +739,7 @@ cString cFlatConfig::DecorDescription(cString File) {
         int line {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != NULL) {
+        while ((s = ReadLine.Read(f)) != nullptr) {
             ++line;
             p = strchr(s, '#');
             if (p) *p = 0;
@@ -771,7 +771,7 @@ void cFlatConfig::DecorLoadCurrent() {
     cString FileName {""};
     cReadDir d(*DecorPath);
     struct dirent *e;
-    while ((e = d.Next()) != NULL) {
+    while ((e = d.Next()) != nullptr) {
         FileName = AddDirectory(*DecorPath, e->d_name);
         files.emplace_back(*FileName);
     }
@@ -792,7 +792,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
         int line {0}, value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != NULL) {
+        while ((s = ReadLine.Read(f)) != nullptr) {
             ++line;
             p = strchr(s, '#');
             if (p)
@@ -891,7 +891,7 @@ void cFlatConfig::RecordingOldLoadConfig() {
         int line {0}, value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != NULL) {
+        while ((s = ReadLine.Read(f)) != nullptr) {
             ++line;
             p = strchr(s, '#');
             if (p) *p = 0;
@@ -961,7 +961,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
-    while ((e = d.Next()) != NULL) {
+    while ((e = d.Next()) != nullptr) {
         files.emplace_back(e->d_name);
     }
 
