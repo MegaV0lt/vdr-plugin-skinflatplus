@@ -310,7 +310,7 @@ void cFlatBaseRender::TopBarUpdate() {
         return;
 
     cString Buffer {""}, CurDate = *DayDateTime();
-    if (strcmp(CurDate, m_TopBarLastDate) || m_TopBarUpdateTitle) {
+    if (m_TopBarUpdateTitle || strcmp(CurDate, m_TopBarLastDate)) {
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
         m_TopBarUpdateTitle = false;

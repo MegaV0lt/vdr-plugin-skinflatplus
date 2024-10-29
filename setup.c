@@ -359,7 +359,7 @@ void cFlatSetupGeneral::LoadConfigFile() {
         int line {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != NULL) {
+        while ((s = ReadLine.Read(f)) != nullptr) {
             ++line;
             p = strchr(s, '#');
             if (p) *p = 0;
@@ -872,10 +872,10 @@ eOSState cFlatSetupGeneral::ProcessKey(eKeys Key) {
             case kOk:
             {
                 const char* ItemText = Get(Current())->Text();
-                if (strstr(ItemText, tr("Save current settings")) != NULL) {
+                if (strstr(ItemText, tr("Save current settings")) != nullptr) {
                     SaveCurrentSettings();
                     return osUnknown;
-                } else if (strstr(ItemText, tr("Press ok to load config file")) != NULL) {
+                } else if (strstr(ItemText, tr("Press ok to load config file")) != nullptr) {
                     LoadConfigFile();
                     return osBack;
                 } else {
@@ -888,10 +888,10 @@ eOSState cFlatSetupGeneral::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("TopBar border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Message border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Use Textscroller?")) != NULL ||
-            strstr(ItemText, tr("Button border by decor-file?")) != NULL) {
+        if (strstr(ItemText, tr("TopBar border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Message border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Use Textscroller?")) != nullptr ||
+            strstr(ItemText, tr("Button border by decor-file?")) != nullptr) {
               ItemLastSel = Current();
               Setup();
         }
@@ -988,10 +988,10 @@ eOSState cFlatSetupChannelInfo::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Channelinfo border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Channelinfo EPG border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Channelinfo progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Signalquality progress by decor-file?")) != NULL) {
+        if (strstr(ItemText, tr("Channelinfo border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Channelinfo EPG border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Channelinfo progress by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Signalquality progress by decor-file?")) != nullptr) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1107,11 +1107,11 @@ eOSState cFlatSetupMenu::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Menuitem border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Menucont. border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Menucont. head border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Menuitem progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Scrollbar by decor-file?")) != NULL) {
+        if (strstr(ItemText, tr("Menuitem border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Menucont. border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Menucont. head border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Menuitem progress by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Scrollbar by decor-file?")) != nullptr) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1133,7 +1133,9 @@ void cFlatSetupReplay::Setup() {
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
+#if APIVERSNUM >= 30004
     Add(new cMenuEditBoolItem(tr("Show error marks in playback"), &SetupConfig->PlaybackShowErrorMarks));
+#endif
     Add(new cMenuEditBoolItem(tr("Show shorttext with date in playback"), &SetupConfig->PlaybackShowRecordingDate));
     Add(new cMenuEditStraItem(tr("Show end time of recording"), &SetupConfig->PlaybackShowEndTime, ShowEndTime.Size(), &ShowEndTime[0]));
 
@@ -1186,9 +1188,9 @@ eOSState cFlatSetupReplay::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Replay border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Replay progress by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Dimm on pause?")) != NULL) {
+        if (strstr(ItemText, tr("Replay border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Replay progress by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Dimm on pause?")) != nullptr) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1246,8 +1248,8 @@ eOSState cFlatSetupVolume::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Volume border by decor-file?")) != NULL ||
-            strstr(ItemText, tr("Volume progress by decor-file?")) != NULL) {
+        if (strstr(ItemText, tr("Volume border by decor-file?")) != nullptr ||
+            strstr(ItemText, tr("Volume progress by decor-file?")) != nullptr) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1294,7 +1296,7 @@ eOSState cFlatSetupTracks::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Tracks border by decor-file?")) != NULL) {
+        if (strstr(ItemText, tr("Tracks border by decor-file?")) != nullptr) {
             ItemLastSel = Current();
             Setup();
         }
@@ -1443,16 +1445,16 @@ eOSState cFlatSetupMMWidget::ProcessKey(eKeys Key) {
     }
     if (Key == kLeft || Key == kRight) {
         const char* ItemText = Get(Current())->Text();
-        if (strstr(ItemText, tr("Enable main menu widgets")) != NULL ||
-            strstr(ItemText, tr("Widget weather: enable")) != NULL ||
-            strstr(ItemText, tr("Widget DVB devices: enable")) != NULL ||
-            strstr(ItemText, tr("Widget timer: enable")) != NULL ||
-            strstr(ItemText, tr("Widget last recordings: enable")) != NULL ||
-            strstr(ItemText, tr("Widget timer conflicts: enable")) != NULL ||
-            strstr(ItemText, tr("Widget system information: enable")) != NULL ||
-            strstr(ItemText, tr("Widget system updates: enable")) != NULL ||
-            strstr(ItemText, tr("Widget temperatures: enable")) != NULL ||
-            strstr(ItemText, tr("Widget custom commands: enable")) != NULL) {
+        if (strstr(ItemText, tr("Enable main menu widgets")) != nullptr ||
+            strstr(ItemText, tr("Widget weather: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget DVB devices: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget timer: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget last recordings: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget timer conflicts: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget system information: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget system updates: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget temperatures: enable")) != nullptr ||
+            strstr(ItemText, tr("Widget custom commands: enable")) != nullptr) {
               ItemLastSel = Current();
               Setup();
         }

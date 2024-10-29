@@ -53,7 +53,8 @@ class cFlatBaseRender {
         void TopBarUpdate();
 
         void ButtonsCreate();
-        void ButtonsSet(const char *Red, const char *Green = NULL, const char *Yellow = NULL, const char *Blue = NULL);
+        void ButtonsSet(const char *Red, const char *Green = nullptr, const char *Yellow = nullptr,
+                        const char *Blue = nullptr);
         bool ButtonsDrawn();
 
         void MessageCreate();

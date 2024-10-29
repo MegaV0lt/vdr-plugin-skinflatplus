@@ -44,7 +44,7 @@ static bool m_MenuActive {false};
 time_t m_RemoteTimersLastRefresh {0};
 
 cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
-    Display_Menu = NULL;
+    Display_Menu = nullptr;
 }
 
 const char *cFlat::Description() {
@@ -82,7 +82,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
-        return NULL;
+        return nullptr;
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
@@ -103,7 +103,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     }
 
     esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
-    return NULL;
+    return nullptr;
 }
 
 // void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
@@ -870,7 +870,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
             }
         }
         if (s) {
-            if ((m_EoL = strchr(s, '\n')) != NULL)
+            if ((m_EoL = strchr(s, '\n')) != nullptr)
                 *m_EoL = 0;
         }
         m_LastLine = Line;

@@ -1205,7 +1205,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         strftime(Buffer, sizeof(Buffer), "%Y%m%d", &tm_r);
         day = Buffer;
     }
-    const char *File {(Setup.FoldersInTimerMenu) ? NULL : strrchr(Timer->File(), FOLDERDELIMCHAR)};
+    const char *File {(Setup.FoldersInTimerMenu) ? nullptr : strrchr(Timer->File(), FOLDERDELIMCHAR)};
     if (File && strcmp(File + 1, TIMERMACRO_TITLE) && strcmp(File + 1, TIMERMACRO_EPISODE))
         ++File;
     else
@@ -4209,7 +4209,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && TimerRec.Size() + TimerActive.Size() < Config.MainMenuWidgetActiveTimerMaxCount) {
         cTimer *RemoteTimer {nullptr};
-        while (pRemoteTimers->Service("RemoteTimers::ForEach-v1.0", &RemoteTimer) && RemoteTimer != NULL) {
+        while (pRemoteTimers->Service("RemoteTimers::ForEach-v1.0", &RemoteTimer) && RemoteTimer != nullptr) {
             RemoteTimer->SetEventFromSchedule(Schedules);  // Make sure the event is current
             if (RemoteTimer->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowRemoteRecording)
                 TimerRemoteRec.Append(RemoteTimer);
@@ -4482,7 +4482,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     FileName.reserve(128);
     num.reserve(16);
     std::size_t found {0};
-    while ((e = d.Next()) != NULL) {
+    while ((e = d.Next()) != nullptr) {
         FileName = e->d_name;
         found = FileName.find('_');
         if (found != std::string::npos) {
@@ -5176,7 +5176,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     cString FileName {""};
     cReadDir d(*Path);
     struct dirent *e;
-    while ((e = d.Next()) != NULL) {
+    while ((e = d.Next()) != nullptr) {
         File = e->d_name;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
         ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);

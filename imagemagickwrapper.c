@@ -121,7 +121,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 }
 
 bool cImageMagickWrapper::LoadImage(const char *fullpath) {
-    if ((fullpath == NULL) || (strlen(fullpath) < 5))
+    if ((fullpath == nullptr) || (strlen(fullpath) < 5))
         return false;
     try {
         buffer.read(fullpath);

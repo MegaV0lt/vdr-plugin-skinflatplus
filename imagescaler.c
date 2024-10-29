@@ -11,11 +11,11 @@
 #include <cmath>
 
 ImageScaler::ImageScaler() :
-    m_memory(NULL),
-    m_hor_filters(NULL),
-    m_ver_filters(NULL),
-    m_buffer(NULL),
-    m_dst_image(NULL),
+    m_memory(nullptr),
+    m_hor_filters(nullptr),
+    m_ver_filters(nullptr),
+    m_buffer(nullptr),
+    m_dst_image(nullptr),
     m_dst_stride(0),
     m_dst_width(0),
     m_dst_height(0),
@@ -29,7 +29,7 @@ ImageScaler::ImageScaler() :
 
 ImageScaler::~ImageScaler() {
     if (m_memory) free(m_memory);
-    // if (m_memory) m_memory = NULL;
+    // if (m_memory) m_memory = nullptr;
 }
 
 // sin(x)/(x)
@@ -112,7 +112,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_src_height = src_height;
 
     if (m_memory) free(m_memory);
-    // if (m_memory) m_memory = NULL;
+    // if (m_memory) m_memory = nullptr;
 
     const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
     const unsigned ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
