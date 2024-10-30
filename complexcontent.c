@@ -92,7 +92,8 @@ int cComplexContent::ContentHeight(bool Full) {
     if (Full) return Height();
 
     CalculateDrawPortHeight();
-    return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
+    // return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
+    return std::min(m_DrawPortHeight, Height());
 }
 
 bool cComplexContent::Scrollable(int height) {
@@ -118,7 +119,7 @@ void cComplexContent::AddImage(cImage *image, cRect Position) {
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos,
                                               tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
                                               int TextHeight, int TextAlignment) {
-    const int TextWidthFull = (TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left();
+    const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
     // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     const int TextWidthLeft {TextWidthFull - image->Width() - 10};
     const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
