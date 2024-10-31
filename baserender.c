@@ -1498,7 +1498,7 @@ void cFlatBaseRender::DecorBorderRedrawAll() {
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end; ++it) {
         const sDecorBorder ib {(*it).Left, (*it).Top,     (*it).Width,   (*it).Height, (*it).Size,
-                         (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
+                               (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
         DecorBorderDraw(ib, false);
     }
 }
