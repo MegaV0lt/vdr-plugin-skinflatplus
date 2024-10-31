@@ -29,17 +29,18 @@ ImageScaler::ImageScaler() :
 
 ImageScaler::~ImageScaler() {
     if (m_memory) free(m_memory);
-    // if (m_memory) m_memory = nullptr;
 }
 
 // sin(x)/(x)
 static float sincf(float x) {
-    if (fabsf(x) < 0.05f) return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
+    if (fabsf(x) < 0.05f)
+        return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
+
     return sin(x) / x;
 }
 
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
-    const float fc = (dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size);
+    const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
     int d {0}, e {0}, offset {0};  // Init outside of loop
     float sub_offset {0.0}, h[4] {0.0}, norm {0.0}, t {0.0};
@@ -114,7 +115,6 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_src_height = src_height;
 
     if (m_memory) free(m_memory);
-    // if (m_memory) m_memory = nullptr;
 
     // Narrowing conversion
     const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
