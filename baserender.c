@@ -441,7 +441,7 @@ void cFlatBaseRender::TopBarUpdate() {
         if (m_TopBarMenuIconRightSet) {
             img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                TopBarMenuIconRightWidth = img->Width() + m_MarginItem * 3;
+                TopBarMenuIconRightWidth = img->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
             }
         }
@@ -543,7 +543,7 @@ void cFlatBaseRender::ButtonsCreate() {
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
     if (!ButtonsPixmap) return;
 
-    const int WidthMargin {m_ButtonsWidth - m_MarginItem * 3};
+    const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
     int ButtonWidth {(WidthMargin / 4) - Config.decorBorderButtonSize * 2};
 
     PixmapFill(ButtonsPixmap, clrTransparent);
@@ -795,12 +795,12 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     }
 
     const int TextWidth {m_Font->Width(Text)};
-    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem * 3 - 10};
+    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 - 10};
 
     if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
         MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                   m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
@@ -821,7 +821,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         } else {  // ~ not found
             if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
                 MessageScroller.AddScroller(Text,
-                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                                                   m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                       Config.decorBorderMessageSize + m_MarginItem,
                                                   MaxWidth, m_FontHeight),
@@ -833,7 +833,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     } else {
         if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
             MessageScroller.AddScroller(Text,
-                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                                               m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                   Config.decorBorderMessageSize + m_MarginItem,
                                               MaxWidth, m_FontHeight),

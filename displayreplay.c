@@ -47,7 +47,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
 
     LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1,
                                    cRect(Config.decorBorderReplaySize,
-                                         m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem * 3 -
+                                         m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem3 -
                                              m_FontHeight - Config.decorBorderReplaySize * 2,
                                          m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
 
@@ -208,7 +208,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
     int left {0};
     if (Setup.ShowReplayMode) {
-        left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem * 3)) / 2;
+        left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem3)) / 2;
 
         if (m_ModeOnly)
             PixmapFill(LabelPixmap, clrTransparent);
@@ -247,7 +247,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
         if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem * 3, 0), *img);
+            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
     }
 
     if (m_ProgressShown) {
@@ -687,7 +687,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
                               m_Font->Width(Jump), m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
-                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem * 3 -
+                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 -
                                m_FontHeight - Config.decorBorderReplaySize * 2,
                            m_Font->Width(Jump),
                            m_FontHeight,

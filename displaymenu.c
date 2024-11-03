@@ -52,7 +52,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     m_ItemTimerHeight = m_ItemHeight;
 
     m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
-    m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem * 3 +
+    m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem3 +
                                        m_ButtonsHeight + Config.decorBorderButtonSize * 2);
     m_ScrollBarTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2;
 
@@ -939,7 +939,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
     m_cHeight =
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                       Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
+                       Config.decorBorderButtonSize * 2 + m_MarginItem3 + Config.decorBorderMenuContentSize * 2);
 
     bool IsEmpty {false};
     cString Text {""};
@@ -1004,7 +1004,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                     MediaPath = call.banner.path.c_str();
                     MediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaWidth = m_cWidth / 2 - m_MarginItem3;
                     MediaPath = call.poster.path.c_str();
                     MediaType = 2;
                 }
@@ -1522,7 +1522,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(/*(time_t)*/Event->StartTime()), buf);
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
@@ -2235,11 +2235,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ItemBorderClear();
 
     m_cLeft = Config.decorBorderMenuContentSize;
-    m_cTop = m_chTop + m_MarginItem * 3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
+    m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
              Config.decorBorderMenuContentHeadSize;
     m_cWidth = m_MenuWidth - Config.decorBorderMenuContentSize * 2;
     m_cHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                               Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + m_chHeight +
+                               Config.decorBorderButtonSize * 2 + m_MarginItem3 + m_chHeight +
                                Config.decorBorderMenuContentHeadSize * 2 + Config.decorBorderMenuContentSize * 2);
 
     if (!ButtonsDrawn())
@@ -2689,7 +2689,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
     m_cHeight =
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                       Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
+                       Config.decorBorderButtonSize * 2 + m_MarginItem3 + Config.decorBorderMenuContentSize * 2);
 
     cString Text {""};
     if (Recording) {
@@ -2800,7 +2800,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             movie.movieId = movieId;
             if (pScraper->Service("GetMovie", &movie)) {
                 MediaPath = movie.poster.path.c_str();
-                MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                MediaWidth = m_cWidth / 2 - m_MarginItem3;
                 MediaType = 2;
             }
         }
@@ -2817,7 +2817,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             if (img) {
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
                 if (Aspect < 1) {  //* Poster (For example 680x1000 = 0.68)
-                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaWidth = m_cWidth / 2 - m_MarginItem3;
                     MediaType = 2;
                 } else {           //* Portrait (For example 1920x1080 = 1.77); Banner (Usually 758x140 = 5.41)
                     MediaWidth = m_cWidth - m_MarginItem2;
@@ -2953,11 +2953,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
     m_cLeft = Config.decorBorderMenuContentSize;
-    m_cTop = m_chTop + m_MarginItem * 3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
+    m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
              Config.decorBorderMenuContentHeadSize;
     m_cWidth = m_MenuWidth - Config.decorBorderMenuContentSize * 2;
     m_cHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                               Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + m_chHeight +
+                               Config.decorBorderButtonSize * 2 + m_MarginItem3 + m_chHeight +
                                Config.decorBorderMenuContentHeadSize * 2 + Config.decorBorderMenuContentSize * 2);
 
     if (!ButtonsDrawn())
