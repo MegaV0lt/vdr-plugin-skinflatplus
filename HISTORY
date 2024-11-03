@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-11-xx: Version 1.1.1
+- [Add] Types for error marks: '|' , 'I' and '+' in small and big variant
+
 2024-10-29: Version 1.1.0
 - [fix] Fix bug in 'SearchRecordingPoster'
 - [update] Disable setup entry for error marks for API < 30003

@@ -196,9 +196,7 @@ class cFlatConfig {
         int SignalQualityUseColors;
         int DiskUsageShow;
         int DiskUsageShort;
-        // 0 = occupied
-        // 1 = free
-        int DiskUsageFree;
+        int DiskUsageFree;  // 0 = occupied, 1 = free
 
         int MenuItemPadding;
         int marginOsdVer, marginOsdHor;
@@ -254,9 +252,7 @@ class cFlatConfig {
         double MenuItemRecordingSeenThreshold;
         int MenuItemRecordingDefaultOldDays;
 
-        // 0 = vertical
-        // 1 = horizontal
-        int MessageColorPosition;
+        int MessageColorPosition;  // 0 = vertical, 1 = horizontal
 
         /* Hidden configs (only in setup.conf, no osd menu) */
         int MenuItemRecordingClearPercent;
@@ -268,11 +264,11 @@ class cFlatConfig {
 
         int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
         int PlaybackShowRecordingErrors;
-        int PlaybackShowErrorMarks;                // 1 = Show error marks on replay progressbar
+        int PlaybackShowErrorMarks;                // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
         int PlaybackShowRecordingDate;
         int PlaybackShowEndTime;
         int MenuItemRecordingShowRecordingErrorsThreshold;
-        int MenuItemRecordingShowFormatIcons;  // Show format icons (sd/hd/uhd) in menu recordings
+        int MenuItemRecordingShowFormatIcons;      // Show format icons (sd/hd/uhd) in menu recordings
 
 
         // Text scroller
