@@ -1140,21 +1140,15 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
     PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
     PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
-    // Test
-    // PixmapSetAlpha(ProgressBarMarkerPixmap, 128);  // Make pixmap 50% transparent
 
-    bool HasMarks {true};
+    const int PosCurrent {ProgressBarMarkPos(Current, Total)};
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     if (!Marks || !Marks->First()) {
         // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
         m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
 
         ProgressBarDraw(Current, Total);
-        HasMarks = false;
-    }  // TODO use 'else' instead of 'HasMarks'
-
-    const int PosCurrent {ProgressBarMarkPos(Current, Total)};
-    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  //? Why 4 instead of 2
-    if (HasMarks) {
+    } else {
         const int top {m_ProgressBarHeight / 2};
         // The small line
         ProgressBarPixmap->DrawRectangle(cRect(0, top - (sml / 2), m_ProgressBarWidth, sml), m_ProgressBarColorFg);
