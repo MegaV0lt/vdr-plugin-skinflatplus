@@ -568,7 +568,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
 }
 
 void cFlatSetupGeneral::SaveCurrentSettings() {
-    time_t t = time(NULL);
+    time_t t = time(0);
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     char time[32];

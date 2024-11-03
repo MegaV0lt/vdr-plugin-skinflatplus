@@ -360,7 +360,7 @@ void cFlatBaseRender::TopBarUpdate() {
         }
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
-        const time_t t {time(NULL)};
+        const time_t t {time(0)};
         const cString time {*TimeString(t)};
         if (Config.TopBarHideClockText)
             Buffer = *time;
@@ -1417,7 +1417,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 3: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            const int Middle {Left + m_ScrollBarWidth / 2};
+            const int Middle {Left + DotHeight};
             int LineWidth {6};
             if (m_ScrollBarWidth <= 10)
                 LineWidth = 2;

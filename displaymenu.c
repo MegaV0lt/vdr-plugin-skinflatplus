@@ -779,7 +779,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = round((time(NULL) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
+            progress = round((time(0) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
             if (progress < 0.0) progress = 0.0;
             else if (progress > 100.0) progress = 100.0;
 
@@ -1194,7 +1194,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     cString day {""}, name {""};
     if (Timer->WeekDays()) {
         day = Timer->PrintDay(0, Timer->WeekDays(), false);
-    } else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
+    } else if (Timer->Day() - time(0) < 28 * SECSINDAY) {
         day = itoa(Timer->GetMDay(Timer->Day()));
         name = WeekDayName(Timer->Day());
     } else {
@@ -1474,7 +1474,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             if (!m_IsScrolling)
                 PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
 
-            time_t now {time(NULL)};
+            time_t now {time(0)};
             if ((now >= (Event->StartTime() - 2 * 60))) {
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
@@ -3634,7 +3634,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     if (value < 0) return false;
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
-    const time_t now {time(NULL)};
+    const time_t now {time(0)};
 
     const int DiffSecs = now - LastRecTimeFromFolder;  // Narrowing conversion
     const int days {DiffSecs / (60 * 60 * 24)};
@@ -4179,7 +4179,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     // Check if remotetimers plugin is available
     static cPlugin *pRemoteTimers = cPluginManager::GetPlugin("remotetimers");
-    time_t now {time(NULL)};
+    time_t now {time(0)};
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && (now - m_RemoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
         m_RemoteTimersLastRefresh = now;
@@ -5029,7 +5029,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     icon.reserve(8); summary.reserve(32); TempMax.reserve(8); TempMin.reserve(8); prec.reserve(8);
     cString DayName {""}, PrecString("0%"), StrWeekDayName {""}, WeatherIcon {""};
     double p {0.0};
-    time_t t {time(NULL)}, t2 {time(NULL)};
+    time_t t {time(0)}, t2 {time(0)};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
