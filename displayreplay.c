@@ -558,26 +558,27 @@ void cFlatDisplayReplay::UpdateInfo() {
         } */
 
         const int Rest {NumFrames - m_CurrentFrame};
-        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeString(time(0) + (Rest / FramesPerSecond)));
+        const cString TimeStr = cString::sprintf("%s" , *TimeString(time(0) + (Rest / FramesPerSecond)));  // HH:MM
+        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
         left += m_Font->Width(*EndTime) + FontWidthSpace;
 
         //* Draw end time of cutted recording with cutted symbol
-        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {  // TODO: Don't show if identical time
-            // if (CurrentFramesAfterEdit >= FramesAfterEdit) {  // Only if greater than '00:00'
+        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {
+            const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
+            EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));  // HH:MM
+            if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
                 img = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
                 if (img) {
                     IconsPixmap->DrawImage(cPoint(left, m_FontHeight + TopOffset), *img);
                     left += img->Width() + m_MarginItem;
                 }
 
-                const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
-                EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
                 // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
-            // }
+            }
         }
     }  // Config.PlaybackShowEndTime
 

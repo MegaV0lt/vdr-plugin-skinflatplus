@@ -2100,11 +2100,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height. Narrowing conversion
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
-                        if (img) {
-                            const int ImageTop {Top + m_FontHeight - m_FontAscender};
-                            const int ImageLeft {Left + m_FontHeight - img->Width()};
-                            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                        }
+                    if (img) {
+                        const int ImageTop {Top + m_FontHeight - m_FontAscender};
+                        const int ImageLeft {Left + m_FontHeight - img->Width()};
+                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                    }
                 }
             }
 
@@ -2381,9 +2381,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
 #endif
 
-    std::vector<cString> ActorsPath;
-    std::vector<cString> ActorsName;
-    std::vector<cString> ActorsRole;
+    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
@@ -3085,9 +3083,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
 #endif
 
-    std::vector<cString> ActorsPath;
-    std::vector<cString> ActorsName;
-    std::vector<cString> ActorsRole;
+    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};

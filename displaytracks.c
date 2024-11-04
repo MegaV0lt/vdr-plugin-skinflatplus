@@ -20,13 +20,13 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     if (img_stereo)
         m_StereoWidth = img_stereo->Width();
 
-    const int imgWidthMax {std::max(m_Ac3Width, m_StereoWidth)};
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     m_CurrentIndex = -1;
     m_MaxItemWidth = m_Font->Width(Title) + m_MarginItem * 4;
     for (int i {0}; i < NumTracks; ++i)
         m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem2);
 
+    const int imgWidthMax {std::max(m_Ac3Width, m_StereoWidth)};
     const int headerWidth {m_Font->Width(Title) + m_Font->Width(' ') + imgWidthMax};
     m_MaxItemWidth = std::max(m_MaxItemWidth, headerWidth);
 
@@ -36,10 +36,10 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 
     TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1,
                                 cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
-    PixmapFill(TracksPixmap, clrTransparent);
 
     TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1,
                                     cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
+    PixmapFill(TracksPixmap, clrTransparent);
     PixmapFill(TracksLogoPixmap, clrTransparent);
 
     SetItem(Title, -1, false);
