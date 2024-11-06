@@ -77,7 +77,8 @@ void cComplexContent::CalculateDrawPortHeight() {
             m_DrawPortHeight = GetBottom;
     }
     if (m_IsScrollingActive)
-        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;}
+        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
+}
 
 int cComplexContent::BottomContent() {
     int Bottom {0};

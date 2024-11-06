@@ -2895,13 +2895,19 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 
     cImage *img {nullptr};
     cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
-    int Actor {0}, ActorsPerLine {6};  // TODO: Config option?
+    int Actor {0};
+    const int ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem * 4};
     const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
     const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  // Narrowing conversion
     const uint PicLines {NumActors / PicsPerLine + (NumActors % PicsPerLine != 0)};
     int x {m_MarginItem};
     int y {ContentTop};
+#ifdef DEBUGFUNCSCALL
+    int y2 {ContentTop};  //! y2 is for testing
+    dsyslog("   ActorsPerLine/PicsPerLine: %d/%d", ActorsPerLine, PicsPerLine);
+    dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
+#endif
     if (NumActors > 50)
         dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
@@ -2919,7 +2925,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
                                        ActorWidth, FontTinyHeight, taCenter);
                 ComplexContent.AddText(
-                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
+                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + FontTinyHeight, ActorWidth, 0),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
                     FontTinyHeight, taCenter);
             }
@@ -2928,6 +2934,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         }  // for col
         x = m_MarginItem;
         y = ComplexContent.BottomContent() + m_FontHeight;
+#ifdef DEBUGFUNCSCALL
+        // Alternate way to get y, but what if different image size?
+        y2 += img->Height() + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
+        dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", y, y2);
+#endif
     }  // for row
 }
 
