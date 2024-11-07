@@ -145,7 +145,7 @@ cFlatConfig::cFlatConfig() {
     MenuItemRecordingDefaultOldDays = -1;
 
     PlaybackShowRecordingErrors = true;
-    PlaybackShowErrorMarks = true;     // Show error marks in replay progressbar
+    PlaybackShowErrorMarks = 1;        // Show error marks in replay progressbar
     PlaybackShowRecordingDate = true;  // Show date and time with short text
     PlaybackShowEndTime = 0;           // Show end time of recording
 

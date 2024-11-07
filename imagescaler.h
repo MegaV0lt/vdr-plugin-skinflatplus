@@ -70,7 +70,7 @@ class ImageScaler {
             return TmpPixel(m_comp[0] + x[0], m_comp[1] + x[1], m_comp[2] + x[2], m_comp[3] + x[3]);
         }
 
-        // Return component i=[0..3] - No range check!
+        // Return component i=[0..3] //! No range check!
         int operator[](unsigned i) const {
             return m_comp[i];
         }

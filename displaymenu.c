@@ -52,7 +52,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     m_ItemTimerHeight = m_ItemHeight;
 
     m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
-    m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem * 3 +
+    m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem3 +
                                        m_ButtonsHeight + Config.decorBorderButtonSize * 2);
     m_ScrollBarTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2;
 
@@ -779,7 +779,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            progress = round((time(NULL) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
+            progress = round((time(0) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
             if (progress < 0.0) progress = 0.0;
             else if (progress > 100.0) progress = 100.0;
 
@@ -939,7 +939,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
     m_cHeight =
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                       Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
+                       Config.decorBorderButtonSize * 2 + m_MarginItem3 + Config.decorBorderMenuContentSize * 2);
 
     bool IsEmpty {false};
     cString Text {""};
@@ -1004,7 +1004,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                     MediaPath = call.banner.path.c_str();
                     MediaType = 1;
                 } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaWidth = m_cWidth / 2 - m_MarginItem3;
                     MediaPath = call.poster.path.c_str();
                     MediaType = 2;
                 }
@@ -1194,7 +1194,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     cString day {""}, name {""};
     if (Timer->WeekDays()) {
         day = Timer->PrintDay(0, Timer->WeekDays(), false);
-    } else if (Timer->Day() - time(NULL) < 28 * SECSINDAY) {
+    } else if (Timer->Day() - time(0) < 28 * SECSINDAY) {
         day = itoa(Timer->GetMDay(Timer->Day()));
         name = WeekDayName(Timer->Day());
     } else {
@@ -1474,7 +1474,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             if (!m_IsScrolling)
                 PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
 
-            time_t now {time(NULL)};
+            time_t now {time(0)};
             if ((now >= (Event->StartTime() - 2 * 60))) {
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
@@ -1522,7 +1522,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName((time_t)Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(/*(time_t)*/Event->StartTime()), buf);
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
@@ -2100,11 +2100,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height. Narrowing conversion
                     img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
-                        if (img) {
-                            const int ImageTop {Top + m_FontHeight - m_FontAscender};
-                            const int ImageLeft {Left + m_FontHeight - img->Width()};
-                            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                        }
+                    if (img) {
+                        const int ImageTop {Top + m_FontHeight - m_FontAscender};
+                        const int ImageLeft {Left + m_FontHeight - img->Width()};
+                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+                    }
                 }
             }
 
@@ -2235,11 +2235,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ItemBorderClear();
 
     m_cLeft = Config.decorBorderMenuContentSize;
-    m_cTop = m_chTop + m_MarginItem * 3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
+    m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
              Config.decorBorderMenuContentHeadSize;
     m_cWidth = m_MenuWidth - Config.decorBorderMenuContentSize * 2;
     m_cHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                               Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + m_chHeight +
+                               Config.decorBorderButtonSize * 2 + m_MarginItem3 + m_chHeight +
                                Config.decorBorderMenuContentHeadSize * 2 + Config.decorBorderMenuContentSize * 2);
 
     if (!ButtonsDrawn())
@@ -2381,9 +2381,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
 #endif
 
-    std::vector<cString> ActorsPath;
-    std::vector<cString> ActorsName;
-    std::vector<cString> ActorsRole;
+    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
@@ -2689,7 +2687,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
     m_cHeight =
         m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                       Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + Config.decorBorderMenuContentSize * 2);
+                       Config.decorBorderButtonSize * 2 + m_MarginItem3 + Config.decorBorderMenuContentSize * 2);
 
     cString Text {""};
     if (Recording) {
@@ -2800,7 +2798,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             movie.movieId = movieId;
             if (pScraper->Service("GetMovie", &movie)) {
                 MediaPath = movie.poster.path.c_str();
-                MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                MediaWidth = m_cWidth / 2 - m_MarginItem3;
                 MediaType = 2;
             }
         }
@@ -2817,7 +2815,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             if (img) {
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
                 if (Aspect < 1) {  //* Poster (For example 680x1000 = 0.68)
-                    MediaWidth = m_cWidth / 2 - m_MarginItem * 3;
+                    MediaWidth = m_cWidth / 2 - m_MarginItem3;
                     MediaType = 2;
                 } else {           //* Portrait (For example 1920x1080 = 1.77); Banner (Usually 758x140 = 5.41)
                     MediaWidth = m_cWidth - m_MarginItem2;
@@ -2897,13 +2895,19 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 
     cImage *img {nullptr};
     cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
-    int Actor {0}, ActorsPerLine {6};  // TODO: Config option?
+    int Actor {0};
+    const int ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem * 4};
     const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
     const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  // Narrowing conversion
     const uint PicLines {NumActors / PicsPerLine + (NumActors % PicsPerLine != 0)};
     int x {m_MarginItem};
     int y {ContentTop};
+#ifdef DEBUGFUNCSCALL
+    int y2 {ContentTop};  //! y2 is for testing
+    dsyslog("   ActorsPerLine/PicsPerLine: %d/%d", ActorsPerLine, PicsPerLine);
+    dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
+#endif
     if (NumActors > 50)
         dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
@@ -2921,7 +2925,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
                                        ActorWidth, FontTinyHeight, taCenter);
                 ComplexContent.AddText(
-                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + m_FontSmlHeight, ActorWidth, 0),
+                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + FontTinyHeight, ActorWidth, 0),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
                     FontTinyHeight, taCenter);
             }
@@ -2930,6 +2934,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         }  // for col
         x = m_MarginItem;
         y = ComplexContent.BottomContent() + m_FontHeight;
+#ifdef DEBUGFUNCSCALL
+        // Alternate way to get y, but what if different image size?
+        y2 += img->Height() + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
+        dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", y, y2);
+#endif
     }  // for row
 }
 
@@ -2953,11 +2962,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
 
     m_cLeft = Config.decorBorderMenuContentSize;
-    m_cTop = m_chTop + m_MarginItem * 3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
+    m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
              Config.decorBorderMenuContentHeadSize;
     m_cWidth = m_MenuWidth - Config.decorBorderMenuContentSize * 2;
     m_cHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                               Config.decorBorderButtonSize * 2 + m_MarginItem * 3 + m_chHeight +
+                               Config.decorBorderButtonSize * 2 + m_MarginItem3 + m_chHeight +
                                Config.decorBorderMenuContentHeadSize * 2 + Config.decorBorderMenuContentSize * 2);
 
     if (!ButtonsDrawn())
@@ -3085,9 +3094,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
 #endif
 
-    std::vector<cString> ActorsPath;
-    std::vector<cString> ActorsName;
-    std::vector<cString> ActorsRole;
+    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
@@ -3634,7 +3641,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     if (value < 0) return false;
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
-    const time_t now {time(NULL)};
+    const time_t now {time(0)};
 
     const int DiffSecs = now - LastRecTimeFromFolder;  // Narrowing conversion
     const int days {DiffSecs / (60 * 60 * 24)};
@@ -4179,7 +4186,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     // Check if remotetimers plugin is available
     static cPlugin *pRemoteTimers = cPluginManager::GetPlugin("remotetimers");
-    time_t now {time(NULL)};
+    time_t now {time(0)};
     if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
         pRemoteTimers && (now - m_RemoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
         m_RemoteTimersLastRefresh = now;
@@ -5029,7 +5036,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     icon.reserve(8); summary.reserve(32); TempMax.reserve(8); TempMin.reserve(8); prec.reserve(8);
     cString DayName {""}, PrecString("0%"), StrWeekDayName {""}, WeatherIcon {""};
     double p {0.0};
-    time_t t {time(NULL)}, t2 {time(NULL)};
+    time_t t {time(0)}, t2 {time(0)};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {

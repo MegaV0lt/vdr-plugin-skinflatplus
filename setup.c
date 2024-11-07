@@ -22,7 +22,8 @@ cStringList ScrollBarTypes;
 cStringList DiskUsageFree;
 cStringList ChannelTimeLefts;
 cStringList WeatherTypes;
-cStringList ShowEndTime;  // For replay show end time of recording
+cStringList ShowEndTime;     // For replay show end time of recording
+cStringList ShowErrorMarks;  // Show error mark in progressbar at replay
 
 int ConfigFileSelection;
 
@@ -125,6 +126,15 @@ void cFlatSetup::Setup() {
     ShowEndTime.Append(strdup(tr("do not show")));
     ShowEndTime.Append(strdup(tr("end of recording")));
     ShowEndTime.Append(strdup(tr("end of edited recording")));
+
+    ShowErrorMarks.Clear();  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
+    ShowErrorMarks.Append(strdup(tr("do not show")));
+    ShowErrorMarks.Append(strdup(tr("small | line")));
+    ShowErrorMarks.Append(strdup(tr("big | line")));
+    ShowErrorMarks.Append(strdup(tr("small textcursor")));
+    ShowErrorMarks.Append(strdup(tr("big textcursor")));
+    ShowErrorMarks.Append(strdup(tr("small +")));
+    ShowErrorMarks.Append(strdup(tr("big +")));
 
     Add(new cOsdItem(tr("General settings"), osUnknown, true));
     Add(new cOsdItem(tr("Channelinfo settings"), osUnknown, true));
@@ -558,7 +568,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
 }
 
 void cFlatSetupGeneral::SaveCurrentSettings() {
-    time_t t = time(NULL);
+    time_t t = time(0);
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     char time[32];
@@ -1134,10 +1144,12 @@ void cFlatSetupReplay::Setup() {
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->PlaybackWeatherShow));
     Add(new cMenuEditBoolItem(tr("Show recerrors icon in playback"), &SetupConfig->PlaybackShowRecordingErrors));
 #if APIVERSNUM >= 30004
-    Add(new cMenuEditBoolItem(tr("Show error marks in playback"), &SetupConfig->PlaybackShowErrorMarks));
+    Add(new cMenuEditStraItem(tr("Show error marks in playback"), &SetupConfig->PlaybackShowErrorMarks,
+                              ShowErrorMarks.Size(), &ShowErrorMarks[0]));
 #endif
     Add(new cMenuEditBoolItem(tr("Show shorttext with date in playback"), &SetupConfig->PlaybackShowRecordingDate));
-    Add(new cMenuEditStraItem(tr("Show end time of recording"), &SetupConfig->PlaybackShowEndTime, ShowEndTime.Size(), &ShowEndTime[0]));
+    Add(new cMenuEditStraItem(tr("Show end time of recording"), &SetupConfig->PlaybackShowEndTime, ShowEndTime.Size(),
+                              &ShowEndTime[0]));
 
     Add(new cMenuEditBoolItem(tr("Dimm on pause?"), &SetupConfig->RecordingDimmOnPause));
     if (SetupConfig->RecordingDimmOnPause) {

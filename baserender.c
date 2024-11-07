@@ -360,7 +360,7 @@ void cFlatBaseRender::TopBarUpdate() {
         }
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
-        const time_t t {time(NULL)};
+        const time_t t {time(0)};
         const cString time {*TimeString(t)};
         if (Config.TopBarHideClockText)
             Buffer = *time;
@@ -441,7 +441,7 @@ void cFlatBaseRender::TopBarUpdate() {
         if (m_TopBarMenuIconRightSet) {
             img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
             if (img) {
-                TopBarMenuIconRightWidth = img->Width() + m_MarginItem * 3;
+                TopBarMenuIconRightWidth = img->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
             }
         }
@@ -543,7 +543,7 @@ void cFlatBaseRender::ButtonsCreate() {
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
     if (!ButtonsPixmap) return;
 
-    const int WidthMargin {m_ButtonsWidth - m_MarginItem * 3};
+    const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
     int ButtonWidth {(WidthMargin / 4) - Config.decorBorderButtonSize * 2};
 
     PixmapFill(ButtonsPixmap, clrTransparent);
@@ -795,12 +795,12 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     }
 
     const int TextWidth {m_Font->Width(Text)};
-    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem * 3 - 10};
+    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 - 10};
 
     if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
         MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                   m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
@@ -821,7 +821,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         } else {  // ~ not found
             if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
                 MessageScroller.AddScroller(Text,
-                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                                                   m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                       Config.decorBorderMessageSize + m_MarginItem,
                                                   MaxWidth, m_FontHeight),
@@ -833,7 +833,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     } else {
         if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
             MessageScroller.AddScroller(Text,
-                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem * 3 + 10,
+                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
                                               m_OsdHeight - Config.MessageOffset - m_MessageHeight -
                                                   Config.decorBorderMessageSize + m_MarginItem,
                                               MaxWidth, m_FontHeight),
@@ -1140,21 +1140,15 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
     PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
     PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
-    // Test
-    // PixmapSetAlpha(ProgressBarMarkerPixmap, 128);  // Make pixmap 50% transparent
 
-    bool HasMarks {true};
+    const int PosCurrent {ProgressBarMarkPos(Current, Total)};
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     if (!Marks || !Marks->First()) {
         // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
         m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
 
         ProgressBarDraw(Current, Total);
-        HasMarks = false;
-    }
-
-    const int PosCurrent {ProgressBarMarkPos(Current, Total)};
-    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  //? Why 4 instead of 2
-    if (HasMarks) {
+    } else {
         const int top {m_ProgressBarHeight / 2};
         // The small line
         ProgressBarPixmap->DrawRectangle(cRect(0, top - (sml / 2), m_ProgressBarWidth, sml), m_ProgressBarColorFg);
@@ -1198,7 +1192,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     }
 
 #if APIVERSNUM >= 30004
-    if (Config.PlaybackShowErrorMarks && Errors) {  // Draw error marks
+    if (Config.PlaybackShowErrorMarks > 0 && Errors) {  // Draw error marks
         int LastPos {-1}, Pos {0};
         const int ErrorsSize {Errors->Size()};
         for (int i {0}; i < ErrorsSize; ++i) {
@@ -1290,15 +1284,60 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
 void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent) {
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks'
 
-    if (IsCurrent) {  //* Draw current pos marker in different color
-        const int top {m_ProgressBarHeight / 2};
-        const int big {m_ProgressBarHeight - (SmallLine * 2) - 2};
+    const int Middle {m_ProgressBarHeight / 2};
+    if (IsCurrent) {  //* Draw current pos marker in color of error mark
+        const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
         //! Marker (Position) at ProgressBarMarkerPixmap to be visible!
-        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (big / 2), top - (big / 2), big, big), ColorError);
-    } else {          //* Small vertical line. 50 percent higher than the small line
-        const int MarkerTop {(m_ProgressBarHeight / 2) - (SmallLine / 4 * 3)};
-        const int MarkerWidth {1};
-        ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine + (SmallLine / 2)), ColorError);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
+    } else {
+        const int MarkerWidth {1}, MarkerWidth3 {3};
+        const int Type {Config.PlaybackShowErrorMarks};  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
+        switch (Type) {
+        case 1:  {  // Small '|'
+            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
+            }
+            break;
+        case 2:  {  // Big '|'
+            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
+            const int MarkerTop {Middle - (Big / 2)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);  // |
+            }
+            break;
+        case 3:  {  // Small 'I'
+            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
+            const int MarkerBottom {Middle + (SmallLine / 4 * 3)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerTop, MarkerWidth3, 1), ColorError);     // Top -
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerBottom, MarkerWidth3, 1), ColorError);  // Bottom -
+            }
+            break;
+        case 4:  {  // Big 'I'
+            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
+            const int MarkerTop {Middle - (Big / 2)};
+            const int MarkerBottom {Middle + (Big / 2)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);        // |
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerTop, MarkerWidth3, 1), ColorError);     // Top -
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerBottom, MarkerWidth3, 1), ColorError);  // Bottom -
+            }
+            break;
+        case 5:  {  // Small '+'
+            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
+            // Two pixel hight needed to be centered
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);  // Middle -
+            }
+            break;
+        case 6:  {  // Big '+'
+            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
+            const int MarkerTop {Middle - (Big / 2)};
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);  // |
+            // Two pixel hight needed to be centered
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);  // Middle -
+            }
+            break;
+        default: esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type); break;
+        }
     }
 }
 #endif
@@ -1378,7 +1417,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 3: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            const int Middle {Left + m_ScrollBarWidth / 2};
+            const int Middle {Left + DotHeight};
             int LineWidth {6};
             if (m_ScrollBarWidth <= 10)
                 LineWidth = 2;
@@ -1498,7 +1537,7 @@ void cFlatBaseRender::DecorBorderRedrawAll() {
     std::vector<sDecorBorder>::iterator it, end = Borders.end();
     for (it = Borders.begin(); it != end; ++it) {
         const sDecorBorder ib {(*it).Left, (*it).Top,     (*it).Width,   (*it).Height, (*it).Size,
-                         (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
+                               (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
         DecorBorderDraw(ib, false);
     }
 }

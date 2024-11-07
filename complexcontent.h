@@ -76,7 +76,7 @@ class cSimpleContent {
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
         m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
-        m_Text.reserve(sizeof(Text));
+        m_Text.reserve(strlen(Text));
         m_Text = Text;
         m_Font = Font;
 

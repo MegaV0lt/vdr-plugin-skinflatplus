@@ -655,6 +655,24 @@ msgstr ""
 msgid "Show error marks in playback"
 msgstr ""
 
+msgid "small | line"
+msgstr ""
+
+msgid "big | line"
+msgstr ""
+
+msgid "small textcursor"
+msgstr ""
+
+msgid "big textcorsor"
+msgstr ""
+
+msgid "small +"
+msgstr ""
+
+msgid "big +"
+msgstr ""
+
 msgid "Show shorttext with date in playback"
 msgstr ""
 

@@ -47,7 +47,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
 
     LabelJumpPixmap = CreatePixmap(m_Osd, "LabelJumpPixmap", 1,
                                    cRect(Config.decorBorderReplaySize,
-                                         m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem * 3 -
+                                         m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem3 -
                                              m_FontHeight - Config.decorBorderReplaySize * 2,
                                          m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
 
@@ -208,7 +208,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
     int left {0};
     if (Setup.ShowReplayMode) {
-        left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem * 3)) / 2;
+        left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem3)) / 2;
 
         if (m_ModeOnly)
             PixmapFill(LabelPixmap, clrTransparent);
@@ -247,7 +247,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
         img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
         if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem * 3, 0), *img);
+            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
     }
 
     if (m_ProgressShown) {
@@ -558,26 +558,27 @@ void cFlatDisplayReplay::UpdateInfo() {
         } */
 
         const int Rest {NumFrames - m_CurrentFrame};
-        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeString(time(0) + (Rest / FramesPerSecond)));
+        const cString TimeStr = cString::sprintf("%s" , *TimeString(time(0) + (Rest / FramesPerSecond)));  // HH:MM
+        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
         left += m_Font->Width(*EndTime) + FontWidthSpace;
 
         //* Draw end time of cutted recording with cutted symbol
-        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {  // TODO: Don't show if identical time
-            // if (CurrentFramesAfterEdit >= FramesAfterEdit) {  // Only if greater than '00:00'
+        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {
+            const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
+            EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));  // HH:MM
+            if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
                 img = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
                 if (img) {
                     IconsPixmap->DrawImage(cPoint(left, m_FontHeight + TopOffset), *img);
                     left += img->Width() + m_MarginItem;
                 }
 
-                const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
-                EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
                 // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
-            // }
+            }
         }
     }  // Config.PlaybackShowEndTime
 
@@ -687,7 +688,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
                               m_Font->Width(Jump), m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
-                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem * 3 -
+                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 -
                                m_FontHeight - Config.decorBorderReplaySize * 2,
                            m_Font->Width(Jump),
                            m_FontHeight,

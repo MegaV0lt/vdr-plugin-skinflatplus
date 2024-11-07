@@ -72,27 +72,31 @@ void cComplexContent::CalculateDrawPortHeight() {
     m_DrawPortHeight = 0;
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        if ((*it).GetBottom() > m_DrawPortHeight)
-            m_DrawPortHeight = (*it).GetBottom();
+        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
+        if (GetBottom > m_DrawPortHeight)
+            m_DrawPortHeight = GetBottom;
     }
     if (m_IsScrollingActive)
-        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;}
+        m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
+}
 
 int cComplexContent::BottomContent() {
-    int bottom {0};
+    int Bottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        if ((*it).GetBottom() > bottom)
-            bottom = (*it).GetBottom();
+        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
+        if (GetBottom > Bottom)
+            Bottom = GetBottom;
     }
-    return bottom;
+    return Bottom;
 }
 
 int cComplexContent::ContentHeight(bool Full) {
     if (Full) return Height();
 
     CalculateDrawPortHeight();
-    return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
+    // return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
+    return std::min(m_DrawPortHeight, Height());
 }
 
 bool cComplexContent::Scrollable(int height) {
@@ -118,7 +122,7 @@ void cComplexContent::AddImage(cImage *image, cRect Position) {
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos,
                                               tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
                                               int TextHeight, int TextAlignment) {
-    const int TextWidthFull = (TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left();
+    const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
     // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     const int TextWidthLeft {TextWidthFull - image->Width() - 10};
     const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
