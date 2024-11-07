@@ -1,7 +1,9 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-11-xx: Version 1.1.1
+2024-11-07: Version 1.1.1
+- [fix] Fix font alignment for 'actor name / actor role'
 - [Add] Types for error marks: '|' , 'I' and '+' in small and big variant
+- [update] Show 'cutted end time' only when not equal to 'end time'
 - [update] Some internal optimizations
 
 2024-10-29: Version 1.1.0
