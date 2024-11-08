@@ -137,6 +137,9 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
+        //! For debug
+            if (ScrollDelay == 0)
+                esyslog("FlatPlus: cTextScrollers::AddScroller() ScrollDelay is 0!");
 
     Scrollers.emplace_back(new cTextScroll(m_Osd, ScrollType, ScrollStep,
         static_cast<int>(WAITDELAY * 1.0 / ScrollDelay), Layer));

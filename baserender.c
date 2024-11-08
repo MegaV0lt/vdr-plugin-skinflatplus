@@ -190,9 +190,16 @@ void cFlatBaseRender::TopBarSetMenuLogo(const cString icon) {
 }
 
 void cFlatBaseRender::TopBarEnableDiskUsage() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
+#endif
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {(100 - DiskUsagePercent)};         // Free %
+    //! For debug
+    if (DiskFreePercent == 0)
+        esyslog("FlatPlus: cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
+
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
     // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
     // The constant is calculated during compilation.).
@@ -304,6 +311,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
 }
+
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
     if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
@@ -939,7 +947,11 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
 
     const int Middle {rect.Height() / 2};
-    const double PercentLeft {Current * 1.0 / Total};
+    //! For debug
+    if (Total == 0)
+        esyslog("FlatPlus: cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
+
+    const double PercentLeft {Current * 1.0 / Total};  //? Avoid DIV/0
     switch (Type) {
     case 0:  // Small line + big line
     {
@@ -976,7 +988,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             const int out2 {out * 2};
             if (IsSignal) {
-                const double perc {100.0 / Total * Current * (1.0 / 100.0)};
+                const double perc {100.0 / Total * Current * (1.0 / 100.0)};  //? Avoid DIV/0
                 if (perc > 0.666) {
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * PercentLeft) - out2, big - out2),
@@ -1346,7 +1358,11 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
                                     bool CanScrollUp, bool CanScrollDown) {
     if (!Pixmap) return;
 
-    const int ScrollHeight {std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5)};
+    //! For debug
+    if (Total == 0)
+        esyslog("FlatPlus: cFlatBaseRender::ScrollBarDrawRaw() Total is 0!");
+
+    const int ScrollHeight {std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5)};  //? Avoid DIV/0
     const int ScrollTop {
         std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - ScrollHeight)};
 

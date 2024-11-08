@@ -236,9 +236,12 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 }
 
 int cFlatDisplayMenu::MaxItems() {
+    //! For debug
+    dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
+
     switch (m_MenuCategory) {
     case mcChannel:
-        return m_ScrollBarHeight / m_ItemChannelHeight;
+        return m_ScrollBarHeight / m_ItemChannelHeight;  //? Avoid DIV/0
     case mcTimer:
         return m_ScrollBarHeight / m_ItemTimerHeight;
     case mcSchedule:
@@ -246,6 +249,8 @@ int cFlatDisplayMenu::MaxItems() {
     case mcScheduleNext:
         return m_ScrollBarHeight / m_ItemEventHeight;
     case mcRecording:
+        //! For debug
+        dsyslog("   m_ItemRecordingHeight %d ", m_ItemRecordingHeight);
         return m_ScrollBarHeight / m_ItemRecordingHeight;
     default:
         return m_ScrollBarHeight / m_ItemHeight;
@@ -778,7 +783,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
-            // Calculate progress bar
+            // Calculate progress bar  //? Avoid DIV/0
+            //! For debug
+            if (Event->Duration() == 0)
+                esyslog("FlatPlus: cFlatDisplayMenu::SetItemChannel() Event->Duration() is 0!");
+
             progress = round((time(0) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
             if (progress < 0.0) progress = 0.0;
             else if (progress > 100.0) progress = 100.0;
@@ -1455,8 +1464,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
             ChannelName = Channel->Name();
             w = m_Font->Width(*ChannelName);
-        } else
+        } else {
             ChannelName = Channel->ShortName(true);
+        }
 
         if (IsGroup) {
             const int LineTop {Top + (m_FontHeight - 3) / 2};
@@ -1464,8 +1474,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             Left += w / 2;
             const cString GroupName = cString::sprintf(" %s ", *ChannelName);
             MenuPixmap->DrawText(cPoint(Left, Top), *GroupName, ColorFg, ColorBg, m_Font, 0, 0, taCenter);
-        } else
+        } else {
             MenuPixmap->DrawText(cPoint(Left, Top), *ChannelName, ColorFg, ColorBg, m_Font, w);
+        }
 
         Left += w + m_MarginItem2;
 
@@ -1478,7 +1489,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             if ((now >= (Event->StartTime() - 2 * 60))) {
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
-                    // Calculate progress bar
+                    // Calculate progress bar  //? Avoid DIV/0
+                    //! For debug
+                    if (Event->Duration() == 0)
+                        esyslog("FlatPlus: cFlatDisplayMenu::SetItemEvent() Event->Duration() is 0!");
+
                     double progress {round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0)};
                     if (progress < 0.0) progress = 0.0;
                     else if (progress > 100.0) progress = 100.0;
@@ -3222,6 +3237,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
+                //! For debug
+                if (img->Height() == 0)
+                    esyslog("FlatPlus: cFlatDisplayMenu::SetRecording img->Height() is 0!");
+
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
                 if (Aspect > 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
@@ -4905,6 +4924,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
+        //! For debug
+        if (CountTemps == 0)
+            esyslog("FlatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() CountTemps is 0!");
+
         const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};

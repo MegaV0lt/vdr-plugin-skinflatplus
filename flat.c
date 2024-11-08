@@ -199,7 +199,11 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
+    //! For debug
+    if (FrameTotal == 0)
+        esyslog("FlatPlus: GetRecordingSeenIcon() FrameTotal is 0!");
+
+    const double FrameSeen {FrameResume * 1.0 / FrameTotal};  //? Avoid DIV/0
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
@@ -224,7 +228,11 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
             ContentSize.Width(), ContentSize.Height());
 #endif
-    // TODO: Set to max size by default or also allow smaller media site?
+    // TODO: Set to max size by default or also allow smaller media site?  //? Avoid DIV/0
+    //! For debug
+        if (MediaSize.Height() == 0)
+            esyslog("FlatPlus: SetMediaSize() MediaSize.Height() is 0!");
+
     const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
