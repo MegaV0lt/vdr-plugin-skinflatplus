@@ -236,9 +236,6 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 }
 
 int cFlatDisplayMenu::MaxItems() {
-    //! For debug
-    dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
-
     switch (m_MenuCategory) {
     case mcChannel:
         return m_ScrollBarHeight / m_ItemChannelHeight;  //? Avoid DIV/0
@@ -250,6 +247,7 @@ int cFlatDisplayMenu::MaxItems() {
         return m_ScrollBarHeight / m_ItemEventHeight;
     case mcRecording:
         //! For debug
+        dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
         dsyslog("   m_ItemRecordingHeight %d ", m_ItemRecordingHeight);
         return m_ScrollBarHeight / m_ItemRecordingHeight;
     default:

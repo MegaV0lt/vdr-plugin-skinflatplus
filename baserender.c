@@ -1358,29 +1358,28 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
                                     bool CanScrollUp, bool CanScrollDown) {
     if (!Pixmap) return;
 
-    //! For debug
-    if (Total == 0)
-        esyslog("FlatPlus: cFlatBaseRender::ScrollBarDrawRaw() Total is 0!");
-
-    const int ScrollHeight {std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5)};  //? Avoid DIV/0
-    const int ScrollTop {
-        std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - ScrollHeight)};
-
-    /* Types
-     * 0 = left line + rect bar
-     * 1 = left line + round bar
-     * 2 = middle line + rect bar
-     * 3 = middle line + round bar
-     * 4 = outline + rect bar
-     * 5 = outline + round bar
-     * 6 = rect bar
-     * 7 = round bar
-     */
-    const int Type {Config.decorScrollBarType};
-
     if (Total > 0 && Total > Shown) {
+        //! For debug
+        esyslog("FlatPlus: cFlatBaseRender::ScrollBarDraw() Total %d, Shown %d, Offset %d", Total, Shown, Offset);
+
+        const int ScrollHeight {std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5)};
+        const int ScrollTop {
+            std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - ScrollHeight)};
+
         PixmapFill(Pixmap, clrTransparent);
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
+
+        /* Types
+         * 0 = left line + rect bar
+         * 1 = left line + round bar
+         * 2 = middle line + rect bar
+         * 3 = middle line + round bar
+         * 4 = outline + rect bar
+         * 5 = outline + round bar
+         * 6 = rect bar
+         * 7 = round bar
+         */
+        const int Type {Config.decorScrollBarType};
         switch (Type) {
         default:
         case 0: {
@@ -1510,7 +1509,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             break;
         }
         }
-    }
+    }  // Total > 0
 }
 
 int cFlatBaseRender::ScrollBarWidth() {
