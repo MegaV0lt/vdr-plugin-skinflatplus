@@ -181,10 +181,10 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
-#ifdef DEBUGFUNCSCALL
+// #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawScrollbar()");
     dsyslog("   Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
-#endif
+// #endif
 
     if (!MenuPixmap) return;
 
@@ -298,9 +298,9 @@ void cFlatDisplayMenu::Clear() {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
-#ifdef DEBUGFUNCSCALL
+// #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
-#endif
+// #endif
 
     m_LastTitle = Title;
 
@@ -385,6 +385,9 @@ void cFlatDisplayMenu::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool Selectable) {
+// #ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetItem() '%s'", Text);
+// #endif
     if (!MenuPixmap || !MenuIconsPixmap) return;
 
     m_ShowEvent = false;
@@ -1759,10 +1762,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-#ifdef DEBUGFUNCSCALL
+// #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
-    dsyslog("   Level: %d, Total: %d, New: %d", Level, Total, New);
-#endif
+    dsyslog("   Index %d, Level %d, Total %d, New %d", Index, Level, Total, New);
+// #endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
         return false;
@@ -1821,6 +1824,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
         ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * (2.0 / 3.0));
+
+    const int ImgRecNewWidth {(ImgRecNew) ? ImgRecNew->Width() : 0};
+    const int ImgRecNewSmlWidth {(ImgRecNewSml) ? ImgRecNewSml->Width() : 0};
+    const int ImgRecCutWidth {(ImgRecCut) ? ImgRecCut->Width() : 0};
+    const int ImgRecCutHeight {(ImgRecCut) ? ImgRecCut->Height() : 0};
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
@@ -1900,9 +1908,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }  // MenuItemRecordingShowRecordingErrors
 #endif
 
-            Left += ImgRecNew->Width() + m_MarginItem;
+            Left += ImgRecNewWidth + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut) {
-                const int ImageTop {Top + m_FontHeight - ImgRecCut->Height()};  // 2/3 image height
+                const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
@@ -1918,7 +1926,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 }
             }
 
-            Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
+            Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
@@ -1948,7 +1956,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (ImgRecNew)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
 
-            Left += ImgRecNew->Width() + m_MarginItem;
+            Left += ImgRecNewWidth + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
             // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
             //                     m_MenuItemWidth - Left - m_MarginItem);
@@ -1957,7 +1965,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += DigitsMaxWidth;  // m_Font->Width(" 9999 ");
             int LeftWidth {Config.decorBorderMenuItemSize + m_FontHeight + (m_Font->Width("9999") * 2) +
-                           ImgRecNew->Width() + m_MarginItem * 5};  // For folder with recordings
+                           ImgRecNewWidth + m_MarginItem * 5};  // For folder with recordings
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
                 LeftWidth += m_Font->Width("(99.99.99)") + m_FontHeight + m_MarginItem2;
@@ -2026,7 +2034,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            int ImagesWidth {ImgRecNew->Width() + ImgRecCut->Width() + m_MarginItem2 + m_ScrollBarWidth};
+            int ImagesWidth {ImgRecNewWidth + ImgRecCutWidth + m_MarginItem2 + m_ScrollBarWidth};
             if (m_IsScrolling)
                 ImagesWidth -= m_ScrollBarWidth;
 
@@ -2121,7 +2129,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 }
             }
 
-            Left += (ImgRecCut->Width() * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
+            Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
         } else if (Total > 0) {  // Folder with recordings
             img = nullptr;
@@ -2153,7 +2161,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (ImgRecNewSml)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNewSml);
 
-            Left += ImgRecNewSml->Width() + m_MarginItem;
+            Left += ImgRecNewSmlWidth + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
             // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
             //                     m_MenuItemWidth - Left - m_MarginItem);
