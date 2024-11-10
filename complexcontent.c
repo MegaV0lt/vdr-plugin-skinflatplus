@@ -103,6 +103,11 @@ bool cComplexContent::Scrollable(int height) {
     CalculateDrawPortHeight();
     if (height == 0) height = m_Position.Height();
 
+    if (m_ScrollSize == 0) {  // Avoid DIV/0
+        esyslog("FlatPlus: cComplexContent::Scrollable() m_ScrollSize is 0!");
+        return false;
+    }
+
     const int total {ScrollTotal()};
     const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
     return (total > shown) ? true : false;
@@ -125,6 +130,11 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
     // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     const int TextWidthLeft {TextWidthFull - image->Width() - 10};
+    if (m_ScrollSize == 0) {  // Avoid DIV/0
+        esyslog("FlatPlus: cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
+        return;
+    }
+
     const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
@@ -168,14 +178,23 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize() {
+    if (m_DrawPortHeight == 0)
+        esyslog("FlatPlus: cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
+
     return m_Position.Height() * 1.0 / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal() {
+    if (m_ScrollSize == 0)
+        esyslog("FlatPlus: cComplexContent::ScrollTotal() m_ScrollSize is 0!");
+
     return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
 }
 
 int cComplexContent::ScrollShown() {
+    if (m_ScrollSize == 0)
+        esyslog("FlatPlus: cComplexContent::ScrollShown() m_ScrollSize is 0!");
+
     // return ceil(m_Position.Height() * 1.0 / m_ScrollSize);
     return m_Position.Height() / m_ScrollSize;
 }
@@ -190,6 +209,9 @@ int cComplexContent::ScrollOffset() {
         else
             y = m_DrawPortHeight - m_Position.Height() - 1;
     }
+
+    if (m_DrawPortHeight == 0)
+        esyslog("FlatPlus: cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
 
     return ScrollTotal() * (y * 1.0 / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
 }

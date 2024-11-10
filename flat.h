@@ -25,6 +25,16 @@
 #include <random>
 #include <filesystem>  // C++17
 
+// Includes and defines for assert()
+#include <iostream>
+// uncomment to disable assert()
+// #define NDEBUG
+#include <cassert>
+
+// Use (void) to silence unused warnings.
+#define assertm(exp, msg) assert(((void)msg, exp))
+// Includes and defines for assert()
+
 #include "./config.h"
 #include "./imagecache.h"
 

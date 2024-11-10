@@ -84,14 +84,14 @@ cFlatConfig::cFlatConfig() {
     MenuItemRecordingShowFolderDate = 1;
     MenuItemRecordingShowRecordingErrors = true;
     MenuItemRecordingShowRecordingErrorsThreshold = 1000;  // Threshold for displaying error instead of warning
-    MenuItemRecordingShowFormatIcons = 1;  // Show foramt icans (sd/hd/uhd) in menu recordings
+    MenuItemRecordingShowFormatIcons = 1;  // Show format icons (sd/hd/uhd) in menu recordings
     MenuItemParseTilde = 1;
 
     RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
     RecordingOldValue.reserve(64);
     ScrollerEnable = 1;
     ScrollerStep = 2;
-    ScrollerDelay = 40;
+    ScrollerDelay = 25;
     ScrollerType = 0;
 
     // Widgets
