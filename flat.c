@@ -199,11 +199,10 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    //! For debug
-    if (FrameTotal == 0)
+    if (FrameTotal == 0)  //? Avoid DIV/0
         esyslog("FlatPlus: GetRecordingSeenIcon() FrameTotal is 0!");
 
-    const double FrameSeen {FrameResume * 1.0 / FrameTotal};  //? Avoid DIV/0
+    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
@@ -228,10 +227,9 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
             ContentSize.Width(), ContentSize.Height());
 #endif
-    // TODO: Set to max size by default or also allow smaller media site?  //? Avoid DIV/0
-    //! For debug
-        if (MediaSize.Height() == 0)
-            esyslog("FlatPlus: SetMediaSize() MediaSize.Height() is 0!");
+    // TODO: Set to max size by default or also allow smaller media site?
+    if (MediaSize.Height() == 0)  //? Avoid DIV/0
+        esyslog("FlatPlus: SetMediaSize() MediaSize.Height() is 0!");
 
     const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
     //* Aspect of image is preserved in cImageLoader::LoadFile()
@@ -672,7 +670,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid div/0 with lines without space
+    if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
         // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
         //          FillCharWidth);
         return;

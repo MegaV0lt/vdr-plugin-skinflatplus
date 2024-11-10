@@ -1,5 +1,10 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-11-10: Version 1.1.2
+- [fix] Do not access image when it could not be loaded
+        - This fixes an crash when 'menu - recordings' was called
+          Thanks for reporting and testing @rofehr
+
 2024-11-07: Version 1.1.1
 - [fix] Fix font alignment for 'actor name / actor role'
 - [Add] Types for error marks: '|' , 'I' and '+' in small and big variant

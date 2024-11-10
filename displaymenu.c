@@ -181,10 +181,10 @@ void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                                      bool CanScrollDown, bool IsContent) {
-// #ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawScrollbar()");
     dsyslog("   Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
-// #endif
+#endif
 
     if (!MenuPixmap) return;
 
@@ -236,6 +236,9 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 }
 
 int cFlatDisplayMenu::MaxItems() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
+#endif
     switch (m_MenuCategory) {
     case mcChannel:
         return m_ScrollBarHeight / m_ItemChannelHeight;  //? Avoid DIV/0
@@ -246,9 +249,6 @@ int cFlatDisplayMenu::MaxItems() {
     case mcScheduleNext:
         return m_ScrollBarHeight / m_ItemEventHeight;
     case mcRecording:
-        //! For debug
-        dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
-        dsyslog("   m_ItemRecordingHeight %d ", m_ItemRecordingHeight);
         return m_ScrollBarHeight / m_ItemRecordingHeight;
     default:
         return m_ScrollBarHeight / m_ItemHeight;
@@ -298,9 +298,9 @@ void cFlatDisplayMenu::Clear() {
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
-// #ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
-// #endif
+#endif
 
     m_LastTitle = Title;
 
@@ -385,9 +385,9 @@ void cFlatDisplayMenu::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool Selectable) {
-// #ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetItem() '%s'", Text);
-// #endif
+#endif
     if (!MenuPixmap || !MenuIconsPixmap) return;
 
     m_ShowEvent = false;
@@ -784,9 +784,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Schedule) {
         Event = Schedule->GetPresentEvent();
         if (Event) {
-            // Calculate progress bar  //? Avoid DIV/0
-            //! For debug
-            if (Event->Duration() == 0)
+            // Calculate progress bar
+            if (Event->Duration() == 0)  //? Avoid DIV/0
                 esyslog("FlatPlus: cFlatDisplayMenu::SetItemChannel() Event->Duration() is 0!");
 
             progress = round((time(0) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
@@ -1486,13 +1485,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             if (!m_IsScrolling)
                 PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
 
-            time_t now {time(0)};
+            const time_t now {time(0)};
             if ((now >= (Event->StartTime() - 2 * 60))) {
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
-                    // Calculate progress bar  //? Avoid DIV/0
-                    //! For debug
-                    if (Event->Duration() == 0)
+                    // Calculate progress bar
+                    if (Event->Duration() == 0)  //? Avoid DIV/0
                         esyslog("FlatPlus: cFlatDisplayMenu::SetItemEvent() Event->Duration() is 0!");
 
                     double progress {round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0)};
@@ -1762,10 +1760,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
-// #ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
     dsyslog("   Index %d, Level %d, Total %d, New %d", Index, Level, Total, New);
-// #endif
+#endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap)
         return false;
@@ -3243,10 +3241,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
-                //! For debug
-                if (img->Height() == 0)
-                    esyslog("FlatPlus: cFlatDisplayMenu::SetRecording img->Height() is 0!");
-
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
                 if (Aspect > 1 && Aspect < 4) {  //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
@@ -4930,7 +4924,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        //! For debug
         if (CountTemps == 0)
             esyslog("FlatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() CountTemps is 0!");
 

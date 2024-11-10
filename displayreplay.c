@@ -417,8 +417,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     const int FontWidthSpace {m_Font->Width(' ')};
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    //! For debug
-    if (FramesPerSecond == 0)
+    if (FramesPerSecond == 0)  //? Avoid DIV/0
         esyslog("FlatPlus: cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
 
     //* Draw total and cutted length with cutted symbol (Right side, 1. line)
@@ -560,7 +559,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             left += img->Width() + m_MarginItem;
         } */
 
-        const int Rest {NumFrames - m_CurrentFrame};  //? Avoid DIV/0
+        const int Rest {NumFrames - m_CurrentFrame};
         const cString TimeStr = cString::sprintf("%s" , *TimeString(time(0) + (Rest / FramesPerSecond)));  // HH:MM
         cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
