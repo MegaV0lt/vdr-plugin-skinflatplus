@@ -507,12 +507,14 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.c_str(),
                                                  ColorExtraTextFg, ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize - l);
-                        } else  // ~ not found
+                        } else {  // ~ not found
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg,
                                                  m_Font, m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
-                    } else  // MenuItemParseTilde disabled
+                        }
+                    } else {  // MenuItemParseTilde disabled
                         MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), s, ColorFg, ColorBg,
                                              m_Font, m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
+                    }
                 }
             }  // Not EPGsearch searchtimer
         }      // if (s)
@@ -613,8 +615,9 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
                 } catch (...) {
                 }
             }
-        } else
+        } else {
             break;
+        }
     }
     return cString::sprintf("extraIcons/%s", element.c_str());
 }
@@ -1220,13 +1223,15 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     else
         File = Timer->File();
 
+    div_t TimerStart {std::div(Timer->Start(), 100)};
+    div_t TimerStop {std::div(Timer->Stop(), 100)};
     if (Config.MenuTimerView == 1) {  // flatPlus long
         Buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
         Left += m_Font->Width("XXX 99.  ");
-        Buffer = cString::sprintf("%02d:%02d - %02d:%02d", Timer->Start() / 100, Timer->Start() % 100,
-                                  Timer->Stop() / 100, Timer->Stop() % 100);
+        Buffer =
+            cString::sprintf("%02d:%02d - %02d:%02d", TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
         Left += m_Font->Width("99:99 - 99:99  ");
@@ -1261,7 +1266,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         }
     } else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus long + EPG, flatPlus short
         Buffer = cString::sprintf("%s%s%s.  %02d:%02d - %02d:%02d", *name, *name && **name ? " " : "", *day,
-                                  Timer->Start() / 100, Timer->Start() % 100, Timer->Stop() / 100, Timer->Stop() % 100);
+                                  TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
 
@@ -1714,12 +1719,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     const cString DateSpace = cString::sprintf(" %s ", date.c_str());
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
-                } else
+                } else {
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
-            } else
+                }
+            } else {
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
+            }
         } catch (...) {
             MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                  m_MenuItemWidth - Left - m_MarginItem);
@@ -1845,8 +1852,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            const int Minutes {(Recording->LengthInSeconds() + 30) / 60};
-            const cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
+            const div_t Result {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
+            const cString Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -2047,8 +2054,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem - ImagesWidth);
             }
 
-            const int Minutes {(Recording->LengthInSeconds() + 30) / 60};
-            const cString Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
+            const div_t Result {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
+            const cString Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -4411,16 +4418,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     std::vector<std::pair<time_t, std::string>> Recs;
     Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
-    int Minutes {0};
     cString DateTime {""}, Length {""};
     std::string StrRec {""};
     StrRec.reserve(128);
+    div_t Result {0, 0};
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecStart = rec->Start();
 
-        Minutes = (rec->LengthInSeconds() + 30) / 60;
-        Length = cString::sprintf("%02d:%02d", Minutes / 60, Minutes % 60);
+        Result = std::div((rec->LengthInSeconds() + 30) / 60, 60);
+        Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
         StrRec = *(cString::sprintf("%s - %s", *DateTime, rec->Name()));
@@ -5067,32 +5074,36 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         if (file.is_open()) {
             std::getline(file, icon);
             file.close();
-        } else
+        } else {
             continue;
+        }
 
         FileName = cString::sprintf("%s/weather/weather.%d.summary", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, summary);
             file.close();
-        } else
+        } else {
             continue;
+        }
 
         FileName = cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, TempMax);
             file.close();
-        } else
+        } else {
             continue;
+        }
 
         FileName = cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
         if (file.is_open()) {
             std::getline(file, TempMin);
             file.close();
-        } else
+        } else {
             continue;
+        }
 
         FileName = cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index);
         file.open(*FileName, std::ifstream::in);
@@ -5105,8 +5116,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             p = p * 100.0;
             p = RoundUp(p, 10);
             PrecString = cString::sprintf("%.0f%%", p);
-        } else
+        } else {
             continue;
+        }
 
         tm_r.tm_mday += index;
         /* time_t */ t2 = mktime(&tm_r);
@@ -5201,7 +5213,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     // Menu icons
     const cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
     std::string File {""};
-    File.reserve(128);
+    File.reserve(256);
     cString FileName {""};
     cReadDir d(*Path);
     struct dirent *e;
