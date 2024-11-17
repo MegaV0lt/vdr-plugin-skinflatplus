@@ -44,27 +44,29 @@ Installation wie bei allen VDR Plugins.
     make install
 
 Für die Kanallogos empfehle ich Logos aus einem der Repositories:
-https://github.com/MegaV0lt/Picon.cz2VDR
-https://github.com/MegaV0lt/MP_Logos
-https://github.com/MegaV0lt/Picons2VDR
+- https://github.com/MegaV0lt/Picon.cz2VDR
+- https://github.com/MegaV0lt/MP_Logos
+- https://github.com/MegaV0lt/Picons2VDR
 
-Die Logos müssen im folgenden Ordner zur Verfügung gestellt werden:
-    <vdrconfigdir>/plugins/skinflatplus/logos/
+Die Logos sollten im folgenden Ordner zur Verfügung gestellt werden:
+    `<vdrconfigdir>/plugins/skinflatplus/logos`
 
 Das Skin sucht Kanallogos im PNG-Format in folgenden Schreibweisen:
-1: Normal wie in der Kanalliste (Nick/Comedy Channel.png)
-2: In Kleinbuchstaben (nick/comedy channel.png) - Umlaute bleiben groß (ÄÖÜ)
-3: In Kleinbuchstaben mit ~ (nick~comedy channel.png)
+
+1. Normal wie in der Kanalliste (Nick/Comedy Channel.png)
+2. In Kleinbuchstaben (nick/comedy channel.png) - Umlaute bleiben groß (ÄÖÜ)
+3. In Kleinbuchstaben mit ~ (nick~comedy channel.png)
+
 Man kann dem Skin den Pfad für die Logos beim Start mitgeben:
-  -l <LOGOPATH>
+  `-l <LOGOPATH>`
 oder
-  --logopath=<LOGOPATH>
+  `--logopath=<LOGOPATH>`
 
 Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
 Schriften
 -------------------------------
-Im Ordner contrib/Fonts sind verschiedene Schriften abgelegt, welche einfach nach /usr/share/fonts kopiert werden können.
+Im Ordner `contrib/Fonts` sind verschiedene Schriften abgelegt, welche einfach nach `/usr/share/fonts` kopiert werden können.
 Ich empfehle DroidSans für die Anzeige zu verwenden.
 
 Versteckte Einstellungen
