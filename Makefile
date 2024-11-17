@@ -19,6 +19,7 @@ PLUGIN = skinflatplus
 #   vdrlogo_default
 #   vdrlogo_easyvdr
 #   vdrlogo_gen2vdr
+#   vdrlogo_mld
 #   vdrlogo_shine
 #   vdrlogo_xubuntu
 #   vdrlogo_xubuntu2
