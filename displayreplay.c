@@ -422,11 +422,11 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw total and cutted length with cutted symbol (Right side, 1. line)
     img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
-    const int ImgWidth = (img) ? img->Width() : 0;
+    const int ImgWidth {(img) ? img->Width() : 0};
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
         cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize)};
-        const int ImgCuttedWidth = (ImgCutted) ? ImgCutted->Width() : 0;
+        const int ImgCuttedWidth {(ImgCutted) ? ImgCutted->Width() : 0};
 
         int right {m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
                    m_Font->Width(m_Total) - FontWidthSpace - ImgCuttedWidth - m_MarginItem - m_Font->Width(cutted)};

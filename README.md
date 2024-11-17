@@ -51,6 +51,15 @@ https://github.com/MegaV0lt/Picons2VDR
 Die Logos müssen im folgenden Ordner zur Verfügung gestellt werden:
     <vdrconfigdir>/plugins/skinflatplus/logos/
 
+Das Skin sucht Kanallogos im PNG-Format in folgenden Schreibweisen:
+1: Normal wie in der Kanalliste (Nick/Comedy Channel.png)
+2: In Kleinbuchstaben (nick/comedy channel.png) - Umlaute bleiben groß (ÄÖÜ)
+3: In Kleinbuchstaben mit ~ (nick~comedy channel.png)
+Man kann dem Skin den Pfad für die Logos beim Start mitgeben:
+  -l <LOGOPATH>
+oder
+  --logopath=<LOGOPATH>
+
 Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
 Schriften
