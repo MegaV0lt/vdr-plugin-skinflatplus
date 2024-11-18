@@ -701,7 +701,7 @@ bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
 int RoundUp(int NumToRound, int multiple) {
     if (multiple == 0) return NumToRound;
 
-    int remainder = NumToRound % multiple;
+    const int remainder = NumToRound % multiple;
     if (remainder == 0) return NumToRound;
 
     return NumToRound + multiple - remainder;
