@@ -69,6 +69,7 @@ void cFlatSetup::Setup() {
     DiskUsageFree.Clear();
     DiskUsageFree.Append(strdup(tr("occupied")));
     DiskUsageFree.Append(strdup(tr("free")));
+    DiskUsageFree.Append(strdup(tr("occupied special mode")));
 
     MenuChannelViews.Clear();
     MenuChannelViews.Append(strdup(tr("VDR default")));

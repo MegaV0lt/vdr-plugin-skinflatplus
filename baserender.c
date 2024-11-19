@@ -189,7 +189,7 @@ void cFlatBaseRender::TopBarSetMenuLogo(const cString icon) {
     m_TopBarUpdateTitle = true;
 }
 
-void cFlatBaseRender::TopBarEnableDiskUsage() {  // TODO: Add a mixed mode display % used xxx:xx free
+void cFlatBaseRender::TopBarEnableDiskUsage() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
 #endif
@@ -207,18 +207,19 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {  // TODO: Add a mixed mode displ
     }
 
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
-    const double AllMinutes {FreeMinutes * 1.0 / DiskFreePercent * 100.0};
-    cString IconName {""};
+    const double AllMinutes{FreeMinutes * 1.0 / DiskFreePercent *
+                            100.0};  // Zero value is prevented with 'DiskFreePercent' check
+    cString IconName{""};
     cString Extra1 {""}, Extra2 {""};
 
-    if (Config.DiskUsageFree == 1) {              // Show in free mode
+    if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t Result {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   DiskFreePercent %d, FreeMinutes %d", DiskFreePercent, FreeMinutes);
-    dsyslog("   FreeGB %.2f, AllGB %.2f, AllMinutes %.2f", FreeGB, AllGB, AllMinutes);
-    dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", Result.quot, Result.rem);
+        dsyslog("   DiskFreePercent %d, FreeMinutes %d", DiskFreePercent, FreeMinutes);
+        dsyslog("   FreeGB %.2f, AllGB %.2f, AllMinutes %.2f", FreeGB, AllGB, AllMinutes);
+        dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", Result.quot, Result.rem);
 #endif
-        if (Config.DiskUsageShort == false) {     // Long format
+        if (Config.DiskUsageShort == false) {  // Long format
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, Result.quot, Result.rem);
@@ -266,25 +267,42 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {  // TODO: Add a mixed mode displ
     } else {  // Show in occupied mode
         const double OccupiedGB {AllGB - FreeGB};
         const int OccupiedMinutes = AllMinutes - FreeMinutes;  // Narrowing conversion
-        const div_t Result {std::div(OccupiedMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   DiskUsagePercent %d, OccupiedMinutes %d", DiskUsagePercent, OccupiedMinutes);
-    dsyslog("   OccupiedGB %.2f, AllGB %.2f, OccupiedMinutes %d", OccupiedGB, AllGB, OccupiedMinutes);
-    dsyslog("   OccupiedMinutes/60 %d, OccupiedMinutes%%60 %d", Result.quot, Result.rem);
+        dsyslog("   DiskUsagePercent %d, OccupiedMinutes %d", DiskUsagePercent, OccupiedMinutes);
+        dsyslog("   OccupiedGB %.2f, AllGB %.2f, OccupiedMinutes %d", OccupiedGB, AllGB, OccupiedMinutes);
 #endif
 
-        if (Config.DiskUsageShort == false) {  // Long format
-            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
-            if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, Result.quot, Result.rem);
-            } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), Result.quot, Result.rem);
+        if (Config.DiskUsageFree == 2) {  //* Special mixed mode free time instead of used
+            const div_t Result {std::div(FreeMinutes, 60)};
+            if (Config.DiskUsageShort == false) {  // Long format
+                Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+                if (OccupiedGB < 1000.0) {  // Less than 1000 GB
+                    Extra2 = cString::sprintf("%.1f GB | %02d:%02d", OccupiedGB, Result.quot, Result.rem);
+                } else {  // 1000 GB+
+                    Extra2 =
+                        cString::sprintf("%.2f TB | %02d:%02d", OccupiedGB * (1.0 / 1024.0), Result.quot, Result.rem);
+                }
+            } else {  // Short format
+                Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+                Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
             }
-        } else {  // Short format
-            Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-            Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
+        } else {  // Show in occupied mode
+            const div_t Result {std::div(OccupiedMinutes, 60)};
+            if (Config.DiskUsageShort == false) {  // Long format
+                Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+                if (OccupiedGB < 1000.0) {  // Less than 1000 GB
+                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, Result.quot, Result.rem);
+                } else {  // 1000 GB+
+                    Extra2 =
+                        cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), Result.quot, Result.rem);
+                }
+            } else {  // Short format
+                Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+                Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
+            }
         }
-        switch (DiskUsagePercent) {  // show used space
+
+        switch (DiskUsagePercent) {  // Show used space
         case 0 ... 3: IconName = "chart1"; break;  // 3,125
         case 4 ... 6: IconName = "chart2"; break;  // 6,25
         case 7 ... 9: IconName = "chart3"; break;  // 9,375

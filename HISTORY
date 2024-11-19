@@ -4,6 +4,8 @@ VDR Plugin 'skin flatPlus' Revision History
 - [fix] Fix wrong display of diskusage in occupied mode
           Thanks for reporting @mrjoe
 - [add] Add 'vdrlogo_mld'. Activate via Makefile if required
+- [add] Special mode for disk usage: show occupied space but with free time
+          Suggested by @mrjoe
 - [update] Log path for not found channel logo
 - [update] Update Readme.md about channel logos format
 
