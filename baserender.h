@@ -129,7 +129,7 @@ class cFlatBaseRender {
         bool m_TopBarMenuLogoSet {false};
 
         bool m_TopBarUpdateTitle {false};
-        cString m_TopBarLastDate {""};
+        time_t m_TopBarLastDate {0};
         int m_TopBarHeight {0};
         int m_VideoDiskUsageState {-1};
 

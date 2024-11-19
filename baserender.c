@@ -343,15 +343,16 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
-    cString Buffer {""}, CurDate = *DayDateTime();
-    if (m_TopBarUpdateTitle || strcmp(CurDate, m_TopBarLastDate)) {
+    const time_t Now {time(0)};
+    cString Buffer {""};
+    if (m_TopBarUpdateTitle || (Now - 60) > m_TopBarLastDate) {
+        m_TopBarUpdateTitle = false;
+        m_TopBarLastDate = Now;
         if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
             return;
 
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
-        m_TopBarUpdateTitle = false;
-        m_TopBarLastDate = CurDate;
 
         const int FontTop {(m_TopBarHeight - m_TopBarFontHeight) / 2};
         const int FontSmlTop {(m_TopBarHeight - m_TopBarFontSmlHeight * 2) / 2};
@@ -397,8 +398,8 @@ void cFlatBaseRender::TopBarUpdate() {
         }
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
-        const time_t t {time(0)};
-        const cString time {*TimeString(t)};
+        // const time_t t {time(0)};  // Reuse 'Now'
+        const cString time {*TimeString(Now)};
         if (Config.TopBarHideClockText)
             Buffer = *time;
         else
@@ -409,10 +410,10 @@ void cFlatBaseRender::TopBarUpdate() {
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString weekday {*WeekDayNameFull(t)};
+        const cString weekday {*WeekDayNameFull(Now)};
         const int WeekdayWidth {m_TopBarFontSml->Width(*weekday)};
 
-        const cString date {*ShortDateString(t)};
+        const cString date {*ShortDateString(Now)};
         const int DateWidth {m_TopBarFontSml->Width(*date)};
 
         Right = TopBarWidth - TimeWidth - std::max(WeekdayWidth, DateWidth) - m_MarginItem;
