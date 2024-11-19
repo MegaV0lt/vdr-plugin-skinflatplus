@@ -65,7 +65,8 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
         if (!success) {  // Image not found on disk
             if (i == 2)  // Third try and not found
-                dsyslog("flatPlus: cImageLoader::LoadLogo() %s.%s could not be loaded", logo, *m_LogoExtension);
+                dsyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                        *m_LogoExtension);
             continue;
         }
 

@@ -1,5 +1,14 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2024-11-19: Version 1.1.3
+- [fix] Fix wrong display of diskusage in occupied mode
+          Thanks for reporting @mrjoe
+- [add] Add 'vdrlogo_mld'. Activate via Makefile if required
+- [add] Special mode for disk usage: show occupied space but with free time
+          Suggested by @mrjoe
+- [update] Log path for not found channel logo
+- [update] Update Readme.md about channel logos format
+
 2024-11-10: Version 1.1.2
 - [fix] Do not access image when it could not be loaded
         - This fixes an crash when 'menu - recordings' was called

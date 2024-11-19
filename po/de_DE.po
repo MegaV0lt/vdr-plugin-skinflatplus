@@ -24,6 +24,9 @@ msgstr "frei"
 msgid "occupied"
 msgstr "belegt"
 
+msgid "occupied special mode"
+msgstr "belegt und freie Zeit"
+
 msgid "clock"
 msgstr "Uhr"
 
