@@ -343,11 +343,11 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
-    if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)
-        return;
-
     cString Buffer {""}, CurDate = *DayDateTime();
     if (m_TopBarUpdateTitle || strcmp(CurDate, m_TopBarLastDate)) {
+        if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
+            return;
+
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
         m_TopBarUpdateTitle = false;
