@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2024-11-xx: Version 1.1.3
+2024-11-19: Version 1.1.3
 - [fix] Fix wrong display of diskusage in occupied mode
           Thanks for reporting @mrjoe
 - [add] Add 'vdrlogo_mld'. Activate via Makefile if required
