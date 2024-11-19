@@ -7,8 +7,19 @@
  */
 #include "./textscroller.h"
 
+/*
+cTextScrollers::AddScroller()
+cTextScroll::SetText()
+cTextScroll::Draw()
+cTextScrollers::StartScrolling()
+cTextScrollers::Action()
+*/
+
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::SetText()");
+#endif
     // if (!m_Osd) return;
 
     Text.reserve(strlen(text));  // Defined in 'textscroller.h'
@@ -22,16 +33,19 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
     m_Osd->DestroyPixmap(Pixmap);
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, position, DrawPort);
-    // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
-    //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
-    // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
-    //        DrawPort.Left(), DrawPort.Top(), DrawPort.Width(), DrawPort.Height());
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   Pixmap left: %d top: %d width: %d height: %d", Position.Left(), Position.Top(), Position.Width(),
+            Position.Height());
+    dsyslog("   DrawPort left: %d top: %d width: %d height: %d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
+            DrawPort.Height());
+#endif
+
     PixmapFill(Pixmap, colorBg);
     Draw();
 }
 
 void cTextScroll::UpdateViewPortWidth(int w) {
-    if (!Pixmap) return;
+    // if (!Pixmap) return;  // Check in 'Draw()'. Try to reduce load
 
     cRect ViewPort {Pixmap->ViewPort()};
     ViewPort.SetWidth(ViewPort.Width() - w);
@@ -39,13 +53,20 @@ void cTextScroll::UpdateViewPortWidth(int w) {
 }
 
 void cTextScroll::Reset() {
-    if (!Pixmap) return;
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::Reset()");
+#endif
+    // if (!Pixmap) return;  // Check in 'Draw()'. Try to reduce load
 
     Pixmap->SetDrawPortPoint(cPoint(0, 0));
     WaitSteps = WAITSTEPS;
 }
 
 void cTextScroll::Draw() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::Draw()");
+#endif
+
     if (!Pixmap) return;
 
     if (ColorExtraTextFg) {
@@ -69,7 +90,7 @@ void cTextScroll::Draw() {
 }
 
 void cTextScroll::DoStep() {
-    if (!Pixmap) return;
+    // if (!Pixmap) return;  // Try to reduce load
 
     if (WaitSteps > 0) {  // Wait at the beginning for better read
         --WaitSteps;
@@ -120,6 +141,10 @@ cTextScrollers::cTextScrollers() {
 cTextScrollers::~cTextScrollers() {}
 
 void cTextScrollers::Clear() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::Clear()");
+#endif
+
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
@@ -134,6 +159,10 @@ void cTextScrollers::Clear() {
 
 void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *m_Font,
                                  tColor ColorExtraTextFg) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::AddScroller()");
+#endif
+
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
@@ -160,11 +189,19 @@ void cTextScrollers::UpdateViewPortWidth(int w) {
 }
 
 void cTextScrollers::StartScrolling() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::StartScrolling()");
+#endif
+
     if (!Running() && Scrollers.size() > 0)
         Start();
 }
 
 void cTextScrollers::Action() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::Action()");
+#endif
+
     // Wait 1 second so the osd is finished
     for (uint i {0}; i < 100 && Running(); ++i) {
         cCondWait::SleepMs(10);
@@ -182,10 +219,10 @@ void cTextScrollers::Action() {
     }
 
     while (Running()) {
-        if (Running())
+        // if (Running())  //? Check needed here?
             cCondWait::SleepMs(ScrollDelay);
 
-        std::vector<cTextScroll *>::iterator it, end = Scrollers.end();
+        // std::vector<cTextScroll *>::iterator it, end = Scrollers.end();  // Reuse iterator above
         for (it = Scrollers.begin(); it != end; ++it) {
             if (!Running()) return;
 
