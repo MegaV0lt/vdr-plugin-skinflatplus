@@ -42,7 +42,7 @@ class cTextScroll {
     cRect m_Position {0, 0, 0, 0};
 
     tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
-    std::string m_Text {""};
+    std::string m_Text {""};  // NOLINT
     cFont *m_Font {nullptr};
     cPixmap *Pixmap {nullptr};
     cOsd *m_Osd {nullptr};
@@ -71,7 +71,7 @@ class cTextScrollers : public cThread {
     bool isActive() { return Active(); }
 
  private:
-    std::vector<cTextScroll *> Scrollers;
+    std::vector<cTextScroll *> Scrollers;  // NOLINT
 
     cOsd *m_Osd {nullptr};
     int m_ScrollStep {0}, m_ScrollDelay {0};
