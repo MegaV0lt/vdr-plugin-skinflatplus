@@ -344,7 +344,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
     const time_t Now {time(0)};
-    cString Buffer {""};
     if (m_TopBarUpdateTitle || (Now - 60) > m_TopBarLastDate) {
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = Now;
@@ -400,6 +399,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         // const time_t t {time(0)};  // Reuse 'Now'
         const cString time {*TimeString(Now)};
+        cString Buffer {""};
         if (Config.TopBarHideClockText)
             Buffer = *time;
         else

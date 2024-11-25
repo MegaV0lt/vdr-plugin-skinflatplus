@@ -535,11 +535,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
 void cFlatDisplayChannel::Flush() {
     if (m_Present) {
-        time_t t {time(0)};
-        int Current {0};
-        if (t > m_Present->StartTime())
-            Current = t - m_Present->StartTime();
-
+        const time_t t {time(0)};
+        const int Current = (t > m_Present->StartTime()) ? t - m_Present->StartTime() : 0;  // Narrowing conversation
         const int Total {m_Present->Duration()};
         ProgressBarDraw(Current, Total);
     }

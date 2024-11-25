@@ -143,6 +143,7 @@ cTextScrollers::~cTextScrollers() {}
 void cTextScrollers::Clear() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScrollers::Clear()");
+    dsyslog("  Scrollers.size() %d", Scrollers.size());
 #endif
 
     Cancel(-1);
@@ -157,7 +158,7 @@ void cTextScrollers::Clear() {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *m_Font,
+void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *Font,
                                  tColor ColorExtraTextFg) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScrollers::AddScroller()");
@@ -174,7 +175,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
 
     Scrollers.emplace_back(new cTextScroll(m_Osd, m_ScrollType, m_ScrollStep,
         static_cast<int>(WAITDELAY * 1.0 / m_ScrollDelay), m_Layer));
-    Scrollers.back()->SetText(text, position, colorFg, colorBg, m_Font, ColorExtraTextFg);
+    Scrollers.back()->SetText(text, position, colorFg, colorBg, Font, ColorExtraTextFg);
 
     StartScrolling();
 }
@@ -203,8 +204,8 @@ void cTextScrollers::Action() {
 #endif
 
     // Wait 1 second so the osd is finished
-    for (uint i {0}; i < 100 && Running(); ++i) {
-        cCondWait::SleepMs(10);
+    for (uint i {0}; i < 10 && Running(); ++i) {
+        cCondWait::SleepMs(100);
     }
 
     if (!Running()) return;

@@ -1063,6 +1063,11 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
 }
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetItemTimer()");
+    dsyslog("   Index %d", Index);
+#endif
+
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap)
         return false;
 
@@ -1130,6 +1135,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     //? Make overlay configurable? (disable)
     if (Timer->Remote()) {  // Remote timer
+        // dsyslog("flatPlus: SetItemTimer() RemoteTimer at Index %d", Index);
         img = ImgLoader.LoadIcon("timerRemote", ImageHeight, ImageHeight);
         if (img) {
             ImageTop = Top + (m_FontHeight - img->Height()) / 2;
