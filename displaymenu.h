@@ -74,7 +74,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_MenuItemLastHeight {0};
         bool m_MenuFullOsdIsDrawn {false};
 
-        eMenuCategory m_MenuCategory;
+        eMenuCategory m_MenuCategory {mcUndefined};
 
         int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender

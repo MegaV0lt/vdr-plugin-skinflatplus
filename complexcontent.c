@@ -61,8 +61,9 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
         }
     } else {  // Log values and return
-        esyslog("flatPlus: CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
-                m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
+        esyslog(
+            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
+            m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
     PixmapFill(PixmapImage, clrTransparent);

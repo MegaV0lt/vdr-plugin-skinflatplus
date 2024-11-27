@@ -186,7 +186,7 @@ THEME_CLR(Theme, clrReplayProgressBarCurFg, 0xFF03A9F4);
 THEME_CLR(Theme, clrReplayProgressBg,       0xF0202020);
 THEME_CLR(Theme, clrReplayMarkFg,           0xFFEEEEEE);
 THEME_CLR(Theme, clrReplayMarkCurrentFg,    0xFF03A9F4);
-THEME_CLR(Theme, clrReplayErrorMark,            clrRed);  // Alternativ 0xFFBB0000
+THEME_CLR(Theme, clrReplayErrorMark,            clrRed);  // Alternative 0xFFBB0000
 
 THEME_CLR(Theme, clrReplayBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrReplayBorderBg,         0xF0202020);

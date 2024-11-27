@@ -10,7 +10,7 @@
 #include <iostream>
 #include <utility>
 
-#include <future>
+#include <future>  // NOLINT
 
 #include <sstream>
 #include <locale>
@@ -42,7 +42,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
 
-    m_RecFolder.reserve(256);  // Defined in 'displaymenu.h'
+    m_RecFolder.reserve(256);
     m_LastRecFolder.reserve(256);
 
     m_VideoDiskUsageState = -1;
@@ -93,8 +93,8 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     PixmapFill(MenuIconsPixmap, clrTransparent);
     PixmapFill(MenuIconsBgPixmap, clrTransparent);
     PixmapFill(MenuIconsOvlPixmap, clrTransparent);
-    PixmapFill(ScrollbarPixmap, clrTransparent);
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
+    PixmapFill(ScrollbarPixmap, clrTransparent);
 
     m_MenuCategory = mcUndefined;
 
@@ -114,7 +114,7 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
     if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
         delete m_FontTempSml;
 
-    if (m_FontTiny)  // Created in 'AddActors'
+    if (m_FontTiny)  // Created in 'AddActors()'
         delete m_FontTiny;
 
     // if (m_Osd) {
@@ -225,10 +225,11 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
         const bool IsScrolled {ComplexContent.Scroll(Up, Page)};
         if (IsScrolled) {
+            const int ScrollOffset {ComplexContent.ScrollOffset()};  // Cache value
             DrawScrollbar(
-                ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
-                ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ComplexContent.ScrollOffset() > 0,
-                ComplexContent.ScrollOffset() + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+                ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
+                ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
+                ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
         }
     } else {
         cSkinDisplayMenu::Scroll(Up, Page);
@@ -693,10 +694,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
     bool DrawProgress {true};
-
     const bool IsGroup {Channel->GroupSep()};  // Also used later
-    if (IsGroup)
-        DrawProgress = false;
 
     /* Disabled because invalid lock sequence
     LOCK_CHANNELS_READ;
@@ -704,7 +702,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     int w {m_Font->Width("9999")};  // At least four digits in channel list because of different sort modes
     cString Buffer {""};
-    if (!IsGroup) {
+    if (IsGroup) {
+        DrawProgress = false;
+    } else {
         Buffer = cString::sprintf("%d", Channel->Number());
         Width = m_Font->Width(*Buffer);
     }
@@ -1187,13 +1187,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
-            /* } else if (Channel->GroupSep()) {  //? Is GroupSep() in SetItemTimer() possible/needed?
-                img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (img) {
-                    ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                    MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                } */
         } else {
             if (Current)
                 img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
@@ -1397,9 +1390,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             m_ItemEventLastChannelName = Channel->Name();
 
         /* Disabled because invalid lock sequence
-            LOCK_CHANNELS_READ;
-            cString ws = cString::sprintf("%d", Channels->MaxNumber());
-            int w = m_Font->Width(ws); */
+        LOCK_CHANNELS_READ;
+        cString ws = cString::sprintf("%d", Channels->MaxNumber());
+        int w = m_Font->Width(ws); */
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
@@ -1858,8 +1851,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            const div_t Result {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
-            const cString Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
+            const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
+            const cString Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -2060,8 +2053,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem - ImagesWidth);
             }
 
-            const div_t Result {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
-            const cString Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
+            const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
+            const cString Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
             Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
@@ -2087,7 +2080,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                     img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
                 if (!img)
                     img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-                    // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
                 if (img)
                     MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
             } else if (Recording->IsNew()) {
@@ -2374,7 +2366,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             // const std::string StrQuery = Event->Title();
             Epgsearch_searchresults_v1_0 data {
                 // .query = (char *)StrQuery.c_str(),  // Search term
-                .query = const_cast<char *>(Event->Title()),  //? Is this save?
+                .query = const_cast<char *>(Event->Title()),  // Search term //? Is this save?
                 .mode = 0,                          // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
                 .channelNr = 0,                     // Channel number to search in (0=any)
                 .useTitle = true,                   // Search in title
@@ -2681,11 +2673,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                            Config.decorBorderMenuContentHeadBg};
     DecorBorderDraw(ib);
 
-    if (Scrollable)
-        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ComplexContent.ScrollOffset() > 0,
-                      ComplexContent.ScrollOffset() + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(),
-                      true);
+    if (Scrollable) {
+        const int ScrollOffset {ComplexContent.ScrollOffset()};
+        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
+                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+    }
 
     sDecorBorder ibContent {m_cLeft,
                             m_cTop,
@@ -2841,8 +2834,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         const cString RecPath = Recording->FileName();
         // cString RecImage {""};
         if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
-            // MediaPath = RecImage;
-            // Preload image with full width. Get aspect and set parameters accordingly
             img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
             if (img) {
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
@@ -2908,7 +2899,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
 #endif
 
-    // Global setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
+    // Setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
     const int ShowMaxActors {Config.TVScraperShowMaxActors};
     if (ShowMaxActors == 0) return;  // Do not show actors
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
@@ -2921,18 +2912,19 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
     ContentTop += 6;
 
-    // Smaller font for actors name
+    // Smaller font for actors name and role
     m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
     const int FontTinyHeight {m_FontTiny->Height()};
 
     cImage *img {nullptr};
-    cString Name {""}, Path {""}, Role {""};  // Actor name, path and role
+    cString Role {""};  // Actor role
     int Actor {0};
     const int ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem * 4};
     const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
     const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  // Narrowing conversion
     const uint PicLines {NumActors / PicsPerLine + (NumActors % PicsPerLine != 0)};
+    int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
     int y {ContentTop};
 #ifdef DEBUGFUNCSCALL
@@ -2947,30 +2939,37 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         for (uint col {0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
-            Path = ActorsPath[Actor];
-            img = ImgLoader.LoadFile(*Path, ActorWidth, 999);
+            img = ImgLoader.LoadFile(*ActorsPath[Actor], ActorWidth, 999);
             if (img) {
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
-                Name = ActorsName[Actor];
-                Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
-                ComplexContent.AddText(*Name, false, cRect(x, y + img->Height() + m_MarginItem, ActorWidth, 0),
+                ImgHeight = img->Height();
+                ComplexContent.AddText(*ActorsName[Actor], false, cRect(x, y + ImgHeight + m_MarginItem, ActorWidth, 0),
                                        Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
                                        ActorWidth, FontTinyHeight, taCenter);
+                Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(
-                    *Role, false, cRect(x, y + img->Height() + m_MarginItem + FontTinyHeight, ActorWidth, 0),
+                    *Role, false, cRect(x, y + ImgHeight + m_MarginItem + FontTinyHeight, ActorWidth, 0),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
                     FontTinyHeight, taCenter);
+                if (ImgHeight > MaxImgHeight) {
+                    MaxImgHeight = ImgHeight;  // In case images have different size
+#ifdef DEBUGFUNCSCALL
+                    dsyslog("   Column %d: MaxImgHeight changed to %d", col, MaxImgHeight);
+#endif
+                }
             }
             x += ActorWidth + ActorMargin;
             ++Actor;
         }  // for col
         x = m_MarginItem;
-        y = ComplexContent.BottomContent() + m_FontHeight;
+        // y = ComplexContent.BottomContent() + m_FontHeight;
+        y += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
 #ifdef DEBUGFUNCSCALL
         // Alternate way to get y, but what if different image size?
-        y2 += img->Height() + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
-        dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", y, y2);
+        y2 += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
+        dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", ComplexContent.BottomContent() + m_FontHeight, y2);
 #endif
+        MaxImgHeight = 0;  // Reset value for next row
     }  // for row
 }
 
@@ -3230,9 +3229,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
                 ImgLoader.SearchRecordingPoster(*RecPath, MediaPath);
-                // cString RecImage {""};
-                // if (ImgLoader.SearchRecordingPoster(*RecPath, RecImage))
-                    // MediaPath = RecImage;
             }
         }  // FirstRun
 
@@ -3446,11 +3442,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                            BorderSetRecording};
     DecorBorderDraw(ib, false);
 
-    if (Scrollable)
-        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ComplexContent.ScrollOffset() > 0,
-                      ComplexContent.ScrollOffset() + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(),
-                      true);
+    if (Scrollable) {
+        const int ScrollOffset {ComplexContent.ScrollOffset()};
+        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
+                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+    }
 
     RecordingBorder.Left = m_cLeft;
     RecordingBorder.Top = m_cTop;
@@ -3462,7 +3459,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     RecordingBorder.ColorBg = Config.decorBorderMenuContentBg;
     RecordingBorder.From = BorderMenuRecord;
 
-    sDecorBorder ibRecording{
+    sDecorBorder ibRecording {
         RecordingBorder.Left, RecordingBorder.Top,  RecordingBorder.Width,   ComplexContent.ContentHeight(false),
         RecordingBorder.Size, RecordingBorder.Type, RecordingBorder.ColorFg, RecordingBorder.ColorBg,
         RecordingBorder.From};
@@ -3547,11 +3544,12 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     ComplexContent.Draw();
 
-    if (Scrollable)
-        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ComplexContent.ScrollOffset() > 0,
-                      ComplexContent.ScrollOffset() + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(),
-                      true);
+    if (Scrollable) {
+        const int ScrollOffset {ComplexContent.ScrollOffset()};
+        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
+                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(),
+                      true);}
 
     sDecorBorder ib {Left, Top, Width, ComplexContent.ContentHeight(false), Config.decorBorderMenuContentSize,
                         Config.decorBorderMenuContentType, Config.decorBorderMenuContentFg,
@@ -3567,8 +3565,6 @@ int cFlatDisplayMenu::GetTextAreaWidth() const {
 }
 
 const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
-    // const cFont *font = (FixedFont) ? m_FontFixed : m_Font;
-    // return font;
     return (FixedFont) ? m_FontFixed : m_Font;
 }
 
@@ -4427,13 +4423,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     cString DateTime {""}, Length {""};
     std::string StrRec {""};
     StrRec.reserve(128);
-    div_t Result {0, 0};
+    div_t TimeHM {0, 0};
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecStart = rec->Start();
 
-        Result = std::div((rec->LengthInSeconds() + 30) / 60, 60);
-        Length = cString::sprintf("%02d:%02d", Result.quot, Result.rem);
+        TimeHM = std::div((rec->LengthInSeconds() + 30) / 60, 60);
+        Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
         StrRec = *(cString::sprintf("%s - %s", *DateTime, rec->Name()));

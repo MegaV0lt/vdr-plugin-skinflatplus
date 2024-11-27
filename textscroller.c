@@ -7,14 +7,6 @@
  */
 #include "./textscroller.h"
 
-/*
-cTextScrollers::AddScroller()
-cTextScroll::SetText()
-cTextScroll::Draw()
-cTextScrollers::StartScrolling()
-cTextScrollers::Action()
-*/
-
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
 #ifdef DEBUGFUNCSCALL
@@ -22,7 +14,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 #endif
     // if (!m_Osd) return;
 
-    m_Text.reserve(strlen(text));  // Defined in 'textscroller.h'
+    m_Text.reserve(strlen(text));
     m_Text = text;
     m_Font = font;
     m_Position = position;
@@ -34,9 +26,9 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", m_Layer, position, DrawPort);
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   Pixmap left: %d top: %d width: %d height: %d", m_Position.Left(), m_Position.Top(), m_Position.Width(),
+    dsyslog("   Pixmap left %d, top %d, width %d, height %d", m_Position.Left(), m_Position.Top(), m_Position.Width(),
             m_Position.Height());
-    dsyslog("   DrawPort left: %d top: %d width: %d height: %d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
+    dsyslog("   DrawPort left %d, top %d, width %d, height %d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
             DrawPort.Height());
 #endif
 
@@ -135,7 +127,7 @@ void cTextScroll::DoStep() {
 
 cTextScrollers::cTextScrollers() {
     m_Layer = 2;
-    Scrollers.reserve(16);
+    Scrollers.reserve(8);
 }
 
 cTextScrollers::~cTextScrollers() {}
@@ -143,7 +135,7 @@ cTextScrollers::~cTextScrollers() {}
 void cTextScrollers::Clear() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScrollers::Clear()");
-    dsyslog("  Scrollers.size() %d", Scrollers.size());
+    dsyslog("   Scrollers.size() %ld", Scrollers.size());
 #endif
 
     Cancel(-1);
@@ -169,7 +161,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
         cCondWait::SleepMs(10);
 
     if (m_ScrollDelay == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cTextScrollers::AddScroller() ScrollDelay is 0!");
+        esyslog("FlatPlus: cTextScrollers::AddScroller() m_ScrollDelay is 0!");
         return;
     }
 

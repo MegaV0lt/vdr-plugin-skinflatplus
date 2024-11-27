@@ -29,13 +29,12 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     LogoLower.reserve(128);
     bool success {false};
     cImage *img {nullptr};
-    for (uint i {0}; i < 3; ++i) {  // Run up to three times (0..2)
-        if (i == 1) {  // Second try (Plain logo not found)
+    for (uint i {0}; i < 3; ++i) {      // Run up to three times (0..2)
+        if (i == 1) {                   // Second try (Plain logo not found)
             LogoLower = logo;
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
-        }
-        if (i == 2) {  // Third try. Search for lowercase logo with '~' for path '/'
+        } else if (i == 2) {            // Third try. Search for lowercase logo with '~' for path '/'
             const std::size_t LogoLowerLength {LogoLower.length()};
             for (std::size_t i {0}; i < LogoLowerLength; ++i) {
                 if (LogoLower[i] == '/')
@@ -62,9 +61,8 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 #endif
 
         success = LoadImage(*File);  // Try to load image from disk
-
-        if (!success) {  // Image not found on disk
-            if (i == 2)  // Third try and not found
+        if (!success) {              // Image not found on disk
+            if (i == 2)              // Third try and not found
                 dsyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
             continue;
@@ -77,7 +75,6 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 #endif
 
         img = CreateImage(width, height);
-
         if (!img) continue;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -204,7 +201,6 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 #endif
 
     const bool success = LoadImage(*File);
-
     if (!success) {
         dsyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return nullptr;
@@ -219,7 +215,6 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 #endif
 
     img = CreateImage(width, height);
-
     if (!img) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -244,9 +239,10 @@ bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) 
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    // Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
+    //* Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
+    cString ManualPoster {""};
     for (const cString &Image : RecordingImages) {
-        cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
+        ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
         if (std::filesystem::exists(*ManualPoster)) {
             // dsyslog("flatPlus: Image found in %s/%s", *RecPath, *Image);
             found = ManualPoster;

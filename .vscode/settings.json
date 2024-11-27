@@ -78,5 +78,10 @@
     "C_Cpp.default.customConfigurationVariables": {
 
     },
-    "C_Cpp.inlayHints.referenceOperator.enabled": true
+    "C_Cpp.inlayHints.referenceOperator.enabled": true,
+    "C_Cpp.inlayHints.autoDeclarationTypes.enabled": true,
+    "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
+    "C_Cpp.inlayHints.parameterNames.enabled": true,
+    "C_Cpp.vcFormat.space.beforeInitializerListOpenBrace": true,
+    "javascript.inlayHints.enumMemberValues.enabled": true
 }

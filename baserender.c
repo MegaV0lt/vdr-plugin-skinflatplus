@@ -16,7 +16,7 @@
 #include <iostream>
 #include <utility>
 
-#include <future>
+#include <future>  // NOLINT
 #include <sstream>
 #include <locale>
 
@@ -87,6 +87,10 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 }
 
 void cFlatBaseRender::TopBarCreate() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::TopBarCreate()");
+#endif
+
     const int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);  // Narrowing conversion
     m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
@@ -213,22 +217,22 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     cString Extra1 {""}, Extra2 {""};
 
     if (Config.DiskUsageFree == 1) {  // Show in free mode
-        const div_t Result {std::div(FreeMinutes, 60)};
+        const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskFreePercent %d, FreeMinutes %d", DiskFreePercent, FreeMinutes);
         dsyslog("   FreeGB %.2f, AllGB %.2f, AllMinutes %.2f", FreeGB, AllGB, AllMinutes);
-        dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", Result.quot, Result.rem);
+        dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", FreeHM.quot, FreeHM.rem);
 #endif
         if (Config.DiskUsageShort == false) {  // Long format
             Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, Result.quot, Result.rem);
+                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), Result.quot, Result.rem);
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
-            Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
+            Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
         switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
@@ -273,32 +277,32 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 #endif
 
         if (Config.DiskUsageFree == 2) {  //* Special mixed mode free time instead of used
-            const div_t Result {std::div(FreeMinutes, 60)};
+            const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB | %02d:%02d", OccupiedGB, Result.quot, Result.rem);
+                    Extra2 = cString::sprintf("%.1f GB | %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
                 } else {  // 1000 GB+
                     Extra2 =
-                        cString::sprintf("%.2f TB | %02d:%02d", OccupiedGB * (1.0 / 1024.0), Result.quot, Result.rem);
+                        cString::sprintf("%.2f TB | %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
         } else {  // Show in occupied mode
-            const div_t Result {std::div(OccupiedMinutes, 60)};
+            const div_t FreeHM {std::div(OccupiedMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, Result.quot, Result.rem);
+                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
                 } else {  // 1000 GB+
                     Extra2 =
-                        cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), Result.quot, Result.rem);
+                        cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", Result.quot, Result.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
         }
 
@@ -397,8 +401,7 @@ void cFlatBaseRender::TopBarUpdate() {
         }
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
-        // const time_t t {time(0)};  // Reuse 'Now'
-        const cString time {*TimeString(Now)};
+        const cString time {*TimeString(Now)};  // Reuse 'Now'
         cString Buffer {""};
         if (Config.TopBarHideClockText)
             Buffer = *time;
@@ -773,10 +776,10 @@ void cFlatBaseRender::MessageCreate() {
     MessagePixmap = CreatePixmap(
         m_Osd, "MessagePixmap", 5,
         cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
-    PixmapFill(MessagePixmap, clrTransparent);
     MessageIconPixmap = CreatePixmap(
         m_Osd, "MessageIconPixmap", 5,
         cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
+    PixmapFill(MessagePixmap, clrTransparent);
     PixmapFill(MessageIconPixmap, clrTransparent);
     // dsyslog("flatPlus: MessagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
     //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
@@ -907,8 +910,9 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
             (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
         const int MaxExtraTime {Setup.OSDMessageTime * 3};                     // Max. extra time to add
         if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
-        // dsyslog("flatPlus: MessageSetExtraTime() Adding %d seconds to message time (%d)", ExtraTime,
-        //          m_OSDMessageTime);
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+#endif
         Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
     }
 }
@@ -1575,8 +1579,9 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
             DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);
             it = Borders.erase(it);  // Invalidates 'it'
             end = Borders.end();     // Reevaluate to avoid crash
-        } else
+        } else {
             ++it;
+        }
     }
 }
 

@@ -245,7 +245,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
                      static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   New MediaSize %dx%d", MediaSize.Width(), MediaSize.Height());
+    dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
 #endif
 }
 
@@ -413,12 +413,18 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
     cMarks Marks;
     bool HasMarks {false};
+    const char *RecordingFileName {Recording->FileName()};
     const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
     const double FramesPerSecond {Recording->FramesPerSecond()};
-    const char *RecordingFileName {Recording->FileName()};
     std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     int LastIndex {0};
     uint16_t MaxFileNum {0};
+
+    if (FramesPerSecond == 0.0) {  // Avoid DIV/0
+        esyslog("flatPlus: InsertCuttedLengthSize() FramesPerSecond is 0.0!");
+        return;
+    }
+
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
@@ -515,11 +521,11 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
                                      RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        if (FramesPerSecond > 0) {
+        // if (FramesPerSecond > 0.0) {  // Already checked
             Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
             if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
                 Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-        }
+        // }
         if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
         if (LastIndex)  //* Bitrate in new line
@@ -652,7 +658,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     } */
     //* Workaround for detecting 'HairSpace'
     const char *FillChar {nullptr};
-    // Assume that 'tofu' char (Char not found) is bigger in size than and space
+    // Assume that 'tofu' char (Char not found) is bigger in size than space
     const char *HairSpace {u8"\U0000200A"}, *Space {" "};
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
