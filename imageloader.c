@@ -26,11 +26,11 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     // Plain logo without converting to lower including '/'
     cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
     std::string LogoLower {""};
-    LogoLower.reserve(128);
     bool success {false};
     cImage *img {nullptr};
     for (uint i {0}; i < 3; ++i) {      // Run up to three times (0..2)
         if (i == 1) {                   // Second try (Plain logo not found)
+            LogoLower.reserve(64);  // Filename without path
             LogoLower = logo;
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
@@ -165,13 +165,14 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     uint32_t tick10 = GetMsTicks();
     dsyslog("   scale logo: %d ms", tick10 - tick9);
 #endif
-        if (!img) {
-            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File);
-            return nullptr;
-        }
 
-        ImgCache.InsertImage(img, *File, width, height);
-        return img;
+    if (!img) {
+        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File);
+        return nullptr;
+    }
+
+    ImgCache.InsertImage(img, *File, width, height);
+    return img;
 }
 
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
@@ -234,7 +235,7 @@ void cImageLoader::ToLowerCase(std::string &str) {
 }
 
 // TODO: Improve? What images are to expect?
-bool cImageLoader::SearchRecordingPoster(const cString RecPath, cString &found) {
+bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif

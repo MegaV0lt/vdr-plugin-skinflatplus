@@ -637,7 +637,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 // cString RecImage {""};
-                if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
+                if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                     // MediaPath = RecImage;
                     img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
                     if (img)

@@ -140,10 +140,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         const char *GetGenreIcon(uchar genre);
         void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
-        // TODO: Eliminate double functions
-        void InsertGenreInfoIcon(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
+
         void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
-        void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);  // NOLINT
+        void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT
 
         time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
 
@@ -160,6 +160,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
+
         void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
         int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);

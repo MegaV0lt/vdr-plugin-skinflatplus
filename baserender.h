@@ -7,8 +7,6 @@
  */
 #pragma once
 
-#include <list>
-
 #include "./imageloader.h"
 #include "./flat.h"
 #include "./textscroller.h"

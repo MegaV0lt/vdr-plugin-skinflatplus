@@ -207,7 +207,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     if (DiskFreePercent == 0) {  // Avoid DIV/0
         esyslog("FlatPlus: cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
-        return;
+        return;  //? Show something in menu at least?
     }
 
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
@@ -367,9 +367,9 @@ void cFlatBaseRender::TopBarUpdate() {
 
         cImage *img {nullptr};
         if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
-            const int IconLeft {m_MarginItem};
             img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, 999, m_TopBarHeight - m_MarginItem2);
             if (img) {
+                const int IconLeft {m_MarginItem};
                 const int IconTop {(m_TopBarHeight / 2 - img->Height() / 2)};
                 TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
                 MenuIconWidth = img->Width() + m_MarginItem2;
@@ -399,7 +399,6 @@ void cFlatBaseRender::TopBarUpdate() {
             }
             MenuIconWidth = ImageBGWidth + m_MarginItem2;
         }
-        const int TitleLeft {MenuIconWidth + m_MarginItem2};
 
         const cString time {*TimeString(Now)};  // Reuse 'Now'
         cString Buffer {""};
@@ -477,7 +476,6 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }
         int TopBarMenuIconRightWidth {0};
-        int TopBarMenuIconRightLeft {0};
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         if (m_TopBarMenuIconRightSet) {
             img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
@@ -493,12 +491,14 @@ void cFlatBaseRender::TopBarUpdate() {
         MiddleWidth += ExtraMaxWidth;
         Right -= ExtraMaxWidth + m_MarginItem;
 
+        const int TitleLeft {MenuIconWidth + m_MarginItem2};
         if ((TitleLeft + TitleWidth) < (TopBarWidth / 2 - MiddleWidth / 2))
             Right = TopBarWidth / 2 - MiddleWidth / 2;
         else if ((TitleLeft + TitleWidth) < Right)
             Right = TitleLeft + TitleWidth + m_MarginItem;
 
         int TitleMaxWidth {Right - TitleLeft - m_MarginItem};
+        int TopBarMenuIconRightLeft {0};
         if (TitleWidth + TopBarMenuIconRightWidth > TitleMaxWidth) {
             TopBarMenuIconRightLeft = TitleMaxWidth + m_MarginItem2;
             TitleMaxWidth -= TopBarMenuIconRightWidth;

@@ -96,7 +96,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
     PixmapFill(ScrollbarPixmap, clrTransparent);
 
-    m_MenuCategory = mcUndefined;
+    // m_MenuCategory = mcUndefined;
 
     MenuItemScroller.SetOsd(m_Osd);
     MenuItemScroller.SetScrollStep(Config.ScrollerStep);
@@ -776,8 +776,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         }
     }
 
-    const int LeftName {Left};
-
     // Event from channel
     const cEvent *Event {nullptr};
     cString EventTitle {""};
@@ -804,6 +802,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     else
         Buffer = Channel->Name();
 
+    const int LeftName {Left};
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = m_MenuItemWidth - LeftName;
         if (IsGroup) {
@@ -1074,9 +1073,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (Config.MenuTimerView == 0 || !Timer)
         return false;
 
-    const cChannel *Channel = Timer->Channel();
-    const cEvent *Event = Timer->Event();
-
     if (Current)
         MenuItemScroller.Clear();
 
@@ -1148,6 +1144,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     LOCK_CHANNELS_READ;
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */
+
+    const cChannel *Channel = Timer->Channel();
     int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
     int Width {m_Font->Width(*Buffer)};
@@ -1327,8 +1325,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (!m_IsScrolling)
         ItemBorderInsertUnique(ib);
 
-    if (Config.MenuTimerView == 3 && Current)  // flatPlus short
+    if (Config.MenuTimerView == 3 && Current)  {  // flatPlus short
+        const cEvent *Event = Timer->Event();
         DrawItemExtraEvent(Event, tr("timer not enabled"));
+    }
 
     return true;
 }
@@ -1379,10 +1379,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int LeftSecond {Left};
     int Top {y}, w {0};
     int ImageTop {Top};
-
-    if (!Channel)
-        TopBarSetMenuLogo(m_ItemEventLastChannelName);
-
     cString Buffer {""};
     cImage *img {nullptr};
     if (Channel) {
@@ -1393,6 +1389,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         LOCK_CHANNELS_READ;
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
         int w = m_Font->Width(ws); */
+
         w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
@@ -1485,9 +1482,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {
-            int PBWidth {m_MenuItemWidth / 20};
-            if (!m_IsScrolling)
-                PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
+            // int PBWidth {m_MenuItemWidth / 20};
+            // if (!m_IsScrolling)
+            //    PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
+
+            int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_ScrollBarWidth) / 20};
 
             const time_t now {time(0)};
             if ((now >= (Event->StartTime() - 2 * 60))) {
@@ -1531,6 +1530,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
             Left += PBWidth + m_MarginItem2;
         }
+    } else {
+        TopBarSetMenuLogo(m_ItemEventLastChannelName);
     }  // if channel
 
     if (WithDate && Event && Selectable) {
@@ -1836,7 +1837,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
-
     cString Buffer {""}, IconName {""};
     const cString RecName = GetRecordingName(Recording, Level, Total == 0).c_str();
     cImage *img {nullptr};
@@ -2284,7 +2284,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (Config.EpgAdditionalInfoShow) {
         Text.Append("\n");
         // Genre
-        InsertGenreInfoIcon(Event, Text, GenreIcons);  // Add genre info
+        InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
         // FSK
         if (Event->ParentalRating()) {
@@ -2634,7 +2634,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     const cString Title = Event->Title();
     const cString ShortText = Event->ShortText();
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};        // Width of short text
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};      // Width of short text
     const int MaxWidth {HeadIconLeft - m_MarginItem};               //? The same as below
      // m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
     int left {m_MarginItem};
@@ -2833,7 +2833,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         const cString RecPath = Recording->FileName();
         // cString RecImage {""};
-        if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
+        if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
             img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
             if (img) {
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
@@ -3034,7 +3034,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
-            InsertGenreInfoIcon(Event, Text, GenreIcons);  // Add genre info
+            InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
             if (Event->Contents(0))
                 Text.Append("\n");
@@ -3228,7 +3228,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
-                ImgLoader.SearchRecordingPoster(*RecPath, MediaPath);
+                ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
             }
         }  // FirstRun
 
@@ -3787,8 +3787,9 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
         }
     }
 }
-void cFlatDisplayMenu::InsertGenreInfoIcon(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
-    bool FirstContent {true};
+
+void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
+    bool FirstContent{true};
     for (int i {0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
@@ -5115,8 +5116,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             std::istringstream istr(prec);
             istr.imbue(std::locale("C"));
             istr >> p;
-            p = p * 100.0;
-            p = RoundUp(p, 10);
+            p = RoundUp(p * 100.0, 10);
             PrecString = cString::sprintf("%.0f%%", p);
         } else {
             continue;
