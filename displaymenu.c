@@ -626,7 +626,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
     const std::size_t TextLength {strlen(text)};
     if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
-        ((text[2] == '|') || (text[2] == ' ')) && text[TextLength - 1] == ']')
+        /* ((text[2] == '|') || (text[2] == ' ')) && */ text[TextLength - 1] == ']')
         return true;
     return false;
 }
@@ -709,8 +709,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    if (Width < w)
-        Width = w;  // Minimal width for channel number
+    if (Width < w) Width = w;  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -733,6 +732,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         // Load named logo only for channels
         img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     }
+
     if (img) {
         ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -741,13 +741,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Left += ImageBgWidth + m_MarginItem2;
     } else {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-
         if (IsRadioChannel) {
             if (Current)
                 img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img)
                 img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -1149,8 +1147,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
     int Width {m_Font->Width(*Buffer)};
-    if (Width < w)
-        Width = w;  // Minimal width for channel number
+    if (Width < w) Width = w;  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1173,13 +1170,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     } else {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-
         if (IsRadioChannel) {
             if (Current)
                 img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img)
                 img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-
             if (img) {
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1190,7 +1185,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img)
                 img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-
             if (img) {
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1428,7 +1422,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (!img)
                     img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-
                 if (img) {
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1446,7 +1439,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (!img)
                     img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-
                 if (img) {
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1577,7 +1569,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
         if (!img)
             img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
-
         if (img) {
             ImageTop = Top;  // TODO: Center image?
             MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -1588,7 +1579,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
         if (!img)
             img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
-
         if (img) {
             ImageTop = Top;
             MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -1603,7 +1593,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 img = ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
             if (!img)
                 img = ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
-
             if (img) {
                 ImageTop = Top;
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -3549,7 +3538,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
         DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
                       ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
                       ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(),
-                      true);}
+                      true);
+    }
 
     sDecorBorder ib {Left, Top, Width, ComplexContent.ContentHeight(false), Config.decorBorderMenuContentSize,
                         Config.decorBorderMenuContentType, Config.decorBorderMenuContentFg,
@@ -4264,7 +4254,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         Config.MainMenuWidgetActiveTimerHideEmpty) {
         return 0;
     } else if (TimerRec.Size() == 0 && TimerActive.Size() == 0 && TimerRemoteRec.Size() == 0 &&
-             TimerRemoteActive.Size() == 0) {
+               TimerRemoteActive.Size() == 0) {
         ContentWidget.AddText(tr("no active/recording timer"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,

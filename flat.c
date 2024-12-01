@@ -850,7 +850,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     }  // for char
 #ifdef DEBUGFUNCSCALL
     uint32_t tick1 {GetMsTicks()};
-    dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+    dsyslog("   Time: %d ms", tick1 - tick0);
 #endif
 }
 

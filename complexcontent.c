@@ -74,10 +74,10 @@ void cComplexContent::CalculateDrawPortHeight() {
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
         const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > m_DrawPortHeight)
-            m_DrawPortHeight = GetBottom;
+        if (GetBottom > m_DrawPortHeight) m_DrawPortHeight = GetBottom;
     }
-    if (m_IsScrollingActive)
+
+    if (m_IsScrollingActive)  //  m_DrawPortHeight has to be set for 'ScrollTotal()'
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
 }
 
@@ -86,8 +86,7 @@ int cComplexContent::BottomContent() {
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
         const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > Bottom)
-            Bottom = GetBottom;
+        if (GetBottom > Bottom) Bottom = GetBottom;
     }
     return Bottom;
 }
