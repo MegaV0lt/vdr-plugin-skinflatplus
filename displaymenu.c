@@ -16,7 +16,6 @@
 #include <locale>
 
 #include "./services/epgsearch.h"
-#include "./services/remotetimers.h"
 #include "./services/scraper2vdr.h"
 
 #ifndef VDRLOGO
@@ -4203,58 +4202,46 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    // Check if remotetimers plugin is available
-    static cPlugin *pRemoteTimers = cPluginManager::GetPlugin("remotetimers");
-    time_t now {time(0)};
-    if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
-        pRemoteTimers && (now - m_RemoteTimersLastRefresh) > Config.MainMenuWidgetActiveTimerShowRemoteRefreshTime) {
-        m_RemoteTimersLastRefresh = now;
-        cString ErrorMsg {""};
-        pRemoteTimers->Service("RemoteTimers::RefreshTimers-v1.0", &ErrorMsg);
-    }
-
     // Look for timers
     cVector<const cTimer *> TimerRec;
     cVector<const cTimer *> TimerActive;
     cVector<const cTimer *> TimerRemoteRec;
     cVector<const cTimer *> TimerRemoteActive;
 
+    int AllTimers {0};  // All timers and remote timers
+
     LOCK_TIMERS_READ;
     for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
-        if (ti->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowRecording)
-            TimerRec.Append(ti);
+        if (ti->HasFlags(tfActive) && !ti->HasFlags(tfRecording)) {
+            if (ti->Remote()) {
+                if (Config.MainMenuWidgetActiveTimerShowRemoteActive) { TimerRemoteActive.Append(ti); }
+            } else {  // Local
+                if (Config.MainMenuWidgetActiveTimerShowActive) { TimerActive.Append(ti); }
+            }
+        }
 
-        if (ti->HasFlags(tfActive) && !ti->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowActive)
-            TimerActive.Append(ti);
+        if (ti->HasFlags(tfRecording)) {
+            if (ti->Remote()) {
+                if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) { TimerRemoteRec.Append(ti); }
+            } else {  // Local
+                if (Config.MainMenuWidgetActiveTimerShowRecording) { TimerRec.Append(ti); }
+            }
+        }
 
-        if (TimerRec.Size() + TimerActive.Size() >= Config.MainMenuWidgetActiveTimerMaxCount)
+        AllTimers = TimerRec.Size() + TimerActive.Size() + TimerRemoteRec.Size() + TimerRemoteActive.Size();
+        if (AllTimers >= Config.MainMenuWidgetActiveTimerMaxCount)
             break;
     }
 
-    LOCK_SCHEDULES_READ;
-    if ((Config.MainMenuWidgetActiveTimerShowRemoteActive || Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
-        pRemoteTimers && TimerRec.Size() + TimerActive.Size() < Config.MainMenuWidgetActiveTimerMaxCount) {
-        cTimer *RemoteTimer {nullptr};
-        while (pRemoteTimers->Service("RemoteTimers::ForEach-v1.0", &RemoteTimer) && RemoteTimer != nullptr) {
-            RemoteTimer->SetEventFromSchedule(Schedules);  // Make sure the event is current
-            if (RemoteTimer->HasFlags(tfRecording) && Config.MainMenuWidgetActiveTimerShowRemoteRecording)
-                TimerRemoteRec.Append(RemoteTimer);
-            if (RemoteTimer->HasFlags(tfActive) && !RemoteTimer->HasFlags(tfRecording) &&
-                Config.MainMenuWidgetActiveTimerShowRemoteActive)
-                TimerRemoteActive.Append(RemoteTimer);
-        }
-    }
+    if (AllTimers == 0 && Config.MainMenuWidgetActiveTimerHideEmpty)
+        return 0;
+
     TimerRec.Sort(CompareTimers);
     TimerActive.Sort(CompareTimers);
     TimerRemoteRec.Sort(CompareTimers);
     TimerRemoteActive.Sort(CompareTimers);
 
-    if ((TimerRec.Size() == 0 && TimerActive.Size() == 0 && TimerRemoteRec.Size() == 0 &&
-         TimerRemoteActive.Size() == 0) &&
-        Config.MainMenuWidgetActiveTimerHideEmpty) {
-        return 0;
-    } else if (TimerRec.Size() == 0 && TimerActive.Size() == 0 && TimerRemoteRec.Size() == 0 &&
-               TimerRemoteActive.Size() == 0) {
+    if (AllTimers == 0) {
         ContentWidget.AddText(tr("no active/recording timer"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4264,7 +4251,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
             cString StrTimer {""};
-            int TimerRecSize {TimerRec.Size()};
+            const int TimerRecSize {TimerRec.Size()};
             for (int i {0}; i < TimerRecSize; ++i) {
                 ++count;
                 if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
@@ -4278,7 +4265,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer = "";  // Reset string
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
-                    pRemoteTimers && (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
+                    (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
                     StrTimer.Append("L");
                 StrTimer.Append(cString::sprintf("%d: ", count + 1));
                 if (Channel)
@@ -4295,7 +4282,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 ContentTop += m_FontSmlHeight;
             }
-        }
+        }  // Config.MainMenuWidgetActiveTimerShowRecording
+
         if (Config.MainMenuWidgetActiveTimerShowActive) {
             cString StrTimer {""};
             const int TimerActiveSize {TimerActive.Size()};
@@ -4312,7 +4300,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 StrTimer = "";  // Reset string
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
-                    pRemoteTimers && (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
+                    (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
                     StrTimer.Append("L");
                 StrTimer.Append(cString::sprintf("%d: ", count + 1));
                 if (Channel)
@@ -4328,7 +4316,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 ContentTop += m_FontSmlHeight;
             }
-        }
+        }  // Config.MainMenuWidgetActiveTimerShowActive
+
         if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
             cString StrTimer {""};
             const int TimerRemoteRecSize {TimerRemoteRec.Size()};
@@ -4358,7 +4347,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 ContentTop += m_FontSmlHeight;
             }
-        }
+        }  // Config.MainMenuWidgetActiveTimerShowRemoteRecording
+
         if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
             cString StrTimer {""};
             const int TimerRemoteActiveSize {TimerRemoteActive.Size()};
@@ -4388,7 +4378,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 ContentTop += m_FontSmlHeight;
             }
-        }
+        }  // Config.MainMenuWidgetActiveTimerShowRemoteActive
     }
 
     return ContentWidget.ContentHeight(false);
