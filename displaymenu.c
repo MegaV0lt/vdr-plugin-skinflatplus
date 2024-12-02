@@ -4259,9 +4259,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                               wWidth - m_MarginItem2);
     } else {
         int count {-1}, RemoteCount {-1};
+        cString StrTimer {""};
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
-            cString StrTimer {""};
             const int TimerRecSize {TimerRec.Size()};
             for (int i {0}; i < TimerRecSize; ++i) {
                 ++count;
@@ -4296,7 +4296,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }  // Config.MainMenuWidgetActiveTimerShowRecording
 
         if (Config.MainMenuWidgetActiveTimerShowActive) {
-            cString StrTimer {""};
             const int TimerActiveSize {TimerActive.Size()};
             for (int i {0}; i < TimerActiveSize; ++i) {
                 ++count;
@@ -4330,7 +4329,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }  // Config.MainMenuWidgetActiveTimerShowActive
 
         if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
-            cString StrTimer {""};
             const int TimerRemoteRecSize {TimerRemoteRec.Size()};
             for (int i {0}; i < TimerRemoteRecSize; ++i) {
                 ++RemoteCount;
@@ -4342,8 +4340,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (TimerRemoteRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                StrTimer = "";  // Reset string
-                StrTimer.Append(cString::sprintf("R: "));
+                // StrTimer = "";  // Reset string
+                StrTimer = cString::sprintf("R: ");
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -4361,7 +4359,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }  // Config.MainMenuWidgetActiveTimerShowRemoteRecording
 
         if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
-            cString StrTimer {""};
             const int TimerRemoteActiveSize {TimerRemoteActive.Size()};
             for (int i {0}; i < TimerRemoteActiveSize; ++i) {
                 ++RemoteCount;
@@ -4373,8 +4370,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel = (TimerRemoteActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                StrTimer = "";  // Reset string
-                StrTimer.Append(cString::sprintf("R: "));
+                // StrTimer = "";  // Reset string
+                StrTimer = cString::sprintf("R: ");
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
