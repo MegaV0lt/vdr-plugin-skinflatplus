@@ -4214,21 +4214,32 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
         if (ti->HasFlags(tfActive) && !ti->HasFlags(tfRecording)) {
             if (ti->Remote()) {
-                if (Config.MainMenuWidgetActiveTimerShowRemoteActive) { TimerRemoteActive.Append(ti); }
+                if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
+                    TimerRemoteActive.Append(ti);
+                    AllTimers += 1;
+                }
             } else {  // Local
-                if (Config.MainMenuWidgetActiveTimerShowActive) { TimerActive.Append(ti); }
+                if (Config.MainMenuWidgetActiveTimerShowActive) {
+                    TimerActive.Append(ti);
+                    AllTimers += 1;
+                }
             }
         }
 
         if (ti->HasFlags(tfRecording)) {
             if (ti->Remote()) {
-                if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) { TimerRemoteRec.Append(ti); }
+                if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
+                    TimerRemoteRec.Append(ti);
+                    AllTimers += 1;
+                }
             } else {  // Local
-                if (Config.MainMenuWidgetActiveTimerShowRecording) { TimerRec.Append(ti); }
+                if (Config.MainMenuWidgetActiveTimerShowRecording) {
+                    TimerRec.Append(ti);
+                    AllTimers += 1;
+                }
             }
         }
 
-        AllTimers = TimerRec.Size() + TimerActive.Size() + TimerRemoteRec.Size() + TimerRemoteActive.Size();
         if (AllTimers >= Config.MainMenuWidgetActiveTimerMaxCount)
             break;
     }
@@ -4266,8 +4277,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
-                    StrTimer.Append("L");
-                StrTimer.Append(cString::sprintf("%d: ", count + 1));
+                    StrTimer.Append("L: ");
+                // StrTimer.Append(cString::sprintf("%d: ", count + 1));
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -4301,8 +4312,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0))
-                    StrTimer.Append("L");
-                StrTimer.Append(cString::sprintf("%d: ", count + 1));
+                    StrTimer.Append("L: ");
+                // StrTimer.Append(cString::sprintf("%d: ", count + 1));
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -4332,7 +4343,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 const cChannel *Channel = (TimerRemoteRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
-                StrTimer.Append(cString::sprintf("R%d: ", RemoteCount + 1));
+                StrTimer.Append(cString::sprintf("R: "));
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -4363,7 +4374,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 const cChannel *Channel = (TimerRemoteActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
-                StrTimer.Append(cString::sprintf("R%d: ", RemoteCount + 1));
+                StrTimer.Append(cString::sprintf("R: "));
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -5122,7 +5133,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            // Instead of 'MyMax' use std::max()
             const int wtemp {std::max(m_FontTempSml->Width(TempMax.c_str()), m_FontTempSml->Width(TempMin.c_str()))};
             ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,

@@ -23,7 +23,7 @@ displaychannel.o: displaychannel.c displaychannel.h baserender.h \
 displaymenu.o: displaymenu.c displaymenu.h services/scraper2vdr.h \
  baserender.h imageloader.h imagemagickwrapper.h flat.h config.h \
  imagecache.h textscroller.h complexcontent.h services/epgsearch.h \
- services/remotetimers.h services/scraper2vdr.h
+ services/scraper2vdr.h
 displaymessage.o: displaymessage.c displaymessage.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h config.h imagecache.h \
  textscroller.h complexcontent.h
