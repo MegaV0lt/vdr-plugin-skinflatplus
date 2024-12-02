@@ -4107,6 +4107,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                 RecDevices[RecDevice->DeviceNumber()] = true;
         }
     }  // for cTimer
+
     int ActualNumDevices {0};
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int i {0}; i < NumDevices; ++i) {
@@ -4259,7 +4260,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, Width);
     } else {
         int count {-1}, RemoteCount {-1};
-        cImage *img {nullptr};
         cString StrTimer {""};
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
@@ -4272,28 +4272,26 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count >= Config.MainMenuWidgetActiveTimerMaxCount)
                     break;
 
-                const cChannel *Channel = (TimerRec[i])->Channel();
-                // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    // StrTimer.Append("L: ");
                     img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
+                    if (img) {
+                        ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
+                        Left += m_FontSmlHeight + m_MarginItem;
+                        Width -= m_FontSmlHeight - m_MarginItem;
+                    }  //? Fallback? // else StrTimer.Append("L: ");
                 }
 
+                const cChannel *Channel = (TimerRec[i])->Channel();
+                // const cEvent *Event = Timer->Event();
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
                     StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
 
                 StrTimer.Append((TimerRec[i])->File());
-
-                if (img) {
-                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
-                    Left += m_FontSmlHeight + m_MarginItem;
-                    Width -= m_FontSmlHeight - m_MarginItem;
-                }
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
                                       Theme.Color(clrTopBarRecordingActiveFg), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4315,27 +4313,25 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count >= Config.MainMenuWidgetActiveTimerMaxCount)
                     break;
 
-                const cChannel *Channel = (TimerActive[i])->Channel();
-                // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    // StrTimer.Append("L: ");
                     img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
+                    if (img) {
+                        ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
+                        Left += m_FontSmlHeight + m_MarginItem;
+                        Width -= m_FontSmlHeight - m_MarginItem;
+                    }  // StrTimer.Append("L: ");
                 }
 
+                const cChannel *Channel = (TimerActive[i])->Channel();
+                // const cEvent *Event = Timer->Event();
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
                     StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
                 StrTimer.Append((TimerActive[i])->File());
-
-                if (img) {
-                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
-                    Left += m_FontSmlHeight + m_MarginItem;
-                    Width -= m_FontSmlHeight - m_MarginItem;
-                }
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
                                       Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, Width);
@@ -4356,24 +4352,22 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount)
                     break;
 
+                StrTimer = "";  // Reset string
+                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
+                if (img) {
+                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
+                    Left += m_FontSmlHeight + m_MarginItem;
+                    Width -= m_FontSmlHeight - m_MarginItem;
+                }  // StrTimer = cString::sprintf("R: ");
+
                 const cChannel *Channel = (TimerRemoteRec[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                StrTimer = "";  // Reset string
-                // StrTimer = cString::sprintf("R: ");
-                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
-
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
                     StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
 
                 StrTimer.Append((TimerRemoteRec[i])->File());
-
-                if (img) {
-                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
-                    Left += m_FontSmlHeight + m_MarginItem;
-                    Width -= m_FontSmlHeight - m_MarginItem;
-                }
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
                                       Theme.Color(clrTopBarRecordingActiveFg), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4395,24 +4389,22 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount)
                     break;
 
+                StrTimer = "";  // Reset string
+                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
+                if (img) {
+                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
+                    Left += m_FontSmlHeight + m_MarginItem;
+                    Width -= m_FontSmlHeight - m_MarginItem;
+                }  // StrTimer = cString::sprintf("R: ");
+
                 const cChannel *Channel = (TimerRemoteActive[i])->Channel();
                 // const cEvent *Event = Timer->Event();
-                StrTimer = "";  // Reset string
-                // StrTimer = cString::sprintf("R: ");
-                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
-
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
                     StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
 
                 StrTimer.Append((TimerRemoteActive[i])->File());
-
-                if (img) {
-                    ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
-                    Left += m_FontSmlHeight + m_MarginItem;
-                    Width -= m_FontSmlHeight - m_MarginItem;
-                }
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
                                       Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, Width);
@@ -4451,7 +4443,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     LOCK_RECORDINGS_READ;
     for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
         RecStart = rec->Start();
-
         TimeHM = std::div((rec->LengthInSeconds() + 30) / 60, 60);
         Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
@@ -4459,6 +4450,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         StrRec = *(cString::sprintf("%s - %s", *DateTime, rec->Name()));
         Recs.emplace_back(std::make_pair(RecStart, StrRec));
     }
+
     // Sort by RecStart
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeStringDesc);
     std::pair<time_t, std::string> PairRec {};
@@ -4496,9 +4488,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     ContentTop += 6;
 
     const int NumConflicts {GetEpgsearchConflicts()};  // Get conflicts from plugin Epgsearch
-    if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty) {
+    if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty)
         return 0;
-    } else if (NumConflicts == 0) {
+
+    if (NumConflicts == 0) {
         ContentWidget.AddText(tr("no timer conflicts"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4849,8 +4842,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     std::ifstream file(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, cont);
-        updates = atoi(cont.c_str());
         file.close();
+        updates = atoi(cont.c_str());
     } else {
         updates = -1;
     }
@@ -4859,8 +4852,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     file.open(*ItemFilename, std::ifstream::in);
     if (file.is_open()) {
         std::getline(file, cont);
-        SecurityUpdates = atoi(cont.c_str());
         file.close();
+        SecurityUpdates = atoi(cont.c_str());
     } else {
         SecurityUpdates = -1;
     }
