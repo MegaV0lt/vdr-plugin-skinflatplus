@@ -4279,7 +4279,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
                     // StrTimer.Append("L: ");
-                    img = ImgLoader.LoadIcon("home", 999, m_FontSmlHeight);
+                    img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
                 }
 
                 if (Channel)
@@ -4322,7 +4322,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
                     // StrTimer.Append("L: ");
-                    img = ImgLoader.LoadIcon("home", 999, m_FontSmlHeight);
+                    img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
                 }
 
                 if (Channel)
@@ -4360,7 +4360,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
                 // StrTimer = cString::sprintf("R: ");
-                img = ImgLoader.LoadIcon("local-network", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
 
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -4399,7 +4399,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 // const cEvent *Event = Timer->Event();
                 StrTimer = "";  // Reset string
                 // StrTimer = cString::sprintf("R: ");
-                img = ImgLoader.LoadIcon("local-network", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
 
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -5304,7 +5304,34 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 
-    ImgLoader.LoadIcon("home", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("local-network", m_FontSmlHeight, m_FontSmlHeight);
-
+    if (Config.MainMenuWidgetDVBDevicesShow) {
+        ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetActiveTimerShow) {
+        ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
+        ImgLoader.LoadIcon("widgets/local-network", m_FontSmlHeight, m_FontSmlHeight);
+    }
+    if (Config.MainMenuWidgetLastRecShow) {
+        ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetTimerConflictsShow) {
+        ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetSystemInfoShow) {
+        ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetSystemUpdatesShow) {
+        ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetTemperaturesShow) {
+        ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetCommandShow) {
+        ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
+    if (Config.MainMenuWidgetWeatherShow) {
+        ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2);
+    }
 }
