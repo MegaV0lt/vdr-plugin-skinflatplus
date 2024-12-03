@@ -232,7 +232,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
     bool IsRec {false};
-    const int RecWidth {m_FontSml->Width("REC")};
+    const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
 
     int left = HeightBottom * 1.34 + m_MarginItem;  // Narrowing conversion
     const int StartTimeLeft {left};

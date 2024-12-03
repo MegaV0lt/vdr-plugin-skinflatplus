@@ -699,7 +699,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     LOCK_CHANNELS_READ;
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-    int w {m_Font->Width("9999")};  // At least four digits in channel list because of different sort modes
+
+    int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -3800,7 +3801,7 @@ void cFlatDisplayMenu::InsertSeriesInfos(const cSeries &Series, cString &SeriesI
     if (Series.network.length() > 0)
         SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), Series.network.c_str()));
     if (Series.genre.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Series.genre.c_str()));
-    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));
+    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));  // TheTVDB
     if (Series.status.length() > 0)
         SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), Series.status.c_str()));
     if (Series.episode.season > 0)
@@ -3818,8 +3819,11 @@ void cFlatDisplayMenu::InsertMovieInfos(const cMovie &Movie, cString &MovieInfo)
     if (Movie.genres.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Movie.genres.c_str()));
     if (Movie.releaseDate.length() > 0)
         MovieInfo.Append(cString::sprintf("%s%s\n", tr("release date: "), Movie.releaseDate.c_str()));
+    // TheMovieDB
     if (Movie.popularity > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), Movie.popularity));
-    if (Movie.voteAverage > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("vote average: "), Movie.voteAverage));
+    if (Movie.voteAverage > 0)
+        MovieInfo.Append(
+            cString::sprintf("%s%.0f%%\n", tr("vote average: "), Movie.voteAverage * 10));  // 10 Points = 100%
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
