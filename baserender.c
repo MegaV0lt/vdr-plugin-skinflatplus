@@ -1332,55 +1332,37 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorE
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks'
 
     const int Middle {m_ProgressBarHeight / 2};
-    if (IsCurrent) {  //* Draw current pos marker in color of error mark
+
+    if (IsCurrent) {  //* Draw current position marker in color of error mark
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-        //! Marker (Position) at ProgressBarMarkerPixmap to be visible!
         ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
     } else {
         const int MarkerWidth {1}, MarkerWidth3 {3};
-        const int Type {Config.PlaybackShowErrorMarks};  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
-        switch (Type) {
-        case 1:  {  // Small '|'
-            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
+        const int Type {Config.PlaybackShowErrorMarks};
+        switch (Type) {  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
+        case 1:
+        case 2: {
+            const int Top = Middle - (SmallLine * (Type == 1 ? 0.75 : 0.5));
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 1 ? 1.5 : 1)),
+                                             ColorError);
             }
             break;
-        case 2:  {  // Big '|'
-            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-            const int MarkerTop {Middle - (Big / 2)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);  // |
+        case 3:
+        case 4: {
+            const int Top = Middle - (SmallLine * (Type == 3 ? 0.75 : 0.5));
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 3 ? 1.5 : 1)),
+                                             ColorError);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Top, MarkerWidth3, 1), ColorError);
+            ProgressBarPixmap->DrawRectangle(
+                cRect(Pos - 1, Middle + (SmallLine * (Type == 3 ? 0.75 : 0.5)), MarkerWidth3, 1), ColorError);
             }
             break;
-        case 3:  {  // Small 'I'
-            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
-            const int MarkerBottom {Middle + (SmallLine / 4 * 3)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerTop, MarkerWidth3, 1), ColorError);     // Top -
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerBottom, MarkerWidth3, 1), ColorError);  // Bottom -
-            }
-            break;
-        case 4:  {  // Big 'I'
-            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-            const int MarkerTop {Middle - (Big / 2)};
-            const int MarkerBottom {Middle + (Big / 2)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);        // |
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerTop, MarkerWidth3, 1), ColorError);     // Top -
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, MarkerBottom, MarkerWidth3, 1), ColorError);  // Bottom -
-            }
-            break;
-        case 5:  {  // Small '+'
-            const int MarkerTop {Middle - (SmallLine / 4 * 3)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, SmallLine * 1.5), ColorError);  // |
-            // Two pixel hight needed to be centered
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);  // Middle -
-            }
-            break;
-        case 6:  {  // Big '+'
-            const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-            const int MarkerTop {Middle - (Big / 2)};
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, MarkerTop, MarkerWidth, Big), ColorError);  // |
-            // Two pixel hight needed to be centered
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);  // Middle -
+        case 5:
+        case 6: {
+            const int Top = Middle - (SmallLine * (Type == 5 ? 0.75 : 0.5));
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 5 ? 1.5 : 1)),
+                                             ColorError);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);
             }
             break;
         default: esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type); break;
