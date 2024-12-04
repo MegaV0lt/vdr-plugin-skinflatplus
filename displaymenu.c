@@ -3694,29 +3694,36 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 }
 
 std::string cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::GetRecordingName() Level %d", Level);
+#endif
+
     if (!Recording) return "";
 
+    std::string_view RecName {Recording->Name()};
     std::string RecNamePart {""};
     RecNamePart.reserve(64);
-    const std::string RecName {Recording->Name()};
-    try {
-        std::vector<std::string> tokens;
-        tokens.reserve(8);  // Set to at least 8 entry's
-        std::istringstream f(RecName.c_str());
-        std::string s {""};
-        s.reserve(64);
-        while (std::getline(f, s, FOLDERDELIMCHAR)) {
-            tokens.emplace_back(s);
+
+    std::size_t start {0}, end;
+    for (int i {0}; i <= Level; ++i) {
+        end = RecName.find(FOLDERDELIMCHAR, start);
+        if (end == std::string::npos) {
+            if (i == Level) RecNamePart = RecName.substr(start);
+            break;
         }
-        RecNamePart = tokens.at(Level);
-    } catch (...) {
-        RecNamePart = RecName;
+        if (i == Level) {
+            RecNamePart = RecName.substr(start, end - start);
+            break;
+        }
+        start = end + 1;
     }
 
-    if (Config.MenuItemRecordingClearPercent && IsFolder) {
-        if (RecNamePart[0] == '%')
-            RecNamePart.erase(0, 1);
+    if (Config.MenuItemRecordingClearPercent && IsFolder && !RecNamePart.empty() && RecNamePart[0] == '%') {
+        RecNamePart.erase(0, 1);
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   RecNamePart '%s'", RecNamePart.c_str());
+#endif
 
     return RecNamePart;
 }
