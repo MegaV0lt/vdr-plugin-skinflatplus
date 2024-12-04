@@ -108,9 +108,10 @@ bool cComplexContent::Scrollable(int height) {
         return false;
     }
 
-    const int total {ScrollTotal()};
-    const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
-    return (total > shown) ? true : false;
+    const int total = ScrollTotal();
+    // const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
+    const int shown = (height + m_ScrollSize - 1) / m_ScrollSize;  // Avoid floating-point and use integer division
+    return total > shown;
 }
 
 void cComplexContent::AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg,
