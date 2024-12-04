@@ -633,21 +633,16 @@ bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
 void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p {bar + 1};
-    bool IsProgressBar {true};
     uint now {0}, total {0};
-    for (; *p != ']'; ++p) {
-        if (*p == ' ' || *p == '|') {
-            ++total;
-            if (*p == '|')
-                ++now;
-        } else {
-            IsProgressBar = false;
-            break;
-        }
+    while (*p != ']') {
+        if (*p == '|')
+            ++now;
+        ++total;
+        ++p;
     }
-    if (IsProgressBar) {
-        const double progress {now * 1.0 / total};
-        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress * total, total, ColorFg, ColorBarFg, ColorBg,
+    if (total > 0) {
+        const double progress {static_cast<double>(now) / total};
+        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress, 1.0, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
 }
