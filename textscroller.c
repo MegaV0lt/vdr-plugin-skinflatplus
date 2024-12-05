@@ -61,23 +61,21 @@ void cTextScroll::Draw() {
 
     if (!Pixmap) return;
 
-    if (ColorExtraTextFg) {
-        std::string_view tilde {m_Text};
-        const std::size_t found {tilde.find('~')};  // Search for ~
-        if (found != std::string::npos) {
-            std::string_view sv1 {tilde.substr(0, found)};
-            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
-            const std::string first {rtrim(sv1)};   // Trim possible space at end
-            const std::string second {ltrim(sv2)};  // Trim possible space at begin
+    const char *text = m_Text.c_str();
+    const char *tildePos = strchr(text, '~');
 
-            Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
-            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-            Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, m_Font);
-        } else {  // ~ not found
-            Pixmap->DrawText(cPoint(0, 0), m_Text.c_str(), ColorFg, ColorBg, m_Font);
-        }
-    } else {  // No extra color defined
-        Pixmap->DrawText(cPoint(0, 0), m_Text.c_str(), ColorFg, ColorBg, m_Font);
+    if (tildePos && ColorExtraTextFg) {
+        std::string_view sv1 {text, static_cast<size_t>(tildePos - text)};
+        std::string_view sv2 {tildePos + 1};
+
+        const std::string first {rtrim(sv1)};
+        const std::string second {ltrim(sv2)};
+
+        Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
+        const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
+        Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, m_Font);
+    } else {
+        Pixmap->DrawText(cPoint(0, 0), text, ColorFg, ColorBg, m_Font);
     }
 }
 
