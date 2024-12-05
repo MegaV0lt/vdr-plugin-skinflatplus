@@ -136,7 +136,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         return;
     }
 
-    const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
+    // const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
+    const int FloatLines = (image->Height() + m_ScrollSize - 1) / m_ScrollSize;  // Use integer division
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
     WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
@@ -182,14 +183,15 @@ double cComplexContent::ScrollbarSize() {
     if (m_DrawPortHeight == 0)
         esyslog("FlatPlus: cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
 
-    return m_Position.Height() * 1.0 / m_DrawPortHeight;
+    return static_cast<double>(m_Position.Height()) / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal() {
     if (m_ScrollSize == 0)
         esyslog("FlatPlus: cComplexContent::ScrollTotal() m_ScrollSize is 0!");
 
-    return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
+    // return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
+    return (m_DrawPortHeight + m_ScrollSize - 1) / m_ScrollSize;
 }
 
 int cComplexContent::ScrollShown() {
@@ -214,7 +216,7 @@ int cComplexContent::ScrollOffset() {
     if (m_DrawPortHeight == 0)
         esyslog("FlatPlus: cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
 
-    return ScrollTotal() * (y * 1.0 / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {

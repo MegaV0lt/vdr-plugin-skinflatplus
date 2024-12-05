@@ -211,7 +211,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     }
 
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
-    const double AllMinutes{FreeMinutes * 1.0 / DiskFreePercent *
+    const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent *
                             100.0};  // Zero value is prevented with 'DiskFreePercent' check
     cString IconName{""};
     cString Extra1 {""}, Extra2 {""};
@@ -846,11 +846,12 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
-        std::string_view tilde {Text};
-        const std::size_t found {tilde.find('~')};  // Search for ~
-        if (found != std::string::npos) {
-            std::string_view sv1 {tilde.substr(0, found)};
-            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+        const char *TildePos {strchr(Text, '~')};
+
+        if (TildePos) {
+            std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
+            std::string_view sv2 {TildePos + 1};
+
             const std::string first {rtrim(sv1)};   // Trim possible space at end
             const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -986,7 +987,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
 
     const int Middle {rect.Height() / 2};
-    const double PercentLeft {Current * 1.0 / Total};
+    const double PercentLeft {static_cast<double>(Current) / Total};
     switch (Type) {
     case 0:  // Small line + big line
     {
@@ -1380,9 +1381,9 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
     if (!Pixmap) return;
 
     if (Total > 0 && Total > Shown) {
-        const int ScrollHeight {std::max(static_cast<int>(Height * 1.0 * Shown / Total + 0.5), 5)};
-        const int ScrollTop {
-            std::min(static_cast<int>(Top * 1.0 + Height * Offset / Total + 0.5), Top + Height - ScrollHeight)};
+        const int ScrollHeight {std::max(static_cast<int>(static_cast<double>(Height) * Shown / Total + 0.5), 5)};
+        const int ScrollTop{std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
+                                     Top + Height - ScrollHeight)};
 
         PixmapFill(Pixmap, clrTransparent);
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);

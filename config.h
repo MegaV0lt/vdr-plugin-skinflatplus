@@ -194,7 +194,7 @@ class cFlatConfig {
         int ChannelIconsShow;
         int SignalQualityShow;
         int SignalQualityUseColors;
-        int DiskUsageShow;
+        int DiskUsageShow;  // 0 = disabled, 1 = Timer and recording menu, 2 = Always in menu, 3 = Always
         int DiskUsageShort;
         int DiskUsageFree;  // 0 = occupied, 1 = free, 2 = special mode free time instead of used
 

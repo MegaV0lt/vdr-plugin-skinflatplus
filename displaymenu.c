@@ -239,20 +239,26 @@ int cFlatDisplayMenu::MaxItems() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
 #endif
+    int ItemHeight = m_ItemHeight;
     switch (m_MenuCategory) {
     case mcChannel:
-        return m_ScrollBarHeight / m_ItemChannelHeight;  //? Avoid DIV/0
+        ItemHeight = m_ItemChannelHeight;
+        break;
     case mcTimer:
-        return m_ScrollBarHeight / m_ItemTimerHeight;
+        ItemHeight = m_ItemTimerHeight;
+        break;
     case mcSchedule:
     case mcScheduleNow:
     case mcScheduleNext:
-        return m_ScrollBarHeight / m_ItemEventHeight;
+        ItemHeight = m_ItemEventHeight;
+        break;
     case mcRecording:
-        return m_ScrollBarHeight / m_ItemRecordingHeight;
+        ItemHeight = m_ItemRecordingHeight;
+        break;
     default:
-        return m_ScrollBarHeight / m_ItemHeight;
+        break;
     }
+    return m_ScrollBarHeight / ItemHeight;  //? Avoid DIV/0
 }
 
 int cFlatDisplayMenu::ItemsHeight() {
@@ -367,10 +373,9 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         TopBarSetTitle(*NewTitle);
         TopBarSetMenuIcon(*IconName);
 
-        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3) {
+        if (Config.DiskUsageShow && (m_MenuCategory == mcRecording || m_MenuCategory == mcTimer))
             TopBarEnableDiskUsage();
-        }
+
     } else {
         TopBarSetTitle(Title);
     }  // Config.TopBarMenuIconShow
@@ -492,11 +497,12 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         ColorBg, m_Font, AvailableTextWidth - xt - m_MarginItem2 - m_FontHeight);
                 } else {
                     if (Config.MenuItemParseTilde) {
-                        std::string_view tilde {s};
-                        const std::size_t found {tilde.find('~')};  // Search for ~
-                        if (found != std::string::npos) {
-                            std::string_view sv1 {tilde.substr(0, found)};
-                            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                        const char *TildePos {strchr(s, '~')};
+
+                        if (TildePos) {
+                            std::string_view sv1 {s, static_cast<size_t>(TildePos - s)};
+                            std::string_view sv2 {TildePos + 1};
+
                             const std::string first {rtrim(sv1)};   // Trim possible space at end
                             const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -641,8 +647,8 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         ++p;
     }
     if (total > 0) {
-        const double progress {static_cast<double>(now) / total};
-        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, progress, 1.0, ColorFg, ColorBarFg, ColorBg,
+        // const double progress {static_cast<double>(now) / total};
+        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, now, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
 }
@@ -782,9 +788,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             if (Event->Duration() == 0)  //? Avoid DIV/0
                 esyslog("FlatPlus: cFlatDisplayMenu::SetItemChannel() Event->Duration() is 0!");
 
-            progress = round((time(0) * 1.0 - Event->StartTime()) / Event->Duration() * 100.0);
-            if (progress < 0.0) progress = 0.0;
-            else if (progress > 100.0) progress = 100.0;
+            const time_t now {time(0)};
+            const double duration = Event->Duration();
+            progress = (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration)) : 0.0;
 
             EventTitle = Event->Title();
         }
@@ -1228,11 +1234,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 clrTransparent, m_Font, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string_view tilde {File};
-                const std::size_t found {tilde.find('~')};  // Search for ~
-                if (found != std::string::npos) {
-                    std::string_view sv1 {tilde.substr(0, found)};
-                    std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                const char *TildePos {strchr(File, '~')};
+
+                if (TildePos) {
+                    std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
+                    std::string_view sv2 {TildePos + 1};
                     const std::string first {rtrim(sv1)};   // Trim possible space at end
                     const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -1264,11 +1270,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
             if (Config.MenuItemParseTilde) {
-                std::string_view tilde {File};
-                const std::size_t found {tilde.find('~')};  // Search for ~
-                if (found != std::string::npos) {
-                    std::string_view sv1 {tilde.substr(0, found)};
-                    std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
+                const char *TildePos {strchr(File, '~')};
+
+                if (TildePos) {
+                    std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
+                    std::string_view sv2 {TildePos + 1};
+
                     const std::string first {rtrim(sv1)};   // Trim possible space at end
                     const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -1483,9 +1490,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     if (Event->Duration() == 0)  //? Avoid DIV/0
                         esyslog("FlatPlus: cFlatDisplayMenu::SetItemEvent() Event->Duration() is 0!");
 
-                    double progress {round((now * 1.0 - Event->StartTime()) / Event->Duration() * 100.0)};
-                    if (progress < 0.0) progress = 0.0;
-                    else if (progress > 100.0) progress = 100.0;
+                    const time_t now {time(0)};
+                    const double duration = Event->Duration();
+                    const double progress =
+                        (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
+                                       : 0.0;
 
                     int PBLeft {Left};
                     int PBTop {y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -

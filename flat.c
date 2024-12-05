@@ -202,7 +202,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0)  //? Avoid DIV/0
         esyslog("FlatPlus: GetRecordingSeenIcon() FrameTotal is 0!");
 
-    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
+    const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
