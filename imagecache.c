@@ -21,20 +21,17 @@ cImageCache::cImageCache() {}
 cImageCache::~cImageCache() {}
 
 void cImageCache::Create() {
-    for (uint i {0}; i < MaxImageCache; ++i) {
-        CacheImage[i] = nullptr;
-        CacheName[i] = "";
-        CacheWidth[i] = -1;
-        CacheHeight[i] = -1;
-    }
+    std::fill(std::begin(CacheImage), std::end(CacheImage), nullptr);
+    std::fill(std::begin(CacheName), std::end(CacheName), "");
+    std::fill(std::begin(CacheWidth), std::end(CacheWidth), -1);
+    std::fill(std::begin(CacheHeight), std::end(CacheHeight), -1);
 
     m_InsertIndex = 0;
 }
 
 void cImageCache::Clear() {
     for (uint i {0}; i < MaxImageCache; ++i) {
-        // if (CacheImage[i] != nullptr)  //* 'delete' already checks for nullptr
-            delete CacheImage[i];
+        delete CacheImage[i];  //* 'delete' already checks for nullptr
     }
 
     m_InsertIndex = 0;
