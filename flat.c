@@ -128,34 +128,37 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     return "unknown_asp";
 }
 
-cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
-    cString res("unknown_res");
-    switch (ScreenWidth) {
-        case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
-        case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
-        // case 2560: res = "2560x1440"; break;  //* 2560x1440 (QHD) Is that used somewhere on sat/cable?
-        case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
-        case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
-        case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
-        case 960: res = "960x720"; break;     // 960x720 (HD720 DV)
-        case 720: res = "720x576"; break;     // 720x576 (PAL)
-        case 704: res = "704x576"; break;     // 704x576 (PAL)
-        case 544: res = "544x576"; break;     // 544x576 (PAL)
-        case 528: res = "528x576"; break;     // 528x576 (PAL)
-        case 480: res = "480x576"; break;     // 480x576 (PAL SVCD)
-        case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
-        default:
-            dsyslog("flatPlus: Unkown screen resolution: %d x %d", ScreenWidth, ScreenHeight);
-            break;
+const cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
+    /* Resolutions
+    7680×4320 (UHD-2 / 8K)
+    3840×2160 (UHD-1 / 4K)
+    2560x1440 (QHD) //* Is that used somewhere on sat/cable?
+    1920x1080 (HD1080 Full HDTV)
+    1440x1080 (HD1080 DV)
+    1280x720 (HD720)
+    960x720 (HD720 DV)
+    720x576 (PAL)
+    704x576 (PAL)
+    544x576 (PAL)
+    528x576 (PAL)
+    480x576 (PAL SVCD)
+    352x576 (PAL CVD) */
+
+    static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
+                                     "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
+                                     "528x576",   "480x576",   "352x576"};
+    static const int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
+    for (int i {0}; i < sizeof(ResWidths) / sizeof(ResWidths[0]); ++i) {
+        if (ScreenWidth <= ResWidths[i])
+            return ResNames[i];
     }
-    return res;
+
+    return "unknown_res";
+    dsyslog("flatPlus: Unkown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
 }
 
 cString GetFormatIcon(int ScreenWidth) {
-    if (ScreenWidth > 1920) return "uhd";
-    if (ScreenWidth > 720) return "hd";
-
-    return "sd";  // 720 and below is considered sd
+    return (ScreenWidth > 1920) ? "uhd" : (ScreenWidth > 720) ? "hd" : "sd";  // 720 and below is considered sd
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {

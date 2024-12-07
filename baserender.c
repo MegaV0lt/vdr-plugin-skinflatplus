@@ -234,7 +234,13 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
-        switch (DiskFreePercent) {  // Show free space
+        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
+        const int IconIndex = (DiskFreePercent * 31) / 100;
+        IconName = cString::sprintf("chart%db", IconIndex + 1);
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   IconIndex %d, IconName %s", IconIndex, IconName);
+#endif
+        /* switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
         case 3 ... 4: IconName = "chart1b"; break;  // 3,125 (4)
         case 5 ... 6: IconName = "chart2b"; break;  // 6,25
@@ -267,7 +273,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         case 89 ... 91: IconName = "chart29b"; break;  // 90,625
         case 92 ... 94: IconName = "chart30b"; break;  // 93,75
         case 95 ... 100: IconName = "chart31b"; break;  // 96,875 - 100
-        }
+        } */
     } else {  // Show in occupied mode
         const double OccupiedGB {AllGB - FreeGB};
         const int OccupiedMinutes = AllMinutes - FreeMinutes;  // Narrowing conversion
@@ -306,7 +312,10 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             }
         }
 
-        switch (DiskUsagePercent) {  // Show used space
+        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
+        const int IconIndex = (DiskUsagePercent * 31) / 100;
+        IconName = cString::sprintf("chart%d", IconIndex + 1);
+        /* switch (DiskUsagePercent) {  // Show used space
         case 0 ... 3: IconName = "chart1"; break;  // 3,125
         case 4 ... 6: IconName = "chart2"; break;  // 6,25
         case 7 ... 9: IconName = "chart3"; break;  // 9,375
@@ -339,7 +348,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         case 92 ... 94: IconName = "chart30"; break;  // 93,75
         case 95 ... 97: IconName = "chart31"; break;  // 96,875
         case 98 ... 100: IconName = "chart32"; break;  // > 98% (chart31 in red)
-        }
+        } */
     }
     TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
