@@ -16,7 +16,7 @@
 #include <iostream>
 #include <utility>
 
-#include <future>  // NOLINT
+// #include <future>  // NOLINT
 #include <sstream>
 #include <locale>
 
@@ -349,6 +349,10 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 void cFlatBaseRender::TopBarUpdate() {
     const time_t Now {time(0)};
     if (m_TopBarUpdateTitle || (Now - 60) > m_TopBarLastDate) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
+#endif
+
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = Now;
         if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
@@ -449,14 +453,14 @@ void cFlatBaseRender::TopBarUpdate() {
         uint NumRec {0};
         if (Config.TopBarRecordingShow) {
             // Look for timers
-            auto recCounterFuture = std::async([&NumRec]() {
-                LOCK_TIMERS_READ;
-                for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
-                    if (ti->HasFlags(tfRecording))
+            // auto recCounterFuture = std::async([&NumRec]() {
+                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                    if (Timer->HasFlags(tfRecording))
                         ++NumRec;
                 }
-            });
-            recCounterFuture.get();
+            // });
+            // recCounterFuture.get();
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
                                             m_TopBarFontHeight - m_MarginItem2);
@@ -585,7 +589,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
     if (!ButtonsPixmap) return;
 
     const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
-    int ButtonWidth {(WidthMargin / 4) - Config.decorBorderButtonSize * 2};
+    int ButtonWidth {WidthMargin / 4 - Config.decorBorderButtonSize * 2};
 
     PixmapFill(ButtonsPixmap, clrTransparent);
     DecorBorderClearByFrom(BorderButton);

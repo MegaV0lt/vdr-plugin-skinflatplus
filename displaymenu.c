@@ -10,7 +10,7 @@
 #include <iostream>
 #include <utility>
 
-#include <future>  // NOLINT
+// #include <future>  // NOLINT
 
 #include <sstream>
 #include <locale>
@@ -337,7 +337,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             IconName = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
                 uint TimerCount {0}, TimerActiveCount {0};
-                LOCK_TIMERS_READ;
+                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
                 for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     ++TimerCount;
                     if (Timer->HasFlags(tfActive))
@@ -373,7 +373,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         TopBarSetTitle(*NewTitle);
         TopBarSetMenuIcon(*IconName);
 
-        if (Config.DiskUsageShow && (m_MenuCategory == mcRecording || m_MenuCategory == mcTimer))
+        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
+            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3)
             TopBarEnableDiskUsage();
 
     } else {
@@ -785,9 +786,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Event = Schedule->GetPresentEvent();
         if (Event) {
             // Calculate progress bar
-            if (Event->Duration() == 0)  //? Avoid DIV/0
-                esyslog("FlatPlus: cFlatDisplayMenu::SetItemChannel() Event->Duration() is 0!");
-
             const time_t now {time(0)};
             const double duration = Event->Duration();
             progress = (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration)) : 0.0;
@@ -1487,9 +1485,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
                     // Calculate progress bar
-                    if (Event->Duration() == 0)  //? Avoid DIV/0
-                        esyslog("FlatPlus: cFlatDisplayMenu::SetItemEvent() Event->Duration() is 0!");
-
                     const time_t now {time(0)};
                     const double duration = Event->Duration();
                     const double progress =
@@ -3014,16 +3009,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        auto channelFuture = std::async(
-            [&RecAdditional](tChannelID channelId) {
+        // auto channelFuture = std::async(
+        //    [&RecAdditional](tChannelID channelId) {
                 LOCK_CHANNELS_READ;
-                const cChannel *channel = Channels->GetByChannelID(channelId);
-                if (channel)
+                const cChannel *Channel = Channels->GetByChannelID(/*channelId*/ RecInfo->ChannelID());
+                if (Channel)
                     RecAdditional.Append(
-                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
-            },
-            RecInfo->ChannelID());
-        channelFuture.get();
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+        //    },
+        //    RecInfo->ChannelID());
+        //  channelFuture.get();
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3592,7 +3587,7 @@ void cFlatDisplayMenu::Flush() {
 
     if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
         uint TimerCount {0}, TimerActiveCount {0};
-        LOCK_TIMERS_READ;
+        LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
             ++TimerCount;
             if (Timer->HasFlags(tfActive))
@@ -3680,10 +3675,10 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     time_t RecStart2 {0};
 
     LOCK_RECORDINGS_READ;
-    for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-        RecFolder2 = GetRecordingName(rec, Level, true);
+    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+        RecFolder2 = GetRecordingName(Rec, Level, true);
         if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
-            RecStart2 = rec->Start();
+            RecStart2 = Rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
                 if (RecStart2 > RecStart)
                     RecStart = RecStart2;
@@ -4111,15 +4106,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     const int NumDevices {cDevice::NumDevices()};
     bool RecDevices[NumDevices] {false};  // Array initialised to false
 
-    LOCK_TIMERS_READ;
-    for (const cTimer *timer = Timers->First(); timer; timer = Timers->Next(timer)) {
-        if (!timer->Recording())
-            continue;
-
-        if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(timer)) {
-            const cDevice *RecDevice = RecordControl->Device();
-            if (RecDevice)
-                RecDevices[RecDevice->DeviceNumber()] = true;
+    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        if (Timer->HasFlags(tfRecording)) {
+            if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
+                const cDevice *RecDevice = RecordControl->Device();
+                if (RecDevice) RecDevices[RecDevice->DeviceNumber()] = true;
+            }
         }
     }  // for cTimer
 
@@ -4226,31 +4219,31 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     int AllTimers {0};  // All timers and remote timers
 
-    LOCK_TIMERS_READ;
-    for (const cTimer *ti = Timers->First(); ti; ti = Timers->Next(ti)) {
-        if (ti->HasFlags(tfActive) && !ti->HasFlags(tfRecording)) {
-            if (ti->Remote()) {
+    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        if (Timer->HasFlags(tfActive) && !Timer->HasFlags(tfRecording)) {
+            if (Timer->Remote()) {
                 if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
-                    TimerRemoteActive.Append(ti);
+                    TimerRemoteActive.Append(Timer);
                     AllTimers += 1;
                 }
             } else {  // Local
                 if (Config.MainMenuWidgetActiveTimerShowActive) {
-                    TimerActive.Append(ti);
+                    TimerActive.Append(Timer);
                     AllTimers += 1;
                 }
             }
         }
 
-        if (ti->HasFlags(tfRecording)) {
-            if (ti->Remote()) {
+        if (Timer->HasFlags(tfRecording)) {
+            if (Timer->Remote()) {
                 if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
-                    TimerRemoteRec.Append(ti);
+                    TimerRemoteRec.Append(Timer);
                     AllTimers += 1;
                 }
             } else {  // Local
                 if (Config.MainMenuWidgetActiveTimerShowRecording) {
-                    TimerRec.Append(ti);
+                    TimerRec.Append(Timer);
                     AllTimers += 1;
                 }
             }
@@ -4368,7 +4361,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/remotetimer", 999, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -4405,7 +4398,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/local-network", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/remotetimer", 999, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -4456,13 +4449,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     StrRec.reserve(128);
     div_t TimeHM {0, 0};
     LOCK_RECORDINGS_READ;
-    for (const cRecording *rec = Recordings->First(); rec; rec = Recordings->Next(rec)) {
-        RecStart = rec->Start();
-        TimeHM = std::div((rec->LengthInSeconds() + 30) / 60, 60);
+    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+        RecStart = Rec->Start();
+        TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);
         Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
-        StrRec = *(cString::sprintf("%s - %s", *DateTime, rec->Name()));
+        StrRec = *(cString::sprintf("%s - %s", *DateTime, Rec->Name()));
         Recs.emplace_back(std::make_pair(RecStart, StrRec));
     }
 
@@ -5318,7 +5311,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     if (Config.MainMenuWidgetActiveTimerShow) {
         ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2);
         ImgLoader.LoadIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
-        ImgLoader.LoadIcon("widgets/local-network", m_FontSmlHeight, m_FontSmlHeight);
+        ImgLoader.LoadIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
     }
     if (Config.MainMenuWidgetLastRecShow) {
         ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2);
