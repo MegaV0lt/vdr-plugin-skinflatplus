@@ -238,7 +238,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         const int IconIndex = (DiskFreePercent * 31) / 100;
         IconName = cString::sprintf("chart%db", IconIndex + 1);
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   IconIndex %d, IconName %s", IconIndex, IconName);
+        dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
 #endif
         /* switch (DiskFreePercent) {  // Show free space
         case 0 ... 2: IconName = "chart0b"; break;  // < 2% (chart1b in red)
@@ -999,12 +999,12 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         return;
     }
 
-    const int Middle {rect.Height() / 2};
+    const int big {rect.Height()};
+    const int Middle {big / 2};
     const double PercentLeft {static_cast<double>(Current) / Total};
     switch (Type) {
     case 0:  // Small line + big line
     {
-        const int big {rect.Height()};
         const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1016,7 +1016,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 1:  // big line
     {
-        const int big {rect.Height()};
         if (Current > 0)
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
@@ -1024,9 +1023,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 2:  // big line + outline
     {
-        const int big {rect.Height()};
-        int out {1};
-        if (big > 10) out = 2;
+        const int out {big > 10 ? 2 : 1};
         // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1070,7 +1067,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 3:  // Small line + big line + dot
     {
-        const int big {rect.Height()};
         const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1087,7 +1083,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 4:  // big line + dot
     {
-        const int big {rect.Height()};
         if (Current > 0) {
             Pixmap->DrawRectangle(
                 cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
@@ -1100,9 +1095,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 5:  // big line + outline + dot
     {
-        const int big {rect.Height()};
-        int out {1};
-        if (big > 10) out = 2;
+        const int out {big > 10 ? 2 : 1};
         // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1121,7 +1114,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 6:  // Small line + dot
     {
-        const int big {rect.Height()};
         const int sml {std::max(big / 10 * 2, 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
@@ -1136,9 +1128,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 7:  // Outline + dot
     {
-        const int big {rect.Height()};
-        int out {1};
-        if (big > 10) out = 2;
+        const int out {big > 10 ? 2 : 1};
         // Outline
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), rect.Width(), out), ColorFg);
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + big - out, rect.Width(), out), ColorFg);
@@ -1156,7 +1146,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 8:  // Small line + big line + alpha blend
     {
         const int sml {std::max(rect.Height() / 10 * 2, 2)};
-        const int big {rect.Height() / 2 - (sml / 2)};
+        const int big {Middle - (sml / 2)};
 
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
@@ -1169,7 +1159,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
     case 9:  // big line + alpha blend
     {
-        const int big {rect.Height()};
         if (Current > 0) {
             DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft),
                                  big / 2, ColorBarFg);
@@ -1485,8 +1474,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             break;
         }
         case 4: {
-            int out {1};
-            if (m_ScrollBarWidth > 10) out = 2;
+            const int out {(m_ScrollBarWidth > 10) ? 2 : 1};
             // Outline
             Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, m_ScrollBarWidth, out), Config.decorScrollBarFg);
@@ -1501,8 +1489,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 5: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            int out {1};
-            if (m_ScrollBarWidth > 10) out = 2;
+            const int out {(m_ScrollBarWidth > 10) ? 2 : 1};
             // Outline
             Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, m_ScrollBarWidth, out), Config.decorScrollBarFg);

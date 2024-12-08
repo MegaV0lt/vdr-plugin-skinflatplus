@@ -128,11 +128,11 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     return "unknown_asp";
 }
 
-const cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
+cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     /* Resolutions
     7680×4320 (UHD-2 / 8K)
     3840×2160 (UHD-1 / 4K)
-    2560x1440 (QHD) //* Is that used somewhere on sat/cable?
+    2560x1440 (QHD) //? Is that used somewhere on sat/cable?
     1920x1080 (HD1080 Full HDTV)
     1440x1080 (HD1080 DV)
     1280x720 (HD720)
@@ -148,7 +148,7 @@ const cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
                                      "528x576",   "480x576",   "352x576"};
     static const int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
-    for (int i {0}; i < sizeof(ResWidths) / sizeof(ResWidths[0]); ++i) {
+    for (uint i {0}; i < sizeof(ResWidths) / sizeof(ResWidths[0]); ++i) {
         if (ScreenWidth <= ResWidths[i])
             return ResNames[i];
     }
