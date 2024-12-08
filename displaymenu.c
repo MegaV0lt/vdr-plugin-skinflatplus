@@ -175,7 +175,8 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
 }
 
 void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
-    DrawScrollbar(Total, Offset, MaxItems(), 0, ItemsHeight(), Offset > 0, Offset + MaxItems() < Total);
+    const int ItemsMax {MaxItems()};  // Cache value
+    DrawScrollbar(Total, Offset, ItemsMax, 0, ItemsHeight(), Offset > 0, Offset + ItemsMax < Total);
 }
 
 void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
@@ -1485,7 +1486,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
                 if (total >= 0) {
                     // Calculate progress bar
-                    const time_t now {time(0)};
                     const double duration = Event->Duration();
                     const double progress =
                         (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
@@ -2733,7 +2733,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (RecInfo && RecInfo->Errors() >= 1) {
+            if (RecInfo && RecInfo->Errors() > 0) {
                 std::ostringstream RecErrors {""};
                 RecErrors.imbue(std::locale(""));  // Set to local locale
                 RecErrors << RecInfo->Errors();
@@ -3037,7 +3037,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-        if (RecInfo && RecInfo->Errors() >= 1) {
+        if (RecInfo && RecInfo->Errors() > 0) {
             std::ostringstream RecErrors {""};
             RecErrors.imbue(std::locale {""});  // Set to local locale
             RecErrors << RecInfo->Errors();
@@ -3607,7 +3607,7 @@ void cFlatDisplayMenu::Flush() {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    /* std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
             (*it).Left = ib.Left;
@@ -3621,28 +3621,29 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
             (*it).From = ib.From;
             return;
         }
+*/
+    auto it = std::find_if(ItemsBorder.begin(), ItemsBorder.end(),
+                           [&ib](const sDecorBorder &b) { return b.Left == ib.Left && b.Top == ib.Top; });
+    if (it != ItemsBorder.end()) {
+        *it = ib;
+    } else {
+        ItemsBorder.emplace_back(ib);
     }
-
-    ItemsBorder.emplace_back(ib);
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
-    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
-    for (it = ItemsBorder.begin(); it != end; ++it) {
-        const sDecorBorder ib {(*it).Left,    (*it).Top,     (*it).Width - m_ScrollBarWidth,
-                               (*it).Height,  (*it).Size,    (*it).Type,
-                               (*it).ColorFg, (*it).ColorBg, BorderMenuItem};
-        DecorBorderDraw(ib);
+    for (auto &Border : ItemsBorder) {
+        Border.Width -= m_ScrollBarWidth;
+        DecorBorderDraw(Border);
+        Border.Width += m_ScrollBarWidth;  // Restore original width
     }
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
-    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
-    for (it = ItemsBorder.begin(); it != end; ++it) {
-        const sDecorBorder ib {(*it).Left,    (*it).Top,     (*it).Width + m_ScrollBarWidth,
-                               (*it).Height,  (*it).Size,    (*it).Type,
-                               (*it).ColorFg, (*it).ColorBg, BorderMenuItem};
-        DecorBorderDraw(ib);
+    for (auto &Border : ItemsBorder) {
+        Border.Width += m_ScrollBarWidth;
+        DecorBorderDraw(Border);
+        Border.Width -= m_ScrollBarWidth;  // Restore original width
     }
 }
 

@@ -37,7 +37,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     /* Make Config.decorProgressReplaySize even
     https://stackoverflow.com/questions/4739388/make-an-integer-even
     number = (number / 2) * 2; */
-    const int ProgressBarHeight = ((Config.decorProgressReplaySize + 1) / 2) * 2;  // Make it even (And round up)
+    const int ProgressBarHeight {((Config.decorProgressReplaySize + 1) / 2) * 2};  // Make it even (And round up)
     ProgressBarCreate(
         cRect(Config.decorBorderReplaySize,
               m_OsdHeight - m_LabelHeight - ProgressBarHeight - Config.decorBorderReplaySize - m_MarginItem,
@@ -120,7 +120,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     //  Done: Substract 'left' in case of displayed recording icon
     //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
     //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
-    int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
+    int MaxWidth {m_OsdWidth - left - Config.decorBorderReplaySize * 2};
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors)

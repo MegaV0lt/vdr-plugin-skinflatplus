@@ -108,7 +108,7 @@ bool cComplexContent::Scrollable(int height) {
         return false;
     }
 
-    const int total = ScrollTotal();
+    const int total {ScrollTotal()};
     // const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
     const int shown = (height + m_ScrollSize - 1) / m_ScrollSize;  // Avoid floating-point and use integer division
     return total > shown;
@@ -206,11 +206,12 @@ int cComplexContent::ScrollOffset() {
     if (!Pixmap) return 0;
 
     int y {Pixmap->DrawPort().Point().Y() * -1};
-    if (y + m_Position.Height() + m_ScrollSize > m_DrawPortHeight) {
-        if (y == m_DrawPortHeight - m_Position.Height())
+    const int PositionHeight {m_Position.Height()};
+    if (y + PositionHeight + m_ScrollSize > m_DrawPortHeight) {
+        if (y == m_DrawPortHeight - PositionHeight)
             y += m_ScrollSize;
         else
-            y = m_DrawPortHeight - m_Position.Height() - 1;
+            y = m_DrawPortHeight - PositionHeight - 1;
     }
 
     if (m_DrawPortHeight == 0)
