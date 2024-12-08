@@ -684,15 +684,16 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
         PixmapFill(LabelJumpPixmap, clrTransparent);
         return;
     }
-    const int left {(m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(Jump)) / 2};
+    const int JumpWidth {m_Font->Width(Jump)};
+    const int left {(m_OsdWidth - Config.decorBorderReplaySize * 2 - JumpWidth) / 2};
 
     LabelJumpPixmap->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
-                              m_Font->Width(Jump), m_FontHeight, taCenter);
+                              JumpWidth, m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
                            m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 -
                                m_FontHeight - Config.decorBorderReplaySize * 2,
-                           m_Font->Width(Jump),
+                           JumpWidth,
                            m_FontHeight,
                            Config.decorBorderReplaySize,
                            Config.decorBorderReplayType,
