@@ -236,7 +236,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         }
         // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
         const int IconIndex = (DiskFreePercent * 31) / 100;
-        IconName = cString::sprintf("chart%db", IconIndex + 1);
+        IconName = cString::sprintf("chart%db", IconIndex);
 #ifdef DEBUGFUNCSCALL
         dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
 #endif
@@ -452,7 +452,7 @@ void cFlatBaseRender::TopBarUpdate() {
                                                 m_TopBarFontHeight - m_MarginItem2);
 
                 if (ImgCon) {
-                    Buffer = cString::sprintf("%d", NumConflicts);
+                    // Buffer = cString::sprintf("%d", NumConflicts);  // Created later
                     Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -474,7 +474,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
                                             m_TopBarFontHeight - m_MarginItem2);
                 if (ImgRec) {
-                    Buffer = cString::sprintf("%d", NumRec);
+                    // Buffer = cString::sprintf("%d", NumRec);  // Created later
                     Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -498,9 +498,8 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }
 
-        const int Extra1Width {m_TopBarFontSml->Width(*m_TopBarTitleExtra1)};
-        const int Extra2Width {m_TopBarFontSml->Width(*m_TopBarTitleExtra2)};
-        const int ExtraMaxWidth {std::max(Extra1Width, Extra2Width)};
+        const int ExtraMaxWidth {std::max(m_TopBarFontSml->Width(*m_TopBarTitleExtra1),
+                                          m_TopBarFontSml->Width(*m_TopBarTitleExtra2))};
         MiddleWidth += ExtraMaxWidth;
         Right -= ExtraMaxWidth + m_MarginItem;
 
@@ -898,7 +897,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
     }
 
-    const int top = m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize;
+    const int top {m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize};
     const sDecorBorder ib {Config.decorBorderMessageSize,
                            top,
                            m_OsdWidth - Config.decorBorderMessageSize * 2,
@@ -1001,7 +1000,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
     const int big {rect.Height()};
     const int Middle {big / 2};
-    const double PercentLeft {static_cast<double>(Current) / Total};
+    const int Percent {static_cast<int>(rect.Width() * static_cast<double>(Current) / Total)};
     switch (Type) {
     case 0:  // Small line + big line
     {
@@ -1011,14 +1010,14 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0)
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), Percent, big), ColorBarFg);
         break;
     }
     case 1:  // big line
     {
         if (Current > 0)
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), Percent, big), ColorBarFg);
         break;
     }
     case 2:  // big line + outline
@@ -1034,33 +1033,33 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         if (Current > 0) {
             const int out2 {out * 2};
             if (IsSignal) {
-                const double perc {100.0 / Total * Current * (1.0 / 100.0)};
-                if (perc > 0.666) {
-                    Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out2, big - out2),
-                                          Theme.Color(clrButtonGreen));
+                const float perc {static_cast<float>(Current) / Total};
+                if (perc > 0.666f) {
+                    Pixmap->DrawRectangle(
+                        cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out, Percent - out2, big - out2),
+                        Theme.Color(clrButtonGreen));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.666) - out2, big - out2),
                                           Theme.Color(clrButtonYellow));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.333) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
-                } else if (perc > 0.333) {
-                    Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out2, big - out2),
-                                          Theme.Color(clrButtonYellow));
+                } else if (perc > 0.333f) {
+                    Pixmap->DrawRectangle(
+                        cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out, Percent - out2, big - out2),
+                        Theme.Color(clrButtonYellow));
                     Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
                                                 (rect.Width() * 0.333) - out2, big - out2),
                                           Theme.Color(clrButtonRed));
                 } else {
-                    Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                                (rect.Width() * PercentLeft) - out2, big - out2),
-                                          Theme.Color(clrButtonRed));
+                    Pixmap->DrawRectangle(
+                        cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out, Percent - out2, big - out2),
+                        Theme.Color(clrButtonRed));
                 }
             } else {
-                Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out,
-                                            (rect.Width() * PercentLeft) - out2, big - out2),
-                                      ColorBarFg);
+                Pixmap->DrawRectangle(
+                    cRect(rect.Left() + out, rect.Top() + Middle - (big / 2) + out, Percent - out2, big - out2),
+                    ColorBarFg);
             }
         }
         break;
@@ -1073,10 +1072,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), Percent, big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
-                                      rect.Top() + Middle - (big / 2), big, big),
+            Pixmap->DrawEllipse(cRect(rect.Left() + Percent - (big / 2), rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
@@ -1085,10 +1083,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     {
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), Percent, big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
-                                      rect.Top() + Middle - (big / 2), big, big),
+            Pixmap->DrawEllipse(cRect(rect.Left() + Percent - (big / 2), rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
@@ -1104,10 +1101,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             Pixmap->DrawRectangle(
-                cRect(rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft), big), ColorBarFg);
+                cRect(rect.Left(), rect.Top() + Middle - (big / 2), Percent, big), ColorBarFg);
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
-                                      rect.Top() + Middle - (big / 2), big, big),
+            Pixmap->DrawEllipse(cRect(rect.Left() + Percent - (big / 2), rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
@@ -1120,8 +1116,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
-                                      rect.Top() + Middle - (big / 2), big, big),
+            Pixmap->DrawEllipse(cRect(rect.Left() + Percent - (big / 2), rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
@@ -1137,8 +1132,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
 
         if (Current > 0) {
             // Dot
-            Pixmap->DrawEllipse(cRect(rect.Left() + (rect.Width() * PercentLeft) - (big / 2),
-                                      rect.Top() + Middle - (big / 2), big, big),
+            Pixmap->DrawEllipse(cRect(rect.Left() + Percent - (big / 2), rect.Top() + Middle - (big / 2), big, big),
                                 ColorBarFg, 0);
         }
         break;
@@ -1151,8 +1145,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
         Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
         if (Current > 0) {
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), (rect.Width() * PercentLeft), big, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + (sml / 2), (rect.Width() * PercentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), Percent, big, ColorBarFg);
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + (sml / 2), Percent,
                                  big * -1, ColorBarFg);
         }
         break;
@@ -1160,9 +1154,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     case 9:  // big line + alpha blend
     {
         if (Current > 0) {
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - (big / 2), (rect.Width() * PercentLeft),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle - (big / 2), Percent,
                                  big / 2, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, (rect.Width() * PercentLeft), (big / -2),
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle, Percent, (big / -2),
                                  ColorBarFg);
         }
         break;
@@ -1569,10 +1563,7 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
 }
 
 void cFlatBaseRender::DecorBorderRedrawAll() {
-    std::vector<sDecorBorder>::iterator it, end = Borders.end();
-    for (it = Borders.begin(); it != end; ++it) {
-        const sDecorBorder ib {(*it).Left, (*it).Top,     (*it).Width,   (*it).Height, (*it).Size,
-                               (*it).Type, (*it).ColorFg, (*it).ColorBg, (*it).From};
+    for (const auto &ib : Borders) {
         DecorBorderDraw(ib, false);
     }
 }
@@ -1876,32 +1867,63 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
     FT_Library library;
     FT_Face face;
-    const cString FontFileName = cFont::GetFontFileName(Name);
+    const cString FontFileName = *cFont::GetFontFileName(Name);
     int Ascender {CharHeight};
-    int rc {FT_Init_FreeType(&library)};
-    if (!rc) {
-        rc = FT_New_Face(library, *FontFileName, 0, &face);
-        if (!rc) {
-            if (face->num_fixed_sizes && face->available_sizes) {  // Fixed font
+
+    if (FT_Init_FreeType(&library) == 0) {
+        if (FT_New_Face(library, *FontFileName, 0, &face) == 0) {
+            if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
                 Ascender = face->available_sizes->height;
+            } else if (FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0) == 0) {
+                Ascender = face->size->metrics.ascender / 64;
             } else {
-                rc = FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0);
-                if (!rc) {
-                    Ascender = face->size->metrics.ascender / 64;
-                } else {
-                    esyslog("ERROR: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-                }
+                esyslog("ERROR: FreeType: error during FT_Set_Char_Size (font = %s)", *FontFileName);
             }
+            FT_Done_Face(face);
         } else {
-            esyslog("ERROR: FreeType: load error %d (font = %s)", rc, *FontFileName);
+            esyslog("ERROR: FreeType: load error (font = %s)", *FontFileName);
         }
+        FT_Done_FreeType(library);
     } else {
-        esyslog("ERROR: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
+        esyslog("ERROR: FreeType: initialization error (font = %s)", *FontFileName);
     }
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
 
     return Ascender;
+}
+cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, std::string delimiter) {
+    std::ifstream file(*filePath);
+    if (!file.is_open()) return "";
+
+    std::string data {""};
+    data.reserve(16);
+    std::getline(file, data);
+    file.close();
+
+    if (!delimiter.empty()) {
+        const std::size_t found = data.find(delimiter);
+        if (found != std::string::npos) {
+            return data.substr(0, found).c_str();
+        }
+    }
+
+    return data.c_str();
+}
+
+cString cFlatBaseRender::FormatPrecipitation(const cString &filePath) {
+    std::ifstream file(*filePath);
+    if (!file.is_open()) return "";
+
+    std::string data {""};
+    data.reserve(16);
+    std::getline(file, data);
+    file.close();
+
+    double p {0.0};
+    std::istringstream istr(data);
+    istr.imbue(std::locale("C"));
+    istr >> p;
+    p = RoundUp(p * 100.0, 10);
+    return cString::sprintf("%.0f%%", p);
 }
 
 void cFlatBaseRender::DrawWidgetWeather() {
@@ -1909,108 +1931,40 @@ void cFlatBaseRender::DrawWidgetWeather() {
     dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
 #endif
 
-    std::ifstream file;
-    cString FileName {""};
+    // Read temperature and sign
+    std::string TempToday {
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH))};
 
-    std::string TempToday {""}, TempTodaySign {""};
-    FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        TempToday.reserve(8);
-        std::getline(file, TempToday);
-        file.close();
-        const std::size_t found {TempToday.find("°")};
-        if (found != std::string::npos) {
-            TempTodaySign = TempToday.substr(found);
-            TempToday = TempToday.substr(0, found);
-        }
-    } else
-        return;
-
-    std::string IconToday {""}, IconTomorrow {""};
-    FileName = cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        IconToday.reserve(8);
-        std::getline(file, IconToday);
-        file.close();
-    } else
-        return;
-
-    FileName = cString::sprintf("%s/weather/weather.1.icon", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        IconTomorrow.reserve(8);
-        std::getline(file, IconTomorrow);
-        file.close();
-    } else
-        return;
-
-    std::string TempMaxToday {""}, TempMaxTomorrow {""};
-    FileName = cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        TempMaxToday.reserve(8);
-        std::getline(file, TempMaxToday);
-        file.close();
-    } else
-        return;
-
-    FileName = cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        TempMaxTomorrow.reserve(8);
-        std::getline(file, TempMaxTomorrow);
-        file.close();
-    } else
-        return;
-
-    std::string TempMinToday {""}, TempMinTomorrow {""};
-    FileName = cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        TempMinToday.reserve(8);
-        std::getline(file, TempMinToday);
-        file.close();
-    } else
-        return;
-
-    FileName = cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        TempMinTomorrow.reserve(8);
-        std::getline(file, TempMinTomorrow);
-        file.close();
-    } else
-        return;
-
-    std::string PrecToday {""}, PrecTomorrow {""};
-    double p {0.0};
-    FileName = cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        PrecToday.reserve(8);
-        std::getline(file, PrecToday);
-        file.close();
-        std::istringstream istr(PrecToday);
-        istr.imbue(std::locale("C"));
-        istr >> p;
-        p = RoundUp(p * 100.0, 10);
-        PrecToday = cString::sprintf("%.0f%%", p);
+    std::string TempTodaySign {""};
+    const std::size_t found {TempToday.find("°")};
+    if (found != std::string::npos) {
+        TempTodaySign = TempToday.substr(found);  // Get the sign (°C or °F)
+        TempToday = TempToday.substr(0, found);  // Get the temperature
     }
 
-    FileName = cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        PrecTomorrow.reserve(8);
-        std::getline(file, PrecTomorrow);
-        file.close();
-        std::istringstream istr(PrecTomorrow);
-        istr.imbue(std::locale("C"));
-        istr >> p;
-        p = RoundUp(p * 100.0, 10);
-        PrecTomorrow = cString::sprintf("%.0f%%", p);
-    }
+    // Read icons
+    const cString IconToday =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH));
+    const cString IconTomorrow =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.icon", WIDGETOUTPUTPATH));
+
+    // Read max temperatures
+    const cString TempMaxToday =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH));
+    const cString TempMaxTomorrow =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH));
+
+    // Read min temperatures
+    const cString TempMinToday =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH));
+    const cString TempMinTomorrow =
+        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH));
+
+    // Read precipitation
+    const cString PrecToday =
+        *FormatPrecipitation(cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH));
+    const cString PrecTomorrow =
+        *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
 
     const int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);  // Narrowing conversion
     cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
@@ -2020,9 +1974,9 @@ void cFlatBaseRender::DrawWidgetWeather() {
     int left {m_MarginItem};
 
     const int WidthTempToday {
-        std::max(WeatherFontSml->Width(TempMaxToday.c_str()), WeatherFontSml->Width(TempMinToday.c_str()))};
+        std::max(WeatherFontSml->Width(*TempMaxToday), WeatherFontSml->Width(*TempMinToday))};
     const int WidthTempTomorrow {
-        std::max(WeatherFontSml->Width(TempMaxTomorrow.c_str()), WeatherFontSml->Width(TempMinTomorrow.c_str()))};
+        std::max(WeatherFontSml->Width(*TempMaxTomorrow), WeatherFontSml->Width(*TempMinTomorrow))};
     const int WeatherFontHeight {WeatherFont->Height()};  // Used multiple times
     const int WeatherFontSmlHeight {WeatherFontSml->Height()};
 
@@ -2030,9 +1984,9 @@ void cFlatBaseRender::DrawWidgetWeather() {
     const int wWidth {m_MarginItem + WeatherFont->Width(TempToday.c_str()) +
                       WeatherFontSign->Width(TempTodaySign.c_str()) + m_MarginItem2 + WeatherFontHeight +
                       m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
-                      WeatherFontSml->Width(PrecToday.c_str()) + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem +
+                      WeatherFontSml->Width(*PrecToday) + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem +
                       WidthTempTomorrow + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
-                      WeatherFontSml->Width(PrecTomorrow.c_str()) + m_MarginItem2};
+                      WeatherFontSml->Width(*PrecTomorrow) + m_MarginItem2};
     const int wLeft {m_OsdWidth - wWidth - 20};
 
     WeatherWidget.Clear();
@@ -2053,16 +2007,16 @@ void cFlatBaseRender::DrawWidgetWeather() {
                           Theme.Color(clrItemCurrentBg), WeatherFontSign);
     left += WeatherFontSign->Width(TempTodaySign.c_str()) + m_MarginItem2;
 
-    cString WeatherIcon = cString::sprintf("widgets/%s", IconToday.c_str());
+    cString WeatherIcon = cString::sprintf("widgets/%s", *IconToday);
     cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
     }
-    WeatherWidget.AddText(TempMaxToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(*TempMaxToday, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(TempMinToday.c_str(), false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(*TempMinToday, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday,
                           WeatherFontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
@@ -2072,24 +2026,24 @@ void cFlatBaseRender::DrawWidgetWeather() {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - m_MarginItem2;
     }
-    WeatherWidget.AddText(PrecToday.c_str(), false,
+    WeatherWidget.AddText(*PrecToday, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml);
-    left += WeatherFontSml->Width(PrecToday.c_str()) + m_MarginItem * 4;
+    left += WeatherFontSml->Width(*PrecToday) + m_MarginItem * 4;
 
     WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
                           Theme.Color(clrChannelBg));
 
-    WeatherIcon = cString::sprintf("widgets/%s", IconTomorrow.c_str());
+    WeatherIcon = cString::sprintf("widgets/%s", *IconTomorrow);
     img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
     }
-    WeatherWidget.AddText(TempMaxTomorrow.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(*TempMaxTomorrow, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(TempMinTomorrow.c_str(), false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(*TempMinTomorrow, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow,
                           WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
@@ -2099,11 +2053,11 @@ void cFlatBaseRender::DrawWidgetWeather() {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - m_MarginItem2;
     }
-    WeatherWidget.AddText(PrecTomorrow.c_str(), false,
+    WeatherWidget.AddText(*PrecTomorrow, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
 
-    // left += WeatherFontSml->Width(PrecTomorrow.c_str());
+    // left += WeatherFontSml->Width(*PrecTomorrow);
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
     WeatherWidget.CreatePixmaps(false);

@@ -649,7 +649,6 @@ void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const cha
         ++p;
     }
     if (total > 0) {
-        // const double progress {static_cast<double>(now) / total};
         ProgressBarDrawRaw(MenuPixmap, MenuPixmap, rec, recBg, now, total, ColorFg, ColorBarFg, ColorBg,
                            Config.decorProgressMenuItemType, true);
     }
@@ -1129,7 +1128,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     //? Make overlay configurable? (disable)
     if (Timer->Remote()) {  // Remote timer
-        // dsyslog("flatPlus: SetItemTimer() RemoteTimer at Index %d", Index);
         img = ImgLoader.LoadIcon("timerRemote", ImageHeight, ImageHeight);
         if (img) {
             ImageTop = Top + (m_FontHeight - img->Height()) / 2;
@@ -1475,10 +1473,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {
-            // int PBWidth {m_MenuItemWidth / 20};
-            // if (!m_IsScrolling)
-            //    PBWidth = (m_MenuItemWidth - m_ScrollBarWidth) / 20;
-
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_ScrollBarWidth) / 20};
 
             const time_t now {time(0)};
@@ -2705,7 +2699,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     cString Text {""};
     if (Recording) {
         const cRecordingInfo *RecInfo = Recording->Info();
-        // Text.imbue(std::locale {""});
 
         if (!isempty(RecInfo->Description()))
             Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
@@ -2820,7 +2813,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     cImage *img {nullptr};
     if (isempty(*MediaPath)) {  // Prio for tvscraper poster
         const cString RecPath = Recording->FileName();
-        // cString RecImage {""};
         if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
             img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
             if (img) {
@@ -3607,10 +3599,10 @@ void cFlatDisplayMenu::Flush() {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    /* std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
-            (*it).Left = ib.Left;
+            /* (*it).Left = ib.Left;
             (*it).Top = ib.Top;
             (*it).Width = ib.Width;
             (*it).Height = ib.Height;
@@ -3618,17 +3610,13 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
             (*it).Type = ib.Type;
             (*it).ColorFg = ib.ColorFg;
             (*it).ColorBg = ib.ColorBg;
-            (*it).From = ib.From;
+            (*it).From = ib.From; */
+            (*it) = ib;
             return;
         }
-*/
-    auto it = std::find_if(ItemsBorder.begin(), ItemsBorder.end(),
-                           [&ib](const sDecorBorder &b) { return b.Left == ib.Left && b.Top == ib.Top; });
-    if (it != ItemsBorder.end()) {
-        *it = ib;
-    } else {
-        ItemsBorder.emplace_back(ib);
     }
+
+    ItemsBorder.emplace_back(ib);
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
@@ -5053,25 +5041,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;
 
-    std::string Location {""};
-    Location.reserve(32);
-    cString FileName = cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH);
-    std::ifstream file(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        std::getline(file, Location);
-        file.close();
-    } else {
+    // Read location
+    cString Location = *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.location", WIDGETOUTPUTPATH));
+    if (isempty(*Location))
         Location = tr("Unknown");
-    }
 
-    std::string TempToday {""};
-    TempToday.reserve(8);
-    FileName = cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH);
-    file.open(*FileName, std::ifstream::in);
-    if (file.is_open()) {
-        std::getline(file, TempToday);
-        file.close();
-    }
+    // Read temperature
+    const cString TempToday = *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH));
+
     //* Declared in 'baserender.h'
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
@@ -5081,7 +5058,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), Location.c_str(), TempToday.c_str());
+    const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
     ContentWidget.AddText(*Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
@@ -5089,63 +5066,31 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     ContentTop += 6;
 
     int left {m_MarginItem};
-    std::string icon {""}, summary {""}, TempMax {""}, TempMin {""}, prec {""};
-    icon.reserve(8); summary.reserve(32); TempMax.reserve(8); TempMin.reserve(8); prec.reserve(8);
-    cString DayName {""}, PrecString("0%"), StrWeekDayName {""}, WeatherIcon {""};
-    double p {0.0};
-    time_t t {time(0)}, t2 {time(0)};
+    cString Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
+    cString DayName {""}, PrecString(""), StrWeekDayName {""}, WeatherIcon {""};
+    time_t t {time(0)};
+    time_t t2 {t};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
-        FileName = cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index);
-        file.open(*FileName, std::ifstream::in);
-        if (file.is_open()) {
-            std::getline(file, icon);
-            file.close();
-        } else {
-            continue;
-        }
+        // Read icon
+        Icon = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index));
 
-        FileName = cString::sprintf("%s/weather/weather.%d.summary", WIDGETOUTPUTPATH, index);
-        file.open(*FileName, std::ifstream::in);
-        if (file.is_open()) {
-            std::getline(file, summary);
-            file.close();
-        } else {
-            continue;
-        }
+        // Read summary
+        Summary = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.summary", WIDGETOUTPUTPATH, index));
 
-        FileName = cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index);
-        file.open(*FileName, std::ifstream::in);
-        if (file.is_open()) {
-            std::getline(file, TempMax);
-            file.close();
-        } else {
-            continue;
-        }
+        // Read max temperature
+        TempMax = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index));
 
-        FileName = cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index);
-        file.open(*FileName, std::ifstream::in);
-        if (file.is_open()) {
-            std::getline(file, TempMin);
-            file.close();
-        } else {
-            continue;
-        }
+        // Read min temperature
+        TempMin = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index));
 
-        FileName = cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index);
-        file.open(*FileName, std::ifstream::in);
-        if (file.is_open()) {
-            std::getline(file, prec);
-            file.close();
-            std::istringstream istr(prec);
-            istr.imbue(std::locale("C"));
-            istr >> p;
-            p = RoundUp(p * 100.0, 10);
-            PrecString = cString::sprintf("%.0f%%", p);
-        } else {
+        // Read precipitation
+        PrecString =
+            *FormatPrecipitation(cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index));
+
+        if (isempty(Icon) || isempty(Summary) || isempty(TempMax) || isempty(TempMin) || (isempty(PrecString)))
             continue;
-        }
 
         tm_r.tm_mday += index;
         /* time_t */ t2 = mktime(&tm_r);
@@ -5161,17 +5106,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 left += m_Font->Width('|') + m_MarginItem2;
             }
 
-            WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
+            WeatherIcon = cString::sprintf("widgets/%s", *Icon);
             img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            const int wtemp {std::max(m_FontTempSml->Width(TempMax.c_str()), m_FontTempSml->Width(TempMin.c_str()))};
-            ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
+            const int wtemp {std::max(m_FontTempSml->Width(*TempMax), m_FontTempSml->Width(*TempMin))};
+            ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   FontTempSmlHeight, taRight);
-            ContentWidget.AddText(TempMin.c_str(), false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
+            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   FontTempSmlHeight, taRight);
 
@@ -5198,16 +5143,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                                   wWidth - m_MarginItem2);
             left += m_Font->Width("XXXX") + m_MarginItem;
 
-            WeatherIcon = cString::sprintf("widgets/%s", icon.c_str());
+            WeatherIcon = cString::sprintf("widgets/%s", *Icon);
             img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            ContentWidget.AddText(TempMax.c_str(), false, cRect(left, ContentTop, 0, 0),
+            ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
                                   m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
-            ContentWidget.AddText(TempMin.c_str(), false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
+            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
                                   m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
 
@@ -5225,7 +5170,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             left += m_FontTempSml->Width("100% ") + m_MarginItem;
 
             ContentWidget.AddText(
-                summary.c_str(), false,
+                *Summary, false,
                 cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), wWidth - left, m_FontHeight),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
 

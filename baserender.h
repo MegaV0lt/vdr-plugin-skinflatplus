@@ -85,6 +85,9 @@ class cFlatBaseRender {
 
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
+        cString ReadAndExtractData(const cString &filePath, const std::string delimiter = "");
+        cString FormatPrecipitation(const cString &filePath);
+
         void DrawWidgetWeather();
 
  protected:
@@ -213,3 +216,4 @@ class cFlatBaseRender {
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
 };
+

@@ -148,13 +148,14 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
                                      "528x576",   "480x576",   "352x576"};
     static const int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
-    for (uint i {0}; i < sizeof(ResWidths) / sizeof(ResWidths[0]); ++i) {
-        if (ScreenWidth <= ResWidths[i])
+    const uint ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
+    for (uint i {0}; i < ResNums; ++i) {
+        if (ScreenWidth == ResWidths[i])
             return ResNames[i];
     }
 
-    return "unknown_res";
     dsyslog("flatPlus: Unkown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
+    return "unknown_res";
 }
 
 cString GetFormatIcon(int ScreenWidth) {
