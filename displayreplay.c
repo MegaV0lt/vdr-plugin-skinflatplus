@@ -37,7 +37,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     /* Make Config.decorProgressReplaySize even
     https://stackoverflow.com/questions/4739388/make-an-integer-even
     number = (number / 2) * 2; */
-    const int ProgressBarHeight = ((Config.decorProgressReplaySize + 1) / 2) * 2;  // Make it even (And round up)
+    const int ProgressBarHeight {((Config.decorProgressReplaySize + 1) / 2) * 2};  // Make it even (And round up)
     ProgressBarCreate(
         cRect(Config.decorBorderReplaySize,
               m_OsdHeight - m_LabelHeight - ProgressBarHeight - Config.decorBorderReplaySize - m_MarginItem,
@@ -77,6 +77,10 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 }
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::Setrecording()");
+#endif
+
     if (m_ModeOnly) return;
     if (!IconsPixmap || !LabelPixmap) return;
 
@@ -120,7 +124,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     //  Done: Substract 'left' in case of displayed recording icon
     //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
     //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
-    int MaxWidth = m_OsdWidth - left - Config.decorBorderReplaySize * 2;
+    int MaxWidth {m_OsdWidth - left - Config.decorBorderReplaySize * 2};
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors)
@@ -192,6 +196,11 @@ void cFlatDisplayReplay::Action() {
 }
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::SetMode)");
+    dsyslog("   Setup.ShowReplayMode: %d, Speed %d", Setup.ShowReplayMode, Speed);
+#endif
+
     if (!LabelPixmap || !IconsPixmap) return;
 
     if (Play == false && Config.RecordingDimmOnPause) {
@@ -206,6 +215,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             Flush();
         }
     }
+
     int left {0};
     if (Setup.ShowReplayMode) {
         left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem3)) / 2;
@@ -338,8 +348,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     constexpr ulong CharCode {0x00000030};  // Zero: U+0030
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
-    // const int TopOffset = Setup.FontOsdSize - GlyphSize - (Setup.FontOsdSize - FontAscender);
-    const int TopOffset {FontAscender - GlyphSize};  //? Should be the same
+    const int TopOffset {FontAscender - GlyphSize};
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   GlyphSize %d, Setup.FontOsdSize %d, m_FontHeight %d, FontAscender %d",
@@ -356,11 +365,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     if (Config.TimeSecsScale == 1.0) {
         // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
-        int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
-        if (m_LastCurrentWidth < CurrentWidth)
-            m_LastCurrentWidth = CurrentWidth;
-        else
-            CurrentWidth = m_LastCurrentWidth;  // CurrentWidth smaller or equal m_LastCurrentWidth
+        const int CurrentWidth {std::max(m_Font->Width(*m_Current) + m_MarginItem, m_LastCurrentWidth)};
+        m_LastCurrentWidth = CurrentWidth;
 
         LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                               m_Font, CurrentWidth, m_FontHeight);
@@ -372,11 +378,8 @@ void cFlatDisplayReplay::UpdateInfo() {
             const std::string hm {cur.substr(0, found)};
             const std::string secs {cur.substr(found, cur.length() - found)};
             // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
-            int FontSecsWidth {m_FontSecs->Width(secs.c_str()) + m_MarginItem};
-            if (m_LastCurrentWidth < FontSecsWidth)
-                m_LastCurrentWidth = FontSecsWidth;
-            else
-                FontSecsWidth = m_LastCurrentWidth;  // FontSecsWidth smaller or equal m_LastCurrentWidth
+            const int FontSecsWidth {std::max(m_FontSecs->Width(secs.c_str()) + m_MarginItem, m_LastCurrentWidth)};
+            m_LastCurrentWidth = FontSecsWidth;
 
             LabelPixmap->DrawText(cPoint(left, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
@@ -387,11 +390,8 @@ void cFlatDisplayReplay::UpdateInfo() {
             left += FontSecsWidth;
         } else {
             // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
-            int CurrentWidth {m_Font->Width(*m_Current) + m_MarginItem};
-            if (m_LastCurrentWidth < CurrentWidth)
-                m_LastCurrentWidth = CurrentWidth;
-            else
-                CurrentWidth = m_LastCurrentWidth;  // CurrentWidth smaller or equal m_LastCurrentWidth
+            const int CurrentWidth {std::max(m_Font->Width(*m_Current) + m_MarginItem, m_LastCurrentWidth)};
+            m_LastCurrentWidth = CurrentWidth;
 
             LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_Font, CurrentWidth, m_FontHeight);
@@ -636,9 +636,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
-                // cString RecImage {""};
-                if (ImgLoader.SearchRecordingPoster(*RecPath, MediaPath)) {
-                    // MediaPath = RecImage;
+                if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                     img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
@@ -684,15 +682,16 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
         PixmapFill(LabelJumpPixmap, clrTransparent);
         return;
     }
-    const int left {(m_OsdWidth - Config.decorBorderReplaySize * 2 - m_Font->Width(Jump)) / 2};
+    const int JumpWidth {m_Font->Width(Jump)};
+    const int left {(m_OsdWidth - Config.decorBorderReplaySize * 2 - JumpWidth) / 2};
 
     LabelJumpPixmap->DrawText(cPoint(left, 0), Jump, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
-                              m_Font->Width(Jump), m_FontHeight, taCenter);
+                              JumpWidth, m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
                            m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 -
                                m_FontHeight - Config.decorBorderReplaySize * 2,
-                           m_Font->Width(Jump),
+                           JumpWidth,
                            m_FontHeight,
                            Config.decorBorderReplaySize,
                            Config.decorBorderReplayType,

@@ -9,29 +9,35 @@
 
 void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::SetText()");
+#endif
     // if (!m_Osd) return;
 
-    Text.reserve(strlen(text));  // Defined in 'textscroller.h'
-    Text = text;
-    Font = font;
-    Position = position;
+    m_Text.reserve(strlen(text));
+    m_Text = text;
+    m_Font = font;
+    m_Position = position;
 
     ColorFg = colorFg; ColorBg = colorBg; ColorExtraTextFg = colorExtraTextFg;
     const cRect DrawPort(0, 0, font->Width(text), position.Height());
 
     m_Osd->DestroyPixmap(Pixmap);
 
-    Pixmap = CreatePixmap(m_Osd, "Pixmap", Layer, position, DrawPort);
-    // dsyslog("flatPlus: TextScrollerPixmap left: %d top: %d width: %d height: %d",
-    //        Position.Left(), Position.Top(), Position.Width(), Position.Height());
-    // dsyslog("flatPlus: TextScrollerPixmap DrawPort left: %d top: %d width: %d height: %d",
-    //        DrawPort.Left(), DrawPort.Top(), DrawPort.Width(), DrawPort.Height());
+    Pixmap = CreatePixmap(m_Osd, "Pixmap", m_Layer, position, DrawPort);
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   Pixmap left %d, top %d, width %d, height %d", m_Position.Left(), m_Position.Top(), m_Position.Width(),
+            m_Position.Height());
+    dsyslog("   DrawPort left %d, top %d, width %d, height %d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
+            DrawPort.Height());
+#endif
+
     PixmapFill(Pixmap, colorBg);
     Draw();
 }
 
 void cTextScroll::UpdateViewPortWidth(int w) {
-    if (!Pixmap) return;
+    // if (!Pixmap) return;  // Check in 'Draw()'. Try to reduce load
 
     cRect ViewPort {Pixmap->ViewPort()};
     ViewPort.SetWidth(ViewPort.Width() - w);
@@ -39,73 +45,78 @@ void cTextScroll::UpdateViewPortWidth(int w) {
 }
 
 void cTextScroll::Reset() {
-    if (!Pixmap) return;
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::Reset()");
+#endif
+    // if (!Pixmap) return;  // Check in 'Draw()'. Try to reduce load
 
     Pixmap->SetDrawPortPoint(cPoint(0, 0));
-    WaitSteps = WAITSTEPS;
+    m_WaitSteps = m_WAITSTEPS;
 }
 
 void cTextScroll::Draw() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScroll::Draw()");
+#endif
+
     if (!Pixmap) return;
 
-    if (ColorExtraTextFg) {
-        std::string_view tilde {Text};
-        const std::size_t found {tilde.find('~')};  // Search for ~
-        if (found != std::string::npos) {
-            std::string_view sv1 {tilde.substr(0, found)};
-            std::string_view sv2 {tilde.substr(found + 1)};  // Default end is npos
-            const std::string first {rtrim(sv1)};   // Trim possible space at end
-            const std::string second {ltrim(sv2)};  // Trim possible space at begin
+    const char *Text {m_Text.c_str()};
+    const char *TildePos {strchr(Text, '~')};
 
-            Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, Font);
-            const int l {Font->Width(first.c_str()) + Font->Width('X')};
-            Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, Font);
-        } else {  // ~ not found
-            Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
-        }
-    } else {  // No extra color defined
-        Pixmap->DrawText(cPoint(0, 0), Text.c_str(), ColorFg, ColorBg, Font);
+    if (TildePos && ColorExtraTextFg) {
+        std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
+        std::string_view sv2 {TildePos + 1};
+
+        const std::string first {rtrim(sv1)};
+        const std::string second {ltrim(sv2)};
+
+        Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
+        const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
+        Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, m_Font);
+    } else {
+        Pixmap->DrawText(cPoint(0, 0), Text, ColorFg, ColorBg, m_Font);
     }
 }
 
 void cTextScroll::DoStep() {
-    if (!Pixmap) return;
+    // if (!Pixmap) return;  // Try to reduce load
 
-    if (WaitSteps > 0) {  // Wait at the beginning for better read
-        --WaitSteps;
+    if (m_WaitSteps > 0) {  // Wait at the beginning for better read
+        --m_WaitSteps;
         return;
     }
 
-    if (ResetX) {  // Wait after return to the front
-        ResetX = false;
+    if (m_ResetX) {  // Wait after return to the front
+        m_ResetX = false;
         Pixmap->SetDrawPortPoint(cPoint(0, 0));
-        WaitSteps = WAITSTEPS;
+        m_WaitSteps = m_WAITSTEPS;
         return;
     }
 
     int DrawPortX {Pixmap->DrawPort().X()};
 
-    if (IsReserveStep)
-        DrawPortX += PixelsPerStep;
+    if (m_IsReserveStep)
+        DrawPortX += m_PixelsPerStep;
     else
-        DrawPortX -= PixelsPerStep;
+        DrawPortX -= m_PixelsPerStep;
 
     int maxX {Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width()};
     maxX *= -1;
 
-    if (ScrollType == 0) {
+    if (m_ScrollType == 0) {
         if (DrawPortX <= maxX) {
-            DrawPortX += PixelsPerStep;
-            ResetX = true;
-            WaitSteps = WAITSTEPS;
+            DrawPortX += m_PixelsPerStep;
+            m_ResetX = true;
+            m_WaitSteps = m_WAITSTEPS;
         }
-    } else if (ScrollType == 1) {
+    } else if (m_ScrollType == 1) {
         if (DrawPortX <= maxX) {
-            IsReserveStep = true;
-            WaitSteps = WAITSTEPS;
+            m_IsReserveStep = true;
+            m_WaitSteps = m_WAITSTEPS;
         } else if (DrawPortX > 0) {
-            IsReserveStep = false;
-            WaitSteps = WAITSTEPS;
+            m_IsReserveStep = false;
+            m_WaitSteps = m_WAITSTEPS;
         }
     }
 
@@ -113,13 +124,18 @@ void cTextScroll::DoStep() {
 }
 
 cTextScrollers::cTextScrollers() {
-    Layer = 2;
-    Scrollers.reserve(16);
+    m_Layer = 2;
+    Scrollers.reserve(8);
 }
 
 cTextScrollers::~cTextScrollers() {}
 
 void cTextScrollers::Clear() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::Clear()");
+    dsyslog("   Scrollers.size() %ld", Scrollers.size());
+#endif
+
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
@@ -132,20 +148,24 @@ void cTextScrollers::Clear() {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *m_Font,
+void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *Font,
                                  tColor ColorExtraTextFg) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::AddScroller()");
+#endif
+
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
 
-    if (ScrollDelay == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cTextScrollers::AddScroller() ScrollDelay is 0!");
+    if (m_ScrollDelay == 0) {  // Avoid DIV/0
+        esyslog("FlatPlus: cTextScrollers::AddScroller() m_ScrollDelay is 0!");
         return;
     }
 
-    Scrollers.emplace_back(new cTextScroll(m_Osd, ScrollType, ScrollStep,
-        static_cast<int>(WAITDELAY * 1.0 / ScrollDelay), Layer));
-    Scrollers.back()->SetText(text, position, colorFg, colorBg, m_Font, ColorExtraTextFg);
+    Scrollers.emplace_back(new cTextScroll(m_Osd, m_ScrollType, m_ScrollStep,
+        static_cast<int>(WAITDELAY * 1.0 / m_ScrollDelay), m_Layer));
+    Scrollers.back()->SetText(text, position, colorFg, colorBg, Font, ColorExtraTextFg);
 
     StartScrolling();
 }
@@ -160,14 +180,22 @@ void cTextScrollers::UpdateViewPortWidth(int w) {
 }
 
 void cTextScrollers::StartScrolling() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::StartScrolling()");
+#endif
+
     if (!Running() && Scrollers.size() > 0)
         Start();
 }
 
 void cTextScrollers::Action() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cTextScrollers::Action()");
+#endif
+
     // Wait 1 second so the osd is finished
-    for (uint i {0}; i < 100 && Running(); ++i) {
-        cCondWait::SleepMs(10);
+    for (uint i {0}; i < 10 && Running(); ++i) {
+        cCondWait::SleepMs(100);
     }
 
     if (!Running()) return;
@@ -182,10 +210,10 @@ void cTextScrollers::Action() {
     }
 
     while (Running()) {
-        if (Running())
-            cCondWait::SleepMs(ScrollDelay);
+        // if (Running())  //? Check needed here?
+            cCondWait::SleepMs(m_ScrollDelay);
 
-        std::vector<cTextScroll *>::iterator it, end = Scrollers.end();
+        // std::vector<cTextScroll *>::iterator it, end = Scrollers.end();  // Reuse iterator above
         for (it = Scrollers.begin(); it != end; ++it) {
             if (!Running()) return;
 

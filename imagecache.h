@@ -9,6 +9,8 @@
 
 #include <vdr/osd.h>
 #include <vdr/skins.h>
+
+#include <array>
 #include <string>
 
 constexpr int MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
@@ -35,10 +37,10 @@ class cImageCache {
     void PreLoadImage();
 
  private:
-    cImage *CacheImage[MaxImageCache];
-    std::string CacheName[MaxImageCache];  // Including full path
-    int CacheWidth[MaxImageCache];
-    int CacheHeight[MaxImageCache];
+    std::array<cImage*, MaxImageCache> CacheImage;
+    std::array<std::string, MaxImageCache> CacheName;  // Including full path
+    std::array<int, MaxImageCache> CacheWidth;
+    std::array<int, MaxImageCache> CacheHeight;
 
     uint m_InsertIndex {0};      // Imagecache index
     uint m_InsertIndexBase {0};  // Imagecache after first fill at start

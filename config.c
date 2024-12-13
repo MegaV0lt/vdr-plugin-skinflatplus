@@ -680,14 +680,15 @@ void cFlatConfig::Init() {
 }
 
 bool StringCompare(const std::string &left, const std::string &right) {
-    std::string::const_iterator lit, rit, leftEnd = left.end(), rightEnd = right.end();
-    for (lit = left.begin(), rit = right.begin(); lit != leftEnd && rit != rightEnd; ++lit, ++rit) {
+    auto lit = left.begin(), rit = right.begin();
+    auto lend = left.end(), rend = right.end();
+    while (lit != lend && rit != rend) {
         if (tolower(*lit) < tolower(*rit)) return true;
         if (tolower(*lit) > tolower(*rit)) return false;
+        ++lit;
+        ++rit;
     }
-    if (left.size() < right.size()) return true;
-
-    return false;
+    return left.size() < right.size();
 }
 
 bool PairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
@@ -701,10 +702,11 @@ bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
 int RoundUp(int NumToRound, int multiple) {
     if (multiple == 0) return NumToRound;
 
-    const int remainder = NumToRound % multiple;
-    if (remainder == 0) return NumToRound;
+    // const int remainder = NumToRound % multiple;
+    // if (remainder == 0) return NumToRound;
+    // return NumToRound + multiple - remainder;
 
-    return NumToRound + multiple - remainder;
+    return (NumToRound + multiple - 1) / multiple * multiple;
 }
 
 void cFlatConfig::DecorDescriptions(cStringList &Decors) {
@@ -725,7 +727,7 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
     std::string File_Name {""};
     cString Desc {""};
     const std::size_t FilesSize {files.size()};
-    for (uint i = 0; i < FilesSize; ++i) {
+    for (uint i {0}; i < FilesSize; ++i) {
         File_Name = files.at(i);
         Desc = DecorDescription(File_Name.c_str());
         Decors.Append(strdup(*Desc));
@@ -928,11 +930,8 @@ void cFlatConfig::SetLogoPath(cString path) {
 }
 
 cString cFlatConfig::CheckSlashAtEnd(std::string path) {
-    try {
-        if (!path.empty() && (path.at(path.size() - 1) == '/'))
-            return path.erase(path.size() - 1).c_str();  // Remove '/' of path if found at end
-    } catch (...) {
-        return path.c_str();
+    if (!path.empty() && path.back() == '/') {
+        path.pop_back();  // Use pop_back for efficiency
     }
     return path.c_str();
 }
@@ -968,7 +967,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     std::sort(files.begin(), files.end(), StringCompare);
     std::string FileName {""};
     const std::size_t FilesSize {files.size()};
-    for (uint i = 0; i < FilesSize; ++i) {
+    for (uint i {0}; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

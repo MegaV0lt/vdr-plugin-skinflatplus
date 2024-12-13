@@ -5,11 +5,12 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/home/darkwing/Dropbox/Public/VDR/**",
-                "/mnt/Daten/Dropbox/Public/VDR/**"
+                "/mnt/Daten/Dropbox/Public/VDR/**",
+                "/usr/include/**"
             ],
             "defines": [],
             "cStandard": "c11",
-            "cppStandard": "c++98",
+            "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64",
             "compilerPath": "/usr/bin/gcc"
         }

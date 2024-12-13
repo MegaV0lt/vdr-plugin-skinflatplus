@@ -6,9 +6,11 @@
  * $Id$
  */
 #include "./imagemagickwrapper.h"
-#include "./imagescaler.h"
+
 #include <sstream>
 #include <string>
+
+#include "./imagescaler.h"
 
 #ifdef IMAGEMAGICK
 #if MagickLibVersion >= 0x700

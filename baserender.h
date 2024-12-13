@@ -7,8 +7,6 @@
  */
 #pragma once
 
-#include <list>
-
 #include "./imageloader.h"
 #include "./flat.h"
 #include "./textscroller.h"
@@ -87,6 +85,9 @@ class cFlatBaseRender {
 
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
+        cString ReadAndExtractData(const cString &filePath, const std::string delimiter = "");
+        cString FormatPrecipitation(const cString &filePath);
+
         void DrawWidgetWeather();
 
  protected:
@@ -129,7 +130,7 @@ class cFlatBaseRender {
         bool m_TopBarMenuLogoSet {false};
 
         bool m_TopBarUpdateTitle {false};
-        cString m_TopBarLastDate {""};
+        time_t m_TopBarLastDate {0};
         int m_TopBarHeight {0};
         int m_VideoDiskUsageState {-1};
 
@@ -215,3 +216,4 @@ class cFlatBaseRender {
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
 };
+

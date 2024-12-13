@@ -129,61 +129,65 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
 }
 
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
-    cString res("unknown_res");
-    switch (ScreenWidth) {
-        case 7680: res = "7680x4320"; break;  // 7680×4320 (UHD-2 / 8K)
-        case 3840: res = "3840x2160"; break;  // 3840×2160 (UHD-1 / 4K)
-        // case 2560: res = "2560x1440"; break;  //* 2560x1440 (QHD) Is that used somewhere on sat/cable?
-        case 1920: res = "1920x1080"; break;  // 1920x1080 (HD1080 Full HDTV)
-        case 1440: res = "1440x1080"; break;  // 1440x1080 (HD1080 DV)
-        case 1280: res = "1280x720"; break;   // 1280x720 (HD720)
-        case 960: res = "960x720"; break;     // 960x720 (HD720 DV)
-        case 720: res = "720x576"; break;     // 720x576 (PAL)
-        case 704: res = "704x576"; break;     // 704x576 (PAL)
-        case 544: res = "544x576"; break;     // 544x576 (PAL)
-        case 528: res = "528x576"; break;     // 528x576 (PAL)
-        case 480: res = "480x576"; break;     // 480x576 (PAL SVCD)
-        case 352: res = "352x576"; break;     // 352x576 (PAL CVD)
-        default:
-            dsyslog("flatPlus: Unkown screen resolution: %d x %d", ScreenWidth, ScreenHeight);
-            break;
+    /* Resolutions
+    7680×4320 (UHD-2 / 8K)
+    3840×2160 (UHD-1 / 4K)
+    2560x1440 (QHD) //? Is that used somewhere on sat/cable?
+    1920x1080 (HD1080 Full HDTV)
+    1440x1080 (HD1080 DV)
+    1280x720 (HD720)
+    960x720 (HD720 DV)
+    720x576 (PAL)
+    704x576 (PAL)
+    544x576 (PAL)
+    528x576 (PAL)
+    480x576 (PAL SVCD)
+    352x576 (PAL CVD) */
+
+    static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
+                                     "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
+                                     "528x576",   "480x576",   "352x576"};
+    static const int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
+    const uint ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
+    for (uint i {0}; i < ResNums; ++i) {
+        if (ScreenWidth == ResWidths[i])
+            return ResNames[i];
     }
-    return res;
+
+    dsyslog("flatPlus: Unkown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
+    return "unknown_res";
 }
 
 cString GetFormatIcon(int ScreenWidth) {
-    if (ScreenWidth > 1920) return "uhd";
-    if (ScreenWidth > 720) return "hd";
-
-    return "sd";  // 720 and below is considered sd
+    return (ScreenWidth > 1920) ? "uhd" : (ScreenWidth > 720) ? "hd" : "sd";  // 720 and below is considered sd
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
     // From skin ElchiHD
-    #if APIVERSNUM >= 20605
-        const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
-        if (FrameWidth > 0) {
-            if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
-            if (FrameWidth > 720) return "hd";
-            return "sd";  // 720 and below is considered sd
-        } else  // NOLINT
-    #endif
-        {   // Find radio and H.264/H.265 streams.
-            //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
-            if (Recording->Info()->Components()) {
-                const cComponents *Components = Recording->Info()->Components();
-                int i {-1}, NumComponents = Components->NumComponents();
-                while (++i < NumComponents) {
-                    const tComponent *p = Components->Component(i);
-                    switch (p->stream) {
-                        case sc_video_MPEG2:     return "sd";
-                        case sc_video_H264_AVC:  return "hd";
-                        case sc_video_H265_HEVC: return "uhd";
-                        default:                 break;
-                    }
+#if APIVERSNUM >= 20605
+    const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
+    if (FrameWidth > 0) {
+        if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
+        if (FrameWidth > 720) return "hd";
+        return "sd";  // 720 and below is considered sd
+    } else  // NOLINT
+#endif
+    {   // Find radio and H.264/H.265 streams.
+        //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
+        if (Recording->Info()->Components()) {
+            const cComponents *Components = Recording->Info()->Components();
+            int i {-1}, NumComponents = Components->NumComponents();
+            while (++i < NumComponents) {
+                const tComponent *p = Components->Component(i);
+                switch (p->stream) {
+                    case sc_video_MPEG2:     return "sd";
+                    case sc_video_H264_AVC:  return "hd";
+                    case sc_video_H265_HEVC: return "uhd";
+                    default:                 break;
                 }
             }
         }
+    }
     return "";  // Nothing found
 }
 
@@ -202,7 +206,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0)  //? Avoid DIV/0
         esyslog("FlatPlus: GetRecordingSeenIcon() FrameTotal is 0!");
 
-    const double FrameSeen {FrameResume * 1.0 / FrameTotal};
+    const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
 
@@ -245,7 +249,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
                      static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   New MediaSize %dx%d", MediaSize.Width(), MediaSize.Height());
+    dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
 #endif
 }
 
@@ -413,12 +417,18 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
     cMarks Marks;
     bool HasMarks {false};
+    const char *RecordingFileName {Recording->FileName()};
     const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
     const double FramesPerSecond {Recording->FramesPerSecond()};
-    const char *RecordingFileName {Recording->FileName()};
     std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     int LastIndex {0};
     uint16_t MaxFileNum {0};
+
+    if (FramesPerSecond == 0.0) {  // Avoid DIV/0
+        esyslog("flatPlus: InsertCuttedLengthSize() FramesPerSecond is 0.0!");
+        return;
+    }
+
     // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
@@ -515,11 +525,11 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
                                      RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        if (FramesPerSecond > 0) {
+        // if (FramesPerSecond > 0.0) {  // Already checked
             Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
             if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
                 Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-        }
+        // }
         if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
         if (LastIndex)  //* Bitrate in new line
@@ -580,52 +590,30 @@ uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
     FT_Library library;
     FT_Face face;
-    FT_Glyph glyph;  // Handle to glyph image
-    uint32_t GlyphSize {0};
-    FT_BBox bbox;    // The control (bounding) box
-    FT_UInt glyph_index {0};
-    const cString FontFileName = cFont::GetFontFileName(Name);
     int rc {FT_Init_FreeType(&library)};
     if (!rc) {
-        rc = FT_New_Face(library, *FontFileName, 0, &face);
+        rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
         if (!rc) {
-            // FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
+            // We don't need to set the charmap, because we already load the glyphs with the correct charmap.
             rc = FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0);
             if (!rc) {
-                glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
-                rc = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+                FT_GlyphSlot slot {face->glyph};
+                rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
-                    rc = FT_Get_Glyph(face->glyph, &glyph);
-                    if (!rc) {
-                        // To get the bbox in pixel coordinates, set bbox_mode to FT_GLYPH_BBOX_TRUNCATE.
-                        // To get the bbox in grid-fitted pixel coordinates, set bbox_mode to FT_GLYPH_BBOX_PIXELS
-                        // If yMin is negative, this value gives the glyph's descender. Otherwise, the glyph doesn't
-                        // descend below the baseline. Similarly, if ymax is positive, this value gives the glyph's
-                        // ascender.
-                        FT_Glyph_Get_CBox(glyph, ft_glyph_bbox_subpixels, &bbox);  // In 26.6 pixels (1/64th of pixels)
-                        GlyphSize = (bbox.yMax - bbox.yMin) / 64;
-                        // dsyslog("flatPlus: GetGlyphSize()\n   GlyphSize: %d bbox yMin/yMax: %ld %ld, FontHeight: %d",
-                        //         GlyphSize, bbox.yMin, bbox.yMax, FontHeight);
-                    } else {
-                        esyslog("flatPlus: FreeType: error %d during FT_Get_Glyph (font = %s)\n", rc, *FontFileName);
-                    }
-                } else {
-                    esyslog("flatPlus: FreeType: error %d during FT_Load_Glyph (font = %s)\n", rc, *FontFileName);
+                    uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
+                    FT_Done_Face(face);
+                    FT_Done_FreeType(library);
+                    return GlyphSize;
                 }
-            } else {
-                esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
             }
-        } else {
-            esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
         }
-    } else {
-        esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
     }
-    FT_Done_Glyph(glyph);
+
+    // Return 0 if anything went wrong
     FT_Done_Face(face);
     FT_Done_FreeType(library);
-
-    return GlyphSize;
+    esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
+    return 0;
 }
 
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
@@ -652,7 +640,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     } */
     //* Workaround for detecting 'HairSpace'
     const char *FillChar {nullptr};
-    // Assume that 'tofu' char (Char not found) is bigger in size than and space
+    // Assume that 'tofu' char (Char not found) is bigger in size than space
     const char *HairSpace {u8"\U0000200A"}, *Space {" "};
     if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
         FillChar = Space;
@@ -844,7 +832,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     }  // for char
 #ifdef DEBUGFUNCSCALL
     uint32_t tick1 {GetMsTicks()};
-    dsyslog("flatPlus: TextFloatingWrapper::Set() time: %d ms", tick1 - tick0);
+    dsyslog("   Time: %d ms", tick1 - tick0);
 #endif
 }
 

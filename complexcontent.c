@@ -61,8 +61,9 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
         }
     } else {  // Log values and return
-        esyslog("flatPlus: CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
-                m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
+        esyslog(
+            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
+            m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
     PixmapFill(PixmapImage, clrTransparent);
@@ -73,10 +74,10 @@ void cComplexContent::CalculateDrawPortHeight() {
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
         const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > m_DrawPortHeight)
-            m_DrawPortHeight = GetBottom;
+        if (GetBottom > m_DrawPortHeight) m_DrawPortHeight = GetBottom;
     }
-    if (m_IsScrollingActive)
+
+    if (m_IsScrollingActive)  //  m_DrawPortHeight has to be set for 'ScrollTotal()'
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
 }
 
@@ -85,8 +86,7 @@ int cComplexContent::BottomContent() {
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
         const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > Bottom)
-            Bottom = GetBottom;
+        if (GetBottom > Bottom) Bottom = GetBottom;
     }
     return Bottom;
 }
@@ -109,8 +109,9 @@ bool cComplexContent::Scrollable(int height) {
     }
 
     const int total {ScrollTotal()};
-    const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
-    return (total > shown) ? true : false;
+    // const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
+    const int shown = (height + m_ScrollSize - 1) / m_ScrollSize;  // Avoid floating-point and use integer division
+    return total > shown;
 }
 
 void cComplexContent::AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg,
@@ -135,7 +136,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         return;
     }
 
-    const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
+    // const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
+    const int FloatLines = (image->Height() + m_ScrollSize - 1) / m_ScrollSize;  // Use integer division
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
     WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
@@ -181,14 +183,15 @@ double cComplexContent::ScrollbarSize() {
     if (m_DrawPortHeight == 0)
         esyslog("FlatPlus: cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
 
-    return m_Position.Height() * 1.0 / m_DrawPortHeight;
+    return static_cast<double>(m_Position.Height()) / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal() {
     if (m_ScrollSize == 0)
         esyslog("FlatPlus: cComplexContent::ScrollTotal() m_ScrollSize is 0!");
 
-    return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
+    // return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
+    return (m_DrawPortHeight + m_ScrollSize - 1) / m_ScrollSize;
 }
 
 int cComplexContent::ScrollShown() {
@@ -203,17 +206,18 @@ int cComplexContent::ScrollOffset() {
     if (!Pixmap) return 0;
 
     int y {Pixmap->DrawPort().Point().Y() * -1};
-    if (y + m_Position.Height() + m_ScrollSize > m_DrawPortHeight) {
-        if (y == m_DrawPortHeight - m_Position.Height())
+    const int PositionHeight {m_Position.Height()};
+    if (y + PositionHeight + m_ScrollSize > m_DrawPortHeight) {
+        if (y == m_DrawPortHeight - PositionHeight)
             y += m_ScrollSize;
         else
-            y = m_DrawPortHeight - m_Position.Height() - 1;
+            y = m_DrawPortHeight - PositionHeight - 1;
     }
 
     if (m_DrawPortHeight == 0)
         esyslog("FlatPlus: cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
 
-    return ScrollTotal() * (y * 1.0 / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {

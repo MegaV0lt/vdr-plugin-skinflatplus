@@ -7,8 +7,8 @@
  */
 #pragma once
 
-#include <cstring>  // string.h
 #include <vdr/thread.h>
+#include <cstring>  // string.h
 #include <list>
 
 #include "./flat.h"
@@ -19,10 +19,10 @@ class cTextScroll {
  public:
     cTextScroll(cOsd *osd, int type, int pixels, int waitsteps, int layer = 2) {
         m_Osd = osd;
-        ScrollType = type;
-        PixelsPerStep = pixels;
-        WAITSTEPS = waitsteps;
-        Layer = layer;
+        m_ScrollType = type;
+        m_PixelsPerStep = pixels;
+        m_WAITSTEPS = waitsteps;
+        m_Layer = layer;
     }
 
     ~cTextScroll() {
@@ -39,19 +39,19 @@ class cTextScroll {
     void Draw();
 
  private:
-    cRect Position {0, 0, 0, 0};
+    cRect m_Position {0, 0, 0, 0};
 
     tColor ColorFg {0}, ColorExtraTextFg {0}, ColorBg {0};
-    std::string Text {""};
-    cFont *Font {nullptr};
+    std::string m_Text {""};  // NOLINT
+    cFont *m_Font {nullptr};
     cPixmap *Pixmap {nullptr};
     cOsd *m_Osd {nullptr};
-    int Layer {0};
-    int PixelsPerStep {0};
-    int WAITSTEPS {0}, WaitSteps {0};
-    bool IsReserveStep {false};
-    bool ResetX {false};
-    int ScrollType {0};
+    int m_Layer {0};
+    int m_PixelsPerStep {0};
+    int m_WAITSTEPS {0}, m_WaitSteps {0};
+    bool m_IsReserveStep {false};
+    bool m_ResetX {false};
+    int m_ScrollType {0};
 };
 
 class cTextScrollers : public cThread {
@@ -61,22 +61,22 @@ class cTextScrollers : public cThread {
 
     void Clear();
     void SetOsd(cOsd *osd) { m_Osd = osd;}
-    void SetPixmapLayer(int layer) { Layer = layer; }
-    void SetScrollStep(int step) { ScrollStep = step; }
-    void SetScrollDelay(int delay) { ScrollDelay = delay; }
-    void SetScrollType(int type) { ScrollType = type; }
+    void SetPixmapLayer(int layer) { m_Layer = layer; }
+    void SetScrollStep(int step) { m_ScrollStep = step; }
+    void SetScrollDelay(int delay) { m_ScrollDelay = delay; }
+    void SetScrollType(int type) { m_ScrollType = type; }
     void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg,
                      cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive() { return Active(); }
 
  private:
-    std::vector<cTextScroll *> Scrollers;
+    std::vector<cTextScroll *> Scrollers;  // NOLINT
 
     cOsd *m_Osd {nullptr};
-    int ScrollStep {0}, ScrollDelay {0};
-    int ScrollType {0};
-    int Layer {0};
+    int m_ScrollStep {0}, m_ScrollDelay {0};
+    int m_ScrollType {0};
+    int m_Layer {0};
     virtual void Action();
     void StartScrolling();
 };

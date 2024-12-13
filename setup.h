@@ -57,7 +57,7 @@ class cFlatSetupChannelInfo : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupChannelInfo(cFlatConfig *data);
         virtual eOSState ProcessKey(eKeys Key);
- 
+
  protected:
         void Setup();
 };
