@@ -558,32 +558,31 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
 }
 
 uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
-    FT_Library library;
+    static std::map<std::string, FT_Face> FaceMap;
+    static std::mutex FaceMapMutex;
+    std::lock_guard<std::mutex> lock(FaceMapMutex);
     FT_Face face;
-    FT_UInt glyph_index {0};
-    const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc {FT_Init_FreeType(&library)};
-    if (!rc) {
-        rc = FT_New_Face(library, *FontFileName, 0, &face);
+    auto it = FaceMap.find(Name);
+    if (it == FaceMap.end()) {
+        FT_Library library;
+        int rc {FT_Init_FreeType(&library)};
         if (!rc) {
-            FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
-            rc = FT_Set_Char_Size(face, 8 * 64, 8 * 64, 0, 0);  // TODO: Is that needed?
+            rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
             if (!rc) {
-                glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
-                // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode,
-                //          glyph_index);
+                FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
+                FaceMap[Name] = face;
             } else {
-                esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
+                esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, Name);
+                return 0;
             }
         } else {
-            esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
+            esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, Name);
+            return 0;
         }
     } else {
-        esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
+        face = it->second;
     }
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
-
+    FT_UInt glyph_index {FT_Get_Char_Index(face, CharCode)};  // Glyph index 0 means 'undefined character code'
     return glyph_index;
 }
 
