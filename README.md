@@ -130,8 +130,10 @@ Die Werte von Latitude und Longitude in die update_weather.conf schreiben und au
 
 Das Script (update_weather.sh) wird nicht vom Skin aufgerufen. Dies muss extern über cron oder ähnliches erfolgen. Z.B. über folgende Zeile in der /etc/crontab
 <pre>
-# update weather every 2 hours
-7 */2   * * *   root    bash /usr/local/lib/vdr/skinflatplus/widgets/weather/update_weather.sh
+# Run at Start of System
+@reboot  root  /usr/bin/bash /usr/local/lib/vdr/skinflatplus/widgets/weather/update_weather.sh
+# Update weather every hour
+@hourly  root  /usr/bin/bash /usr/local/lib/vdr/skinflatplus/widgets/weather/update_weather.sh
 </pre>
 
 Für die Wetterdaten wird openweathermap.org verwendet. Hier sind 1.000 Abfragen am Tag (30.000 im Monat) frei (https://openweathermap.org/full-price#current). Bitte registriere dich kostenlos bei openweathermap.org und erstelle einen eigenen Api-Key. Diesen dann einfach in die update_weather.conf eintragen. Hierfür ist nur eine E-Mail Adresse + Passwort notwendig.
