@@ -1563,7 +1563,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (!img)
             img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
         if (img) {
-            ImageTop = Top;  // TODO: Center image?
+            ImageTop = Top;
             MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
         }
     } else if (TimerMatch == tmPartial) {
@@ -3429,23 +3429,21 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                       ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
     }
 
-    RecordingBorder.Left = m_cLeft;
-    RecordingBorder.Top = m_cTop;
-    RecordingBorder.Width = m_cWidth;
-    RecordingBorder.Height = ComplexContent.Height();
-    RecordingBorder.Size = Config.decorBorderMenuContentSize;
-    RecordingBorder.Type = Config.decorBorderMenuContentType;
-    RecordingBorder.ColorFg = Config.decorBorderMenuContentFg;
-    RecordingBorder.ColorBg = Config.decorBorderMenuContentBg;
-    RecordingBorder.From = BorderMenuRecord;
+    RecordingBorder = {
+        m_cLeft,
+        m_cTop,
+        m_cWidth,
+        ComplexContent.Height(),
+        Config.decorBorderMenuContentSize,
+        Config.decorBorderMenuContentType,
+        Config.decorBorderMenuContentFg,
+        Config.decorBorderMenuContentBg,
+        BorderMenuRecord
+    };
 
-    sDecorBorder ibRecording {
-        RecordingBorder.Left, RecordingBorder.Top,  RecordingBorder.Width,   ComplexContent.ContentHeight(false),
-        RecordingBorder.Size, RecordingBorder.Type, RecordingBorder.ColorFg, RecordingBorder.ColorBg,
-        RecordingBorder.From};
-
-    if (Config.MenuContentFullSize || Scrollable) ibRecording.Height = ComplexContent.ContentHeight(true);
-
+    sDecorBorder ibRecording = RecordingBorder;
+    ibRecording.Height = (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
+                                                                    : ComplexContent.ContentHeight(false);
     DecorBorderDraw(ibRecording, false);
 
 #ifdef DEBUGEPGTIME
@@ -4832,28 +4830,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    int updates {0}, SecurityUpdates {0};
-    std::string cont {""};
-    cont.reserve(4);
-    cString ItemFilename = cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH);
-    std::ifstream file(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        std::getline(file, cont);
-        file.close();
-        updates = atoi(cont.c_str());
-    } else {
-        updates = -1;
-    }
+    cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
+    const int updates = (isempty(*Content) ? -1 : atoi(*Content));
 
-    ItemFilename = cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH);
-    file.open(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        std::getline(file, cont);
-        file.close();
-        SecurityUpdates = atoi(cont.c_str());
-    } else {
-        SecurityUpdates = -1;
-    }
+    Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
+    const int SecurityUpdates = (isempty(*Content) ? -1 : atoi(*Content));
 
     if (updates == -1 || SecurityUpdates == -1) {
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
@@ -4896,86 +4877,51 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     int CountTemps {0};
 
-    std::string TempCPU {""}, TempCase {""}, TempMB {""}, TempGPU {""};
-    cString ItemFilename = cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH);
-    std::ifstream file(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        TempCPU.reserve(8);
-        std::getline(file, TempCPU);
-        file.close();
-        ++CountTemps;
-    } else {
-        TempCPU = "-1";
-    }
+    cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
+    (isempty(TempCPU)) ? TempCPU = "-1" : ++CountTemps;
 
-    ItemFilename = cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH);
-    file.open(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        TempCase.reserve(8);
-        std::getline(file, TempCase);
-        file.close();
-        ++CountTemps;
-    } else {
-        TempCase = "-1";
-    }
+    cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
+    (isempty(TempCase)) ? TempCase = "-1" : ++CountTemps;
 
-    ItemFilename = cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH);
-    file.open(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        TempMB.reserve(8);
-        std::getline(file, TempMB);
-        file.close();
-        ++CountTemps;
-    } else {
-        TempMB = "-1";
-    }
-    ItemFilename = cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH);
-    file.open(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        TempGPU.reserve(8);
-        std::getline(file, TempGPU);
-        file.close();
-        ++CountTemps;
-    } else {
-        TempGPU = "-1";
-    }
+    cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
+    (isempty(TempMB)) ? TempMB = "-1" : ++CountTemps;
 
-    if (!strcmp(TempCPU.c_str(), "-1") && !strcmp(TempCase.c_str(), "-1") && !strcmp(TempMB.c_str(), "-1") &&
-        !strcmp(TempGPU.c_str(), "-1")) {
+    cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
+    (isempty(TempGPU)) ? TempGPU = "-1" : ++CountTemps;
+
+    // if (!strcmp(*TempCPU, "-1") && !strcmp(*TempCase, "-1") && !strcmp(*TempMB, "-1") && !strcmp(*TempGPU, "-1")) {
+    if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        if (CountTemps == 0)
-            esyslog("FlatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() CountTemps is 0!");
-
         const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
-        if (strcmp(TempCPU.c_str(), "-1")) {
-            str = cString::sprintf("%s: %s", tr("CPU"), TempCPU.c_str());
+        if (strcmp(*TempCPU, "-1")) {
+            str = cString::sprintf("%s: %s", tr("CPU"), *TempCPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(TempCase.c_str(), "-1")) {
-            str = cString::sprintf("%s: %s", tr("PC-Case"), TempCase.c_str());
+        if (strcmp(*TempCase, "-1")) {
+            str = cString::sprintf("%s: %s", tr("PC-Case"), *TempCase);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(TempMB.c_str(), "-1")) {
-            str = cString::sprintf("%s: %s", tr("MB"), TempMB.c_str());
+        if (strcmp(*TempMB, "-1")) {
+            str = cString::sprintf("%s: %s", tr("MB"), *TempMB);
             ContentWidget.AddText(
                 *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(TempGPU.c_str(), "-1")) {
-            str = cString::sprintf("%s: %s", tr("GPU"), TempGPU.c_str());
+        if (strcmp(*TempGPU, "-1")) {
+            str = cString::sprintf("%s: %s", tr("GPU"), *TempGPU);
             ContentWidget.AddText(
                 *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
@@ -4992,22 +4938,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
-    std::string Title {""};
-    Title.reserve(32);
-    cString ItemFilename = cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH);
-    std::ifstream file(*ItemFilename, std::ifstream::in);
-    if (file.is_open()) {
-        std::getline(file, Title);
-        file.close();
-    } else {
-        Title = tr("no title available");
-    }
+    cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
+    if (isempty(Title)) Title = tr("no title available");
 
     cImage *img {ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
         ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
-    ContentWidget.AddText(Title.c_str(), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
+    ContentWidget.AddText(*Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
