@@ -127,9 +127,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar();
         void ItemBorderClear();
 
-        const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                     "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                     "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        const cString items[16]{"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                "Replay",   "Miscellaneous", "Plugins", "Restart"};
         std::string MainMenuText(const std::string &Text);
         cString GetIconName(const std::string &element);
 
