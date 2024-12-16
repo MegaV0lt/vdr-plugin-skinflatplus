@@ -85,7 +85,7 @@ class cFlatBaseRender {
 
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
-        cString ReadAndExtractData(const cString &filePath, const std::string delimiter = "");
+        cString ReadAndExtractData(const cString &filePath, const cString delimiter = "");
         cString FormatPrecipitation(const cString &filePath);
 
         void DrawWidgetWeather();

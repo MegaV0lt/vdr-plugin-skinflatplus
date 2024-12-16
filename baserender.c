@@ -1890,7 +1890,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
     return Ascender;
 }
-cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, std::string delimiter) {
+cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, cString delimiter) {
     std::ifstream file(*filePath);
     if (!file.is_open()) return "";
 
@@ -1899,8 +1899,8 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, std::string
     std::getline(file, data);
     file.close();
 
-    if (!delimiter.empty()) {
-        const std::size_t found = data.find(delimiter);
+    if (!isempty(delimiter)) {
+        const std::size_t found = data.find(*delimiter);
         if (found != std::string::npos) {
             return data.substr(0, found).c_str();
         }

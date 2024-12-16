@@ -32,7 +32,7 @@ class cSimpleContent {
 
     int m_TextWidth {0}, m_TextHeight {0}, m_TextAlignment {0};
     tColor m_ColorFg {0}, m_ColorBg {0};
-    std::string m_Text {""};
+    cString m_Text {""};
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
@@ -76,7 +76,7 @@ class cSimpleContent {
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
         m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
-        m_Text.reserve(strlen(Text));
+        // m_Text.reserve(strlen(Text));
         m_Text = Text;
         m_Font = Font;
 
@@ -104,7 +104,7 @@ class cSimpleContent {
 
         if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
+            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
             return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
         }
 
@@ -121,11 +121,11 @@ class cSimpleContent {
         if (!Pixmap) return;
 
         if (m_ContentType == CT_Text) {
-            Pixmap->DrawText(m_Position.Point(), m_Text.c_str(), m_ColorFg, m_ColorBg, m_Font, m_TextWidth,
+            Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font, m_TextWidth,
                              m_TextHeight, m_TextAlignment);
         } else if (m_ContentType == CT_TextMultiline) {
             cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(m_Text.c_str(), m_Font, m_Position.Width());
+            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
             std::string Line {""};
             Line.reserve(128);
             const int Lines {Wrapper.Lines()};

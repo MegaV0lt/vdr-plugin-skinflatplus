@@ -3530,11 +3530,15 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
                       true);
     }
 
-    sDecorBorder ib {Left, Top, Width, ComplexContent.ContentHeight(false), Config.decorBorderMenuContentSize,
-                        Config.decorBorderMenuContentType, Config.decorBorderMenuContentFg,
-                        Config.decorBorderMenuContentBg};
-    if (Config.MenuContentFullSize || Scrollable)
-        ib.Height = ComplexContent.ContentHeight(true);
+    sDecorBorder ib {.Left = Left,
+                     .Top = Top,
+                     .Width = Width,
+                     .Height = (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
+                                                                          : ComplexContent.ContentHeight(false),
+                     .Size = Config.decorBorderMenuContentSize,
+                     .Type = Config.decorBorderMenuContentType,
+                     .ColorFg = Config.decorBorderMenuContentFg,
+                     .ColorBg = Config.decorBorderMenuContentBg};
 
     DecorBorderDraw(ib);
 }
@@ -4878,18 +4882,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     int CountTemps {0};
 
     cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
-    (isempty(TempCPU)) ? TempCPU = "-1" : ++CountTemps;
+    if (!isempty(*TempCPU)) ++CountTemps;
 
     cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
-    (isempty(TempCase)) ? TempCase = "-1" : ++CountTemps;
+    if (!isempty(*TempCase)) ++CountTemps;
 
     cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
-    (isempty(TempMB)) ? TempMB = "-1" : ++CountTemps;
+    if (!isempty(*TempMB)) ++CountTemps;
 
     cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
-    (isempty(TempGPU)) ? TempGPU = "-1" : ++CountTemps;
+    if (!isempty(*TempGPU)) ++CountTemps;
 
-    // if (!strcmp(*TempCPU, "-1") && !strcmp(*TempCase, "-1") && !strcmp(*TempMB, "-1") && !strcmp(*TempGPU, "-1")) {
     if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -4899,28 +4902,28 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
         const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
-        if (strcmp(*TempCPU, "-1")) {
+        if (!isempty(*TempCPU)) {
             str = cString::sprintf("%s: %s", tr("CPU"), *TempCPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(*TempCase, "-1")) {
+        if (!isempty(*TempCase)) {
             str = cString::sprintf("%s: %s", tr("PC-Case"), *TempCase);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(*TempMB, "-1")) {
+        if (!isempty(*TempMB)) {
             str = cString::sprintf("%s: %s", tr("MB"), *TempMB);
             ContentWidget.AddText(
                 *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (strcmp(*TempGPU, "-1")) {
+        if (!isempty(*TempGPU)) {
             str = cString::sprintf("%s: %s", tr("GPU"), *TempGPU);
             ContentWidget.AddText(
                 *str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
@@ -4953,8 +4956,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     std::string Output {""};
     Output.reserve(32);
-    ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
-    file.open(*ItemFilename, std::ifstream::in);
+    const cString ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
+    std::ifstream file(*ItemFilename);
     if (file.is_open()) {
         for (; std::getline(file, Output);) {
             if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())

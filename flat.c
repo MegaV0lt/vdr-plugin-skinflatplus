@@ -5,6 +5,8 @@
  *
  * $Id$
  */
+#include "./flat.h"
+
 #include <vdr/osd.h>
 #include <vdr/menu.h>
 
@@ -12,7 +14,7 @@
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>  // For glyph metrics
 
-#include "./flat.h"
+#include<mutex>
 
 #include "./displaychannel.h"
 #include "./displaymenu.h"
@@ -119,10 +121,18 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    if (ScreenAspect == 16.0 / 9.0) return "169";
+    /* if (ScreenAspect == 16.0 / 9.0) return "169";
     if (ScreenAspect == 4.0 / 3.0) return "43";
     if (ScreenAspect == 20.0 / 11.0 || ScreenAspect == 15.0 / 11.0) return "169w";
-    if (ScreenAspect == 2.21) return "221";
+    if (ScreenAspect == 2.21) return "221"; */
+
+    static const double ScreenAspects[] {16.0 / 9.0, 4.0 / 3.0, 20.0 / 11.0, 15.0 / 11.0, 2.21};
+    static const cString ScreenAspectNames[] {"169", "43", "169w", "169w", "221"};
+    const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
+    for (uint i {0}; i < ScreenAspectNums; ++i) {
+        if (ScreenAspect == ScreenAspects[i])
+            return ScreenAspectNames[i];
+    }
 
     dsyslog("flatPlus: Unknown screen aspect %.2f", ScreenAspect);
     return "unknown_asp";
@@ -209,9 +219,15 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
-
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
+    const int idx = std::min(static_cast<int>(FrameSeen * 10.0), 10);
+    const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
+                                   "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
+                                   "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+    return SeenIconNames[idx];
+
+    /*
     if (FrameSeen < 0.1) return "recording_seen_0";
     if (FrameSeen < 0.2) return "recording_seen_1";
     if (FrameSeen < 0.3) return "recording_seen_2";
@@ -224,6 +240,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameSeen < 0.98) return "recording_seen_9";
 
     return "recording_seen_10";
+*/
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT

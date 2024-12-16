@@ -45,7 +45,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         double m_ScreenAspect {0.0};
 
         // TVScraper
-        cRect TVSRect {0, 0, 0, 0};
+        cRect m_TVSRect {0, 0, 0, 0};
 
         // Dimm on pause
         bool m_DimmActive {false};

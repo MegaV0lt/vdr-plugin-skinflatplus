@@ -14,7 +14,7 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 #endif
     // if (!m_Osd) return;
 
-    m_Text.reserve(strlen(text));
+    // m_Text.reserve(strlen(text));
     m_Text = text;
     m_Font = font;
     m_Position = position;
@@ -61,13 +61,12 @@ void cTextScroll::Draw() {
 
     if (!Pixmap) return;
 
-    const char *Text {m_Text.c_str()};
+    const char *Text {*m_Text};
     const char *TildePos {strchr(Text, '~')};
 
     if (TildePos && ColorExtraTextFg) {
         std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
         std::string_view sv2 {TildePos + 1};
-
         const std::string first {rtrim(sv1)};
         const std::string second {ltrim(sv2)};
 
