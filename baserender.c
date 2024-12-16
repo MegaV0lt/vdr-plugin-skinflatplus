@@ -461,15 +461,10 @@ void cFlatBaseRender::TopBarUpdate() {
 
         uint NumRec {0};
         if (Config.TopBarRecordingShow) {
-            // Look for timers
-            // auto recCounterFuture = std::async([&NumRec]() {
-                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                    if (Timer->HasFlags(tfRecording))
-                        ++NumRec;
-                }
-            // });
-            // recCounterFuture.get();
+            LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+            for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                if (Timer->HasFlags(tfRecording)) ++NumRec;
+            }
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
                                             m_TopBarFontHeight - m_MarginItem2);
@@ -528,7 +523,6 @@ void cFlatBaseRender::TopBarUpdate() {
         if (m_TopBarExtraIconSet) {
             img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
             if (img) {
-                // const int IconTop {0};
                 TopBarIconPixmap->DrawImage(cPoint(Right, 0), *img);
                 Right += img->Width() + m_MarginItem;
             }

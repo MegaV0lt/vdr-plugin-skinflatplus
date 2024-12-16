@@ -669,7 +669,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short +EPG
         Height = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize;
-        m_MenuItemWidth *= 0.5;
+        m_MenuItemWidth /= 2;
     }
 
     if (m_IsScrolling)
@@ -1077,7 +1077,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus short, flatPlus short + EPG
         Height = m_FontHeight + m_FontSmlHeight + m_MarginItem;
-        m_MenuItemWidth *= 0.5;
+        m_MenuItemWidth /= 2;
     }
 
     if (m_IsScrolling)
@@ -1387,9 +1387,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
-            int Width {m_Font->Width(*Buffer)};  // w is used here for calculation of width
-            if (Width > w)
-                w = Width;  // Minimal width for channel number in Event (epgSearch)
+            const int Width = m_Font->Width(*Buffer);
+            w = std::max(w, Width);  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1775,7 +1774,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuRecordingView == 2 || Config.MenuRecordingView == 3) {  // flatPlus short, flatPlus short + EPG
         Height = m_FontHeight + m_FontSmlHeight + m_MarginItem;
-        m_MenuItemWidth *= 0.5;
+        m_MenuItemWidth /= 2;
     }
 
     if (m_IsScrolling)
@@ -3001,16 +3000,11 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        // auto channelFuture = std::async(
-        //    [&RecAdditional](tChannelID channelId) {
-                LOCK_CHANNELS_READ;
-                const cChannel *Channel = Channels->GetByChannelID(/*channelId*/ RecInfo->ChannelID());
-                if (Channel)
-                    RecAdditional.Append(
-                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
-        //    },
-        //    RecInfo->ChannelID());
-        //  channelFuture.get();
+        LOCK_CHANNELS_READ;
+        const cChannel *Channel = Channels->GetByChannelID(RecInfo->ChannelID());
+        if (Channel)
+            RecAdditional.Append(
+                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3358,7 +3352,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         Title = Recording->Name();
 
     const cString ShortText = RecInfo->ShortText();
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};                   // Width of short text
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};                 // Width of short text
     int MaxWidth {m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft)};  // HeadIconLeft includes right margin
     int left {m_MarginItem};
 
