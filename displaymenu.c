@@ -4936,7 +4936,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
-    if (isempty(Title)) Title = tr("no title available");
+    if (isempty(*Title)) Title = tr("no title available");
 
     cImage *img {ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img)
@@ -5024,7 +5024,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         PrecString =
             *FormatPrecipitation(cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index));
 
-        if (isempty(Icon) || isempty(Summary) || isempty(TempMax) || isempty(TempMin) || (isempty(PrecString)))
+        if (isempty(*Icon) || isempty(*Summary) || isempty(*TempMax) || isempty(*TempMin) || (isempty(*PrecString)))
             continue;
 
         tm_r.tm_mday += index;

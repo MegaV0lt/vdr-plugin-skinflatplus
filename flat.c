@@ -14,8 +14,6 @@
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>  // For glyph metrics
 
-#include<mutex>
-
 #include "./displaychannel.h"
 #include "./displaymenu.h"
 #include "./displaymessage.h"
@@ -574,35 +572,6 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return std::string();  // Empty string
 }
 
-uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
-    static std::map<std::string, FT_Face> FaceMap;
-    static std::mutex FaceMapMutex;
-    std::lock_guard<std::mutex> lock(FaceMapMutex);
-    FT_Face face;
-    auto it = FaceMap.find(Name);
-    if (it == FaceMap.end()) {
-        FT_Library library;
-        int rc {FT_Init_FreeType(&library)};
-        if (!rc) {
-            rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
-            if (!rc) {
-                FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
-                FaceMap[Name] = face;
-            } else {
-                esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, Name);
-                return 0;
-            }
-        } else {
-            esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, Name);
-            return 0;
-        }
-    } else {
-        face = it->second;
-    }
-    FT_UInt glyph_index {FT_Get_Char_Index(face, CharCode)};  // Glyph index 0 means 'undefined character code'
-    return glyph_index;
-}
-
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
     FT_Library library;
     FT_Face face;
@@ -645,16 +614,10 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     // Hair Space is a very small space:
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
-    /* FT_ULong HairSpaceCode = 0x0000200A;  // HairSpace: U+200A
-    FT_ULong ThinSpaceCode = 0x00002009;  // ThinSpace: U+2009
-    if (GetCharIndex(Setup.FontOsd, HairSpaceCode) > 0) {
-        FillChar = u8"\U0000200A";
-    } else if (GetCharIndex(Setup.FontOsd, ThinSpaceCode) > 0) {
-        FillChar = u8"\U00002009";
-    } else {
-        FillChar = " ";  // White space U+0020 (Decimal 32)
-    } */
-    //* Workaround for detecting 'HairSpace'
+    /* HairSpaceCode = 0x0000200A;  // HairSpace: U+200A
+       ThinSpaceCode = 0x00002009;  // ThinSpace: U+2009
+    */
+    //* Detect 'HairSpace'
     const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     const char *HairSpace {u8"\U0000200A"}, *Space {" "};
