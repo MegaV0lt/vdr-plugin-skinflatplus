@@ -89,8 +89,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
 
         cPixmap *ScrollbarPixmap {nullptr};
-        int m_ScrollBarTop {0};
-        int m_ScrollBarWidth {0}, m_ScrollBarHeight {0};  //? 'm_ScrollBarWidth' also in cFlatBaseRender
+        int m_ScrollBarTop {0}, m_ScrollBarHeight {0};;
+        int m_WidthScrollBar {0};  //* 'm_WidthScrollBar' to avoid nameconflict with cFlatBaseRender::m_ScrollBarWidth
 
         int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
         int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};

@@ -50,7 +50,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     m_ItemChannelHeight = m_ItemHeight;
     m_ItemTimerHeight = m_ItemHeight;
 
-    m_ScrollBarWidth = ScrollBarWidth() + m_MarginItem;
+    m_WidthScrollBar = ScrollBarWidth() + m_MarginItem;
     m_ScrollBarHeight = m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem3 +
                                        m_ButtonsHeight + Config.decorBorderButtonSize * 2);
     m_ScrollBarTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2;
@@ -195,15 +195,15 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
             ItemBorderDrawAllWithScrollbar();
             ItemBorderClear();
 
-            MenuItemScroller.UpdateViewPortWidth(m_ScrollBarWidth);
+            MenuItemScroller.UpdateViewPortWidth(m_WidthScrollBar);
 
             if (IsContent)
-                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_ScrollBarWidth + Config.decorBorderMenuContentSize,
-                                                0, m_ScrollBarWidth + m_MarginItem, m_ScrollBarHeight),
+                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuContentSize,
+                                                0, m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
                                           clrTransparent);
             else
-                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_ScrollBarWidth + Config.decorBorderMenuItemSize, 0,
-                                                m_ScrollBarWidth + m_MarginItem, m_ScrollBarHeight),
+                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuItemSize, 0,
+                                                m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
                                           clrTransparent);
         }
     } else if (m_ShowEvent == false && m_ShowRecording == false && m_ShowText == false) {
@@ -212,11 +212,11 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 
     if (IsContent)
         ScrollbarDraw(ScrollbarPixmap,
-                      m_MenuItemWidth - m_ScrollBarWidth + Config.decorBorderMenuContentSize * 2 + m_MarginItem, Top,
+                      m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuContentSize * 2 + m_MarginItem, Top,
                       Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
     else
         ScrollbarDraw(ScrollbarPixmap,
-                      m_MenuItemWidth - m_ScrollBarWidth + Config.decorBorderMenuItemSize * 2 + m_MarginItem, Top,
+                      m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuItemSize * 2 + m_MarginItem, Top,
                       Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
 }
 
@@ -406,7 +406,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         m_MenuItemWidth *= Config.MainMenuItemScale;
 
     if (m_IsScrolling)
-        m_MenuItemWidth -= m_ScrollBarWidth;
+        m_MenuItemWidth -= m_WidthScrollBar;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -438,7 +438,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, m_FontHeight), ColorBg);
 
-    const int AvailableTextWidth {m_MenuItemWidth - m_ScrollBarWidth};
+    const int AvailableTextWidth {m_MenuItemWidth - m_WidthScrollBar};
     int XOff {0}, xt {0};
     const char *s {nullptr};
     for (uint i {0}; i < MaxTabs; ++i) {
@@ -672,7 +672,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     }
 
     if (m_IsScrolling)
-        m_MenuItemWidth -= m_ScrollBarWidth;
+        m_MenuItemWidth -= m_WidthScrollBar;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -818,7 +818,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     } else {  // flatPlus short
         Width = m_MenuItemWidth / 10 * 2;
         if (m_IsScrolling)
-            Width = (m_MenuItemWidth + m_ScrollBarWidth) / 10 * 2;
+            Width = (m_MenuItemWidth + m_WidthScrollBar) / 10 * 2;
 
         if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
             Width = m_MenuItemWidth - LeftName;
@@ -849,15 +849,15 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                     PBTop = Top + m_FontHeight + m_FontSmlHeight;
                     PBLeft = Left - Width - m_MarginItem;
                     PBWidth = m_MenuItemWidth - LeftName - m_MarginItem2 - Config.decorBorderMenuItemSize -
-                              m_ScrollBarWidth;
+                              m_WidthScrollBar;
 
                     if (m_IsScrolling)
-                        PBWidth += m_ScrollBarWidth;
+                        PBWidth += m_WidthScrollBar;
                 }
 
                 Width = m_MenuItemWidth / 10;
                 if (m_IsScrolling)
-                    Width = (m_MenuItemWidth + m_ScrollBarWidth) / 10;
+                    Width = (m_MenuItemWidth + m_WidthScrollBar) / 10;
                 if (Current)
                     ProgressBarDrawRaw(MenuPixmap, MenuPixmap,
                                        cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize),
@@ -940,7 +940,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
 
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
-        m_cLeft += m_ScrollBarWidth;
+        m_cLeft += m_WidthScrollBar;
 
     m_cTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
@@ -1080,7 +1080,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     }
 
     if (m_IsScrolling)
-        m_MenuItemWidth -= m_ScrollBarWidth;
+        m_MenuItemWidth -= m_WidthScrollBar;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -1261,7 +1261,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         if (Current && m_FontSml->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(File,
                                          cRect(Left, Top + m_FontHeight + m_MenuTop,  // TODO: Mismatch when scrolling
-                                               m_MenuItemWidth - Left - m_MarginItem - m_ScrollBarWidth,
+                                               m_MenuItemWidth - Left - m_MarginItem - m_WidthScrollBar,
                                                m_FontSmlHeight),
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
@@ -1347,7 +1347,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
 
     if (m_IsScrolling)
-        m_MenuItemWidth -= m_ScrollBarWidth;
+        m_MenuItemWidth -= m_WidthScrollBar;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -1448,7 +1448,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         w = m_MenuItemWidth / 10 * 2;
         if (!m_IsScrolling)
-            w = (m_MenuItemWidth - m_ScrollBarWidth) / 10 * 2;
+            w = (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
         cString ChannelName {""};
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
@@ -1471,7 +1471,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {
-            int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_ScrollBarWidth) / 20};
+            int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
             if ((now >= (Event->StartTime() - 2 * 60))) {
@@ -1491,9 +1491,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     if ((Config.MenuEventView == 2 || Config.MenuEventView == 3)) {
                         // flatPlus short, flatPlus short + EPG
                         PBTop = y + m_FontHeight + m_FontSmlHeight + m_MarginItem;
-                        PBWidth = m_MenuItemWidth - LeftSecond - m_ScrollBarWidth - m_MarginItem2;
+                        PBWidth = m_MenuItemWidth - LeftSecond - m_WidthScrollBar - m_MarginItem2;
                         if (m_IsScrolling)
-                            PBWidth += m_ScrollBarWidth;
+                            PBWidth += m_WidthScrollBar;
 
                         PBLeft = LeftSecond;
                         PBHeight = Config.decorProgressMenuItemSize / 2;
@@ -1777,7 +1777,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     }
 
     if (m_IsScrolling)
-        m_MenuItemWidth -= m_ScrollBarWidth;
+        m_MenuItemWidth -= m_WidthScrollBar;
 
     tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
@@ -2018,9 +2018,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_FontHeight + m_MarginItem;
             }
 
-            int ImagesWidth {ImgRecNewWidth + ImgRecCutWidth + m_MarginItem2 + m_ScrollBarWidth};
+            int ImagesWidth {ImgRecNewWidth + ImgRecCutWidth + m_MarginItem2 + m_WidthScrollBar};
             if (m_IsScrolling)
-                ImagesWidth -= m_ScrollBarWidth;
+                ImagesWidth -= m_WidthScrollBar;
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem - ImagesWidth) &&
                 Config.ScrollerEnable) {
@@ -2397,9 +2397,9 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     do {  // Runs up to two times!
         if (FirstRun)
-            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbar most of the time
+            m_cWidth -= m_WidthScrollBar;  // Assume that we need scrollbar most of the time
         else
-            m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
+            m_cWidth += m_WidthScrollBar;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
         ComplexContent.SetOsd(m_Osd);
@@ -2686,7 +2686,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
     m_cLeft = m_MenuItemWidth + Config.decorBorderMenuItemSize * 2 + Config.decorBorderMenuContentSize + m_MarginItem;
     if (m_IsScrolling)
-        m_cLeft += m_ScrollBarWidth;
+        m_cLeft += m_WidthScrollBar;
 
     m_cTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentSize;
     m_cWidth = m_MenuWidth - m_cLeft - Config.decorBorderMenuContentSize;
@@ -3110,9 +3110,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     do {  // Runs up to two times!
         if (FirstRun)
-            m_cWidth -= m_ScrollBarWidth;  // Assume that we need scrollbar most of the time
+            m_cWidth -= m_WidthScrollBar;  // Assume that we need scrollbar most of the time
         else
-            m_cWidth += m_ScrollBarWidth;  // For second run readd scrollbar width
+            m_cWidth += m_WidthScrollBar;  // For second run readd scrollbar width
 
         ComplexContent.Clear();
         ComplexContent.SetOsd(m_Osd);
@@ -3473,7 +3473,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     m_MenuItemWidth = Width;
 
-    Width -= m_ScrollBarWidth;  // First assume text is with scrollbar and redraw if not
+    Width -= m_WidthScrollBar;  // First assume text is with scrollbar and redraw if not
     if (FixedFont) {
         ComplexContent.AddText(Text, true,
                                cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
@@ -3488,7 +3488,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     const bool Scrollable {ComplexContent.Scrollable(Height - m_MarginItem2)};
     if (!Scrollable) {
-        Width += m_ScrollBarWidth;  // Readd scrollbar width
+        Width += m_WidthScrollBar;  // Readd scrollbar width
         ComplexContent.Clear();
         if (FixedFont) {
             ComplexContent.AddText(
@@ -3616,17 +3616,17 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
     for (auto &Border : ItemsBorder) {
-        Border.Width -= m_ScrollBarWidth;
+        Border.Width -= m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width += m_ScrollBarWidth;  // Restore original width
+        Border.Width += m_WidthScrollBar;  // Restore original width
     }
 }
 
 void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
     for (auto &Border : ItemsBorder) {
-        Border.Width += m_ScrollBarWidth;
+        Border.Width += m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width -= m_ScrollBarWidth;  // Restore original width
+        Border.Width -= m_WidthScrollBar;  // Restore original width
     }
 }
 
