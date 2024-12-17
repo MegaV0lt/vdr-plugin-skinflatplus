@@ -130,7 +130,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         const cString items[16]{"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                 "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                 "Replay",   "Miscellaneous", "Plugins", "Restart"};
-        std::string MainMenuText(const std::string &Text);
+        cString MainMenuText(const cString &Text);
         cString GetIconName(const std::string &element);
 
         cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);

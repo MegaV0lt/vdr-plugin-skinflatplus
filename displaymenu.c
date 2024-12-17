@@ -472,7 +472,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
                     cImageLoader ImgLoader;
-                    const cString IconName = *GetIconName(MainMenuText(s));
+                    const cString IconName = *GetIconName(*MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
                         cString IconNameCur = cString::sprintf("%s_cur", *IconName);
@@ -559,10 +559,9 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     SetEditableWidth(m_MenuWidth - Tab(1));
 }
 
-std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
-    const std::string text {skipspace(Text.c_str())};
-    std::string MenuEntry {""};
-    MenuEntry.reserve(13);  // Length of 'Miscellaneous'
+cString cFlatDisplayMenu::MainMenuText(const cString &Text) {
+    const std::string text {skipspace(*Text)};
+    cString MenuEntry {""};
     bool found {false}, DoBreak {false};
     const std::size_t TextLength {text.length()};
     uint i {0};  // 'i' used also after loop
@@ -581,7 +580,7 @@ std::string cFlatDisplayMenu::MainMenuText(const std::string &Text) {
     if (found) {
         MenuEntry = skipspace(text.substr(i).c_str());
     } else {
-        MenuEntry = text;
+        MenuEntry = text.c_str();
     }
     return MenuEntry;
 }
