@@ -1884,8 +1884,8 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
     return Ascender;
 }
-cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, cString delimiter) {
-    std::ifstream file(*filePath);
+cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString delimiter) {
+    std::ifstream file(*FilePath);
     if (!file.is_open()) return "";
 
     std::string data {""};
@@ -1903,8 +1903,8 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &filePath, cString del
     return data.c_str();
 }
 
-cString cFlatBaseRender::FormatPrecipitation(const cString &filePath) {
-    std::ifstream file(*filePath);
+cString cFlatBaseRender::FormatPrecipitation(const cString &FilePath) {
+    std::ifstream file(*FilePath);
     if (!file.is_open()) return "";
 
     std::string data {""};

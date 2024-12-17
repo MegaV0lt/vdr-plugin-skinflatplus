@@ -133,7 +133,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         std::string MainMenuText(const std::string &Text);
         cString GetIconName(const std::string &element);
 
-        std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
