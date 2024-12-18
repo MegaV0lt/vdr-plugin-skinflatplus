@@ -71,10 +71,11 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 
 void cComplexContent::CalculateDrawPortHeight() {
     m_DrawPortHeight = 0;
+    int Bottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > m_DrawPortHeight) m_DrawPortHeight = GetBottom;
+        Bottom = (*it).GetBottom();  // Process only once; Esp. for multiline text
+        m_DrawPortHeight = std::max(m_DrawPortHeight, Bottom);
     }
 
     if (m_IsScrollingActive)  //  m_DrawPortHeight has to be set for 'ScrollTotal()'
@@ -82,11 +83,11 @@ void cComplexContent::CalculateDrawPortHeight() {
 }
 
 int cComplexContent::BottomContent() {
-    int Bottom {0};
+    int Bottom {0}, GetBottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > Bottom) Bottom = GetBottom;
+        GetBottom = (*it).GetBottom();  // Process only once; Esp. for multiline text
+        Bottom = std::max(Bottom, GetBottom);
     }
     return Bottom;
 }

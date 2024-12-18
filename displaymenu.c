@@ -3769,7 +3769,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
 }
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) {
-    bool FirstContent{true};
+    bool FirstContent {true};
     for (int i {0}; Event->Contents(i); ++i) {
         if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
             if (!FirstContent)
