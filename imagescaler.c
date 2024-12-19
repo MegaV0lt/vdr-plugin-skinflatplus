@@ -43,7 +43,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
     int d {0}, e {0}, offset {0};  // Init outside of loop
-    float sub_offset {0.0}, h[4] {0.0}, norm {0.0}, t {0.0};
+    float sub_offset {0.0f}, h[4] {0.0f}, norm {0.0f}, t {0.0f};
     for (int i {0}; i < dst_size; ++i) {
         /* const int */   d          = 2 * dst_size;                       // Sample position denominator
         /* const int */   e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
@@ -114,26 +114,25 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_src_width  = src_width;
     m_src_height = src_height;
 
-    if (m_memory) free(m_memory);
+    if (m_memory) {
+        // Free memory only if it was allocated before
+        free(m_memory);
+        m_memory = nullptr;
+    }
 
     // Narrowing conversion
-    const unsigned hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
-    const unsigned ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
-    const unsigned buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
+    const size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
+    const size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
+    const size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
-    char *p = (char *) malloc(hor_filters_size + ver_filters_size + buffer_size);
+    char *p = reinterpret_cast<char *>(malloc(hor_filters_size + ver_filters_size + buffer_size));
     if (!p) exit(EXIT_FAILURE);  // Unable to allocate memory!
-    // Besser std::vector, den vector als Parameter übergeben, falls notwendig
-    // std::vector<char> buffer(hor_filters_size + ver_filters_size + buffer_size);
-
-    // Zugriff auf den Puffer
-    // char *p = buffer.data();
 
     m_memory = p;
 
-    m_hor_filters = (Filter   *) p;  p += hor_filters_size;
-    m_ver_filters = (Filter   *) p;  p += ver_filters_size;
-    m_buffer      = (TmpPixel *) p;
+    m_hor_filters = reinterpret_cast<Filter *>(p);
+    m_ver_filters = reinterpret_cast<Filter *>(p + hor_filters_size);
+    m_buffer      = reinterpret_cast<TmpPixel *>(p + hor_filters_size + ver_filters_size);
 
     CalculateFilters(m_hor_filters, m_dst_width , m_src_width);
     CalculateFilters(m_ver_filters, m_dst_height, m_src_height);
@@ -141,11 +140,10 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
 
 // Shift range to 0..255 and clamp overflows
 static unsigned shift_clamp(int x) {
-    x = (x + (1 << 21)) >> 22;
-    if (x < 0) return 0;
-    if (x > 255) return 255;
-
-    return x;
+    // x = (x + 2^21) >> 22;
+    // But that's equivalent to this:
+    x = (x + 2097152) >> 22;
+    return (x < 0) ? 0 : (x > 255) ? 255 : x;
 }
 
 void ImageScaler::NextSourceLine() {
@@ -174,3 +172,4 @@ void ImageScaler::NextSourceLine() {
         m_dst_y++;
     }
 }
+
