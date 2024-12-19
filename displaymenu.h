@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <ctype.h>
+// #include <ctype.h>
 #include <vdr/menu.h>
 #include <vdr/tools.h>
 
