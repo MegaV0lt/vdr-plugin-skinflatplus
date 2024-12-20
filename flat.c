@@ -200,14 +200,10 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 }
 
 cString GetRecordingErrorIcon(int RecInfoErrors) {
-    if (RecInfoErrors == 0) return "recording_ok";       // No errors
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
-
-    const int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-    if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
-    if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
-
-    return "";
+    return (RecInfoErrors == 0) ? "recording_ok"
+           : (RecInfoErrors < 0) ? "recording_untested"
+           : (RecInfoErrors < Config.MenuItemRecordingShowRecordingErrorsThreshold) ? "recording_warning"
+           : "recording_error";
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
