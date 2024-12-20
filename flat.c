@@ -171,32 +171,25 @@ cString GetFormatIcon(int ScreenWidth) {
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
-    // From skin ElchiHD
 #if APIVERSNUM >= 20605
     const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
-    if (FrameWidth > 0) {
-        if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
-        if (FrameWidth > 720) return "hd";
-        return "sd";  // 720 and below is considered sd
-    } else  // NOLINT
+    if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
+    if (FrameWidth > 720) return "hd";
+    if (FrameWidth > 0) return "sd";  // 720 and below is considered sd
 #endif
-    {   // Find radio and H.264/H.265 streams.
-        //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
-        if (Recording->Info()->Components()) {
-            const cComponents *Components = Recording->Info()->Components();
-            int i {-1}, NumComponents = Components->NumComponents();
-            while (++i < NumComponents) {
-                const tComponent *p = Components->Component(i);
-                switch (p->stream) {
-                    case sc_video_MPEG2:     return "sd";
-                    case sc_video_H264_AVC:  return "hd";
-                    case sc_video_H265_HEVC: return "uhd";
-                    default:                 break;
-                }
+    // Find radio and H.264/H.265 streams.
+    //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
+    if (const auto *Components = Recording->Info()->Components()) {
+        for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {
+            switch (Components->Component(i)->stream) {
+                case sc_video_MPEG2: return "sd";
+                case sc_video_H264_AVC: return "hd";
+                case sc_video_H265_HEVC: return "uhd";
+                default: break;
             }
         }
     }
-    return "";  // Nothing found
+    return "";
 }
 
 cString GetRecordingErrorIcon(int RecInfoErrors) {
