@@ -595,16 +595,15 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
             return cString::sprintf("menuIcons/%s", *items[i]);
         }
     }
+
     // Check for special main menu entries "stop recording", "stop replay"
     const std::string StopRecording {skipspace(trVDR(" Stop recording "))};
     const std::string StopReplay {skipspace(trVDR(" Stop replaying"))};
-    try {
-        if (element.substr(0, StopRecording.size()) == StopRecording)
-            return "menuIcons/StopRecording";
-        if (element.substr(0, StopReplay.size()) == StopReplay)
-            return "menuIcons/StopReplay";
-    } catch (...) {
-    }
+    if (element.compare(0, StopRecording.size(), StopRecording) == 0)
+        return "menuIcons/StopRecording";
+    if (element.compare(0, StopReplay.size(), StopReplay) == 0)
+        return "menuIcons/StopReplay";
+
     // Check for plugins
     const char *MainMenuEntry {nullptr};
     std::string PlugMainEntry {""};
@@ -615,15 +614,12 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
             MainMenuEntry = p->MainMenuEntry();
             if (MainMenuEntry) {
                 PlugMainEntry = MainMenuEntry;
-                try {
-                    if (element.substr(0, PlugMainEntry.size()) == PlugMainEntry) {
-                        return cString::sprintf("pluginIcons/%s", p->Name());
-                    }
-                } catch (...) {
+                if (element.compare(0, PlugMainEntry.size(), PlugMainEntry) == 0) {
+                    return cString::sprintf("pluginIcons/%s", p->Name());
                 }
+            } else {
+                break;
             }
-        } else {
-            break;
         }
     }
     return cString::sprintf("extraIcons/%s", element.c_str());
