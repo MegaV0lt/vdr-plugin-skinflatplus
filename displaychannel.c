@@ -19,7 +19,6 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     m_ChannelHeight = m_OsdHeight - Config.decorBorderChannelSize * 2;
     // From bottom to top (2 * EPG + 2 * EPGsml)
     m_HeightBottom = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
-    // m_HeightImageLogo = m_HeightBottom;
     if (Config.SignalQualityShow)
         m_HeightBottom += std::max(m_FontSmlHeight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
     else if (Config.ChannelIconsShow)
@@ -146,7 +145,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
         int ImageTop {m_MarginItem};
-        cImage *img {ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34, ImageHeight)};
+        cImage *img {ImgLoader.LoadIcon("logo_background", ImageHeight * 1.34f, ImageHeight)};
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -234,7 +233,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     bool IsRec {false};
     const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
 
-    int left = m_HeightBottom * 1.34 + m_MarginItem;  // Narrowing conversion
+    int left = m_HeightBottom * 1.34f + m_MarginItem;  // Narrowing conversion
     const int StartTimeLeft {left};
 
     if (Config.ChannelShowStartTime)
@@ -564,7 +563,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.LoadIcon("logo_background", height, height);
 
-    cImage *img {ImgLoader.LoadIcon("logo_background", height * 1.34, height)};
+    cImage *img {ImgLoader.LoadIcon("logo_background", height * 1.34f, height)};
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();

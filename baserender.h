@@ -42,12 +42,12 @@ class cFlatBaseRender {
 
         void TopBarCreate();
         void TopBarSetTitle(const cString &Title, bool Clear = true);
-        void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
-        void TopBarSetMenuIcon(const cString icon);
-        void TopBarSetMenuIconRight(const cString icon);
+        void TopBarSetTitleExtra(const cString &Extra1, const cString &Extra2);
+        void TopBarSetMenuIcon(const cString &icon);
+        void TopBarSetMenuIconRight(const cString &icon);
         void TopBarClearMenuIconRight();
-        void TopBarSetMenuLogo(const cString icon);
-        void TopBarSetExtraIcon(const cString icon);
+        void TopBarSetMenuLogo(const cString &icon);
+        void TopBarSetExtraIcon(const cString &icon);
         void TopBarUpdate();
 
         void ButtonsCreate();

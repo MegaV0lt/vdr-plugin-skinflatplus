@@ -119,11 +119,6 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    /* if (ScreenAspect == 16.0 / 9.0) return "169";
-    if (ScreenAspect == 4.0 / 3.0) return "43";
-    if (ScreenAspect == 20.0 / 11.0 || ScreenAspect == 15.0 / 11.0) return "169w";
-    if (ScreenAspect == 2.21) return "221"; */
-
     static const double ScreenAspects[] {16.0 / 9.0, 4.0 / 3.0, 20.0 / 11.0, 15.0 / 11.0, 2.21};
     static const cString ScreenAspectNames[] {"169", "43", "169w", "169w", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
@@ -213,21 +208,6 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
                                    "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
                                    "recording_seen_8", "recording_seen_9", "recording_seen_10"};
     return SeenIconNames[idx];
-
-    /*
-    if (FrameSeen < 0.1) return "recording_seen_0";
-    if (FrameSeen < 0.2) return "recording_seen_1";
-    if (FrameSeen < 0.3) return "recording_seen_2";
-    if (FrameSeen < 0.4) return "recording_seen_3";
-    if (FrameSeen < 0.5) return "recording_seen_4";
-    if (FrameSeen < 0.6) return "recording_seen_5";
-    if (FrameSeen < 0.7) return "recording_seen_6";
-    if (FrameSeen < 0.8) return "recording_seen_7";
-    if (FrameSeen < 0.9) return "recording_seen_8";
-    if (FrameSeen < 0.98) return "recording_seen_9";
-
-    return "recording_seen_10";
-*/
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
@@ -529,11 +509,9 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
                                      RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        // if (FramesPerSecond > 0.0) {  // Already checked
-            Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
-            if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
-                Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-        // }
+        Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
+        if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
+            Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
         if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
         if (LastIndex)  //* Bitrate in new line
@@ -603,9 +581,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     // Hair Space is a very small space:
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
-    /* HairSpaceCode = 0x0000200A;  // HairSpace: U+200A
-       ThinSpaceCode = 0x00002009;  // ThinSpace: U+2009
-    */
+    // HairSpace: U+200A, ThinSpace: U+2009
+
     //* Detect 'HairSpace'
     const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than space

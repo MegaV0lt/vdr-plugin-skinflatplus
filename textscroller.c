@@ -14,7 +14,6 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 #endif
     // if (!m_Osd) return;
 
-    // m_Text.reserve(strlen(text));
     m_Text = text;
     m_Font = font;
     m_Position = position;

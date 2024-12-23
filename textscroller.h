@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vdr/thread.h>
+
 #include <cstring>  // string.h
 #include <list>
 

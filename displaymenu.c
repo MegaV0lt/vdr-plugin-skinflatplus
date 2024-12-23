@@ -95,8 +95,6 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     PixmapFill(ContentHeadIconsPixmap, clrTransparent);
     PixmapFill(ScrollbarPixmap, clrTransparent);
 
-    // m_MenuCategory = mcUndefined;
-
     MenuItemScroller.SetOsd(m_Osd);
     MenuItemScroller.SetScrollStep(Config.ScrollerStep);
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
@@ -700,7 +698,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    if (Width < w) Width = w;  // Minimal width for channel number
+    Width = std::max(w, Width);  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -708,7 +706,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int ImageLeft {Left};
     int ImageTop {Top};
     int ImageHeight {m_FontHeight};
-    int ImageBgWidth = ImageHeight * 1.34;  // Narrowing conversion
+    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
 
     cImage *img {nullptr};
@@ -1133,14 +1131,13 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     const cChannel *Channel = Timer->Channel();
     int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    int Width {m_Font->Width(*Buffer)};
-    if (Width < w) Width = w;  // Minimal width for channel number
+    int Width {std::max(w, m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
 
     ImageLeft = Left;
-    int ImageBgWidth = ImageHeight * 1.34;  // Narrowing conversion
+    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
     img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
     if (img) {
@@ -1384,7 +1381,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem;
 
         int ImageLeft {Left};
-        int ImageBgWidth = m_FontHeight * 1.34;  // Narrowing conversion
+        int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
         int ImageBgHeight {m_FontHeight};
         if (!IsGroup) {
             img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
@@ -2605,8 +2602,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     const cString Title = Event->Title();
     const cString ShortText = Event->ShortText();
     const int ShortTextWidth {m_FontSml->Width(*ShortText)};      // Width of short text
-    const int MaxWidth {HeadIconLeft - m_MarginItem};               //? The same as below
-     // m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft);  // headIconLeft includes right margin
+    const int MaxWidth {HeadIconLeft - m_MarginItem};
     int left {m_MarginItem};
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuEventFontInfo),
@@ -3341,8 +3337,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         Title = Recording->Name();
 
     const cString ShortText = RecInfo->ShortText();
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};                 // Width of short text
-    int MaxWidth {m_MenuWidth - m_MarginItem - (m_MenuWidth - HeadIconLeft)};  // HeadIconLeft includes right margin
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};  // Width of short text
+    int MaxWidth {HeadIconLeft - m_MarginItem};  // Reduce redundant calculations
     int left {m_MarginItem};
 
 #if APIVERSNUM >= 20505
@@ -3634,11 +3630,8 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
 
-    const int DiffSecs = now - LastRecTimeFromFolder;  // Narrowing conversion
-    const int days {DiffSecs / (60 * 60 * 24)};
-    // dsyslog("flatPlus: RecFolder: %s LastRecTimeFromFolder: %ld time: %d value: %d diff: %d days: %d",
-    //          RecFolder.c_str(), LastRecTimeFromFolder, now, value, DiffSecs, days);
-    return (days > value) ? true : false;
+    double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
+    return days > value;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
@@ -5122,7 +5115,7 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     const int ImageHeight {m_FontHeight};
     int ImageBgHeight {ImageHeight};
-    int ImageBgWidth = ImageHeight * 1.34;  // Narrowing conversion
+    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     cImage *img {ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight)};
     if (img) {
         ImageBgHeight = img->Height();
