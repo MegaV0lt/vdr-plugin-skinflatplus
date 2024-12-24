@@ -105,7 +105,7 @@ bool cComplexContent::Scrollable(int height) {
     if (height == 0) height = m_Position.Height();
 
     if (m_ScrollSize == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cComplexContent::Scrollable() m_ScrollSize is 0!");
+        esyslog("FlatPlus: Error in cComplexContent::Scrollable() m_ScrollSize is 0!");
         return false;
     }
 
@@ -133,7 +133,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     const int TextWidthLeft {TextWidthFull - image->Width() - 10};
     if (m_ScrollSize == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
+        esyslog("FlatPlus: Error in cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
         return;
     }
 

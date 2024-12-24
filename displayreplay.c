@@ -417,8 +417,10 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     const int FontWidthSpace {m_Font->Width(' ')};
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    if (FramesPerSecond == 0)  //? Avoid DIV/0
-        esyslog("FlatPlus: cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+    if (FramesPerSecond == 0.0) {  // Avoid DIV/0
+        esyslog("FlatPlus: Error in cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+        return;
+    }
 
     //* Draw total and cutted length with cutted symbol (Right side, 1. line)
     img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);

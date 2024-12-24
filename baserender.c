@@ -206,7 +206,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
     const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     if (DiskFreePercent == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
+        esyslog("FlatPlus: Error in cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
         return;  //? Show something in menu at least?
     }
 
@@ -922,7 +922,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
 
     if (Total == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
+        esyslog("FlatPlus: Error in cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
         return;
     }
 
