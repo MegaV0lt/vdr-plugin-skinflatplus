@@ -573,16 +573,16 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     return 0;
 }
 
+
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
-    if (Line.empty())  // Check for empty line
+    if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
     if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
         return;
 
-    uint LineSpaces {0};
-    for (auto &ch : Line)  // Count spaces in 'Line'
-        if (ch == ' ') ++LineSpaces;
+    // Count spaces in line
+    const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
 
     // Hair Space is a very small space:
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
@@ -616,8 +616,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
-        int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'. Narrowing conversion
-        if (!FillCharBlock) ++FillCharBlock;            // Set minimum to one 'FillChar'
+        const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
 
         std::string FillChars {""};
         FillChars.reserve(16);
