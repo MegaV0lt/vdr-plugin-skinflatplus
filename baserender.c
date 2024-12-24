@@ -206,7 +206,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
     const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     if (DiskFreePercent == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
+        esyslog("flatPlus: Error in cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
         return;  //? Show something in menu at least?
     }
 
@@ -922,7 +922,7 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRe
     }
 
     if (Total == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
+        esyslog("flatPlus: Error in cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
         return;
     }
 
@@ -1299,7 +1299,7 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorE
 void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
                                     bool CanScrollUp, bool CanScrollDown) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("FlatPlus: cFlatBaseRender::ScrollBarDraw() Total %d, Shown %d, Offset %d", Total, Shown, Offset);
+    dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Total %d, Shown %d, Offset %d", Total, Shown, Offset);
 #endif
 
     if (!Pixmap) return;

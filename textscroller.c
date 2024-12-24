@@ -157,7 +157,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
         cCondWait::SleepMs(10);
 
     if (m_ScrollDelay == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in cTextScrollers::AddScroller() m_ScrollDelay is 0!");
+        esyslog("flatPlus: Error in cTextScrollers::AddScroller() m_ScrollDelay is 0!");
         return;
     }
 

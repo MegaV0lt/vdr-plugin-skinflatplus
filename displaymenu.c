@@ -236,7 +236,7 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
 
 int cFlatDisplayMenu::MaxItems() {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("FlatPlus: cFlatDisplayMenu::MaxItems()");
+    dsyslog("flatPlus: cFlatDisplayMenu::MaxItems()");
 #endif
     int ItemHeight = m_ItemHeight;
     switch (m_MenuCategory) {

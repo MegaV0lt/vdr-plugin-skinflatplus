@@ -196,7 +196,7 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0!");
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0!");
         return "recording_seen_0";
     }
 
@@ -219,7 +219,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
 #endif
 
     if (MediaSize.Height() == 0)  {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in SetMediaSize() MediaSize.Height() is 0!");
+        esyslog("flatPlus: Error in SetMediaSize() MediaSize.Height() is 0!");
         return;
     }
 

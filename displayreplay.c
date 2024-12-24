@@ -418,7 +418,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int FontWidthSpace {m_Font->Width(' ')};
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
     if (FramesPerSecond == 0.0) {  // Avoid DIV/0
-        esyslog("FlatPlus: Error in cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+        esyslog("flatPlus: Error in cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
         return;
     }
 
