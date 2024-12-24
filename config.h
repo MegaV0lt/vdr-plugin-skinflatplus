@@ -8,6 +8,7 @@
 #pragma once
 
 #include <vdr/plugin.h>
+
 #include <string>
 #include <vector>
 
@@ -45,13 +46,14 @@ class cFlatConfig {
         void RecordingOldLoadConfig();
         int GetRecordingOldValue(const std::string &folder);
 
-        cString ThemeCurrent;
-        cString LogoPath;
-        cString IconPath;
-        cString RecordingOldConfigFile;
+        cString ThemeCurrent {""};
+        cString LogoPath {""};
+        cString IconPath {""};
+        cString RecordingOldConfigFile {""};
 
         std::vector<std::string> RecordingOldFolder;
         std::vector<int> RecordingOldValue;
+
         // BORDER TYPES
         // 0 = none
         // 1 = rect
@@ -61,73 +63,73 @@ class cFlatConfig {
         // 5 = round + alpha blend
         // 6 = invert round + alpha blend
 
-        int decorBorderChannelByTheme;
+        int decorBorderChannelByTheme {1};
         int decorBorderChannelTypeTheme, decorBorderChannelSizeTheme;
-        int decorBorderChannelTypeUser, decorBorderChannelSizeUser;
+        int decorBorderChannelTypeUser {0}, decorBorderChannelSizeUser {0};
         int decorBorderChannelType, decorBorderChannelSize;
         tColor decorBorderChannelFg, decorBorderChannelBg;
 
-        int decorBorderChannelEPGByTheme;
+        int decorBorderChannelEPGByTheme {1};
         int decorBorderChannelEPGTypeTheme, decorBorderChannelEPGSizeTheme;
-        int decorBorderChannelEPGTypeUser, decorBorderChannelEPGSizeUser;
+        int decorBorderChannelEPGTypeUser {0}, decorBorderChannelEPGSizeUser {0};
         int decorBorderChannelEPGType, decorBorderChannelEPGSize;
         tColor decorBorderChannelEPGFg, decorBorderChannelEPGBg;
 
-        int decorBorderTopBarByTheme;
+        int decorBorderTopBarByTheme {1};
         int decorBorderTopBarTypeTheme, decorBorderTopBarSizeTheme;
-        int decorBorderTopBarTypeUser, decorBorderTopBarSizeUser;
+        int decorBorderTopBarTypeUser {0}, decorBorderTopBarSizeUser {0};
         int decorBorderTopBarType, decorBorderTopBarSize;
         tColor decorBorderTopBarFg, decorBorderTopBarBg;
 
-        int decorBorderMessageByTheme;
+        int decorBorderMessageByTheme {1};
         int decorBorderMessageTypeTheme, decorBorderMessageSizeTheme;
-        int decorBorderMessageTypeUser, decorBorderMessageSizeUser;
+        int decorBorderMessageTypeUser {0}, decorBorderMessageSizeUser {0};
         int decorBorderMessageType, decorBorderMessageSize;
         tColor decorBorderMessageFg, decorBorderMessageBg;
 
-        int decorBorderVolumeByTheme;
+        int decorBorderVolumeByTheme {1};
         int decorBorderVolumeTypeTheme, decorBorderVolumeSizeTheme;
-        int decorBorderVolumeTypeUser, decorBorderVolumeSizeUser;
+        int decorBorderVolumeTypeUser {0}, decorBorderVolumeSizeUser {0};
         int decorBorderVolumeType, decorBorderVolumeSize;
         tColor decorBorderVolumeFg, decorBorderVolumeBg;
 
-        int decorBorderTrackByTheme;
+        int decorBorderTrackByTheme {1};
         int decorBorderTrackTypeTheme, decorBorderTrackSizeTheme;
-        int decorBorderTrackTypeUser, decorBorderTrackSizeUser;
+        int decorBorderTrackTypeUser {0}, decorBorderTrackSizeUser {0};
         int decorBorderTrackType, decorBorderTrackSize;
         tColor decorBorderTrackFg, decorBorderTrackBg;
         tColor decorBorderTrackSelFg, decorBorderTrackSelBg;
         tColor decorBorderTrackCurFg, decorBorderTrackCurBg;
 
-        int decorBorderReplayByTheme;
+        int decorBorderReplayByTheme {1};
         int decorBorderReplayTypeTheme, decorBorderReplaySizeTheme;
-        int decorBorderReplayTypeUser, decorBorderReplaySizeUser;
+        int decorBorderReplayTypeUser {0}, decorBorderReplaySizeUser {0};
         int decorBorderReplayType, decorBorderReplaySize;
         tColor decorBorderReplayFg, decorBorderReplayBg;
 
-        int decorBorderMenuItemByTheme;
+        int decorBorderMenuItemByTheme {1};
         int decorBorderMenuItemTypeTheme, decorBorderMenuItemSizeTheme;
-        int decorBorderMenuItemTypeUser, decorBorderMenuItemSizeUser;
+        int decorBorderMenuItemTypeUser {0}, decorBorderMenuItemSizeUser {0};
         int decorBorderMenuItemType, decorBorderMenuItemSize;
         tColor decorBorderMenuItemFg, decorBorderMenuItemBg;
         tColor decorBorderMenuItemSelFg, decorBorderMenuItemSelBg;
         tColor decorBorderMenuItemCurFg, decorBorderMenuItemCurBg;
 
-        int decorBorderMenuContentHeadByTheme;
+        int decorBorderMenuContentHeadByTheme {1};
         int decorBorderMenuContentHeadTypeTheme, decorBorderMenuContentHeadSizeTheme;
-        int decorBorderMenuContentHeadTypeUser, decorBorderMenuContentHeadSizeUser;
+        int decorBorderMenuContentHeadTypeUser {0}, decorBorderMenuContentHeadSizeUser {0};
         int decorBorderMenuContentHeadType, decorBorderMenuContentHeadSize;
         tColor decorBorderMenuContentHeadFg, decorBorderMenuContentHeadBg;
 
-        int decorBorderMenuContentByTheme;
+        int decorBorderMenuContentByTheme {1};
         int decorBorderMenuContentTypeTheme, decorBorderMenuContentSizeTheme;
-        int decorBorderMenuContentTypeUser, decorBorderMenuContentSizeUser;
+        int decorBorderMenuContentTypeUser {0}, decorBorderMenuContentSizeUser {0};
         int decorBorderMenuContentType, decorBorderMenuContentSize;
         tColor decorBorderMenuContentFg, decorBorderMenuContentBg;
 
-        int decorBorderButtonByTheme;
+        int decorBorderButtonByTheme {1};
         int decorBorderButtonTypeTheme, decorBorderButtonSizeTheme;
-        int decorBorderButtonTypeUser, decorBorderButtonSizeUser;
+        int decorBorderButtonTypeUser {0}, decorBorderButtonSizeUser {0};
         int decorBorderButtonType, decorBorderButtonSize;
         tColor decorBorderButtonFg, decorBorderButtonBg;
 
@@ -142,34 +144,35 @@ class cFlatConfig {
         // 7 = outline + dot
         // 8 = small line + big line + alpha blend
         // 9 = big line + alpha blend
-        int decorProgressChannelByTheme;
+
+        int decorProgressChannelByTheme {1};
         int decorProgressChannelTypeTheme, decorProgressChannelSizeTheme;
-        int decorProgressChannelTypeUser, decorProgressChannelSizeUser;
+        int decorProgressChannelTypeUser {0}, decorProgressChannelSizeUser {20};
         int decorProgressChannelType, decorProgressChannelSize;
         tColor decorProgressChannelFg, decorProgressChannelBarFg, decorProgressChannelBg;
 
-        int decorProgressVolumeByTheme;
+        int decorProgressVolumeByTheme {1};
         int decorProgressVolumeTypeTheme, decorProgressVolumeSizeTheme;
-        int decorProgressVolumeTypeUser, decorProgressVolumeSizeUser;
+        int decorProgressVolumeTypeUser {0}, decorProgressVolumeSizeUser {20};
         int decorProgressVolumeType, decorProgressVolumeSize;
         tColor decorProgressVolumeFg, decorProgressVolumeBarFg, decorProgressVolumeBg;
 
-        int decorProgressMenuItemByTheme;
+        int decorProgressMenuItemByTheme {1};
         int decorProgressMenuItemTypeTheme, decorProgressMenuItemSizeTheme;
-        int decorProgressMenuItemTypeUser, decorProgressMenuItemSizeUser;
+        int decorProgressMenuItemTypeUser {0}, decorProgressMenuItemSizeUser {20};
         int decorProgressMenuItemType, decorProgressMenuItemSize;
         tColor decorProgressMenuItemFg, decorProgressMenuItemBarFg, decorProgressMenuItemBg;
         tColor decorProgressMenuItemCurFg, decorProgressMenuItemCurBarFg, decorProgressMenuItemCurBg;
 
-        int decorProgressReplayByTheme;
+        int decorProgressReplayByTheme {1};
         int decorProgressReplayTypeTheme, decorProgressReplaySizeTheme;
-        int decorProgressReplayTypeUser, decorProgressReplaySizeUser;
+        int decorProgressReplayTypeUser {0}, decorProgressReplaySizeUser {40};
         int decorProgressReplayType, decorProgressReplaySize;
         tColor decorProgressReplayFg, decorProgressReplayBarFg, decorProgressReplayBg;
 
-        int decorProgressSignalByTheme;
+        int decorProgressSignalByTheme {1};
         int decorProgressSignalTypeTheme, decorProgressSignalSizeTheme;
-        int decorProgressSignalTypeUser, decorProgressSignalSizeUser;
+        int decorProgressSignalTypeUser {0}, decorProgressSignalSizeUser {20};
         int decorProgressSignalType, decorProgressSignalSize;
         tColor decorProgressSignalFg, decorProgressSignalBarFg, decorProgressSignalBg;
 
@@ -183,161 +186,165 @@ class cFlatConfig {
         * 6 = rect bar
         * 7 = round bar
         */
-        int decorScrollBarByTheme;
-        int decorScrollBarTypeTheme, decorScrollBarSizeTheme;
-        int decorScrollBarTypeUser, decorScrollBarSizeUser;
+        int decorScrollBarByTheme {0};
+        int decorScrollBarTypeTheme {0}, decorScrollBarSizeTheme {20};
+        int decorScrollBarTypeUser {0}, decorScrollBarSizeUser {20};
         int decorScrollBarType, decorScrollBarSize;
         tColor decorScrollBarFg, decorScrollBarBarFg, decorScrollBarBg;
 
         // General Config
-        int ButtonsShowEmpty;
-        int ChannelIconsShow;
-        int SignalQualityShow;
-        int SignalQualityUseColors;
-        int DiskUsageShow;  // 0 = disabled, 1 = Timer and recording menu, 2 = Always in menu, 3 = Always
-        int DiskUsageShort;
-        int DiskUsageFree;  // 0 = occupied, 1 = free, 2 = special mode free time instead of used
+        int ButtonsShowEmpty {true};
+        int ChannelIconsShow {true};
 
-        int MenuItemPadding;
-        int marginOsdVer, marginOsdHor;
-        int MessageOffset;
+        int SignalQualityShow {true};
+        int SignalQualityUseColors {false};
 
-        int MenuContentFullSize;
-        double TopBarFontSize;
-        double TopBarFontClockScale;
+        int DiskUsageShow {1};  // 0 = disabled, 1 = Timer and recording menu, 2 = Always in menu, 3 = Always
+        int DiskUsageShort {false};
+        int DiskUsageFree {1};  // 0 = occupied, 1 = free, 2 = special mode free time instead of used
 
-        int ChannelResolutionAspectShow;
-        int ChannelFormatShow;
-        int ChannelSimpleAspectFormat;
-        int ChannelTimeLeft;
-        int ChannelDvbapiInfoShow;
-        int ChannelShowStartTime;
+        int MenuContentFullSize {true};
 
-        int ChannelWeatherShow;
-        int PlaybackWeatherShow;
-        double WeatherFontSize;
+        int MenuItemPadding {3};
+        int marginOsdVer {5}, marginOsdHor {5};
+        int MessageOffset {50};
 
-        int RecordingResolutionAspectShow;
-        int RecordingFormatShow;
-        int RecordingSimpleAspectFormat;
-        int RecordingAdditionalInfoShow;
-        double TimeSecsScale;
+        double TopBarFontSize {5.0 / 100};
+        double TopBarFontClockScale {1.0 / 100};
 
-        int RecordingDimmOnPause;
-        int RecordingDimmOnPauseDelay;
-        int RecordingDimmOnPauseOpaque;
+        int ChannelResolutionAspectShow {true};
+        int ChannelFormatShow {true};
+        int ChannelSimpleAspectFormat {true};
+        int ChannelTimeLeft {0};
+        int ChannelDvbapiInfoShow {1};
+        int ChannelShowStartTime {true};
 
-        double EpgFskGenreIconSize;
-        int EpgRerunsShow;
-        int EpgAdditionalInfoShow;
-        int TopBarRecordingShow;
-        int TopBarRecConflictsShow;
-        int TopBarRecConflictsHigh;
-        int MenuItemIconsShow;
-        int TopBarMenuIconShow;
-        int TopBarHideClockText;
+        int ChannelWeatherShow {1};
+        int PlaybackWeatherShow {1};
+        double WeatherFontSize {5.0 / 100};
 
-        int MenuChannelView;
-        int MenuTimerView;
-        int MenuEventView;
-        int MenuEventRecordingViewJustify;  // 0 = disable, 1 = Justify wrapped text
-        int MenuRecordingView;
-        int MenuFullOsd;
-        int MenuEventViewAlwaysWithDate;
+        int RecordingResolutionAspectShow {true};
+        int RecordingFormatShow {true};
+        int RecordingSimpleAspectFormat {true};
+        int RecordingAdditionalInfoShow {true};
+        double TimeSecsScale {1.0};
 
-        int MenuRecordingShowCount;
-        int MenuTimerShowCount;
-        int MenuChannelShowCount;
+        int RecordingDimmOnPause {true};
+        int RecordingDimmOnPauseDelay {20};
+        int RecordingDimmOnPauseOpaque {240};
 
-        double MenuItemRecordingSeenThreshold;
-        int MenuItemRecordingDefaultOldDays;
+        double EpgFskGenreIconSize {0.5 / 100};  // Percent of content head height
+        int EpgRerunsShow {true};
+        int EpgAdditionalInfoShow {true};
 
-        int MessageColorPosition;  // 0 = vertical, 1 = horizontal
+        int TopBarRecordingShow {true};
+        int TopBarRecConflictsShow {true};
+        int TopBarRecConflictsHigh {2};
 
-        /* Hidden configs (only in setup.conf, no osd menu) */
-        int MenuItemRecordingClearPercent;
-        int MenuItemRecordingShowFolderDate;  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
-        int MenuItemParseTilde;
-        int ShortRecordingCount;
-        int MainMenuWidgetActiveTimerShowRemoteRefreshTime;  // in seconds
-        /* Hidden configs (only in setup.conf, no osd menu) */
+        int MenuItemIconsShow {true};
+        int TopBarMenuIconShow {true};
+        int TopBarHideClockText {0};
 
-        int MenuItemRecordingShowRecordingErrors;  // 0 = disable, 1 = show recording error icons
-        int PlaybackShowRecordingErrors;
-        int PlaybackShowErrorMarks;                // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
-        int PlaybackShowRecordingDate;
-        int PlaybackShowEndTime;
-        int MenuItemRecordingShowRecordingErrorsThreshold;
-        int MenuItemRecordingShowFormatIcons;      // Show format icons (sd/hd/uhd) in menu recordings
+        int MenuChannelView {1};
+        int MenuTimerView {1};
+        int MenuEventView {1};
+        int MenuEventRecordingViewJustify {0};  // 0 = disable, 1 = Justify wrapped text
+        int MenuRecordingView {1};
+        int MenuFullOsd {0};
+        int MenuEventViewAlwaysWithDate {1};
 
+        int MenuRecordingShowCount {1};
+        int MenuTimerShowCount {1};
+        int MenuChannelShowCount {1};
+
+        double MenuItemRecordingSeenThreshold {0.98 / 100.0};
+        int MenuItemRecordingDefaultOldDays {-1};
+
+        int MessageColorPosition {1};  // 0 = vertical, 1 = horizontal
+
+        //* Hidden configs (only in setup.conf, no osd menu)
+        int MenuItemRecordingClearPercent {1};
+        int MenuItemRecordingShowFolderDate {1};  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
+        int MenuItemParseTilde {1};
+        int ShortRecordingCount {0};
+        int MainMenuWidgetActiveTimerShowRemoteRefreshTime {60 * 30};  // Every 30 minutes
+        //* Hidden configs (only in setup.conf, no osd menu)
+
+        int MenuItemRecordingShowRecordingErrors {1};  // 0 = disable, 1 = show recording error icons
+        int PlaybackShowRecordingErrors {true};        // Show error marks in replay progressbar
+        int PlaybackShowErrorMarks {1};                // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
+        int PlaybackShowRecordingDate {true};          // Show date and time with short text
+        int PlaybackShowEndTime {0};                   // Show end time of recording
+        int MenuItemRecordingShowRecordingErrorsThreshold {1000};  // Threshold for displaying error instead of warning
+        int MenuItemRecordingShowFormatIcons {1};      // Show format icons (sd/hd/uhd) in menu recordings
 
         // Text scroller
-        int ScrollerEnable;
-        int ScrollerStep;
-        int ScrollerDelay;
-        int ScrollerType;
+        int ScrollerEnable {1};
+        int ScrollerStep {2};
+        int ScrollerDelay {25};  // In ms
+        int ScrollerType {0};
 
         // Main menu widgets
-        int MainMenuWidgetsEnable;
-        double MainMenuItemScale;
+        int MainMenuWidgetsEnable {1};
+        double MainMenuItemScale {0.5};
 
-        int MainMenuWidgetDVBDevicesShow;
-        int MainMenuWidgetDVBDevicesPosition;
-        int MainMenuWidgetDVBDevicesDiscardUnknown;
-        int MainMenuWidgetDVBDevicesDiscardNotUsed;
-        int MainMenuWidgetDVBDevicesNativeNumbering;
+        int MainMenuWidgetWeatherShow {true};
+        int MainMenuWidgetWeatherPosition {1};
+        int MainMenuWidgetWeatherType {0};
+        int MainMenuWidgetWeatherDays {5};
 
-        int MainMenuWidgetActiveTimerShow;
-        int MainMenuWidgetActiveTimerPosition;
-        int MainMenuWidgetActiveTimerMaxCount;
-        int MainMenuWidgetActiveTimerShowActive;
-        int MainMenuWidgetActiveTimerShowRecording;
-        int MainMenuWidgetActiveTimerShowRemoteActive;
-        int MainMenuWidgetActiveTimerShowRemoteRecording;
-        int MainMenuWidgetActiveTimerHideEmpty;
+        int MainMenuWidgetDVBDevicesShow {true};
+        int MainMenuWidgetDVBDevicesPosition {2};
+        int MainMenuWidgetDVBDevicesDiscardUnknown {true};
+        int MainMenuWidgetDVBDevicesDiscardNotUsed {false};
+        int MainMenuWidgetDVBDevicesNativeNumbering {false};  // Display device numbers from 1..x
 
-        int MainMenuWidgetLastRecShow;
-        int MainMenuWidgetLastRecPosition;
-        int MainMenuWidgetLastRecMaxCount;
+        int MainMenuWidgetActiveTimerShow {true};
+        int MainMenuWidgetActiveTimerPosition {3};
+        int MainMenuWidgetActiveTimerMaxCount {2};
+        int MainMenuWidgetActiveTimerShowActive {true};
+        int MainMenuWidgetActiveTimerShowRecording {true};
+        int MainMenuWidgetActiveTimerShowRemoteActive {false};
+        int MainMenuWidgetActiveTimerShowRemoteRecording {false};
+        int MainMenuWidgetActiveTimerHideEmpty {false};
 
-        int MainMenuWidgetTimerConflictsShow;
-        int MainMenuWidgetTimerConflictsPosition;
-        int MainMenuWidgetTimerConflictsHideEmpty;
+        int MainMenuWidgetLastRecShow {false};
+        int MainMenuWidgetLastRecPosition {4};
+        int MainMenuWidgetLastRecMaxCount {3};
 
-        int MainMenuWidgetSystemInfoShow;
-        int MainMenuWidgetSystemInfoPosition;
+        int MainMenuWidgetTimerConflictsShow {false};
+        int MainMenuWidgetTimerConflictsPosition {5};
+        int MainMenuWidgetTimerConflictsHideEmpty {false};
 
-        int MainMenuWidgetSystemUpdatesShow;
-        int MainMenuWidgetSystemUpdatesPosition;
-        int MainMenuWidgetSystemUpdatesHideIfZero;
+        int MainMenuWidgetSystemInfoShow {true};
+        int MainMenuWidgetSystemInfoPosition {6};
 
-        int MainMenuWidgetTemperaturesShow;
-        int MainMenuWidgetTemperaturesPosition;
+        int MainMenuWidgetSystemUpdatesShow {true};
+        int MainMenuWidgetSystemUpdatesPosition {7};
+        int MainMenuWidgetSystemUpdatesHideIfZero {0};
 
-        int MainMenuWidgetCommandShow;
-        int MainMenuWidgetCommandPosition;
+        int MainMenuWidgetTemperaturesShow {true};
+        int MainMenuWidgetTemperaturesPosition {8};
 
-        int MainMenuWidgetWeatherShow;
-        int MainMenuWidgetWeatherPosition;
-        int MainMenuWidgetWeatherType;
-        int MainMenuWidgetWeatherDays;
+        int MainMenuWidgetCommandShow {true};
+        int MainMenuWidgetCommandPosition {9};
 
         // TVScraper
-        int TVScraperChanInfoShowPoster;
-        double TVScraperChanInfoPosterSize;
+        int TVScraperChanInfoShowPoster {1};
+        double TVScraperChanInfoPosterSize {1.0 / 100};
 
-        int TVScraperReplayInfoShowPoster;
-        double TVScraperReplayInfoPosterSize;
-        double TVScraperPosterOpacity;  // Transparency for channel info and replay info poster
+        int TVScraperReplayInfoShowPoster {1};
+        double TVScraperReplayInfoPosterSize {1.0 / 100};
+        double TVScraperPosterOpacity {0.8 / 100};  // Opacitiy of poster in replay info and channel info (80%)
 
-        int TVScraperEPGInfoShowPoster;
-        int TVScraperRecInfoShowPoster;
+        int TVScraperEPGInfoShowPoster {1};
+        int TVScraperRecInfoShowPoster {1};
 
-        int TVScraperEPGInfoShowActors;
-        int TVScraperRecInfoShowActors;
-        int TVScraperShowMaxActors;
+        int TVScraperEPGInfoShowActors {1};
+        int TVScraperRecInfoShowActors {1};
+        int TVScraperShowMaxActors {-1};  // -1 Show all actors
 
-        int DecorIndex;
+        int DecorIndex {0};
 
         void Store(const char *Name, const char *Value, const char *Filename);
         void Store(const char *Name, int Value, const char *Filename);
