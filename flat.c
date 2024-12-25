@@ -589,16 +589,10 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // HairSpace: U+200A, ThinSpace: U+2009
 
     //* Detect 'HairSpace'
-    const char *FillChar {nullptr};
     // Assume that 'tofu' char (Char not found) is bigger in size than space
-    const char *HairSpace {u8"\U0000200A"}, *Space {" "};
-    if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
-        FillChar = Space;
-        // dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
-    } else {
-        FillChar = HairSpace;
-        // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
-    }
+    // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
+    const char *FillChar = (Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A";
+
     const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
