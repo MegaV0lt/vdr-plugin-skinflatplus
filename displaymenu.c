@@ -1036,11 +1036,16 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     ComplexContent.Draw();
 
     DecorBorderClearByFrom(BorderContent);
-    sDecorBorder ib {m_cLeft, m_cTop, m_cWidth, ComplexContent.ContentHeight(false),
-                        Config.decorBorderMenuContentSize, Config.decorBorderMenuContentType,
-                        Config.decorBorderMenuContentFg, Config.decorBorderMenuContentBg, BorderContent};
-    if (Config.MenuContentFullSize)
-        ib.Height = ComplexContent.ContentHeight(true);
+    sDecorBorder ib{m_cLeft,
+                    m_cTop,
+                    m_cWidth,
+                    (Config.MenuContentFullSize) ? ComplexContent.ContentHeight(true)
+                                                 : ComplexContent.ContentHeight(false),
+                    Config.decorBorderMenuContentSize,
+                    Config.decorBorderMenuContentType,
+                    Config.decorBorderMenuContentFg,
+                    Config.decorBorderMenuContentBg,
+                    BorderContent};
 
     DecorBorderDraw(ib);
 }
@@ -1433,9 +1438,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
 
-        w = m_MenuItemWidth / 10 * 2;
-        if (!m_IsScrolling)
-            w = (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
+        w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
         cString ChannelName {""};
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
@@ -2646,16 +2649,15 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                       ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
     }
 
-    sDecorBorder ibContent {m_cLeft,
-                            m_cTop,
-                            m_cWidth,
-                            ComplexContent.ContentHeight(false),
-                            Config.decorBorderMenuContentSize,
-                            Config.decorBorderMenuContentType,
-                            Config.decorBorderMenuContentFg,
-                            Config.decorBorderMenuContentBg};
-    if (Config.MenuContentFullSize || Scrollable)
-        ibContent.Height = ComplexContent.ContentHeight(true);
+    sDecorBorder ibContent{m_cLeft,
+                           m_cTop,
+                           m_cWidth,
+                           (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
+                                                                      : ComplexContent.ContentHeight(false),
+                           Config.decorBorderMenuContentSize,
+                           Config.decorBorderMenuContentType,
+                           Config.decorBorderMenuContentFg,
+                           Config.decorBorderMenuContentBg};
 
     DecorBorderDraw(ibContent);
 
@@ -2841,17 +2843,16 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     ComplexContent.Draw();
 
     DecorBorderClearByFrom(BorderContent);
-    sDecorBorder ib {m_cLeft,
-                     m_cTop,
-                     m_cWidth,
-                     ComplexContent.ContentHeight(false),
-                     Config.decorBorderMenuContentSize,
-                     Config.decorBorderMenuContentType,
-                     Config.decorBorderMenuContentFg,
-                     Config.decorBorderMenuContentBg,
-                     BorderContent};
-    if (Config.MenuContentFullSize)
-        ib.Height = ComplexContent.ContentHeight(true);
+    sDecorBorder ib{m_cLeft,
+                    m_cTop,
+                    m_cWidth,
+                    (Config.MenuContentFullSize) ? ComplexContent.ContentHeight(true)
+                                                 : ComplexContent.ContentHeight(false),
+                    Config.decorBorderMenuContentSize,
+                    Config.decorBorderMenuContentType,
+                    Config.decorBorderMenuContentFg,
+                    Config.decorBorderMenuContentBg,
+                    BorderContent};
 
     DecorBorderDraw(ib);
 }

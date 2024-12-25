@@ -49,7 +49,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         /* const int */   e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         /* int */         offset     =  e / d;                             // Truncated sample position
         // Exact sample position is (float) e/d = offset + sub_offset
-        /* const float */ sub_offset = ((e * 1.0f - offset * d) / d);
+        /* const float */ sub_offset = (static_cast<float>(e - offset * d) / static_cast<float>(d));
                                     // ((float)(e - offset * d)) / ((float)d);
 
         // Calculate filter coefficients
