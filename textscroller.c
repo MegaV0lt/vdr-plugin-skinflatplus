@@ -92,12 +92,7 @@ void cTextScroll::DoStep() {
         return;
     }
 
-    int DrawPortX {Pixmap->DrawPort().X()};
-
-    if (m_IsReserveStep)
-        DrawPortX += m_PixelsPerStep;
-    else
-        DrawPortX -= m_PixelsPerStep;
+    int DrawPortX {Pixmap->DrawPort().X() + (m_IsReserveStep ? m_PixelsPerStep : -m_PixelsPerStep)};
 
     int maxX {Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width()};
     maxX *= -1;
