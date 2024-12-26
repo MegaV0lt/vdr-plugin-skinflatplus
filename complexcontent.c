@@ -181,23 +181,29 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize() {
-    if (m_DrawPortHeight == 0)
+    if (m_DrawPortHeight == 0) {  // Avoid DIV/0}
         esyslog("flatPlus: Error in cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
+        return 0;
+    }
 
     return static_cast<double>(m_Position.Height()) / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal() {
-    if (m_ScrollSize == 0)
+    if (m_ScrollSize == 0) {  // Avoid DIV/0}
         esyslog("flatPlus: Error in cComplexContent::ScrollTotal() m_ScrollSize is 0!");
+        return 0;
+    }
 
     // return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
     return (m_DrawPortHeight + m_ScrollSize - 1) / m_ScrollSize;
 }
 
 int cComplexContent::ScrollShown() {
-    if (m_ScrollSize == 0)
+    if (m_ScrollSize == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in cComplexContent::ScrollShown() m_ScrollSize is 0!");
+        return 0;
+    }
 
     // return ceil(m_Position.Height() * 1.0 / m_ScrollSize);
     return m_Position.Height() / m_ScrollSize;
@@ -215,7 +221,7 @@ int cComplexContent::ScrollOffset() {
             y = m_DrawPortHeight - PositionHeight - 1;
     }
 
-    if (m_DrawPortHeight == 0) {
+    if (m_DrawPortHeight == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
         return 0;
     }
