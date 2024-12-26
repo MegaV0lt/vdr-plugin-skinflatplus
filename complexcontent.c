@@ -215,10 +215,13 @@ int cComplexContent::ScrollOffset() {
             y = m_DrawPortHeight - PositionHeight - 1;
     }
 
-    if (m_DrawPortHeight == 0)
+    if (m_DrawPortHeight == 0) {
         esyslog("flatPlus: Error in cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
+        return 0;
+    }
 
-    return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    // return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    return (y * ScrollTotal()) / m_DrawPortHeight;
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {
