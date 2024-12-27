@@ -16,7 +16,6 @@
 #include <iostream>
 #include <utility>
 
-// #include <future>  // NOLINT
 #include <sstream>
 #include <locale>
 
@@ -107,18 +106,12 @@ void cFlatBaseRender::TopBarCreate() {
     TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1,
                                 cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                       m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
-    // dsyslog("flatPlus: TopBarPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2,
                                       cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                             m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
-    // dsyslog("flatPlus: TopBarIconBgPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3,
                                     cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
                                           m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
-    // dsyslog("flatPlus: TopBarIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderTopBarSize,
-    //         Config.decorBorderTopBarSize, m_OsdWidth - Config.decorBorderTopBarSize*2, m_TopBarHeight);
     PixmapFill(TopBarPixmap, clrTransparent);
     PixmapFill(TopBarIconBgPixmap, clrTransparent);
     PixmapFill(TopBarIconPixmap, clrTransparent);
@@ -517,8 +510,6 @@ void cFlatBaseRender::ButtonsCreate() {
                                  cRect(Config.decorBorderButtonSize, m_ButtonsTop,
                                        m_ButtonsWidth - Config.decorBorderButtonSize * 2, m_ButtonsHeight));
     PixmapFill(ButtonsPixmap, clrTransparent);
-    // dsyslog("flatPlus: ButtonsPixmap left: %d top: %d width: %d height: %d",
-    //    Config.decorBorderButtonSize, m_ButtonsTop, m_ButtonsWidth - Config.decorBorderButtonSize*2, m_ButtonsHeight);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -721,10 +712,6 @@ void cFlatBaseRender::MessageCreate() {
         cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
     PixmapFill(MessagePixmap, clrTransparent);
     PixmapFill(MessageIconPixmap, clrTransparent);
-    // dsyslog("flatPlus: MessagePixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
-    // dsyslog("flatPlus: MessageIconPixmap left: %d top: %d width: %d height: %d", Config.decorBorderMessageSize,
-    //         top, m_OsdWidth - Config.decorBorderMessageSize*2, m_MessageHeight);
 
     MessageScroller.SetOsd(m_Osd);
     MessageScroller.SetScrollStep(Config.ScrollerStep);
@@ -1514,7 +1501,6 @@ void cFlatBaseRender::DecorBorderDraw(const sDecorBorder &ib, bool Store) {
     const int BottomDecor {ib.Height + ib.Size};
 
     if (!DecorPixmap) {
-        // dsyslog("flatPlus: DecorBorderDraw() Creating 'DecorPixmap'");
         DecorPixmap = CreatePixmap(m_Osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 

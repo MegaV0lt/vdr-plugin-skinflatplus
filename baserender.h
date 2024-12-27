@@ -162,31 +162,11 @@ class cFlatBaseRender {
         cTextScrollers MessageScroller;
         int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 
-        // Multiline content with scrollbar
-        // cPixmap *ContentPixmap;  //* Content* is unused
-        // cPixmap *ContentEpgImagePixmap;
-        // int ContentLeft, ContentTop, ContentHeight, ContentWidth;
-        // int ContentDrawPortHeight;  // Complete high of text
-        // int ContentTextHeight;
-        // bool ContentHasScrollbar;
-        // bool ContentShown;
-        // int ContentFontType;
-        // int ContentEventType;
-        // int ContentEventHeight;
-        // int ContentEventPosterWidth, ContentEventPosterHeight;
-
-        // tColor ContentColorFg, ContentColorBg;
-        // cTextWrapper ContentWrapper;
-        // cTextWrapper ContentWrapperPoster;
-        // const cEvent *ContentEvent;
-
         cComplexContent WeatherWidget;
 
         cPixmap *DecorPixmap {nullptr};
         std::vector<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
-        /* void ContentDraw();  // Unused
-        void ContentEventDraw(); */
         double ScrollbarSize();
 
         void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);

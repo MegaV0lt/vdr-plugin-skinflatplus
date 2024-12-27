@@ -49,10 +49,6 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, m_Position, PositionDraw);
     PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, m_Position, PositionDraw);
-    // dsyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
-    //         m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
-    // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", m_PositionDraw.Left(),
-    //         m_PositionDraw.Top(), m_PositionDraw.Width(), m_PositionDraw.Height());
 
     if (Pixmap) {
         if (FullFillBackground) {
