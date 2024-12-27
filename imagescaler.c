@@ -7,6 +7,7 @@
  */
 #include "./imagescaler.h"
 
+#include <array>
 #include <cstdlib>
 #include <cmath>
 
@@ -43,48 +44,48 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
     int d {0}, e {0}, offset {0};  // Init outside of loop
-    float sub_offset {0.0f}, h[4] {0.0f}, norm {0.0f}, t {0.0f};
+    float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
+    std::array<float, 4> h_arr {0.0f, 0.0f, 0.0f, 0.0f};
     for (int i {0}; i < dst_size; ++i) {
-        /* const int */   d          = 2 * dst_size;                       // Sample position denominator
-        /* const int */   e          = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
-        /* int */         offset     =  e / d;                             // Truncated sample position
+        d = 2 * dst_size;                       // Sample position denominator
+        e = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
+        offset = e / d;                         // Truncated sample position
         // Exact sample position is (float) e/d = offset + sub_offset
-        /* const float */ sub_offset = (static_cast<float>(e - offset * d) / static_cast<float>(d));
-                                    // ((float)(e - offset * d)) / ((float)d);
+        /* const float */  // sub_offset = (static_cast<float>(e - offset * d) / static_cast<float>(d));
+        sub_offset = (e - offset * d) * (1.0f / d);
 
         // Calculate filter coefficients
-        /* float h[4];*/
         for (uint j {0}; j < 4; ++j) {
-            /* const float */ t = 3.14159265359f * (sub_offset + (1 - j));
-            h[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
+            t = 3.14159265359f * (sub_offset + (1 - j));
+            h_arr[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
 
         // Ensure that filter does not reach out off image bounds:
         while (offset < 1) {
-            h[0] += h[1];
-            h[1] = h[2];
-            h[2] = h[3];
-            h[3] = 0.0f;
+            h_arr[0] += h_arr[1];
+            h_arr[1] = h_arr[2];
+            h_arr[2] = h_arr[3];
+            h_arr[3] = 0.0f;
             ++offset;
         }
 
         while (offset + 3 > src_size) {
-            h[3] += h[2];
-            h[2] = h[1];
-            h[1] = h[0];
-            h[0] = 0.0f;
+            h_arr[3] += h_arr[2];
+            h_arr[2] = h_arr[1];
+            h_arr[1] = h_arr[0];
+            h_arr[0] = 0.0f;
             --offset;
         }
 
         // Coefficients are normalized to sum up to 2048
-        /* const float */ norm = 2048.0f / (h[0] + h[1] + h[2] + h[3]);
+        norm = 2048.0f / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
 
         --offset;  // Offset of fist used pixel
 
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
 
         for (uint j {0}; j < 4; ++j) {
-            /* const float */ t = norm * h[j];
+            t = norm * h_arr[j];
             filters[i].m_coeff[(offset + j) & 3] =
                 static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
         }
