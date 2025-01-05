@@ -7,8 +7,8 @@
  */
 #include "./imagemagickwrapper.h"
 
-#include <sstream>
-#include <string>
+// #include <sstream>
+// #include <string>
 
 #include "./imagescaler.h"
 

@@ -15,6 +15,8 @@
 #include <list>
 
 #include <Magick++.h>
+
+// Must be included after Magick++ (which includes <ft2build.h>)
 #include "./imagemagickwrapper.h"
 
 using namespace Magick;

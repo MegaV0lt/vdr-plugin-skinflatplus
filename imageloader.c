@@ -6,10 +6,11 @@
  * $Id$
  */
 #include "./imageloader.h"
+
 #include <dirent.h>
 #include <math.h>
 
-#include <iostream>
+// #include <iostream>
 #include <string>
 
 #include "./flat.h"
