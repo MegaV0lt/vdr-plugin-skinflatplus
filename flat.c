@@ -79,6 +79,10 @@ cSkinDisplayMessage *cFlat::DisplayMessage() {
 }
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, %d, %d, %d, %d, %d)", *Name, Layer, ViewPort.Left(), ViewPort.Top(),
+            ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+#endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
@@ -86,8 +90,10 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
-        // dsyslog("flatPlus: Created pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
-        //        DrawPort.Size().Height());
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: Created pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
+                DrawPort.Size().Height());
+#endif
         return pixmap;
     }  // Everything runs according to the plan
 
