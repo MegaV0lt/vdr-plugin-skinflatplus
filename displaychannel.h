@@ -42,7 +42,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int m_ScreenWidth {-1}, m_LastScreenWidth {-1};
         int m_ScreenHeight {0};
         double m_ScreenAspect {0.0};
-        int m_HeightBottom {0};  //, m_HeightImageLogo {0};
+        int m_HeightBottom {0}, m_HeightImageLogo {0};
 
         int m_LastSignalStrength {-1}, m_LastSignalQuality {-1};
         int m_SignalStrengthRight {0};

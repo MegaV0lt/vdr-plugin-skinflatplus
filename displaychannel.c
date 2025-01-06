@@ -17,27 +17,26 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     m_ChannelWidth = m_OsdWidth - Config.decorBorderChannelSize * 2;
     m_ChannelHeight = m_OsdHeight - Config.decorBorderChannelSize * 2;
+
     // From bottom to top (2 * EPG + 2 * EPGsml)
     m_HeightBottom = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
+    m_HeightImageLogo = m_HeightBottom;  // High of channel logo image
     if (Config.SignalQualityShow)
         m_HeightBottom += std::max(m_FontSmlHeight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
     else if (Config.ChannelIconsShow)
         m_HeightBottom += m_FontSmlHeight + m_MarginItem;
-
-    const int HeightTop {m_FontHeight};
 
     int height {m_HeightBottom};
     ChanInfoBottomPixmap =
         CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, m_HeightBottom));
-    PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
 
     ChanIconsPixmap =
         CreatePixmap(m_Osd, "ChanIconsPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, m_HeightBottom));
-    PixmapFill(ChanIconsPixmap, clrTransparent);
+
     // Area for TVScraper images
     m_TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
                 m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
@@ -45,19 +44,17 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                 m_OsdHeight - m_TopBarHeight - m_HeightBottom - 40 - Config.decorBorderChannelEPGSize * 2);
 
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
-    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
 
+    // Pixmap for channel logo background
     ChanLogoBGPixmap =
         CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_HeightBottom * 2, m_HeightBottom * 2));
-    PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
     ChanLogoPixmap =
         CreatePixmap(m_Osd, "ChanLogoPixmap", 3,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_HeightBottom * 2, m_HeightBottom * 2));
-    PixmapFill(ChanLogoPixmap, clrTransparent);
 
     height += Config.decorProgressChannelSize + m_MarginItem2;
     ProgressBarCreate(cRect(Config.decorBorderChannelSize,
@@ -69,11 +66,18 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     ProgressBarDrawBgColor();
 
+    const int HeightTop {m_FontHeight};
     height += HeightTop;
     ChanInfoTopPixmap =
         CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1,
                      cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
                            m_ChannelWidth, HeightTop));
+
+    PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
+    PixmapFill(ChanIconsPixmap, clrTransparent);
+    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+    PixmapFill(ChanLogoBGPixmap, clrTransparent);
+    PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanInfoTopPixmap, clrTransparent);
 
     Scrollers.SetOsd(m_Osd);
@@ -140,7 +144,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
 
     if (!IsGroup) {
-        const int ImageHeight {m_HeightBottom - m_MarginItem2};
+        const int ImageHeight {m_HeightImageLogo - m_MarginItem2};
         int ImageBgHeight {ImageHeight};
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
@@ -233,7 +237,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     bool IsRec {false};
     const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
 
-    int left = m_HeightBottom * 1.34f + m_MarginItem;  // Narrowing conversion
+    int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
     const int StartTimeLeft {left};
 
     if (Config.ChannelShowStartTime)
