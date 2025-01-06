@@ -1,10 +1,15 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-01-xx: Version 1.1.5
+- [update] Do not show weather widget when no weather data is available
+- [update] Remove outdated 'update_weather_API_2.5.sh'
+- [update] Some internal optimizations
+
 2024-12-13: Version 1.1.4
 - [update] Use image to mark local and remote timer in timer widget
              Suggested by mrjoe @ VDR-Portal
 - [update] Disable numbering of timers in timer widget
-- [update] Use remote timer from VDR instaead of plugin 'remptetimers'
+- [update] Use remote timer from VDR instead of plugin 'remotetimers'
 - [update] Show movie rating in %
 - [update] Some internal optimizations
 
