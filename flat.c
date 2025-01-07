@@ -90,10 +90,6 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
-#ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: Created pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
-                DrawPort.Size().Height());
-#endif
         return pixmap;
     }  // Everything runs according to the plan
 

@@ -192,7 +192,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     if (Resolution && !m_IsRadioChannel && m_ScreenWidth > 0) {
         cString IconName {""};
-        if (Config.ChannelResolutionAspectShow) {  // Show Aspect
+        if (Config.ChannelResolutionAspectShow) {  // Show Aspect (16:9)
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
@@ -201,7 +201,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= m_MarginItem2;
             }
 
-            IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution
+            IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
@@ -211,7 +211,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         }
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
-            IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format
+            IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
@@ -490,11 +490,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("  ChannelSid: %d Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
+    dsyslog("  ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
     dsyslog("  CAID: %d", ecmInfo.caid);
     dsyslog("  Card system: %s", *ecmInfo.cardsystem);
     dsyslog("  Reader: %s", *ecmInfo.reader);
     dsyslog("  From: %s", *ecmInfo.from);
+    dsyslog("  Hops: %d", ecmInfo.hops);
     dsyslog("  Protocol: %s", *ecmInfo.protocol);
 #endif
 
@@ -510,8 +511,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont,
-                                   DvbapiInfoFont->Width(*DvbapiInfoText) * 2);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont);
+                                   // DvbapiInfoFont->Width(*DvbapiInfoText) * 2*/);
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
@@ -530,9 +531,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     }
 
     DvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
+    if (ecmInfo.hops > 1)
+        DvbapiInfoText.Append(cString::sprintf(" (%d hops)", ecmInfo.hops));
+
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont,
-                                   DvbapiInfoFont->Width(*DvbapiInfoText) * 2);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont);
+                                   // DvbapiInfoFont->Width(*DvbapiInfoText) * 2*/);
     delete DvbapiInfoFont;
 }
 
