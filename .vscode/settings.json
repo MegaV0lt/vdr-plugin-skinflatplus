@@ -62,7 +62,12 @@
         "stop_token": "cpp",
         "thread": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "charconv": "cpp",
+        "codecvt": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "variant": "cpp"
     },
     "cSpell.words": [
         "Epgsearch",

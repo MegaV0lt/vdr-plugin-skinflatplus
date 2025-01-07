@@ -5,14 +5,14 @@
  *
  * $Id$
  */
+#include "./flat.h"
+
 #include <vdr/osd.h>
 #include <vdr/menu.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>  // For glyph metrics
-
-#include "./flat.h"
 
 #include "./displaychannel.h"
 #include "./displaymenu.h"
@@ -79,6 +79,10 @@ cSkinDisplayMessage *cFlat::DisplayMessage() {
 }
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, %d, %d, %d, %d, %d)", *Name, Layer, ViewPort.Left(), ViewPort.Top(),
+            ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+#endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
                 DrawPort.Size().Height());
@@ -86,8 +90,6 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
-        // dsyslog("flatPlus: Created pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
-        //        DrawPort.Size().Height());
         return pixmap;
     }  // Everything runs according to the plan
 
@@ -119,10 +121,13 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    if (ScreenAspect == 16.0 / 9.0) return "169";
-    if (ScreenAspect == 4.0 / 3.0) return "43";
-    if (ScreenAspect == 20.0 / 11.0 || ScreenAspect == 15.0 / 11.0) return "169w";
-    if (ScreenAspect == 2.21) return "221";
+    static const double ScreenAspects[] {16.0 / 9.0, 4.0 / 3.0, 20.0 / 11.0, 15.0 / 11.0, 2.21};
+    static const cString ScreenAspectNames[] {"169", "43", "169w", "169w", "221"};
+    const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
+    for (uint i {0}; i < ScreenAspectNums; ++i) {
+        if (ScreenAspect == ScreenAspects[i])
+            return ScreenAspectNames[i];
+    }
 
     dsyslog("flatPlus: Unknown screen aspect %.2f", ScreenAspect);
     return "unknown_asp";
@@ -163,67 +168,50 @@ cString GetFormatIcon(int ScreenWidth) {
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
-    // From skin ElchiHD
 #if APIVERSNUM >= 20605
     const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
-    if (FrameWidth > 0) {
-        if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
-        if (FrameWidth > 720) return "hd";
-        return "sd";  // 720 and below is considered sd
-    } else  // NOLINT
+    if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
+    if (FrameWidth > 720) return "hd";
+    if (FrameWidth > 0) return "sd";  // 720 and below is considered sd
 #endif
-    {   // Find radio and H.264/H.265 streams.
-        //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
-        if (Recording->Info()->Components()) {
-            const cComponents *Components = Recording->Info()->Components();
-            int i {-1}, NumComponents = Components->NumComponents();
-            while (++i < NumComponents) {
-                const tComponent *p = Components->Component(i);
-                switch (p->stream) {
-                    case sc_video_MPEG2:     return "sd";
-                    case sc_video_H264_AVC:  return "hd";
-                    case sc_video_H265_HEVC: return "uhd";
-                    default:                 break;
-                }
+    // Find radio and H.264/H.265 streams.
+    //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
+    if (const auto *Components = Recording->Info()->Components()) {
+        for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {
+            switch (Components->Component(i)->stream) {
+                case sc_video_MPEG2: return "sd";
+                case sc_video_H264_AVC: return "hd";
+                case sc_video_H265_HEVC: return "uhd";
+                default: break;
             }
         }
     }
-    return "";  // Nothing found
-}
-
-cString GetRecordingErrorIcon(int RecInfoErrors) {
-    if (RecInfoErrors == 0) return "recording_ok";       // No errors
-    if (RecInfoErrors < 0) return "recording_untested";  // -1 Untested recording
-
-    const int RecErrIconThreshold = Config.MenuItemRecordingShowRecordingErrorsThreshold;
-    if (RecInfoErrors < RecErrIconThreshold) return "recording_warning";
-    if (RecInfoErrors >= RecErrIconThreshold) return "recording_error";
-
     return "";
 }
 
+cString GetRecordingErrorIcon(int RecInfoErrors) {
+    return (RecInfoErrors == 0) ? "recording_ok"
+           : (RecInfoErrors < 0) ? "recording_untested"
+           : (RecInfoErrors < Config.MenuItemRecordingShowRecordingErrorsThreshold) ? "recording_warning"
+           : "recording_error";
+}
+
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    if (FrameTotal == 0)  //? Avoid DIV/0
-        esyslog("FlatPlus: GetRecordingSeenIcon() FrameTotal is 0!");
+    if (FrameTotal == 0) {  // Avoid DIV/0
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0!");
+        return "recording_seen_0";
+    }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
-
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
-    if (FrameSeen < 0.1) return "recording_seen_0";
-    if (FrameSeen < 0.2) return "recording_seen_1";
-    if (FrameSeen < 0.3) return "recording_seen_2";
-    if (FrameSeen < 0.4) return "recording_seen_3";
-    if (FrameSeen < 0.5) return "recording_seen_4";
-    if (FrameSeen < 0.6) return "recording_seen_5";
-    if (FrameSeen < 0.7) return "recording_seen_6";
-    if (FrameSeen < 0.8) return "recording_seen_7";
-    if (FrameSeen < 0.9) return "recording_seen_8";
-    if (FrameSeen < 0.98) return "recording_seen_9";
-
-    return "recording_seen_10";
+    const int idx = std::min(static_cast<int>(FrameSeen * 10.0), 10);
+    const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
+                                   "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
+                                   "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+    return SeenIconNames[idx];
 }
 
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
@@ -231,10 +219,13 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
             ContentSize.Width(), ContentSize.Height());
 #endif
-    // TODO: Set to max size by default or also allow smaller media site?
-    if (MediaSize.Height() == 0)  //? Avoid DIV/0
-        esyslog("FlatPlus: SetMediaSize() MediaSize.Height() is 0!");
 
+    if (MediaSize.Height() == 0)  {  // Avoid DIV/0
+        esyslog("flatPlus: Error in SetMediaSize() MediaSize.Height() is 0!");
+        return;
+    }
+
+    // TODO: Set to max size by default or also allow smaller media site?
     const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
@@ -425,7 +416,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     uint16_t MaxFileNum {0};
 
     if (FramesPerSecond == 0.0) {  // Avoid DIV/0
-        esyslog("flatPlus: InsertCuttedLengthSize() FramesPerSecond is 0.0!");
+        esyslog("flatPlus: Error in InsertCuttedLengthSize() FramesPerSecond is 0.0!");
         return;
     }
 
@@ -525,11 +516,9 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
                                      RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        // if (FramesPerSecond > 0.0) {  // Already checked
-            Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
-            if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
-                Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-        // }
+        Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
+        if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
+            Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
         if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
 
         if (LastIndex)  //* Bitrate in new line
@@ -555,36 +544,6 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
         return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
 
     return std::string();  // Empty string
-}
-
-uint32_t GetCharIndex(const char *Name, const FT_ULong CharCode) {
-    FT_Library library;
-    FT_Face face;
-    FT_UInt glyph_index {0};
-    const cString FontFileName = cFont::GetFontFileName(Name);
-    int rc {FT_Init_FreeType(&library)};
-    if (!rc) {
-        rc = FT_New_Face(library, *FontFileName, 0, &face);
-        if (!rc) {
-            FT_Select_Charmap(face, FT_ENCODING_UNICODE);  // Ensure an unicode charater map is loaded
-            rc = FT_Set_Char_Size(face, 8 * 64, 8 * 64, 0, 0);  // TODO: Is that needed?
-            if (!rc) {
-                glyph_index = FT_Get_Char_Index(face, CharCode);  // Glyph index 0 means 'undefined character code'
-                // dsyslog("flatPlus: GetCharIndex() CharCode: 0x%lX (%ld), glyph_index: %d", CharCode, CharCode,
-                //          glyph_index);
-            } else {
-                esyslog("flatPlus: FreeType: error %d during FT_Set_Char_Size (font = %s)\n", rc, *FontFileName);
-            }
-        } else {
-            esyslog("flatPlus: FreeType: load error %d (font = %s)", rc, *FontFileName);
-        }
-    } else {
-        esyslog("flatPlus: FreeType: initialization error %d (font = %s)", rc, *FontFileName);
-    }
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
-
-    return glyph_index;
 }
 
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
@@ -616,39 +575,26 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     return 0;
 }
 
+
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
-    if (Line.empty())  // Check for empty line
+    if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
     if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
         return;
 
-    uint LineSpaces {0};
-    for (auto &ch : Line)  // Count spaces in 'Line'
-        if (ch == ' ') ++LineSpaces;
+    // Count spaces in line
+    const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
 
     // Hair Space is a very small space:
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
-    /* FT_ULong HairSpaceCode = 0x0000200A;  // HairSpace: U+200A
-    FT_ULong ThinSpaceCode = 0x00002009;  // ThinSpace: U+2009
-    if (GetCharIndex(Setup.FontOsd, HairSpaceCode) > 0) {
-        FillChar = u8"\U0000200A";
-    } else if (GetCharIndex(Setup.FontOsd, ThinSpaceCode) > 0) {
-        FillChar = u8"\U00002009";
-    } else {
-        FillChar = " ";  // White space U+0020 (Decimal 32)
-    } */
-    //* Workaround for detecting 'HairSpace'
-    const char *FillChar {nullptr};
+    // HairSpace: U+200A, ThinSpace: U+2009
+
+    //* Detect 'HairSpace'
     // Assume that 'tofu' char (Char not found) is bigger in size than space
-    const char *HairSpace {u8"\U0000200A"}, *Space {" "};
-    if (Font->Width(Space) < Font->Width(HairSpace)) {  // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
-        FillChar = Space;
-        // dsyslog("flatPlus: JustifyLine(): Using 'Space' (U+0020) as 'FillChar'");
-    } else {
-        FillChar = HairSpace;
-        // dsyslog("flatPlus: JustifyLine(): Using 'HairSpace' (U+200A) as 'FillChar'");
-    }
+    // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
+    const char *FillChar = (Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A";
+
     const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
@@ -666,8 +612,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
-        int FillCharBlock = NeedFillChar / LineSpaces;  // For inserting multiple 'FillChar'. Narrowing conversion
-        if (!FillCharBlock) ++FillCharBlock;            // Set minimum to one 'FillChar'
+        const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
 
         std::string FillChars {""};
         FillChars.reserve(16);

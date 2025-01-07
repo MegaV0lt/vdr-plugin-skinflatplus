@@ -6,7 +6,6 @@
  * $Id$
  */
 #include "./imagecache.h"
-#include <libgen.h>
 
 #include "./config.h"
 #include "./displaychannel.h"

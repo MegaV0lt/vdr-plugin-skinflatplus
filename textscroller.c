@@ -14,7 +14,6 @@ void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tCol
 #endif
     // if (!m_Osd) return;
 
-    m_Text.reserve(strlen(text));
     m_Text = text;
     m_Font = font;
     m_Position = position;
@@ -61,13 +60,12 @@ void cTextScroll::Draw() {
 
     if (!Pixmap) return;
 
-    const char *Text {m_Text.c_str()};
+    const char *Text {*m_Text};
     const char *TildePos {strchr(Text, '~')};
 
     if (TildePos && ColorExtraTextFg) {
         std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
         std::string_view sv2 {TildePos + 1};
-
         const std::string first {rtrim(sv1)};
         const std::string second {ltrim(sv2)};
 
@@ -94,12 +92,7 @@ void cTextScroll::DoStep() {
         return;
     }
 
-    int DrawPortX {Pixmap->DrawPort().X()};
-
-    if (m_IsReserveStep)
-        DrawPortX += m_PixelsPerStep;
-    else
-        DrawPortX -= m_PixelsPerStep;
+    int DrawPortX {Pixmap->DrawPort().X() + (m_IsReserveStep ? m_PixelsPerStep : -m_PixelsPerStep)};
 
     int maxX {Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width()};
     maxX *= -1;
@@ -159,7 +152,7 @@ void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorF
         cCondWait::SleepMs(10);
 
     if (m_ScrollDelay == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cTextScrollers::AddScroller() m_ScrollDelay is 0!");
+        esyslog("flatPlus: Error in cTextScrollers::AddScroller() m_ScrollDelay is 0!");
         return;
     }
 

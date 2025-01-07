@@ -49,10 +49,6 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 
     Pixmap = CreatePixmap(m_Osd, "Pixmap", 1, m_Position, PositionDraw);
     PixmapImage = CreatePixmap(m_Osd, "PixmapImage", 2, m_Position, PositionDraw);
-    // dsyslog("flatPlus: ComplexContentPixmap left: %d top: %d width: %d height: %d",
-    //         m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
-    // dsyslog("flatPlus: ComplexContentPixmap drawport left: %d top: %d width: %d height: %d", m_PositionDraw.Left(),
-    //         m_PositionDraw.Top(), m_PositionDraw.Width(), m_PositionDraw.Height());
 
     if (Pixmap) {
         if (FullFillBackground) {
@@ -71,10 +67,11 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 
 void cComplexContent::CalculateDrawPortHeight() {
     m_DrawPortHeight = 0;
+    int Bottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > m_DrawPortHeight) m_DrawPortHeight = GetBottom;
+        Bottom = (*it).GetBottom();  // Process only once; Esp. for multiline text
+        m_DrawPortHeight = std::max(m_DrawPortHeight, Bottom);
     }
 
     if (m_IsScrollingActive)  //  m_DrawPortHeight has to be set for 'ScrollTotal()'
@@ -82,11 +79,11 @@ void cComplexContent::CalculateDrawPortHeight() {
 }
 
 int cComplexContent::BottomContent() {
-    int Bottom {0};
+    int Bottom {0}, GetBottom {0};
     std::vector<cSimpleContent>::iterator it, end = Contents.end();
     for (it = Contents.begin(); it != end; ++it) {
-        const int GetBottom {(*it).GetBottom()};  // Process only once; Esp. for multiline text
-        if (GetBottom > Bottom) Bottom = GetBottom;
+        GetBottom = (*it).GetBottom();  // Process only once; Esp. for multiline text
+        Bottom = std::max(Bottom, GetBottom);
     }
     return Bottom;
 }
@@ -104,7 +101,7 @@ bool cComplexContent::Scrollable(int height) {
     if (height == 0) height = m_Position.Height();
 
     if (m_ScrollSize == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cComplexContent::Scrollable() m_ScrollSize is 0!");
+        esyslog("flatPlus: Error in cComplexContent::Scrollable() m_ScrollSize is 0!");
         return false;
     }
 
@@ -132,7 +129,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
     const int TextWidthLeft {TextWidthFull - image->Width() - 10};
     if (m_ScrollSize == 0) {  // Avoid DIV/0
-        esyslog("FlatPlus: cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
+        esyslog("flatPlus: Error in cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
         return;
     }
 
@@ -180,23 +177,29 @@ void cComplexContent::Draw() {
 }
 
 double cComplexContent::ScrollbarSize() {
-    if (m_DrawPortHeight == 0)
-        esyslog("FlatPlus: cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
+    if (m_DrawPortHeight == 0) {  // Avoid DIV/0}
+        esyslog("flatPlus: Error in cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
+        return 0;
+    }
 
     return static_cast<double>(m_Position.Height()) / m_DrawPortHeight;
 }
 
 int cComplexContent::ScrollTotal() {
-    if (m_ScrollSize == 0)
-        esyslog("FlatPlus: cComplexContent::ScrollTotal() m_ScrollSize is 0!");
+    if (m_ScrollSize == 0) {  // Avoid DIV/0}
+        esyslog("flatPlus: Error in cComplexContent::ScrollTotal() m_ScrollSize is 0!");
+        return 0;
+    }
 
     // return ceil(m_DrawPortHeight * 1.0 / m_ScrollSize);
     return (m_DrawPortHeight + m_ScrollSize - 1) / m_ScrollSize;
 }
 
 int cComplexContent::ScrollShown() {
-    if (m_ScrollSize == 0)
-        esyslog("FlatPlus: cComplexContent::ScrollShown() m_ScrollSize is 0!");
+    if (m_ScrollSize == 0) {  // Avoid DIV/0
+        esyslog("flatPlus: Error in cComplexContent::ScrollShown() m_ScrollSize is 0!");
+        return 0;
+    }
 
     // return ceil(m_Position.Height() * 1.0 / m_ScrollSize);
     return m_Position.Height() / m_ScrollSize;
@@ -214,10 +217,13 @@ int cComplexContent::ScrollOffset() {
             y = m_DrawPortHeight - PositionHeight - 1;
     }
 
-    if (m_DrawPortHeight == 0)
-        esyslog("FlatPlus: cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
+    if (m_DrawPortHeight == 0) {  // Avoid DIV/0
+        esyslog("flatPlus: Error in cComplexContent::ScrollOffset() m_DrawPortHeight is 0!");
+        return 0;
+    }
 
-    return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    // return ScrollTotal() * (static_cast<double>(y) / m_DrawPortHeight);  // offset = y * 1.0 / m_DrawPortHeight;
+    return (y * ScrollTotal()) / m_DrawPortHeight;
 }
 
 bool cComplexContent::Scroll(bool Up, bool Page) {

@@ -7,7 +7,7 @@
  */
 #pragma once
 
-#include <ctype.h>
+// #include <ctype.h>
 #include <vdr/menu.h>
 #include <vdr/tools.h>
 
@@ -89,8 +89,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
 
         cPixmap *ScrollbarPixmap {nullptr};
-        int m_ScrollBarTop {0};
-        int m_ScrollBarWidth {0}, m_ScrollBarHeight {0};  //? 'm_ScrollBarWidth' also in cFlatBaseRender
+        int m_ScrollBarTop {0}, m_ScrollBarHeight {0};;
+        int m_WidthScrollBar {0};  //* 'm_WidthScrollBar' to avoid nameconflict with cFlatBaseRender::m_ScrollBarWidth
 
         int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
         int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
@@ -127,13 +127,13 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar();
         void ItemBorderClear();
 
-        const std::string items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                     "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                     "Replay",   "Miscellaneous", "Plugins", "Restart"};
-        std::string MainMenuText(const std::string &Text);
+        const cString items[16]{"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        cString MainMenuText(const cString &Text);
         cString GetIconName(const std::string &element);
 
-        std::string GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
         bool IsRecordingOld(const cRecording *Recording, int Level);

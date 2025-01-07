@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <vector>
+
 #include "./imageloader.h"
 #include "./flat.h"
 #include "./textscroller.h"
@@ -42,12 +44,12 @@ class cFlatBaseRender {
 
         void TopBarCreate();
         void TopBarSetTitle(const cString &Title, bool Clear = true);
-        void TopBarSetTitleExtra(const cString Extra1, const cString Extra2);
-        void TopBarSetMenuIcon(const cString icon);
-        void TopBarSetMenuIconRight(const cString icon);
+        void TopBarSetTitleExtra(const cString &Extra1, const cString &Extra2);
+        void TopBarSetMenuIcon(const cString &icon);
+        void TopBarSetMenuIconRight(const cString &icon);
         void TopBarClearMenuIconRight();
-        void TopBarSetMenuLogo(const cString icon);
-        void TopBarSetExtraIcon(const cString icon);
+        void TopBarSetMenuLogo(const cString &icon);
+        void TopBarSetExtraIcon(const cString &icon);
         void TopBarUpdate();
 
         void ButtonsCreate();
@@ -85,8 +87,8 @@ class cFlatBaseRender {
 
         int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
-        cString ReadAndExtractData(const cString &filePath, const std::string delimiter = "");
-        cString FormatPrecipitation(const cString &filePath);
+        cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "");
+        cString FormatPrecipitation(const cString &FilePath);
 
         void DrawWidgetWeather();
 
@@ -162,32 +164,12 @@ class cFlatBaseRender {
         cTextScrollers MessageScroller;
         int m_OSDMessageTime {0};  // Backup for Setup.OSDMessageTime
 
-        // Multiline content with scrollbar
-        // cPixmap *ContentPixmap;  //* Content* is unused
-        // cPixmap *ContentEpgImagePixmap;
-        // int ContentLeft, ContentTop, ContentHeight, ContentWidth;
-        // int ContentDrawPortHeight;  // Complete high of text
-        // int ContentTextHeight;
-        // bool ContentHasScrollbar;
-        // bool ContentShown;
-        // int ContentFontType;
-        // int ContentEventType;
-        // int ContentEventHeight;
-        // int ContentEventPosterWidth, ContentEventPosterHeight;
-
-        // tColor ContentColorFg, ContentColorBg;
-        // cTextWrapper ContentWrapper;
-        // cTextWrapper ContentWrapperPoster;
-        // const cEvent *ContentEvent;
-
         cComplexContent WeatherWidget;
 
         cPixmap *DecorPixmap {nullptr};
         std::vector<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
-        /* void ContentDraw();  // Unused
-        void ContentEventDraw(); */
-        double ScrollbarSize();
+        // double ScrollbarSize();
 
         void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
 #if APIVERSNUM >= 30004

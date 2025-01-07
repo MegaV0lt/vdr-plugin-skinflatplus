@@ -15,6 +15,8 @@
 #include <list>
 
 #include <Magick++.h>
+
+// Must be included after Magick++ (which includes <ft2build.h>)
 #include "./imagemagickwrapper.h"
 
 using namespace Magick;
@@ -30,8 +32,6 @@ class cImageLoader : public cImageMagickWrapper {
     bool SearchRecordingPoster(const cString &RecPath, cString &found);  // NOLINT
 
  private:
-    // int epgImageWidthLarge, epgImageHeightLarge;  // Unused?
-    // int epgImageWidth, epgImageHeight;
     const cString m_LogoExtension {"png"};
     const std::list<cString> RecordingImages {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     void ToLowerCase(std::string &str);  // NOLINT

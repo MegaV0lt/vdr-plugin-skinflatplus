@@ -19,11 +19,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     TopBarCreate();
     MessageCreate();
 
-    TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
+    m_TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
                 m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
                 m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2,
                 m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
-    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, TVSRect);
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
     LabelPixmap =
         CreatePixmap(m_Osd, "LabelPixmap", 1,
@@ -417,8 +417,10 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     const int FontWidthSpace {m_Font->Width(' ')};
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    if (FramesPerSecond == 0)  //? Avoid DIV/0
-        esyslog("FlatPlus: cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+    if (FramesPerSecond == 0.0) {  // Avoid DIV/0
+        esyslog("flatPlus: Error in cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+        return;
+    }
 
     //* Draw total and cutted length with cutted symbol (Right side, 1. line)
     img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
@@ -637,7 +639,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
-                    img = ImgLoader.LoadFile(*MediaPath, TVSRect.Width(), TVSRect.Height());
+                    img = ImgLoader.LoadFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
                     else
@@ -650,7 +652,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
-            SetMediaSize(MediaSize, TVSRect.Size());  // Check for too big images
+            SetMediaSize(MediaSize, m_TVSRect.Size());  // Check for too big images
             MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
             MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
             img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());

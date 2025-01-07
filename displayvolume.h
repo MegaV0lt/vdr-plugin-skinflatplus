@@ -20,8 +20,6 @@ class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
         void PreLoadImages();
 
  private:
-        // bool Muted;  // Unused?
-
         cPixmap *LabelPixmap {nullptr};
         cPixmap *MuteLogoPixmap {nullptr};
 

@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "/home/darkwing/Dropbox/Public/VDR/**",
                 "/mnt/Daten/Dropbox/Public/VDR/**",
-                "/usr/include/**"
+                "/usr/include/**",
+                "/usr/local/include/**"
             ],
             "defines": [],
             "cStandard": "c11",
