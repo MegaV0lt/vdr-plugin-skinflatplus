@@ -4946,7 +4946,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         return -1;
 
     // Read location
-    cString Location = *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.location", WIDGETOUTPUTPATH));
+    cString Location = *ReadAndExtractData(cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH));
     if (isempty(*Location))
         Location = tr("Unknown");
 

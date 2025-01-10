@@ -1812,7 +1812,7 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString del
     std::getline(file, data);
     file.close();
 
-    if (!isempty(delimiter)) {
+    if (!isempty(*delimiter)) {
         const std::size_t found = data.find(*delimiter);
         if (found != std::string::npos) {
             return data.substr(0, found).c_str();
