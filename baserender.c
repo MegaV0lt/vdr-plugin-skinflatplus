@@ -192,21 +192,42 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {(100 - DiskUsagePercent)};         // Free %
+    cString IconName{""};
+    cString Extra1 {""}, Extra2 {""};
+
+    if (DiskFreePercent == 0) {  // Show something if disk is full. Avoid DIV/0
+        if (Config.DiskUsageFree == 1) {  // Show in free mode
+            if (Config.DiskUsageShort == false) {  // Long format
+                Extra1 = cString::sprintf("%s: 0%% %s", tr("Disk"), tr("free"));
+                Extra2 = "0 GB ≈ 00:00";
+            } else {  // Short format
+                Extra1 = cString::sprintf("0%% %s", tr("free"));
+                Extra2 = "≈ 00:00";
+            }
+            IconName = "chart31b";
+        } else {  // Show in occupied mode
+            if (Config.DiskUsageShort == false) {  // Long format
+                Extra1 = cString::sprintf("%s: 100%% %s", tr("Disk"), tr("occupied"));
+            } else {  // Short format
+                Extra1 = cString::sprintf("100%% %s", tr("occupied"));
+            }
+            IconName = "chart32";
+            // Extra2 = "";  // Can not be calculated if disk is full (DIV/0)
+        }
+
+        TopBarSetTitleExtra(*Extra1, *Extra2);
+        TopBarSetExtraIcon(*IconName);
+
+        return;
+    }
+
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
     // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
     // The constant is calculated during compilation.).
     const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
     const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
-    if (DiskFreePercent == 0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in cFlatBaseRender::TopBarEnableDiskUsage() DiskFreePercent is 0!");
-        return;  //? Show something in menu at least?
-    }
-
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
-    const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent *
-                            100.0};  // Zero value is prevented with 'DiskFreePercent' check
-    cString IconName{""};
-    cString Extra1 {""}, Extra2 {""};
+    const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent * 100.0};
 
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
@@ -285,7 +306,7 @@ void cFlatBaseRender::TopBarUpdate() {
     const time_t Now {time(0)};
     if (m_TopBarUpdateTitle || (Now - 60) > m_TopBarLastDate) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
+        dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
 #endif
 
         m_TopBarUpdateTitle = false;
