@@ -545,19 +545,17 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
 cString cFlatDisplayMenu::MainMenuText(const cString &Text) {
     const std::string text {skipspace(*Text)};
-    bool found {false}, DoBreak {false};
+    bool found {false};
     const std::size_t TextLength {text.length()};
     uint i {0};  // 'i' used also after loop
     char s;
     for (; i < TextLength; ++i) {
         s = text.at(i);
-        if (i == 0 && !isdigit(s)) break;  // If text directly starts with nonnumeric, break
 
-        if (found && !isdigit(s)) DoBreak = true;
-
-        if (isdigit(s)) found = true;
-
-        if (DoBreak || i > 4) break;
+        if (isdigit(s) && i < 5)  // Up to 4 digits expected
+            found = true;
+        else
+            break;
     }
 
     return found ? skipspace(text.substr(i).c_str()) : text.c_str();
@@ -600,6 +598,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
             }
         }
     }
+
     return cString::sprintf("extraIcons/%s", element.c_str());
 }
 
