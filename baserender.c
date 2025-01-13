@@ -189,9 +189,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
 #endif
-    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);    // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
+    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
-    const int DiskFreePercent {(100 - DiskUsagePercent)};         // Free %
+    const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
     cString IconName{""};
     cString Extra1 {""}, Extra2 {""};
 
@@ -372,19 +372,17 @@ void cFlatBaseRender::TopBarUpdate() {
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString weekday {*WeekDayNameFull(Now)};
-        const int WeekdayWidth {m_TopBarFontSml->Width(*weekday)};
+        const cString WeekDay {*WeekDayNameFull(Now)};
+        const cString DateStr {*ShortDateString(Now)};
+        const int MaxDateWidth {std::max(m_TopBarFontSml->Width(*WeekDay), m_TopBarFontSml->Width(*DateStr))};
 
-        const cString date {*ShortDateString(Now)};
-        const int DateWidth {m_TopBarFontSml->Width(*date)};
-
-        Right = TopBarWidth - TimeWidth - std::max(WeekdayWidth, DateWidth) - m_MarginItem;
-        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *weekday, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
+        Right = TopBarWidth - TimeWidth - MaxDateWidth - m_MarginItem;
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *WeekDay, Theme.Color(clrTopBarDateFont),
+                               Theme.Color(clrTopBarBg), m_TopBarFontSml, MaxDateWidth, 0,
                                taRight);
-        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop + m_TopBarFontSmlHeight), *date, Theme.Color(clrTopBarDateFont),
-                               Theme.Color(clrTopBarBg), m_TopBarFontSml, std::max(WeekdayWidth, DateWidth), 0,
-                               taRight);
+        TopBarPixmap->DrawText(cPoint(Right, FontSmlTop + m_TopBarFontSmlHeight), *DateStr,
+                               Theme.Color(clrTopBarDateFont), Theme.Color(clrTopBarBg), m_TopBarFontSml, MaxDateWidth,
+                               0, taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
         cImage *ImgCon {nullptr}, *ImgRec {nullptr};
@@ -479,6 +477,7 @@ void cFlatBaseRender::TopBarUpdate() {
             const int IconTop {(m_TopBarFontHeight - ImgRec->Height()) / 2};
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgRec);
             Right += ImgRec->Width();
+
             Buffer = cString::sprintf("%d", NumRec);
             TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarRecordingActiveFg),
                                    Theme.Color(clrTopBarRecordingActiveBg), m_TopBarFontSml);

@@ -224,7 +224,7 @@ int cFlatDisplayMenu::MaxItems() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::MaxItems()");
 #endif
-    int ItemHeight = m_ItemHeight;
+    int ItemHeight {m_ItemHeight};
     switch (m_MenuCategory) {
     case mcChannel:
         ItemHeight = m_ItemChannelHeight;
@@ -459,7 +459,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     const cString IconName = *GetIconName(*MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
-                        cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                        const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
                         img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight - m_MarginItem2,
                                                  m_FontHeight - m_MarginItem2);
                     }
@@ -1499,7 +1499,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(/*(time_t)*/Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(Event->StartTime()), buf);
         if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Channel) {
             // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
@@ -1519,14 +1519,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left = LeftSecond;
         Top += m_FontHeight;
         ImageHeight = m_FontSmlHeight;
-        MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
-        Left += m_FontSml->Width(Event->GetTimeString()) + m_MarginItem;
+        MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
+        Left += m_FontSml->Width(*Event->GetTimeString()) + m_MarginItem;
     /* } else if ((Config.MenuEventView == 2 || Config.MenuEventView == 3) && Event && Selectable) {
-            MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_Font);
-            Left += m_Font->Width(Event->GetTimeString()) + m_MarginItem; */
+            MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_Font);
+            Left += m_Font->Width(*Event->GetTimeString()) + m_MarginItem; */
     } else if (Event && Selectable) {  //? Same as above
-        MenuPixmap->DrawText(cPoint(Left, Top), Event->GetTimeString(), ColorFg, ColorBg, m_Font);
-        Left += m_Font->Width(Event->GetTimeString()) + m_MarginItem;
+        MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_Font);
+        Left += m_Font->Width(*Event->GetTimeString()) + m_MarginItem;
     }
 
     if (TimerMatch == tmFull) {
