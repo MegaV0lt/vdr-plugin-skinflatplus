@@ -60,7 +60,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
             if (i == 2)              // Third try and not found
-                dsyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                isyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
             continue;
         }
@@ -82,6 +82,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
         return img;  // Image loaded from disk
     }  // for
+
     return nullptr;  // No image; so return nullptr
 }
 
@@ -148,7 +149,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 #endif
 
         if (!success) {
-            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' could not be loaded", *File);
+            isyslog("flatPlus: cImageLoader::LoadIcon() '%s' could not be loaded", *File);
             return nullptr;
         }
     }
@@ -200,7 +201,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     const bool success = LoadImage(*File);
     if (!success) {
-        dsyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
+        isyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return nullptr;
     }
 #ifdef DEBUGIMAGELOADTIME
@@ -226,7 +227,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
 void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
-        if (ch >= 'A' && ch <= 'Z')
+        if (ch <= 'Z' && ch >= 'A')  // Check for 'Z' first. Small letters start at 97
             ch += 32;  // Or: ch ^= 1 << 5;
     }
 }
@@ -259,6 +260,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
             return true;
         }
     }
+
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
     return false;
 }
