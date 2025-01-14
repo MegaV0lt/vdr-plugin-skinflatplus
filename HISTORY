@@ -1,7 +1,10 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-xx-xx: Version 1.1.6
+2025-01-14: Version 1.1.6
 - [fix] Fix display of weather location in main menu
+- [fix] Fix display of plugin icons in main menu
+- [update] Show usage also if disk is 100%full
+- [update] Some internal optimizations
 
 2025-01-07: Version 1.1.5
 - [fix] Fix spacing between channel logo and epg text
