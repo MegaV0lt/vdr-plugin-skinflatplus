@@ -593,9 +593,9 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
                 if (element.compare(0, PlugMainEntry.size(), PlugMainEntry) == 0) {
                     return cString::sprintf("pluginIcons/%s", p->Name());
                 }
-            } else {
-                break;
             }
+        } else {
+            break;  // Plugin not found
         }
     }
 
