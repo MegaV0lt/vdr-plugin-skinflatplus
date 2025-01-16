@@ -5085,9 +5085,14 @@ void cFlatDisplayMenu::PreLoadImages() {
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         File = e->d_name;
+        if (File.find("vdrlogo") == 0)  // Skip vdrlogo* files
+            continue;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
         ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
     }
+
+    if (Config.TopBarMenuIconShow)
+        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), 999, m_TopBarHeight - m_MarginItem2);
 
     ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
 
@@ -5133,16 +5138,17 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight * (1.0 / 3.0));
     ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight * (1.0 / 3.0));
 
-    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
     ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
-    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old_cur", ImageHeight, ImageHeight);
+
+    ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 
