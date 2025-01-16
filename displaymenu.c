@@ -2205,7 +2205,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (!Event) return;
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick0 = GetMsTicks();
+    cTimeMs Timer;  // Set Timer
 #endif
 
     m_ShowEvent = true;
@@ -2309,8 +2309,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick1 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetEvent info-text time @ %ld ms", Timer.Elapsed());
+    // Timer.Set();
 #endif
 
     cString Reruns {""};
@@ -2356,8 +2356,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }  // Config.EpgRerunsShow
 #ifdef DEBUGEPGTIME
-    uint32_t tick2 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
+    dsyslog("flatPlus: SetEvent reruns time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -2384,7 +2383,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.SetScrollingActive(true);
 
 #ifdef DEBUGEPGTIME
-        uint32_t tick3 = GetMsTicks();
+        // Timer.Set();
 #endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
@@ -2462,8 +2461,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }  // Scraper plugin
         }  // FirstRun
 #ifdef DEBUGEPGTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetEvent tvscraper time @ %ld ms", Timer.Elapsed());
+        // Timer.Set();
 #endif
         ContentTop = m_MarginItem;
         if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
@@ -2518,8 +2517,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick5 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
+        // Timer.Set();
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -2528,8 +2527,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick6 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent actor time: %d ms", tick6 - tick5);
+        dsyslog("flatPlus: SetEvent actor time @ %ld ms", Timer.Elapsed());
 #endif
 
         if (!isempty(*Reruns)) {
@@ -2572,13 +2570,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     else
         ComplexContent.CreatePixmaps(false);
 #ifdef DEBUGEPGTIME
-        uint32_t tick7 = GetMsTicks();
+        // Timer.Set();
 #endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-        uint32_t tick8 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording actor time: %d ms", tick8 - tick7);
+        dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
@@ -2647,8 +2644,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     DecorBorderDraw(ibContent);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick9 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent total time: %d ms", tick9 - tick0);
+    dsyslog("flatPlus: SetEvent total time: %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -2932,7 +2928,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (!Recording) return;
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick0 = GetMsTicks();
+    cTimeMs Timer;  // Set Timer
 #endif
 
     m_ShowEvent = false;
@@ -3066,8 +3062,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick1 = GetMsTicks();
-    dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetRecording info-text time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -3094,7 +3089,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollingActive(true);
 
 #ifdef DEBUGEPGTIME
-        uint32_t tick2 = GetMsTicks();
+        // Timer.Set();
 #endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
@@ -3178,8 +3173,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }  // FirstRun
 
 #ifdef DEBUGEPGTIME
-        uint32_t tick3 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);
+        dsyslog("flatPlus: SetRecording tvscraper time @ %ld ms", Timer.Elapsed());
+        // Timer.Set();
 #endif
 
         ContentTop = m_MarginItem;
@@ -3246,8 +3241,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
+        // Timer.Set();
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -3256,8 +3251,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick5 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
         if (!isempty(*RecAdditional)) {
@@ -3301,13 +3295,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     else
         ComplexContent.CreatePixmaps(false);
 #ifdef DEBUGEPGTIME
-        uint32_t tick6 = GetMsTicks();
+        // Timer.Set();
 #endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-        uint32_t tick7 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording complexcontent draw time: %d ms", tick7 - tick6);
+        dsyslog("flatPlus: SetRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
@@ -3412,8 +3405,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     DecorBorderDraw(ibRecording, false);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick8 = GetMsTicks();
-    dsyslog("flatPlus: SetRecording total time: %d ms", tick8 - tick0);
+    dsyslog("flatPlus: SetRecording total time: %ld ms", Timer.Elapsed());
 #endif
 }
 

@@ -710,7 +710,7 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextFloatingWrapper::Set() Text length: %ld", strlen(Text));
-    uint32_t tick0 {GetMsTicks()};
+    cTimeMs Timer;  // Start timer
 #endif
 
     free(m_Text);
@@ -776,8 +776,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    uint32_t tick1 {GetMsTicks()};
-    dsyslog("   Time: %d ms", tick1 - tick0);
+    dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 

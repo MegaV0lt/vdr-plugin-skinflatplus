@@ -490,13 +490,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("  ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
-    dsyslog("  CAID: %d", ecmInfo.caid);
-    dsyslog("  Card system: %s", *ecmInfo.cardsystem);
-    dsyslog("  Reader: %s", *ecmInfo.reader);
-    dsyslog("  From: %s", *ecmInfo.from);
-    dsyslog("  Hops: %d", ecmInfo.hops);
-    dsyslog("  Protocol: %s", *ecmInfo.protocol);
+    dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
+    dsyslog("   CAID: %d", ecmInfo.caid);
+    dsyslog("   Card system: %s", *ecmInfo.cardsystem);
+    dsyslog("   Reader: %s", *ecmInfo.reader);
+    dsyslog("   From: %s", *ecmInfo.from);
+    dsyslog("   Hops: %d", ecmInfo.hops);
+    dsyslog("   Protocol: %s", *ecmInfo.protocol);
 #endif
 
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999)

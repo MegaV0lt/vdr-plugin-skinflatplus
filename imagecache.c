@@ -81,7 +81,7 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
 }
 
 void cImageCache::PreLoadImage() {
-    uint32_t tick1 {GetMsTicks()};
+    cTimeMs Timer;  // Start timer
 
     cFlatDisplayChannel DisplayChannel(false);
     DisplayChannel.PreLoadImages();
@@ -95,8 +95,7 @@ void cImageCache::PreLoadImage() {
     cFlatDisplayVolume DisplayVolume;
     DisplayVolume.PreLoadImages();
 
-    uint32_t tick2 {GetMsTicks()};
     m_InsertIndexBase = GetCacheCount();
-    dsyslog("flatPlus: Imagecache pre load images time: %d ms", tick2 - tick1);
+    dsyslog("flatPlus: Imagecache pre load images time: %ld ms", Timer.Elapsed());
     dsyslog("flatPlus: Imagecache pre loaded images %d / %d", m_InsertIndexBase, MaxImageCache);
 }
