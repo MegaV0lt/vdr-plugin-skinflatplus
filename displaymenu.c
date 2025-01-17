@@ -2310,7 +2310,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: SetEvent info-text time @ %ld ms", Timer.Elapsed());
-    // Timer.Set();
 #endif
 
     cString Reruns {""};
@@ -2382,11 +2381,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-#ifdef DEBUGEPGTIME
-        // Timer.Set();
-#endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
@@ -2462,7 +2457,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }  // FirstRun
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent tvscraper time @ %ld ms", Timer.Elapsed());
-        // Timer.Set();
 #endif
         ContentTop = m_MarginItem;
         if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
@@ -2518,7 +2512,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
-        // Timer.Set();
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -2569,9 +2562,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
-#ifdef DEBUGEPGTIME
-        // Timer.Set();
-#endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
@@ -3088,11 +3078,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-#ifdef DEBUGEPGTIME
-        // Timer.Set();
-#endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
@@ -3174,7 +3160,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording tvscraper time @ %ld ms", Timer.Elapsed());
-        // Timer.Set();
 #endif
 
         ContentTop = m_MarginItem;
@@ -3242,7 +3227,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
-        // Timer.Set();
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -3294,9 +3278,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
-#ifdef DEBUGEPGTIME
-        // Timer.Set();
-#endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME

@@ -10,7 +10,6 @@
 #include <dirent.h>
 #include <math.h>
 
-// #include <iostream>
 #include <string>
 
 #include "./flat.h"
@@ -75,7 +74,6 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 
 #ifdef DEBUGIMAGELOADTIME
         dsyslog("   scale logo #%d: %ld ms", i + 1, Timer.Elapsed());
-        // Timer.Set();  // Reset timer
 #endif
 
         ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
