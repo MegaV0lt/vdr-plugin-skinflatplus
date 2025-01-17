@@ -6,6 +6,7 @@
  * $Id$
  */
 #include "./displaymenu.h"
+
 #include <fstream>
 #include <iostream>
 #include <utility>
@@ -16,12 +17,12 @@
 #include "./services/epgsearch.h"
 #include "./services/scraper2vdr.h"
 
+#include "./flat.h"
+#include "./locale"
+
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
 #endif
-
-#include "./flat.h"
-#include "./locale"
 
 static int CompareTimers(const void *a, const void *b) {
     return (*(const cTimer **)a)->Compare(**(const cTimer **)b);
@@ -399,21 +400,9 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
         ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
-
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
-    } else {
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
     }
 
     const int y {Index * m_ItemHeight};
@@ -434,20 +423,43 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
             // Check for timer info symbols: " !#>" (EPGSearch search timer)
             if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
+                cImage *img {nullptr};
                 switch (s[0]) {
                 case '>':
-                    if (IconTimerFull)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconTimerFull->Height()) / 2),
-                                                   *IconTimerFull);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 case '#':
-                    if (IconRec)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconRec->Height()) / 2), *IconRec);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 case '!':
-                    if (IconArrowTurn)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconArrowTurn->Height()) / 2),
-                                                   *IconArrowTurn);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 // case ' ':
                 default:
@@ -455,7 +467,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 }
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
-                    cImageLoader ImgLoader;
                     const cString IconName = *GetIconName(*MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {

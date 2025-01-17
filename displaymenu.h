@@ -117,11 +117,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         std::string m_RecFolder {""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
-        // Icons
-        cImage *IconTimerFull {nullptr};
-        cImage *IconArrowTurn {nullptr};
-        cImage *IconRec {nullptr};
-
         void ItemBorderInsertUnique(const sDecorBorder &ib);
         void ItemBorderDrawAllWithScrollbar();
         void ItemBorderDrawAllWithoutScrollbar();
