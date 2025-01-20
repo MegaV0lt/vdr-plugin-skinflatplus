@@ -80,8 +80,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage() {
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, %d, %d, %d, %d, %d)", *Name, Layer, ViewPort.Left(), ViewPort.Top(),
-            ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
+            Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
 #endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
@@ -307,9 +307,9 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
     std::string Channel {""}, Searchtimer {""};
-    Channel.reserve(32);
-    Searchtimer.reserve(32);
     if (!Buffer.empty()) {
+        Channel.reserve(32);
+        Searchtimer.reserve(32);
         Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
         Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
         if (Searchtimer.empty())
@@ -318,17 +318,17 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
     std::string Causedby {""}, Reason {""};
-    Causedby.reserve(32);
-    Reason.reserve(32);
     if (!Buffer.empty()) {
+        Causedby.reserve(32);
+        Reason.reserve(32);
         Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
         Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
     }
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
     std::string Pattern {""};
-    Pattern.reserve(32);
     if (!Buffer.empty()) {
+        Pattern.reserve(32);
         Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
     }
 
@@ -537,13 +537,14 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
 // Returns the string between start and end or an empty string if not found
 std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
-    const std::size_t start {source.find(StrStart)};
-    const std::size_t end {source.find(StrEnd)};
+    auto StartPos {source.find(StrStart)};
+    if (StartPos == std::string::npos) return {};
 
-    if (std::string::npos != start && std::string::npos != end)
-        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
+    StartPos += strlen(StrStart);
+    const auto EndPos {source.find(StrEnd, StartPos)};
+    if (EndPos == std::string::npos) return {};
 
-    return std::string();  // Empty string
+    return source.substr(StartPos, EndPos - StartPos);
 }
 
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {

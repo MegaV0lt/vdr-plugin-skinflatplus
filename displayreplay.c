@@ -203,16 +203,18 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
     if (!LabelPixmap || !IconsPixmap) return;
 
-    if (Play == false && Config.RecordingDimmOnPause) {
-        time(&m_DimmStartTime);
-        Start();
-    } else if (Play == true && Config.RecordingDimmOnPause) {
-        Cancel(-1);
-        while (Active())
-            cCondWait::SleepMs(10);
-        if (m_DimmActive) {
-            PixmapFill(DimmPixmap, clrTransparent);
-            Flush();
+    if (Config.RecordingDimmOnPause) {
+        if (Play == false) {
+            time(&m_DimmStartTime);
+            Start();
+        } else {
+            Cancel(-1);
+            while (Active())
+                cCondWait::SleepMs(10);
+            if (m_DimmActive) {
+                PixmapFill(DimmPixmap, clrTransparent);
+                Flush();
+            }
         }
     }
 

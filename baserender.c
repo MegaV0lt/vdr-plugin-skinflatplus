@@ -89,7 +89,7 @@ void cFlatBaseRender::TopBarCreate() {
     dsyslog("flatPlus: cFlatBaseRender::TopBarCreate()");
 #endif
 
-    const int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);  // Narrowing conversion
+    const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
     m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
@@ -1902,7 +1902,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const cString PrecTomorrow =
         *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
 
-    const int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);  // Narrowing conversion
+    const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;  // Use a more precise calculation
     cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
     cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
