@@ -300,67 +300,57 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
 
     m_LastTitle = Title;
 
-    if (Config.TopBarMenuIconShow) {
-        cString IconName {""}, NewTitle = Title;
-        switch (m_MenuCategory) {
-        case mcMain:
-            NewTitle = "";
-            IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
-            break;
-        case mcSchedule:
-        case mcScheduleNow:
-        case mcScheduleNext:
-            IconName = "menuIcons/Schedule"; break;
-        case mcChannel:
-            IconName = "menuIcons/Channels";
-            if (Config.MenuChannelShowCount) {
-                uint ChanCount {0};
-                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
-                    if (!Channel->GroupSep())
-                        ++ChanCount;
-                }  // for
-                NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
-            }  // Config.MenuChannelShowCount
-            break;
-        case mcTimer:
-            IconName = "menuIcons/Timers";
-            if (Config.MenuTimerShowCount) {
-                NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
+    cString IconName{""}, NewTitle = Title;
+    switch (m_MenuCategory) {
+    case mcMain:
+        NewTitle = "";
+        IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
+        break;
+    case mcSchedule:
+    case mcScheduleNow:
+    case mcScheduleNext: IconName = "menuIcons/Schedule"; break;
+    case mcChannel:
+        IconName = "menuIcons/Channels";
+        if (Config.MenuChannelShowCount) {
+            uint ChanCount {0};
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+            for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
+                if (!Channel->GroupSep()) ++ChanCount;
             }
-            break;
-        case mcRecording:
-            if (Config.MenuRecordingShowCount) {
-                NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
-            }
-            /*
-            if(RecordingsSortMode == rsmName)
-                TopBarSetMenuIconRight("menuIcons/RecsSortName");
-            else if(RecordingsSortMode == rsmTime)
-                TopBarSetMenuIconRight("menuIcons/RecsSortDate");
-            */
-            IconName = "menuIcons/Recordings"; break;
-        case mcSetup:
-            IconName = "menuIcons/Setup"; break;
-        case mcCommand:
-            IconName = "menuIcons/Commands"; break;
-        case mcEvent:
-            IconName = "extraIcons/Info"; break;
-        case mcRecordingInfo:
-            IconName = "extraIcons/PlayInfo"; break;
-        default:
-            break;
+            NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
+        }  // Config.MenuChannelShowCount
+        break;
+    case mcTimer:
+        IconName = "menuIcons/Timers";
+        if (Config.MenuTimerShowCount) {
+            NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
         }
-        TopBarSetTitle(*NewTitle);
+        break;
+    case mcRecording:
+        if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
+        /*
+        if(RecordingsSortMode == rsmName)
+            TopBarSetMenuIconRight("menuIcons/RecsSortName");
+        else if(RecordingsSortMode == rsmTime)
+            TopBarSetMenuIconRight("menuIcons/RecsSortDate");
+        */
+        IconName = "menuIcons/Recordings";
+        break;
+    case mcSetup: IconName = "menuIcons/Setup"; break;
+    case mcCommand: IconName = "menuIcons/Commands"; break;
+    case mcEvent: IconName = "extraIcons/Info"; break;
+    case mcRecordingInfo: IconName = "extraIcons/PlayInfo"; break;
+    default: break;
+    }  // switch (m_MenuCategory)
+
+    if (Config.TopBarMenuIconShow)
         TopBarSetMenuIcon(*IconName);
 
-        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3)
-            TopBarEnableDiskUsage();
+    TopBarSetTitle(*NewTitle);
 
-    } else {
-        TopBarSetTitle(Title);
-    }  // Config.TopBarMenuIconShow
+    if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
+        Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3)
+        TopBarEnableDiskUsage();
 }
 
 void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -3537,7 +3527,7 @@ void cFlatDisplayMenu::Flush() {
         m_MenuFullOsdIsDrawn = true;
     }
 
-    if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
+    if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
         uint TimerCount {0}, TimerActiveCount {0};
         GetTimerCounts(TimerCount, TimerActiveCount);
         /* LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
