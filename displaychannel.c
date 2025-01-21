@@ -578,7 +578,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo

@@ -131,6 +131,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
+        void GetTimerCounts(uint &TimerCount, uint &TimerActiveCount);  // NOLINT
+
         bool IsRecordingOld(const cRecording *Recording, int Level);
 
         const char *GetGenreIcon(uchar genre);

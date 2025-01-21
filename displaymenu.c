@@ -8,9 +8,9 @@
 #include "./displaymenu.h"
 
 #include <fstream>
+#include <future>  // NOLINT
 #include <iostream>
 #include <utility>
-
 #include <sstream>
 #include <locale>
 
@@ -19,6 +19,7 @@
 
 #include "./flat.h"
 #include "./locale"
+#include "displaymenu.h"
 
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
@@ -91,6 +92,9 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
     cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
+
+    // Update timer counts
+    GetTimerCounts(m_LastTimerCount, m_LastTimerActiveCount);
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
@@ -311,7 +315,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             IconName = "menuIcons/Channels";
             if (Config.MenuChannelShowCount) {
                 uint ChanCount {0};
-                LOCK_CHANNELS_READ;
+                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                 for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
                     if (!Channel->GroupSep())
                         ++ChanCount;
@@ -322,17 +326,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         case mcTimer:
             IconName = "menuIcons/Timers";
             if (Config.MenuTimerShowCount) {
-                uint TimerCount {0}, TimerActiveCount {0};
-                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                    ++TimerCount;
-                    if (Timer->HasFlags(tfActive))
-                        ++TimerActiveCount;
-                }  // for
-                m_LastTimerCount = TimerCount;
-                m_LastTimerActiveCount = TimerActiveCount;
-                NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
-            }  // Config.MenuTimerShowCount
+                NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
+            }
             break;
         case mcRecording:
             if (Config.MenuRecordingShowCount) {
@@ -681,7 +676,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const bool IsGroup {Channel->GroupSep()};  // Also used later
 
     /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
 
@@ -1125,7 +1120,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageHeight + m_MarginItem2;
 
     /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */
 
@@ -1366,7 +1361,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             m_ItemEventLastChannelName = Channel->Name();
 
         /* Disabled because invalid lock sequence
-        LOCK_CHANNELS_READ;
+        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
         int w = m_Font->Width(ws); */
 
@@ -2350,7 +2345,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             continue;
                         ++i;
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
-                        LOCK_CHANNELS_READ;
+                        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                         const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
                         if (channel)
                             Reruns.Append(cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
@@ -2673,7 +2668,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
-            LOCK_CHANNELS_READ;
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
             const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
             if (channel)
                 Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
@@ -2968,11 +2963,25 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        LOCK_CHANNELS_READ;
-        const cChannel *Channel = Channels->GetByChannelID(RecInfo->ChannelID());
-        if (Channel)
-            RecAdditional.Append(
-                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+        //! Try to prevent 'Invalid lock sequence'
+        auto ChannelFuture = std::async(
+            [&RecAdditional](tChannelID channelId) {
+                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+                const cChannel *Channel = Channels->GetByChannelID(channelId);
+                if (Channel)
+                    RecAdditional.Append(
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+            },
+            RecInfo->ChannelID());
+        ChannelFuture.get();
+
+        /* {  //! Causes 'Invalid lock sequence'
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+            const cChannel *Channel = Channels->GetByChannelID(RecInfo->ChannelID());
+            if (Channel)
+                RecAdditional.Append(
+                    cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+        } */
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3530,12 +3539,14 @@ void cFlatDisplayMenu::Flush() {
 
     if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
         uint TimerCount {0}, TimerActiveCount {0};
-        LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+        GetTimerCounts(TimerCount, TimerActiveCount);
+        /* LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
             ++TimerCount;
             if (Timer->HasFlags(tfActive))
                 ++TimerActiveCount;
-        }
+        } */
+
         if (m_LastTimerCount != TimerCount || m_LastTimerActiveCount != TimerActiveCount) {
             m_LastTimerCount = TimerCount;
             m_LastTimerActiveCount = TimerActiveCount;
@@ -3543,6 +3554,7 @@ void cFlatDisplayMenu::Flush() {
             TopBarSetTitle(*NewTitle, false);  // Do not clear
         }
     }
+
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
         TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
@@ -3695,6 +3707,16 @@ cString cFlatDisplayMenu::GetRecCounts() {
     }  // Config.ShortRecordingCount */
 
     return RecCounts;
+}
+
+void cFlatDisplayMenu::GetTimerCounts(uint &TimerCount, uint &TimerActiveCount) {
+    TimerCount = 0;
+    TimerActiveCount = 0;
+    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        ++TimerCount;
+        if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
+    }
 }
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
@@ -5097,7 +5119,7 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
     int index {0};
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
         Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
