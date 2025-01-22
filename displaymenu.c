@@ -3770,144 +3770,55 @@ void cFlatDisplayMenu::InsertMovieInfos(const cMovie &Movie, cString &MovieInfo)
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
-    switch (genre & 0xF0) {
-    case ecgMovieDrama:
-        switch (genre & 0x0F) {
-        case 0x00: return "Movie_Drama";
-        case 0x01: return "Detective_Thriller";
-        case 0x02: return "Adventure_Western_War";
-        case 0x03: return "Science Fiction_Fantasy_Horror";
-        case 0x04: return "Comedy";
-        case 0x05: return "Soap_Melodrama_Folkloric";
-        case 0x06: return "Romance";
-        case 0x07: return "Serious_Classical_Religious_Historical Movie_Drama";
-        case 0x08: return "Adult Movie_Drama";
-        default: return "Movie_Drama";
+    static const char *icons[][16] {
+        // MovieDrama
+        {"Movie_Drama", "Detective_Thriller", "Adventure_Western_War", "Science Fiction_Fantasy_Horror", "Comedy",
+         "Soap_Melodrama_Folkloric", "Romance", "Serious_Classical_Religious_Historical Movie_Drama",
+         "Adult Movie_Drama"},
+        // NewsCurrentAffairs
+        {"News_Current Affairs", "News_Weather Report", "News Magazine", "Documentary", "Discussion_Interview_Debate"},
+        // Show
+        {"Show_Game Show", "Game Show_Quiz_Contest", "Variety Show", "Talk Show"},
+        // Sports
+        {"Sports", "Special Event", "Sport Magazine", "Football_Soccer", "Tennis_Squash", "Team Sports", "Athletics",
+         "Motor Sport", "Water Sport", "Winter Sports", "Equestrian", "Martial Sports"},
+        // ChildrenYouth
+        {"Childrens_Youth Programme", "Pre-school Childrens Programme", "Entertainment Programme for 6 to 14",
+         "Entertainment Programme for 10 to 16", "Informational_Educational_School Programme", "Cartoons_Puppets"},
+        // MusicBalletDance
+        {"Music_Ballet_Dance", "Rock_Pop", "Serious_Classical Music", "Folk_Traditional Music", "Jazz", "Musical_Opera",
+         "Ballet"},
+        // ArtsCulture
+        {"Arts_Culture", "Performing Arts", "Fine Arts", "Religion", "Popular Culture_Traditional Arts", "Literature",
+         "Film_Cinema", "Experimental Film_Video", "Broadcasting_Press", "New Media", "Arts_Culture Magazine",
+         "Fashion"},
+        // SocialPoliticalEconomics
+        {"Social_Political_Economics", "Magazine_Report_Documentary", "Economics_Social Advisory", "Remarkable People"},
+        // EducationalScience
+        {"Education_Science_Factual", "Nature_Animals_Environment", "Technology_Natural Sciences",
+         "Medicine_Physiology_Psychology", "Foreign Countries_Expeditions", "Social_Spiritual Sciences",
+         "Further Education", "Languages"},
+        // LeisureHobbies
+        {"Leisure_Hobbies", "Tourism_Travel", "Handicraft", "Motoring", "Fitness_Health", "Cooking",
+         "Advertisement_Shopping", "Gardening"},
+        // Special
+        {"Original Language", "Black & White", "Unpublished", "Live Broadcast"}};
+
+    static const uchar BaseGenres[] {
+        ecgMovieDrama, ecgNewsCurrentAffairs, ecgShow, ecgSports, ecgChildrenYouth,
+        ecgMusicBalletDance, ecgArtsCulture, ecgSocialPoliticalEconomics,
+        ecgEducationalScience, ecgLeisureHobbies, ecgSpecial
+    };
+
+    const size_t GenreNums {sizeof(BaseGenres) / sizeof(BaseGenres[0])};
+    for (size_t i {0}; i < GenreNums; ++i) {
+        if ((genre & 0xF0) == BaseGenres[i]) {
+            // Return the first icon for the genre if field is empty
+            return (isempty(icons[i][genre & 0x0F])) ? icons[i][0] : icons[i][genre & 0x0F];
         }
-        break;
-    case ecgNewsCurrentAffairs:
-        switch (genre & 0x0F) {
-        case 0x00: return "News_Current Affairs";
-        case 0x01: return "News_Weather Report";
-        case 0x02: return "News Magazine";
-        case 0x03: return "Documentary";
-        case 0x04: return "Discussion_Interview_Debate";
-        default: return "News_Current Affairs";
-        }
-        break;
-    case ecgShow:
-        switch (genre & 0x0F) {
-        case 0x00: return "Show_Game Show";
-        case 0x01: return "Game Show_Quiz_Contest";
-        case 0x02: return "Variety Show";
-        case 0x03: return "Talk Show";
-        default: return "Show_Game Show";
-        }
-        break;
-    case ecgSports:
-        switch (genre & 0x0F) {
-        case 0x00: return "Sports";
-        case 0x01: return "Special Event";
-        case 0x02: return "Sport Magazine";
-        case 0x03: return "Football_Soccer";
-        case 0x04: return "Tennis_Squash";
-        case 0x05: return "Team Sports";
-        case 0x06: return "Athletics";
-        case 0x07: return "Motor Sport";
-        case 0x08: return "Water Sport";
-        case 0x09: return "Winter Sports";
-        case 0x0A: return "Equestrian";
-        case 0x0B: return "Martial Sports";
-        default: return "Sports";
-        }
-        break;
-    case ecgChildrenYouth:
-        switch (genre & 0x0F) {
-        case 0x00: return "Childrens_Youth Programme";
-        case 0x01: return "Pre-school Childrens Programme";
-        case 0x02: return "Entertainment Programme for 6 to 14";
-        case 0x03: return "Entertainment Programme for 10 to 16";
-        case 0x04: return "Informational_Educational_School Programme";
-        case 0x05: return "Cartoons_Puppets";
-        default: return "Childrens_Youth Programme";
-        }
-        break;
-    case ecgMusicBalletDance:
-        switch (genre & 0x0F) {
-        case 0x00: return "Music_Ballet_Dance";
-        case 0x01: return "Rock_Pop";
-        case 0x02: return "Serious_Classical Music";
-        case 0x03: return "Folk_Traditional Music";
-        case 0x04: return "Jazz";
-        case 0x05: return "Musical_Opera";
-        case 0x06: return "Ballet";
-        default: return "Music_Ballet_Dance";
-        }
-        break;
-    case ecgArtsCulture:
-        switch (genre & 0x0F) {
-        case 0x00: return "Arts_Culture";
-        case 0x01: return "Performing Arts";
-        case 0x02: return "Fine Arts";
-        case 0x03: return "Religion";
-        case 0x04: return "Popular Culture_Traditional Arts";
-        case 0x05: return "Literature";
-        case 0x06: return "Film_Cinema";
-        case 0x07: return "Experimental Film_Video";
-        case 0x08: return "Broadcasting_Press";
-        case 0x09: return "New Media";
-        case 0x0A: return "Arts_Culture Magazine";
-        case 0x0B: return "Fashion";
-        default: return "Arts_Culture";
-        }
-        break;
-    case ecgSocialPoliticalEconomics:
-        switch (genre & 0x0F) {
-        case 0x00: return "Social_Political_Economics";
-        case 0x01: return "Magazine_Report_Documentary";
-        case 0x02: return "Economics_Social Advisory";
-        case 0x03: return "Remarkable People";
-        default: return "Social_Political_Economics";
-        }
-        break;
-    case ecgEducationalScience:
-        switch (genre & 0x0F) {
-        case 0x00: return "Education_Science_Factual";
-        case 0x01: return "Nature_Animals_Environment";
-        case 0x02: return "Technology_Natural Sciences";
-        case 0x03: return "Medicine_Physiology_Psychology";
-        case 0x04: return "Foreign Countries_Expeditions";
-        case 0x05: return "Social_Spiritual Sciences";
-        case 0x06: return "Further Education";
-        case 0x07: return "Languages";
-        default: return "Education_Science_Factual";
-        }
-        break;
-    case ecgLeisureHobbies:
-        switch (genre & 0x0F) {
-        case 0x00: return "Leisure_Hobbies";
-        case 0x01: return "Tourism_Travel";
-        case 0x02: return "Handicraft";
-        case 0x03: return "Motoring";
-        case 0x04: return "Fitness_Health";
-        case 0x05: return "Cooking";
-        case 0x06: return "Advertisement_Shopping";
-        case 0x07: return "Gardening";
-        default: return "Leisure_Hobbies";
-        }
-        break;
-    case ecgSpecial:
-        switch (genre & 0x0F) {
-        case 0x00: return "Original Language";
-        case 0x01: return "Black & White";
-        case 0x02: return "Unpublished";
-        case 0x03: return "Live Broadcast";
-        default: return "Original Language";
-        }
-        break;
-    default:
-        isyslog("flatPlus: Genre not found: %x", genre);
     }
+
+    isyslog("flatPlus: Genre not found: %x", genre);
     return "";
 }
 
