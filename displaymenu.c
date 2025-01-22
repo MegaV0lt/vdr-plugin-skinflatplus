@@ -19,7 +19,6 @@
 
 #include "./flat.h"
 #include "./locale"
-#include "displaymenu.h"
 
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
@@ -92,9 +91,6 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
     cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
-
-    // Update timer counts
-    GetTimerCounts(m_LastTimerCount, m_LastTimerActiveCount);
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
@@ -303,8 +299,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     cString IconName{""}, NewTitle = Title;
     switch (m_MenuCategory) {
     case mcMain:
-        NewTitle = "";
         IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
+        NewTitle = "";
         break;
     case mcSchedule:
     case mcScheduleNow:
@@ -323,18 +319,17 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcTimer:
         IconName = "menuIcons/Timers";
         if (Config.MenuTimerShowCount) {
+            GetTimerCounts(m_LastTimerCount, m_LastTimerActiveCount);  // Update timer counts
             NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
         }
         break;
     case mcRecording:
+        IconName = "menuIcons/Recordings";
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
         /*
-        if(RecordingsSortMode == rsmName)
-            TopBarSetMenuIconRight("menuIcons/RecsSortName");
-        else if(RecordingsSortMode == rsmTime)
-            TopBarSetMenuIconRight("menuIcons/RecsSortDate");
+        if(RecordingsSortMode == rsmName) TopBarSetMenuIconRight("menuIcons/RecsSortName");
+        else if(RecordingsSortMode == rsmTime) TopBarSetMenuIconRight("menuIcons/RecsSortDate");
         */
-        IconName = "menuIcons/Recordings";
         break;
     case mcSetup: IconName = "menuIcons/Setup"; break;
     case mcCommand: IconName = "menuIcons/Commands"; break;
@@ -343,13 +338,18 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     default: break;
     }  // switch (m_MenuCategory)
 
+    TopBarSetTitle(*NewTitle);  // Must be called before other TopBarSet*
+
     if (Config.TopBarMenuIconShow)
         TopBarSetMenuIcon(*IconName);
 
-    TopBarSetTitle(*NewTitle);
-
-    if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-        Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3)
+    // Enable DiskUsage in the TopBar if:
+    // - the user is in the Recordings or Timers menu
+    // - the user has chosen to always show DiskUsage
+    // - the user has chosen to only show DiskUsage in the Recordings menu
+    // - the user has chosen to only show DiskUsage in the Timers menu
+    if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) &&
+        (Config.DiskUsageShow == 1 || Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3))
         TopBarEnableDiskUsage();
 }
 
@@ -600,9 +600,9 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
 
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
     const std::size_t TextLength {strlen(text)};
-    if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
-        /* ((text[2] == '|') || (text[2] == ' ')) && */ text[TextLength - 1] == ']')
+    if (text[0] == '[' && TextLength > 5 && ((text[1] == '|') || (text[1] == ' ')) && text[TextLength - 1] == ']')
         return true;
+
     return false;
 }
 
@@ -670,7 +670,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
 
-    int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
+    // int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -679,7 +679,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    Width = std::max(w, Width);  // Minimal width for channel number
+    Width = std::max(/*w*/m_Font->Width("9999"), Width);  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1115,9 +1115,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int w = m_Font->Width(ws); */
 
     const cChannel *Channel = Timer->Channel();
-    int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    int Width {std::max(w, m_Font->Width(*Buffer))};  // Minimal width for channel number
+    // int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+    const int Width {std::max(/*w*/m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1359,8 +1359,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
-            const int Width = m_Font->Width(*Buffer);
-            w = std::max(w, Width);  // Minimal width for channel number in Event (epgSearch)
+            // const int Width = m_Font->Width(*Buffer);
+            w = std::max(w, /*Width*/m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -2953,7 +2953,17 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        //! Try to prevent 'Invalid lock sequence'
+        // Explanation for the following lines:
+        // The call to `Channels->GetByChannelID(RecInfo->ChannelID())` is a potential source of
+        // 'Invalid lock sequence' errors. This is because the `LOCK_CHANNELS_READ` call can cause a
+        // lock on the `Channels` object to be taken, but the `cChannels` object is already locked when
+        // the `cRecording` object is created. To avoid this, we use `std::async` to execute the code
+        // that gets the channel information in a separate thread. This allows the lock on the `Channels`
+        // object to be taken without causing an 'Invalid lock sequence' error.
+        //
+        // The `ChannelFuture.get()` call is used to wait for the asynchronous operation to complete.
+        // This ensures that the `RecAdditional` string is properly updated with the channel information
+        // before the `Text` string is updated with the `RecAdditional` string.
         auto ChannelFuture = std::async(
             [&RecAdditional](tChannelID channelId) {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
@@ -2965,13 +2975,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             RecInfo->ChannelID());
         ChannelFuture.get();
 
-        /* {  //! Causes 'Invalid lock sequence'
-            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-            const cChannel *Channel = Channels->GetByChannelID(RecInfo->ChannelID());
-            if (Channel)
-                RecAdditional.Append(
-                    cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
-        } */
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3530,12 +3533,6 @@ void cFlatDisplayMenu::Flush() {
     if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
         uint TimerCount {0}, TimerActiveCount {0};
         GetTimerCounts(TimerCount, TimerActiveCount);
-        /* LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-            ++TimerCount;
-            if (Timer->HasFlags(tfActive))
-                ++TimerActiveCount;
-        } */
 
         if (m_LastTimerCount != TimerCount || m_LastTimerActiveCount != TimerActiveCount) {
             m_LastTimerCount = TimerCount;

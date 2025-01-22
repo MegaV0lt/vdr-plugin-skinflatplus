@@ -13,6 +13,7 @@
 #include FT_FREETYPE_H
 
 #include <fstream>
+#include <future>  // NOLINT
 #include <iostream>
 #include <utility>
 #include <sstream>
@@ -129,8 +130,8 @@ void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
         m_TopBarTitleExtra1 = "";
         m_TopBarTitleExtra2 = "";
         m_TopBarExtraIcon = "";
-        m_TopBarMenuIcon = "";
         m_TopBarExtraIconSet = false;
+        m_TopBarMenuIcon = "";
         m_TopBarMenuIconSet = false;
         m_TopBarMenuLogo = "";
         m_TopBarMenuLogoSet = false;
@@ -199,7 +200,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         if (Config.DiskUsageFree == 1) {  // Show in free mode
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: 0%% %s", tr("Disk"), tr("free"));
-                Extra2 = "0 GB ≈ 00:00";
+                Extra2 = "? GB ≈ 00:00";
             } else {  // Short format
                 Extra1 = cString::sprintf("0%% %s", tr("free"));
                 Extra2 = "≈ 00:00";
@@ -397,7 +398,6 @@ void cFlatBaseRender::TopBarUpdate() {
                                                 m_TopBarFontHeight - m_MarginItem2);
 
                 if (ImgCon) {
-                    // Buffer = cString::sprintf("%d", NumConflicts);  // Created later
                     Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -406,15 +406,26 @@ void cFlatBaseRender::TopBarUpdate() {
 
         uint NumRec {0};
         if (Config.TopBarRecordingShow) {
-            LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-            for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                if (Timer->HasFlags(tfRecording)) ++NumRec;
-            }
+            // The code below is a workaround for a problem with the VDR thread handling.
+            // The VDR is not designed to handle multiple threads, which is why we have
+            // to use a workaround to get the number of current recordings.
+            // The following code creates a new thread that queries the number of
+            // recordings and waits for the result. This is necessary because the
+            // cTimers::GetTimers() function can only be called from the main thread.
+            // The result is then stored in the NumRec variable.
+            auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
+                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                    if (Timer->HasFlags(tfRecording))
+                        ++NumRec;
+                }
+            });
+            RecCounterFuture.get();
+
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
                                             m_TopBarFontHeight - m_MarginItem2);
                 if (ImgRec) {
-                    // Buffer = cString::sprintf("%d", NumRec);  // Created later
                     Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -505,6 +516,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *img);
             }
         }
+
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
                                Theme.Color(clrTopBarBg), m_TopBarFont, TitleMaxWidth);
 
@@ -849,7 +861,7 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    const uint threshold {75};  // TODO: Add config options?
+    const uint threshold {75};  //? Add config option?
     const std::size_t MessageLength {strlen(Text)};
     if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
         // Narrowing conversion
