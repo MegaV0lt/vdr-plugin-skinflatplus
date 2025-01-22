@@ -2908,14 +2908,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
     if (!Recording) return;
-
-#ifdef DEBUGEPGTIME
-    cTimeMs Timer;  // Set Timer
-#endif
 
     m_ShowEvent = false;
     m_ShowRecording = true;
@@ -2953,6 +2950,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() @ %ld ms", Timer.Elapsed());
+#endif
         // Explanation for the following lines:
         // The call to `Channels->GetByChannelID(RecInfo->ChannelID())` is a potential source of
         // 'Invalid lock sequence' errors. This is because the `LOCK_CHANNELS_READ` call can cause a
@@ -2974,6 +2974,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             },
             RecInfo->ChannelID());
         ChannelFuture.get();
+
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
+#endif
 
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {

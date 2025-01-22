@@ -406,6 +406,11 @@ void cFlatBaseRender::TopBarUpdate() {
 
         uint NumRec {0};
         if (Config.TopBarRecordingShow) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   Get number of recordings");
+        cTimeMs Timer;  // Start Timer
+#endif
+
             // The code below is a workaround for a problem with the VDR thread handling.
             // The VDR is not designed to handle multiple threads, which is why we have
             // to use a workaround to get the number of current recordings.
@@ -421,6 +426,10 @@ void cFlatBaseRender::TopBarUpdate() {
                 }
             });
             RecCounterFuture.get();
+
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   End of Get number of recordings (%d): %ld ms", NumRec, Timer.Elapsed());
+#endif
 
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
