@@ -4672,11 +4672,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                             }
                         }
                         file.close();
-                    }
-                }
-            }
-        }
-    }
+                    }  // if file.is_open
+                }  // if atoi(num.c_str()) > 0
+            }  // if found != std::string::npos
+        }  // for
+    }  // files.size() > 0
 
     return ContentWidget.ContentHeight(false);
 }
