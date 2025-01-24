@@ -869,17 +869,16 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
 #endif
 
     const uint threshold {75};  //? Add config option?
-    const std::size_t MessageLength {strlen(Text)};
-    if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
+    const std::size_t TextLength {strlen(Text)};
+    if (TextLength > threshold) {  // Message is longer than threshold and uses almost the full screen
         // Narrowing conversion
-        int ExtraTime =
-            (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
-        const int MaxExtraTime {Setup.OSDMessageTime * 3};                     // Max. extra time to add
-        if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
+        const int ExtraTime {
+            std::min(static_cast<int>((TextLength - threshold) / (threshold / Setup.OSDMessageTime)),
+                     Setup.OSDMessageTime * 3)};  // Max. extra time to add
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+        dsyslog("   Adding %d seconds to message time (%d)", ExtraTime + 1, m_OSDMessageTime);
 #endif
-        Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
+        Setup.OSDMessageTime += ExtraTime + 1;  // Add time of displaying message
     }
 }
 
