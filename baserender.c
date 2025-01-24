@@ -386,7 +386,7 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
-        cImage *ImgCon {nullptr}, *ImgRec {nullptr};
+        cImage *ImgCon {nullptr};
         if (Config.TopBarRecConflictsShow) {
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
@@ -405,10 +405,11 @@ void cFlatBaseRender::TopBarUpdate() {
         }  // Config.TopBarRecConflictsShow
 
         uint NumRec {0};
+        cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   Get number of recordings");
-        cTimeMs Timer;  // Start Timer
+            dsyslog("   Get number of recordings");
+            cTimeMs Timer;  // Start Timer
 #endif
 
             // The code below is a workaround for a problem with the VDR thread handling.
@@ -441,19 +442,22 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }  // Config.TopBarRecordingShow
 
-        if (m_TopBarExtraIconSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
-            if (img) {
-                Right -= img->Width() + m_MarginItem;
-                MiddleWidth += img->Width() + m_MarginItem;
+        cImage *ImgExtra {nullptr};
+        if (m_TopBarExtraIconSet) {  // Show extra icon (Disk usage)
+            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
+            if (ImgExtra) {
+                Right -= ImgExtra->Width() + m_MarginItem;
+                MiddleWidth += ImgExtra->Width() + m_MarginItem;
             }
         }
+
         int TopBarMenuIconRightWidth {0};
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
+        cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
-            if (img) {
-                TopBarMenuIconRightWidth = img->Width() + m_MarginItem3;
+            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
+            if (ImgIconRight) {
+                TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
             }
         }
@@ -485,12 +489,9 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
         Right += ExtraMaxWidth + m_MarginItem;
 
-        if (m_TopBarExtraIconSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
-            if (img) {
-                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *img);
-                Right += img->Width() + m_MarginItem;
-            }
+        if (m_TopBarExtraIconSet && ImgExtra) {
+                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *ImgExtra);
+                Right += ImgExtra->Width() + m_MarginItem;
         }
 
         if (NumRec && ImgRec) {
@@ -519,11 +520,8 @@ void cFlatBaseRender::TopBarUpdate() {
             Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (m_TopBarMenuIconRightSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
-            if (img) {
-                TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *img);
-            }
+        if (m_TopBarMenuIconRightSet && ImgIconRight) {
+            TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *ImgIconRight);
         }
 
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
