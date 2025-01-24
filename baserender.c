@@ -193,17 +193,23 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
+    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
+    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
+    // The constant is calculated during compilation.).
+    const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
+    const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     cString IconName{""};
     cString Extra1 {""}, Extra2 {""};
 
     if (DiskFreePercent == 0) {  // Show something if disk is full. Avoid DIV/0
         if (Config.DiskUsageFree == 1) {  // Show in free mode
+            const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: 0%% %s", tr("Disk"), tr("free"));
-                Extra2 = "? GB ≈ 00:00";
+                Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // Short format
                 Extra1 = cString::sprintf("0%% %s", tr("free"));
-                Extra2 = "≈ 00:00";
+                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
             IconName = "chart31b";
         } else {  // Show in occupied mode
@@ -213,20 +219,15 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
                 Extra1 = cString::sprintf("100%% %s", tr("occupied"));
             }
             IconName = "chart32";
-            // Extra2 = "";  // Can not be calculated if disk is full (DIV/0)
+            // Extra2 = "";  //* Can not be calculated if disk is full (DIV/0)
         }
 
         TopBarSetTitleExtra(*Extra1, *Extra2);
         TopBarSetExtraIcon(*IconName);
 
         return;
-    }
+    }  // DiskFreePercent == 0
 
-    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
-    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
-    // The constant is calculated during compilation.).
-    const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
-    const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
     const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent * 100.0};
 
