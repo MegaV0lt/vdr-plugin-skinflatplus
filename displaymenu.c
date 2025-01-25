@@ -3592,17 +3592,18 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
 
-    double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
+    const double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
     return days > value;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
-    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
-    std::string RecFolder2 {""};
-    RecFolder2.reserve(256);
     time_t RecStart {Recording->Start()};
 
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
+
+    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
+    std::string RecFolder2 {""};
+    RecFolder2.reserve(256);
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
