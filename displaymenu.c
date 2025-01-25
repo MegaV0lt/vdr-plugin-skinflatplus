@@ -785,9 +785,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     } else {  // flatPlus short
-        Width = m_MenuItemWidth / 10 * 2;
-        if (m_IsScrolling)
-            Width = (m_MenuItemWidth + m_WidthScrollBar) / 10 * 2;
+        Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10 * 2;
 
         if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
             Width = m_MenuItemWidth - LeftName;
@@ -3568,7 +3566,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width -= m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width += m_WidthScrollBar;  // Restore original width
+        // Border.Width += m_WidthScrollBar;  // Restore original width
     }
 }
 
@@ -3576,7 +3574,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width += m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width -= m_WidthScrollBar;  // Restore original width
+        // Border.Width -= m_WidthScrollBar;  // Restore original width
     }
 }
 
