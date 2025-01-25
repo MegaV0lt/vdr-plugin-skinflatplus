@@ -3603,19 +3603,17 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     std::string RecFolder2 {""};
     RecFolder2.reserve(256);
     time_t RecStart {Recording->Start()};
-    time_t RecStart2 {0};
+
+    if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
         if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
-            RecStart2 = Rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
-                if (RecStart2 > RecStart)
-                    RecStart = RecStart2;
+                RecStart = std::max(RecStart, Rec->Start());
             } else if (Config.MenuItemRecordingShowFolderDate == 2) {  // Oldest
-                if (RecStart2 < RecStart)
-                    RecStart = RecStart2;
+                RecStart = std::min(RecStart, Rec->Start());
             }
         }
     }
