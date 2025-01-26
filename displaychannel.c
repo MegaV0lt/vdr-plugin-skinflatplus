@@ -235,7 +235,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
     bool IsRec {false};
-    const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
+    // const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
+    const int RecWidth {m_FontSml->Width("\u2B24")};  // Use ⬤ (Black Large Circle U+2B24)
 
     int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
     const int StartTimeLeft {left};
@@ -309,9 +310,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                                            Theme.Color(clrChannelBg), m_FontSml, m_ChannelWidth - left - MaxWidth);
         }
 
-        if (IsRec) {
-            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, 0), "REC",
-                Theme.Color(clrChannelRecordingPresentFg), Theme.Color(clrChannelRecordingPresentBg), m_FontSml);
+        if (IsRec) {  // Use ⬤ (Black Large Circle U+2B24)
+            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, 0), "\u2B24",
+                                           Theme.Color(clrChannelRecordingPresentFg),
+                                           Theme.Color(clrChannelRecordingPresentBg), m_FontSml);
         }
     }  // Present
 
@@ -368,11 +370,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                                            m_FontSml, m_ChannelWidth - left - MaxWidth);
         }
 
-        if (IsRec) {
-            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth,
-                                                  m_FontHeight + m_FontSmlHeight),
-                                           "REC", Theme.Color(clrChannelRecordingFollowFg),
-                                           Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
+        if (IsRec) {  // Use ⬤ (Black Large Circle U+2B24)
+            ChanInfoBottomPixmap->DrawText(
+                cPoint(left + EpgWidth + m_MarginItem - RecWidth, m_FontHeight + m_FontSmlHeight), "\u2B24",
+                Theme.Color(clrChannelRecordingFollowFg), Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
         }
     }  // Following
 
