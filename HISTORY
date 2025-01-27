@@ -1,5 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-xx-xx: Version 1.1.7
+- [update] Update TopBar to show more data when disk is full
+- [update] Try to prevent 'Invalid lock sequence' in 'displaymenu.c'
+- [update] Log not found images by default
+- [update] Some internal optimizations
+
 2025-01-14: Version 1.1.6
 - [fix] Fix display of weather location in main menu
 - [fix] Fix display of plugin icons in main menu
