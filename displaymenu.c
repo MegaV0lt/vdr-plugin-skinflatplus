@@ -2942,8 +2942,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     GenreIcons.reserve(8);
 
     if (!isempty(RecInfo->Description()))
-        Text.Append(RecInfo->Description());
-        // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
+        Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  // Two line breaks
 
     cString Fsk {""};
     // Lent from skinelchi
