@@ -125,8 +125,8 @@ cTextScrollers::~cTextScrollers() {}
 
 void cTextScrollers::Clear() {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cTextScrollers::Clear()");
-    dsyslog("   Scrollers.size() %ld", Scrollers.size());
+if (!Scrollers.empty())
+    dsyslog("flatPlus: cTextScrollers::Clear() Size %ld", Scrollers.size());
 #endif
 
     Cancel(-1);

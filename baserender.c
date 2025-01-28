@@ -116,7 +116,7 @@ void cFlatBaseRender::TopBarCreate() {
     PixmapFill(TopBarIconBgPixmap, clrTransparent);
     PixmapFill(TopBarIconPixmap, clrTransparent);
 
-    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
+    if (Config.DiskUsageShow == 3)  // 3 = Always
         TopBarEnableDiskUsage();
 }
 
@@ -139,7 +139,8 @@ void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
 
     m_TopBarTitle = Title;
     m_TopBarUpdateTitle = true;
-    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
+
+    if (Config.DiskUsageShow == 3)  // 3 = Always
         TopBarEnableDiskUsage();
 }
 
@@ -215,18 +216,19 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         } else {  // Show in occupied mode
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: 100%% %s", tr("Disk"), tr("occupied"));
+                Extra2 = "? GB ≈ ??:??";  //* Can not be calculated if disk is full (DIV/0)
             } else {  // Short format
                 Extra1 = cString::sprintf("100%% %s", tr("occupied"));
+                Extra2 = "≈ ??:??";
             }
             IconName = "chart32";
-            // Extra2 = "";  //* Can not be calculated if disk is full (DIV/0)
         }
 
         TopBarSetTitleExtra(*Extra1, *Extra2);
         TopBarSetExtraIcon(*IconName);
 
         return;
-    }  // DiskFreePercent == 0
+    }  // DiskFreePercent == 0 (Show something if disk is full)
 
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
     const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent * 100.0};
@@ -279,18 +281,18 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
                 Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
         } else {  // Show in occupied mode
-            const div_t FreeHM {std::div(OccupiedMinutes, 60)};
+            const div_t OccupiedHM {std::div(OccupiedMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
+                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedHM.quot, OccupiedHM.rem);
                 } else {  // 1000 GB+
-                    Extra2 =
-                        cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
+                    Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedHM.quot,
+                                              OccupiedHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedHM.quot, OccupiedHM.rem);
             }
         }
 
@@ -409,7 +411,7 @@ void cFlatBaseRender::TopBarUpdate() {
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {
 #ifdef DEBUGFUNCSCALL
-            dsyslog("   Get number of recordings");
+            dsyslog("   Get number of recording timers");
             cTimeMs Timer;  // Start Timer
 #endif
 
@@ -430,7 +432,7 @@ void cFlatBaseRender::TopBarUpdate() {
             RecCounterFuture.get();
 
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   End of Get number of recordings (%d): %ld ms", NumRec, Timer.Elapsed());
+            dsyslog("   End of Get number of recording timers (%d): %ld ms", NumRec, Timer.Elapsed());
 #endif
 
             if (NumRec) {
@@ -576,7 +578,6 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
         // If there is enough space for the last button, add its width to the
         // right edge of the buttons area. This is done to align the last button
         // to the right edge of the screen.
-        // x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
         if (i == 3 && x + ButtonWidth + Config.decorBorderButtonSize * 2 < m_ButtonsWidth)
             ButtonWidth += m_ButtonsWidth - (x + ButtonWidth + Config.decorBorderButtonSize * 2);
 

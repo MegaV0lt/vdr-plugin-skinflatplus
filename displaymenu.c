@@ -291,7 +291,7 @@ void cFlatDisplayMenu::Clear() {
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
+    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s' m_MenuCategory %d", Title, m_MenuCategory);
 #endif
 
     m_LastTitle = Title;
@@ -343,13 +343,12 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     if (Config.TopBarMenuIconShow)
         TopBarSetMenuIcon(*IconName);
 
-    // Enable DiskUsage in the TopBar if:
-    // - the user is in the Recordings or Timers menu
-    // - the user has chosen to always show DiskUsage
-    // - the user has chosen to only show DiskUsage in the Recordings menu
-    // - the user has chosen to only show DiskUsage in the Timers menu
-    if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) &&
-        (Config.DiskUsageShow == 1 || Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3))
+    // Show disk usage in Top Bar if:
+    // - in Recording or Timer menu and Config.DiskUsageShow > 0
+    // - in any menu and Config.DiskUsageShow > 1
+    // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
+    if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
+        ((m_MenuCategory && (Config.DiskUsageShow > 1))) /* || (Config.DiskUsageShow == 3)*/)
         TopBarEnableDiskUsage();
 }
 
@@ -822,9 +821,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                         PBWidth += m_WidthScrollBar;
                 }
 
-                Width = m_MenuItemWidth / 10;
-                if (m_IsScrolling)
-                    Width = (m_MenuItemWidth + m_WidthScrollBar) / 10;
+                Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
                 if (Current)
                     ProgressBarDrawRaw(MenuPixmap, MenuPixmap,
                                        cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize),
@@ -3518,6 +3515,10 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
 }
 
 void cFlatDisplayMenu::Flush() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::Flush()");
+#endif
+
     if (!MenuPixmap) return;
     TopBarUpdate();
 

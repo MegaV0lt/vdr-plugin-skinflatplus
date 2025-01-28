@@ -512,6 +512,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont);
+
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
@@ -533,8 +534,15 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (ecmInfo.hops > 1)
         DvbapiInfoText.Append(cString::sprintf(" (%d hops)", ecmInfo.hops));
 
+    // Store the width of the drawn dvbapi info text for the next draw call,
+    // so that we can ensure that the text is drawn at the correct position
+    // even if the text changes (e.g. when the channel is changed).
+    // This is done by storing the maximum width of the text seen so far.
+    m_LastDvbapiInfoTextWidth = std::max(DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
+
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
+
     delete DvbapiInfoFont;
 }
 
