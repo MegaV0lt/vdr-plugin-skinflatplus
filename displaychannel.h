@@ -47,6 +47,8 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int m_LastSignalStrength {-1}, m_LastSignalQuality {-1};
         int m_SignalStrengthRight {0};
 
+        int m_LastDvbapiInfoTextWidth {0};
+
         // TVScraper
         cRect m_TVSRect {0, 0, 0, 0};
 

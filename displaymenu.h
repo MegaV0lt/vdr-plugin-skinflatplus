@@ -117,11 +117,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         std::string m_RecFolder {""}, m_LastRecFolder {""};
         int m_LastItemRecordingLevel {0};
 
-        // Icons
-        cImage *IconTimerFull {nullptr};
-        cImage *IconArrowTurn {nullptr};
-        cImage *IconRec {nullptr};
-
         void ItemBorderInsertUnique(const sDecorBorder &ib);
         void ItemBorderDrawAllWithScrollbar();
         void ItemBorderDrawAllWithoutScrollbar();
@@ -135,6 +130,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
+
+        void GetTimerCounts(uint &TimerCount, uint &TimerActiveCount);  // NOLINT
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 

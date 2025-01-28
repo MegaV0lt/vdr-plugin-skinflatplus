@@ -6,22 +6,23 @@
  * $Id$
  */
 #include "./displaymenu.h"
+
 #include <fstream>
+#include <future>  // NOLINT
 #include <iostream>
 #include <utility>
-
 #include <sstream>
 #include <locale>
 
 #include "./services/epgsearch.h"
 #include "./services/scraper2vdr.h"
 
+#include "./flat.h"
+#include "./locale"
+
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
 #endif
-
-#include "./flat.h"
-#include "./locale"
 
 static int CompareTimers(const void *a, const void *b) {
     return (*(const cTimer **)a)->Compare(**(const cTimer **)b);
@@ -290,81 +291,65 @@ void cFlatDisplayMenu::Clear() {
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s'", Title);
+    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s' m_MenuCategory %d", Title, m_MenuCategory);
 #endif
 
     m_LastTitle = Title;
 
-    if (Config.TopBarMenuIconShow) {
-        cString IconName {""}, NewTitle = Title;
-        switch (m_MenuCategory) {
-        case mcMain:
-            NewTitle = "";
-            IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
-            break;
-        case mcSchedule:
-        case mcScheduleNow:
-        case mcScheduleNext:
-            IconName = "menuIcons/Schedule"; break;
-        case mcChannel:
-            IconName = "menuIcons/Channels";
-            if (Config.MenuChannelShowCount) {
-                uint ChanCount {0};
-                LOCK_CHANNELS_READ;
-                for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
-                    if (!Channel->GroupSep())
-                        ++ChanCount;
-                }  // for
-                NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
-            }  // Config.MenuChannelShowCount
-            break;
-        case mcTimer:
-            IconName = "menuIcons/Timers";
-            if (Config.MenuTimerShowCount) {
-                uint TimerCount {0}, TimerActiveCount {0};
-                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                    ++TimerCount;
-                    if (Timer->HasFlags(tfActive))
-                        ++TimerActiveCount;
-                }  // for
-                m_LastTimerCount = TimerCount;
-                m_LastTimerActiveCount = TimerActiveCount;
-                NewTitle = cString::sprintf("%s (%d/%d)", Title, TimerActiveCount, TimerCount);
-            }  // Config.MenuTimerShowCount
-            break;
-        case mcRecording:
-            if (Config.MenuRecordingShowCount) {
-                NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts());
+    cString IconName{""}, NewTitle = Title;
+    switch (m_MenuCategory) {
+    case mcMain:
+        IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
+        NewTitle = "";
+        break;
+    case mcSchedule:
+    case mcScheduleNow:
+    case mcScheduleNext: IconName = "menuIcons/Schedule"; break;
+    case mcChannel:
+        IconName = "menuIcons/Channels";
+        if (Config.MenuChannelShowCount) {
+            uint ChanCount {0};
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+            for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
+                if (!Channel->GroupSep()) ++ChanCount;
             }
-            /*
-            if(RecordingsSortMode == rsmName)
-                TopBarSetMenuIconRight("menuIcons/RecsSortName");
-            else if(RecordingsSortMode == rsmTime)
-                TopBarSetMenuIconRight("menuIcons/RecsSortDate");
-            */
-            IconName = "menuIcons/Recordings"; break;
-        case mcSetup:
-            IconName = "menuIcons/Setup"; break;
-        case mcCommand:
-            IconName = "menuIcons/Commands"; break;
-        case mcEvent:
-            IconName = "extraIcons/Info"; break;
-        case mcRecordingInfo:
-            IconName = "extraIcons/PlayInfo"; break;
-        default:
-            break;
+            NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
+        }  // Config.MenuChannelShowCount
+        break;
+    case mcTimer:
+        IconName = "menuIcons/Timers";
+        if (Config.MenuTimerShowCount) {
+            GetTimerCounts(m_LastTimerCount, m_LastTimerActiveCount);  // Update timer counts
+            NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
         }
-        TopBarSetTitle(*NewTitle);
+        break;
+    case mcRecording:
+        IconName = "menuIcons/Recordings";
+        if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
+        /*
+        if(RecordingsSortMode == rsmName) TopBarSetMenuIconRight("menuIcons/RecsSortName");
+        else if(RecordingsSortMode == rsmTime) TopBarSetMenuIconRight("menuIcons/RecsSortDate");
+        */
+        break;
+    case mcSetup: IconName = "menuIcons/Setup"; break;
+    case mcCommand: IconName = "menuIcons/Commands"; break;
+    case mcEvent: IconName = "extraIcons/Info"; break;
+    case mcRecordingInfo: IconName = "extraIcons/PlayInfo"; break;
+    default: break;
+    }  // switch (m_MenuCategory)
+
+    TopBarSetTitle(*NewTitle);  // Must be called before other TopBarSet*
+
+    if (Config.TopBarMenuIconShow)
         TopBarSetMenuIcon(*IconName);
 
-        if ((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && Config.DiskUsageShow == 1 ||
-            Config.DiskUsageShow == 2 || Config.DiskUsageShow == 3)
-            TopBarEnableDiskUsage();
-
-    } else {
-        TopBarSetTitle(Title);
-    }  // Config.TopBarMenuIconShow
+    // Show disk usage in Top Bar if:
+    // - in Recording or Timer menu and Config.DiskUsageShow > 0
+    // - in any menu and Config.DiskUsageShow > 1
+    // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
+    if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
+        ((m_MenuCategory && (Config.DiskUsageShow > 1))) /* || (Config.DiskUsageShow == 3)*/)
+        TopBarEnableDiskUsage();
 }
 
 void cFlatDisplayMenu::SetButtons(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -399,21 +384,9 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
         ColorFg = Theme.Color(clrItemCurrentFont);
         ColorBg = Theme.Color(clrItemCurrentBg);
         ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextCurrentFont);
-
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
-    } else {
-        IconTimerFull = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
-        IconArrowTurn = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
-        IconRec = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
     }
 
     const int y {Index * m_ItemHeight};
@@ -434,20 +407,43 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
 
             // Check for timer info symbols: " !#>" (EPGSearch search timer)
             if (i == 0 && strlen(s) == 1 && strchr(" !#>", s[0])) {
+                cImage *img {nullptr};
                 switch (s[0]) {
                 case '>':
-                    if (IconTimerFull)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconTimerFull->Height()) / 2),
-                                                   *IconTimerFull);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 case '#':
-                    if (IconRec)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconRec->Height()) / 2), *IconRec);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 case '!':
-                    if (IconArrowTurn)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - IconArrowTurn->Height()) / 2),
-                                                   *IconArrowTurn);
+                    if (Current) {
+                        img = ImgLoader.LoadIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
+                    } else if (Selectable) {
+                        img = ImgLoader.LoadIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
+                    } else {
+                        img = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
+                    }
+                    if (img)
+                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
+                                                   *img);
                     break;
                 // case ' ':
                 default:
@@ -455,7 +451,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 }
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
-                    cImageLoader ImgLoader;
                     const cString IconName = *GetIconName(*MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
@@ -604,9 +599,9 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) {
 
 bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
     const std::size_t TextLength {strlen(text)};
-    if (TextLength > 5 && text[0] == '[' && ((text[1] == '|') || (text[1] == ' ')) &&
-        /* ((text[2] == '|') || (text[2] == ' ')) && */ text[TextLength - 1] == ']')
+    if (text[0] == '[' && TextLength > 5 && ((text[1] == '|') || (text[1] == ' ')) && text[TextLength - 1] == ']')
         return true;
+
     return false;
 }
 
@@ -670,11 +665,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const bool IsGroup {Channel->GroupSep()};  // Also used later
 
     /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
 
-    int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
+    // int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -683,7 +678,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    Width = std::max(w, Width);  // Minimal width for channel number
+    Width = std::max(/*w*/m_Font->Width("9999"), Width);  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -789,9 +784,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     } else {  // flatPlus short
-        Width = m_MenuItemWidth / 10 * 2;
-        if (m_IsScrolling)
-            Width = (m_MenuItemWidth + m_WidthScrollBar) / 10 * 2;
+        Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10 * 2;
 
         if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
             Width = m_MenuItemWidth - LeftName;
@@ -828,9 +821,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                         PBWidth += m_WidthScrollBar;
                 }
 
-                Width = m_MenuItemWidth / 10;
-                if (m_IsScrolling)
-                    Width = (m_MenuItemWidth + m_WidthScrollBar) / 10;
+                Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
                 if (Current)
                     ProgressBarDrawRaw(MenuPixmap, MenuPixmap,
                                        cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize),
@@ -1114,14 +1105,14 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageHeight + m_MarginItem2;
 
     /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */
 
     const cChannel *Channel = Timer->Channel();
-    int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    int Width {std::max(w, m_Font->Width(*Buffer))};  // Minimal width for channel number
+    // int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+    const int Width {std::max(/*w*/m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1355,7 +1346,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             m_ItemEventLastChannelName = Channel->Name();
 
         /* Disabled because invalid lock sequence
-        LOCK_CHANNELS_READ;
+        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
         int w = m_Font->Width(ws); */
 
@@ -1363,8 +1354,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
-            const int Width = m_Font->Width(*Buffer);
-            w = std::max(w, Width);  // Minimal width for channel number in Event (epgSearch)
+            // const int Width = m_Font->Width(*Buffer);
+            w = std::max(w, /*Width*/m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -2205,7 +2196,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (!Event) return;
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick0 = GetMsTicks();
+    cTimeMs Timer;  // Set Timer
 #endif
 
     m_ShowEvent = true;
@@ -2309,8 +2300,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     }
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick1 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetEvent info-text time @ %ld ms", Timer.Elapsed());
 #endif
 
     cString Reruns {""};
@@ -2340,7 +2330,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             continue;
                         ++i;
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
-                        LOCK_CHANNELS_READ;
+                        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                         const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
                         if (channel)
                             Reruns.Append(cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
@@ -2356,8 +2346,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }  // Config.EpgRerunsShow
 #ifdef DEBUGEPGTIME
-    uint32_t tick2 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent reruns time: %d ms", tick2 - tick1);
+    dsyslog("flatPlus: SetEvent reruns time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -2383,11 +2372,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-#ifdef DEBUGEPGTIME
-        uint32_t tick3 = GetMsTicks();
-#endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
@@ -2462,8 +2447,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             }  // Scraper plugin
         }  // FirstRun
 #ifdef DEBUGEPGTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent tvscraper time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetEvent tvscraper time @ %ld ms", Timer.Elapsed());
 #endif
         ContentTop = m_MarginItem;
         if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
@@ -2518,8 +2502,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick5 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent epg-text time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -2528,8 +2511,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick6 = GetMsTicks();
-        dsyslog("flatPlus: SetEvent actor time: %d ms", tick6 - tick5);
+        dsyslog("flatPlus: SetEvent actor time @ %ld ms", Timer.Elapsed());
 #endif
 
         if (!isempty(*Reruns)) {
@@ -2571,14 +2553,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
-#ifdef DEBUGEPGTIME
-        uint32_t tick7 = GetMsTicks();
-#endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-        uint32_t tick8 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording actor time: %d ms", tick8 - tick7);
+        dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
@@ -2647,8 +2625,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     DecorBorderDraw(ibContent);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick9 = GetMsTicks();
-    dsyslog("flatPlus: SetEvent total time: %d ms", tick9 - tick0);
+    dsyslog("flatPlus: SetEvent total time: %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -2676,7 +2653,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
-            LOCK_CHANNELS_READ;
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
             const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
             if (channel)
                 Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
@@ -2926,14 +2903,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
     if (!Recording) return;
-
-#ifdef DEBUGEPGTIME
-    uint32_t tick0 = GetMsTicks();
-#endif
 
     m_ShowEvent = false;
     m_ShowRecording = true;
@@ -2965,17 +2939,40 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     GenreIcons.reserve(8);
 
     if (!isempty(RecInfo->Description()))
-        Text.Append(RecInfo->Description());
-        // Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));  //! Why two line breaks?
+        Text.Append(cString::sprintf("%s\n", RecInfo->Description()));
 
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        LOCK_CHANNELS_READ;
-        const cChannel *Channel = Channels->GetByChannelID(RecInfo->ChannelID());
-        if (Channel)
-            RecAdditional.Append(
-                cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() @ %ld ms", Timer.Elapsed());
+#endif
+        // Explanation for the following lines:
+        // The call to `Channels->GetByChannelID(RecInfo->ChannelID())` is a potential source of
+        // 'Invalid lock sequence' errors. This is because the `LOCK_CHANNELS_READ` call can cause a
+        // lock on the `Channels` object to be taken, but the `cChannels` object is already locked when
+        // the `cRecording` object is created. To avoid this, we use `std::async` to execute the code
+        // that gets the channel information in a separate thread. This allows the lock on the `Channels`
+        // object to be taken without causing an 'Invalid lock sequence' error.
+        //
+        // The `ChannelFuture.get()` call is used to wait for the asynchronous operation to complete.
+        // This ensures that the `RecAdditional` string is properly updated with the channel information
+        // before the `Text` string is updated with the `RecAdditional` string.
+        auto ChannelFuture = std::async(
+            [&RecAdditional](tChannelID channelId) {
+                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+                const cChannel *Channel = Channels->GetByChannelID(channelId);
+                if (Channel)
+                    RecAdditional.Append(
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+            },
+            RecInfo->ChannelID());
+        ChannelFuture.get();
+
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
+#endif
+
         const cEvent *Event = RecInfo->GetEvent();
         if (Event) {
             // Genre
@@ -3066,8 +3063,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     }
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick1 = GetMsTicks();
-    dsyslog("flatPlus: SetRecording info-text time: %d ms", tick1 - tick0);
+    dsyslog("flatPlus: SetRecording info-text time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -3093,11 +3089,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-#ifdef DEBUGEPGTIME
-        uint32_t tick2 = GetMsTicks();
-#endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        // MediaHeight = m_cHeight - m_MarginItem2 - m_FontHeight - 6;
         if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
             static cPlugin *pScraper = GetScraperPlugin();
             if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
@@ -3178,8 +3170,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }  // FirstRun
 
 #ifdef DEBUGEPGTIME
-        uint32_t tick3 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording tvscraper time: %d ms", tick3 - tick2);
+        dsyslog("flatPlus: SetRecording tvscraper time @ %ld ms", Timer.Elapsed());
 #endif
 
         ContentTop = m_MarginItem;
@@ -3246,8 +3237,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording epg-text time: %d ms", tick4 - tick3);
+        dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
 #endif
 
         const int NumActors = ActorsPath.size();  // Narrowing conversion
@@ -3256,8 +3246,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
         }
 #ifdef DEBUGEPGTIME
-        uint32_t tick5 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording actor time: %d ms", tick5 - tick4);
+        dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
         if (!isempty(*RecAdditional)) {
@@ -3300,14 +3289,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.CreatePixmaps(true);
     else
         ComplexContent.CreatePixmaps(false);
-#ifdef DEBUGEPGTIME
-        uint32_t tick6 = GetMsTicks();
-#endif
 
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-        uint32_t tick7 = GetMsTicks();
-        dsyslog("flatPlus: SetRecording complexcontent draw time: %d ms", tick7 - tick6);
+        dsyslog("flatPlus: SetRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
@@ -3412,8 +3397,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     DecorBorderDraw(ibRecording, false);
 
 #ifdef DEBUGEPGTIME
-    uint32_t tick8 = GetMsTicks();
-    dsyslog("flatPlus: SetRecording total time: %d ms", tick8 - tick0);
+    dsyslog("flatPlus: SetRecording total time: %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -3531,6 +3515,10 @@ void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
 }
 
 void cFlatDisplayMenu::Flush() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::Flush()");
+#endif
+
     if (!MenuPixmap) return;
     TopBarUpdate();
 
@@ -3544,14 +3532,10 @@ void cFlatDisplayMenu::Flush() {
         m_MenuFullOsdIsDrawn = true;
     }
 
-    if (Config.MenuTimerShowCount && m_MenuCategory == mcTimer) {
+    if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
         uint TimerCount {0}, TimerActiveCount {0};
-        LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-            ++TimerCount;
-            if (Timer->HasFlags(tfActive))
-                ++TimerActiveCount;
-        }
+        GetTimerCounts(TimerCount, TimerActiveCount);
+
         if (m_LastTimerCount != TimerCount || m_LastTimerActiveCount != TimerActiveCount) {
             m_LastTimerCount = TimerCount;
             m_LastTimerActiveCount = TimerActiveCount;
@@ -3559,6 +3543,7 @@ void cFlatDisplayMenu::Flush() {
             TopBarSetTitle(*NewTitle, false);  // Do not clear
         }
     }
+
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
         TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
@@ -3569,15 +3554,6 @@ void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
     std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
-            /* (*it).Left = ib.Left;
-            (*it).Top = ib.Top;
-            (*it).Width = ib.Width;
-            (*it).Height = ib.Height;
-            (*it).Size = ib.Size;
-            (*it).Type = ib.Type;
-            (*it).ColorFg = ib.ColorFg;
-            (*it).ColorBg = ib.ColorBg;
-            (*it).From = ib.From; */
             (*it) = ib;
             return;
         }
@@ -3590,7 +3566,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width -= m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width += m_WidthScrollBar;  // Restore original width
+        // Border.Width += m_WidthScrollBar;  // Restore original width
     }
 }
 
@@ -3598,7 +3574,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width += m_WidthScrollBar;
         DecorBorderDraw(Border);
-        Border.Width -= m_WidthScrollBar;  // Restore original width
+        // Border.Width -= m_WidthScrollBar;  // Restore original width
     }
 }
 
@@ -3616,28 +3592,27 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) {
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
 
-    double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
+    const double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
     return days > value;
 }
 
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) {
+    time_t RecStart {Recording->Start()};
+
+    if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
+
     const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
     std::string RecFolder2 {""};
     RecFolder2.reserve(256);
-    time_t RecStart {Recording->Start()};
-    time_t RecStart2 {0};
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
         if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
-            RecStart2 = Rec->Start();
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
-                if (RecStart2 > RecStart)
-                    RecStart = RecStart2;
+                RecStart = std::max(RecStart, Rec->Start());
             } else if (Config.MenuItemRecordingShowFolderDate == 2) {  // Oldest
-                if (RecStart2 < RecStart)
-                    RecStart = RecStart2;
+                RecStart = std::min(RecStart, Rec->Start());
             }
         }
     }
@@ -3656,7 +3631,7 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     std::string RecNamePart {""};
     RecNamePart.reserve(64);
 
-    std::size_t start {0}, end;
+    std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
         if (end == std::string::npos) {
@@ -3720,6 +3695,16 @@ cString cFlatDisplayMenu::GetRecCounts() {
     }  // Config.ShortRecordingCount */
 
     return RecCounts;
+}
+
+void cFlatDisplayMenu::GetTimerCounts(uint &TimerCount, uint &TimerActiveCount) {
+    TimerCount = 0;
+    TimerActiveCount = 0;
+    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        ++TimerCount;
+        if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
+    }
 }
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) {
@@ -3786,144 +3771,55 @@ void cFlatDisplayMenu::InsertMovieInfos(const cMovie &Movie, cString &MovieInfo)
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) {
-    switch (genre & 0xF0) {
-    case ecgMovieDrama:
-        switch (genre & 0x0F) {
-        case 0x00: return "Movie_Drama";
-        case 0x01: return "Detective_Thriller";
-        case 0x02: return "Adventure_Western_War";
-        case 0x03: return "Science Fiction_Fantasy_Horror";
-        case 0x04: return "Comedy";
-        case 0x05: return "Soap_Melodrama_Folkloric";
-        case 0x06: return "Romance";
-        case 0x07: return "Serious_Classical_Religious_Historical Movie_Drama";
-        case 0x08: return "Adult Movie_Drama";
-        default: return "Movie_Drama";
+    static const char *icons[][16] {
+        // MovieDrama
+        {"Movie_Drama", "Detective_Thriller", "Adventure_Western_War", "Science Fiction_Fantasy_Horror", "Comedy",
+         "Soap_Melodrama_Folkloric", "Romance", "Serious_Classical_Religious_Historical Movie_Drama",
+         "Adult Movie_Drama"},
+        // NewsCurrentAffairs
+        {"News_Current Affairs", "News_Weather Report", "News Magazine", "Documentary", "Discussion_Interview_Debate"},
+        // Show
+        {"Show_Game Show", "Game Show_Quiz_Contest", "Variety Show", "Talk Show"},
+        // Sports
+        {"Sports", "Special Event", "Sport Magazine", "Football_Soccer", "Tennis_Squash", "Team Sports", "Athletics",
+         "Motor Sport", "Water Sport", "Winter Sports", "Equestrian", "Martial Sports"},
+        // ChildrenYouth
+        {"Childrens_Youth Programme", "Pre-school Childrens Programme", "Entertainment Programme for 6 to 14",
+         "Entertainment Programme for 10 to 16", "Informational_Educational_School Programme", "Cartoons_Puppets"},
+        // MusicBalletDance
+        {"Music_Ballet_Dance", "Rock_Pop", "Serious_Classical Music", "Folk_Traditional Music", "Jazz", "Musical_Opera",
+         "Ballet"},
+        // ArtsCulture
+        {"Arts_Culture", "Performing Arts", "Fine Arts", "Religion", "Popular Culture_Traditional Arts", "Literature",
+         "Film_Cinema", "Experimental Film_Video", "Broadcasting_Press", "New Media", "Arts_Culture Magazine",
+         "Fashion"},
+        // SocialPoliticalEconomics
+        {"Social_Political_Economics", "Magazine_Report_Documentary", "Economics_Social Advisory", "Remarkable People"},
+        // EducationalScience
+        {"Education_Science_Factual", "Nature_Animals_Environment", "Technology_Natural Sciences",
+         "Medicine_Physiology_Psychology", "Foreign Countries_Expeditions", "Social_Spiritual Sciences",
+         "Further Education", "Languages"},
+        // LeisureHobbies
+        {"Leisure_Hobbies", "Tourism_Travel", "Handicraft", "Motoring", "Fitness_Health", "Cooking",
+         "Advertisement_Shopping", "Gardening"},
+        // Special
+        {"Original Language", "Black & White", "Unpublished", "Live Broadcast"}};
+
+    static const uchar BaseGenres[] {
+        ecgMovieDrama, ecgNewsCurrentAffairs, ecgShow, ecgSports, ecgChildrenYouth,
+        ecgMusicBalletDance, ecgArtsCulture, ecgSocialPoliticalEconomics,
+        ecgEducationalScience, ecgLeisureHobbies, ecgSpecial
+    };
+
+    const size_t GenreNums {sizeof(BaseGenres) / sizeof(BaseGenres[0])};
+    for (size_t i {0}; i < GenreNums; ++i) {
+        if ((genre & 0xF0) == BaseGenres[i]) {
+            // Return the first icon for the genre if field is empty
+            return (isempty(icons[i][genre & 0x0F])) ? icons[i][0] : icons[i][genre & 0x0F];
         }
-        break;
-    case ecgNewsCurrentAffairs:
-        switch (genre & 0x0F) {
-        case 0x00: return "News_Current Affairs";
-        case 0x01: return "News_Weather Report";
-        case 0x02: return "News Magazine";
-        case 0x03: return "Documentary";
-        case 0x04: return "Discussion_Interview_Debate";
-        default: return "News_Current Affairs";
-        }
-        break;
-    case ecgShow:
-        switch (genre & 0x0F) {
-        case 0x00: return "Show_Game Show";
-        case 0x01: return "Game Show_Quiz_Contest";
-        case 0x02: return "Variety Show";
-        case 0x03: return "Talk Show";
-        default: return "Show_Game Show";
-        }
-        break;
-    case ecgSports:
-        switch (genre & 0x0F) {
-        case 0x00: return "Sports";
-        case 0x01: return "Special Event";
-        case 0x02: return "Sport Magazine";
-        case 0x03: return "Football_Soccer";
-        case 0x04: return "Tennis_Squash";
-        case 0x05: return "Team Sports";
-        case 0x06: return "Athletics";
-        case 0x07: return "Motor Sport";
-        case 0x08: return "Water Sport";
-        case 0x09: return "Winter Sports";
-        case 0x0A: return "Equestrian";
-        case 0x0B: return "Martial Sports";
-        default: return "Sports";
-        }
-        break;
-    case ecgChildrenYouth:
-        switch (genre & 0x0F) {
-        case 0x00: return "Childrens_Youth Programme";
-        case 0x01: return "Pre-school Childrens Programme";
-        case 0x02: return "Entertainment Programme for 6 to 14";
-        case 0x03: return "Entertainment Programme for 10 to 16";
-        case 0x04: return "Informational_Educational_School Programme";
-        case 0x05: return "Cartoons_Puppets";
-        default: return "Childrens_Youth Programme";
-        }
-        break;
-    case ecgMusicBalletDance:
-        switch (genre & 0x0F) {
-        case 0x00: return "Music_Ballet_Dance";
-        case 0x01: return "Rock_Pop";
-        case 0x02: return "Serious_Classical Music";
-        case 0x03: return "Folk_Traditional Music";
-        case 0x04: return "Jazz";
-        case 0x05: return "Musical_Opera";
-        case 0x06: return "Ballet";
-        default: return "Music_Ballet_Dance";
-        }
-        break;
-    case ecgArtsCulture:
-        switch (genre & 0x0F) {
-        case 0x00: return "Arts_Culture";
-        case 0x01: return "Performing Arts";
-        case 0x02: return "Fine Arts";
-        case 0x03: return "Religion";
-        case 0x04: return "Popular Culture_Traditional Arts";
-        case 0x05: return "Literature";
-        case 0x06: return "Film_Cinema";
-        case 0x07: return "Experimental Film_Video";
-        case 0x08: return "Broadcasting_Press";
-        case 0x09: return "New Media";
-        case 0x0A: return "Arts_Culture Magazine";
-        case 0x0B: return "Fashion";
-        default: return "Arts_Culture";
-        }
-        break;
-    case ecgSocialPoliticalEconomics:
-        switch (genre & 0x0F) {
-        case 0x00: return "Social_Political_Economics";
-        case 0x01: return "Magazine_Report_Documentary";
-        case 0x02: return "Economics_Social Advisory";
-        case 0x03: return "Remarkable People";
-        default: return "Social_Political_Economics";
-        }
-        break;
-    case ecgEducationalScience:
-        switch (genre & 0x0F) {
-        case 0x00: return "Education_Science_Factual";
-        case 0x01: return "Nature_Animals_Environment";
-        case 0x02: return "Technology_Natural Sciences";
-        case 0x03: return "Medicine_Physiology_Psychology";
-        case 0x04: return "Foreign Countries_Expeditions";
-        case 0x05: return "Social_Spiritual Sciences";
-        case 0x06: return "Further Education";
-        case 0x07: return "Languages";
-        default: return "Education_Science_Factual";
-        }
-        break;
-    case ecgLeisureHobbies:
-        switch (genre & 0x0F) {
-        case 0x00: return "Leisure_Hobbies";
-        case 0x01: return "Tourism_Travel";
-        case 0x02: return "Handicraft";
-        case 0x03: return "Motoring";
-        case 0x04: return "Fitness_Health";
-        case 0x05: return "Cooking";
-        case 0x06: return "Advertisement_Shopping";
-        case 0x07: return "Gardening";
-        default: return "Leisure_Hobbies";
-        }
-        break;
-    case ecgSpecial:
-        switch (genre & 0x0F) {
-        case 0x00: return "Original Language";
-        case 0x01: return "Black & White";
-        case 0x02: return "Unpublished";
-        case 0x03: return "Live Broadcast";
-        default: return "Original Language";
-        }
-        break;
-    default:
-        isyslog("flatPlus: Genre not found: %x", genre);
     }
+
+    isyslog("flatPlus: Genre not found: %x", genre);
     return "";
 }
 
@@ -4773,11 +4669,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                             }
                         }
                         file.close();
-                    }
-                }
-            }
-        }
-    }
+                    }  // if file.is_open
+                }  // if atoi(num.c_str()) > 0
+            }  // if found != std::string::npos
+        }  // for
+    }  // files.size() > 0
 
     return ContentWidget.ContentHeight(false);
 }
@@ -5085,6 +4981,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
 void cFlatDisplayMenu::PreLoadImages() {
     // Menu icons
+    const int ImageHeight {m_FontHeight};
     const cString Path = cString::sprintf("%s/%s/menuIcons", *Config.IconPath, Setup.OSDTheme);
     std::string File {""};
     File.reserve(256);
@@ -5093,13 +4990,17 @@ void cFlatDisplayMenu::PreLoadImages() {
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         File = e->d_name;
+        if (File.find("vdrlogo") == 0)  // Skip vdrlogo* files
+            continue;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
-        ImgLoader.LoadIcon(*FileName, m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon(*FileName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
     }
 
-    ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2, m_FontHeight - m_MarginItem2);
+    if (Config.TopBarMenuIconShow)
+        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), 999, m_TopBarHeight - m_MarginItem2);
 
-    const int ImageHeight {m_FontHeight};
+    ImgLoader.LoadIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     cImage *img {ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight)};
@@ -5117,7 +5018,7 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
     int index {0};
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
         Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
@@ -5141,47 +5042,48 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight * (1.0 / 3.0));
     ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight * (1.0 / 3.0));
 
-    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
     ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
-    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording_old_cur", ImageHeight, ImageHeight);
+
+    ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 
     if (Config.MainMenuWidgetDVBDevicesShow) {
-        ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/dvb_devices", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetActiveTimerShow) {
-        ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/active_timers", ImageHeight, ImageHeight - m_MarginItem2);
         ImgLoader.LoadIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
         ImgLoader.LoadIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
     }
     if (Config.MainMenuWidgetLastRecShow) {
-        ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/last_recordings", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetTimerConflictsShow) {
-        ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/timer_conflicts", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetSystemInfoShow) {
-        ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/system_information", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetSystemUpdatesShow) {
-        ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/system_updates", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetTemperaturesShow) {
-        ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/temperatures", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetCommandShow) {
-        ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/command_output", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetWeatherShow) {
-        ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2);
-        ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/weather", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.LoadIcon("widgets/umbrella", ImageHeight, ImageHeight - m_MarginItem2);
     }
 }

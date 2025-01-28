@@ -13,6 +13,7 @@
 #include FT_FREETYPE_H
 
 #include <fstream>
+#include <future>  // NOLINT
 #include <iostream>
 #include <utility>
 #include <sstream>
@@ -89,7 +90,7 @@ void cFlatBaseRender::TopBarCreate() {
     dsyslog("flatPlus: cFlatBaseRender::TopBarCreate()");
 #endif
 
-    const int fs = round(cOsd::OsdHeight() * Config.TopBarFontSize);  // Narrowing conversion
+    const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
     m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
     m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
@@ -115,7 +116,7 @@ void cFlatBaseRender::TopBarCreate() {
     PixmapFill(TopBarIconBgPixmap, clrTransparent);
     PixmapFill(TopBarIconPixmap, clrTransparent);
 
-    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
+    if (Config.DiskUsageShow == 3)  // 3 = Always
         TopBarEnableDiskUsage();
 }
 
@@ -129,8 +130,8 @@ void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
         m_TopBarTitleExtra1 = "";
         m_TopBarTitleExtra2 = "";
         m_TopBarExtraIcon = "";
-        m_TopBarMenuIcon = "";
         m_TopBarExtraIconSet = false;
+        m_TopBarMenuIcon = "";
         m_TopBarMenuIconSet = false;
         m_TopBarMenuLogo = "";
         m_TopBarMenuLogoSet = false;
@@ -138,7 +139,8 @@ void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
 
     m_TopBarTitle = Title;
     m_TopBarUpdateTitle = true;
-    if (Config.DiskUsageShow == 3)  // 3 = Always in menu
+
+    if (Config.DiskUsageShow == 3)  // 3 = Always
         TopBarEnableDiskUsage();
 }
 
@@ -192,40 +194,42 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
+    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
+    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
+    // The constant is calculated during compilation.).
+    const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
+    const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     cString IconName{""};
     cString Extra1 {""}, Extra2 {""};
 
     if (DiskFreePercent == 0) {  // Show something if disk is full. Avoid DIV/0
         if (Config.DiskUsageFree == 1) {  // Show in free mode
+            const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: 0%% %s", tr("Disk"), tr("free"));
-                Extra2 = "0 GB ≈ 00:00";
+                Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // Short format
                 Extra1 = cString::sprintf("0%% %s", tr("free"));
-                Extra2 = "≈ 00:00";
+                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
             IconName = "chart31b";
         } else {  // Show in occupied mode
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: 100%% %s", tr("Disk"), tr("occupied"));
+                Extra2 = "? GB ≈ ??:??";  //* Can not be calculated if disk is full (DIV/0)
             } else {  // Short format
                 Extra1 = cString::sprintf("100%% %s", tr("occupied"));
+                Extra2 = "≈ ??:??";
             }
             IconName = "chart32";
-            // Extra2 = "";  // Can not be calculated if disk is full (DIV/0)
         }
 
         TopBarSetTitleExtra(*Extra1, *Extra2);
         TopBarSetExtraIcon(*IconName);
 
         return;
-    }
+    }  // DiskFreePercent == 0 (Show something if disk is full)
 
-    // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
-    // multiplication with the inverse (For example, x = x / 3.0 becomes x = x * (1.0/3.0).
-    // The constant is calculated during compilation.).
-    const double FreeGB {cVideoDiskUsage::FreeMB() * (1.0 / 1024.0)};
-    const int FreeMinutes {cVideoDiskUsage::FreeMinutes()};
     const double AllGB {FreeGB / DiskFreePercent * 100.0};
     const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent * 100.0};
 
@@ -277,18 +281,18 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
                 Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
         } else {  // Show in occupied mode
-            const div_t FreeHM {std::div(OccupiedMinutes, 60)};
+            const div_t OccupiedHM {std::div(OccupiedMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
+                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedHM.quot, OccupiedHM.rem);
                 } else {  // 1000 GB+
-                    Extra2 =
-                        cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
+                    Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedHM.quot,
+                                              OccupiedHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedHM.quot, OccupiedHM.rem);
             }
         }
 
@@ -385,7 +389,7 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
-        cImage *ImgCon {nullptr}, *ImgRec {nullptr};
+        cImage *ImgCon {nullptr};
         if (Config.TopBarRecConflictsShow) {
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
@@ -397,7 +401,6 @@ void cFlatBaseRender::TopBarUpdate() {
                                                 m_TopBarFontHeight - m_MarginItem2);
 
                 if (ImgCon) {
-                    // Buffer = cString::sprintf("%d", NumConflicts);  // Created later
                     Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -405,35 +408,59 @@ void cFlatBaseRender::TopBarUpdate() {
         }  // Config.TopBarRecConflictsShow
 
         uint NumRec {0};
+        cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {
-            LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-            for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                if (Timer->HasFlags(tfRecording)) ++NumRec;
-            }
+#ifdef DEBUGFUNCSCALL
+            dsyslog("   Get number of recording timers");
+            cTimeMs Timer;  // Start Timer
+#endif
+
+            // The code below is a workaround for a problem with the VDR thread handling.
+            // The VDR is not designed to handle multiple threads, which is why we have
+            // to use a workaround to get the number of current recordings.
+            // The following code creates a new thread that queries the number of
+            // recordings and waits for the result. This is necessary because the
+            // cTimers::GetTimers() function can only be called from the main thread.
+            // The result is then stored in the NumRec variable.
+            auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
+                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                    if (Timer->HasFlags(tfRecording))
+                        ++NumRec;
+                }
+            });
+            RecCounterFuture.get();
+
+#ifdef DEBUGFUNCSCALL
+            dsyslog("   End of Get number of recording timers (%d): %ld ms", NumRec, Timer.Elapsed());
+#endif
+
             if (NumRec) {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
                                             m_TopBarFontHeight - m_MarginItem2);
                 if (ImgRec) {
-                    // Buffer = cString::sprintf("%d", NumRec);  // Created later
                     Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecordingShow
 
-        if (m_TopBarExtraIconSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
-            if (img) {
-                Right -= img->Width() + m_MarginItem;
-                MiddleWidth += img->Width() + m_MarginItem;
+        cImage *ImgExtra {nullptr};
+        if (m_TopBarExtraIconSet) {  // Show extra icon (Disk usage)
+            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
+            if (ImgExtra) {
+                Right -= ImgExtra->Width() + m_MarginItem;
+                MiddleWidth += ImgExtra->Width() + m_MarginItem;
             }
         }
+
         int TopBarMenuIconRightWidth {0};
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
+        cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
-            if (img) {
-                TopBarMenuIconRightWidth = img->Width() + m_MarginItem3;
+            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
+            if (ImgIconRight) {
+                TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
             }
         }
@@ -465,12 +492,9 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
         Right += ExtraMaxWidth + m_MarginItem;
 
-        if (m_TopBarExtraIconSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
-            if (img) {
-                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *img);
-                Right += img->Width() + m_MarginItem;
-            }
+        if (m_TopBarExtraIconSet && ImgExtra) {
+                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *ImgExtra);
+                Right += ImgExtra->Width() + m_MarginItem;
         }
 
         if (NumRec && ImgRec) {
@@ -499,12 +523,10 @@ void cFlatBaseRender::TopBarUpdate() {
             Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (m_TopBarMenuIconRightSet) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
-            if (img) {
-                TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *img);
-            }
+        if (m_TopBarMenuIconRightSet && ImgIconRight) {
+            TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *ImgIconRight);
         }
+
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),
                                Theme.Color(clrTopBarBg), m_TopBarFont, TitleMaxWidth);
 
@@ -532,6 +554,10 @@ void cFlatBaseRender::ButtonsCreate() {
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::ButtonsSet() '%s' '%s' '%s' '%s'", Red, Green, Yellow, Blue);
+#endif
+
     if (!ButtonsPixmap) return;
 
     const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
@@ -542,175 +568,41 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     m_ButtonsDrawn = false;
 
+    const char *ButtonText[] {Red, Green, Yellow, Blue};  // ButtonText
+    const tColor ButtonColor[] {clrButtonRed, clrButtonGreen, clrButtonYellow, clrButtonBlue};  // ButtonColor
+    const int ColorKey[] {Setup.ColorKey0, Setup.ColorKey1, Setup.ColorKey2, Setup.ColorKey3};  // ColorKey
+
     int x {0};
-    if (!(!Config.ButtonsShowEmpty && !Red)) {
-        switch (Setup.ColorKey0) {
-        case 0:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
+
+    for (int i {0}; i < 4; i++) {  // Four buttons
+        // If there is enough space for the last button, add its width to the
+        // right edge of the buttons area. This is done to align the last button
+        // to the right edge of the screen.
+        if (i == 3 && x + ButtonWidth + Config.decorBorderButtonSize * 2 < m_ButtonsWidth)
+            ButtonWidth += m_ButtonsWidth - (x + ButtonWidth + Config.decorBorderButtonSize * 2);
+
+        // If buttons should be shown even when empty, or if there is some text to show
+        if (!(Config.ButtonsShowEmpty == 0 && ButtonText[ColorKey[i]] == nullptr)) {
+            ButtonsPixmap->DrawText(cPoint(x, 0), ButtonText[ColorKey[i]], Theme.Color(clrButtonFont),
+                                    Theme.Color(clrButtonBg), m_Font, ButtonWidth, m_FontHeight + m_MarginButtonColor,
+                                    taCenter);
             ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonRed));
-            break;
-        case 1:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonGreen));
-            break;
-        case 2:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonYellow));
-            break;
-        case 3:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonBlue));
-            break;
+                                         Theme.Color(ButtonColor[ColorKey[i]]));
+
+            const sDecorBorder ib{x + Config.decorBorderButtonSize,
+                                  m_ButtonsTop,
+                                  ButtonWidth,
+                                  m_ButtonsHeight,
+                                  Config.decorBorderButtonSize,
+                                  Config.decorBorderButtonType,
+                                  Config.decorBorderButtonFg,
+                                  Config.decorBorderButtonBg,
+                                  BorderButton};
+            DecorBorderDraw(ib);
+            m_ButtonsDrawn = true;
         }
-
-        const sDecorBorder ib {x + Config.decorBorderButtonSize,
-                               m_ButtonsTop,
-                               ButtonWidth,
-                               m_ButtonsHeight,
-                               Config.decorBorderButtonSize,
-                               Config.decorBorderButtonType,
-                               Config.decorBorderButtonFg,
-                               Config.decorBorderButtonBg,
-                               BorderButton};
-        DecorBorderDraw(ib);
-        m_ButtonsDrawn = true;
-    }
-
-    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
-    if (!(!Config.ButtonsShowEmpty && !Green)) {
-        switch (Setup.ColorKey1) {
-        case 0:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonRed));
-            break;
-        case 1:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonGreen));
-            break;
-        case 2:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonYellow));
-            break;
-        case 3:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonBlue));
-            break;
-        }
-
-        const sDecorBorder ib {x + Config.decorBorderButtonSize,
-                               m_ButtonsTop,
-                               ButtonWidth,
-                               m_ButtonsHeight,
-                               Config.decorBorderButtonSize,
-                               Config.decorBorderButtonType,
-                               Config.decorBorderButtonFg,
-                               Config.decorBorderButtonBg,
-                               BorderButton};
-        DecorBorderDraw(ib);
-        m_ButtonsDrawn = true;
-    }
-
-    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
-    if (!(!Config.ButtonsShowEmpty && !Yellow)) {
-        switch (Setup.ColorKey2) {
-        case 0:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonRed));
-            break;
-        case 1:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonGreen));
-            break;
-        case 2:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonYellow));
-            break;
-        case 3:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonBlue));
-            break;
-        }
-
-        const sDecorBorder ib {x + Config.decorBorderButtonSize,
-                               m_ButtonsTop,
-                               ButtonWidth,
-                               m_ButtonsHeight,
-                               Config.decorBorderButtonSize,
-                               Config.decorBorderButtonType,
-                               Config.decorBorderButtonFg,
-                               Config.decorBorderButtonBg,
-                               BorderButton};
-        DecorBorderDraw(ib);
-        m_ButtonsDrawn = true;
-    }
-
-    x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;
-    if (x + ButtonWidth + Config.decorBorderButtonSize * 2 < m_ButtonsWidth)
-        ButtonWidth += m_ButtonsWidth - (x + ButtonWidth + Config.decorBorderButtonSize * 2);
-    if (!(!Config.ButtonsShowEmpty && !Blue)) {
-        switch (Setup.ColorKey3) {
-        case 0:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Red, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonRed));
-            break;
-        case 1:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Green, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonGreen));
-            break;
-        case 2:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Yellow, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonYellow));
-            break;
-        case 3:
-            ButtonsPixmap->DrawText(cPoint(x, 0), Blue, Theme.Color(clrButtonFont), Theme.Color(clrButtonBg), m_Font,
-                                    ButtonWidth, m_FontHeight + m_MarginButtonColor, taCenter);
-            ButtonsPixmap->DrawRectangle(cRect(x, m_FontHeight + m_MarginButtonColor, ButtonWidth, m_ButtonColorHeight),
-                                         Theme.Color(clrButtonBlue));
-            break;
-        }
-
-        const sDecorBorder ib {x + Config.decorBorderButtonSize,
-                               m_ButtonsTop,
-                               ButtonWidth,
-                               m_ButtonsHeight,
-                               Config.decorBorderButtonSize,
-                               Config.decorBorderButtonType,
-                               Config.decorBorderButtonFg,
-                               Config.decorBorderButtonBg,
-                               BorderButton};
-        DecorBorderDraw(ib);
-        m_ButtonsDrawn = true;
-    }
+        x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;  // Add button width and margin
+    }  // for (int i = 0; i < 4; i++)
 }
 
 bool cFlatBaseRender::ButtonsDrawn() {
@@ -849,18 +741,17 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    const uint threshold {75};  // TODO: Add config options?
-    const std::size_t MessageLength {strlen(Text)};
-    if (MessageLength > threshold) {  // Message is longer than threshold and uses almost the full screen
+    const uint threshold {75};  //? Add config option?
+    const std::size_t TextLength {strlen(Text)};
+    if (TextLength > threshold) {  // Message is longer than threshold and uses almost the full screen
         // Narrowing conversion
-        int ExtraTime =
-            (MessageLength - threshold) / (threshold / Setup.OSDMessageTime);  // 1 second for threshold char
-        const int MaxExtraTime {Setup.OSDMessageTime * 3};                     // Max. extra time to add
-        if (ExtraTime > MaxExtraTime) ExtraTime = MaxExtraTime;
+        const int ExtraTime {
+            std::min(static_cast<int>((TextLength - threshold) / (threshold / Setup.OSDMessageTime)),
+                     Setup.OSDMessageTime * 3)};  // Max. extra time to add
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   Adding %d seconds to message time (%d)", ExtraTime, m_OSDMessageTime);
+        dsyslog("   Adding %d seconds to message time (%d)", ExtraTime + 1, m_OSDMessageTime);
 #endif
-        Setup.OSDMessageTime += (++ExtraTime);  // Add time of displaying message
+        Setup.OSDMessageTime += ExtraTime + 1;  // Add time of displaying message
     }
 }
 
@@ -1902,7 +1793,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const cString PrecTomorrow =
         *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
 
-    const int fs = round(cOsd::OsdHeight() * Config.WeatherFontSize);  // Narrowing conversion
+    const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;  // Use a more precise calculation
     cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
     cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
     cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));

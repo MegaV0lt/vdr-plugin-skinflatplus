@@ -108,15 +108,15 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     }
 
     cString InfoText {""};
-    if (RecInfo->ShortText()) {
+    if (isempty(RecInfo->ShortText())) {  // No short text. Show date and time instead
+        InfoText = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()),
+                                    *TimeString(Recording->Start()));
+    } else {
         if (Config.PlaybackShowRecordingDate)  // Date  Time - ShortText
             InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()),
                                     *TimeString(Recording->Start()), RecInfo->ShortText());
         else
             InfoText = RecInfo->ShortText();
-    } else {  // No short text
-        InfoText = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()),
-                                    *TimeString(Recording->Start()));
     }
 
     const int InfoWidth {m_FontSml->Width(*InfoText)};  // Width of infotext
@@ -203,16 +203,18 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
     if (!LabelPixmap || !IconsPixmap) return;
 
-    if (Play == false && Config.RecordingDimmOnPause) {
-        time(&m_DimmStartTime);
-        Start();
-    } else if (Play == true && Config.RecordingDimmOnPause) {
-        Cancel(-1);
-        while (Active())
-            cCondWait::SleepMs(10);
-        if (m_DimmActive) {
-            PixmapFill(DimmPixmap, clrTransparent);
-            Flush();
+    if (Config.RecordingDimmOnPause) {
+        if (Play == false) {
+            time(&m_DimmStartTime);
+            Start();
+        } else {
+            Cancel(-1);
+            while (Active())
+                cCondWait::SleepMs(10);
+            if (m_DimmActive) {
+                PixmapFill(DimmPixmap, clrTransparent);
+                Flush();
+            }
         }
     }
 

@@ -16,12 +16,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
 #include <stdint.h>
 
 #include <memory>   // For 'unique_ptr<T>()' ...
 #include <cstring>  // string.h
+#include <string>
 #include <string_view>
 #include <random>
 #include <filesystem>  // C++17
@@ -255,20 +255,6 @@ class cTextFloatingWrapper {
     int m_LastLine {-1};
 };
 
-static inline uint32_t GetMsTicks() {
-#ifdef CLOCK_MONOTONIC
-    struct timespec tspec;
-
-    clock_gettime(CLOCK_MONOTONIC, &tspec);
-    return (tspec.tv_sec * 1000) + (tspec.tv_nsec / (1000 * 1000));
-#else
-    struct timeval tval;
-
-    if (gettimeofday(&tval, NULL) < 0)
-        return 0;
-    return (tval.tv_sec * 1000) + (tval.tv_usec / 1000);
-#endif
-}
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);

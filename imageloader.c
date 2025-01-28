@@ -10,7 +10,6 @@
 #include <dirent.h>
 #include <math.h>
 
-// #include <iostream>
 #include <string>
 
 #include "./flat.h"
@@ -23,6 +22,11 @@ cImageLoader::~cImageLoader() {}
 
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
+
+#ifdef DEBUGIMAGELOADTIME
+    dsyslog("flatPlus: cImageLoader::LoadLogo() '%s' %dx%d", logo, width, height);
+    cTimeMs Timer;  // Start timer
+#endif
 
     // Plain logo without converting to lower including '/'
     cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
@@ -39,194 +43,170 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
             std::replace(LogoLower.begin(), LogoLower.end(), '/', '~');
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: cImageLoader::LoadLogo() '%s'", *File);
-        uint32_t tick1 = GetMsTicks();
-#endif
 
         img = ImgCache.GetImage(*File, width, height);  // Check if image is in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick2 = GetMsTicks();
-        dsyslog("   search in cache: %d ms", tick2 - tick1);
+        dsyslog("   search in cache #%d: %ld ms", i + 1, Timer.Elapsed());
 #endif
 
         if (img) return img;  // Image found in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick3 = GetMsTicks();
+        Timer.Set();  // Reset timer
 #endif
 
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
             if (i == 2)              // Third try and not found
-                dsyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                isyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
             continue;
         }
 
 #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick4 = GetMsTicks();
-        dsyslog("   load file from disk: %d ms", tick4 - tick3);
-        uint32_t tick5 = GetMsTicks();
+        dsyslog("   load file from disk #%d: %ld ms", i + 1, Timer.Elapsed());
+        Timer.Set();  // Reset timer
 #endif
 
         img = CreateImage(width, height);
         if (!img) continue;
 
 #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick6 = GetMsTicks();
-        dsyslog("   scale logo: %d ms", tick6 - tick5);
+        dsyslog("   scale logo #%d: %ld ms", i + 1, Timer.Elapsed());
 #endif
 
         ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
         return img;  // Image loaded from disk
     }  // for
+
     return nullptr;  // No image; so return nullptr
 }
 
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
 
-    cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
-
-#ifdef DEBUGIMAGELOADTIME
-    dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
-#endif
-
+    const cString File[] {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension),
+                          cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension)};
     cImage *img {nullptr};
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick1 = GetMsTicks();
+    dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' %dx%d", *File[0], width, height);
+    cTimeMs Timer;  // Start timer
 #endif
 
-    img = ImgCache.GetImage(*File, width, height);
+    img = ImgCache.GetImage(*File[0], width, height);
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick2 = GetMsTicks();
-    dsyslog("   search in cache: %d ms", tick2 - tick1);
+    dsyslog("   search in cache: %ld ms", Timer.Elapsed());
 #endif
 
-    if (img) return img;
+    if (img)
+        return img;  // Image found in imagecache
+    else
+        img = ImgCache.GetImage(*File[1], width, height);
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick3 = GetMsTicks();
+    dsyslog("   search in cache (default): %ld ms", Timer.Elapsed());
 #endif
 
-    bool success = LoadImage(*File);
+    if (img) return img;  // Image found in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick4 = GetMsTicks();
-    dsyslog("   load file from disk: %d ms", tick4 - tick3);
+    Timer.Set();  // Reset timer
 #endif
 
+    bool success = LoadImage(*File[0]);
+
+#ifdef DEBUGIMAGELOADTIME
+    dsyslog("   load file from disk: %ld ms", Timer.Elapsed());
+    Timer.Set();  // Reset timer
+#endif
+
+    bool DefaultPath {false};
     if (!success) {  // Search for logo in default folder
-        File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
-        uint32_t tick5 = GetMsTicks();
-#endif
-
-        img = ImgCache.GetImage(*File, width, height);
+        success = LoadImage(*File[1]);
 
 #ifdef DEBUGIMAGELOADTIME
-        uint32_t tick6 = GetMsTicks();
-        dsyslog("   search in cache: %d ms", tick6 - tick5);
-#endif
-
-        if (img) return img;
-
-#ifdef DEBUGIMAGELOADTIME
-        uint32_t tick7 = GetMsTicks();
-#endif
-
-        success = LoadImage(*File);
-
-#ifdef DEBUGIMAGELOADTIME
-        uint32_t tick8 = GetMsTicks();
-        dsyslog("   load file from disk: %d ms", tick8 - tick7);
+        dsyslog("   load file from disk (default): %ld ms", Timer.Elapsed());
+        Timer.Set();  // Reset timer
 #endif
 
         if (!success) {
-            dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' could not be loaded", *File);
+            isyslog("flatPlus: cImageLoader::LoadIcon() '%s' and '%s' could not be loaded", *File[0], *File[1]);
             return nullptr;
         }
-    }
-#ifdef DEBUGIMAGELOADTIME
-    uint32_t tick9 = GetMsTicks();
-#endif
+
+        DefaultPath = true;
+    }  // if (!success)
 
     img = CreateImage(width, height);
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick10 = GetMsTicks();
-    dsyslog("   scale logo: %d ms", tick10 - tick9);
+    dsyslog("   scale logo: %ld ms", Timer.Elapsed());
 #endif
 
-    if (!img) {
-        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File);
-        return nullptr;
+    if (img) {
+        ImgCache.InsertImage(img, *File[DefaultPath ? 1 : 0], width, height);
+        return img;
     }
 
-    ImgCache.InsertImage(img, *File, width, height);
-    return img;
+    dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File[DefaultPath ? 1 : 0]);
+    return nullptr;
 }
 
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
 
     const cString File = cFile;
+    cImage *img {nullptr};
+
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::LoadFile() '%s'", *File);
-#endif
-
-    cImage *img {nullptr};
-#ifdef DEBUGIMAGELOADTIME
-    uint32_t tick1 = GetMsTicks();
+    cTimeMs Timer;  // Start timer
 #endif
 
     img = ImgCache.GetImage(*File, width, height);
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick2 = GetMsTicks();
-    dsyslog("   search in cache: %d ms", tick2 - tick1);
+    dsyslog("   search in cache: %ld ms", Timer.Elapsed());
 #endif
 
-    if (img) return img;
+    if (img) return img;  // Image found in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick3 = GetMsTicks();
+    Timer.Set();  // Reset timer
 #endif
 
     const bool success = LoadImage(*File);
     if (!success) {
-        dsyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
+        isyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return nullptr;
     }
-#ifdef DEBUGIMAGELOADTIME
-    uint32_t tick4 = GetMsTicks();
-    dsyslog("   load file from disk: %d ms", tick4 - tick3);
-#endif
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick5 = GetMsTicks();
+    dsyslog("   load file from disk: %ld ms", Timer.Elapsed());
+    Timer.Set();  // Reset timer
 #endif
 
     img = CreateImage(width, height);
-    if (!img) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
-    uint32_t tick6 = GetMsTicks();
-    dsyslog("   scale logo: %d ms", tick6 - tick5);
+    dsyslog("   scale logo: %ld ms", Timer.Elapsed());
 #endif
 
-    ImgCache.InsertImage(img, *File, width, height);
-    return img;
+    if (img) {
+        ImgCache.InsertImage(img, *File, width, height);
+        return img;
+    }
+
+    dsyslog("flatPlus: cImageLoader::LoadFile() '%s' 'CreateImage' failed", *File);
+    return nullptr;
 }
 
 void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
-        if (ch >= 'A' && ch <= 'Z')
+        if (ch <= 'Z' && ch >= 'A')  // Check for 'Z' first. Small letters start at 97
             ch += 32;  // Or: ch ^= 1 << 5;
     }
 }
@@ -259,6 +239,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
             return true;
         }
     }
+
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
     return false;
 }

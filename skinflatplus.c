@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.1.6";
+static const char *VERSION        = "1.1.7";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -152,11 +152,7 @@ const char **cPluginFlat::SVDRPHelpPages() {
 
 cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode) {
     if (!strcasecmp(Command, "RLFC")) {
-        if (!Option) {
-            ReplyCode = 500;
-            return "No logo given";
-        }
-        if (!strcmp(Option, "")) {
+        if (!Option || !strcmp(Option, "")) {
             ReplyCode = 500;
             return "No logo given";
         }

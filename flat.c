@@ -80,8 +80,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage() {
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, %d, %d, %d, %d, %d)", *Name, Layer, ViewPort.Left(), ViewPort.Top(),
-            ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
+            Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
 #endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
@@ -307,9 +307,9 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
     std::string Channel {""}, Searchtimer {""};
-    Channel.reserve(32);
-    Searchtimer.reserve(32);
     if (!Buffer.empty()) {
+        Channel.reserve(32);
+        Searchtimer.reserve(32);
         Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
         Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
         if (Searchtimer.empty())
@@ -318,17 +318,17 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
     std::string Causedby {""}, Reason {""};
-    Causedby.reserve(32);
-    Reason.reserve(32);
     if (!Buffer.empty()) {
+        Causedby.reserve(32);
+        Reason.reserve(32);
         Causedby = XmlSubstring(Buffer, "<causedBy>", "</causedBy>");
         Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
     }
 
     Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
     std::string Pattern {""};
-    Pattern.reserve(32);
     if (!Buffer.empty()) {
+        Pattern.reserve(32);
         Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
     }
 
@@ -537,13 +537,14 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
 
 // Returns the string between start and end or an empty string if not found
 std::string XmlSubstring(const std::string &source, const char *StrStart, const char *StrEnd) {
-    const std::size_t start {source.find(StrStart)};
-    const std::size_t end {source.find(StrEnd)};
+    auto StartPos {source.find(StrStart)};
+    if (StartPos == std::string::npos) return {};
 
-    if (std::string::npos != start && std::string::npos != end)
-        return (source.substr(start + strlen(StrStart), end - start - strlen(StrStart)));
+    StartPos += strlen(StrStart);
+    const auto EndPos {source.find(StrEnd, StartPos)};
+    if (EndPos == std::string::npos) return {};
 
-    return std::string();  // Empty string
+    return source.substr(StartPos, EndPos - StartPos);
 }
 
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
@@ -577,6 +578,9 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 
 
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
+#endif
     if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
@@ -610,12 +614,12 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    if (LineWidth > (LineMaxWidth * 0.8)) {  // Lines shorter than 80% looking bad when justified
+    if (LineWidth > (LineMaxWidth * 0.8f)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
 
         std::string FillChars {""};
-        FillChars.reserve(16);
+        FillChars.reserve(FillCharBlock);
         for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }
@@ -624,60 +628,60 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         std::size_t LineLength {Line.length()};
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
         int InsertedFillChar {0};
-        /* dsyslog("flatPlus: JustifyLine() [Line: spaces %d, width %d, length %ld]\n"
-                "[FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
-                "[FillChars: length %ld]",
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   [Line: spaces %d, width %d, length %ld]\n"
+                "   [FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
+                "   [FillChars: length %ld]",
                 LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, NeedFillChar % LineSpaces,
-                FillCharWidth, FillCharsLength); */
-
-        //* Insert blocks at spaces
-        std::size_t pos {Line.find(' ')};
-        while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
-            if (!(isspace(Line[pos - 1]))) {
+                FillCharWidth, FillCharsLength);
+#endif
+        //* Insert blocks at (space)
+        std::size_t pos {0};  // Position also used in following loops
+        for (pos = Line.find(' '); pos != std::string::npos && (InsertedFillChar + FillCharBlock <= NeedFillChar);
+             pos = Line.find(' ', pos + FillCharsLength + 1)) {
+            if (!isspace(Line[pos - 1])) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
                 Line.insert(pos, FillChars);
                 InsertedFillChar += FillCharBlock;
             }
-            pos = Line.find(' ', pos + FillCharsLength + 1);  // Inserted chars plus one
         }
-        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after first loop (' '): %d", InsertedFillChar);
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   InsertedFillChar after first loop (space): %d", InsertedFillChar);
+#endif
 
-        pos = Line.find(".,?!;");  //* Insert blocks at (.,?!;)
-        while (pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar)) {
-            if (pos < (LineLength - FillCharBlock - 1)) {
-                // Check for repeating '.'
-                if (Line[pos] != Line[pos + 1]) {  // Next char is different
-                    // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
-                    Line.insert(pos + 1, FillChars);  // Insert after pos!
-                    pos = Line.find(".,?!;", pos + FillCharsLength + 1);
-                    InsertedFillChar += FillCharBlock;
-                    LineLength = Line.length();
-                } else {
-                    // dsyslog("flatPlus:  Double '.' found");
-                    ++pos;
-                }
-            } else {
-                // dsyslog("flatPlus: No space for blocks left or end of line reached: %ld", pos);
-                break;
+        //* Insert blocks at (.,?!;)
+        for (pos = Line.find_first_of(".,?!;");
+             pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
+             pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1)) {
+            if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
+                // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
+                Line.insert(pos + 1, FillChars);
+                InsertedFillChar += FillCharBlock;
+                LineLength = Line.length();
             }
         }
-        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
+#endif
 
         //* Insert the remainder of 'NeedFillChar' left to right
-        pos = Line.find_last_of(' ');
-        while (pos != std::string::npos && (InsertedFillChar < NeedFillChar)) {
+        while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
+               (InsertedFillChar < NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert char at %ld", pos);
                 Line.insert(pos, FillChar);
                 ++InsertedFillChar;
             }
-            pos = Line.find_last_of(' ', pos - FillCharLength);  // 'FillChar' can be more than one byte in length
         }
-        // dsyslog("flatPlus: JustifyLine() InsertedFillChar after third loop (' '): %d", InsertedFillChar);
+#ifdef DEBUGFUNCSCALL
+    if (InsertedFillChar < NeedFillChar)
+        dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
+    else
+        dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
+#endif
     } else {
         // dsyslog("flatPlus: JustifyLine() Line too short for justifying: LineWidth %d, LineMaxWidth * 0.8: %.0f",
         //        LineWidth, LineMaxWidth * 0.8);
-        // return;
     }
 }
 
@@ -710,7 +714,7 @@ cTextFloatingWrapper::~cTextFloatingWrapper() {
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextFloatingWrapper::Set() Text length: %ld", strlen(Text));
-    uint32_t tick0 {GetMsTicks()};
+    cTimeMs Timer;  // Start timer
 #endif
 
     free(m_Text);
@@ -776,8 +780,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    uint32_t tick1 {GetMsTicks()};
-    dsyslog("   Time: %d ms", tick1 - tick0);
+    dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 

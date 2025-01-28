@@ -235,7 +235,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
     bool IsRec {false};
-    const int RecWidth {m_FontSml->Width("REC")};  //? Use ● (Black Circle U+25CF)
+    const int RecWidth {m_FontSml->Width("REC")};
 
     int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
     const int StartTimeLeft {left};
@@ -311,7 +311,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
         if (IsRec) {
             ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth, 0), "REC",
-                Theme.Color(clrChannelRecordingPresentFg), Theme.Color(clrChannelRecordingPresentBg), m_FontSml);
+                                           Theme.Color(clrChannelRecordingPresentFg),
+                                           Theme.Color(clrChannelRecordingPresentBg), m_FontSml);
         }
     }  // Present
 
@@ -369,10 +370,9 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }
 
         if (IsRec) {
-            ChanInfoBottomPixmap->DrawText(cPoint(left + EpgWidth + m_MarginItem - RecWidth,
-                                                  m_FontHeight + m_FontSmlHeight),
-                                           "REC", Theme.Color(clrChannelRecordingFollowFg),
-                                           Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
+            ChanInfoBottomPixmap->DrawText(
+                cPoint(left + EpgWidth + m_MarginItem - RecWidth, m_FontHeight + m_FontSmlHeight), "REC",
+                Theme.Color(clrChannelRecordingFollowFg), Theme.Color(clrChannelRecordingFollowBg), m_FontSml);
         }
     }  // Following
 
@@ -490,13 +490,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("  ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
-    dsyslog("  CAID: %d", ecmInfo.caid);
-    dsyslog("  Card system: %s", *ecmInfo.cardsystem);
-    dsyslog("  Reader: %s", *ecmInfo.reader);
-    dsyslog("  From: %s", *ecmInfo.from);
-    dsyslog("  Hops: %d", ecmInfo.hops);
-    dsyslog("  Protocol: %s", *ecmInfo.protocol);
+    dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
+    dsyslog("   CAID: %d", ecmInfo.caid);
+    dsyslog("   Card system: %s", *ecmInfo.cardsystem);
+    dsyslog("   Reader: %s", *ecmInfo.reader);
+    dsyslog("   From: %s", *ecmInfo.from);
+    dsyslog("   Hops: %d", ecmInfo.hops);
+    dsyslog("   Protocol: %s", *ecmInfo.protocol);
 #endif
 
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999)
@@ -512,7 +512,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont);
-                                   // DvbapiInfoFont->Width(*DvbapiInfoText) * 2*/);
+
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
@@ -534,9 +534,15 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (ecmInfo.hops > 1)
         DvbapiInfoText.Append(cString::sprintf(" (%d hops)", ecmInfo.hops));
 
+    // Store the width of the drawn dvbapi info text for the next draw call,
+    // so that we can ensure that the text is drawn at the correct position
+    // even if the text changes (e.g. when the channel is changed).
+    // This is done by storing the maximum width of the text seen so far.
+    m_LastDvbapiInfoTextWidth = std::max(DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
+
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont);
-                                   // DvbapiInfoFont->Width(*DvbapiInfoText) * 2*/);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
+
     delete DvbapiInfoFont;
 }
 
@@ -580,7 +586,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     int index {0};
-    LOCK_CHANNELS_READ;
+    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
