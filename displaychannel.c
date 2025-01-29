@@ -419,7 +419,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
                     - m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
-    int ProgressLeft {left + SignalFont->Width("STR ") + m_MarginItem};
+    const int ProgressLeft {left + std::max(SignalFont->Width("STR "), SignalFont->Width("SNR ")) + m_MarginItem};
     const int SignalWidth {m_ChannelWidth / 2};
     const int ProgressWidth {SignalWidth / 2 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
@@ -431,7 +431,6 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
-    ProgressLeft = left + SignalFont->Width("STR ") + m_MarginItem;
     // ProgressWidth = SignalWidth - ProgressLeft - m_MarginItem;
     ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
