@@ -81,8 +81,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: cFlatDisplayReplay::Setrecording()");
 #endif
 
-    if (m_ModeOnly) return;
-    if (!IconsPixmap || !LabelPixmap) return;
+    if (!IconsPixmap || !LabelPixmap || m_ModeOnly) return;
 
     const cRecordingInfo *RecInfo = Recording->Info();
     m_Recording = Recording;
@@ -341,8 +340,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
 #endif
 
-    if (m_ModeOnly) return;
-    if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap) return;
+    if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap || m_ModeOnly) return;
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
