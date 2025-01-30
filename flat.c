@@ -189,6 +189,14 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     return "";
 }
 
+cString GetCurrentAudioIcon() {
+    const eTrackType CurrentAudioTrack {cDevice::PrimaryDevice()->GetCurrentAudioTrack()};
+    dsyslog("flatPlus: Current audio track: %d", CurrentAudioTrack);
+    return (IS_AUDIO_TRACK(CurrentAudioTrack))   ? "audio_stereo"
+           : (IS_DOLBY_TRACK(CurrentAudioTrack)) ? "audio_dolby"
+                                                 : "";  // No audio?
+}
+
 cString GetRecordingErrorIcon(int RecInfoErrors) {
     return (RecInfoErrors == 0) ? "recording_ok"
            : (RecInfoErrors < 0) ? "recording_untested"

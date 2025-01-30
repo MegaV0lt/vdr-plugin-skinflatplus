@@ -274,6 +274,7 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingFormatIcon(const cRecording *Recording);
+cString GetCurrentAudioIcon();
 cString GetRecordingErrorIcon(int RecInfoErrors);
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
 

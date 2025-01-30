@@ -175,15 +175,16 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
     if (!ChanIconsPixmap) return;
 
-    // if (!Resolution)
+    if (!Resolution)
         PixmapFill(ChanIconsPixmap, clrTransparent);
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
     int left {m_ChannelWidth - m_FontSmlHeight - m_MarginItem2};
+    const int ImageHeight = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
 
     cImage *img {nullptr};
     if (Channel) {
-        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, m_FontSmlHeight);
+        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, ImageHeight);
         if (img) {
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left -= m_MarginItem2;
@@ -194,7 +195,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         cString IconName {""};
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect (16:9)
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -202,7 +203,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -212,11 +213,21 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
                 left -= m_MarginItem2;
+            }
+        }
+        // Show audio icon (Dolby, Stereo)
+        if (Config.ChannelResolutionAspectShow) {  //? Add separate config option
+            IconName = *GetCurrentAudioIcon();
+            img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
+            if (img) {
+                left -= img->Width();
+                ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
+                // left -= m_MarginItem2;
             }
         }
     }
@@ -568,7 +579,7 @@ void cFlatDisplayChannel::PreLoadImages() {
         }
     }  // for cChannel
 
-    height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize);
+    height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
     ImgLoader.LoadIcon("crypted", 999, height);
     ImgLoader.LoadIcon("uncrypted", 999, height);
     ImgLoader.LoadIcon("unknown_asp", 999, height);
@@ -592,4 +603,6 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("uhd", 999, height);
     ImgLoader.LoadIcon("hd", 999, height);
     ImgLoader.LoadIcon("sd", 999, height);
+    ImgLoader.LoadIcon("audio_stereo", 999, height);
+    ImgLoader.LoadIcon("audio_dolby", 999, height);
 }

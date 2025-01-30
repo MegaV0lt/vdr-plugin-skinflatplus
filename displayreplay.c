@@ -197,7 +197,7 @@ void cFlatDisplayReplay::Action() {
 
 void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayReplay::SetMode)");
+    dsyslog("flatPlus: cFlatDisplayReplay::SetMode()");
     dsyslog("   Setup.ShowReplayMode: %d, Speed %d", Setup.ShowReplayMode, Speed);
 #endif
 
@@ -706,8 +706,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw() {
-    if (m_ModeOnly) return;
-    if (!IconsPixmap) return;
+    if (!IconsPixmap || m_ModeOnly) return;
 
     if (m_ScreenWidth > 0) {
         // First line for current, total and cutted length, second line for end time
@@ -736,6 +735,16 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format
+            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            if (img) {
+                left -= img->Width();
+                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+                left -= m_MarginItem2;
+            }
+        }
+        // Show audio icon (Dolby, Stereo)
+        if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
+            IconName = *GetCurrentAudioIcon();
             img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
@@ -805,4 +814,6 @@ void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("uhd", 999, m_FontSmlHeight);
     ImgLoader.LoadIcon("hd", 999, m_FontSmlHeight);
     ImgLoader.LoadIcon("sd", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("audio_stereo", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("audio_dolby", 999, m_FontSmlHeight);
 }
