@@ -179,13 +179,14 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         PixmapFill(ChanIconsPixmap, clrTransparent);
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
-    int left {m_ChannelWidth - m_FontSmlHeight - m_MarginItem2};
+    int left {m_ChannelWidth /* m_FomtSmlHeight */ - m_MarginItem2};
     const int ImageHeight = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
 
     cImage *img {nullptr};
     if (Channel) {
         img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", 999, ImageHeight);
         if (img) {
+            left -= img->Width();
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
             left -= m_MarginItem2;
         }
