@@ -332,7 +332,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 Scrollers.AddScroller(*Epg,
                                       cRect(Config.decorBorderChannelSize + left,
                                             Config.decorBorderChannelSize + m_ChannelHeight - m_HeightBottom + TopEpg,
-                                            MaxAvailableWidth, m_FontHeight),
+                                            (IsRec) ? MaxAvailableWidth - m_MarginItem - RecWidth : MaxAvailableWidth,
+                                            m_FontHeight),
                                       Theme.Color(EpgColor), clrTransparent, m_Font);
             } else {
                 ChanInfoBottomPixmap->DrawText(cPoint(left, TopEpg), *Epg, Theme.Color(EpgColor),
