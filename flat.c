@@ -568,7 +568,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                 FT_GlyphSlot slot {face->glyph};
                 rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
-                    uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
+                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
                     FT_Done_Face(face);
                     FT_Done_FreeType(library);
                     return GlyphSize;
@@ -672,7 +672,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
 #endif
 
-        //* Insert the remainder of 'NeedFillChar' left to right
+        //* Insert the remainder of 'NeedFillChar' from right to left
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
                (InsertedFillChar < NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
