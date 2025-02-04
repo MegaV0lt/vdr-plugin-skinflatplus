@@ -672,7 +672,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 DecorBorderDraw(ib);
             }
         }
-    }
+    }  // m_Recording
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {

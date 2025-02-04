@@ -235,6 +235,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::SetEvents()");
+#endif
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
@@ -253,7 +256,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     cString SeenDur {""};
     int SeenDurWidth {0}, SeenDurMaxWidth {0};
-    int MaxAvailableWidth {0};
+    int MaxAvailWidth {0};
 
     int EventDuration {0};
 
@@ -313,52 +316,59 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
             SeenDurWidth = m_FontSml->Width(*SeenDur) + m_FontSml->Width("  ");
             SeenDurMaxWidth = std::max(StrTimeWidth, SeenDurWidth);
-            MaxAvailableWidth = m_ChannelWidth - left - SeenDurMaxWidth;
+            MaxAvailWidth = m_ChannelWidth - left - SeenDurMaxWidth;
+#ifdef DEBUGFUNCSCALL
+            dsyslog("   EpgWidth: %d, EpgShortWidth: %d, MaxAvailWidth: %d", EpgWidth, EpgShortWidth, MaxAvailWidth);
+            dsyslog("   left: %d, m_ChannelWidth: %d, SeenDurMaxWidth: %d", left, m_ChannelWidth, SeenDurMaxWidth);
+            dsyslog("   IsRec: %d, RecWidth: %d", IsRec, RecWidth);
+#endif
+            // Draw EPG info
+            if (Config.ChannelShowStartTime) {
+                ChanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, TopEpg), *StartTime, Theme.Color(EpgColor),
+                                               Theme.Color(clrChannelBg), m_Font);
+            }
 
-            // Draw EPG
+            if ((EpgWidth > MaxAvailWidth) && Config.ScrollerEnable) {
+                Scrollers.AddScroller(*Epg,
+                                      cRect(Config.decorBorderChannelSize + left,
+                                            Config.decorBorderChannelSize + m_ChannelHeight - m_HeightBottom + TopEpg,
+                                            MaxAvailWidth - ((IsRec) ? RecWidth + m_MarginItem2 : 0),
+                                            m_FontHeight),
+                                      Theme.Color(EpgColor), clrTransparent, m_Font);
+            } else {
+                ChanInfoBottomPixmap->DrawText(cPoint(left, TopEpg), *Epg, Theme.Color(EpgColor),
+                                               Theme.Color(clrChannelBg), m_Font, MaxAvailWidth);
+            }
+
+            if (IsRec) {
+                ChanInfoBottomPixmap->DrawText(
+                    cPoint(left +
+                               ((EpgWidth > MaxAvailWidth) ? MaxAvailWidth - m_MarginItem : EpgWidth + m_MarginItem) -
+                               RecWidth,
+                           TopEpg),
+                    "REC", Theme.Color((IsPresent) ? clrChannelRecordingPresentFg : clrChannelRecordingFollowFg),
+                    Theme.Color((IsPresent) ? clrChannelRecordingPresentBg : clrChannelRecordingFollowBg), m_FontSml);
+                IsRec = false;  // Reset for next event
+            }
+
+            if ((EpgShortWidth > MaxAvailWidth) && Config.ScrollerEnable) {
+                Scrollers.AddScroller(
+                    *EpgShort,
+                    cRect(Config.decorBorderChannelSize + left,
+                          Config.decorBorderChannelSize + m_ChannelHeight - m_HeightBottom + TopEpg + m_FontHeight,
+                          MaxAvailWidth, m_FontSmlHeight),
+                    Theme.Color(EpgColor), clrTransparent, m_FontSml);
+            } else {
+                ChanInfoBottomPixmap->DrawText(cPoint(left, TopEpg + m_FontHeight), *EpgShort, Theme.Color(EpgColor),
+                                               Theme.Color(clrChannelBg), m_FontSml, MaxAvailWidth);
+            }
+
             ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - StrTimeWidth - m_MarginItem2, TopEpg), *StrTime,
                                            Theme.Color(EpgColor), Theme.Color(clrChannelBg), m_FontSml, StrTimeWidth, 0,
                                            taRight);
             ChanInfoBottomPixmap->DrawText(cPoint(m_ChannelWidth - SeenDurWidth - m_MarginItem2, TopSeen), *SeenDur,
                                            Theme.Color(EpgColor), Theme.Color(clrChannelBg), m_FontSml, SeenDurWidth, 0,
                                            taRight);
-
-            if (Config.ChannelShowStartTime) {
-                ChanInfoBottomPixmap->DrawText(cPoint(StartTimeLeft, TopEpg), *StartTime, Theme.Color(EpgColor),
-                                               Theme.Color(clrChannelBg), m_Font);
-            }
-
-            if ((EpgWidth > MaxAvailableWidth) && Config.ScrollerEnable) {
-                Scrollers.AddScroller(*Epg,
-                                      cRect(Config.decorBorderChannelSize + left,
-                                            Config.decorBorderChannelSize + m_ChannelHeight - m_HeightBottom + TopEpg,
-                                            (IsRec) ? MaxAvailableWidth - m_MarginItem - RecWidth : MaxAvailableWidth,
-                                            m_FontHeight),
-                                      Theme.Color(EpgColor), clrTransparent, m_Font);
-            } else {
-                ChanInfoBottomPixmap->DrawText(cPoint(left, TopEpg), *Epg, Theme.Color(EpgColor),
-                                               Theme.Color(clrChannelBg), m_Font, MaxAvailableWidth);
-            }
-
-            if ((EpgShortWidth > MaxAvailableWidth) && Config.ScrollerEnable) {
-                Scrollers.AddScroller(
-                    *EpgShort,
-                    cRect(Config.decorBorderChannelSize + left,
-                          Config.decorBorderChannelSize + m_ChannelHeight - m_HeightBottom + TopEpg + m_FontHeight,
-                          MaxAvailableWidth, m_FontSmlHeight),
-                    Theme.Color(EpgColor), clrTransparent, m_FontSml);
-            } else {
-                ChanInfoBottomPixmap->DrawText(cPoint(left, TopEpg + m_FontHeight), *EpgShort, Theme.Color(EpgColor),
-                                               Theme.Color(clrChannelBg), m_FontSml, MaxAvailableWidth);
-            }
-
-            if (IsRec) {
-                ChanInfoBottomPixmap->DrawText(
-                    cPoint(left + EpgWidth + m_MarginItem - RecWidth, TopEpg), "REC",
-                    Theme.Color((IsPresent) ? clrChannelRecordingPresentFg : clrChannelRecordingFollowFg),
-                    Theme.Color((IsPresent) ? clrChannelRecordingPresentBg : clrChannelRecordingFollowBg), m_FontSml);
-                IsRec = false;  // Reset for next event
-            }
         }  // if (Event)
     }  // for
 
