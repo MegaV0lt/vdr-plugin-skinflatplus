@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: vdr-skinflatplus 1.0.1\n"
+"Project-Id-Version: vdr-skinflatplus 1.1.8\n"
 "Report-Msgid-Bugs-To: <see README>\n"
 "POT-Creation-Date: 2017-05-06 16:13+0200\n"
-"PO-Revision-Date: 2024-01-27 10:09+0100\n"
+"PO-Revision-Date: 2025-02-27 10:09+0100\n"
 "Last-Translator: Martin Schirrmacher\n"
 "Language-Team: Martin Schirrmacher\n"
 "Language: de_DE\n"

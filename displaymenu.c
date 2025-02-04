@@ -18,7 +18,7 @@
 #include "./services/scraper2vdr.h"
 
 #include "./flat.h"
-#include "./locale"
+// #include "./locale"
 
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
@@ -4374,7 +4374,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
-
     std::vector<std::string> files;
     files.reserve(32);  // Set to at least 32 entry's
 
@@ -4396,8 +4395,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     std::sort(files.begin(), files.end(), StringCompare);
 
     cString str {""};
-    const std::size_t FilesSize {files.size()};
-    if (FilesSize == 0) {
+    if (files.size() == 0) {
         str = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
         ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4413,23 +4411,25 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         const struct ItemData {
             const char *key;
             const char *label;
-        } items[] {{"sys_version", "System Version"},
-                   {"kernel_version", "Kernel Version"},
-                   {"uptime", "Uptime"},
-                   {"load", "Load"},
-                   {"processes", "Processes"},
-                   {"mem_usage", "Memory Usage"},
-                   {"swap_usage", "Swap Usage"},
-                   {"root_usage", "Root Usage"},
-                   {"video_usage", "Video Usage"},
-                   {"vdr_cpu_usage", "VDR CPU Usage"},
-                   {"vdr_mem_usage", "VDR MEM Usage"},
-                   {"cpu", "Temp CPU"},
-                   {"gpu", "Temp GPU"},
-                   {"pccase", "Temp PC-Case"},
-                   {"motherboard", "Temp MB"},
-                   {"updates", "Updates"},
-                   {"security_updates", "Security Updates"}};
+        } items[] {
+            {"sys_version", "System Version"},
+            {"kernel_version", "Kernel Version"},
+            {"uptime", "Uptime"},
+            {"load", "Load"},
+            {"processes", "Processes"},
+            {"mem_usage", "Memory Usage"},
+            {"swap_usage", "Swap Usage"},
+            {"root_usage", "Root Usage"},
+            {"video_usage", "Video Usage"},
+            {"vdr_cpu_usage", "VDR CPU Usage"},
+            {"vdr_mem_usage", "VDR MEM Usage"},
+            {"cpu", "Temp CPU"},
+            {"gpu", "Temp GPU"},
+            {"pccase", "Temp PC-Case"},
+            {"motherboard", "Temp MB"},
+            {"updates", "Updates"},
+            {"security_updates", "Security Updates"}
+        };
 
         for (const auto &FileName : files) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
