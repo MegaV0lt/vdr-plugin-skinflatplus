@@ -100,7 +100,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-        esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
+        isyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
         return pixmap;
     }
 
