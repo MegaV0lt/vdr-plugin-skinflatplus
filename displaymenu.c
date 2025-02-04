@@ -4542,16 +4542,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     int CountTemps {0};
 
-    cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
+    const cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
     if (!isempty(*TempCPU)) ++CountTemps;
 
-    cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
+    const cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
     if (!isempty(*TempCase)) ++CountTemps;
 
-    cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
+    const cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
     if (!isempty(*TempMB)) ++CountTemps;
 
-    cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
+    const cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
     if (!isempty(*TempGPU)) ++CountTemps;
 
     if (CountTemps == 0) {
