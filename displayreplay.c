@@ -346,7 +346,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
     const int TopSecs {FontAscender - FontSecsAscender};
 
-    constexpr ulong CharCode {0x00000030};  // Zero: U+0030
+    constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
     const int TopOffset {FontAscender - GlyphSize};
 
@@ -552,7 +552,10 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // HasMarks
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
-    if (Config.PlaybackShowEndTime > 0) {  // 1 = End time, 2 = End time and cutted end time
+    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update only once per second
+    if (Config.PlaybackShowEndTime > 0 && (m_LastEndTimeUpdate != CurTime)) {
+        // 1 = End time, 2 = End time and cutted end time
+        m_LastEndTimeUpdate = CurTime;
         left = m_MarginItem;
         //* Image instead of 'ends at:' text
         /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
@@ -569,7 +572,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         left += m_Font->Width(*EndTime) + Spacer;
 
         //* Draw end time of cutted recording with cutted symbol
-        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit >= 0) {
+        if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit > 0) {
             const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
             EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));  // HH:MM
             if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
@@ -781,7 +784,7 @@ void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
 
-    constexpr ulong CharCode {0x00000030};  // Zero: U+0030
+    constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
     ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
     ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
