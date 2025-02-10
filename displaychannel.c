@@ -21,7 +21,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     // From bottom to top (2 * EPG + 2 * EPGsml)
     m_HeightBottom = m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem;  // Top, Bottom, Between
     m_HeightImageLogo = m_HeightBottom;  // High of channel logo image
-    if (Config.SignalQualityShow)
+    if (Config.SignalQualityShow || Config.ChannelDvbapiInfoShow)
         m_HeightBottom += std::max(m_FontSmlHeight, (Config.decorProgressSignalSize * 2) + m_MarginItem) + m_MarginItem;
     else if (Config.ChannelIconsShow)
         m_HeightBottom += m_FontSmlHeight + m_MarginItem;
@@ -437,24 +437,21 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     const cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
 
     const int left {m_MarginItem2};
-    int top {m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem};
-    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
-                    - m_MarginItem;
+    int top {m_HeightBottom -
+             (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
+
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
     const int ProgressLeft {left + std::max(SignalFont->Width("STR "), SignalFont->Width("SNR ")) + m_MarginItem};
-    const int SignalWidth {m_ChannelWidth / 2};
-    const int ProgressWidth {SignalWidth / 2 - ProgressLeft - m_MarginItem};
+    const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
-    // left = SignalWidth / 2 + m_MarginItem;
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), SignalFont);
-    // ProgressWidth = SignalWidth - ProgressLeft - m_MarginItem;
     ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
@@ -486,11 +483,9 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
-    dsyslog("   CAID: %d", ecmInfo.caid);
-    dsyslog("   Card system: %s", *ecmInfo.cardsystem);
+    dsyslog("   CAID: %d, Card system: %s", ecmInfo.caid, *ecmInfo.cardsystem);
     dsyslog("   Reader: %s", *ecmInfo.reader);
-    dsyslog("   From: %s", *ecmInfo.from);
-    dsyslog("   Hops: %d", ecmInfo.hops);
+    dsyslog("   From: %s, Hops: %d", *ecmInfo.from, ecmInfo.hops);
     dsyslog("   Protocol: %s", *ecmInfo.protocol);
 #endif
 
@@ -498,11 +493,16 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         return;
 
     int left {m_SignalStrengthRight + m_MarginItem2};
-    int top {m_FontHeight2 + m_FontSmlHeight * 2 + m_MarginItem};
-    top += std::max(m_FontSmlHeight, Config.decorProgressSignalSize) - (Config.decorProgressSignalSize * 2)
-                     - m_MarginItem2;
+    const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
 
-    const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, (Config.decorProgressSignalSize * 2) + m_MarginItem);
+    const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, ProgressBarHeight);
+
+    const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
+    constexpr ulong CharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
+    const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, ProgressBarHeight);  // Narrowing conversion
+    const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
+    const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
+        TopOffset};  // One margin for progress bar to bottom
 
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),

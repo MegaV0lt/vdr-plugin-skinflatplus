@@ -1,9 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2025-xx-xx: Version 1.1.8
+- [fix] Fix 'jumping' end times - Update only once per second
 - [add] Add audio icon (dolby/stereo) to replay and channel status
 - [update] Better positioning for channel status icons (crypted/uncrypted)
 - [update] Keep 'REC' visible when event title is scrolling in channel status
+- [update] Optimize alignment in SignalQualityDraw() and DvbapiInfoDraw()
 - [update] Some internal optimizations
 
 2025-01-28: Version 1.1.7
