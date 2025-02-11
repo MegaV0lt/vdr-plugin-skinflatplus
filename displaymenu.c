@@ -2539,7 +2539,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetEvent second run with no scrollbars ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3275,7 +3274,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetRecording second run with no scrollbar ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3668,8 +3666,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
                 if (Rec->IsNew()) ++RecNewCount;
             }
         }  // for
-    } else {
-        // dsyslog("flatPlus: GetRecCounts() Count all!");
+    } else {  // All recordings
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
             ++RecCount;

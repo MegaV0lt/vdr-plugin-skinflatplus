@@ -183,7 +183,6 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 
 cString GetCurrentAudioIcon() {
     const eTrackType CurrentAudioTrack {cDevice::PrimaryDevice()->GetCurrentAudioTrack()};
-    dsyslog("flatPlus: Current audio track: %d", CurrentAudioTrack);
     return (IS_AUDIO_TRACK(CurrentAudioTrack))   ? "audio_stereo"
            : (IS_DOLBY_TRACK(CurrentAudioTrack)) ? "audio_dolby"
                                                  : "";  // No audio?
@@ -569,11 +568,10 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
         }
     }
 
-    // Return 0 if anything went wrong
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
-    return 0;
+    return 0;  // Return 0 if anything went wrong
 }
 
 
@@ -774,7 +772,9 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Delim = p;
                 Blank = nullptr;
             } else {
-                // dsyslog("flatPlus: TextFloatingWrapper::Set() skipping double delimiter char!");
+#ifdef DEBUGFUNCSCALL
+                dsyslog("   Skipping double delimiter char '%c'", *p);
+#endif
             }
         }
         p += sl;

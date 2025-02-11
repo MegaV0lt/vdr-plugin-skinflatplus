@@ -151,7 +151,6 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
             JustifyLine(Line, Font, (i < FloatLines) ? TextWidthLeft : TextWidthFull);
 
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
-        // dsyslog("flatPlus: Adding floatline (%d): %s", i, WrapperFloat.GetLine(i));
     }
 
     const cRect ImagePos {TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height()};
