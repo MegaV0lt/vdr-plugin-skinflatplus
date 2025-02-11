@@ -3863,7 +3863,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     if (Config.MainMenuWidgetWeatherShow)
         widgets.emplace_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
 
-    std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
+    std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
     std::pair<int, std::string> PairWidget {};
     std::string widget {""};
     widget.reserve(19);  // Size of 'system_information'
@@ -4290,12 +4290,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    std::vector<std::pair<time_t, std::string>> Recs;
+    std::vector<std::pair<time_t, cString>> Recs;
     Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
-    cString DateTime {""}, Length {""};
-    std::string StrRec {""};
-    StrRec.reserve(128);
+    cString DateTime {""}, Length {""}, StrRec {""};
     div_t TimeHM {0, 0};
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
@@ -4304,13 +4302,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
-        StrRec = *(cString::sprintf("%s - %s", *DateTime, Rec->Name()));
+        StrRec = cString::sprintf("%s - %s", *DateTime, Rec->Name());
         Recs.emplace_back(std::make_pair(RecStart, StrRec));
     }
 
     // Sort by RecStart
-    std::sort(Recs.begin(), Recs.end(), PairCompareTimeStringDesc);
-    std::pair<time_t, std::string> PairRec {};
+    std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
+    std::pair<time_t, cString> PairRec {};
     int index {0};
     cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
@@ -4319,7 +4317,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
 
         PairRec = Recs.back();
         Recs.pop_back();
-        Rec = PairRec.second.c_str();
+        Rec = PairRec.second;
 
         ContentWidget.AddText(*Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,

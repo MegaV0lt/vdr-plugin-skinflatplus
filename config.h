@@ -20,8 +20,9 @@
 
 
 bool StringCompare(const std::string &left, const std::string &right);
-bool PairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j);
-bool pairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);  // NOLINT
+/* bool PairCompareTimeStringDesc(const std::pair<time_t, std::string>&i, const std::pair<time_t, std::string>&j); */
+bool PairCompareTimeString(const std::pair<time_t, cString>&i, const std::pair<time_t, cString>&j);
+bool PairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);  // NOLINT
 int RoundUp(int NumToRound, int multiple);
 
 class cFlatConfig {
