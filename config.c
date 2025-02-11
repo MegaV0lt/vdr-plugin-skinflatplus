@@ -464,10 +464,6 @@ bool StringCompare(const std::string &left, const std::string &right) {
     return left.size() < right.size();
 }
 
-/* bool PairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
-    return i.first < j.first;
-} */
-
 bool PairCompareTimeString(const std::pair<time_t, cString> &i, const std::pair<time_t, cString> &j) {
     return i.first < j.first;
 }

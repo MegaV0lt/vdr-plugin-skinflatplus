@@ -108,8 +108,6 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
-// void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
-
 cPlugin *GetScraperPlugin() {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
     if (!pScraper)  // If it doesn't exit, try scraper2vdr
@@ -135,19 +133,13 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
 
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     /* Resolutions
-    7680×4320 (UHD-2 / 8K)
-    3840×2160 (UHD-1 / 4K)
+    7680×4320 (UHD-2 / 8K)        3840×2160 (UHD-1 / 4K)
     2560x1440 (QHD) //? Is that used somewhere on sat/cable?
-    1920x1080 (HD1080 Full HDTV)
-    1440x1080 (HD1080 DV)
-    1280x720 (HD720)
-    960x720 (HD720 DV)
-    720x576 (PAL)
-    704x576 (PAL)
-    544x576 (PAL)
-    528x576 (PAL)
-    480x576 (PAL SVCD)
-    352x576 (PAL CVD) */
+    1920x1080 (HD1080 Full HDTV)  1440x1080 (HD1080 DV)
+    1280x720 (HD720)              960x720 (HD720 DV)
+    720x576 (PAL)                 704x576 (PAL)
+    544x576 (PAL)                 528x576 (PAL)
+    480x576 (PAL SVCD)            352x576 (PAL CVD) */
 
     static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",

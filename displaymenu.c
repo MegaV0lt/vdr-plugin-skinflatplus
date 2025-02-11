@@ -326,10 +326,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcRecording:
         IconName = "menuIcons/Recordings";
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
-        /*
-        if(RecordingsSortMode == rsmName) TopBarSetMenuIconRight("menuIcons/RecsSortName");
-        else if(RecordingsSortMode == rsmTime) TopBarSetMenuIconRight("menuIcons/RecsSortDate");
-        */
         break;
     case mcSetup: IconName = "menuIcons/Setup"; break;
     case mcCommand: IconName = "menuIcons/Commands"; break;
@@ -348,7 +344,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     // - in any menu and Config.DiskUsageShow > 1
     // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
     if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
-        ((m_MenuCategory && (Config.DiskUsageShow > 1))) /* || (Config.DiskUsageShow == 3)*/)
+        ((m_MenuCategory && (Config.DiskUsageShow > 1))))
         TopBarEnableDiskUsage();
 }
 
@@ -669,7 +665,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
 
-    // int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -678,7 +673,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    Width = std::max(/*w*/m_Font->Width("9999"), Width);  // Minimal width for channel number
+    //* At least four digits width in channel list because of different sort modes
+    Width = std::max(m_Font->Width("9999"), Width);
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1111,8 +1107,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     const cChannel *Channel = Timer->Channel();
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    // int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-    const int Width {std::max(/*w*/m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
+    const int Width {std::max(m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1350,12 +1345,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
         int w = m_Font->Width(ws); */
 
-        w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+        w = m_Font->Width("9999");
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
-            // const int Width = m_Font->Width(*Buffer);
-            w = std::max(w, /*Width*/m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
+            w = std::max(w, m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
