@@ -3501,13 +3501,13 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
-    cString SortIcon("SortUnknown");
+    cString SortIcon {""};  // SortUnknown
     switch (MenuSortMode) {
     case msmTime: SortIcon = "SortDate"; break;
     case msmName: SortIcon = "SortName"; break;
     case msmNumber: SortIcon = "SortNumber"; break;
     case msmProvider: SortIcon = "SortProvider"; break;
-    case msmUnknown: return;  // Do not set search icon if it is unknown
+    case msmUnknown: return;  // Do not set sort icon if mode is unknown
     default: return;
     }
 
