@@ -42,7 +42,7 @@
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
 
-extern time_t m_RemoteTimersLastRefresh;
+// extern time_t m_RemoteTimersLastRefresh;
 
 class cFlatDisplayMenu;
 extern cTheme Theme;

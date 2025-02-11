@@ -41,7 +41,7 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive {false};
-time_t m_RemoteTimersLastRefresh {0};
+// time_t m_RemoteTimersLastRefresh {0};
 
 cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
     Display_Menu = nullptr;
