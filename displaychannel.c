@@ -119,26 +119,45 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     m_LastScreenWidth = -1;
 
     bool IsGroup {false};
-    cString ChannelName {""}, ChannelNumber {""};
+    cString ChannelName {""}, ChannelNumber {""}, TransponderInfo {""};
     if (Channel) {
         m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         IsGroup = Channel->GroupSep();
 
         ChannelName = Channel->Name();
-        if (!IsGroup)
+        if (!IsGroup) {
             ChannelNumber = cString::sprintf("%d%s", Channel->Number(), (Number) ? "-" : "");
-        else if (Number)
+#ifdef SHOW_TRANSPONDERINFO
+            // Config.ChannelShowTransponderInfo (Hidden option?)
+            if (!Number) {
+                const int tp {Channel->Transponder()};
+                const int f {(tp > 200000) ? (tp - 200000) : (tp > 100000) ? (tp - 100000) : tp};
+                // dsyslog("Channel: %s, Frequency: %d, Transponder: %d", *ChannelName, f, tp);
+                const cString pol = (tp > 200000) ? "V" : (tp > 100000) ? "H" : "?";
+                const cString band = (f > Setup.LnbSLOF) ? "H" : "L";
+                // Frequency, Polarity (V/H), Band (H/L)
+                TransponderInfo = cString::sprintf("  (%d %s%s)", f, *pol, *band);
+            }
+#endif
+        } else if (Number) {
             ChannelNumber = cString::sprintf("%d-", Number);
+        }
 
         m_CurChannel = Channel;
     } else {
         ChannelName = ChannelString(NULL, 0);
-    }
+    }  // if (Channel)
+
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
 
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
     ChanInfoTopPixmap->DrawText(cPoint(50, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), m_Font);
+
+    if (!isempty(*TransponderInfo)) {
+        ChanInfoTopPixmap->DrawText(cPoint(50 + m_Font->Width(*ChannelString), 0), *TransponderInfo,
+                                    Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg), m_Font);
+    }
 
     PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
