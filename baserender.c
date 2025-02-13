@@ -1223,11 +1223,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         switch (Type) {
         default:
         case 0: {
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1237,11 +1233,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 1: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1259,12 +1251,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 2: {
             const int Middle {Left + m_ScrollBarWidth / 2};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
-
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
             // Bar
             Pixmap->DrawRectangle(cRect(Left, ScrollTop, m_ScrollBarWidth, ScrollHeight), Config.decorScrollBarBarFg);
@@ -1273,12 +1260,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 3: {
             const int DotHeight {m_ScrollBarWidth / 2};
             const int Middle {Left + DotHeight};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
-
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1346,7 +1328,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
 
             break;
         }
-        }
+        }  // switch Type
     }  // Total > 0
 }
 
