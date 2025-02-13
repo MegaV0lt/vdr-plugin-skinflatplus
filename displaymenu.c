@@ -3543,7 +3543,7 @@ void cFlatDisplayMenu::Flush() {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end {ItemsBorder.end()};
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
             (*it) = ib;

@@ -453,8 +453,8 @@ void cFlatConfig::Init() {
 }
 
 bool StringCompare(const std::string &left, const std::string &right) {
-    auto lit = left.begin(), rit = right.begin();
-    auto lend = left.end(), rend = right.end();
+    auto lit {left.begin()}, rit {right.begin()};
+    auto lend {left.end()}, rend {right.end()};
     while (lit != lend && rit != rend) {
         if (tolower(*lit) < tolower(*rit)) return true;
         if (tolower(*lit) > tolower(*rit)) return false;

@@ -67,7 +67,7 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 
 void cComplexContent::CalculateDrawPortHeight() {
     m_DrawPortHeight = 0;
-    std::vector<cSimpleContent>::iterator it, end = Contents.end();
+    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
     for (it = Contents.begin(); it != end; ++it) {
         m_DrawPortHeight = std::max(m_DrawPortHeight, (*it).GetBottom());
     }
@@ -78,7 +78,7 @@ void cComplexContent::CalculateDrawPortHeight() {
 
 int cComplexContent::BottomContent() {
     int Bottom {0};
-    std::vector<cSimpleContent>::iterator it, end = Contents.end();
+    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
     for (it = Contents.begin(); it != end; ++it) {
         Bottom = std::max(Bottom, (*it).GetBottom());
     }
@@ -164,7 +164,7 @@ void cComplexContent::AddRect(cRect Position, tColor ColorBg) {
 
 void cComplexContent::Draw() {
     m_IsShown = true;
-    std::vector<cSimpleContent>::iterator it, end = Contents.end();
+    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
     for (it = Contents.begin(); it != end; ++it) {
         if ((*it).GetContentType() == CT_Image)
             (*it).Draw(PixmapImage);
