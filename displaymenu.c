@@ -1647,12 +1647,16 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
         }
     } else if (Event) {
-        try {
+        if (isempty(Event->Title())) {
+            dsyslog("flatPlus: SetItemEvent() Event title is empty!");
+        } else {
+        // try {
             // Extract date from separator
             std::string_view sep {Event->Title()};
             if (sep.length() > 12) {
                 const std::size_t found {sep.find(" -")};
                 if (found >= 10) {
+                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
                     const std::string date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
@@ -1660,16 +1664,18 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {
+                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
             } else {
+                dsyslog("flatPlus: SetItemEvent() Event title too short!");
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
-        } catch (...) {
-            MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
-                                 m_MenuItemWidth - Left - m_MarginItem);
+        // } catch (...) {
+        //    MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
+        //                         m_MenuItemWidth - Left - m_MarginItem);
         }
     }
 
