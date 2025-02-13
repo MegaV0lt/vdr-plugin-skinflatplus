@@ -149,13 +149,13 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     }  // if (Channel)
 
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
-
+    const int left {m_MarginItem * 10};  // 50 Pixel
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
-    ChanInfoTopPixmap->DrawText(cPoint(50, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
+    ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), m_Font);
 
     if (!isempty(*TransponderInfo)) {
-        ChanInfoTopPixmap->DrawText(cPoint(50 + m_Font->Width(*ChannelString), 0), *TransponderInfo,
+        ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), 0), *TransponderInfo,
                                     Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg), m_Font);
     }
 
