@@ -552,10 +552,11 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // HasMarks
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
-    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update only once per second
-    if (Config.PlaybackShowEndTime > 0 && (m_LastEndTimeUpdate != CurTime)) {
+    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update once per second or 'm_Current' current changed
+    if (Config.PlaybackShowEndTime > 0 && (m_LastEndTimeUpdate != CurTime || strcmp(*m_Current, *m_LastCurrent) != 0)) {
         // 1 = End time, 2 = End time and cutted end time
         m_LastEndTimeUpdate = CurTime;
+        m_LastCurrent = m_Current;
         left = m_MarginItem;
         //* Image instead of 'ends at:' text
         /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
