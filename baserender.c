@@ -640,24 +640,20 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     if (!MessagePixmap || !MessageIconPixmap)
         return;
 
-    tColor Col = Theme.Color(clrMessageInfo);
-    cString Icon("message_info");
-    switch (Type) {
-    case mtInfo:  // Already preset
-        break;
-    case mtWarning:
-        Col = Theme.Color(clrMessageWarning);
-        Icon = "message_warning";
-        break;
-    case mtStatus:
-        Col = Theme.Color(clrMessageStatus);
-        Icon = "message_status";
-        break;
-    case mtError:
-        Col = Theme.Color(clrMessageError);
-        Icon = "message_error";
-        break;
-    }
+    static const struct {
+        tColor color;
+        const char* icon;
+    } messageSettings[] = {
+        {Theme.Color(clrMessageStatus), "message_status"},    // mtStatus = 0
+        {Theme.Color(clrMessageInfo), "message_info"},        // mtInfo
+        {Theme.Color(clrMessageWarning), "message_warning"},  // mtWarning
+        {Theme.Color(clrMessageError), "message_error"}       // mtError
+    };
+
+    const int typeIndex {static_cast<int>(Type)};
+    tColor Col {messageSettings[typeIndex].color};
+    cString Icon = messageSettings[typeIndex].icon;
+
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
