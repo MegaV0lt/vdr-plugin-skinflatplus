@@ -3500,7 +3500,7 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
-    const char* SortIcons[] {"SortDate", "SortName", "SortNumber", "SortProvider"};
+    const char* SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
     if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) {
         TopBarSetMenuIconRight(SortIcons[MenuSortMode - 1]);
     }
