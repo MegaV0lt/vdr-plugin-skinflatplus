@@ -26,6 +26,9 @@ PLUGIN = skinflatplus
 #   vdrlogo_yavdr
 SKINFLATPLUS_VDRLOGO = vdrlogo_default
 
+# Akćtivate to show transponder info in channel status
+#DEFINES += -DSHOW_TRANSPONDERINFO
+
 #DEFINES += -DDEBUGIMAGELOADTIME
 #DEFINES += -DDEBUGEPGTIME
 #DEFINES += -DDEBUGFUNCSCALL

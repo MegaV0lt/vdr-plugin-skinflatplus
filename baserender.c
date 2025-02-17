@@ -78,7 +78,6 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
     tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) {
-        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
         return;
     }
 
@@ -640,24 +639,20 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     if (!MessagePixmap || !MessageIconPixmap)
         return;
 
-    tColor Col = Theme.Color(clrMessageInfo);
-    cString Icon("message_info");
-    switch (Type) {
-    case mtInfo:  // Already preset
-        break;
-    case mtWarning:
-        Col = Theme.Color(clrMessageWarning);
-        Icon = "message_warning";
-        break;
-    case mtStatus:
-        Col = Theme.Color(clrMessageStatus);
-        Icon = "message_status";
-        break;
-    case mtError:
-        Col = Theme.Color(clrMessageError);
-        Icon = "message_error";
-        break;
-    }
+    static const struct {
+        tColor color;
+        const char* icon;
+    } messageSettings[] = {
+        {Theme.Color(clrMessageStatus), "message_status"},    // mtStatus = 0
+        {Theme.Color(clrMessageInfo), "message_info"},        // mtInfo
+        {Theme.Color(clrMessageWarning), "message_warning"},  // mtWarning
+        {Theme.Color(clrMessageError), "message_error"}       // mtError
+    };
+
+    const int typeIndex {static_cast<int>(Type)};
+    tColor Col {messageSettings[typeIndex].color};
+    cString Icon = messageSettings[typeIndex].icon;
+
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
@@ -1223,11 +1218,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         switch (Type) {
         default:
         case 0: {
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1237,11 +1228,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 1: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1259,12 +1246,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 2: {
             const int Middle {Left + m_ScrollBarWidth / 2};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
-
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
             // Bar
             Pixmap->DrawRectangle(cRect(Left, ScrollTop, m_ScrollBarWidth, ScrollHeight), Config.decorScrollBarBarFg);
@@ -1273,12 +1255,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 3: {
             const int DotHeight {m_ScrollBarWidth / 2};
             const int Middle {Left + DotHeight};
-            int LineWidth {6};
-            if (m_ScrollBarWidth <= 10)
-                LineWidth = 2;
-            else if (m_ScrollBarWidth <= 20)
-                LineWidth = 4;
-
+            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1346,7 +1323,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
 
             break;
         }
-        }
+        }  // switch Type
     }  // Total > 0
 }
 
@@ -1375,7 +1352,7 @@ void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    std::vector<sDecorBorder>::iterator it, end = Borders.end();
+    std::vector<sDecorBorder>::iterator it, end {Borders.end()};
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
             DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);

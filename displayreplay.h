@@ -44,6 +44,9 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         int m_ScreenHeight {0};
         double m_ScreenAspect {0.0};
 
+        time_t m_LastEndTimeUpdate {0};
+        cString m_LastCurrent {""};
+
         // TVScraper
         cRect m_TVSRect {0, 0, 0, 0};
 

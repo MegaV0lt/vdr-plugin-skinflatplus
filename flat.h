@@ -42,7 +42,7 @@
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
 
-extern time_t m_RemoteTimersLastRefresh;
+// extern time_t m_RemoteTimersLastRefresh;
 
 class cFlatDisplayMenu;
 extern cTheme Theme;
@@ -274,6 +274,7 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
 cString GetRecordingFormatIcon(const cRecording *Recording);
+cString GetCurrentAudioIcon();
 cString GetRecordingErrorIcon(int RecInfoErrors);
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
 

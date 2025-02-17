@@ -7,8 +7,10 @@
  */
 #include "./config.h"
 
-#include <vector>
 #include <algorithm>
+#include <utility>
+#include <vector>
+
 cFlatConfig::cFlatConfig() {
     RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
     RecordingOldValue.reserve(64);
@@ -451,8 +453,8 @@ void cFlatConfig::Init() {
 }
 
 bool StringCompare(const std::string &left, const std::string &right) {
-    auto lit = left.begin(), rit = right.begin();
-    auto lend = left.end(), rend = right.end();
+    auto lit {left.begin()}, rit {right.begin()};
+    auto lend {left.end()}, rend {right.end()};
     while (lit != lend && rit != rend) {
         if (tolower(*lit) < tolower(*rit)) return true;
         if (tolower(*lit) > tolower(*rit)) return false;
@@ -462,11 +464,11 @@ bool StringCompare(const std::string &left, const std::string &right) {
     return left.size() < right.size();
 }
 
-bool PairCompareTimeStringDesc(const std::pair<time_t, std::string> &i, const std::pair<time_t, std::string> &j) {
+bool PairCompareTimeString(const std::pair<time_t, cString> &i, const std::pair<time_t, cString> &j) {
     return i.first < j.first;
 }
 
-bool pairCompareIntString(const std::pair<int, std::string> &i, const std::pair<int, std::string> &j) {
+bool PairCompareIntString(const std::pair<int, std::string> &i, const std::pair<int, std::string> &j) {
     return i.first > j.first;
 }
 

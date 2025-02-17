@@ -41,7 +41,7 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive {false};
-time_t m_RemoteTimersLastRefresh {0};
+// time_t m_RemoteTimersLastRefresh {0};
 
 cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
     Display_Menu = nullptr;
@@ -100,15 +100,13 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
-        esyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
+        isyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
         return pixmap;
     }
 
     esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
     return nullptr;
 }
-
-// void inline PixmapFill(cPixmap *Pixmap, tColor Color);  //* See flat.h
 
 cPlugin *GetScraperPlugin() {
     static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
@@ -135,19 +133,13 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
 
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     /* Resolutions
-    7680×4320 (UHD-2 / 8K)
-    3840×2160 (UHD-1 / 4K)
+    7680×4320 (UHD-2 / 8K)        3840×2160 (UHD-1 / 4K)
     2560x1440 (QHD) //? Is that used somewhere on sat/cable?
-    1920x1080 (HD1080 Full HDTV)
-    1440x1080 (HD1080 DV)
-    1280x720 (HD720)
-    960x720 (HD720 DV)
-    720x576 (PAL)
-    704x576 (PAL)
-    544x576 (PAL)
-    528x576 (PAL)
-    480x576 (PAL SVCD)
-    352x576 (PAL CVD) */
+    1920x1080 (HD1080 Full HDTV)  1440x1080 (HD1080 DV)
+    1280x720 (HD720)              960x720 (HD720 DV)
+    720x576 (PAL)                 704x576 (PAL)
+    544x576 (PAL)                 528x576 (PAL)
+    480x576 (PAL SVCD)            352x576 (PAL CVD) */
 
     static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
@@ -187,6 +179,13 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
         }
     }
     return "";
+}
+
+cString GetCurrentAudioIcon() {
+    const eTrackType CurrentAudioTrack {cDevice::PrimaryDevice()->GetCurrentAudioTrack()};
+    return (IS_AUDIO_TRACK(CurrentAudioTrack))   ? "audio_stereo"
+           : (IS_DOLBY_TRACK(CurrentAudioTrack)) ? "audio_dolby"
+                                                 : "";  // No audio?
 }
 
 cString GetRecordingErrorIcon(int RecInfoErrors) {
@@ -560,7 +559,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                 FT_GlyphSlot slot {face->glyph};
                 rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
-                    uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
+                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
                     FT_Done_Face(face);
                     FT_Done_FreeType(library);
                     return GlyphSize;
@@ -569,11 +568,10 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
         }
     }
 
-    // Return 0 if anything went wrong
     FT_Done_Face(face);
     FT_Done_FreeType(library);
     esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
-    return 0;
+    return 0;  // Return 0 if anything went wrong
 }
 
 
@@ -664,7 +662,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
 #endif
 
-        //* Insert the remainder of 'NeedFillChar' left to right
+        //* Insert the remainder of 'NeedFillChar' from right to left
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
                (InsertedFillChar < NeedFillChar)) {
             if (!(isspace(Line[pos - 1]))) {
@@ -774,7 +772,9 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Delim = p;
                 Blank = nullptr;
             } else {
-                // dsyslog("flatPlus: TextFloatingWrapper::Set() skipping double delimiter char!");
+#ifdef DEBUGFUNCSCALL
+                dsyslog("   Skipping double delimiter char '%c'", *p);
+#endif
             }
         }
         p += sl;

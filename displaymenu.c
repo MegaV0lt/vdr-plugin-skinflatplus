@@ -326,10 +326,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcRecording:
         IconName = "menuIcons/Recordings";
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
-        /*
-        if(RecordingsSortMode == rsmName) TopBarSetMenuIconRight("menuIcons/RecsSortName");
-        else if(RecordingsSortMode == rsmTime) TopBarSetMenuIconRight("menuIcons/RecsSortDate");
-        */
         break;
     case mcSetup: IconName = "menuIcons/Setup"; break;
     case mcCommand: IconName = "menuIcons/Commands"; break;
@@ -348,7 +344,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     // - in any menu and Config.DiskUsageShow > 1
     // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
     if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
-        ((m_MenuCategory && (Config.DiskUsageShow > 1))) /* || (Config.DiskUsageShow == 3)*/)
+        ((m_MenuCategory && (Config.DiskUsageShow > 1))))
         TopBarEnableDiskUsage();
 }
 
@@ -546,7 +542,6 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) {
     char s;
     for (; i < TextLength; ++i) {
         s = text.at(i);
-
         if (isdigit(s) && i < 5)  // Up to 4 digits expected
             found = true;
         else
@@ -669,7 +664,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString ws = cString::sprintf("%d", Channels->MaxNumber());
     int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
 
-    // int w {m_Font->Width("9999")};  //* At least four digits in channel list because of different sort modes
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -678,7 +672,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         Width = m_Font->Width(*Buffer);
     }
 
-    Width = std::max(/*w*/m_Font->Width("9999"), Width);  // Minimal width for channel number
+    //* At least four digits width in channel list because of different sort modes
+    Width = std::max(m_Font->Width("9999"), Width);
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1111,8 +1106,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     const cChannel *Channel = Timer->Channel();
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    // int w {m_Font->Width("999")};  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-    const int Width {std::max(/*w*/m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
+    const int Width {std::max(m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1350,12 +1344,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString ws = cString::sprintf("%d", Channels->MaxNumber());
         int w = m_Font->Width(ws); */
 
-        w = m_Font->Width("9999");  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
+        w = m_Font->Width("9999");
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
-            // const int Width = m_Font->Width(*Buffer);
-            w = std::max(w, /*Width*/m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
+            w = std::max(w, m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1653,12 +1646,16 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
         }
     } else if (Event) {
-        try {
+        if (isempty(Event->Title())) {
+            dsyslog("flatPlus: SetItemEvent() Event title is empty!");
+        } else {
+        // try {
             // Extract date from separator
             std::string_view sep {Event->Title()};
             if (sep.length() > 12) {
                 const std::size_t found {sep.find(" -")};
                 if (found >= 10) {
+                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
                     const std::string date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
@@ -1666,16 +1663,18 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {
+                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
             } else {
+                dsyslog("flatPlus: SetItemEvent() Event title too short!");
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
-        } catch (...) {
-            MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
-                                 m_MenuItemWidth - Left - m_MarginItem);
+        // } catch (...) {
+        //    MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
+        //                         m_MenuItemWidth - Left - m_MarginItem);
         }
     }
 
@@ -2545,7 +2544,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetEvent second run with no scrollbars ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3281,7 +3279,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (FirstRun) {        // Second run because not scrolling content. Should be cheap to rerun
             SecondRun = true;  // Only runs when minimal contents fits in area of description
             FirstRun = false;
-            // dsyslog("flatPlus: --- SetRecording second run with no scrollbar ---");
         }
     } while (FirstRun || SecondRun);
 
@@ -3501,17 +3498,11 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
 }
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
-    cString SortIcon("SortUnknown");
-    switch (MenuSortMode) {
-    case msmTime: SortIcon = "SortDate"; break;
-    case msmName: SortIcon = "SortName"; break;
-    case msmNumber: SortIcon = "SortNumber"; break;
-    case msmProvider: SortIcon = "SortProvider"; break;
-    case msmUnknown: return;  // Do not set search icon if it is unknown
-    default: return;
+    // Do not set sort icon if mode is unknown
+    const char* SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
+    if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) {
+        TopBarSetMenuIconRight(SortIcons[MenuSortMode - 1]);
     }
-
-    TopBarSetMenuIconRight(*SortIcon);
 }
 
 void cFlatDisplayMenu::Flush() {
@@ -3551,7 +3542,7 @@ void cFlatDisplayMenu::Flush() {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    std::vector<sDecorBorder>::iterator it, end = ItemsBorder.end();
+    std::vector<sDecorBorder>::iterator it, end {ItemsBorder.end()};
     for (it = ItemsBorder.begin(); it != end; ++it) {
         if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
             (*it) = ib;
@@ -3674,8 +3665,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
                 if (Rec->IsNew()) ++RecNewCount;
             }
         }  // for
-    } else {
-        // dsyslog("flatPlus: GetRecCounts() Count all!");
+    } else {  // All recordings
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
             ++RecCount;
@@ -3863,7 +3853,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     if (Config.MainMenuWidgetWeatherShow)
         widgets.emplace_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
 
-    std::sort(widgets.begin(), widgets.end(), pairCompareIntString);
+    std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
     std::pair<int, std::string> PairWidget {};
     std::string widget {""};
     widget.reserve(19);  // Size of 'system_information'
@@ -4290,12 +4280,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
-    std::vector<std::pair<time_t, std::string>> Recs;
+    std::vector<std::pair<time_t, cString>> Recs;
     Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
-    cString DateTime {""}, Length {""};
-    std::string StrRec {""};
-    StrRec.reserve(128);
+    cString DateTime {""}, Length {""}, StrRec {""};
     div_t TimeHM {0, 0};
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
@@ -4304,13 +4292,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
         DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
 
-        StrRec = *(cString::sprintf("%s - %s", *DateTime, Rec->Name()));
+        StrRec = cString::sprintf("%s - %s", *DateTime, Rec->Name());
         Recs.emplace_back(std::make_pair(RecStart, StrRec));
     }
 
     // Sort by RecStart
-    std::sort(Recs.begin(), Recs.end(), PairCompareTimeStringDesc);
-    std::pair<time_t, std::string> PairRec {};
+    std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
+    std::pair<time_t, cString> PairRec {};
     int index {0};
     cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
@@ -4319,7 +4307,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
 
         PairRec = Recs.back();
         Recs.pop_back();
-        Rec = PairRec.second.c_str();
+        Rec = PairRec.second;
 
         ContentWidget.AddText(*Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4383,7 +4371,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
     std::vector<std::string> files;
-    files.reserve(64);  // Set to at least 64 entry's
+    files.reserve(32);  // Set to at least 32 entry's
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
@@ -4394,16 +4382,15 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     while ((e = d.Next()) != nullptr) {
         FileName = e->d_name;
         found = FileName.find('_');
-        if (found != std::string::npos) {
+        if (found != std::string::npos) {  // File name contains '_'
             num = FileName.substr(0, found);
-            if (atoi(num.c_str()) > 0)
-                files.emplace_back(e->d_name);
+            if (atoi(num.c_str()) > 0)  // Number is greater than zero
+                files.emplace_back(FileName);
         }
     }
-    cString str {""};
-    int Column {1};
-    int ContentLeft {m_MarginItem};
     std::sort(files.begin(), files.end(), StringCompare);
+
+    cString str {""};
     const std::size_t FilesSize {files.size()};
     if (FilesSize == 0) {
         str = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
@@ -4411,269 +4398,73 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        std::string item {""}, ItemContent {""};
+        std::string item {""}, ItemContent {""}, ItemFilename {""};
         item.reserve(17);
         ItemContent.reserve(16);
-        cString ItemFilename {""};
-        for (uint i {0}; i < FilesSize; ++i) {
-            // Check for height
-            if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
-                break;
+        ItemFilename.reserve(128);
+        int Column {1};
+        int ContentLeft {m_MarginItem};
 
-            FileName = files[i];
+        const struct ItemData {
+            const char *key;
+            const char *label;
+        } items[] {{"sys_version", "System Version"},
+                   {"kernel_version", "Kernel Version"},
+                   {"uptime", "Uptime"},
+                   {"load", "Load"},
+                   {"processes", "Processes"},
+                   {"mem_usage", "Memory Usage"},
+                   {"swap_usage", "Swap Usage"},
+                   {"root_usage", "Root Usage"},
+                   {"video_usage", "Video Usage"},
+                   {"vdr_cpu_usage", "VDR CPU Usage"},
+                   {"vdr_mem_usage", "VDR MEM Usage"},
+                   {"cpu", "Temp CPU"},
+                   {"gpu", "Temp GPU"},
+                   {"pccase", "Temp PC-Case"},
+                   {"motherboard", "Temp MB"},
+                   {"updates", "Updates"},
+                   {"security_updates", "Security Updates"}};
+
+        for (const auto &FileName : files) {
+            if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height()) break;
+
             found = FileName.find('_');
-            if (found != std::string::npos) {
-                num = FileName.substr(0, found);
-                if (atoi(num.c_str()) > 0) {
-                    item = FileName.substr(found + 1, FileName.length() - found);
-                    ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileName.c_str());
-                    std::ifstream file(*ItemFilename, std::ifstream::in);
-                    if (file.is_open()) {
-                        std::getline(file, ItemContent);
+            // if (found == std::string::npos) continue;  // Only files with '_' added above
 
-                        if (!strcmp(item.c_str(), "sys_version")) {
-                            if (Column == 2) {
-                                Column = 1;
-                                ContentTop += m_FontSmlHeight;
-                                ContentLeft = m_MarginItem;
-                            }
-                            str = cString::sprintf("%s: %s", tr("System Version"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false,
-                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            ContentTop += m_FontSmlHeight;
-                        } else if (!item.compare("kernel_version")) {
-                            if (Column == 2) {
-                                Column = 1;
-                                ContentTop += m_FontSmlHeight;
-                                ContentLeft = m_MarginItem;
-                            }
-                            str = cString::sprintf("%s: %s", tr("Kernel Version"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false,
-                                cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            ContentTop += m_FontSmlHeight;
-                        } else if (!item.compare("uptime")) {
-                            str = cString::sprintf("%s: %s", tr("Uptime"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("load")) {
-                            str = cString::sprintf("%s: %s", tr("Load"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("processes")) {
-                            str = cString::sprintf("%s: %s", tr("Processes"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("mem_usage")) {
-                            str = cString::sprintf("%s: %s", tr("Memory Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("swap_usage")) {
-                            str = cString::sprintf("%s: %s", tr("Swap Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("root_usage")) {
-                            str = cString::sprintf("%s: %s", tr("Root Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("video_usage")) {
-                            str = cString::sprintf("%s: %s", tr("Video Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("vdr_cpu_usage")) {
-                            str = cString::sprintf("%s: %s", tr("VDR CPU Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("vdr_mem_usage")) {
-                            str = cString::sprintf("%s: %s", tr("VDR MEM Usage"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("cpu")) {
-                            str = cString::sprintf("%s: %s", tr("Temp CPU"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("gpu")) {
-                            str = cString::sprintf("%s: %s", tr("Temp GPU"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("pccase")) {
-                            str = cString::sprintf("%s: %s", tr("Temp PC-Case"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("motherboard")) {
-                            str = cString::sprintf("%s: %s", tr("Temp MB"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("updates")) {
-                            str = cString::sprintf("%s: %s", tr("Updates"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        } else if (!item.compare("security_updates")) {
-                            str = cString::sprintf("%s: %s", tr("Security Updates"), ItemContent.c_str());
-                            ContentWidget.AddText(
-                                *str, false, cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
-                                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                wWidth - m_MarginItem2);
-                            if (Column == 1) {
-                                Column = 2;
-                                ContentLeft = wWidth / 2;
-                            } else {
-                                Column = 1;
-                                ContentLeft = m_MarginItem;
-                                ContentTop += m_FontSmlHeight;
-                            }
-                        }
-                        file.close();
-                    }  // if file.is_open
-                }  // if atoi(num.c_str()) > 0
-            }  // if found != std::string::npos
-        }  // for
-    }  // files.size() > 0
+            // auto num = FileName.substr(0, found);  // Already checked above
+            // if (atoi(num.c_str()) <= 0) continue;
+
+            item = FileName.substr(found + 1);
+            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileName.c_str());
+
+            std::ifstream file(ItemFilename.c_str());
+            if (!file.is_open()) continue;
+
+            std::getline(file, ItemContent);
+
+            for (const auto &data : items) {
+                if (item.compare(data.key) == 0) {
+                    str = cString::sprintf("%s: %s", tr(data.label), ItemContent.c_str());
+                    ContentWidget.AddText(*str, false,
+                                          cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+                                          Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
+                                          wWidth - m_MarginItem2);
+                    // Items 'sys_version' and 'kernel_version' are printed on one line
+                    if (Column == 1 && !(item.compare(items[0].key) == 0 || item.compare(items[1].key) == 0)) {
+                        Column = 2;
+                        ContentLeft = wWidth / 2;
+                    } else {
+                        Column = 1;
+                        ContentLeft = m_MarginItem;
+                        ContentTop += m_FontSmlHeight;
+                    }
+                    break;
+                }
+            }
+            file.close();
+        }
+    }
 
     return ContentWidget.ContentHeight(false);
 }
@@ -4739,16 +4530,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     int CountTemps {0};
 
-    cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
+    const cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
     if (!isempty(*TempCPU)) ++CountTemps;
 
-    cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
+    const cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
     if (!isempty(*TempCase)) ++CountTemps;
 
-    cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
+    const cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
     if (!isempty(*TempMB)) ++CountTemps;
 
-    cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
+    const cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
     if (!isempty(*TempGPU)) ++CountTemps;
 
     if (CountTemps == 0) {
