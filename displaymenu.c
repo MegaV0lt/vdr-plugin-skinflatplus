@@ -542,7 +542,6 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) {
     char s;
     for (; i < TextLength; ++i) {
         s = text.at(i);
-
         if (isdigit(s) && i < 5)  // Up to 4 digits expected
             found = true;
         else

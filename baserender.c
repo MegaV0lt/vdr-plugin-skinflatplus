@@ -78,7 +78,6 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
     tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) {
-        // dsyslog("flatPlus: Create osd SUCCESS left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
         return;
     }
 
