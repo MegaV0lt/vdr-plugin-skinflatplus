@@ -44,6 +44,7 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
 
         if (BaseFileName == Name) {
             dsyslog("flatPlus: RemoveFromCache - %s", CacheName[i].c_str());
+            delete CacheImage[i];
             CacheImage[i] = nullptr;
             CacheName[i] = "";
             CacheWidth[i] = -1;
