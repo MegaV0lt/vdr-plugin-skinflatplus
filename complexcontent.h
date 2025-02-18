@@ -38,7 +38,7 @@ class cSimpleContent {
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
-    cTextFloatingWrapper m_Wrapper;  // Reuse a single instance
+    // cTextFloatingWrapper m_Wrapper;  // Reuse a single instance
 
  public:
     cSimpleContent() {
@@ -55,7 +55,7 @@ class cSimpleContent {
         m_Text = rhs.m_Text;
         m_Image = rhs.m_Image;
         m_Font = rhs.m_Font;
-        m_Wrapper = rhs.m_Wrapper;
+        // m_Wrapper = rhs.m_Wrapper;
     }
 
     ~cSimpleContent() {
@@ -73,7 +73,7 @@ class cSimpleContent {
             this->m_Text = other.m_Text;
             this->m_Image = other.m_Image;
             this->m_Font = other.m_Font;
-            this->m_Wrapper = other.m_Wrapper;
+            // this->m_Wrapper = other.m_Wrapper;
         }
         return *this;
     }
@@ -108,9 +108,9 @@ class cSimpleContent {
             return m_Position.Top() + m_Font->Height();
 
         if (m_ContentType == CT_TextMultiline) {
-            // cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            m_Wrapper.Set(*m_Text, m_Font, m_Position.Width());
-            return m_Position.Top() + (m_Wrapper.Lines() * m_Font->Height());
+            cTextFloatingWrapper Wrapper;  // Use modified wrapper
+            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
+            return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
         }
 
         if (m_ContentType == CT_Image)
@@ -129,14 +129,14 @@ class cSimpleContent {
             Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font, m_TextWidth,
                              m_TextHeight, m_TextAlignment);
         } else if (m_ContentType == CT_TextMultiline) {
-            // cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            m_Wrapper.Set(*m_Text, m_Font, m_Position.Width());
+            cTextFloatingWrapper Wrapper;  // Use modified wrapper
+            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
             std::string Line {""};
             Line.reserve(128);
-            const int Lines {m_Wrapper.Lines()};
+            const int Lines {Wrapper.Lines()};
             const int FontHeight {m_Font->Height()};
             for (int i {0}; i < Lines; ++i) {
-                Line = m_Wrapper.GetLine(i);
+                Line = Wrapper.GetLine(i);
                 // Last line is not justified
                 if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
                     JustifyLine(Line, m_Font, m_Position.Width());
