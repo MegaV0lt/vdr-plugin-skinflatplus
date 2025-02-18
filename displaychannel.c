@@ -634,6 +634,10 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("uhd", 999, height);
     ImgLoader.LoadIcon("hd", 999, height);
     ImgLoader.LoadIcon("sd", 999, height);
-    ImgLoader.LoadIcon("audio_stereo", 999, height);
     ImgLoader.LoadIcon("audio_dolby", 999, height);
+    ImgLoader.LoadIcon("audio_stereo", 999, height);
+
+    // Audio tracks (displaytracks.c)
+    ImgLoader.LoadIcon("tracks_ac3", 999, m_FontHeight);
+    ImgLoader.LoadIcon("tracks_stereo", 999, m_FontHeight);
 }
