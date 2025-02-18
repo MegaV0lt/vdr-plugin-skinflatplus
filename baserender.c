@@ -330,7 +330,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         cImage *img {nullptr};
         if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, 999, m_TopBarHeight - m_MarginItem2);
+            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
             if (img) {
                 const int IconLeft {m_MarginItem};
                 const int IconTop {(m_TopBarHeight / 2 - img->Height() / 2)};
@@ -446,7 +446,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         cImage *ImgExtra {nullptr};
         if (m_TopBarExtraIconSet) {  // Show extra icon (Disk usage)
-            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, 999, m_TopBarHeight);
+            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, ICON_WIDTH_UNLIMITED, m_TopBarHeight);
             if (ImgExtra) {
                 Right -= ImgExtra->Width() + m_MarginItem;
                 MiddleWidth += ImgExtra->Width() + m_MarginItem;
@@ -457,7 +457,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {
-            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, 999, m_TopBarHeight);
+            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, ICON_WIDTH_UNLIMITED, m_TopBarHeight);
             if (ImgIconRight) {
                 TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;

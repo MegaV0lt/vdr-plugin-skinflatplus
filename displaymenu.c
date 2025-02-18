@@ -1866,7 +1866,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height. Narrowing conversion
-                    img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
+                    img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
                         if (img) {
                             const int ImageTop {Top + m_FontHeight - m_FontAscender};
                             const int ImageLeft {Left + m_FontHeight - img->Width()};
@@ -2068,7 +2068,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
                 if (!isempty(*IconName)) {
                     const int ImageHeight = m_FontHeight * (1.0 / 3.0);  // 1/3 image height. Narrowing conversion
-                    img = ImgLoader.LoadIcon(*IconName, 999, ImageHeight);
+                    img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
                     if (img) {
                         const int ImageTop {Top + m_FontHeight - m_FontAscender};
                         const int ImageLeft {Left + m_FontHeight - img->Width()};
@@ -2864,7 +2864,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         for (uint col {0}; col < PicsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
-            img = ImgLoader.LoadFile(*ActorsPath[Actor], ActorWidth, 999);
+            img = ImgLoader.LoadFile(*ActorsPath[Actor], ActorWidth, ICON_HEIGHT_UNLIMITED);
             if (img) {
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 ImgHeight = img->Height();
@@ -3349,7 +3349,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
         const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
-        img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
+        img = ImgLoader.LoadIcon(*RecErrIcon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
             const int ImageTop {m_MarginItem + m_FontSmlHeight + m_FontHeight};
@@ -4123,7 +4123,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
+                    img = ImgLoader.LoadIcon("widgets/home", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
@@ -4164,7 +4164,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.LoadIcon("widgets/home", 999, m_FontSmlHeight);
+                    img = ImgLoader.LoadIcon("widgets/home", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
@@ -4200,7 +4200,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/remotetimer", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/remotetimer", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -4237,7 +4237,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/remotetimer", 999, m_FontSmlHeight);
+                img = ImgLoader.LoadIcon("widgets/remotetimer", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -4788,7 +4788,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     }
 
     if (Config.TopBarMenuIconShow)
-        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), 999, m_TopBarHeight - m_MarginItem2);
+        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
 
     ImgLoader.LoadIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
 
@@ -4819,9 +4819,9 @@ void cFlatDisplayMenu::PreLoadImages() {
         }
     }  // for channel
 
-    ImgLoader.LoadIcon("radio", 999, m_TopBarHeight - m_MarginItem2);
-    ImgLoader.LoadIcon("changroup", 999, m_TopBarHeight - m_MarginItem2);
-    ImgLoader.LoadIcon("tv", 999, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.LoadIcon("radio", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.LoadIcon("changroup", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.LoadIcon("tv", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
 
     ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);

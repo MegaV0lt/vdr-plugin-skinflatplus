@@ -97,7 +97,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     int left {m_MarginItem};  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        img = ImgLoader.LoadIcon("timerRecording", 999, m_FontSmlHeight);  // Small image
+        img = ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
 
         if (img) {
             const int ImageTop {SmallTop};
@@ -130,7 +130,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    img = ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHeight);
+    img = ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     if (img)
         MaxWidth -= img->Width() * 3;  //* Substract guessed max. used space of aspect and format icons
 
@@ -162,7 +162,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
         const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
-        img = ImgLoader.LoadIcon(*RecErrIcon, 999, m_FontSmlHeight);  // Small image
+        img = ImgLoader.LoadIcon(*RecErrIcon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
             const int ImageTop {SmallTop};
@@ -357,7 +357,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img {ImgLoader.LoadIcon("recording_pos", 999, GlyphSize)};
+    cImage *img {ImgLoader.LoadIcon("recording_pos", ICON_WIDTH_UNLIMITED, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -423,11 +423,11 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw total and cutted length with cutted symbol (Right side, 1. line)
     const int Spacer {m_Font->Width("0")};  // One digit width space between total and cutted length
-    img = ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
+    img = ImgLoader.LoadIcon("recording_total", ICON_WIDTH_UNLIMITED, GlyphSize);
     const int ImgWidth {(img) ? img->Width() : 0};
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
-        cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize)};
+        cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", ICON_WIDTH_UNLIMITED, GlyphSize)};
         const int ImgCuttedWidth {(ImgCutted) ? ImgCutted->Width() : 0};
 
         int right {m_OsdWidth - Config.decorBorderReplaySize * 2 - ImgWidth - m_MarginItem -
@@ -577,7 +577,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
             EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));  // HH:MM
             if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
-                img = ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
+                img = ImgLoader.LoadIcon("recording_cutted_extra", ICON_WIDTH_UNLIMITED, GlyphSize);
                 if (img) {
                     IconsPixmap->DrawImage(cPoint(left, m_FontHeight + TopOffset), *img);
                     left += img->Width() + m_MarginItem;
@@ -719,7 +719,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         cString IconName {""};
         if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -727,7 +727,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -737,7 +737,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
 
         if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -747,7 +747,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         // Show audio icon (Dolby, Stereo)
         if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
             IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.LoadIcon(*IconName, 999, m_FontSmlHeight);
+            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -787,35 +787,35 @@ void cFlatDisplayReplay::PreLoadImages() {
 
     constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
-    ImgLoader.LoadIcon("recording_pos", 999, GlyphSize);
-    ImgLoader.LoadIcon("recording_total", 999, GlyphSize);
-    ImgLoader.LoadIcon("recording_cutted_extra", 999, GlyphSize);
+    ImgLoader.LoadIcon("recording_pos", ICON_WIDTH_UNLIMITED, GlyphSize);
+    ImgLoader.LoadIcon("recording_total", ICON_WIDTH_UNLIMITED, GlyphSize);
+    ImgLoader.LoadIcon("recording_cutted_extra", ICON_WIDTH_UNLIMITED, GlyphSize);
 
-    ImgLoader.LoadIcon("recording_untested_replay", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_ok_replay", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_warning_replay", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_error_replay", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_untested_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_ok_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_warning_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("recording_error_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
 
-    ImgLoader.LoadIcon("43", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("169", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("169w", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("221", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("7680x4320", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("3840x2160", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1920x1080", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1440x1080", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1280x720", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("960x720", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("704x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("720x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("544x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("528x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("480x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("352x576", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("unknown_res", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("uhd", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("hd", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("sd", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("audio_stereo", 999, m_FontSmlHeight);
-    ImgLoader.LoadIcon("audio_dolby", 999, m_FontSmlHeight);
+    ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
 }
