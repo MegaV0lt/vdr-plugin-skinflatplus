@@ -229,7 +229,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                          m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
 
-        cString rewind("rewind"), pause("pause"), play("play"), forward("forward");
+        cString rewind {"rewind"}, pause {"pause"}, play {"play"}, forward {"forward"};
         if (Speed == -1) {  // Replay or pause
             (Play) ? play = "play_sel" : pause = "pause_sel";
         } else {
