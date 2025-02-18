@@ -3511,7 +3511,6 @@ void cFlatDisplayMenu::Flush() {
 #endif
 
     if (!MenuPixmap) return;
-    TopBarUpdate();
 
     if (Config.MenuFullOsd && !m_MenuFullOsdIsDrawn) {
         MenuPixmap->DrawRectangle(cRect(0, m_MenuItemLastHeight - Config.decorBorderMenuItemSize,
@@ -3538,6 +3537,7 @@ void cFlatDisplayMenu::Flush() {
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState))
         TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
+    TopBarUpdate();
     m_Osd->Flush();
 }
 
