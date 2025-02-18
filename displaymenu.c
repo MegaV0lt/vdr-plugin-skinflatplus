@@ -2876,12 +2876,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                     *Role, false, cRect(x, y + ImgHeight + m_MarginItem + FontTinyHeight, ActorWidth, 0),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
                     FontTinyHeight, taCenter);
-                if (ImgHeight > MaxImgHeight) {
-                    MaxImgHeight = ImgHeight;  // In case images have different size
 #ifdef DEBUGFUNCSCALL
-                    dsyslog("   Column %d: MaxImgHeight changed to %d", col, MaxImgHeight);
-#endif
+                if (ImgHeight > MaxImgHeight) {
+                    dsyslog("   Column %d: MaxImgHeight changed to %d", col, ImgHeight);
                 }
+#endif
+                MaxImgHeight = std::max(MaxImgHeight, ImgHeight);  // In case images have different size
             }
             x += ActorWidth + ActorMargin;
             ++Actor;
