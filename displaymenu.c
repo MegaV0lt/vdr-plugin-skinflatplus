@@ -3918,7 +3918,8 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     cImage *img {ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2)};
@@ -3958,7 +3959,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     int ActualNumDevices {0};
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int i {0}; i < NumDevices; ++i) {
-        if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+        if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             continue;
 
         const cDevice *device = cDevice::GetDevice(i);
@@ -4037,7 +4038,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     cImage *img {ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2)};
@@ -4113,7 +4115,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             const int TimerRecSize {TimerRec.Size()};
             for (int i {0}; i < TimerRecSize; ++i) {
                 ++count;
-                if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                     break;
 
                 if (count >= Config.MainMenuWidgetActiveTimerMaxCount)
@@ -4154,7 +4156,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             const int TimerActiveSize {TimerActive.Size()};
             for (int i {0}; i < TimerActiveSize; ++i) {
                 ++count;
-                if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                     break;
 
                 if (count >= Config.MainMenuWidgetActiveTimerMaxCount)
@@ -4193,7 +4195,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             const int TimerRemoteRecSize {TimerRemoteRec.Size()};
             for (int i {0}; i < TimerRemoteRecSize; ++i) {
                 ++RemoteCount;
-                if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                     break;
 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount)
@@ -4230,7 +4232,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             const int TimerRemoteActiveSize {TimerRemoteActive.Size()};
             for (int i {0}; i < TimerRemoteActiveSize; ++i) {
                 ++RemoteCount;
-                if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                     break;
 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount)
@@ -4267,7 +4269,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     cImage *img {ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2)};
@@ -4302,7 +4305,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     int index {0};
     cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
-        if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+        if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             continue;
 
         PairRec = Recs.back();
@@ -4352,7 +4355,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     cImage *img {ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2)};
@@ -4427,14 +4431,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                    {"security_updates", "Security Updates"}};
 
         for (const auto &FileName : files) {
-            if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height()) break;
+            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
             found = FileName.find('_');
-            // if (found == std::string::npos) continue;  // Only files with '_' added above
-
-            // auto num = FileName.substr(0, found);  // Already checked above
-            // if (atoi(num.c_str()) <= 0) continue;
-
             item = FileName.substr(found + 1);
             ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileName.c_str());
 
@@ -4584,7 +4583,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
@@ -4609,7 +4609,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     std::ifstream file(*ItemFilename);
     if (file.is_open()) {
         for (; std::getline(file, Output);) {
-            if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                 break;
             ContentWidget.AddText(
                 Output.c_str(), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -4628,7 +4628,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop) {
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;
 
     // Read location
@@ -4722,7 +4723,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
             left += m_FontTempSml->Width(*PrecString) + m_MarginItem2;
         } else {  // Long
-            if (ContentTop + m_MarginItem > MenuPixmap->ViewPort().Height())
+            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
                 break;
 
             left = m_MarginItem;
@@ -4788,7 +4789,8 @@ void cFlatDisplayMenu::PreLoadImages() {
     }
 
     if (Config.TopBarMenuIconShow)
-        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
+        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), ICON_WIDTH_UNLIMITED,
+                           m_TopBarHeight - m_MarginItem2);
 
     ImgLoader.LoadIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
 
