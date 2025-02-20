@@ -38,7 +38,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     ButtonsCreate();
     MessageCreate();
 
-    m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
+    // m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letter
 
     m_RecFolder.reserve(256);
     m_LastRecFolder.reserve(256);

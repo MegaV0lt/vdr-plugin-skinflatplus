@@ -342,17 +342,17 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap || m_ModeOnly) return;
 
-    const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
+    // const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
-    const int TopSecs {FontAscender - FontSecsAscender};
+    const int TopSecs {m_FontAscender - FontSecsAscender};
 
     constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
-    const int TopOffset {FontAscender - GlyphSize};
+    const int TopOffset {m_FontAscender - GlyphSize};
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   GlyphSize %d, Setup.FontOsdSize %d, m_FontHeight %d, FontAscender %d",
-             GlyphSize, Setup.FontOsdSize, m_FontHeight, FontAscender);
+             GlyphSize, Setup.FontOsdSize, m_FontHeight, m_FontAscender);
 #endif
 
     //* Draw current position with symbol (1. line)

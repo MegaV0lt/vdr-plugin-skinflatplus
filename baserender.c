@@ -31,6 +31,8 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 
+    m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
+
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
     Borders.reserve(64);

@@ -109,6 +109,7 @@ class cFlatBaseRender {
         int m_FontHeight2 {0};
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
+        int m_FontAscender {0};  // Ascender for font
 
         // Font for main menu weather widget
         cFont *m_FontTempSml {nullptr};
