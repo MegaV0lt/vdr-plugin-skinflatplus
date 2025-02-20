@@ -1429,7 +1429,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         Left += w + m_MarginItem2;
 
-        if (Event) {
+        if (Event) {  // Draw progress of event
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
@@ -1458,23 +1458,26 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                         PBHeight = Config.decorProgressMenuItemSize / 2;
                     }
 
-                    if (Current)
-                        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
-                                           cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
-                                           Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
-                                           Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false);
-                    else
-                        ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
-                                           cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
-                                           Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
-                                           Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
+                    if (!IsGroup) {  // Exclude epg2vdr group separator
+                        if (Current)
+                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
+                                               cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
+                                               Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
+                                               Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType,
+                                               false);
+                        else
+                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
+                                               cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
+                                               Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
+                                               Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
+                    }
                 }
             }
             Left += PBWidth + m_MarginItem2;
-        }
+        }  // if Event
     } else {
         TopBarSetMenuLogo(m_ItemEventLastChannelName);
-    }  // if channel
+    }  // if Channel
 
     if (WithDate && Event && Selectable) {
         struct tm tm_r;
@@ -1513,27 +1516,29 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += m_Font->Width(*Event->GetTimeString()) + m_MarginItem;
     }
 
-    if (TimerMatch == tmFull) {
-        img = nullptr;
-        if (Current)
-            img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
-        if (!img)
-            img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
-        if (img) {
-            ImageTop = Top;
-            MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
+    if (TimerActive) {  // Show timer icon only if timer is active
+        if (TimerMatch == tmFull) {
+            img = nullptr;
+            if (Current)
+                img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
+            if (!img)
+                img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
+            if (img) {
+                ImageTop = Top;
+                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
+            }
+        } else if (TimerMatch == tmPartial) {
+            img = nullptr;
+            if (Current)
+                img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
+            if (!img)
+                img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
+            if (img) {
+                ImageTop = Top;
+                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
+            }
         }
-    } else if (TimerMatch == tmPartial) {
-        img = nullptr;
-        if (Current)
-            img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
-        if (!img)
-            img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
-        if (img) {
-            ImageTop = Top;
-            MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
-        }
-    }
+    }  // TimerActive
 
     Left += ImageHeight + m_MarginItem;
     if (Event && Selectable) {
@@ -1646,16 +1651,17 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
         }
     } else if (Event) {
-        if (isempty(Event->Title())) {
-            dsyslog("flatPlus: SetItemEvent() Event title is empty!");
+        dsyslog("flatPlus: SetItemEvent() Try to extract date from event title\n   Title is '%s'", Event->Title());
+        if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
+            dsyslog("flatPlus: SetItemEvent() Channel is group separator!");
         } else {
-        // try {
             // Extract date from separator
-            std::string_view sep {Event->Title()};
+            // epgsearch program '----------------------------------------         Fr. 21.02.2025 ----------------------------------------'  //NOLINT
+            std::string_view sep {Event->Title()};  // Event->Title should always set to something
             if (sep.length() > 12) {
                 const std::size_t found {sep.find(" -")};
                 if (found >= 10) {
-                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
+                    dsyslog("flatPlus: SetItemEvent() Date string found at %ld", found);
                     const std::string date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
@@ -1672,9 +1678,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
-        // } catch (...) {
-        //    MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
-        //                         m_MenuItemWidth - Left - m_MarginItem);
         }
     }
 
