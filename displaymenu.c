@@ -174,7 +174,7 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
     if (!MenuPixmap) return;
 
     if (Total > 0 && Total > Shown) {
-        if (m_IsScrolling == false && m_ShowEvent == false && m_ShowRecording == false && m_ShowText == false) {
+        if (!m_IsScrolling && !(m_ShowEvent || m_ShowRecording || m_ShowText)) {
             m_IsScrolling = true;
             DecorBorderClearByFrom(BorderMenuItem);
             ItemBorderDrawAllWithScrollbar();
@@ -191,7 +191,7 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
                                                 m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
                                           clrTransparent);
         }
-    } else if (m_ShowEvent == false && m_ShowRecording == false && m_ShowText == false) {
+    } else if (!(m_ShowEvent || m_ShowRecording || m_ShowText)) {
         m_IsScrolling = false;
     }
 
@@ -2567,8 +2567,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
     const cString Title = Event->Title();
-    const cString ShortText = Event->ShortText();
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};      // Width of short text
+    const cString ShortText = (Event->ShortText()) ? Event->ShortText() : " - ";  // No short text. Show ' - '
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};  // Width of short text
     const int MaxWidth {HeadIconLeft - m_MarginItem};
     int left {m_MarginItem};
 
@@ -2907,8 +2907,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cTimeMs Timer;  // Set Timer
 #endif
 
-    if (!ContentHeadPixmap || !ContentHeadIconsPixmap) return;
-    if (!Recording) return;
+    if (!ContentHeadPixmap || !ContentHeadIconsPixmap || !Recording) return;
 
     m_ShowEvent = false;
     m_ShowRecording = true;
@@ -3307,7 +3306,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     if (isempty(*Title))
         Title = Recording->Name();
 
-    const cString ShortText = RecInfo->ShortText();
+    const cString ShortText = (RecInfo->ShortText() ? RecInfo->ShortText() : " - ");  // No short text. Show ' - '
     const int ShortTextWidth {m_FontSml->Width(*ShortText)};  // Width of short text
     int MaxWidth {HeadIconLeft - m_MarginItem};  // Reduce redundant calculations
     int left {m_MarginItem};

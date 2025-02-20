@@ -78,7 +78,7 @@ cFlatDisplayReplay::~cFlatDisplayReplay() {
 
 void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayReplay::Setrecording()");
+    dsyslog("flatPlus: cFlatDisplayReplay::SetRecording()");
 #endif
 
     if (!IconsPixmap || !LabelPixmap || m_ModeOnly) return;
@@ -98,7 +98,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     cImage *img {nullptr};
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
-
         if (img) {
             const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
