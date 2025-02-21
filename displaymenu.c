@@ -2194,8 +2194,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
 #endif
 
-    if (!ContentHeadIconsPixmap || !ContentHeadPixmap) return;
-    if (!Event) return;
+    if (!ContentHeadIconsPixmap || !ContentHeadPixmap || !Event ) return;
 
 #ifdef DEBUGEPGTIME
     cTimeMs Timer;  // Set Timer
@@ -2567,8 +2566,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
     const cString Title = Event->Title();
-    const cString ShortText = (Event->ShortText()) ? Event->ShortText() : " - ";  // No short text. Show ' - '
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};  // Width of short text
+    const cString ShortText = (Event->ShortText()) ? Event->ShortText() : "";  // No short text. Show empty string
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};
     const int MaxWidth {HeadIconLeft - m_MarginItem};
     int left {m_MarginItem};
 
@@ -3307,7 +3306,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         Title = Recording->Name();
 
     const cString ShortText = (RecInfo->ShortText() ? RecInfo->ShortText() : " - ");  // No short text. Show ' - '
-    const int ShortTextWidth {m_FontSml->Width(*ShortText)};  // Width of short text
+    const int ShortTextWidth {m_FontSml->Width(*ShortText)};
     int MaxWidth {HeadIconLeft - m_MarginItem};  // Reduce redundant calculations
     int left {m_MarginItem};
 
