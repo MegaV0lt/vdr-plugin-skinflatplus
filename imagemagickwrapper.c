@@ -41,7 +41,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
             height = h * width / w;
     }
 #ifndef IMAGEMAGICK7
-    const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #endif
     cImage *image = new cImage(cSize(width, height));
     tColor *imgData = (tColor *)image->Data();
@@ -125,11 +125,11 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 bool cImageMagickWrapper::LoadImage(const char *fullpath) {
     if ((fullpath == nullptr) || (strlen(fullpath) < 5))
         return false;
+
     try {
         buffer.read(fullpath);
-    } catch (...) {
-        return false;
-    }
+    } catch (...) { return false; }
+
     return true;
 }
 

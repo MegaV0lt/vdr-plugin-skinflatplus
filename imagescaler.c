@@ -29,7 +29,10 @@ ImageScaler::ImageScaler() :
 }
 
 ImageScaler::~ImageScaler() {
-    if (m_memory) free(m_memory);
+    if (m_memory) {
+        free(m_memory);
+        m_memory = nullptr;
+    }
 }
 
 // sin(x)/(x)
