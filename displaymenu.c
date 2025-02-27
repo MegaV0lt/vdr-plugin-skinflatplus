@@ -4410,25 +4410,25 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
         const struct ItemData {
             const char *key;
-            const char *label;
+            const char *label;  // Store the translated string. Needed for 'xgettext'
         } items[] {
-            {"sys_version", "System Version"},
-            {"kernel_version", "Kernel Version"},
-            {"uptime", "Uptime"},
-            {"load", "Load"},
-            {"processes", "Processes"},
-            {"mem_usage", "Memory Usage"},
-            {"swap_usage", "Swap Usage"},
-            {"root_usage", "Root Usage"},
-            {"video_usage", "Video Usage"},
-            {"vdr_cpu_usage", "VDR CPU Usage"},
-            {"vdr_mem_usage", "VDR MEM Usage"},
-            {"cpu", "Temp CPU"},
-            {"gpu", "Temp GPU"},
-            {"pccase", "Temp PC-Case"},
-            {"motherboard", "Temp MB"},
-            {"updates", "Updates"},
-            {"security_updates", "Security Updates"}
+            {"sys_version", tr("System Version")},
+            {"kernel_version", tr("Kernel Version")},
+            {"uptime", tr("Uptime")},
+            {"load", tr("Load")},
+            {"processes", tr("Processes")},
+            {"mem_usage", tr("Memory Usage")},
+            {"swap_usage", tr("Swap Usage")},
+            {"root_usage", tr("Root Usage")},
+            {"video_usage", tr("Video Usage")},
+            {"vdr_cpu_usage", tr("VDR CPU Usage")},
+            {"vdr_mem_usage", tr("VDR MEM Usage")},
+            {"cpu", tr("Temp CPU")},
+            {"gpu", tr("Temp GPU")},
+            {"pccase", tr("Temp PC-Case")},
+            {"motherboard", tr("Temp MB")},
+            {"updates", tr("Updates")},
+            {"security_updates", tr("Security Updates")}
         };
 
         for (const auto &FileName : files) {
@@ -4445,7 +4445,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
             for (const auto &data : items) {
                 if (item.compare(data.key) == 0) {
-                    str = cString::sprintf("%s: %s", tr(data.label), ItemContent.c_str());
+                    str = cString::sprintf("%s: %s", data.label, ItemContent.c_str());
                     ContentWidget.AddText(*str, false,
                                           cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
