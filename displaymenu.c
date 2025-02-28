@@ -319,8 +319,8 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcTimer:
         IconName = "menuIcons/Timers";
         if (Config.MenuTimerShowCount) {
-            GetTimerCounts(m_LastTimerCount, m_LastTimerActiveCount);  // Update timer counts
-            NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerCount, m_LastTimerActiveCount);
+            GetTimerCounts(m_LastTimerActiveCount, m_LastTimerCount);  // Update timer counts
+            NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerActiveCount, m_LastTimerCount);
         }
         break;
     case mcRecording:
@@ -3524,12 +3524,12 @@ void cFlatDisplayMenu::Flush() {
     }
 
     if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
-        uint TimerCount {0}, TimerActiveCount {0};
-        GetTimerCounts(TimerCount, TimerActiveCount);
+        uint TimerActiveCount {0}, TimerCount {0};
+        GetTimerCounts(TimerActiveCount, TimerCount);
 
-        if (m_LastTimerCount != TimerCount || m_LastTimerActiveCount != TimerActiveCount) {
-            m_LastTimerCount = TimerCount;
+        if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
             m_LastTimerActiveCount = TimerActiveCount;
+            m_LastTimerCount = TimerCount;
             const cString NewTitle = cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount);
             TopBarSetTitle(*NewTitle, false);  // Do not clear
         }
@@ -3688,9 +3688,9 @@ cString cFlatDisplayMenu::GetRecCounts() {
     return RecCounts;
 }
 
-void cFlatDisplayMenu::GetTimerCounts(uint &TimerCount, uint &TimerActiveCount) {
-    TimerCount = 0;
+void cFlatDisplayMenu::GetTimerCounts(uint &TimerActiveCount, uint &TimerCount) {
     TimerActiveCount = 0;
+    TimerCount = 0;
     LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
     for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
         ++TimerCount;
