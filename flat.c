@@ -770,7 +770,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
+        if (strchr("-.,:;!?_~", *p)) {  //! Breaks '...'
             if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
                 Delim = p;
                 Blank = nullptr;

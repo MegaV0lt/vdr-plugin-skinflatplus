@@ -4,6 +4,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [fix] Fix order of timer count variables
 - [fix] Fix display of channel separators in plugin epg2vdr
 - [add] Show ' - ' for missing short text in recording content
+- [update] Add '~' as delimiter char in cTextFloatingWrapper
 - [update] Search default icon only if theme icon not in cache
 - [update] Show timer icon in schedule menu only if timer is active
 - [update] Some internal optimizations
