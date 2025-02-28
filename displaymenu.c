@@ -4408,27 +4408,30 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         int Column {1};
         int ContentLeft {m_MarginItem};
 
+        // Items are stored in an array, in which case they need to be marked differently
+        // Using the trNOOP() macro, the actual translation is then done when such a text is used
+        // https://github.com/vdr-projects/vdr/wiki/The-VDR-Plugin-System#internationalization
         const struct ItemData {
             const char *key;
-            const char *label;  // Store the translated string. Needed for 'xgettext'
+            const char *label;
         } items[] {
-            {"sys_version", tr("System Version")},
-            {"kernel_version", tr("Kernel Version")},
-            {"uptime", tr("Uptime")},
-            {"load", tr("Load")},
-            {"processes", tr("Processes")},
-            {"mem_usage", tr("Memory Usage")},
-            {"swap_usage", tr("Swap Usage")},
-            {"root_usage", tr("Root Usage")},
-            {"video_usage", tr("Video Usage")},
-            {"vdr_cpu_usage", tr("VDR CPU Usage")},
-            {"vdr_mem_usage", tr("VDR MEM Usage")},
-            {"cpu", tr("Temp CPU")},
-            {"gpu", tr("Temp GPU")},
-            {"pccase", tr("Temp PC-Case")},
-            {"motherboard", tr("Temp MB")},
-            {"updates", tr("Updates")},
-            {"security_updates", tr("Security Updates")}
+            {"sys_version", trNOOP("System Version")},
+            {"kernel_version", trNOOP("Kernel Version")},
+            {"uptime", trNOOP("Uptime")},
+            {"load", trNOOP("Load")},
+            {"processes", trNOOP("Processes")},
+            {"mem_usage", trNOOP("Memory Usage")},
+            {"swap_usage", trNOOP("Swap Usage")},
+            {"root_usage", trNOOP("Root Usage")},
+            {"video_usage", trNOOP("Video Usage")},
+            {"vdr_cpu_usage", trNOOP("VDR CPU Usage")},
+            {"vdr_mem_usage", trNOOP("VDR MEM Usage")},
+            {"cpu", trNOOP("Temp CPU")},
+            {"gpu", trNOOP("Temp GPU")},
+            {"pccase", trNOOP("Temp PC-Case")},
+            {"motherboard", trNOOP("Temp MB")},
+            {"updates", trNOOP("Updates")},
+            {"security_updates", trNOOP("Security Updates")}
         };
 
         for (const auto &FileName : files) {
@@ -4445,7 +4448,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
             for (const auto &data : items) {
                 if (item.compare(data.key) == 0) {
-                    str = cString::sprintf("%s: %s", data.label, ItemContent.c_str());
+                    str = cString::sprintf("%s: %s", tr(data.label), ItemContent.c_str());
                     ContentWidget.AddText(*str, false,
                                           cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
