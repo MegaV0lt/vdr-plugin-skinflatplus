@@ -186,7 +186,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     img = CreateImage(width, height);
 
 #ifdef DEBUGIMAGELOADTIME
-    dsyslog("   scale logo: %ld ms", Timer.Elapsed());
+    dsyslog("   scale image: %ld ms", Timer.Elapsed());
 #endif
 
     if (img) {

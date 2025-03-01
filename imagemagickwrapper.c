@@ -96,7 +96,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     cImage image(cSize(w, h));
     tColor col {0};
 #ifndef IMAGEMAGICK7
-    const PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #else
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
 #endif
