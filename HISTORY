@@ -1,8 +1,9 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-xx-xx: Version 1.1.9
+2025-03-03: Version 1.1.9
 - [fix] Fix order of timer count variables
 - [fix] Fix display of channel separators in plugin epg2vdr
+- [fix] Fix translation in system information widget
 - [add] Show ' - ' for missing short text in recording content
 - [update] Add '~' as delimiter char in cTextFloatingWrapper
 - [update] Search default icon only if theme icon not in cache
