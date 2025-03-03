@@ -76,10 +76,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         eMenuCategory m_MenuCategory {mcUndefined};
 
-        int m_FontAscender {0};  // Top of capital letter
+        // int m_FontAscender {0};  // Top of capital letter
         // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
 
-        uint m_LastTimerCount {0}, m_LastTimerActiveCount {0};
+        uint m_LastTimerActiveCount {0}, m_LastTimerCount {0};
         cString m_LastTitle {""};
 
         int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
@@ -131,7 +131,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
-        void GetTimerCounts(uint &TimerCount, uint &TimerActiveCount);  // NOLINT
+        void GetTimerCounts(uint &TimerActiveCount, uint &TimerCount);  // NOLINT
 
         bool IsRecordingOld(const cRecording *Recording, int Level);
 

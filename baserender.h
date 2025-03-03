@@ -98,20 +98,20 @@ class cFlatBaseRender {
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
         const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
 
+        const int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
+        const int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
+
         // Standard fonts
         cFont *m_Font {nullptr};
         cFont *m_FontSml {nullptr};
         cFont *m_FontFixed {nullptr};
-        int m_FontHeight {0};
-        int m_FontHeight2 {0};
+        int m_FontHeight {0}, m_FontHeight2 {0};
         int m_FontSmlHeight {0};
         int m_FontFixedHeight {0};
+        int m_FontAscender {0};  // Ascender for font
 
-        // Font for main menu weather widget
-        cFont *m_FontTempSml {nullptr};
-
-        // Very small font for actor name and role
-        cFont *m_FontTiny {nullptr};
+        cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
+        cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};
@@ -185,14 +185,14 @@ class cFlatBaseRender {
         void DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
         void DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
 
-        void DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height,
-                                    tColor ColorBg, int type);
-        void DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height,
-                                    tColor ColorBg, int type);
-        void DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height,
-                                    tColor ColorBg, int type);
-        void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height,
-                                    tColor ColorBg, int type);
+        void DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
+                                    int type);
+        void DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
+                                    int type);
+        void DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
+                                    int type);
+        void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
+                                    int type);
 
         void TopBarEnableDiskUsage();
         // tColor Multiply(tColor Color, uint8_t Alpha);

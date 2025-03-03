@@ -9,6 +9,8 @@
 
 #include <cstring>  // string.h
 #include <list>
+#include <string>
+#include <vector>
 
 #include "./imageloader.h"
 #include "./flat.h"
@@ -36,6 +38,8 @@ class cSimpleContent {
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
+    // cTextFloatingWrapper m_Wrapper;  // Reuse a single instance
+
  public:
     cSimpleContent() {
     }
@@ -51,6 +55,7 @@ class cSimpleContent {
         m_Text = rhs.m_Text;
         m_Image = rhs.m_Image;
         m_Font = rhs.m_Font;
+        // m_Wrapper = rhs.m_Wrapper;
     }
 
     ~cSimpleContent() {
@@ -68,6 +73,7 @@ class cSimpleContent {
             this->m_Text = other.m_Text;
             this->m_Image = other.m_Image;
             this->m_Font = other.m_Font;
+            // this->m_Wrapper = other.m_Wrapper;
         }
         return *this;
     }
@@ -129,10 +135,12 @@ class cSimpleContent {
             Line.reserve(128);
             const int Lines {Wrapper.Lines()};
             const int FontHeight {m_Font->Height()};
-            for (int i {0}; i < Lines; ++i) {  // Justify line by line
+            for (int i {0}; i < Lines; ++i) {
                 Line = Wrapper.GetLine(i);
-                if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))  // Last line is not justified
+                // Last line is not justified
+                if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
                     JustifyLine(Line, m_Font, m_Position.Width());
+
                 Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)), Line.c_str(),
                                  m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight, m_TextAlignment);
             }

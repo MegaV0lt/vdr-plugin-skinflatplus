@@ -17,7 +17,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.1.8";
+static const char *VERSION        = "1.1.9";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -32,7 +32,7 @@ class cPluginFlat : public cPlugin {
         virtual bool Start();
         virtual void Stop();
         virtual void Housekeeping();
-        virtual void MainThreadHook();
+        // virtual void MainThreadHook();  // Deprecated in VDR 2.7.4
         virtual cString Active();
         virtual time_t WakeupTime();
         virtual const char *MainMenuEntry() { return nullptr; }
@@ -113,8 +113,7 @@ void cPluginFlat::Stop() {
 void cPluginFlat::Housekeeping() {
 }
 
-void cPluginFlat::MainThreadHook() {
-}
+// void cPluginFlat::MainThreadHook() {}  // Deprecated in VDR 2.7.4
 
 cString cPluginFlat::Active() {
     return NULL;

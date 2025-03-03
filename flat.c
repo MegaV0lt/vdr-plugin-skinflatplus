@@ -706,7 +706,10 @@ std::string_view trim(std::string_view str) {
 cTextFloatingWrapper::cTextFloatingWrapper() {}
 
 cTextFloatingWrapper::~cTextFloatingWrapper() {
-    free(m_Text);
+    if (m_Text) {
+        free(m_Text);
+        m_Text = nullptr;
+    }
 }
 
 void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines, int WidthUpper) {
@@ -767,7 +770,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr("-.,:;!?_", *p)) {  //! Breaks '...'
+        if (strchr("-.,:;!?_~", *p)) {  //! Breaks '...'
             if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
                 Delim = p;
                 Blank = nullptr;

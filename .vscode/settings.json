@@ -89,5 +89,8 @@
     "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
     "C_Cpp.inlayHints.parameterNames.enabled": true,
     "C_Cpp.vcFormat.space.beforeInitializerListOpenBrace": true,
-    "javascript.inlayHints.enumMemberValues.enabled": true
+    "javascript.inlayHints.enumMemberValues.enabled": true,
+    "C_Cpp.default.defines": [
+        "PLUGIN_NAME_I18N=skinflatplus"
+    ]
 }
