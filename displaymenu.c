@@ -3413,12 +3413,11 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     PixmapFill(ContentHeadPixmap, clrTransparent);
 
-    const int Left {Config.decorBorderMenuContentSize};
-    const int Top {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 +
-                   Config.decorBorderMenuContentSize};
-    int Width {m_MenuWidth - Config.decorBorderMenuContentSize * 2};
+    const int Left {Config.decorBorderMenuContentSize};  // Config.decorBorderMenuContentSize
+    const int Top {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Left};
+    int Width {m_MenuWidth - Left * 2};
     int Height {m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
-                Config.decorBorderButtonSize * 2 + Config.decorBorderMenuContentSize * 2 + m_MarginItem)};
+                Config.decorBorderButtonSize * 2 + Left * 2 + m_MarginItem)};
 
     if (!ButtonsDrawn())
         Height += m_ButtonsHeight + Config.decorBorderButtonSize * 2;
@@ -3482,7 +3481,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
                      .Width = Width,
                      .Height = (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
                                                                           : ComplexContent.ContentHeight(false),
-                     .Size = Config.decorBorderMenuContentSize,
+                     .Size = Left,
                      .Type = Config.decorBorderMenuContentType,
                      .ColorFg = Config.decorBorderMenuContentFg,
                      .ColorBg = Config.decorBorderMenuContentBg};
