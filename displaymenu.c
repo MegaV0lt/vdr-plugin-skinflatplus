@@ -659,11 +659,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     bool DrawProgress {true};
     const bool IsGroup {Channel->GroupSep()};  // Also used later
 
-    /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    cString ws = cString::sprintf("%d", Channels->MaxNumber());
-    int w = m_Font->Width(ws); */  // Try to fix invalid lock sequence (Only with scraper2vdr - Program)
-
     cString Buffer {""};
     if (IsGroup) {
         DrawProgress = false;
@@ -750,7 +745,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             // Calculate progress bar
             const time_t now {time(0)};
             const double duration = Event->Duration();
-            progress = (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration)) : 0.0;
+            progress =
+                (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration)) : 0.0;
 
             EventTitle = Event->Title();
         }
@@ -1099,11 +1095,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     }
     Left += ImageHeight + m_MarginItem2;
 
-    /* Disabled because invalid lock sequence
-    LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    cString ws = cString::sprintf("%d", Channels->MaxNumber());
-    int w = m_Font->Width(ws); */
-
     const cChannel *Channel = Timer->Channel();
     cString Buffer = cString::sprintf("%d", Channel->Number());
     const int Width {std::max(m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
@@ -1338,11 +1329,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Channel) {
         if (Current)
             m_ItemEventLastChannelName = Channel->Name();
-
-        /* Disabled because invalid lock sequence
-        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-        cString ws = cString::sprintf("%d", Channels->MaxNumber());
-        int w = m_Font->Width(ws); */
 
         w = m_Font->Width("9999");
         const bool IsGroup {Channel->GroupSep()};

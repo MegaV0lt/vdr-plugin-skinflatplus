@@ -761,8 +761,6 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayReplay::Flush() {
-    TopBarUpdate();
-
     if (Config.RecordingResolutionAspectShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
         if (m_ScreenWidth != m_LastScreenWidth) {
@@ -771,6 +769,7 @@ void cFlatDisplayReplay::Flush() {
         }
     }
 
+    TopBarUpdate();
     m_Osd->Flush();
 }
 

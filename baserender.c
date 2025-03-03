@@ -433,7 +433,7 @@ void cFlatBaseRender::TopBarUpdate() {
             RecCounterFuture.get();
 
 #ifdef DEBUGFUNCSCALL
-            dsyslog("   End of Get number of recording timers (%d): %ld ms", NumRec, Timer.Elapsed());
+            dsyslog("   Got number of recording timers (%d): %ld ms", NumRec, Timer.Elapsed());
 #endif
 
             if (NumRec) {
