@@ -516,10 +516,10 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, ProgressBarHeight);
 
-    // const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
+    const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
     constexpr ulong CharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, ProgressBarHeight);  // Narrowing conversion
-    const int TopOffset {(m_FontAscender - GlyphSize) / 2};  // Center vertically
+    const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
         TopOffset};  // One margin for progress bar to bottom
 
