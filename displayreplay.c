@@ -81,7 +81,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: cFlatDisplayReplay::SetRecording()");
 #endif
 
-    if (!IconsPixmap || !LabelPixmap || m_ModeOnly) return;
+    if (m_ModeOnly || !IconsPixmap || !LabelPixmap) return;
 
     const cRecordingInfo *RecInfo = Recording->Info();
     m_Recording = Recording;
@@ -339,7 +339,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
 #endif
 
-    if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap || m_ModeOnly) return;
+    if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
     // const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
@@ -707,7 +707,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw() {
-    if (!IconsPixmap || m_ModeOnly) return;
+    if (m_ModeOnly || !IconsPixmap) return;
 
     if (m_ScreenWidth > 0) {
         // First line for current, total and cutted length, second line for end time
