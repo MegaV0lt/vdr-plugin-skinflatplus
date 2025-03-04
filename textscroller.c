@@ -125,17 +125,17 @@ cTextScrollers::~cTextScrollers() {}
 
 void cTextScrollers::Clear() {
 #ifdef DEBUGFUNCSCALL
-if (!Scrollers.empty())
-    dsyslog("flatPlus: cTextScrollers::Clear() Size %ld", Scrollers.size());
+    if (!Scrollers.empty())
+        dsyslog("flatPlus: cTextScrollers::Clear() Size %ld", Scrollers.size());
 #endif
 
     Cancel(-1);
     while (Active())
         cCondWait::SleepMs(10);
 
-    std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};
-    for (it = Scrollers.begin(); it != end; ++it) {
-        delete *it;
+    // No need to iterate over the vector in this case
+    for (auto &scroller : Scrollers) {
+        delete scroller;
     }
 
     Scrollers.clear();
@@ -194,8 +194,8 @@ void cTextScrollers::Action() {
     if (!Running()) return;
 
     std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};
-    for (it = Scrollers.begin(); it != end; ++it) {
-        if (!Running()) return;
+    for (it = Scrollers.begin(); it != end && Running(); ++it) {
+        // if (!Running()) return;
 
         cPixmap::Lock();
         (*it)->Reset();
@@ -207,8 +207,8 @@ void cTextScrollers::Action() {
             cCondWait::SleepMs(m_ScrollDelay);
 
         // std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};  // Reuse iterator above
-        for (it = Scrollers.begin(); it != end; ++it) {
-            if (!Running()) return;
+        for (it = Scrollers.begin(); it != end && Running(); ++it) {
+            // if (!Running()) return;
 
             cPixmap::Lock();
             (*it)->DoStep();
