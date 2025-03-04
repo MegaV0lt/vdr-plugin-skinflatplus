@@ -119,15 +119,15 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    static const double ScreenAspects[] {16.0 / 9.0, 4.0 / 3.0, 20.0 / 11.0, 15.0 / 11.0, 2.21};
-    static const cString ScreenAspectNames[] {"169", "43", "169w", "169w", "221"};
+    static const double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
+    static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (uint i {0}; i < ScreenAspectNums; ++i) {
         if (ScreenAspect == ScreenAspects[i])
             return ScreenAspectNames[i];
     }
 
-    dsyslog("flatPlus: Unknown screen aspect %.2f", ScreenAspect);
+    dsyslog("flatPlus: Unknown screen aspect (%.5f)", ScreenAspect);
     return "unknown_asp";
 }
 
