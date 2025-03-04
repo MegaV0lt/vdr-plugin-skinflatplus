@@ -183,7 +183,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         } else {  // Draw default logo
             img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
-                ImageTop = m_MarginItem + (ImageHeight - img->Height()) / 2;
+                ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
                 ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
