@@ -126,9 +126,20 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
     if ((fullpath == nullptr) || (strlen(fullpath) < 5))
         return false;
 
+    // Check if file exists
+    struct stat st;
+    if (stat(fullpath, &st) != 0)
+        return false;
+
     try {
         buffer.read(fullpath);
-    } catch (...) { return false; }
+    } catch (const Magick::Exception& e) {  // Log specific error
+        esyslog("flatPlus: Error loading image: %s\n", e.what());
+        return false;
+    } catch (const std::exception& e) {  // Log general error
+        esyslog("flatPlus: Error loading image: %s\n", e.what());
+        return false;
+    }
 
     return true;
 }
