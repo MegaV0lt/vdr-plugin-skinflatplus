@@ -38,7 +38,24 @@ class cSimpleContent {
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
-    // cTextFloatingWrapper m_Wrapper;  // Reuse a single instance
+    void DrawMultilineText(cPixmap *Pixmap) const {
+        cTextFloatingWrapper Wrapper;
+        Wrapper.Set(*m_Text, m_Font, m_Position.Width());
+        std::string Line;
+        Line.reserve(128);
+        const int Lines = Wrapper.Lines();
+        const int FontHeight = m_Font->Height();
+
+        for (int i {0}; i < Lines; ++i) {
+            Line = Wrapper.GetLine(i);
+            if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1)) {
+                JustifyLine(Line, m_Font, m_Position.Width());
+            }
+            Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)),
+                            Line.data(), m_ColorFg, m_ColorBg, m_Font,
+                            m_TextWidth, m_TextHeight, m_TextAlignment);
+        }
+    }
 
  public:
     cSimpleContent() {
@@ -90,6 +107,7 @@ class cSimpleContent {
     }
 
     void SetImage(cImage *image, cRect Position) {
+        if (!image) return;
         m_ContentType = CT_Image;
         m_Position = Position;
         m_Image = image;
@@ -101,53 +119,50 @@ class cSimpleContent {
         m_ColorBg = ColorBg;
     }
 
-    int GetContentType() { return m_ContentType; }
+    int GetContentType() const { return m_ContentType; }
+    int GetBottom() const {
+        switch (m_ContentType) {
+            case CT_Text:
+                return m_Position.Top() + m_Font->Height();
 
-    int GetBottom() {
-        if (m_ContentType == CT_Text)
-            return m_Position.Top() + m_Font->Height();
-
-        if (m_ContentType == CT_TextMultiline) {
-            cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
-            return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
-        }
-
-        if (m_ContentType == CT_Image)
-            return m_Position.Top() + m_Image->Height();
-
-        if (m_ContentType == CT_Rect)
-            return m_Position.Top() + m_Position.Height();
-
-        return 0;
-    }
-
-    void Draw(cPixmap *Pixmap) {
-        if (!Pixmap) return;
-
-        if (m_ContentType == CT_Text) {
-            Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font, m_TextWidth,
-                             m_TextHeight, m_TextAlignment);
-        } else if (m_ContentType == CT_TextMultiline) {
-            cTextFloatingWrapper Wrapper;  // Use modified wrapper
-            Wrapper.Set(*m_Text, m_Font, m_Position.Width());
-            std::string Line {""};
-            Line.reserve(128);
-            const int Lines {Wrapper.Lines()};
-            const int FontHeight {m_Font->Height()};
-            for (int i {0}; i < Lines; ++i) {
-                Line = Wrapper.GetLine(i);
-                // Last line is not justified
-                if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
-                    JustifyLine(Line, m_Font, m_Position.Width());
-
-                Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)), Line.c_str(),
-                                 m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight, m_TextAlignment);
+            case CT_TextMultiline: {
+                cTextFloatingWrapper Wrapper;
+                Wrapper.Set(*m_Text, m_Font, m_Position.Width());
+                return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
             }
-        } else if (m_ContentType == CT_Rect) {
-            Pixmap->DrawRectangle(m_Position, m_ColorBg);
-        } else if (m_ContentType == CT_Image) {
-            Pixmap->DrawImage(m_Position.Point(), *m_Image);
+
+            case CT_Image:
+                return m_Position.Top() + m_Image->Height();
+
+            case CT_Rect:
+                return m_Position.Top() + m_Position.Height();
+
+            case CT_None:
+            default:
+                return 0;
+        }
+    }
+    void Draw(cPixmap *Pixmap) const {
+        if (!Pixmap) return;
+        // if (!m_Font || !m_Text) return;
+
+        switch (m_ContentType) {
+            case CT_Text:
+                Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font,
+                               m_TextWidth, m_TextHeight, m_TextAlignment);
+                return;
+
+            case CT_TextMultiline:
+                DrawMultilineText(Pixmap);
+                return;
+
+            case CT_Rect:
+                Pixmap->DrawRectangle(m_Position, m_ColorBg);
+                return;
+
+            case CT_Image:
+                Pixmap->DrawImage(m_Position.Point(), *m_Image);
+                return;
         }
     }
 };

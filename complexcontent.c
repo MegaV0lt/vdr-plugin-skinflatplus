@@ -66,16 +66,17 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 }
 
 void cComplexContent::CalculateDrawPortHeight() {
-    m_DrawPortHeight = 0;
-    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
-    for (it = Contents.begin(); it != end; ++it) {
-        m_DrawPortHeight = std::max(m_DrawPortHeight, (*it).GetBottom());
-    }
+    // Using std::accumulate algorithm instead of manual loop
+    m_DrawPortHeight = std::accumulate(Contents.begin(), Contents.end(), 0,
+        [](int max, const auto& content) {
+            return std::max(max, content.GetBottom());
+        });
 
-    if (m_IsScrollingActive)  //  m_DrawPortHeight has to be set for 'ScrollTotal()'
+    // m_DrawPortHeight has to be set for 'ScrollTotal()' to work
+    if (m_IsScrollingActive && m_ScrollSize > 0) {
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
+    }
 }
-
 int cComplexContent::BottomContent() {
     int Bottom {0};
     std::vector<cSimpleContent>::iterator it, end {Contents.end()};
