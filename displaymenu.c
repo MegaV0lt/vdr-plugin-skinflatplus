@@ -244,7 +244,8 @@ int cFlatDisplayMenu::MaxItems() {
     default:
         break;
     }
-    return m_ScrollBarHeight / ItemHeight;  //? Avoid DIV/0
+    // Use integer division rounding
+    return (m_ScrollBarHeight + ItemHeight - 1) / ItemHeight;
 }
 
 int cFlatDisplayMenu::ItemsHeight() {
@@ -289,24 +290,48 @@ void cFlatDisplayMenu::Clear() {
     m_ShowRecording = m_ShowEvent = m_ShowText = false;
 }
 
+cString cFlatDisplayMenu::GetMenuIconName() const {
+    static const struct {
+        eMenuCategory category;
+        const cString icon;
+    } menuIcons[] = {
+        { mcMain,          cString::sprintf("menuIcons/%s", VDRLOGO) },
+        { mcSchedule,      "menuIcons/Schedule" },
+        { mcScheduleNow,   "menuIcons/Schedule" },
+        { mcScheduleNext,  "menuIcons/Schedule" },
+        { mcChannel,       "menuIcons/Channels" },
+        { mcTimer,         "menuIcons/Timers" },
+        { mcRecording,     "menuIcons/Recordings" },
+        { mcSetup,         "menuIcons/Setup" },
+        { mcCommand,       "menuIcons/Commands" },
+        { mcEvent,         "extraIcons/Info" },
+        { mcRecordingInfo, "extraIcons/PlayInfo" }
+    };
+
+    for (const auto& icon : menuIcons) {
+        if (icon.category == m_MenuCategory)
+            return icon.icon;
+    }
+
+    return "";
+}
 void cFlatDisplayMenu::SetTitle(const char *Title) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s' m_MenuCategory %d", Title, m_MenuCategory);
 #endif
 
     m_LastTitle = Title;
+    cString NewTitle = Title;
+    cString IconName = *GetMenuIconName();
 
-    cString IconName{""}, NewTitle = Title;
     switch (m_MenuCategory) {
     case mcMain:
-        IconName = cString::sprintf("menuIcons/%s", VDRLOGO);
         NewTitle = "";
         break;
-    case mcSchedule:
-    case mcScheduleNow:
-    case mcScheduleNext: IconName = "menuIcons/Schedule"; break;
+    // case mcSchedule:
+    // case mcScheduleNow:
+    // case mcScheduleNext: break;
     case mcChannel:
-        IconName = "menuIcons/Channels";
         if (Config.MenuChannelShowCount) {
             uint ChanCount {0};
             LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
@@ -317,20 +342,18 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         }  // Config.MenuChannelShowCount
         break;
     case mcTimer:
-        IconName = "menuIcons/Timers";
         if (Config.MenuTimerShowCount) {
             GetTimerCounts(m_LastTimerActiveCount, m_LastTimerCount);  // Update timer counts
             NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerActiveCount, m_LastTimerCount);
         }
         break;
     case mcRecording:
-        IconName = "menuIcons/Recordings";
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
         break;
-    case mcSetup: IconName = "menuIcons/Setup"; break;
-    case mcCommand: IconName = "menuIcons/Commands"; break;
-    case mcEvent: IconName = "extraIcons/Info"; break;
-    case mcRecordingInfo: IconName = "extraIcons/PlayInfo"; break;
+    // case mcSetup:
+    // case mcCommand:
+    // case mcEvent:
+    // case mcRecordingInfo:
     default: break;
     }  // switch (m_MenuCategory)
 

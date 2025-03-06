@@ -22,8 +22,8 @@ cImageMagickWrapper::cImageMagickWrapper() {
 }
 
 cImageMagickWrapper::~cImageMagickWrapper() {
-    buffer.erase();  // Clear any image data
-    buffer = Magick::Image();  // Release associated memory
+    // buffer.erase();  // Clear any image data
+    // buffer = Magick::Image();  // Release associated memory
 }
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {

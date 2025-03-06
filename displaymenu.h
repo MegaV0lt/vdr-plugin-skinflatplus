@@ -122,11 +122,13 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void ItemBorderDrawAllWithoutScrollbar();
         void ItemBorderClear();
 
-        const cString items[16]{"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        const cString items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                 "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                 "Replay",   "Miscellaneous", "Plugins", "Restart"};
+
         cString MainMenuText(const cString &Text);
         cString GetIconName(const std::string &element);
+        cString GetMenuIconName() const;
 
         cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
