@@ -53,7 +53,7 @@ void cTextScroll::Reset() {
     m_WaitSteps = m_WAITSTEPS;
 }
 
-void cTextScroll::Draw() {
+void cTextScroll::Draw() const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScroll::Draw()");
 #endif

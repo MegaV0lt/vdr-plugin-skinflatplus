@@ -37,7 +37,7 @@ class cTextScroll {
     void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg,
                  cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep();
-    void Draw();
+    void Draw() const;
 
  private:
     cRect m_Position {0, 0, 0, 0};
