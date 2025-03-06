@@ -587,6 +587,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
 #endif
+    if (!Font) {
+        esyslog("flatPlus: JustifyLine() called with null Font");
+        return;
+    }
+
     if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
@@ -620,7 +625,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    if (LineWidth > (LineMaxWidth * 0.8f)) {  // Lines shorter than 80% looking bad when justified
+    if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
 
@@ -656,9 +661,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert blocks at (.,?!;)
-        for (pos = Line.find_first_of(".,?!;");
+        for (pos = Line.find_first_of(PUNCTUATION_CHARS);
              pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
-             pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1)) {
+             pos = Line.find_first_of(PUNCTUATION_CHARS, pos + FillCharsLength + 1)) {
             if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
                 // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
                 Line.insert(pos + 1, FillChars);
@@ -726,20 +731,26 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     cTimeMs Timer;  // Start timer
 #endif
 
+    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+        return;
+
     free(m_Text);
     m_Text = (Text) ? strdup(Text) : nullptr;
     if (!m_Text)
         return;
-    m_Lines = 1;
-    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
-        return;
 
-    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
+    m_Lines = 1;
+
+    static const char* const DELIMITER_CHARS = "-.,:;!?_~";
+    char *Blank {nullptr}, *Delim {nullptr};
+    // Pre-calculate string length and reserve memory upfront to reduce reallocations during string manipulations
+    size_t textLen = strlen(m_Text);
+    char *s = static_cast<char*>(malloc(textLen + textLen / 2));  // Reserve extra space for line breaks
+    // Rest of code using pre-allocated buffer
     int cw {0}, l {0}, sl {0}, w {0};
     int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
-
     for (char *p {m_Text}; *p;) {
         /* int */ sl = Utf8CharLen(p);
         /* uint */ sym = Utf8CharGet(p, sl);
@@ -766,7 +777,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
 
-                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* char * */  // s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
                 /* int */ l = p - m_Text;
                 strncpy(s, m_Text, l);  // Dest, Source, Size
                 s[l] = '\n';            // Insert line break.
@@ -778,8 +789,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr("-.,:;!?_~", *p)) {  //! Breaks '...'
-            if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
+        if (strchr(DELIMITER_CHARS, *p)) {
+            if (*p != *(p + 1)) {  // Avoid breaks between repeated delimiters (like in "...")
                 Delim = p;
                 Blank = nullptr;
             } else {
