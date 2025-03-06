@@ -224,19 +224,27 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
         return;
     }
 
+    static constexpr int POSTER_ASPECT_THRESHOLD = 1;            // Smaller than 1 = Poster
+    static constexpr int BANNER_ASPECT_THRESHOLD = 4;            // Smaller than 4 = Portrait, bigger than 4 = Banner
+    static constexpr double POSTER_HEIGHT_RATIO = 0.7;           // Max 70% of pixmap height
+    static constexpr double PORTRAIT_WIDTH_RATIO = 1.0/3.0;      // Max 1/3 of pixmap width
+    static constexpr double BANNER_TARGET_RATIO = 758.0/1920.0;  // To get 758 width @ 1920
+
     // TODO: Set to max size by default or also allow smaller media site?
-    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
+    const uint Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
+    if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(
-            std::min(MediaSize.Height(), static_cast<int>(ContentSize.Height() * 0.7)));  // Max 70% of pixmap height
-    } else if (Aspect < 4) {  //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(
-            std::min(MediaSize.Width(), static_cast<int>(ContentSize.Width() / 3)));      // Max 1/3 of pixmap width
-    } else {                  //* Banner (Usually 758x140 = 5.41)
+            std::min(MediaSize.Height(),
+                     static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO)));
+    } else if (Aspect < BANNER_ASPECT_THRESHOLD) {  //* Portrait (For example 1920x1080 = 1.77)
         MediaSize.SetWidth(
             std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
+                     static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO)));
+    } else {                                        //* Banner (Usually 758x140 = 5.41)
+        MediaSize.SetWidth(
+            std::min(MediaSize.Width(),
+                     static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO)));
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
