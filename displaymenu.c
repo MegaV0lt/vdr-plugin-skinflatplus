@@ -2198,6 +2198,86 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     return true;
 }
 
+void cFlatDisplayMenu::GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,
+                                       std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,
+                                       std::vector<cString> &ActorsRole,
+                                       const cEvent *Event, const cRecording *Recording) {
+    static cPlugin *pScraper = GetScraperPlugin();
+    if (pScraper) {
+        ScraperGetEventType call;
+        if (Event)
+            call.event = Event;
+        else if (Recording)
+            call.recording = Recording;  // Check if both are unset
+
+        int seriesId {0}, episodeId {0}, movieId {0};
+        if (pScraper->Service("GetEventType", &call)) {
+            seriesId = call.seriesId;
+            episodeId = call.episodeId;
+            movieId = call.movieId;
+        }
+        if (call.type == tSeries) {
+            cSeries series;
+            series.seriesId = seriesId;
+            series.episodeId = episodeId;
+            if (pScraper->Service("GetSeries", &series)) {
+                if (series.banners.size() > 1) {  // Use random banner
+                    // Gets 'entropy' from device that generates random numbers itself
+                    // to seed a mersenne twister (pseudo) random generator
+                    std::mt19937 generator(std::random_device {}());
+
+                    // Make sure all numbers have an equal chance.
+                    // Range is inclusive (so we need -1 for vector index)
+                    std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+                    const std::size_t number {distribution(generator)};
+
+                    MediaPath = series.banners[number].path.c_str();
+                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                            static_cast<int>(number + 1), *MediaPath,
+                            static_cast<int>(series.banners.size()));  // Log result
+                } else if (series.banners.size() == 1) {               // Just one banner
+                    MediaPath = series.banners[0].path.c_str();
+                }
+                if (Config.TVScraperEPGInfoShowActors) {
+                    const int ActorsSize = series.actors.size();
+                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+                    ActorsName.reserve(ActorsSize);
+                    ActorsRole.reserve(ActorsSize);
+                    for (int i {0}; i < ActorsSize; ++i) {
+                        if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
+                            ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
+                            ActorsName.emplace_back(series.actors[i].name.c_str());
+                            ActorsRole.emplace_back(series.actors[i].role.c_str());
+                        }
+                    }
+                }
+                InsertSeriesInfos(series, SeriesInfo);  // Add series infos
+            }
+        } else if (call.type == tMovie) {
+            cMovie movie;
+            movie.movieId = movieId;
+            if (pScraper->Service("GetMovie", &movie)) {
+                MediaPath = movie.poster.path.c_str();
+                if (Config.TVScraperEPGInfoShowActors) {
+                    const int ActorsSize = movie.actors.size();
+                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+                    ActorsName.reserve(ActorsSize);
+                    ActorsRole.reserve(ActorsSize);
+                    for (int i {0}; i < ActorsSize; ++i) {
+                        if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
+                            ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                            ActorsName.emplace_back(movie.actors[i].name.c_str());
+                            ActorsRole.emplace_back(movie.actors[i].role.c_str());
+                        }
+                    }
+                }
+                InsertMovieInfos(movie, MovieInfo);  // Add movie infos
+            }
+        }
+    }  // Scraper plugin
+}
+
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
@@ -2383,79 +2463,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ComplexContent.SetScrollingActive(true);
 
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
-            static cPlugin *pScraper = GetScraperPlugin();
-            if ((Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) && pScraper) {
-                ScraperGetEventType call;
-                call.event = Event;
-                int seriesId {0}, episodeId {0}, movieId {0};
-
-                if (pScraper->Service("GetEventType", &call)) {
-                    seriesId = call.seriesId;
-                    episodeId = call.episodeId;
-                    movieId = call.movieId;
-                }
-                if (call.type == tSeries) {
-                    cSeries series;
-                    series.seriesId = seriesId;
-                    series.episodeId = episodeId;
-                    if (pScraper->Service("GetSeries", &series)) {
-                        if (series.banners.size() > 1) {  // Use random banner
-                            // Gets 'entropy' from device that generates random numbers itself
-                            // to seed a mersenne twister (pseudo) random generator
-                            std::mt19937 generator(std::random_device {}());
-
-                            // Make sure all numbers have an equal chance.
-                            // Range is inclusive (so we need -1 for vector index)
-                            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                            const std::size_t number {distribution(generator)};
-
-                            MediaPath = series.banners[number].path.c_str();
-                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), *MediaPath,
-                                    static_cast<int>(series.banners.size()));  // Log result
-                        } else if (series.banners.size() == 1) {               // Just one banner
-                            MediaPath = series.banners[0].path.c_str();
-                        }
-                        if (Config.TVScraperEPGInfoShowActors) {
-                            const int ActorsSize = series.actors.size();
-                            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                            ActorsName.reserve(ActorsSize);
-                            ActorsRole.reserve(ActorsSize);
-                            for (int i {0}; i < ActorsSize; ++i) {
-                                if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
-                                    ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
-                                    ActorsName.emplace_back(series.actors[i].name.c_str());
-                                    ActorsRole.emplace_back(series.actors[i].role.c_str());
-                                }
-                            }
-                        }
-                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
-                    }
-                } else if (call.type == tMovie) {
-                    cMovie movie;
-                    movie.movieId = movieId;
-                    if (pScraper->Service("GetMovie", &movie)) {
-                        MediaPath = movie.poster.path.c_str();
-                        if (Config.TVScraperEPGInfoShowActors) {
-                            const int ActorsSize = movie.actors.size();
-                            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                            ActorsName.reserve(ActorsSize);
-                            ActorsRole.reserve(ActorsSize);
-                            for (int i {0}; i < ActorsSize; ++i) {
-                                if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
-                                    ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
-                                    ActorsName.emplace_back(movie.actors[i].name.c_str());
-                                    ActorsRole.emplace_back(movie.actors[i].role.c_str());
-                                }
-                            }
-                        }
-                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
-                    }
-                }
-            }  // Scraper plugin
-        }  // FirstRun
+        if (FirstRun && (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors)) {
+            // Call scraper plugin only at first run and reuse data at second run
+            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName, ActorsRole, Event, nullptr);
+        }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent tvscraper time @ %ld ms", Timer.Elapsed());
 #endif
@@ -3098,85 +3109,16 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ComplexContent.SetScrollingActive(true);
 
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        if (FirstRun) {  // Call scraper plugin only at first run and reuse data at second run
-            static cPlugin *pScraper = GetScraperPlugin();
-            if ((Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) && pScraper) {
-                ScraperGetEventType call;
-                call.recording = Recording;
-                int seriesId {0}, episodeId {0}, movieId {0};
-
-                if (pScraper->Service("GetEventType", &call)) {
-                    seriesId = call.seriesId;
-                    episodeId = call.episodeId;
-                    movieId = call.movieId;
-                }
-                if (call.type == tSeries) {
-                    cSeries series;
-                    series.seriesId = seriesId;
-                    series.episodeId = episodeId;
-                    if (pScraper->Service("GetSeries", &series)) {
-                        if (series.banners.size() > 1) {  // Use random banner
-                            // Gets 'entropy' from device that generates random numbers itself
-                            // to seed a mersenne twister (pseudo) random generator
-                            std::mt19937 generator(std::random_device {}());
-
-                            // Make sure all numbers have an equal chance.
-                            // Range is inclusive (so we need -1 for vector index)
-                            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                            const std::size_t number {distribution(generator)};
-
-                            MediaPath = series.banners[number].path.c_str();
-                            dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                    static_cast<int>(number + 1), *MediaPath,
-                                    static_cast<int>(series.banners.size()));  // Log result
-                        } else if (series.banners.size() == 1) {               // Just one banner
-                            MediaPath = series.banners[0].path.c_str();
-                        }
-                        if (Config.TVScraperRecInfoShowActors) {
-                            const int ActorsSize = series.actors.size();
-                            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                            ActorsName.reserve(ActorsSize);
-                            ActorsRole.reserve(ActorsSize);
-                            for (int i {0}; i < ActorsSize; ++i) {
-                                if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
-                                    ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
-                                    ActorsName.emplace_back(series.actors[i].name.c_str());
-                                    ActorsRole.emplace_back(series.actors[i].role.c_str());
-                                }
-                            }
-                        }
-                        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
-                    }
-                } else if (call.type == tMovie) {
-                    cMovie movie;
-                    movie.movieId = movieId;
-                    if (pScraper->Service("GetMovie", &movie)) {
-                        MediaPath = movie.poster.path.c_str();
-                        if (Config.TVScraperRecInfoShowActors) {
-                            const int ActorsSize = movie.actors.size();
-                            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                            ActorsName.reserve(ActorsSize);
-                            ActorsRole.reserve(ActorsSize);
-                            for (int i {0}; i < ActorsSize; ++i) {
-                                if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
-                                    ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
-                                    ActorsName.emplace_back(movie.actors[i].name.c_str());
-                                    ActorsRole.emplace_back(movie.actors[i].role.c_str());
-                                }
-                            }
-                        }
-                        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
-                    }
-                }
-            }  // Scraper plugin
+        if (FirstRun && (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors)) {
+            // Call scraper plugin only at first run and reuse data at second run
+                GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName,
+                                ActorsRole, nullptr, Recording);
 
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
                 ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
             }
-        }  // FirstRun
-
+        }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording tvscraper time @ %ld ms", Timer.Elapsed());
 #endif

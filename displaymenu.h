@@ -159,6 +159,10 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
+        void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
+                             std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
+                             std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
+                             const cRecording *Recording = nullptr);                              // NOLINT
 
         void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
