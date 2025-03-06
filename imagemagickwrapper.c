@@ -22,6 +22,8 @@ cImageMagickWrapper::cImageMagickWrapper() {
 }
 
 cImageMagickWrapper::~cImageMagickWrapper() {
+    buffer.erase();  // Clear any image data
+    buffer = Magick::Image();  // Release associated memory
 }
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {
@@ -50,41 +52,48 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+        const double QuantumScale {255.0 / QuantumRange};  // Eliminates repeated division operations in tight loops
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
-                /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
-                /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
-                /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
-                /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
-                scaler.PutSourcePixel((int(b)), (int(g)), (int(r)), (int(o)));
+                r = static_cast<unsigned char>(c.quantumRed() * QuantumScale);
+                g = static_cast<unsigned char>(c.quantumGreen() * QuantumScale);
+                b = static_cast<unsigned char>(c.quantumBlue() * QuantumScale);
+                o = static_cast<unsigned char>(c.quantumAlpha() * QuantumScale);
+                scaler.PutSourcePixel(static_cast<int>(b), static_cast<int>(g), static_cast<int>(r),
+                                      static_cast<int>(o));
             }
         }
 #else
+        const double RGBScale {(MaxRGB + 1) / 256};  // Eliminates repeated division operations in tight loops
         for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
-            scaler.PutSourcePixel(pixels->blue / ((MaxRGB + 1) / 256), pixels->green / ((MaxRGB + 1) / 256),
-                                  pixels->red / ((MaxRGB + 1) / 256),
-                                  ~((unsigned char)(pixels->opacity / ((MaxRGB + 1) / 256))));
+            scaler.PutSourcePixel(static_cast<int>(pixels->blue / RGBScale),
+                                  static_cast<int>(pixels->green / RGBScale),
+                                  static_cast<int>(pixels->red / RGBScale),
+                                  ~static_cast<unsigned char>(pixels->opacity / RGBScale));
 #endif
         return image;
     }
 #ifdef IMAGEMAGICK7
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+    const double QuantumScale {255.0 / QuantumRange};  // Eliminates repeated division operations in tight loops
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
-            /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
-            /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
-            /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
-            /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
-            *imgData++ = ((int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b)));
+            r = static_cast<unsigned char>(c.quantumRed() * QuantumScale);
+            g = static_cast<unsigned char>(c.quantumGreen() * QuantumScale);
+            b = static_cast<unsigned char>(c.quantumBlue() * QuantumScale);
+            o = static_cast<unsigned char>(c.quantumAlpha() * QuantumScale);
+            *imgData++ = (static_cast<int>(o) << 24) | (static_cast<int>(r) << 16) | (static_cast<int>(g) << 8) |
+                         static_cast<int>(b);
         }
     }
 #else
+    const double RGBScale {(MaxRGB + 1) / 256};  // Eliminates repeated division operations in tight loops
     for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
         *imgData++ =
-            ((~int(pixels->opacity / ((MaxRGB + 1) / 256)) << 24) | (int(pixels->green / ((MaxRGB + 1) / 256)) << 8) |
-             (int(pixels->red / ((MaxRGB + 1) / 256)) << 16) | (int(pixels->blue / ((MaxRGB + 1) / 256))));
+            ((~static_cast<int>(pixels->opacity / RGBScale) << 24) | (static_cast<int>(pixels->green / RGBScale) << 8) |
+             (static_cast<int>(pixels->red / RGBScale) << 16) | static_cast<int>(pixels->blue / RGBScale));
 #endif
     return image;
 }
@@ -99,19 +108,23 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #else
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+    const double QuantumScale {255.0 / QuantumRange};  // Eliminates repeated division operations in tight loops
 #endif
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
 #ifdef IMAGEMAGICK7
             Color c = buffer.pixelColor(ix, iy);
-            /*unsigned char*/ r = c.quantumRed() * 255 / QuantumRange;
-            /*unsigned char*/ g = c.quantumGreen() * 255 / QuantumRange;
-            /*unsigned char*/ b = c.quantumBlue() * 255 / QuantumRange;
-            /*unsigned char*/ o = c.quantumAlpha() * 255 / QuantumRange;
-            /* tColor */ col = (int(o) << 24) | (int(r) << 16) | (int(g) << 8) | (int(b));
+            r = c.quantumRed() * QuantumScale;
+            g = c.quantumGreen() * QuantumScale;
+            b = c.quantumBlue() * QuantumScale;
+            o = c.quantumAlpha() * QuantumScale;
+            col = (static_cast<int>(o) << 24) | (static_cast<int>(r) << 16) | (static_cast<int>(g) << 8) |
+                               (static_cast<int>(b));
 #else
-            /* tColor */ col = (~int(pixels->opacity * 255 / MaxRGB) << 24) | (int(pixels->green * 255 / MaxRGB) << 8) |
-                         (int(pixels->red * 255 / MaxRGB) << 16) | (int(pixels->blue * 255 / MaxRGB));
+            col = (~static_cast<int>(pixels->opacity * 255 / MaxRGB) << 24) |
+                  (static_cast<int>(pixels->green * 255 / MaxRGB) << 8) |
+                  (static_cast<int>(pixels->red * 255 / MaxRGB) << 16) |
+                  (static_cast<int>(pixels->blue * 255 / MaxRGB));
 #endif
             image.SetPixel(cPoint(ix, iy), col);
 #ifndef IMAGEMAGICK7
@@ -134,10 +147,10 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
     try {
         buffer.read(fullpath);
     } catch (const Magick::Exception& e) {  // Log specific error
-        esyslog("flatPlus: Error loading image: %s\n", e.what());
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Error: %s\n", e.what());
         return false;
     } catch (const std::exception& e) {  // Log general error
-        esyslog("flatPlus: Error loading image: %s\n", e.what());
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Error: %s\n", e.what());
         return false;
     }
 
