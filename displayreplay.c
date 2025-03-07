@@ -589,9 +589,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     }  // Config.PlaybackShowEndTime
 
-    // TODO: Update only once per second
-    //* Draw Banner/Poster
-    if (m_Recording) {
+    //* Draw Banner/Poster (Update only every 5 seconds)
+    if (m_Recording && (m_LastPosterBannerUpdate + 5 < CurTime)) {
+        m_LastPosterBannerUpdate = CurTime;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
         static cPlugin *pScraper = GetScraperPlugin();
