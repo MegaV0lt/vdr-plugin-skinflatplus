@@ -110,18 +110,18 @@ bool cComplexContent::Scrollable(int height) {
     return total > shown;
 }
 
-void cComplexContent::AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg,
+void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg,
                               cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
     Contents.emplace_back(cSimpleContent());
     Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
 }
 
-void cComplexContent::AddImage(cImage *image, cRect Position) {
+void cComplexContent::AddImage(cImage *image, const cRect &Position) {
     Contents.emplace_back(cSimpleContent());
     Contents.back().SetImage(image, Position);
 }
 
-void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos,
+void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
                                               tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
                                               int TextHeight, int TextAlignment) {
     const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
@@ -159,7 +159,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     AddImage(image, ImagePos);
 }
 
-void cComplexContent::AddRect(cRect Position, tColor ColorBg) {
+void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
     Contents.emplace_back(cSimpleContent());
     Contents.back().SetRect(Position, ColorBg);
 }

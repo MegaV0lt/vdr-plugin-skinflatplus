@@ -62,10 +62,10 @@ class cFlatBaseRender {
         void MessageSetExtraTime(const char *Text);
         void MessageClear();
 
-        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
-                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
-                                int Type, bool SetBackground, bool IsSignal = false);
-        void ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
+        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rec, const cRect &recBg, int Current,
+                                int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
+                                bool SetBackground, bool IsSignal = false);
+        void ProgressBarCreate(const cRect &Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
                                tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
         void ProgressBarDrawBgColor();
         void ProgressBarDraw(int Current, int Total);
@@ -80,7 +80,7 @@ class cFlatBaseRender {
         int ScrollBarWidth();
 
         void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
-        void DecorBorderClear(cRect Rect, int Size);
+        void DecorBorderClear(const cRect &Rect, int Size);
         void DecorBorderClearAll();
         void DecorBorderRedrawAll();
         void DecorBorderClearByFrom(int From);

@@ -623,7 +623,7 @@ bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
     return false;
 }
 
-void cFlatDisplayMenu::DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
+void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &recBg, const char *bar, tColor ColorFg,
                                                tColor ColorBarFg, tColor ColorBg) {
     const char *p {bar + 1};
     uint now {0}, total {0};

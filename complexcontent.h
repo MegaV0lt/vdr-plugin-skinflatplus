@@ -95,7 +95,7 @@ class cSimpleContent {
         return *this;
     }
 
-    void SetText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg, cFont *Font,
+    void SetText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
         m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
@@ -106,14 +106,14 @@ class cSimpleContent {
         m_ColorFg = ColorFg; m_ColorBg = ColorBg;
     }
 
-    void SetImage(cImage *image, cRect Position) {
+    void SetImage(cImage *image, const cRect &Position) {
         if (!image) return;
         m_ContentType = CT_Image;
         m_Position = Position;
         m_Image = image;
     }
 
-    void SetRect(cRect Position, tColor ColorBg) {
+    void SetRect(const cRect &Position, tColor ColorBg) {
         m_ContentType = CT_Rect;
         m_Position = Position;
         m_ColorBg = ColorBg;
@@ -174,20 +174,20 @@ class cComplexContent {
     ~cComplexContent();
 
     void SetOsd(cOsd *osd) { m_Osd = osd; }
-    void SetPosition(cRect Position) { m_Position = Position; }
+    void SetPosition(const cRect &Position) { m_Position = Position; }
     void SetScrollSize(int ScrollSize) { m_ScrollSize = ScrollSize; }
     void SetBGColor(tColor ColorBg) { m_ColorBg = ColorBg; }
     void CreatePixmaps(bool FullFillBackground);
 
     void Clear();
 
-    void AddText(const char *Text, bool Multiline, cRect Position, tColor ColorFg, tColor ColorBg, cFont *Font,
+    void AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
-    void AddImage(cImage *image, cRect Position);
-    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, cRect TextPos, tColor ColorFg,
-                                 tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
+    void AddImage(cImage *image, const cRect &Position);
+    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
+                                 tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
                                  int TextAlignment = taDefault);
-    void AddRect(cRect Position, tColor ColorBg);
+    void AddRect(const cRect &Position, tColor ColorBg);
     bool Scrollable(int height = 0);
      int ScrollTotal();
      int ScrollOffset();

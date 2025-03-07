@@ -7,7 +7,7 @@
  */
 #include "./textscroller.h"
 
-void cTextScroll::SetText(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *font,
+void cTextScroll::SetText(const char *text, const cRect &position, tColor colorFg, tColor colorBg, cFont *font,
                           tColor colorExtraTextFg) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScroll::SetText()");
@@ -141,7 +141,7 @@ void cTextScrollers::Clear() {
     Scrollers.clear();
 }
 
-void cTextScrollers::AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg, cFont *Font,
+void cTextScrollers::AddScroller(const char *text, const cRect &position, tColor colorFg, tColor colorBg, cFont *Font,
                                  tColor ColorExtraTextFg) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cTextScrollers::AddScroller()");

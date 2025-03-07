@@ -34,7 +34,7 @@ class cTextScroll {
     void UpdateViewPortWidth(int w);
     void Reset();
 
-    void SetText(const char *text, cRect position, tColor colorFg, tColor colorBg,
+    void SetText(const char *text, const cRect &position, tColor colorFg, tColor colorBg,
                  cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep();
     void Draw() const;
@@ -66,7 +66,7 @@ class cTextScrollers : public cThread {
     void SetScrollStep(int step) { m_ScrollStep = step; }
     void SetScrollDelay(int delay) { m_ScrollDelay = delay; }
     void SetScrollType(int type) { m_ScrollType = type; }
-    void AddScroller(const char *text, cRect position, tColor colorFg, tColor colorBg,
+    void AddScroller(const char *text, const cRect &position, tColor colorFg, tColor colorBg,
                      cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive() { return Active(); }

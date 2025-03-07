@@ -433,7 +433,7 @@ void cFlatBaseRender::TopBarUpdate() {
             RecCounterFuture.get();
 
 #ifdef DEBUGFUNCSCALL
-            dsyslog("   Got number of recording timers (%d): %ld ms", NumRec, Timer.Elapsed());
+            dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
 
             if (NumRec) {
@@ -644,16 +644,16 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     static const struct {
         tColor color;
         const char* icon;
-    } messageSettings[] = {
+    } MessageSettings[] = {
         {Theme.Color(clrMessageStatus), "message_status"},    // mtStatus = 0
         {Theme.Color(clrMessageInfo), "message_info"},        // mtInfo
         {Theme.Color(clrMessageWarning), "message_warning"},  // mtWarning
         {Theme.Color(clrMessageError), "message_error"}       // mtError
     };
 
-    const int typeIndex {static_cast<int>(Type)};
-    tColor Col {messageSettings[typeIndex].color};
-    cString Icon = messageSettings[typeIndex].icon;
+    const int TypeIndex {static_cast<int>(Type)};
+    const tColor Col {MessageSettings[TypeIndex].color};
+    const cString Icon = MessageSettings[TypeIndex].icon;
 
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
@@ -760,8 +760,9 @@ void cFlatBaseRender::MessageClear() {
     MessageScroller.Clear();
 }
 
-void cFlatBaseRender::ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
-                                        tColor ColorBg, int Type, bool SetBackground, bool IsSignal) {
+void cFlatBaseRender::ProgressBarCreate(const cRect &Rect, int MarginHor, int MarginVer, tColor ColorFg,
+                                        tColor ColorBarFg, tColor ColorBg, int Type, bool SetBackground,
+                                        bool IsSignal) {
     m_ProgressBarTop = Rect.Top();
     m_ProgressBarWidth = Rect.Width();
     m_ProgressBarHeight = Rect.Height();
@@ -778,8 +779,13 @@ void cFlatBaseRender::ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer
 
     m_ProgressBarColorBarCurFg = Theme.Color(clrReplayProgressBarCurFg);
 
-    ProgressBarMarkerPixmap = CreatePixmap(m_Osd, "ProgressBarMarkerPixmap", 4, Rect);  // Keep marker on top of errors
-    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3, Rect);              // Also used for error marks
+    // Layer 4: Marker pixmap - topmost layer for progress markers
+    ProgressBarMarkerPixmap = CreatePixmap(m_Osd, "ProgressBarMarkerPixmap", 4, Rect);
+
+    // Layer 3: Main progress bar and error marks
+    ProgressBarPixmap = CreatePixmap(m_Osd, "ProgressBarPixmap", 3, Rect);
+
+    // Layer 2: Background layer with margins
     ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
                                        cRect(Rect.Left() - MarginVer, Rect.Top() - MarginHor,
                                              Rect.Width() + MarginVer * 2, Rect.Height() + MarginHor * 2));
@@ -800,9 +806,9 @@ void cFlatBaseRender::ProgressBarDrawBgColor() {
     PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
 }
 
-void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rect, cRect rectBg, int Current,
-                                         int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
-                                         bool SetBackground, bool IsSignal) {
+void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rect, const cRect &rectBg,
+                                         int Current, int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
+                                         int Type, bool SetBackground, bool IsSignal) {
     if (!Pixmap) return;
 
     if (PixmapBg && SetBackground)
@@ -1325,7 +1331,7 @@ int cFlatBaseRender::ScrollBarWidth() {
     return m_ScrollBarWidth;
 }
 
-void cFlatBaseRender::DecorBorderClear(cRect Rect, int Size) {
+void cFlatBaseRender::DecorBorderClear(const cRect &Rect, int Size) {
     const int Size2 {Size * 2};
     const int TopDecor {Rect.Top() - Size};
     const int LeftDecor {Rect.Left() - Size};

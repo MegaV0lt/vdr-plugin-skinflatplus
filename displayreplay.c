@@ -589,6 +589,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     }  // Config.PlaybackShowEndTime
 
+    // TODO: Update only once per second
     //* Draw Banner/Poster
     if (m_Recording) {
         cString MediaPath {""};

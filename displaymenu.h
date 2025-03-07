@@ -150,7 +150,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
                            bool CanScrollDown, bool IsContent = false);
         int ItemsHeight();
         bool CheckProgressBar(const char *text);
-        void DrawProgressBarFromText(cRect rec, cRect recBg, const char *bar, tColor ColorFg,
+        void DrawProgressBarFromText(const cRect &rec, const cRect &recBg, const char *bar, tColor ColorFg,
                                      tColor ColorBarFg, tColor ColorBg);
 
         // static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;  // Unused?
