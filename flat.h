@@ -36,6 +36,8 @@
 #define assertm(exp, msg) assert(((void)msg, exp))
 // Includes and defines for assert()
 
+#include "./services/scraper2vdr.h"
+
 #include "./config.h"
 #include "./imagecache.h"
 
@@ -270,6 +272,16 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth); 
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
 cPlugin *GetScraperPlugin();
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
+    std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
+    std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
+    const cRecording *Recording = nullptr);                              // NOLINT
+int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event = nullptr, const cRecording *Recording = nullptr);  // NOLINT
+
+void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
+void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT
+
+
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);

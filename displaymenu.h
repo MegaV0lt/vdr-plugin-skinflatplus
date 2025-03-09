@@ -17,7 +17,7 @@
 #include <sstream>
 #include <string>
 
-#include "./services/scraper2vdr.h"
+// #include "./services/scraper2vdr.h"
 
 #include "./baserender.h"
 #include "./complexcontent.h"
@@ -126,25 +126,22 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
                                  "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                  "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
-        cString MainMenuText(const cString &Text);
-        cString GetIconName(const std::string &element);
+        cString MainMenuText(const cString &Text) const;
+        cString GetIconName(const std::string &element) const;
         cString GetMenuIconName() const;
 
-        cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder);
+        cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;
         cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
-        void GetTimerCounts(uint &TimerActiveCount, uint &TimerCount);  // NOLINT
+        void GetTimerCounts(uint &TimerActiveCount, uint &TimerCount) const;  // NOLINT
 
-        bool IsRecordingOld(const cRecording *Recording, int Level);
+        bool IsRecordingOld(const cRecording *Recording, int Level) const;
 
-        const char *GetGenreIcon(uchar genre);
-        void InsertGenreInfo(const cEvent *Event, cString &Text);  // NOLINT
-        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons);  // NOLINT
+        const char *GetGenreIcon(uchar genre) const;
+        void InsertGenreInfo(const cEvent *Event, cString &Text) const;  // NOLINT
+        void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const;  // NOLINT
 
-        void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
-        void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT
-
-        time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level);
+        time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 
         void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                            bool CanScrollDown, bool IsContent = false);
@@ -159,10 +156,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
         void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
-        void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
-                             std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
-                             std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
-                             const cRecording *Recording = nullptr);                              // NOLINT
 
         void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);

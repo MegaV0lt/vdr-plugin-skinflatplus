@@ -594,52 +594,8 @@ void cFlatDisplayReplay::UpdateInfo() {
         m_LastPosterBannerUpdate = CurTime;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
-        static cPlugin *pScraper = GetScraperPlugin();
-        if (Config.TVScraperReplayInfoShowPoster && pScraper) {
-            ScraperGetEventType call;
-            call.recording = m_Recording;
-            int seriesId {0}, episodeId {0}, movieId {0};
-
-            if (pScraper->Service("GetEventType", &call)) {
-                seriesId = call.seriesId;
-                episodeId = call.episodeId;
-                movieId = call.movieId;
-            }
-            if (call.type == tSeries) {
-                cSeries series;
-                series.seriesId = seriesId;
-                series.episodeId = episodeId;
-                if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 1) {  // Use random banner
-                        // Gets 'entropy' from device that generates random numbers itself
-                        // to seed a mersenne twister (pseudo) random generator
-                        std::mt19937 generator(std::random_device {}());
-
-                        // Make sure all numbers have an equal chance.
-                        // Range is inclusive (so we need -1 for vector index)
-                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                        const std::size_t number {distribution(generator)};
-
-                        MediaPath = series.banners[number].path.c_str();
-                        MediaSize.Set(series.banners[number].width, series.banners[number].height);
-                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                static_cast<int>(number + 1), *MediaPath,
-                                static_cast<int>(series.banners.size()));  // Log result
-                    } else if (series.banners.size() == 1) {               // Just one banner
-                        MediaPath = series.banners[0].path.c_str();
-                        MediaSize.Set(series.banners[0].width, series.banners[0].height);
-                    }
-                }
-            } else if (call.type == tMovie) {
-                cMovie movie;
-                movie.movieId = movieId;
-                if (pScraper->Service("GetMovie", &movie)) {
-                    MediaPath = movie.poster.path.c_str();
-                    MediaSize.Set(movie.poster.width, movie.poster.height);
-                }
-            }
-
+        if (Config.TVScraperReplayInfoShowPoster) {
+            GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {

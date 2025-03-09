@@ -396,21 +396,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     cString MediaPath {""};
     cSize MediaSize {0, 0};  // Width, Height
-
-    static cPlugin *pScraper = GetScraperPlugin();
-    if (Config.TVScraperChanInfoShowPoster && pScraper) {
-        ScraperGetPosterBannerV2 call;
-        call.event = Present;
-        if (pScraper->Service("GetPosterBannerV2", &call)) {
-            if ((call.type == tSeries) && call.banner.path.size() > 0) {
-                MediaSize.Set(call.banner.width, call.banner.height);
-                MediaPath = call.banner.path.c_str();
-            } else if (call.type == tMovie && call.poster.path.size() > 0) {
-                MediaSize.Set(call.poster.width, call.poster.height);
-                MediaPath = call.poster.path.c_str();
-            }
-        }
-    }
+    if (Config.TVScraperChanInfoShowPoster)
+        GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
 
     PixmapFill(ChanEpgImagesPixmap, clrTransparent);
     PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
