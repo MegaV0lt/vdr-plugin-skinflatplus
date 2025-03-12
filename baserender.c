@@ -433,7 +433,8 @@ void cFlatBaseRender::TopBarUpdate() {
             RecCounterFuture.get();
 
 #ifdef DEBUGFUNCSCALL
-            dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
+            if (Timer.Elapsed() > 0)
+                dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
 
             if (NumRec) {
@@ -1149,7 +1150,6 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorE
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks()'
 
     const int Middle {m_ProgressBarHeight / 2};
-
     if (IsCurrent) {  //* Draw current position marker in color of error mark
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
         ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);

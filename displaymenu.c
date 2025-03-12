@@ -244,8 +244,7 @@ int cFlatDisplayMenu::MaxItems() {
     default:
         break;
     }
-    // Use integer division rounding
-    return (m_ScrollBarHeight + ItemHeight - 1) / ItemHeight;
+    return m_ScrollBarHeight / ItemHeight;  // Truncation is wanted here to get only full items displayed
 }
 
 int cFlatDisplayMenu::ItemsHeight() {
@@ -653,21 +652,22 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     const cEvent *Event {nullptr};
     cString EventTitle {""};
     double progress {0.0};
-    LOCK_SCHEDULES_READ;
-    const cSchedule *Schedule = Schedules->GetSchedule(Channel);
-    if (Schedule) {
-        Event = Schedule->GetPresentEvent();
-        if (Event) {
-            // Calculate progress bar
-            const time_t now {time(0)};
-            const double duration = Event->Duration();
-            progress =
-                (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration)) : 0.0;
-
-            EventTitle = Event->Title();
+    {
+        LOCK_SCHEDULES_READ;
+        const cSchedule *Schedule = Schedules->GetSchedule(Channel);
+        if (Schedule) {
+            Event = Schedule->GetPresentEvent();
+            if (Event) {
+                // Calculate progress bar
+                const time_t now {time(0)};
+                const double duration = Event->Duration();
+                progress = (duration > 0)
+                               ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
+                               : 0.0;
+                EventTitle = Event->Title();
+            }
         }
     }
-
     if (WithProvider)
         Buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
     else
@@ -1545,9 +1545,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
         }
     } else if (Event) {
-        dsyslog("flatPlus: SetItemEvent() Try to extract date from event title\n   Title is '%s'", Event->Title());
+        // dsyslog("flatPlus: SetItemEvent() Try to extract date from event title\n   Title is '%s'", Event->Title());
         if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
-            dsyslog("flatPlus: SetItemEvent() Channel is group separator!");
+            // dsyslog("flatPlus: SetItemEvent() Channel is group separator!");
         } else {
             // Extract date from separator
             // epgsearch program '----------------------------------------         Fr. 21.02.2025 ----------------------------------------'  //NOLINT
@@ -1555,7 +1555,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             if (sep.length() > 12) {
                 const std::size_t found {sep.find(" -")};
                 if (found >= 10) {
-                    dsyslog("flatPlus: SetItemEvent() Date string found at %ld", found);
+                    // dsyslog("flatPlus: SetItemEvent() Date string found at %ld", found);
                     const std::string date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
@@ -1563,12 +1563,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {
-                    dsyslog("flatPlus: SetItemEvent() Date string not found!");
+                    // dsyslog("flatPlus: SetItemEvent() Date string not found!");
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
             } else {
-                dsyslog("flatPlus: SetItemEvent() Event title too short!");
+                // dsyslog("flatPlus: SetItemEvent() Event title too short!");
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
@@ -1659,6 +1659,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
     //* Preload for calculation of position
+    // TODO: Move to: if (Config.MenuRecordingView == 1) {  // flatPlus long
+
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
@@ -2225,11 +2227,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                             continue;
                         ++i;
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
-                        LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                        const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
-                        if (channel)
-                            Reruns.Append(cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
-
+                        {
+                            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+                            const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
+                            if (channel)
+                                Reruns.Append(
+                                    cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
+                        }
                         Reruns.Append(cString::sprintf(":  %s", r->event->Title()));
                         // if (!isempty(r->event->ShortText()))
                         //    Reruns.Append(cString::sprintf("~%s", r->event->ShortText()));
@@ -2478,11 +2482,13 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
-            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-            const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
-            if (channel)
-                Text.Append(cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
-
+            {
+                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+                const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
+                if (channel)
+                    Text.Append(
+                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
+            }
             const cEvent *Event = RecInfo->GetEvent();
             if (Event) {
                 // Genre
@@ -2743,7 +2749,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         // The `ChannelFuture.get()` call is used to wait for the asynchronous operation to complete.
         // This ensures that the `RecAdditional` string is properly updated with the channel information
         // before the `Text` string is updated with the `RecAdditional` string.
-        auto ChannelFuture = std::async(
+        auto ChannelFuture = std::async(std::launch::async,
             [&RecAdditional](tChannelID channelId) {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                 const cChannel *Channel = Channels->GetByChannelID(channelId);
@@ -3343,7 +3349,7 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
     static const struct {
         eMenuCategory category;
         const cString icon;
-    } menuIcons[] = {
+    } MenuIcons[] = {
         { mcMain,          cString::sprintf("menuIcons/%s", VDRLOGO) },
         { mcSchedule,      "menuIcons/Schedule" },
         { mcScheduleNow,   "menuIcons/Schedule" },
@@ -3356,10 +3362,10 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
         { mcEvent,         "extraIcons/Info" },
         { mcRecordingInfo, "extraIcons/PlayInfo" }
     };
-
-    for (const auto& icon : menuIcons) {
-        if (icon.category == m_MenuCategory)
-            return icon.icon;
+    // Use structured binding
+    for (const auto& [category, icon] : MenuIcons) {
+        if (category == m_MenuCategory)
+            return icon;
     }
 
     return "";
@@ -3738,16 +3744,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     const int NumDevices {cDevice::NumDevices()};
     bool RecDevices[NumDevices] {false};  // Array initialised to false
 
-    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-        if (Timer->HasFlags(tfRecording)) {
-            if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
-                const cDevice *RecDevice = RecordControl->Device();
-                if (RecDevice) RecDevices[RecDevice->DeviceNumber()] = true;
+    {
+        LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+            if (Timer->HasFlags(tfRecording)) {
+                if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
+                    const cDevice *RecDevice = RecordControl->Device();
+                    if (RecDevice) RecDevices[RecDevice->DeviceNumber()] = true;
+                }
             }
-        }
-    }  // for cTimer
-
+        }  // for cTimer
+    }
     int ActualNumDevices {0};
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int i {0}; i < NumDevices; ++i) {
@@ -3852,36 +3859,37 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     int AllTimers {0};  // All timers and remote timers
 
-    LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-        if (Timer->HasFlags(tfActive) && !Timer->HasFlags(tfRecording)) {
-            if (Timer->Remote()) {
-                if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
-                    TimerRemoteActive.Append(Timer);
-                    AllTimers += 1;
+    {
+        LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
+        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+            if (Timer->HasFlags(tfActive) && !Timer->HasFlags(tfRecording)) {
+                if (Timer->Remote()) {
+                    if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
+                        TimerRemoteActive.Append(Timer);
+                        AllTimers += 1;
+                    }
+                } else {  // Local
+                    if (Config.MainMenuWidgetActiveTimerShowActive) {
+                        TimerActive.Append(Timer);
+                        AllTimers += 1;
+                    }
                 }
-            } else {  // Local
-                if (Config.MainMenuWidgetActiveTimerShowActive) {
-                    TimerActive.Append(Timer);
-                    AllTimers += 1;
+            }
+
+            if (Timer->HasFlags(tfRecording)) {
+                if (Timer->Remote()) {
+                    if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
+                        TimerRemoteRec.Append(Timer);
+                        AllTimers += 1;
+                    }
+                } else {  // Local
+                    if (Config.MainMenuWidgetActiveTimerShowRecording) {
+                        TimerRec.Append(Timer);
+                        AllTimers += 1;
+                    }
                 }
             }
         }
-
-        if (Timer->HasFlags(tfRecording)) {
-            if (Timer->Remote()) {
-                if (Config.MainMenuWidgetActiveTimerShowRemoteRecording) {
-                    TimerRemoteRec.Append(Timer);
-                    AllTimers += 1;
-                }
-            } else {  // Local
-                if (Config.MainMenuWidgetActiveTimerShowRecording) {
-                    TimerRec.Append(Timer);
-                    AllTimers += 1;
-                }
-            }
-        }
-
         if (AllTimers >= Config.MainMenuWidgetActiveTimerMaxCount)
             break;
     }
@@ -4080,17 +4088,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     time_t RecStart {0};
     cString DateTime {""}, Length {""}, StrRec {""};
     div_t TimeHM {0, 0};
-    LOCK_RECORDINGS_READ;
-    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
-        RecStart = Rec->Start();
-        TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);
-        Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
-        DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
-
-        StrRec = cString::sprintf("%s - %s", *DateTime, Rec->Name());
-        Recs.emplace_back(std::make_pair(RecStart, StrRec));
+    {
+        LOCK_RECORDINGS_READ;
+        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+            RecStart = Rec->Start();
+            TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);
+            Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
+            DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
+            StrRec = cString::sprintf("%s - %s", *DateTime, Rec->Name());
+            Recs.emplace_back(std::make_pair(RecStart, StrRec));
+        }
     }
-
     // Sort by RecStart
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
     std::pair<time_t, cString> PairRec {};

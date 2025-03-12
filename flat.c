@@ -154,7 +154,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                 } else if (series.banners.size() == 1) {               // Just one banner
                     MediaPath = series.banners[0].path.c_str();
                 }
-                if (Config.TVScraperEPGInfoShowActors) {
+                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
                     const int ActorsSize = series.actors.size();
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
@@ -174,7 +174,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
             movie.movieId = movieId;
             if (pScraper->Service("GetMovie", &movie)) {
                 MediaPath = movie.poster.path.c_str();
-                if (Config.TVScraperEPGInfoShowActors) {
+                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
                     const int ActorsSize = movie.actors.size();
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
@@ -195,7 +195,6 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 
 // Get MediaPath, MediaSize and MediaType
 int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event, const cRecording *Recording) {  // NOLINT
-    // cSize MediaSize {0, 0};  // As parameter: cSize MediaSize = 0, 0
     static cPlugin *pScraper = GetScraperPlugin();
     if (pScraper) {
         ScraperGetEventType call;
@@ -908,10 +907,11 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     m_Lines = 1;
 
     static const char* const DELIMITER_CHARS = "-.,:;!?_~";
-    char *Blank {nullptr}, *Delim {nullptr};
+    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
     // Pre-calculate string length and reserve memory upfront to reduce reallocations during string manipulations
-    size_t textLen = strlen(m_Text);
-    char *s = static_cast<char*>(malloc(textLen + textLen / 2));  // Reserve extra space for line breaks
+    // size_t textLen = strlen(m_Text);
+    // char *s = static_cast<char*>(malloc(textLen + textLen / 2));  // Reserve extra space for line breaks
+    // char *s = MALLOC(char, textLen + textLen / 2);  // Reserve extra space for line breaks
     // Rest of code using pre-allocated buffer
     int cw {0}, l {0}, sl {0}, w {0};
     int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
@@ -943,7 +943,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
 
-                /* char * */  // s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* char* */  s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
                 /* int */ l = p - m_Text;
                 strncpy(s, m_Text, l);  // Dest, Source, Size
                 s[l] = '\n';            // Insert line break.
@@ -968,7 +968,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0)
+        dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 
