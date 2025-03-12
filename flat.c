@@ -606,15 +606,13 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     bool FsErr {false};
     uint64_t FileSize[MaxFileNum];
     FileSize[0] = 0;
-    int i {0}, rc {0};
+    int rc {0};
     struct stat FileBuf;
     cString FileName {""};
-    do {
-        ++i;
-        if (IsPesRecording)
-            FileName = cString::sprintf("%s/%03d.vdr", RecordingFileName, i);
-        else
-            FileName = cString::sprintf("%s/%05d.ts", RecordingFileName, i);
+    for (uint16_t i {1}; i <= MaxFileNum && !rc; ++i) {
+        FileName = IsPesRecording
+            ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
+            : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
 
         rc = stat(*FileName, &FileBuf);
         if (rc == 0) {
@@ -623,7 +621,7 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
             esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
             FsErr = true;  // Remember failed status for later displaying an '!'
         }
-    } while (i < MaxFileNum && !rc);
+    }
 
     int CuttedLength {0};
     uint64_t RecSizeCutted {0};
