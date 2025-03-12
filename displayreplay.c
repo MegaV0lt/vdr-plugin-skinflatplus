@@ -664,51 +664,49 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw() {
-    if (m_ModeOnly || !IconsPixmap) return;
+    if (m_ModeOnly || !IconsPixmap || m_ScreenWidth <= 0 || m_ScreenHeight <= 0) return;
 
-    if (m_ScreenWidth > 0) {
-        // First line for current, total and cutted length, second line for end time
-        const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
+    // First line for current, total and cutted length, second line for end time
+    const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
 
-        int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
-        cImage *img {nullptr};
-        cString IconName {""};
-        if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
-            IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
-
-            IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
+    int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
+    cImage *img {nullptr};
+    cString IconName {""};
+    if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
+        IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
         }
 
-        if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
-            IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
+        IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
         }
-        // Show audio icon (Dolby, Stereo)
-        if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
-            IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                // left -= m_MarginItem2;
-            }
+    }
+
+    if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
+        IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
+        }
+    }
+
+    if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
+        IconName = *GetCurrentAudioIcon();  // Show audio icon (Dolby, Stereo)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            // left -= m_MarginItem2;
         }
     }
 }
