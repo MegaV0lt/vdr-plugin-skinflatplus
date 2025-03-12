@@ -13,6 +13,7 @@
 #include <string>
 
 #include "./flat.h"
+#include "imageloader.h"
 
 using Magick::Image;
 using Magick::Geometry;
@@ -212,28 +213,31 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
 #endif
 
     //* Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
-    cString ManualPoster {""};
     for (const cString &Image : RecordingImages) {
-        ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/%s", *RecPath, *Image);
-            found = ManualPoster;
-            return true;
-        }
-        ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/../../../%s", *RecPath, *Image);
-            found = ManualPoster;
-            return true;
-        }
-        ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/../../%s", *RecPath, *Image);
-            found = ManualPoster;
+        if (CheckImageExistence(RecPath, Image, found)) {
             return true;
         }
     }
 
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
+    return false;
+}
+
+bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
+    cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
+    ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
+    ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
     return false;
 }
