@@ -12,7 +12,6 @@
 #include <array>
 #include <cstdlib>
 #include <cmath>
-#include "imagescaler.h"
 
 ImageScaler::ImageScaler() :
     m_memory(nullptr),
@@ -175,8 +174,8 @@ void ImageScaler::NextSourceLine() {
     m_src_x = 0;
     m_src_y++;
 
-    if (m_dst_y >= m_dst_height) {
-        esyslog("ImageScaler::NextSourceLine: m_dst_y >= m_dst_height");
+    if (m_dst_y > m_dst_height) {
+        esyslog("ImageScaler::NextSourceLine: m_dst_y (%d) >= m_dst_height (%d)", m_dst_y, m_dst_height);
         return;  // Protect against buffer overrun
     }
 

@@ -209,18 +209,16 @@ class cComplexContent {
  private:
     std::vector<cSimpleContent> Contents;
 
+    cOsd *m_Osd {nullptr};
     cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
     cRect m_Position {0, 0, 0, 0};
 
     tColor m_ColorBg {0};
-
     bool m_FullFillBackground {false};
     int m_DrawPortHeight {0};
     int m_ScrollSize {0};
     bool m_IsShown {false};
     bool m_IsScrollingActive {true};
-
-    cOsd *m_Osd {nullptr};
 
     void CalculateDrawPortHeight();
 };

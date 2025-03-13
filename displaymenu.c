@@ -3889,9 +3889,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     }
                 }
             }
+            if (AllTimers >= Config.MainMenuWidgetActiveTimerMaxCount)
+                break;
         }
-        if (AllTimers >= Config.MainMenuWidgetActiveTimerMaxCount)
-            break;
     }
 
     if (AllTimers == 0 && Config.MainMenuWidgetActiveTimerHideEmpty)

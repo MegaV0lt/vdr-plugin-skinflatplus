@@ -11,9 +11,9 @@ cComplexContent::cComplexContent() {
     Contents.reserve(128);  // Set to at least 128 entry's
 }
 
-cComplexContent::cComplexContent(cOsd *osd, int ScrollSize)
-    : m_Osd(osd)
-    , m_ScrollSize(ScrollSize) {
+cComplexContent::cComplexContent(cOsd *osd, int ScrollSize) {
+    m_Osd = osd;
+    m_ScrollSize = ScrollSize;
     Contents.reserve(128);
 }
 

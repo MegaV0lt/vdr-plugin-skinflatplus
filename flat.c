@@ -609,7 +609,8 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
     int rc {0};
     struct stat FileBuf;
     cString FileName {""};
-    for (uint16_t i {1}; i <= MaxFileNum && !rc; ++i) {
+    uint16_t i {1};  // Used also later for RecSize
+    for (; i <= MaxFileNum && !rc; ++i) {
         FileName = IsPesRecording
             ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
             : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
