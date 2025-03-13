@@ -7,9 +7,12 @@
  */
 #include "./imagescaler.h"
 
+#include <vdr/tools.h>
+
 #include <array>
 #include <cstdlib>
 #include <cmath>
+#include "imagescaler.h"
 
 ImageScaler::ImageScaler() :
     m_memory(nullptr),
@@ -150,10 +153,32 @@ static unsigned shift_clamp(int x) {
     return (x < 0) ? 0 : (x > 255) ? 255 : x;
 }
 
+inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
+    return shift_clamp(pixel[0]) |
+           (shift_clamp(pixel[1]) << 8) |
+           (shift_clamp(pixel[2]) << 16) |
+           (shift_clamp(pixel[3]) << 24);
+}
+
+/**
+ * Processes the next source line for vertical image scaling
+ * 
+ * Applies vertical filtering coefficients to calculate output pixels
+ * using a 4-tap filter. Each output pixel is computed as weighted sum
+ * of 4 input pixels using pre-calculated coefficients.
+ * 
+ * The filter coefficients (h0-h3) are optimized for minimal ringing
+ * while preserving sharpness.
+ */
 void ImageScaler::NextSourceLine() {
     m_dst_x = 0;
     m_src_x = 0;
     m_src_y++;
+
+    if (m_dst_y >= m_dst_height) {
+        esyslog("ImageScaler::NextSourceLine: m_dst_y >= m_dst_height");
+        return;  // Protect against buffer overrun
+    }
 
     int h0 {0}, h1 {0}, h2 {0}, h3 {0};  // Init outside of loop
     // TmpPixel *src {nullptr}, t {nullptr};
@@ -167,13 +192,11 @@ void ImageScaler::NextSourceLine() {
         unsigned             *dst = m_dst_image + m_dst_stride * m_dst_y;
 
         for (unsigned i {0}; i < m_dst_width; ++i) {
-            const ImageScaler::TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
+            const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
             src += 4;
-            dst[i] = shift_clamp(t[0]) | (shift_clamp(t[1]) << 8) | (shift_clamp(t[2]) << 16)
-                     | (shift_clamp(t[3]) << 24);
+            dst[i] = PackPixel(t);
         }
 
         m_dst_y++;
     }
 }
-

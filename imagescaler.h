@@ -81,6 +81,7 @@ class ImageScaler {
 
     //! This is called whenever one input line is processed completely
     void NextSourceLine();
+    unsigned PackPixel(const TmpPixel &pixel);
 
     TmpPixel   m_hbuf[4];      //! Ring buffer for 4 input pixels
     char      *m_memory;       //! Buffer container
