@@ -157,8 +157,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
                        std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                        int NumActors);  // Add Actors to complexcontent
 
-        void DrawRecordingStateIcon(const cRecording * Recording, int Left, int Top, bool Current);
-        void DrawRecordingErrorIcon(const cRecording * Recording, int Left, int Top, bool Current);
+        void DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current);
+        void DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top);
+        void DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current);
         void DrawRecordingFolderIcon(int &Left, int Top, bool Current);  // NOLINT
 
         void DrawMainMenuWidgets();

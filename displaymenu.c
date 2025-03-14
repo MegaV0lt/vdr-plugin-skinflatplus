@@ -1653,6 +1653,29 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
 }
 
 /**
+ * @brief Draws an icon representing a recording format (SD, HD, UHD).
+ *
+ * This function draws an overlay icon at the specified position to indicate the recording format.
+ *
+ * @param Recording The recording whose format should be drawn.
+ * @param Left The x-coordinate where the icon should be drawn.
+ * @param Top The y-coordinate where the icon should be drawn.
+ */
+void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
+    const float ICON_FORMAT_HEIGHT_RATIO = 1.0 / 3.0;
+    const cString IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
+    if (!isempty(*IconName)) {
+        const int ImageHeight = m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
+        const cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight)};
+        if (img) {
+            const int ImageTop {Top + m_FontHeight - m_FontAscender};
+            const int ImageLeft {Left + m_FontHeight - img->Width()};
+            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        }
+    }
+}
+
+/**
  * @brief Draws an icon representing the error state of a recording.
  *
  * This function draws an overlay icon at the specified position to indicate the error state of a recording.
@@ -1751,7 +1774,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     // TODO: Move to: if (Config.MenuRecordingView == 1) {  // flatPlus long
 
     const float ICON_CUT_HEIGHT_RATIO = 2.0 / 3.0;
-    const float ICON_FORMAT_HEIGHT_RATIO = 1.0 / 3.0;
 
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
@@ -1810,19 +1832,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
-            if (Config.MenuItemRecordingShowFormatIcons) {
-                IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
-                if (!isempty(*IconName)) {
-                    const int ImageHeight =
-                        m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
-                    img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
-                        if (img) {
-                            const int ImageTop {Top + m_FontHeight - m_FontAscender};
-                            const int ImageLeft {Left + m_FontHeight - img->Width()};
-                            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                        }
-                }
-            }
+
+            if (Config.MenuItemRecordingShowFormatIcons)
+                DrawRecordingFormatIcon(Recording, Left, Top);  // Show (SD), HD or UHD Logo
 
             Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
@@ -1955,19 +1967,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
-            if (Config.MenuItemRecordingShowFormatIcons) {
-                IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
-                if (!isempty(*IconName)) {
-                    const int ImageHeight =
-                        m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
-                    img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
-                    if (img) {
-                        const int ImageTop {Top + m_FontHeight - m_FontAscender};
-                        const int ImageLeft {Left + m_FontHeight - img->Width()};
-                        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                    }
-                }
-            }
+
+            if (Config.MenuItemRecordingShowFormatIcons)
+                DrawRecordingFormatIcon(Recording, Left, Top);  // Show (SD), HD or UHD Logo
 
             Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
