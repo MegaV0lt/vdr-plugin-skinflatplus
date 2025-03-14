@@ -159,6 +159,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
         void DrawRecordingStateIcon(const cRecording * Recording, int Left, int Top, bool Current);
         void DrawRecordingErrorIcon(const cRecording * Recording, int Left, int Top, bool Current);
+        void DrawRecordingFolderIcon(int &Left, int Top, bool Current);  // NOLINT
 
         void DrawMainMenuWidgets();
         int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);

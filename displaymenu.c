@@ -1664,7 +1664,6 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
  * @param Top The y-coordinate where the icon should be drawn.
  * @param Current Boolean indicating whether the recording is the current item.
  */
-
 void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current) {
     const cString IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
     cImage *img {nullptr};
@@ -1674,6 +1673,27 @@ void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int L
     }
     if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
     if (img) MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
+}
+
+/**
+ * @brief Draws an icon representing a folder.
+ *
+ * This function draws an overlay icon at the specified position to indicate a folder.
+ * The icon is visually differentiated if the folder is the current item.
+ *
+
+ * @param Left The x-coordinate where the icon should be drawn. The method will update this value to the right of the icon.
+ * @param Top The y-coordinate where the icon should be drawn.
+ * @param Current Boolean indicating whether the folder is the current item.
+ */
+void cFlatDisplayMenu::DrawRecordingFolderIcon(int &Left, int Top, bool Current) {
+    cImage *img {nullptr};
+    if (Current) img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
+    if (!img) img = ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
+    if (img) {
+        MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+        Left += img->Width() + m_MarginItem;
+    }
 }
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
@@ -1815,15 +1835,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
         } else if (Total > 0) {  // Folder with recordings
-            img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
-            if (img) {
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                Left += img->Width() + m_MarginItem;
-            }
+            DrawRecordingFolderIcon(Left, Top, Current);
 
             const int DigitsMaxWidth {m_Font->Width("9999") + m_MarginItem};  // Use same width for recs and new recs
             Buffer = cString::sprintf("%d", Total);
@@ -1879,15 +1891,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
             // LeftWidth += m_Font->Width(*RecName) + m_MarginItem2;  //* Unused from here
         } else if (Total == -1) {  // Folder without recordings
-            img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
-            if (img) {
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                Left += img->Width() + m_MarginItem;
-            }
+            DrawRecordingFolderIcon(Left, Top, Current);
 
             if (Current && m_Font->Width(Recording->FileName()) > (m_MenuItemWidth - Left - m_MarginItem) &&
                 Config.ScrollerEnable) {
@@ -1968,15 +1972,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
 
         } else if (Total > 0) {  // Folder with recordings
-            img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
-            if (img) {
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                Left += img->Width() + m_MarginItem;
-            }
+            DrawRecordingFolderIcon(Left, Top, Current);
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
@@ -2020,15 +2016,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 }
             }
         } else if (Total == -1) {  // Folder without recordings
-            img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("folder_cur", m_FontHeight, m_FontHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("folder", m_FontHeight, m_FontHeight);
-            if (img) {
-                MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                Left += img->Width() + m_MarginItem;
-            }
+            DrawRecordingFolderIcon(Left, Top, Current);
+
             if (Current && m_Font->Width(Recording->FileName()) > (m_MenuItemWidth - Left - m_MarginItem) &&
                 Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
