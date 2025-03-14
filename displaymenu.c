@@ -1608,7 +1608,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     return true;
 }
 
-
 /**
  * @brief Draws an icon representing the state of a recording.
  *
@@ -1623,15 +1622,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
  */
 void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current) {
     cImage *img {nullptr};
-    // Show if recording is still in progress (ruTimer), or played (ruReplay)
     const int RecordingIsInUse {Recording->IsInUse()};
     if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
-        // img = nullptr;
         if (Current) img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
         if (!img) img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
         if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
     } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
-        // img = nullptr;
         if (Current) img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
         if (!img) img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
         // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
@@ -1642,7 +1638,6 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
         if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
     } else /* if (!RecordingIsInUse) */ {
         const cString IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
-        // img = nullptr;
         if (Current) {
             const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
             img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
@@ -1770,11 +1765,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_MenuItemLastHeight = y + m_ItemRecordingHeight;
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
-    //* Preload for calculation of position
-    // TODO: Move to: if (Config.MenuRecordingView == 1) {  // flatPlus long
-
     const float ICON_CUT_HEIGHT_RATIO = 2.0 / 3.0;
-
+    //* Preload for calculation of position
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
@@ -1822,9 +1814,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            if (Config.MenuItemRecordingShowRecordingErrors) {
+            if (Config.MenuItemRecordingShowRecordingErrors)
                 DrawRecordingErrorIcon(Recording, Left, Top, Current);
-            }
 #endif
 
             Left += ImgRecNewWidth + m_MarginItem;
@@ -1957,9 +1948,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            if (Config.MenuItemRecordingShowRecordingErrors) {
+            if (Config.MenuItemRecordingShowRecordingErrors)
                 DrawRecordingErrorIcon(Recording, Left, Top, Current);
-            }
 #endif
 
             Left += ImgRecNewWidth + m_MarginItem;
@@ -2701,9 +2691,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_MenuItemWidth = m_cWidth;
 
     cString RecAdditional {""}, Text {""}, TextAdditional {""};
-    // Text.imbue(std::locale {""});
-    // TextAdditional.imbue(std::locale {""});
-    // RecAdditional.imbue(std::locale {""});
 
     const cRecordingInfo *RecInfo = Recording->Info();
     std::vector<std::string> GenreIcons;
@@ -3204,9 +3191,7 @@ void cFlatDisplayMenu::Flush() {
     dsyslog("flatPlus: cFlatDisplayMenu::Flush()");
 #endif
 
-    if (!MenuPixmap) return;
-
-    if (Config.MenuFullOsd && !m_MenuFullOsdIsDrawn) {
+    if (Config.MenuFullOsd && !m_MenuFullOsdIsDrawn && MenuPixmap) {
         MenuPixmap->DrawRectangle(cRect(0, m_MenuItemLastHeight - Config.decorBorderMenuItemSize,
                                         m_MenuItemWidth + Config.decorBorderMenuItemSize * 2,
                                         MenuPixmap->ViewPort().Height() - m_MenuItemLastHeight + m_MarginItem),
