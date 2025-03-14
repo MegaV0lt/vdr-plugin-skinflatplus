@@ -1624,7 +1624,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current) {
     cImage *img {nullptr};
     // Show if recording is still in progress (ruTimer), or played (ruReplay)
-    const int RecordingIsInUse{Recording->IsInUse()};
+    const int RecordingIsInUse {Recording->IsInUse()};
     if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
         // img = nullptr;
         if (Current) img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
@@ -1650,6 +1650,30 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
         if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
         if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
     }
+}
+
+/**
+ * @brief Draws an icon representing the error state of a recording.
+ *
+ * This function draws an overlay icon at the specified position to indicate the error state of a recording.
+ * The icon is based on the number of errors associated with the recording, and is visually differentiated if
+ * the recording is the current item.
+ *
+ * @param Recording Pointer to the recording object whose error state is to be represented.
+ * @param Left The x-coordinate where the icon should be drawn.
+ * @param Top The y-coordinate where the icon should be drawn.
+ * @param Current Boolean indicating whether the recording is the current item.
+ */
+
+void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current) {
+    const cString IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
+    cImage *img {nullptr};
+    if (Current) {
+        const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
+    }
+    if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
+    if (img) MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
 }
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
@@ -1757,18 +1781,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
-
-                img = nullptr;
-                if (Current) {
-                    const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                    img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
-                }
-                if (!img)
-                    img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
-            }  // MenuItemRecordingShowRecordingErrors
+                DrawRecordingErrorIcon(Recording, Left, Top, Current);
+            }
 #endif
 
             Left += ImgRecNewWidth + m_MarginItem;
@@ -1928,18 +1942,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
-                IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
-
-                img = nullptr;
-                if (Current) {
-                    const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                    img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
-                }
-                if (!img)
-                    img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
-            }  // MenuItemRecordingShowRecordingErrors
+                DrawRecordingErrorIcon(Recording, Left, Top, Current);
+            }
 #endif
 
             Left += ImgRecNewWidth + m_MarginItem;
