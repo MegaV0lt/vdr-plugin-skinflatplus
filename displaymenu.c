@@ -18,6 +18,7 @@
 #include "./services/scraper2vdr.h"
 
 #include "./flat.h"
+#include "displaymenu.h"
 // #include "./locale"
 
 #ifndef VDRLOGO
@@ -1607,6 +1608,50 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     return true;
 }
 
+
+/**
+ * @brief Draws an icon representing the state of a recording.
+ *
+ * This function draws an icon at the specified position to indicate whether a recording is currently being recorded,
+ * replayed, is new, or has been seen. The icon is chosen based on the state of the recording and whether it is the
+ * current item.
+ *
+ * @param Recording Pointer to the recording object whose state is to be represented.
+ * @param Left The x-coordinate where the icon should be drawn.
+ * @param Top The y-coordinate where the icon should be drawn.
+ * @param Current Boolean indicating whether the recording is the current item.
+ */
+void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current) {
+    cImage *img {nullptr};
+    // Show if recording is still in progress (ruTimer), or played (ruReplay)
+    const int RecordingIsInUse{Recording->IsInUse()};
+    if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
+        // img = nullptr;
+        if (Current) img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
+        if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+    } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
+        // img = nullptr;
+        if (Current) img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
+        // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
+        if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+    } else if (Recording->IsNew()) {
+        if (Current) img = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
+        if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+    } else /* if (!RecordingIsInUse) */ {
+        const cString IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
+        // img = nullptr;
+        if (Current) {
+            const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+            img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
+        }
+        if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
+        if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+    }
+}
+
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                         int Level, int Total, int New) {
 #ifdef DEBUGFUNCSCALL
@@ -1661,6 +1706,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     //* Preload for calculation of position
     // TODO: Move to: if (Config.MenuRecordingView == 1) {  // flatPlus long
 
+    const float ICON_CUT_HEIGHT_RATIO = 2.0 / 3.0;
+    const float ICON_FORMAT_HEIGHT_RATIO = 1.0 / 3.0;
+
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
         ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
@@ -1706,40 +1754,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += m_Font->Width(*Buffer);
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            const int RecordingIsInUse {Recording->IsInUse()};
-            if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
-                img = nullptr;
-                if (Current)
-                    img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
-                if (!img)
-                    img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
-                img = nullptr;
-                if (Current)
-                    img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
-                if (!img)
-                    img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-                    // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if (Recording->IsNew()) {
-                if (ImgRecNew)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
-            } else /* if (!RecordingIsInUse) */ {
-                IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
-
-                img = nullptr;
-                if (Current) {
-                    const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                    img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
-                }
-                if (!img)
-                    img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            }
+            DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
@@ -1909,39 +1924,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left = m_MenuItemWidth - ImagesWidth;
             Top -= m_FontHeight;
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
-            const int RecordingIsInUse {Recording->IsInUse()};
-            if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
-                img = nullptr;
-                if (Current)
-                    img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
-                if (!img)
-                    img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
-                img = nullptr;
-                if (Current)
-                    img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
-                if (!img)
-                    img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            } else if (Recording->IsNew()) {
-                if (ImgRecNew)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
-            } else {
-                IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
-
-                img = nullptr;
-                if (Current) {
-                    cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                    img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
-                }
-                if (!img)
-                    img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
-                if (img)
-                    MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-            }
+            DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
             if (Config.MenuItemRecordingShowRecordingErrors) {
                 IconName = *GetRecordingErrorIcon(Recording->Info()->Errors());
@@ -1958,9 +1941,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }  // MenuItemRecordingShowRecordingErrors
 #endif
 
-            Left += ImgRecNew->Width() + m_MarginItem;
+            Left += ImgRecNewWidth + m_MarginItem;
             if (Recording->IsEdited() && ImgRecCut) {
-                const int ImageTop {Top + m_FontHeight - ImgRecCut->Height()};  // 2/3 image height
+                const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
             }
             if (Config.MenuItemRecordingShowFormatIcons) {
