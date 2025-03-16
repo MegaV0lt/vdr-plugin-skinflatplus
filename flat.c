@@ -389,11 +389,11 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
         return;
     }
 
-    static constexpr int POSTER_ASPECT_THRESHOLD = 1;            // Smaller than 1 = Poster
-    static constexpr int BANNER_ASPECT_THRESHOLD = 4;            // Smaller than 4 = Portrait, bigger than 4 = Banner
-    static constexpr double POSTER_HEIGHT_RATIO = 0.7;           // Max 70% of pixmap height
-    static constexpr double PORTRAIT_WIDTH_RATIO = 1.0/3.0;      // Max 1/3 of pixmap width
-    static constexpr double BANNER_TARGET_RATIO = 758.0/1920.0;  // To get 758 width @ 1920
+    static constexpr int POSTER_ASPECT_THRESHOLD = 1;              // Smaller than 1 = Poster
+    static constexpr int BANNER_ASPECT_THRESHOLD = 4;              // Smaller than 4 = Portrait, bigger than 4 = Banner
+    static constexpr double POSTER_HEIGHT_RATIO = 0.7;             // Max 70% of pixmap height
+    static constexpr double PORTRAIT_WIDTH_RATIO = 1.0 / 3.0;      // Max 1/3 of pixmap width
+    static constexpr double BANNER_TARGET_RATIO = 758.0 / 1920.0;  // To get 758 width @ 1920
 
     // TODO: Set to max size by default or also allow smaller media site?
     const uint Aspect = MediaSize.Width() / MediaSize.Height();

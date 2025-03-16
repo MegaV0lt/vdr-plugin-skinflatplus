@@ -244,20 +244,16 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             }
         }
         cImage *img {ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight)};
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left, 0), *img);
 
         img = ImgLoader.LoadIcon(*pause, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
 
         img = ImgLoader.LoadIcon(*play, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight2 + m_MarginItem2, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight2 + m_MarginItem2, 0), *img);
 
         img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
     }
 
     if (m_ProgressShown) {
@@ -341,7 +337,6 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
-    // const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
     const int TopSecs {m_FontAscender - FontSecsAscender};
 

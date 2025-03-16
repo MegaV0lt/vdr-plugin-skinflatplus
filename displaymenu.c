@@ -418,9 +418,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     } else {
                         img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
                     }
-                    if (img)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
-                                                   *img);
+                    if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
                     break;
                 case '!':
                     if (Current) {
@@ -430,9 +428,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     } else {
                         img = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
                     }
-                    if (img)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
-                                                   *img);
+                    if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
                     break;
                 // case ' ':
                 default:
@@ -613,10 +609,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     } else {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
-            if (Current)
-                img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img)
-                img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -632,10 +626,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 Left += ImageBgWidth + m_MarginItem2;
             }
         } else {
-            if (Current)
-                img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img)
-                img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -837,10 +829,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                 cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
 
-                if (!isempty(*Audio))
-                    Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                if (!isempty(*Subtitle))
-                    Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
+                if (!isempty(*Audio)) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
+                if (!isempty(*Subtitle)) Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }  // if Components
         }      // EpgAdditionalInfoShow
     } else {
@@ -1026,20 +1016,16 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
-            if (Current)
-                img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img)
-                img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
                 MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
         } else {
-            if (Current)
-                img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img)
-                img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
             if (img) {
                 ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                 ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1267,10 +1253,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
 
             if (IsRadioChannel) {
-                if (Current)
-                    img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img)
-                    img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1284,10 +1268,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
                 }
             } else {
-                if (Current)
-                    img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img)
-                    img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (img) {
                     ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
                     ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1410,20 +1392,16 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (TimerActive) {  // Show timer icon only if timer is active
         if (TimerMatch == tmFull) {
             img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
             if (img) {
                 ImageTop = Top;
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
             }
         } else if (TimerMatch == tmPartial) {
             img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
             if (img) {
                 ImageTop = Top;
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -1435,10 +1413,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Event && Selectable) {
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = nullptr;
-            if (Current)
-                img = ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
-            if (!img)
-                img = ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
             if (img) {
                 ImageTop = Top;
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -1789,7 +1765,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Top {y};
     cString Buffer {""}, IconName {""};
     const cString RecName = *GetRecordingName(Recording, Level, Total == 0);
-    // cImage *img {nullptr};  // Not used
     if (Config.MenuRecordingView == 1) {  // flatPlus long
         if (Total == 0) {  // Recording
             IconName = "recording";
@@ -1865,16 +1840,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Left += m_Font->Width(*Buffer) + m_MarginItem;
                 if (IsRecordingOld(Recording, Level)) {
                     // Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
-                    // img = nullptr;
                     IconName = "recording_old";
                     DrawRecordingIcon(IconName, Left, Top, Current);
-                    /* if (Current)
-                        img = ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
-                    else
-                        img = ImgLoader.LoadIcon("recording_old", m_FontHeight, m_FontHeight);
-                    if (img) {
-                        MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                    } */
                     Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
                 }
                 Left += m_FontHeight + m_MarginItem;  // Increase 'Left' even if no image is drawn
@@ -1991,15 +1958,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_FontSml);
                 if (IsRecordingOld(Recording, Level)) {
                     Left += m_FontSml->Width(*Buffer);
-                    // img = nullptr;
                     IconName = "recording_old";
                     DrawRecordingIcon(IconName, Left, Top, Current);
-                    /* if (Current)
-                        img = ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
-                    else
-                        img = ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
-                    if (img)
-                        MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img); */
                 }
             }
         } else if (Total == -1) {  // Folder without recordings
@@ -3160,9 +3120,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
     const char* SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
-    if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) {
+    if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider)
         TopBarSetMenuIconRight(SortIcons[MenuSortMode - 1]);
-    }
 }
 
 void cFlatDisplayMenu::Flush() {

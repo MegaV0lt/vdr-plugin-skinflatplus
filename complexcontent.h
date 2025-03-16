@@ -72,7 +72,6 @@ class cSimpleContent {
         m_Text = rhs.m_Text;
         m_Image = rhs.m_Image;
         m_Font = rhs.m_Font;
-        // m_Wrapper = rhs.m_Wrapper;
     }
 
     ~cSimpleContent() {
@@ -90,7 +89,6 @@ class cSimpleContent {
             this->m_Text = other.m_Text;
             this->m_Image = other.m_Image;
             this->m_Font = other.m_Font;
-            // this->m_Wrapper = other.m_Wrapper;
         }
         return *this;
     }

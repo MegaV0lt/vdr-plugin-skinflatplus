@@ -30,10 +30,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     int w {0}, h {0};
     w = buffer.columns();
     h = buffer.rows();
-    if (width == 0)
-        width = w;
-    if (height == 0)
-        height = h;
+    if (width == 0) width = w;
+    if (height == 0) height = h;
     if (PreserveAspect) {
         unsigned scale_w = 1000 * width / w;
         unsigned scale_h = 1000 * height / h;

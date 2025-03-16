@@ -175,7 +175,7 @@ void ImageScaler::NextSourceLine() {
     m_src_y++;
 
     if (m_dst_y > m_dst_height) {
-        esyslog("ImageScaler::NextSourceLine: m_dst_y (%d) >= m_dst_height (%d)", m_dst_y, m_dst_height);
+        esyslog("ImageScaler::NextSourceLine: m_dst_y (%d) > m_dst_height (%d)", m_dst_y, m_dst_height);
         return;  // Protect against buffer overrun
     }
 
