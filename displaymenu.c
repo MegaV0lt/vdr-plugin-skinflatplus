@@ -1791,7 +1791,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Top {y};
     cString Buffer {""}, IconName {""};
     const cString RecName = *GetRecordingName(Recording, Level, Total == 0);
-    cImage *img {nullptr};
+    // cImage *img {nullptr};  // Not used
     if (Config.MenuRecordingView == 1) {  // flatPlus long
         if (Total == 0) {  // Recording
             IconName = "recording";
@@ -2053,6 +2053,66 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     return true;
 }
 
+/**
+ * Draws FSK and genre icons on the content header.
+ *
+ * This function attempts to load and draw the FSK (Freiwillige Selbstkontrolle) icon specified 
+ * by the provided `Fsk` string, followed by genre icons listed in the `GenreIcons` vector.
+ * If the specified FSK or genre icon cannot be found, a default 'unknown' icon is used instead.
+ * Icons are drawn at the specified `HeadIconLeft` and `HeadIconTop` position, and `HeadIconLeft`
+ * is adjusted after each icon is drawn to prevent overlap.
+ *
+ * @param IconHeight    The height of the icons to be drawn.
+ * @param HeadIconLeft  A reference to the x-coordinate for the icon's starting point, which is 
+ *                      updated after each icon is drawn.
+ * @param HeadIconTop   The y-coordinate for the icon's starting point.
+ * @param Fsk           A string specifying the FSK icon to be loaded and drawn.
+ * @param GenreIcons    A vector of genre icon names to be loaded and drawn. The vector is sorted 
+ *                      and duplicates are removed before drawing.
+ */
+void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft, int HeadIconTop, const cString &Fsk,
+                                               std::vector<std::string> &GenreIcons) {
+    cString IconName {""};
+    cImage *img {nullptr};
+    if (strlen(*Fsk) > 0) {
+        IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
+        if (img) {
+            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+            HeadIconLeft -= IconHeight + m_MarginItem;
+        } else {
+            isyslog("flatPlus: DrawContentHeadFskGenre() FSK icon not found: %s", *IconName);
+            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
+            if (img) {
+                ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+                HeadIconLeft -= IconHeight + m_MarginItem;
+            }
+        }
+    }
+    bool IsUnknownDrawn {false};
+    std::sort(GenreIcons.begin(), GenreIcons.end());
+    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
+    while (!GenreIcons.empty()) {
+        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
+        if (img) {
+            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+            HeadIconLeft -= IconHeight + m_MarginItem;
+        } else {
+            isyslog("flatPlus: Genre icon not found: %s", *IconName);
+            if (!IsUnknownDrawn) {
+                img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
+                if (img) {
+                    ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+                    HeadIconLeft -= IconHeight + m_MarginItem;
+                    IsUnknownDrawn = true;
+                }
+            }
+        }
+        GenreIcons.pop_back();
+    }
+}
+
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
@@ -2124,45 +2184,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
     int HeadIconLeft {m_chWidth - IconHeight - m_MarginItem};
     int HeadIconTop {m_chHeight - IconHeight - m_MarginItem};  // Position for fsk/genre image
-    cString IconName {""};
-    cImage *img {nullptr};
-    if (strlen(*Fsk) > 0) {
-        IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
-            isyslog("flatPlus: FSK icon not found: %s", *IconName);
-            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
-            if (img) {
-                ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                HeadIconLeft -= IconHeight + m_MarginItem;
-            }
-        }
-    }
-    bool IsUnknownDrawn {false};
-    std::sort(GenreIcons.begin(), GenreIcons.end());
-    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
-    while (!GenreIcons.empty()) {
-        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
-            isyslog("flatPlus: Genre icon not found: %s", *IconName);
-            if (!IsUnknownDrawn) {
-                img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
-                if (img) {
-                    ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                    HeadIconLeft -= IconHeight + m_MarginItem;
-                    IsUnknownDrawn = true;
-                }
-            }
-        }
-        GenreIcons.pop_back();
-    }
+    DrawContentHeadFskGenre(IconHeight, HeadIconLeft, HeadIconTop, Fsk, GenreIcons);
 
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: SetEvent info-text time @ %ld ms", Timer.Elapsed());
@@ -2778,45 +2800,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
     int HeadIconLeft {m_chWidth - IconHeight - m_MarginItem};
     int HeadIconTop {m_chHeight - IconHeight - m_MarginItem};  // Position for fsk/genre image
-    cString IconName {""};
-    cImage *img {nullptr};
-    if (strlen(*Fsk) > 0) {
-        IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
-            isyslog("flatPlus: FSK icon not found: %s", *IconName);
-            img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
-            if (img) {
-                ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                HeadIconLeft -= IconHeight + m_MarginItem;
-            }
-        }
-    }
-    bool IsUnknownDrawn {false};
-    std::sort(GenreIcons.begin(), GenreIcons.end());
-    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
-    while (!GenreIcons.empty()) {
-        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
-            isyslog("flatPlus: Genre icon not found: %s", *IconName);
-            if (!IsUnknownDrawn) {
-                img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
-                if (img) {
-                    ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                    HeadIconLeft -= IconHeight + m_MarginItem;
-                    IsUnknownDrawn = true;
-                }
-            }
-        }
-        GenreIcons.pop_back();
-    }
+    DrawContentHeadFskGenre(IconHeight, HeadIconLeft, HeadIconTop, Fsk, GenreIcons);
 
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: SetRecording info-text time @ %ld ms", Timer.Elapsed());
