@@ -13,7 +13,6 @@
 #include <string>
 
 #include "./flat.h"
-#include "imageloader.h"
 
 using Magick::Image;
 using Magick::Geometry;

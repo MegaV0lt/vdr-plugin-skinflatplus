@@ -1634,7 +1634,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
         if (Current) img = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
         if (!img) img = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
         if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-    } else /* if (!RecordingIsInUse) */ {
+    } else {
         const cString IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
         if (Current) {
             const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
@@ -1690,8 +1690,6 @@ void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int L
     if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
     if (img) MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
 }
-
-
 
 /**
  * @brief Draws a recording icon on the menu.
@@ -1870,15 +1868,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (IsRecordingOld(Recording, Level)) {
                     // Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
                     // img = nullptr;
-                    // IconName = "recording_old";
-                    // DrawRecordingIcon(IconName, Left, Top, Current);
-                    if (Current)
+                    IconName = "recording_old";
+                    DrawRecordingIcon(IconName, Left, Top, Current);
+                    /* if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontHeight, m_FontHeight);
                     else
                         img = ImgLoader.LoadIcon("recording_old", m_FontHeight, m_FontHeight);
                     if (img) {
                         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-                    }
+                    } */
+                    Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
                 }
                 Left += m_FontHeight + m_MarginItem;  // Increase 'Left' even if no image is drawn
             }
@@ -1995,12 +1994,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 if (IsRecordingOld(Recording, Level)) {
                     Left += m_FontSml->Width(*Buffer);
                     // img = nullptr;
-                    if (Current)
+                    IconName = "recording_old";
+                    DrawRecordingIcon(IconName, Left, Top, Current);
+                    /* if (Current)
                         img = ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
                     else
                         img = ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
                     if (img)
-                        MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
+                        MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img); */
                 }
             }
         } else if (Total == -1) {  // Folder without recordings
