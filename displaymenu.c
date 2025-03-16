@@ -18,8 +18,6 @@
 #include "./services/scraper2vdr.h"
 
 #include "./flat.h"
-#include "displaymenu.h"
-// #include "./locale"
 
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
@@ -2242,7 +2240,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
-
+    cImage *img {nullptr};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
     bool FirstRun {true}, SecondRun {false};
@@ -2810,7 +2808,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
-
+    cImage *img {nullptr};
     int ContentTop {0};
     int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
     bool FirstRun {true}, SecondRun {false};
@@ -2853,7 +2851,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
         if (!isempty(*MediaPath)) {
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
-
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
                 const uint Aspect = img->Width() / img->Height();  // Narrowing conversion
