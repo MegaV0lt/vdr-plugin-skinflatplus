@@ -270,18 +270,19 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     PixmapFill(ChanIconsPixmap, clrTransparent);
 
+    // Epg related variables
     cString Epg {""}, EpgShort {""};
     int EpgWidth {0}, EpgShortWidth {0};
     tColor EpgColor {clrTransparent};
 
+    // Time related variables
     cString StartTime {""}, StrTime {""};
     int StrTimeWidth {0};
+    int EventDuration {0};
 
     cString SeenDur {""};
     int SeenDurWidth {0}, SeenDurMaxWidth {0};
     int MaxAvailWidth {0};
-
-    int EventDuration {0};
 
     bool IsRec {false};
     const int RecWidth {m_FontSml->Width("REC")};

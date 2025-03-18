@@ -205,7 +205,7 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
         else if (Recording)
             call.recording = Recording;
         else
-            return;  // Check if both are unset
+            return 0;  // Check if both are unset
 
         int seriesId {0}, episodeId {0}, movieId {0};
         if (pScraper->Service("GetEventType", &call)) {
