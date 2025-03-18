@@ -925,13 +925,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 
     m_Lines = 1;
 
-    static const char* const DELIMITER_CHARS = "-.,:;!?_~";
+    static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
     char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
-    // Pre-calculate string length and reserve memory upfront to reduce reallocations during string manipulations
-    // size_t textLen = strlen(m_Text);
-    // char *s = static_cast<char*>(malloc(textLen + textLen / 2));  // Reserve extra space for line breaks
-    // char *s = MALLOC(char, textLen + textLen / 2);  // Reserve extra space for line breaks
-    // Rest of code using pre-allocated buffer
     int cw {0}, l {0}, sl {0}, w {0};
     int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint sym {0};
