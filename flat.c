@@ -738,7 +738,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                 FT_GlyphSlot slot {face->glyph};
                 rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
-                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
+                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversion
                     FT_Done_Face(face);
                     FT_Done_FreeType(library);
                     return GlyphSize;
