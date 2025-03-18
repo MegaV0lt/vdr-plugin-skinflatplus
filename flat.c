@@ -573,22 +573,22 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     return EditedFrame;
 }
 
-void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
+void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlat::InsertCuttedLengthSize()");
+    dsyslog("flatPlus: cFlat::InsertCutLengthSize()");
 #endif
 
     cMarks Marks;
     bool HasMarks {false};
     const char *RecordingFileName {Recording->FileName()};
-    const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
+    const bool IsPesRecording {Recording->IsPesRecording()};
     const double FramesPerSecond {Recording->FramesPerSecond()};
     std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     int LastIndex {0};
     uint16_t MaxFileNum {0};
 
     if (FramesPerSecond == 0.0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in InsertCuttedLengthSize() FramesPerSecond is 0.0!");
+        esyslog("flatPlus: Error in InsertCutLengthSize() FramesPerSecond is 0.0!");
         return;
     }
 
@@ -603,14 +603,17 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
         }
     }
 
+    if (MaxFileNum == 0) {
+        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum is 0!");
+        return;
+    }
+
     bool FsErr {false};
-    uint64_t FileSize[MaxFileNum];
-    FileSize[0] = 0;
+    std::vector<uint64_t> FileSize(MaxFileNum, 0);
     int rc {0};
     struct stat FileBuf;
     cString FileName {""};
-    uint16_t i {1};  // Used also later for RecSize
-    for (; i <= MaxFileNum && !rc; ++i) {
+    for (uint16_t i {1}; i <= MaxFileNum && !rc; ++i) {
         FileName = IsPesRecording
             ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
             : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
@@ -624,8 +627,8 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
         }
     }
 
-    int CuttedLength {0};
-    uint64_t RecSizeCutted {0};
+    int CutLength {0};
+    uint64_t RecSizeCut {0};
     if (HasMarks && index) {
         uint16_t FileNumber {0};
         off_t FileOffset {0};
@@ -641,42 +644,42 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
                 CutIn = false;
                 CutInOffset = FileSize[FileNumber - 1] + FileOffset;
             } else {
-                CuttedLength += position - CutInFrame;
+                CutLength += position - CutInFrame;
                 CutIn = true;
-                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+                RecSizeCut += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
             }
             cMark *NextMark = Marks.Next(Mark);
             Mark = NextMark;
         }
         if (!CutIn) {
-            CuttedLength += index->Last() - CutInFrame;
+            CutLength += index->Last() - CutInFrame;
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
-            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+            RecSizeCut += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
     }
 
-    if (index) {
+    if (index && LastIndex) {  // Do not show zero value
         Text.Append(
             cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
-        if (HasMarks)
+        if (HasMarks && CutLength > 0)  // Do not show zero value
             Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
-                                         *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
+                                         *IndexToHMSF(CutLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
 
-    const uint64_t RecSize {FileSize[i]};  // In case of error show partial size
+    const uint64_t RecSize {FileSize[MaxFileNum]};
     if (RecSize > MEGABYTE(1023))          // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
         Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
 
-    if (HasMarks && (RecSizeCutted > 0)) {  // Do not show zero value
-        if (RecSizeCutted > MEGABYTE(1023))
+    if (HasMarks && (RecSizeCut)) {  // Do not show zero value
+        if (RecSizeCut > MEGABYTE(1023))
             Text.Append(
-                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCut) / MEGABYTE(1024)));
         else
-            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCut / MEGABYTE(1)));
     }
     Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                  Recording->Lifetime()));

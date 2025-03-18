@@ -2014,18 +2014,18 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 /**
  * Draws FSK and genre icons on the content header.
  *
- * This function attempts to load and draw the FSK (Freiwillige Selbstkontrolle) icon specified 
+ * This function attempts to load and draw the FSK (Freiwillige Selbstkontrolle) icon specified
  * by the provided `Fsk` string, followed by genre icons listed in the `GenreIcons` vector.
  * If the specified FSK or genre icon cannot be found, a default 'unknown' icon is used instead.
  * Icons are drawn at the specified `HeadIconLeft` and `HeadIconTop` position, and `HeadIconLeft`
  * is adjusted after each icon is drawn to prevent overlap.
  *
  * @param IconHeight    The height of the icons to be drawn.
- * @param HeadIconLeft  A reference to the x-coordinate for the icon's starting point, which is 
+ * @param HeadIconLeft  A reference to the x-coordinate for the icon's starting point, which is
  *                      updated after each icon is drawn.
  * @param HeadIconTop   The y-coordinate for the icon's starting point.
  * @param Fsk           A string specifying the FSK icon to be loaded and drawn.
- * @param GenreIcons    A vector of genre icon names to be loaded and drawn. The vector is sorted 
+ * @param GenreIcons    A vector of genre icon names to be loaded and drawn. The vector is sorted
  *                      and duplicates are removed before drawing.
  */
 void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft, int HeadIconTop, const cString &Fsk,
@@ -2449,7 +2449,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
-            InsertCuttedLengthSize(Recording, Text);  // Process marks and insert text
+            InsertCutLengthSize(Recording, Text);  // Process marks and insert text
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
@@ -2723,7 +2723,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
 
-        InsertCuttedLengthSize(Recording, RecAdditional);  // Process marks and insert text
+        InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505
