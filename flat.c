@@ -874,12 +874,20 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
 std::string_view ltrim(std::string_view str) {
     const auto pos(str.find_first_not_of(" \t\n\r\f\v"));
+    if (pos == std::string_view::npos) {
+        // String contains only whitespace, return empty string_view
+        return std::string_view {};
+    }
     str.remove_prefix(std::min(pos, str.length()));
     return str;
 }
 
 std::string_view rtrim(std::string_view str) {
     const auto pos(str.find_last_not_of(" \t\n\r\f\v"));
+    if (pos == std::string_view::npos) {
+        // String contains only whitespace, return empty string_view
+        return std::string_view {};
+    }
     str.remove_suffix(std::min(str.length() - pos - 1, str.length()));
     return str;
 }
