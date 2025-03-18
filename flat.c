@@ -124,7 +124,9 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         if (Event)
             call.event = Event;
         else if (Recording)
-            call.recording = Recording;  // Check if both are unset
+            call.recording = Recording;
+        else
+            return;  // Check if both are unset
 
         int seriesId {0}, episodeId {0}, movieId {0};
         if (pScraper->Service("GetEventType", &call)) {
@@ -201,7 +203,9 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
         if (Event)
             call.event = Event;
         else if (Recording)
-            call.recording = Recording;  // Check if both are unset
+            call.recording = Recording;
+        else
+            return;  // Check if both are unset
 
         int seriesId {0}, episodeId {0}, movieId {0};
         if (pScraper->Service("GetEventType", &call)) {
