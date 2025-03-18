@@ -119,7 +119,10 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     m_LastScreenWidth = -1;
 
     bool IsGroup {false};
-    cString ChannelName {""}, ChannelNumber {""}, TransponderInfo {""};
+    cString ChannelName {""}, ChannelNumber {""};
+#ifdef SHOW_TRANSPONDERINFO
+    cString TransponderInfo {""};
+#endif
     if (Channel) {
         m_IsRadioChannel = ((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false;
         IsGroup = Channel->GroupSep();
@@ -154,10 +157,11 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                 Theme.Color(clrChannelBg), m_Font);
 
-    if (!isempty(*TransponderInfo)) {
+#ifdef SHOW_TRANSPONDERINFO
+    if (!isempty(*TransponderInfo))
         ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), 0), *TransponderInfo,
                                     Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg), m_Font);
-    }
+#endif
 
     PixmapFill(ChanLogoPixmap, clrTransparent);
     PixmapFill(ChanLogoBGPixmap, clrTransparent);
