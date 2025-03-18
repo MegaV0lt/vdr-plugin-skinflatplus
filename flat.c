@@ -815,7 +815,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
         //* Insert blocks at (space)
         std::size_t pos {0};  // Position also used in following loops
-        for (pos = Line.find(' '); pos != std::string::npos && (InsertedFillChar + FillCharBlock <= NeedFillChar);
+        for (pos = Line.find(' ');
+             pos != std::string::npos && pos > 0 && (InsertedFillChar + FillCharBlock <= NeedFillChar);
              pos = Line.find(' ', pos + FillCharsLength + 1)) {
             if (!isspace(Line[pos - 1])) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
@@ -829,13 +830,14 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
         //* Insert blocks at (.,?!;)
         for (pos = Line.find_first_of(PUNCTUATION_CHARS);
-             pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
+             pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
              pos = Line.find_first_of(PUNCTUATION_CHARS, pos + FillCharsLength + 1)) {
             if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
                 // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
                 Line.insert(pos + 1, FillChars);
                 InsertedFillChar += FillCharBlock;
-                LineLength = Line.length();
+                // LineLength = Line.length();  // Recalculating the entire length
+                LineLength += FillCharsLength;  // Just add the length we inserted
             }
         }
 #ifdef DEBUGFUNCSCALL
@@ -843,9 +845,12 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert the remainder of 'NeedFillChar' from right to left
+        std::size_t PrevPos = std::string::npos;
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
+               pos < PrevPos &&  // Ensure position is decreasing (potential infinite loop)
                (InsertedFillChar < NeedFillChar)) {
-            if (!(isspace(Line[pos - 1]))) {
+            PrevPos = pos;
+            if (pos > 0 && !(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert char at %ld", pos);
                 Line.insert(pos, FillChar);
                 ++InsertedFillChar;
