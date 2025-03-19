@@ -27,15 +27,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_HeightBottom += m_FontSmlHeight + m_MarginItem;
 
     int height {m_HeightBottom};
-    ChanInfoBottomPixmap =
-        CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1,
-                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                           m_ChannelWidth, m_HeightBottom));
-
-    ChanIconsPixmap =
-        CreatePixmap(m_Osd, "ChanIconsPixmap", 2,
-                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                           m_ChannelWidth, m_HeightBottom));
+    const cRect ChanInfoViewPort {Config.decorBorderChannelSize,
+                                  Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
+                                  m_HeightBottom};
+    ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoViewPort);
+    ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoViewPort);
 
     // Area for TVScraper images
     m_TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
@@ -46,15 +42,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
     // Pixmap for channel logo background
-    ChanLogoBGPixmap =
-        CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2,
-                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                           m_HeightBottom * 2, m_HeightBottom * 2));
-
-    ChanLogoPixmap =
-        CreatePixmap(m_Osd, "ChanLogoPixmap", 3,
-                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                           m_HeightBottom * 2, m_HeightBottom * 2));
+    const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
+                                  Config.decorBorderChannelSize + m_ChannelHeight - height,
+                                  m_HeightBottom * 2, m_HeightBottom * 2};
+    ChanLogoBGPixmap = CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2, ChanLogoViewPort);
+    ChanLogoPixmap = CreatePixmap(m_Osd, "ChanLogoPixmap", 3, ChanLogoViewPort);
 
     height += Config.decorProgressChannelSize + m_MarginItem2;
     ProgressBarCreate(cRect(Config.decorBorderChannelSize,
