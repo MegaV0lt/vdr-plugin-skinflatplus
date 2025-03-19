@@ -1328,15 +1328,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     }
 
                     if (!IsGroup) {  // Exclude epg2vdr group separator
+                        const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, PBHeight};
                         if (Current)
-                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
-                                               cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
+                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
                                                Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
                                                Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType,
                                                false);
                         else
-                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, cRect(PBLeft, PBTop, PBWidth, PBHeight),
-                                               cRect(PBLeft, PBTop, PBWidth, PBHeight), progress, 100,
+                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
                                                Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
                                                Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
                     }
