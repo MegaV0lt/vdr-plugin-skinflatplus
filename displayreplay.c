@@ -25,14 +25,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                 m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
-    LabelPixmap =
-        CreatePixmap(m_Osd, "LabelPixmap", 1,
-                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
-    IconsPixmap =
-        CreatePixmap(m_Osd, "IconsPixmap", 2,
-                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
+    const cRect LabelPixmapViewPort{Config.decorBorderReplaySize,
+                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                                    m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight};
+    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, LabelPixmapViewPort);
+    IconsPixmap = CreatePixmap(m_Osd, "IconsPixmap", 2, LabelPixmapViewPort);
 
     /* Make Config.decorProgressReplaySize even
     https://stackoverflow.com/questions/4739388/make-an-integer-even
