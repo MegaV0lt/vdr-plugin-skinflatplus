@@ -367,7 +367,7 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0!");
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
         return "recording_seen_0";
     }
 
@@ -376,7 +376,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
-    const int idx = std::min(static_cast<int>(FrameSeen * 10.0), 10);
+    const int idx = std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10);  // 0..10 rounded
     const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
                                    "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
                                    "recording_seen_8", "recording_seen_9", "recording_seen_10"};
