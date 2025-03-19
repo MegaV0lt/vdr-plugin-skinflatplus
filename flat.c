@@ -368,19 +368,15 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
-        return "recording_seen_0";
+        return SeenIconNames[0];  // 0 = 0%
     }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
-    if (FrameSeen >= SeenThreshold) return "recording_seen_10";
+    if (FrameSeen >= SeenThreshold) return SeenIconNames[10];  // 10 = 100%
 
     const int idx = std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10);  // 0..10 rounded
-    //? Define this outside the function, perhaps near other global variables or constants (static const)
-    const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
-                                   "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
-                                   "recording_seen_8", "recording_seen_9", "recording_seen_10"};
     return SeenIconNames[idx];
 }
 
@@ -727,6 +723,14 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return source.substr(StartPos, EndPos - StartPos);
 }
 
+/**
+ * @brief Get the size of a glyph in a given font and font height.
+ * @param[in] Name The name of the font to use.
+ * @param[in] CharCode The character code of the glyph to query.
+ * @param[in] FontHeight The height of the font in pixels.
+ * @return The size of the glyph in pixels, rounded up to the nearest integer.
+ * @note This function returns 0 if any error occurs during the execution of the function.
+ */
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
     FT_Library library;
     FT_Face face;
