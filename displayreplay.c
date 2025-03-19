@@ -174,7 +174,7 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 }
 
 void cFlatDisplayReplay::Action() {
-    time_t CurTime;
+    time_t CurTime {0};
     while (Running()) {
         time(&CurTime);
         if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay) {
