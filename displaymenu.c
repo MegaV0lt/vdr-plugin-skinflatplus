@@ -717,16 +717,13 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 }
 
                 Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
+                const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize};
                 if (Current)
-                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap,
-                                       cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize),
-                                       cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize), progress, 100,
+                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
                                        Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
                                        Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false);
                 else
-                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap,
-                                       cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize),
-                                       cRect(PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize), progress, 100,
+                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
                                        Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
                                        Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
                 Left += Width + m_MarginItem;
