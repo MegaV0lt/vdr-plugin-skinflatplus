@@ -610,12 +610,10 @@ void cFlatBaseRender::MessageCreate() {
         m_MessageHeight += 8;
 
     const int top {m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize};
-    MessagePixmap = CreatePixmap(
-        m_Osd, "MessagePixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
-    MessageIconPixmap = CreatePixmap(
-        m_Osd, "MessageIconPixmap", 5,
-        cRect(Config.decorBorderMessageSize, top, m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight));
+    const cRect MessagePixmapViewPort {Config.decorBorderMessageSize, top,
+                                       m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight};
+    MessagePixmap = CreatePixmap(m_Osd, "MessagePixmap", 5, MessagePixmapViewPort);
+    MessageIconPixmap = CreatePixmap(m_Osd, "MessageIconPixmap", 5, MessagePixmapViewPort);
     PixmapFill(MessagePixmap, clrTransparent);
     PixmapFill(MessageIconPixmap, clrTransparent);
 
