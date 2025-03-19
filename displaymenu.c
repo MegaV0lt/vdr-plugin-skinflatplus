@@ -53,20 +53,19 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     m_MenuWidth = m_OsdWidth;
     m_MenuTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuItemSize;
-    MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
-    MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2,
-                                     cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
-    MenuIconsPixmap = CreatePixmap(m_Osd, "MenuIconsPixmap", 3, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
-    MenuIconsOvlPixmap =
-        CreatePixmap(m_Osd, "MenuIconsOvlPixmap", 4, cRect(0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight));
+    const cRect MenuPixmapViewPort {0, m_MenuTop, m_MenuWidth, m_ScrollBarHeight};
+    MenuPixmap = CreatePixmap(m_Osd, "MenuPixmap", 1, MenuPixmapViewPort);
+    MenuIconsBgPixmap = CreatePixmap(m_Osd, "MenuIconsBgPixmap", 2, MenuPixmapViewPort);
+    MenuIconsPixmap = CreatePixmap(m_Osd, "MenuIconsPixmap", 3, MenuPixmapViewPort);
+    MenuIconsOvlPixmap = CreatePixmap(m_Osd, "MenuIconsOvlPixmap", 4, MenuPixmapViewPort);
 
     m_chLeft = Config.decorBorderMenuContentHeadSize;
     m_chTop = m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Config.decorBorderMenuContentHeadSize;
     m_chWidth = m_MenuWidth - Config.decorBorderMenuContentHeadSize * 2;
     m_chHeight = m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2;
-    ContentHeadPixmap = CreatePixmap(m_Osd, "ContentHeadPixmap", 1, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
-    ContentHeadIconsPixmap =
-        CreatePixmap(m_Osd, "ContentHeadIconsPixmap", 2, cRect(m_chLeft, m_chTop, m_chWidth, m_chHeight));
+    const cRect ContentHeadPixmapViewPort {m_chLeft, m_chTop, m_chWidth, m_chHeight};
+    ContentHeadPixmap = CreatePixmap(m_Osd, "ContentHeadPixmap", 1, ContentHeadPixmapViewPort);
+    ContentHeadIconsPixmap = CreatePixmap(m_Osd, "ContentHeadIconsPixmap", 2, ContentHeadPixmapViewPort);
 
     ScrollbarPixmap = CreatePixmap(
         m_Osd, "ScrollbarPixmap", 2,
