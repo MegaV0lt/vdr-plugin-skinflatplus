@@ -34,11 +34,9 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
     TopBarSetTitle(Title);
 
-    TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1,
-                                cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
-
-    TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1,
-                                    cRect(left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight));
+    const cRect TraksPixmapViewPort{left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight};
+    TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1, TraksPixmapViewPort);
+    TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1, TraksPixmapViewPort);
     PixmapFill(TracksPixmap, clrTransparent);
     PixmapFill(TracksLogoPixmap, clrTransparent);
 
