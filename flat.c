@@ -377,6 +377,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";
 
     const int idx = std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10);  // 0..10 rounded
+    //? Define this outside the function, perhaps near other global variables or constants (static const)
     const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
                                    "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
                                    "recording_seen_8", "recording_seen_9", "recording_seen_10"};

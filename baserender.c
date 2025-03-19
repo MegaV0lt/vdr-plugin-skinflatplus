@@ -22,14 +22,23 @@
 #include "./flat.h"
 
 cFlatBaseRender::cFlatBaseRender() {
+    // Standard fonts
     m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
-
     m_FontHeight = m_Font->Height();
     m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
+
+    // Top bar fonts
+    const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
+    m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
+    m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
+    m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
+    m_TopBarFontHeight = m_TopBarFont->Height();
+    m_TopBarFontSmlHeight = m_TopBarFontSml->Height();
+    m_TopBarFontClockHeight = m_TopBarFontClock->Height();
 
     m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
 
@@ -46,9 +55,9 @@ cFlatBaseRender::~cFlatBaseRender() {
     delete m_FontSml;
     delete m_FontFixed;
 
-    if (m_TopBarFont) delete m_TopBarFont;
-    if (m_TopBarFontSml) delete m_TopBarFontSml;
-    if (m_TopBarFontClock) delete m_TopBarFontClock;
+    delete m_TopBarFont;
+    delete m_TopBarFontSml;
+    delete m_TopBarFontClock;
 
     // if (m_Osd) {
         MessageScroller.Clear();
@@ -91,28 +100,12 @@ void cFlatBaseRender::TopBarCreate() {
     dsyslog("flatPlus: cFlatBaseRender::TopBarCreate()");
 #endif
 
-    const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
-    m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
-    m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
-    m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
-    m_TopBarFontHeight = m_TopBarFont->Height();
-    m_TopBarFontSmlHeight = m_TopBarFontSml->Height();
-    m_TopBarFontClockHeight = m_TopBarFontClock->Height();
-
-    if (m_TopBarFontHeight > m_TopBarFontSmlHeight * 2)
-        m_TopBarHeight = m_TopBarFontHeight;
-    else
-        m_TopBarHeight = m_TopBarFontSmlHeight * 2;
-
-    TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1,
-                                cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                      m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
-    TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2,
-                                      cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                            m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
-    TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3,
-                                    cRect(Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
-                                          m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight));
+    m_TopBarHeight = std::max(m_TopBarFontHeight, m_TopBarFontSmlHeight * 2);
+    const cRect TopBarViewPort {Config.decorBorderTopBarSize, Config.decorBorderTopBarSize,
+                                m_OsdWidth - Config.decorBorderTopBarSize * 2, m_TopBarHeight};
+    TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1, TopBarViewPort);
+    TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2, TopBarViewPort);
+    TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3, TopBarViewPort);
     PixmapFill(TopBarPixmap, clrTransparent);
     PixmapFill(TopBarIconBgPixmap, clrTransparent);
     PixmapFill(TopBarIconPixmap, clrTransparent);
