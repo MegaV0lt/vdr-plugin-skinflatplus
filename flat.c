@@ -292,7 +292,8 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (uint i {0}; i < ScreenAspectNums; ++i) {
-        if (ScreenAspect == ScreenAspects[i])
+        // if (ScreenAspect == ScreenAspects[i])
+        if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
             return ScreenAspectNames[i];
     }
 
