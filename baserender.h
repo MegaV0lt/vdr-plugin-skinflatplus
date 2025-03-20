@@ -70,9 +70,17 @@ class cFlatBaseRender {
         void ProgressBarDrawBgColor();
         void ProgressBarDraw(int Current, int Total);
 #if APIVERSNUM >= 30004
+        /**
+         * Draws marks on the progress bar with error indicators
+         * @param Errors Error markers to display (added in API v3.0.4)
+         */
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, const cErrors *Errors, tColor Color,
                                   tColor ColorCurrent);
 #else
+        /**
+         * Draws marks on the progress bar (legacy version)
+         * Note: Error indicators not supported in API versions before 3.0.4
+         */
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
 #endif
         void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
