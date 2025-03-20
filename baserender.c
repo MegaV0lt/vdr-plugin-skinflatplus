@@ -1657,8 +1657,8 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 }
 
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
-    FT_Library library;
-    FT_Face face;
+    FT_Library library {nullptr};
+    FT_Face face {nullptr};
     const cString FontFileName = *cFont::GetFontFileName(Name);
     int Ascender {CharHeight};
 

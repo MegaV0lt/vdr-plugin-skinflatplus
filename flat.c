@@ -729,8 +729,8 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
  * @note This function returns 0 if any error occurs during the execution of the function.
  */
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
-    FT_Library library;
-    FT_Face face;
+    FT_Library library {nullptr};
+    FT_Face face {nullptr};
     int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
@@ -741,6 +741,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                 FT_GlyphSlot slot {face->glyph};
                 rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
+                    // Convert from 26.6 fixed-point format to integer, rounding up
                     const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversion
                     FT_Done_Face(face);
                     FT_Done_FreeType(library);
@@ -750,8 +751,10 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
         }
     }
 
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
+    // Safe cleanup - only free initialized resources
+    if (face) FT_Done_Face(face);
+    if (library) FT_Done_FreeType(library);
+
     esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
     return 0;  // Return 0 if anything went wrong
 }
