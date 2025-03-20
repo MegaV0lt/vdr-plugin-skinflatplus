@@ -611,7 +611,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
 
     bool FsErr {false};
-    std::vector<uint64_t> FileSize(MaxFileNum, 0);
+    std::vector<uint64_t> FileSize(MaxFileNum + 1, 0);
     int rc {0};
     struct stat FileBuf;
     cString FileName {""};
@@ -637,8 +637,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         bool CutIn {true};
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};
-        cMark *Mark = Marks.First();
-        while (Mark) {
+        for (cMark *Mark = Marks.First(); Mark; Mark = Marks.Next(Mark)) {
             position = Mark->Position();
             index->Get(position, &FileNumber, &FileOffset);
             if (CutIn) {
@@ -650,8 +649,6 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
                 CutIn = true;
                 RecSizeCut += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
             }
-            cMark *NextMark = Marks.Next(Mark);
-            Mark = NextMark;
         }
         if (!CutIn) {
             CutLength += index->Last() - CutInFrame;
