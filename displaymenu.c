@@ -3154,10 +3154,9 @@ void cFlatDisplayMenu::Flush() {
 }
 
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
-    std::vector<sDecorBorder>::iterator it, end {ItemsBorder.end()};
-    for (it = ItemsBorder.begin(); it != end; ++it) {
-        if ((*it).Left == ib.Left && (*it).Top == ib.Top) {
-            (*it) = ib;
+    for (auto& item : ItemsBorder) {
+        if (item.Left == ib.Left && item.Top == ib.Top) {
+            item = ib;
             return;
         }
     }
@@ -3169,7 +3168,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width -= m_WidthScrollBar;
         DecorBorderDraw(Border);
-        // Border.Width += m_WidthScrollBar;  // Restore original width
+        Border.Width += m_WidthScrollBar;  // Restore original width
     }
 }
 
@@ -3177,7 +3176,7 @@ void cFlatDisplayMenu::ItemBorderDrawAllWithoutScrollbar() {
     for (auto &Border : ItemsBorder) {
         Border.Width += m_WidthScrollBar;
         DecorBorderDraw(Border);
-        // Border.Width -= m_WidthScrollBar;  // Restore original width
+        Border.Width -= m_WidthScrollBar;  // Restore original width
     }
 }
 
