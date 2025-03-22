@@ -1,5 +1,10 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-03-xx: Version 1.1.10
+- [add] Use a medium sized font for additional infos in channel and recording info
+- [update] Update poster/banner in replay every 5 seconds
+- [update] Some internal optimizations
+
 2025-03-03: Version 1.1.9
 - [fix] Fix order of timer count variables
 - [fix] Fix display of channel separators in plugin epg2vdr

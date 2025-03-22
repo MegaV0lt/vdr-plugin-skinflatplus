@@ -666,7 +666,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         Text.Append("\n");
     }
 
-    const uint64_t RecSize {FileSize[MaxFileNum]};
+    const uint64_t RecSize {FileSize[MaxFileNum]};  // Size of the recording in bytes
     if (RecSize > MEGABYTE(1023))          // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));

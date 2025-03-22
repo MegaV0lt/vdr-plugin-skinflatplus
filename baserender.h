@@ -106,8 +106,8 @@ class cFlatBaseRender {
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
         const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
 
-        const int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
-        const int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
+        static constexpr int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
+        static constexpr int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
 
         // Standard fonts
         cFont *m_Font {nullptr};
@@ -118,8 +118,10 @@ class cFlatBaseRender {
         int m_FontFixedHeight {0};
         int m_FontAscender {0};  // Ascender for font
 
+        cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
         cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
         cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
+        // int m_FontMediumHeight {0};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};

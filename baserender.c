@@ -31,6 +31,8 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 
+    m_FontMedium = cFont::CreateFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
+
     // Top bar fonts
     const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
     m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);

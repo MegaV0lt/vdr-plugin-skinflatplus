@@ -2259,7 +2259,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ComplexContent.AddText(
                 *MovieInfo, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 
         if (!isempty(*SeriesInfo)) {
@@ -2272,7 +2272,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ComplexContent.AddText(
                 *SeriesInfo, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
@@ -2297,7 +2297,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ComplexContent.AddText(
                 *Reruns, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 
         if (!isempty(*TextAdditional)) {
@@ -2310,7 +2310,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ComplexContent.AddText(
                 *TextAdditional, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
         }
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
         if (Scrollable || SecondRun)
@@ -2843,7 +2843,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ComplexContent.AddText(
                 *MovieInfo, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
         }
 
         if (!isempty(*SeriesInfo)) {
@@ -2856,7 +2856,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ComplexContent.AddText(
                 *SeriesInfo, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
@@ -2881,7 +2881,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ComplexContent.AddText(
                 *RecAdditional, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
         }
 
         if (!isempty(*TextAdditional)) {
@@ -2894,7 +2894,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             ComplexContent.AddText(
                 *TextAdditional, true,
                 cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
         }
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);

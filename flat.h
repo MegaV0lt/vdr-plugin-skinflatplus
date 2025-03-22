@@ -17,10 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdint.h>
+// #include <stdint.h>
 
 #include <memory>   // For 'unique_ptr<T>()' ...
 #include <cstring>  // string.h
+#include <cstdint>  // stdint.h
 #include <string>
 #include <string_view>
 #include <random>
