@@ -111,13 +111,18 @@ bool cComplexContent::Scrollable(int height) {
 
 void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg,
                               cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
-    Contents.emplace_back(cSimpleContent());
-    Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
+    // Contents.emplace_back(cSimpleContent());
+    // Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
+    // Method Chaining: Instead of using two separate lines, implement method chaining for a more concise approach:
+    Contents.emplace_back(cSimpleContent())
+        .SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, const cRect &Position) {
-    Contents.emplace_back(cSimpleContent());
-    Contents.back().SetImage(image, Position);
+    // Contents.emplace_back(cSimpleContent());
+    // Contents.back().SetImage(image, Position);
+    Contents.emplace_back(cSimpleContent()).SetImage(image, Position);
+
 }
 
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
@@ -159,18 +164,25 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 }
 
 void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
-    Contents.emplace_back(cSimpleContent());
-    Contents.back().SetRect(Position, ColorBg);
+    // Contents.emplace_back(cSimpleContent());
+    // Contents.back().SetRect(Position, ColorBg);
+    Contents.emplace_back(cSimpleContent()).SetRect(Position, ColorBg);
 }
 
 void cComplexContent::Draw() {
     m_IsShown = true;
-    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
+    /* std::vector<cSimpleContent>::iterator it, end {Contents.end()};
     for (it = Contents.begin(); it != end; ++it) {
         if ((*it).GetContentType() == CT_Image)
             (*it).Draw(PixmapImage);
         else
             (*it).Draw(Pixmap);
+    } */
+    for (auto& content : Contents) {
+        if (content.GetContentType() == CT_Image)
+            content.Draw(PixmapImage);
+        else
+            content.Draw(Pixmap);
     }
 }
 

@@ -472,6 +472,13 @@ bool PairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
     return i.first > j.first;
 }
 
+/**
+ * Round up a number to the nearest multiple of another number.
+ *
+ * @param[in] NumToRound The number to round up.
+ * @param[in] multiple The number to round up to. If zero, return NumToRound.
+ * @return the rounded up number.
+ */
 int RoundUp(int NumToRound, int multiple) {
     if (multiple == 0) return NumToRound;
 

@@ -147,7 +147,10 @@ void cFlatBaseRender::TopBarSetTitleExtra(const cString &Extra1, const cString &
 }
 
 void cFlatBaseRender::TopBarSetExtraIcon(const cString &icon) {
-    if (!strcmp(*icon, "")) return;
+    // if (!strcmp(*icon, "")) return;
+
+    // Check if the string is empty
+    if (**icon == '\0') return;  // Double dereference to get the first character
 
     m_TopBarExtraIcon = icon;
     m_TopBarExtraIconSet = true;
@@ -155,7 +158,8 @@ void cFlatBaseRender::TopBarSetExtraIcon(const cString &icon) {
 }
 
 void cFlatBaseRender::TopBarSetMenuIcon(const cString &icon) {
-    if (!strcmp(*icon, "")) return;
+    // Check if the string is empty
+    if (**icon == '\0') return;  // Double dereference to get the first character
 
     m_TopBarMenuIcon = icon;
     m_TopBarMenuIconSet = true;
@@ -163,7 +167,8 @@ void cFlatBaseRender::TopBarSetMenuIcon(const cString &icon) {
 }
 
 void cFlatBaseRender::TopBarSetMenuIconRight(const cString &icon) {
-    if (!strcmp(*icon, "")) return;
+    // Check if the string is empty
+    if (**icon == '\0') return;  // Double dereference to get the first character
 
     m_TopBarMenuIconRight = icon;
     m_TopBarMenuIconRightSet = true;
@@ -176,7 +181,8 @@ void cFlatBaseRender::TopBarClearMenuIconRight() {
 }
 
 void cFlatBaseRender::TopBarSetMenuLogo(const cString &icon) {
-    if (!strcmp(*icon, "")) return;
+    // Check if the string is empty
+    if (**icon == '\0') return;  // Double dereference to get the first character
 
     m_TopBarMenuLogo = icon;
     m_TopBarMenuLogoSet = true;
@@ -1345,7 +1351,7 @@ void cFlatBaseRender::DecorBorderClear(const cRect &Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    std::vector<sDecorBorder>::iterator it, end {Borders.end()};
+    /* std::vector<sDecorBorder>::iterator it, end {Borders.end()};
     for (it = Borders.begin(); it != end;) {
         if ((*it).From == From) {
             DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);
@@ -1354,7 +1360,18 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
         } else {
             ++it;
         }
-    }
+    } */
+    // The erase-remove idiom is a standard C++ pattern for removing elements from containers. It uses std::remove_if to
+    // move elements to be removed to the end of the container, then uses erase to remove them all at once.
+    auto removeStart = std::remove_if(Borders.begin(), Borders.end(), [this, From](const sDecorBorder &border) {
+        if (border.From == From) {
+            DecorBorderClear(cRect(border.Left, border.Top, border.Width, border.Height), border.Size);
+            return true;
+        }
+        return false;
+    });
+
+    Borders.erase(removeStart, Borders.end());
 }
 
 void cFlatBaseRender::DecorBorderRedrawAll() {
@@ -1517,30 +1534,42 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
-    if (Height < 0) {
+    /* if (Height < 0) {
         Height *= -1;
         for (int i {Height}, j {0}; i >= 0; --i, ++j) {
             Alpha = 255.0 / Height * j;
-            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            // col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
     } else {
         for (int i {0}; i < Height; ++i) {
             Alpha = 255.0 / Height * i;
-            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
+            col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
             pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
         }
+    } */
+    const int start {(Height < 0) ? Height * -1 : 0};
+    const int end {(Height < 0) ? 0 : Height};
+    const int step {(Height < 0) ? -1 : 1};
+    // const int offset {(Height < 0) ? 0 : 1};
+    const double AlphaStep {255.0 / std::abs(Height)};
+
+    for (int i {start}, j {0}; (Height < 0) ? i >= end : i < end; i += step, ++j) {
+        Alpha = AlphaStep * j;
+        col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
+        pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
-    double Alpha {0.0};
+    /* double Alpha {0.0};
     tColor col {};  // Init outside of loop
     if (Width < 0) {
         Width *= -1;
@@ -1555,23 +1584,54 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
             col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
+    } */
+    if (Width == 0) return;  // Avoid division by zero
+
+    const int absWidth = std::abs(Width);
+    const int start = (Width < 0) ? absWidth : 0;
+    const int end = (Width < 0) ? 0 : absWidth;
+    const int step = (Width < 0) ? -1 : 1;
+    const double AlphaStep = 255.0 / absWidth;
+
+    double Alpha{0.0};
+    tColor col {};  // Init outside of loop
+
+    for (int i {start}, j {0}; (Width < 0) ? i >= end : i < end; i += step, ++j) {
+        Alpha = AlphaStep * j;
+        col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
+        pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
-    double Alpha {0.0};
+    /* double Alpha {0.0};
     tColor col {};  // Init outside of loop
     for (int i {0}; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
+    } */
+    const int absWidth {std::abs(Width)};
+    const int absHeight {std::abs(Height)};
+    const int start {0};
+    const int end {absWidth};
+    const int step {1};
+    const double AlphaStep {255.0 / absWidth};
+
+    double Alpha {0.0};
+    tColor col {};
+
+    for (int i {start}, j {0}; i < end; i += step, ++j) {
+        Alpha = AlphaStep * j;
+        col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
+        pixmap->DrawRectangle(cRect(Left + i, Top + i, absWidth - i, absHeight - i), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1583,7 +1643,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1595,7 +1655,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 }
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1608,7 +1668,7 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1621,7 +1681,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1634,7 +1694,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop
@@ -1647,7 +1707,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
-    if (!pixmap) return;
+    // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     double Alpha {0.0};
     tColor col {};  // Init outside of loop

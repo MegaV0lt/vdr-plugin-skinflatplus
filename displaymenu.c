@@ -292,7 +292,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
 
     m_LastTitle = Title;
     cString NewTitle = Title;
-    cString IconName = *GetMenuIconName();
 
     switch (m_MenuCategory) {
     case mcMain:
@@ -330,7 +329,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     TopBarSetTitle(*NewTitle);  // Must be called before other TopBarSet*
 
     if (Config.TopBarMenuIconShow)
-        TopBarSetMenuIcon(*IconName);
+        TopBarSetMenuIcon(*GetMenuIconName());
 
     // Show disk usage in Top Bar if:
     // - in Recording or Timer menu and Config.DiskUsageShow > 0
@@ -3153,6 +3152,7 @@ void cFlatDisplayMenu::Flush() {
     m_Osd->Flush();
 }
 
+// Insert a new sDecorBorder into ItemsBorder, or update the existing one if Left and Top already exist.
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
     for (auto& item : ItemsBorder) {
         if (item.Left == ib.Left && item.Top == ib.Top) {
@@ -3683,7 +3683,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         } else {
             if (channel) {
                 ChannelName = channel->Name();
-                if (!strcmp(*ChannelName, "")) {
+                // Check if the first character is null terminator (empty string)
+                if (**ChannelName == '\0') {  // Double dereference to get the first character
                     if (Config.MainMenuWidgetDVBDevicesDiscardNotUsed)
                         continue;
                     StrDevice.Append(tr("not used"));
