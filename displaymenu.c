@@ -3529,74 +3529,88 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     std::vector<std::pair<int, std::string>> widgets;
     widgets.reserve(10);  // Set to at least 10 entry's
 
-    if (Config.MainMenuWidgetDVBDevicesShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"));
-    if (Config.MainMenuWidgetActiveTimerShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetActiveTimerPosition, "active_timer"));
-    if (Config.MainMenuWidgetLastRecShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetDVBDevicesPosition, "last_recordings"));
-    if (Config.MainMenuWidgetSystemInfoShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetSystemInfoPosition, "system_information"));
-    if (Config.MainMenuWidgetSystemUpdatesShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetSystemUpdatesPosition, "system_updates"));
-    if (Config.MainMenuWidgetTemperaturesShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetTemperaturesPosition, "temperatures"));
-    if (Config.MainMenuWidgetTimerConflictsShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetTimerConflictsPosition, "timer_conflicts"));
-    if (Config.MainMenuWidgetCommandShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetCommandPosition, "custom_command"));
-    if (Config.MainMenuWidgetWeatherShow)
-        widgets.emplace_back(std::make_pair(Config.MainMenuWidgetWeatherPosition, "weather"));
+    struct WidgetConfig {
+        int& ShowFlag;
+        int& position;
+        const char* name;
+    };
 
-    std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
-    std::pair<int, std::string> PairWidget {};
-    std::string widget {""};
-    widget.reserve(19);  // Size of 'system_information'
-    int AddHeight {0};
-    int ContentTop {0};
-    while (!widgets.empty()) {
-        PairWidget = widgets.back();
-        widgets.pop_back();
-        widget = PairWidget.second;
+    const WidgetConfig WidgetConfigs[] {
+        {Config.MainMenuWidgetDVBDevicesShow, Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"},
+        {Config.MainMenuWidgetActiveTimerShow, Config.MainMenuWidgetActiveTimerPosition, "active_timer"},
+        {Config.MainMenuWidgetLastRecShow, Config.MainMenuWidgetLastRecPosition, "last_recordings"},
+        {Config.MainMenuWidgetSystemInfoShow, Config.MainMenuWidgetSystemInfoPosition, "system_information"},
+        {Config.MainMenuWidgetSystemUpdatesShow, Config.MainMenuWidgetSystemUpdatesPosition, "system_updates"},
+        {Config.MainMenuWidgetTemperaturesShow, Config.MainMenuWidgetTemperaturesPosition, "temperatures"},
+        {Config.MainMenuWidgetTimerConflictsShow, Config.MainMenuWidgetTimerConflictsPosition, "timer_conflicts"},
+        {Config.MainMenuWidgetCommandShow, Config.MainMenuWidgetCommandPosition, "custom_command"},
+        {Config.MainMenuWidgetWeatherShow, Config.MainMenuWidgetWeatherPosition, "weather"}
+    };
 
-        if (widget.compare("dvb_devices") == 0) {
-            AddHeight = DrawMainMenuWidgetDVBDevices(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("active_timer") == 0) {
-            AddHeight = DrawMainMenuWidgetActiveTimers(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("last_recordings") == 0) {
-            AddHeight = DrawMainMenuWidgetLastRecordings(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("system_information") == 0) {
-            AddHeight = DrawMainMenuWidgetSystemInformation(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("system_updates") == 0) {
-            AddHeight = DrawMainMenuWidgetSystemUpdates(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("temperatures") == 0) {
-            AddHeight = DrawMainMenuWidgetTemperatures(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("timer_conflicts") == 0) {
-            AddHeight = DrawMainMenuWidgetTimerConflicts(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("custom_command") == 0) {
-            AddHeight = DrawMainMenuWidgetCommand(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
-        } else if (widget.compare("weather") == 0) {
-            AddHeight = DrawMainMenuWidgetWeather(wLeft, wWidth, ContentTop);
-            if (AddHeight > 0)
-                ContentTop = AddHeight + m_MarginItem;
+    // Populates the widgets vector with enabled widgets based on configuration
+    // Iterates through predefined widget configurations and adds widgets to the vector
+    // if their corresponding show flag is enabled, preserving their configured position
+    for (const auto& cfg : WidgetConfigs) {
+        if (cfg.ShowFlag) {
+            widgets.emplace_back(std::make_pair(cfg.position, cfg.name));
         }
     }
+
+    // Define a type for the widget drawing functions
+    using WidgetDrawFunction = std::function<int(int, int, int)>;
+
+    // Create a map that associates widget names with their drawing functions
+    std::unordered_map<std::string, WidgetDrawFunction> widgetDrawers = {
+        {"dvb_devices",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetDVBDevices(left, width, top); }},
+        {"active_timer",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetActiveTimers(left, width, top); }},
+        {"last_recordings",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetLastRecordings(left, width, top); }},
+        {"system_information",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetSystemInformation(left, width, top); }},
+        {"system_updates",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetSystemUpdates(left, width, top); }},
+        {"temperatures",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetTemperatures(left, width, top); }},
+        {"timer_conflicts",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetTimerConflicts(left, width, top); }},
+        {"custom_command",
+         [this](int left, int width, int top) { return DrawMainMenuWidgetCommand(left, width, top); }},
+        {"weather", [this](int left, int width, int top) { return DrawMainMenuWidgetWeather(left, width, top); }}};
+
+    int ContentTop {0};
+    // Helper function to update ContentTop
+    auto updateContentTop = [&](int height) {
+        if (height > 0) {
+            ContentTop = height + m_MarginItem;
+        }
+    };
+
+    // Sort the widgets based on their positions
+    std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
+
+    int AddHeight {0};
+    // Process widgets
+    while (!widgets.empty()) {
+        // Using a reference to avoid copy:
+        const auto& PairWidget = widgets.back();
+        const std::string &widget = PairWidget.second;
+
+        // Look up the widget drawer function
+        auto drawerIt = widgetDrawers.find(widget);
+        if (drawerIt != widgetDrawers.end()) {
+            // Call the drawer function and update ContentTop
+            AddHeight = drawerIt->second(wLeft, wWidth, ContentTop);
+            updateContentTop(AddHeight);
+        } else {
+            // Handle unknown widget type
+            esyslog("flatPlus: DrawMainMenuWidget() Unknown widget type: %s", widget.c_str());
+        }
+
+        widgets.pop_back();
+    }
+
     ContentWidget.CreatePixmaps(false);
     ContentWidget.Draw();
 
