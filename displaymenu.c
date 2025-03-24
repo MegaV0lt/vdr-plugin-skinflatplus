@@ -3693,20 +3693,15 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         StrDevice = "";  // Reset string
 
         const cChannel *channel = device->GetCurrentlyTunedTransponder();
+        if (channel && channel->Number() > 0)
+            ChannelName = channel->Name();
+        else
+            ChannelName = tr("Unknown");
+
         if (i == DeviceLiveTV) {
-            StrDevice.Append(cString::sprintf("%s (", tr("LiveTV")));
-            if (channel && channel->Number() > 0)
-                ChannelName = channel->Name();
-            else
-                ChannelName = tr("Unknown");
-            StrDevice.Append(cString::sprintf("%s)", *ChannelName));
+            StrDevice.Append(cString::sprintf("%s (%s)", tr("LiveTV"), *ChannelName));
         } else if (RecDevices[i]) {
-            StrDevice.Append(cString::sprintf("%s (", tr("recording")));
-            if (channel && channel->Number() > 0)
-                ChannelName = channel->Name();
-            else
-                ChannelName = tr("Unknown");
-            StrDevice.Append(cString::sprintf("%s)", *ChannelName));
+            StrDevice.Append(cString::sprintf("%s (%s)", tr("recording"), *ChannelName));
         } else {
             if (channel) {
                 ChannelName = channel->Name();
