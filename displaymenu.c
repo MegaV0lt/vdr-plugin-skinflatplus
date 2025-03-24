@@ -4028,19 +4028,18 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     }
     // Sort by RecStart
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
-    // std::pair<time_t, cString> PairRec {};
     int index {0};
-    // cString Rec {""};
+    cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
         const auto& PairRec = Recs.back();
-        Recs.pop_back();
-        // Rec = PairRec.second;
+        Rec = PairRec.second;
+        Recs.pop_back();  // Delete after value is copied
 
         ContentWidget.AddText(
-            *PairRec.second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+            *Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
         ++index;
