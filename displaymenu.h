@@ -171,4 +171,20 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop);
     int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
     int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
+
+    // Helper functions
+    // Add Text to ComplexContent in SetText()
+    void ComplexContentAddText(const char* Text, bool FixedFont, int Width, int Height) {
+        if (FixedFont) {
+            ComplexContent.AddText(Text, true,
+                cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
+                Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_FontFixed);
+            ComplexContent.SetScrollSize(m_FontFixedHeight);
+        } else {
+            ComplexContent.AddText(Text, true,
+                cRect(m_MarginItem, m_MarginItem, Width - m_MarginItem2, Height - m_MarginItem2),
+                Theme.Color(clrMenuTextFixedFont), Theme.Color(clrMenuTextBg), m_Font);
+            ComplexContent.SetScrollSize(m_FontHeight);
+        }
+    }
 };
