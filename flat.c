@@ -380,6 +380,21 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     return SeenIconNames[idx];
 }
 
+/**
+ * Adjusts the MediaSize (width & height) to fit the ContentSize (width & height)
+ * while preserving the aspect ratio.
+ *
+ * The MediaSize is shrunk to fit the ContentSize according to the following rules:
+ * - For posters with an aspect ratio smaller than 1 (e.g. 680x1000 = 0.68),
+ *   the height is limited to 70% of the ContentSize height.
+ * - For portraits with an aspect ratio smaller than 4 (e.g. 1920x1080 = 1.77),
+ *   the width is limited to 1/3 of the ContentSize width.
+ * - For banners with an aspect ratio of 4 or larger (e.g. 758x140 = 5.41),
+ *   the width is limited to 758 pixels at a height of 1920 pixels.
+ *
+ * @param MediaSize[in/out] The size of the image to be adjusted.
+ * @param ContentSize[in] The size of the parent widget that contains the image.
+ */
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
@@ -760,6 +775,21 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 }
 
 
+/**
+ * @brief Justifies a line of text by inserting fill characters to fit a specified maximum width.
+ *
+ * This function adjusts the spacing within a line of text to ensure that it fits within the specified
+ * maximum width. The line is justified by inserting fill characters, typically spaces or hair spaces,
+ * between existing spaces or punctuation marks in the text. The function does not justify lines with
+ * fixed-width fonts or lines that cannot accommodate additional fill characters.
+ *
+ * @param Line The line of text to be justified, passed by reference and modified in place.
+ * @param Font The font used to calculate the width of characters and spaces. Must not be null.
+ * @param LineMaxWidth The maximum width in pixels that the justified line should fit within.
+ *
+ * @note The function returns immediately if the font is null, the line is empty, or the maximum
+ * width is non-positive. Additionally, no justification is performed if a fixed-width font is detected.
+ */
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());

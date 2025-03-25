@@ -56,6 +56,7 @@ cFlatBaseRender::~cFlatBaseRender() {
     delete m_Font;
     delete m_FontSml;
     delete m_FontFixed;
+    delete m_FontMedium;
 
     delete m_TopBarFont;
     delete m_TopBarFontSml;
@@ -310,7 +311,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
     const time_t Now {time(0)};
-    if (m_TopBarUpdateTitle || (Now - 60) > m_TopBarLastDate) {
+    if (m_TopBarUpdateTitle || (Now > m_TopBarLastDate + 60)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
 #endif
@@ -331,21 +332,24 @@ void cFlatBaseRender::TopBarUpdate() {
         PixmapFill(TopBarIconPixmap, clrTransparent);
         PixmapFill(TopBarIconBgPixmap, clrTransparent);
 
+        const int TopBarLogoHeight {m_TopBarHeight - m_MarginItem2};      // Height of TopBar
+        const int TopBarIconHeight {m_TopBarFontHeight - m_MarginItem2};  // Height of font in TopBar
+
         cImage *img {nullptr};
-        if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
+        if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {  // Show menu icon
+            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
             if (img) {
                 const int IconLeft {m_MarginItem};
-                const int IconTop {(m_TopBarHeight / 2 - img->Height() / 2)};
+                const int IconTop {(m_TopBarHeight - img->Height()) / 2};
                 TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
                 MenuIconWidth = img->Width() + m_MarginItem2;
             }
         }
 
-        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {
+        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {  // Show menu logo
             PixmapFill(TopBarIconPixmap, clrTransparent);
             int IconLeft {m_MarginItem};
-            int ImageBGHeight {m_TopBarHeight - m_MarginItem2};
+            int ImageBGHeight {TopBarLogoHeight};
             int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
             int IconTop {0};
 
@@ -353,7 +357,7 @@ void cFlatBaseRender::TopBarUpdate() {
             if (img) {
                 ImageBGHeight = img->Height();
                 ImageBGWidth = img->Width();
-                IconTop = (m_TopBarHeight / 2 - ImageBGHeight / 2);
+                IconTop = (m_TopBarHeight - ImageBGHeight) / 2;
                 TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
             }
 
@@ -392,17 +396,16 @@ void cFlatBaseRender::TopBarUpdate() {
 
         int MiddleWidth {0}, NumConflicts {0};
         cImage *ImgCon {nullptr};
-        if (Config.TopBarRecConflictsShow) {
+        if (Config.TopBarRecConflictsShow) {  // Load conflict icon
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", m_TopBarFontHeight - m_MarginItem2,
-                                                m_TopBarFontHeight - m_MarginItem2);
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
                 else
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", m_TopBarFontHeight - m_MarginItem2,
-                                                m_TopBarFontHeight - m_MarginItem2);
+                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
 
                 if (ImgCon) {
+                    Buffer = cString::sprintf("%d", NumConflicts);
                     Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -411,7 +414,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         uint NumRec {0};
         cImage *ImgRec {nullptr};
-        if (Config.TopBarRecordingShow) {
+        if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
 #ifdef DEBUGFUNCSCALL
             dsyslog("   Get number of recording timers");
             cTimeMs Timer;  // Start Timer
@@ -439,9 +442,9 @@ void cFlatBaseRender::TopBarUpdate() {
 #endif
 
             if (NumRec) {
-                ImgRec = ImgLoader.LoadIcon("topbar_timer", m_TopBarFontHeight - m_MarginItem2,
-                                            m_TopBarFontHeight - m_MarginItem2);
-                if (ImgRec) {
+                ImgRec = ImgLoader.LoadIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
+                if (ImgRec) {  // Load recording icon
+                    Buffer = cString::sprintf("%d", NumRec);
                     Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                     MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
                 }
@@ -449,7 +452,7 @@ void cFlatBaseRender::TopBarUpdate() {
         }  // Config.TopBarRecordingShow
 
         cImage *ImgExtra {nullptr};
-        if (m_TopBarExtraIconSet) {  // Show extra icon (Disk usage)
+        if (m_TopBarExtraIconSet) {  // Load extra icon (Disk usage) with full height of TopBar
             ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, ICON_WIDTH_UNLIMITED, m_TopBarHeight);
             if (ImgExtra) {
                 Right -= ImgExtra->Width() + m_MarginItem;
@@ -460,8 +463,8 @@ void cFlatBaseRender::TopBarUpdate() {
         int TopBarMenuIconRightWidth {0};
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         cImage *ImgIconRight {nullptr};
-        if (m_TopBarMenuIconRightSet) {
-            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, ICON_WIDTH_UNLIMITED, m_TopBarHeight);
+        if (m_TopBarMenuIconRightSet) {  // Load sort icon
+            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
             if (ImgIconRight) {
                 TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
@@ -474,19 +477,13 @@ void cFlatBaseRender::TopBarUpdate() {
         Right -= ExtraMaxWidth + m_MarginItem;
 
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
-        if ((TitleLeft + TitleWidth) < (TopBarWidth / 2 - MiddleWidth / 2))
+        const int TitleRight {TitleLeft + TitleWidth};
+        if (TitleRight < (TopBarWidth / 2 - MiddleWidth / 2))
             Right = TopBarWidth / 2 - MiddleWidth / 2;
-        else if ((TitleLeft + TitleWidth) < Right)
-            Right = TitleLeft + TitleWidth + m_MarginItem;
+        else if (TitleRight < Right)
+            Right = TitleRight + m_MarginItem;
 
         int TitleMaxWidth {Right - TitleLeft - m_MarginItem};
-        int TopBarMenuIconRightLeft {0};
-        if (TitleWidth + TopBarMenuIconRightWidth > TitleMaxWidth) {
-            TopBarMenuIconRightLeft = TitleMaxWidth + m_MarginItem2;
-            TitleMaxWidth -= TopBarMenuIconRightWidth;
-        } else {
-            TopBarMenuIconRightLeft = TitleLeft + TitleWidth + m_MarginItem2;
-        }
 
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *m_TopBarTitleExtra1, Theme.Color(clrTopBarDateFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontSml, ExtraMaxWidth, 0, taRight);
@@ -495,13 +492,14 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
         Right += ExtraMaxWidth + m_MarginItem;
 
-        if (m_TopBarExtraIconSet && ImgExtra) {
-                TopBarIconPixmap->DrawImage(cPoint(Right, 0), *ImgExtra);
+        if (m_TopBarExtraIconSet && ImgExtra) {  // Draw extra icon (Disk usage)
+                const int IconTop {(m_TopBarHeight - ImgExtra->Height()) / 2};
+                TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgExtra);
                 Right += ImgExtra->Width() + m_MarginItem;
         }
 
-        if (NumRec && ImgRec) {
-            const int IconTop {(m_TopBarFontHeight - ImgRec->Height()) / 2};
+        if (NumRec && ImgRec) {  // Draw recording icon and number of recording timers
+            const int IconTop {(m_TopBarHeight - ImgRec->Height()) / 2};
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgRec);
             Right += ImgRec->Width();
 
@@ -511,8 +509,8 @@ void cFlatBaseRender::TopBarUpdate() {
             Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (NumConflicts && ImgCon) {
-            const int IconTop {(m_TopBarFontHeight - ImgCon->Height()) / 2};
+        if (NumConflicts && ImgCon) {  // Draw conflict icon and number of conflicts
+            const int IconTop {(m_TopBarHeight - ImgCon->Height()) / 2};
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgCon);
             Right += ImgCon->Width();
 
@@ -526,8 +524,17 @@ void cFlatBaseRender::TopBarUpdate() {
             Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
         }
 
-        if (m_TopBarMenuIconRightSet && ImgIconRight) {
-            TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, 0), *ImgIconRight);
+        int TopBarMenuIconRightLeft {0};
+        if (TitleWidth + TopBarMenuIconRightWidth > TitleMaxWidth) {
+            TopBarMenuIconRightLeft = TitleMaxWidth + m_MarginItem2;
+            TitleMaxWidth -= TopBarMenuIconRightWidth;
+        } else {
+            TopBarMenuIconRightLeft = TitleRight + m_MarginItem2;
+        }
+
+        if (m_TopBarMenuIconRightSet && ImgIconRight) {  // Draw sort icon
+            const int IconTop {(m_TopBarHeight - ImgIconRight->Height()) / 2};
+            TopBarIconPixmap->DrawImage(cPoint(TopBarMenuIconRightLeft, IconTop), *ImgIconRight);
         }
 
         TopBarPixmap->DrawText(cPoint(TitleLeft, FontTop), *m_TopBarTitle, Theme.Color(clrTopBarFont),

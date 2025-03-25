@@ -4010,6 +4010,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
     ContentTop += 6;
 
+    // Get all Recordings including start time and build string for displaying
     std::vector<std::pair<time_t, cString>> Recs;
     Recs.reserve(512);  // Set to at least 512 entry's
     time_t RecStart {0};
@@ -4026,7 +4027,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
             Recs.emplace_back(std::make_pair(RecStart, StrRec));
         }
     }
-    // Sort by RecStart
+    // Sort by RecStart and add entrys to ContentWidget
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
     int index {0};
     cString Rec {""};
