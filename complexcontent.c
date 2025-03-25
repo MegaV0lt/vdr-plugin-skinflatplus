@@ -119,18 +119,13 @@ bool cComplexContent::Scrollable(int height) {
 
 void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg,
                               cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
-    // Contents.emplace_back(cSimpleContent());
-    // Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
     // Method Chaining: Instead of using two separate lines, implement method chaining for a more concise approach:
     Contents.emplace_back(cSimpleContent())
         .SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, const cRect &Position) {
-    // Contents.emplace_back(cSimpleContent());
-    // Contents.back().SetImage(image, Position);
     Contents.emplace_back(cSimpleContent()).SetImage(image, Position);
-
 }
 
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
@@ -172,20 +167,11 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 }
 
 void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
-    // Contents.emplace_back(cSimpleContent());
-    // Contents.back().SetRect(Position, ColorBg);
     Contents.emplace_back(cSimpleContent()).SetRect(Position, ColorBg);
 }
 
 void cComplexContent::Draw() {
     m_IsShown = true;
-    /* std::vector<cSimpleContent>::iterator it, end {Contents.end()};
-    for (it = Contents.begin(); it != end; ++it) {
-        if ((*it).GetContentType() == CT_Image)
-            (*it).Draw(PixmapImage);
-        else
-            (*it).Draw(Pixmap);
-    } */
     for (auto& content : Contents) {
         if (content.GetContentType() == CT_Image)
             content.Draw(PixmapImage);
@@ -244,6 +230,26 @@ int cComplexContent::ScrollOffset() {
     return (y * ScrollTotal()) / m_DrawPortHeight;
 }
 
+/**
+ * Scrolls the content within the Pixmap and PixmapImage vertically.
+ *
+ * This function adjusts the vertical position of the content by either a line
+ * or a page, depending on the parameters, within the visible viewport. It uses
+ * the `Up` and `Page` parameters to determine the direction and amount of scroll:
+ *
+ * - If `Up` is true and `Page` is true, it scrolls a page up.
+ * - If `Up` is true and `Page` is false, it scrolls a line up.
+ * - If `Up` is false and `Page` is true, it scrolls a page down.
+ * - If `Up` is false and `Page` is false, it scrolls a line down.
+ *
+ * The function ensures that scrolling does not move the content beyond
+ * the top or bottom boundaries. If a scroll occurs, the draw port points
+ * of Pixmap and PixmapImage are updated accordingly.
+ *
+ * @param Up A boolean indicating the scroll direction. True for upward, false for downward.
+ * @param Page A boolean indicating the scroll amount. True for a page, false for a line.
+ * @return Returns true if the content was scrolled; otherwise, false.
+ */
 bool cComplexContent::Scroll(bool Up, bool Page) {
     if (!Pixmap || !PixmapImage) return false;
 
@@ -252,48 +258,38 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
     const int ScreenHeight {Pixmap->ViewPort().Height()};
     const int LineHeight {m_ScrollSize};
 
+    int NewY {AktHeight};
     bool scrolled {false};
-    if (Up) {
-        if (Page) {
-            int NewY {AktHeight + ScreenHeight};
-            if (NewY > 0) NewY = 0;
 
-            Pixmap->SetDrawPortPoint(cPoint(0, NewY));
-            PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
-            scrolled = true;
-        } else {
-            if (AktHeight < 0) {
-                if (AktHeight + LineHeight < 0) {
-                    Pixmap->SetDrawPortPoint(cPoint(0, AktHeight + LineHeight));
-                    PixmapImage->SetDrawPortPoint(cPoint(0, AktHeight + LineHeight));
-                } else {
-                    Pixmap->SetDrawPortPoint(cPoint(0, 0));
-                    PixmapImage->SetDrawPortPoint(cPoint(0, 0));
-                }
-                scrolled = true;
-            }
-        }
-    } else {  // Down
-        if (Page) {
-            int NewY {AktHeight - ScreenHeight};
-            if ((-1) * NewY > TotalHeight - ScreenHeight)
-                NewY = (-1) * (TotalHeight - ScreenHeight);
-            Pixmap->SetDrawPortPoint(cPoint(0, NewY));
-            PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
-            scrolled = true;
-        } else {
-            if (TotalHeight - ((-1) * AktHeight + LineHeight) > ScreenHeight) {
-                Pixmap->SetDrawPortPoint(cPoint(0, AktHeight - LineHeight));
-                PixmapImage->SetDrawPortPoint(cPoint(0, AktHeight - LineHeight));
-            } else {
-                int NewY {AktHeight - ScreenHeight};
-                if ((-1) * NewY > TotalHeight - ScreenHeight)
-                    NewY = (-1) * (TotalHeight - ScreenHeight);
-                Pixmap->SetDrawPortPoint(cPoint(0, NewY));
-                PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
-            }
+    if (Up && Page) {
+        // Page up
+        NewY = std::min(AktHeight + ScreenHeight, 0);  // Clamp to top boundary
+        scrolled = true;
+    } else if (Up && !Page) {
+        // Line up
+        if (AktHeight < 0) {
+            NewY = std::min(AktHeight + LineHeight, 0);
             scrolled = true;
         }
+    } else if (!Up && Page) {
+        // Page down
+        const int maxScroll = -(TotalHeight - ScreenHeight);
+        NewY = std::max(AktHeight - ScreenHeight, maxScroll);  // Clamp to bottom boundary
+        scrolled = true;
+    } else {  // !Up && !Page
+        // Line down
+        const int maxScroll = -(TotalHeight - ScreenHeight);
+        if (TotalHeight - (-AktHeight + LineHeight) > ScreenHeight) {
+            NewY = AktHeight - LineHeight;
+        } else {
+            NewY = maxScroll;
+        }
+        scrolled = true;
+    }
+
+    if (scrolled) {
+        Pixmap->SetDrawPortPoint(cPoint(0, NewY));
+        PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
     }
 
     return scrolled;
