@@ -197,7 +197,7 @@ class cComplexContent {
     int Height() { return m_Position.Height(); }
     int ContentHeight(bool Full);
 
-    int BottomContent();
+    int BottomContent() const;
 
     int Top() { return m_Position.Top(); }
     void Draw();
