@@ -185,7 +185,7 @@ class cFlatBaseRender {
 #if APIVERSNUM >= 30004
         void ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent);
 #endif
-        int ProgressBarMarkPos(int P, int Total);
+        // int ProgressBarMarkPos(int P, int Total);
 
         void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
         void DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
