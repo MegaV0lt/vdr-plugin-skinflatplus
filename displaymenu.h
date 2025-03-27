@@ -143,7 +143,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
                        bool CanScrollDown, bool IsContent = false);
     int ItemsHeight();
-    bool CheckProgressBar(const char *text);
+    bool CheckProgressBar(const char *text) const;
     void DrawProgressBarFromText(const cRect &rec, const cRect &recBg, const char *bar, tColor ColorFg,
                                  tColor ColorBarFg, tColor ColorBg);
 

@@ -187,22 +187,22 @@ class cComplexContent {
                                  int TextAlignment = taDefault);
     void AddRect(const cRect &Position, tColor ColorBg);
     bool Scrollable(int height = 0);
-     int ScrollTotal();
-     int ScrollOffset();
-     int ScrollShown();
+     int ScrollTotal() const;
+     int ScrollOffset() const;
+     int ScrollShown() const;
     bool Scroll(bool Up, bool Page);
-    double ScrollbarSize();
+    double ScrollbarSize() const;
     void SetScrollingActive(bool active) { m_IsScrollingActive = active; }
 
-    int Height() { return m_Position.Height(); }
+    int Height() const { return m_Position.Height(); }
     int ContentHeight(bool Full);
 
     int BottomContent() const;
 
-    int Top() { return m_Position.Top(); }
+    int Top() const { return m_Position.Top(); }
     void Draw();
-    bool IsShown() { return m_IsShown; }
-    bool IsScrollingActive() { return m_IsScrollingActive; }
+    bool IsShown() const { return m_IsShown; }
+    bool IsScrollingActive() const { return m_IsScrollingActive; }
 
  private:
     std::vector<cSimpleContent> Contents;

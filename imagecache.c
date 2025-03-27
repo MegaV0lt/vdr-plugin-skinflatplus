@@ -52,7 +52,7 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
     return false;
 }
 
-cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
+cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) const {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (uint i {0}; i < MaxImageCache; ++i) {
         // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),

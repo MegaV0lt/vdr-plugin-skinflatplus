@@ -31,6 +31,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 
+    m_FontBig = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
     m_FontMedium = cFont::CreateFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
 
     // Top bar fonts
@@ -57,6 +58,7 @@ cFlatBaseRender::~cFlatBaseRender() {
     delete m_FontSml;
     delete m_FontFixed;
     delete m_FontMedium;
+    delete m_FontBig;
 
     delete m_TopBarFont;
     delete m_TopBarFontSml;
@@ -615,7 +617,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
     }  // for (int i = 0; i < 4; i++)
 }
 
-bool cFlatBaseRender::ButtonsDrawn() {
+bool cFlatBaseRender::ButtonsDrawn() const {
     return m_ButtonsDrawn;
 }
 
@@ -809,7 +811,7 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
         m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
-void cFlatBaseRender::ProgressBarDrawBgColor() {
+void cFlatBaseRender::ProgressBarDrawBgColor() const {
     PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
 }
 
@@ -1339,7 +1341,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
     }  // Total > 0
 }
 
-int cFlatBaseRender::ScrollBarWidth() {
+int cFlatBaseRender::ScrollBarWidth() const {
     return m_ScrollBarWidth;
 }
 
@@ -1364,16 +1366,6 @@ void cFlatBaseRender::DecorBorderClear(const cRect &Rect, int Size) {
 }
 
 void cFlatBaseRender::DecorBorderClearByFrom(int From) {
-    /* std::vector<sDecorBorder>::iterator it, end {Borders.end()};
-    for (it = Borders.begin(); it != end;) {
-        if ((*it).From == From) {
-            DecorBorderClear(cRect((*it).Left, (*it).Top, (*it).Width, (*it).Height), (*it).Size);
-            it = Borders.erase(it);  // Invalidates 'it'
-            end = Borders.end();     // Reevaluate to avoid crash
-        } else {
-            ++it;
-        }
-    } */
     // The erase-remove idiom is a standard C++ pattern for removing elements from containers. It uses std::remove_if to
     // move elements to be removed to the end of the container, then uses erase to remove them all at once.
     auto removeStart = std::remove_if(Borders.begin(), Borders.end(), [this, From](const sDecorBorder &border) {
@@ -1393,7 +1385,7 @@ void cFlatBaseRender::DecorBorderRedrawAll() {
     }
 }
 
-void cFlatBaseRender::DecorBorderClearAll() {
+void cFlatBaseRender::DecorBorderClearAll() const {
     PixmapFill(DecorPixmap, clrTransparent);
 }
 
@@ -1731,7 +1723,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
-int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
+int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) const {
     FT_Library library {nullptr};
     FT_Face face {nullptr};
     const cString FontFileName = *cFont::GetFontFileName(Name);
@@ -1757,7 +1749,7 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
     return Ascender;
 }
-cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString delimiter) {
+cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString delimiter) const {
     std::ifstream file(*FilePath);
     if (!file.is_open()) return "";
 
@@ -1776,7 +1768,7 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString del
     return data.c_str();
 }
 
-cString cFlatBaseRender::FormatPrecipitation(const cString &FilePath) {
+cString cFlatBaseRender::FormatPrecipitation(const cString &FilePath) const {
     std::ifstream file(*FilePath);
     if (!file.is_open()) return "";
 

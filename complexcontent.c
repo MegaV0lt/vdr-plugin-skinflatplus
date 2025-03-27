@@ -65,12 +65,6 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 }
 
 void cComplexContent::CalculateDrawPortHeight() {
-    // Using std::accumulate algorithm instead of manual loop
-    /* m_DrawPortHeight = std::accumulate(Contents.begin(), Contents.end(), 0,
-        [](int max, const auto& content) {
-            return std::max(max, content.GetBottom());
-        }); */
-
     m_DrawPortHeight = BottomContent();
 
     // m_DrawPortHeight has to be set for 'ScrollTotal()' to work
@@ -79,14 +73,6 @@ void cComplexContent::CalculateDrawPortHeight() {
     }
 }
 int cComplexContent::BottomContent() const {
-    /* int Bottom {0};
-    std::vector<cSimpleContent>::iterator it, end {Contents.end()};
-    for (it = Contents.begin(); it != end; ++it) {
-        Bottom = std::max(Bottom, (*it).GetBottom());
-    }
-
-    return Bottom; */
-
     // Using std::accumulate algorithm instead of manual loop
     return std::accumulate(Contents.begin(), Contents.end(), 0,
     [](int max, const auto& content) {
@@ -180,7 +166,7 @@ void cComplexContent::Draw() {
     }
 }
 
-double cComplexContent::ScrollbarSize() {
+double cComplexContent::ScrollbarSize() const {
     if (m_DrawPortHeight == 0) {  // Avoid DIV/0}
         esyslog("flatPlus: Error in cComplexContent::ScrollbarSize() m_DrawPortHeight is 0!");
         return 0;
@@ -189,7 +175,7 @@ double cComplexContent::ScrollbarSize() {
     return static_cast<double>(m_Position.Height()) / m_DrawPortHeight;
 }
 
-int cComplexContent::ScrollTotal() {
+int cComplexContent::ScrollTotal() const {
     if (m_ScrollSize == 0) {  // Avoid DIV/0}
         esyslog("flatPlus: Error in cComplexContent::ScrollTotal() m_ScrollSize is 0!");
         return 0;
@@ -199,7 +185,7 @@ int cComplexContent::ScrollTotal() {
     return (m_DrawPortHeight + m_ScrollSize - 1) / m_ScrollSize;
 }
 
-int cComplexContent::ScrollShown() {
+int cComplexContent::ScrollShown() const {
     if (m_ScrollSize == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in cComplexContent::ScrollShown() m_ScrollSize is 0!");
         return 0;
@@ -209,7 +195,7 @@ int cComplexContent::ScrollShown() {
     return m_Position.Height() / m_ScrollSize;
 }
 
-int cComplexContent::ScrollOffset() {
+int cComplexContent::ScrollOffset() const {
     if (!Pixmap) return 0;
 
     int y {Pixmap->DrawPort().Point().Y() * -1};

@@ -55,7 +55,7 @@ class cFlatBaseRender {
         void ButtonsCreate();
         void ButtonsSet(const char *Red, const char *Green = nullptr, const char *Yellow = nullptr,
                         const char *Blue = nullptr);
-        bool ButtonsDrawn();
+        bool ButtonsDrawn() const;
 
         void MessageCreate();
         void MessageSet(eMessageType Type, const char *Text);
@@ -67,7 +67,7 @@ class cFlatBaseRender {
                                 bool SetBackground, bool IsSignal = false);
         void ProgressBarCreate(const cRect &Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
                                tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
-        void ProgressBarDrawBgColor();
+        void ProgressBarDrawBgColor() const;
         void ProgressBarDraw(int Current, int Total);
 #if APIVERSNUM >= 30004
         /**
@@ -85,18 +85,18 @@ class cFlatBaseRender {
 #endif
         void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
                            int Shown, bool CanScrollUp, bool CanScrollDown);
-        int ScrollBarWidth();
+        int ScrollBarWidth() const;
 
         void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
         void DecorBorderClear(const cRect &Rect, int Size);
-        void DecorBorderClearAll();
+        void DecorBorderClearAll() const;
         void DecorBorderRedrawAll();
         void DecorBorderClearByFrom(int From);
 
-        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
+        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0) const;
 
-        cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "");
-        cString FormatPrecipitation(const cString &FilePath);
+        cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "") const;
+        cString FormatPrecipitation(const cString &FilePath) const;
 
         void DrawWidgetWeather();
 
@@ -118,10 +118,10 @@ class cFlatBaseRender {
         int m_FontFixedHeight {0};
         int m_FontAscender {0};  // Ascender for font
 
+        cFont *m_FontBig {nullptr};      // Big font for channel name in displaychannel.c
         cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
         cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
         cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
-        // int m_FontMediumHeight {0};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};

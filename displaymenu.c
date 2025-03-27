@@ -3063,7 +3063,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     m_MenuItemWidth = Width;
 
-    // First assume text is with scrollbar and redraw if not
+    // First assume text is with scrollbar
     ComplexContentAddText(Text, FixedFont, Width - m_WidthScrollBar, Height);
 
     const bool Scrollable {ComplexContent.Scrollable(Height - m_MarginItem2)};
@@ -3491,7 +3491,7 @@ const cFont *cFlatDisplayMenu::GetTextAreaFont(bool FixedFont) const {
     return (FixedFont) ? m_FontFixed : m_Font;
 }
 
-bool cFlatDisplayMenu::CheckProgressBar(const char *text) {
+bool cFlatDisplayMenu::CheckProgressBar(const char *text) const {
     const std::size_t TextLength {strlen(text)};
     if (text[0] == '[' && TextLength > 5 && ((text[1] == '|') || (text[1] == ' ')) && text[TextLength - 1] == ']')
         return true;

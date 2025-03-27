@@ -251,7 +251,7 @@ class cTextFloatingWrapper {
     ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
     const char *Text();
     ///< Returns the full wrapped text.
-    int Lines() { return m_Lines; }
+    int Lines() const { return m_Lines; }
     ///< Returns the actual number of lines needed to display the full wrapped text.
     const char *GetLine(int Line);
     ///< Returns the given Line. The first line is numbered 0.
@@ -262,7 +262,6 @@ class cTextFloatingWrapper {
     int m_Lines {0};
     int m_LastLine {-1};
 };
-
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);

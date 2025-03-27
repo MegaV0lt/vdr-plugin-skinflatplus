@@ -41,7 +41,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
-    // Pixmap for channel logo background
+    // Pixmap for channel logo and background
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
                                   Config.decorBorderChannelSize + m_ChannelHeight - height,
                                   m_HeightBottom * 2, m_HeightBottom * 2};
@@ -58,7 +58,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     ProgressBarDrawBgColor();
 
-    const int HeightTop {m_FontHeight};
+    // Pixmap for channel number and name
+    const int HeightTop {m_FontBig->Height()};
     height += HeightTop;
     ChanInfoTopPixmap =
         CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1,
@@ -147,12 +148,15 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     const int left {m_MarginItem * 10};  // 50 Pixel
     PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
     ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
-                                Theme.Color(clrChannelBg), m_Font);
+                                Theme.Color(clrChannelBg), m_FontBig);
 
 #ifdef SHOW_TRANSPONDERINFO
-    if (!isempty(*TransponderInfo))
-        ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), 0), *TransponderInfo,
-                                    Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg), m_Font);
+    if (!isempty(*TransponderInfo)) {
+        const int top {m_FontBig->Height() - m_FontHeight};
+        ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), top),
+                                    *TransponderInfo, Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg),
+                                    m_Font);
+    }
 #endif
 
     PixmapFill(ChanLogoPixmap, clrTransparent);
@@ -188,7 +192,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
-    if (!ChanIconsPixmap) return;
+    // if (!ChanIconsPixmap) return;  // Remove redundant check since caller already checks
 
     if (!Resolution)
         PixmapFill(ChanIconsPixmap, clrTransparent);
@@ -210,6 +214,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
     if (Resolution && !m_IsRadioChannel && m_ScreenWidth > 0) {
         cString IconName {""};
         if (Config.ChannelResolutionAspectShow) {  // Show Aspect (16:9)
+            // If Config.ChannelSimpleAspectFormat is enabled, the aspect ratio is only shown for
+            // sd program, else format (HD/UHD) is shown
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
             img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
             if (img) {
@@ -237,7 +243,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
         }
         // Show audio icon (Dolby, Stereo)
-        if (Config.ChannelResolutionAspectShow) {  //? Add separate config option
+        if (Config.ChannelResolutionAspectShow) {  //? Add separate config option (Config.ChannelAudioIconShow)
             IconName = *GetCurrentAudioIcon();
             img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
             if (img) {
@@ -437,14 +443,20 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalStrength = SignalStrength;
     m_LastSignalQuality = SignalQuality;
 
-    const cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
+    // const cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
+    // Use std::unique_ptr for automatic cleanup
+    std::unique_ptr<cFont> SignalFont(cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize));
+    if (!SignalFont) {  // Add null check
+        esyslog("flatPlus: Failed to create font for signal quality display");
+        return;
+    }
 
     const int left {m_MarginItem2};
     int top {m_HeightBottom -
              (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont);
+                                   Theme.Color(clrChannelBg), SignalFont.get());
     const int ProgressLeft {left + std::max(SignalFont->Width("STR "), SignalFont->Width("SNR ")) + m_MarginItem};
     const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
@@ -454,7 +466,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
 
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont);
+                                   Theme.Color(clrChannelBg), SignalFont.get());
     ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
@@ -462,7 +474,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
 
     m_SignalStrengthRight = ProgressLeft + ProgressWidth;
 
-    delete SignalFont;
+    // delete SignalFont;
 }
 
 // You need oscam min rev 10653
@@ -498,7 +510,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     int left {m_SignalStrengthRight + m_MarginItem2};
     const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
 
-    const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, ProgressBarHeight);
+    // const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, ProgressBarHeight);
+    // Use std::unique_ptr for automatic cleanup
+    std::unique_ptr<cFont> DvbapiInfoFont(cFont::CreateFont(Setup.FontOsd, ProgressBarHeight));
+    if (!DvbapiInfoFont) {  // Add null check
+        esyslog("flatPlus: Failed to create font for dvbapi info display");
+        return;
+    }
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
     constexpr ulong CharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
@@ -509,7 +527,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     cString DvbapiInfoText = "DVBAPI: ";
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get());
 
     left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
@@ -539,9 +557,9 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     m_LastDvbapiInfoTextWidth = std::max(DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
+                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get(), m_LastDvbapiInfoTextWidth);
 
-    delete DvbapiInfoFont;
+    // delete DvbapiInfoFont;
 }
 
 void cFlatDisplayChannel::Flush() {

@@ -27,11 +27,11 @@ class cImageCache {
     void Clear();
     bool RemoveFromCache(const std::string &Name);
 
-    int GetCacheCount() {
+    int GetCacheCount() const {
       return m_InsertIndex + 1;
     }
 
-    cImage *GetImage(const std::string &Name, int Width, int Height);
+    cImage *GetImage(const std::string &Name, int Width, int Height) const;
     void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
 
     void PreLoadImage();
