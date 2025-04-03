@@ -462,7 +462,6 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalStrength = SignalStrength;
     m_LastSignalQuality = SignalQuality;
 
-    // const cFont *SignalFont = cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize);
     // Use std::unique_ptr for automatic cleanup
     std::unique_ptr<cFont> SignalFont(cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize));
     if (!SignalFont) {  // Add null check
@@ -492,8 +491,6 @@ void cFlatDisplayChannel::SignalQualityDraw() {
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
     m_SignalStrengthRight = ProgressLeft + ProgressWidth;
-
-    // delete SignalFont;
 }
 
 // You need oscam min rev 10653
@@ -529,7 +526,6 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     int left {m_SignalStrengthRight + m_MarginItem2};
     const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
 
-    // const cFont *DvbapiInfoFont = cFont::CreateFont(Setup.FontOsd, ProgressBarHeight);
     // Use std::unique_ptr for automatic cleanup
     std::unique_ptr<cFont> DvbapiInfoFont(cFont::CreateFont(Setup.FontOsd, ProgressBarHeight));
     if (!DvbapiInfoFont) {  // Add null check
@@ -577,8 +573,6 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont.get(), m_LastDvbapiInfoTextWidth);
-
-    // delete DvbapiInfoFont;
 }
 
 void cFlatDisplayChannel::Flush() {

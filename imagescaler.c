@@ -180,8 +180,6 @@ void ImageScaler::NextSourceLine() {
     }
 
     int h0 {0}, h1 {0}, h2 {0}, h3 {0};  // Init outside of loop
-    // TmpPixel *src {nullptr}, t {nullptr};
-    // unsigned *dst {nullptr};
     while (m_ver_filters[m_dst_y].m_offset == m_src_y) {
         /* const int */       h0  = m_ver_filters[m_dst_y].m_coeff[0];
         /* const int */       h1  = m_ver_filters[m_dst_y].m_coeff[1];

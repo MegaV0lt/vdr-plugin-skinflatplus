@@ -183,13 +183,10 @@ class cFlatBaseRender {
         cPixmap *DecorPixmap {nullptr};
         std::vector<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
-        // double ScrollbarSize();
-
         void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
 #if APIVERSNUM >= 30004
         void ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent);
 #endif
-        // int ProgressBarMarkPos(int P, int Total);
 
         void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
         void DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);

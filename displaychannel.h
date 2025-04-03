@@ -56,7 +56,6 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         cTextScrollers Scrollers;
 
         bool m_IsRadioChannel {false};
-        // bool m_IsGroup {false};
 
         void SignalQualityDraw();
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);

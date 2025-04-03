@@ -826,10 +826,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
     const int LineWidth {Font->Width(Line.c_str())};   // Width in Pixel
-    if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
-        // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
+    if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
         return;
-    }
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
         // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,

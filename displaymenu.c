@@ -297,9 +297,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcMain:
         NewTitle = "";
         break;
-    // case mcSchedule:
-    // case mcScheduleNow:
-    // case mcScheduleNext: break;
     case mcChannel:
         if (Config.MenuChannelShowCount) {
             uint ChanCount {0};
@@ -319,10 +316,6 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcRecording:
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
         break;
-    // case mcSetup:
-    // case mcCommand:
-    // case mcEvent:
-    // case mcRecordingInfo:
     default: break;
     }  // switch (m_MenuCategory)
 

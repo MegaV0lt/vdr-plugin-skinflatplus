@@ -73,9 +73,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    // int m_FontAscender {0};  // Top of capital letter
-    // int m_VideoDiskUsageState;  // Also in cFlatBaseRender
-
     uint m_LastTimerActiveCount {0}, m_LastTimerCount {0};
     cString m_LastTitle {""};
 
@@ -147,7 +144,6 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void DrawProgressBarFromText(const cRect &rec, const cRect &recBg, const char *bar, tColor ColorFg,
                                  tColor ColorBarFg, tColor ColorBg);
 
-    // static cBitmap bmCNew, bmCRec, bmCArrowTurn, bmCHD, bmCVPS;  // Unused?
     void DrawItemExtraEvent(const cEvent *Event, const cString EmptyText);
     void DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText);
     void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT

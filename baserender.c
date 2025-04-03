@@ -151,8 +151,6 @@ void cFlatBaseRender::TopBarSetTitleExtra(const cString &Extra1, const cString &
 }
 
 void cFlatBaseRender::TopBarSetExtraIcon(const cString &icon) {
-    // if (!strcmp(*icon, "")) return;
-
     // Check if the string is empty
     if (**icon == '\0') return;  // Double dereference to get the first character
 
@@ -1018,9 +1016,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     // Eliminate the division operation in each iteration and potentially reduce the computational cost, especially for
     // large collections of marks.
     const double PosScaleFactor = static_cast<double>(m_ProgressBarWidth) / Total;
-    const int PosCurrent {static_cast<int>(Current * PosScaleFactor)};
-    // const int PosCurrent {ProgressBarMarkPos(Current, Total)};  // Not needed to calculate for every mark
-
+    const int PosCurrent {static_cast<int>(Current * PosScaleFactor)};  // Not needed to calculate for every mark
     const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     if (!Marks || !Marks->First()) {
         // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
@@ -1035,7 +1031,6 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         int PosMark {0}, PosMarkLast {0};
         bool Start {true};
         for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
-            // PosMark = ProgressBarMarkPos(m->Position(), Total);
             PosMark = static_cast<int>(m->Position() * PosScaleFactor);
             ProgressBarDrawMark(PosMark, PosMarkLast, PosCurrent, Start, m->Position() == Current);
             PosMarkLast = PosMark;
@@ -1075,8 +1070,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         int LastPos {-1}, Pos {0};
         const int ErrorsSize {Errors->Size()};
         for (int i {0}; i < ErrorsSize; ++i) {
-            // Pos = ProgressBarMarkPos(Errors->At(i), Total);  // Position on progressbar in pixel
-            Pos = static_cast<int>(Errors->At(i) * PosScaleFactor);
+            Pos = static_cast<int>(Errors->At(i) * PosScaleFactor);  // Position on progressbar in pixel
             if (Pos != LastPos) {                            // Draw mark if pos is not the same as the last one
                 ProgressBarDrawError(Pos, sml, Theme.Color(clrReplayErrorMark), Pos == PosCurrent);
                 LastPos = Pos;
@@ -1085,10 +1079,6 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     }
 #endif
 }
-
-/* int cFlatBaseRender::ProgressBarMarkPos(int P, int Total) {
-    return static_cast<int64_t>(P) * m_ProgressBarWidth / Total;
-} */
 
 void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent) {
     // if (!ProgressBarPixmap || !ProgressBarMarkerPixmap)  // Checked in calling function 'ProgressBarDrawMarks()'
