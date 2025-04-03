@@ -82,6 +82,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: CreatePixmap(\"%s\", %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
             Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
@@ -90,6 +91,10 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+#ifdef DEBUGFUNCSCALL
+        if (Timer.Elapsed() > 0)
+            dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
+#endif
         return pixmap;
     }  // Everything runs according to the plan
 

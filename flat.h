@@ -245,16 +245,16 @@ class cTextFloatingWrapper {
  public:
     cTextFloatingWrapper();
     ~cTextFloatingWrapper();
-    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline characters into the string.
     ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
-    const char *Text();
+    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Returns the full wrapped text.
-    int Lines() const { return m_Lines; }
+    const char *Text();
     ///< Returns the actual number of lines needed to display the full wrapped text.
-    const char *GetLine(int Line);
+    int Lines() const { return m_Lines; }
     ///< Returns the given Line. The first line is numbered 0.
+    const char *GetLine(int Line);
 
  private:
     char *m_Text {nullptr};
@@ -268,7 +268,15 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect 
 inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
     if (Pixmap) Pixmap->Fill(Color);
 }
-
+inline void PixmapClear(cPixmap *Pixmap) {
+    if (Pixmap) Pixmap->Clear();
+}
+/**
+ * Sets the alpha value of the given `cPixmap` object.
+ * 
+ * @param Pixmap - A pointer to the `cPixmap` object.
+ * @param Alpha - The alpha value to be set (0-255, where 0 represents full transparency).
+ */
 inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }

@@ -99,6 +99,9 @@ class cFlatBaseRender {
         cString FormatPrecipitation(const cString &FilePath) const;
 
         void DrawWidgetWeather();
+        void DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
+                                tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset = 1,
+                                int yOffset = 1);
 
  protected:
         cOsd *m_Osd {nullptr};
@@ -122,6 +125,7 @@ class cFlatBaseRender {
         cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
         cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
         cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
+        int m_FontBigHeight {0};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};
@@ -208,4 +212,3 @@ class cFlatBaseRender {
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
 };
-

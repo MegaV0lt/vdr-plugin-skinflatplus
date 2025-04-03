@@ -71,12 +71,12 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
         m_Osd, "ScrollbarPixmap", 2,
         cRect(0, m_ScrollBarTop, m_MenuWidth, m_ScrollBarHeight + m_ButtonsHeight + Config.decorBorderButtonSize * 2));
 
-    PixmapFill(MenuPixmap, clrTransparent);
-    PixmapFill(MenuIconsPixmap, clrTransparent);
-    PixmapFill(MenuIconsBgPixmap, clrTransparent);
-    PixmapFill(MenuIconsOvlPixmap, clrTransparent);
-    PixmapFill(ContentHeadIconsPixmap, clrTransparent);
-    PixmapFill(ScrollbarPixmap, clrTransparent);
+    PixmapClear(MenuPixmap);
+    PixmapClear(MenuIconsPixmap);
+    PixmapClear(MenuIconsBgPixmap);
+    PixmapClear(MenuIconsOvlPixmap);
+    PixmapClear(ContentHeadIconsPixmap);
+    PixmapClear(ScrollbarPixmap);
 
     MenuItemScroller.SetOsd(m_Osd);
     MenuItemScroller.SetScrollStep(Config.ScrollerStep);
@@ -262,13 +262,13 @@ int cFlatDisplayMenu::ItemsHeight() {
 
 void cFlatDisplayMenu::Clear() {
     MenuItemScroller.Clear();
-    PixmapFill(MenuPixmap, clrTransparent);
-    PixmapFill(MenuIconsPixmap, clrTransparent);
-    PixmapFill(MenuIconsBgPixmap, clrTransparent);
-    PixmapFill(MenuIconsOvlPixmap, clrTransparent);
-    PixmapFill(ScrollbarPixmap, clrTransparent);
-    PixmapFill(ContentHeadPixmap, clrTransparent);
-    PixmapFill(ContentHeadIconsPixmap, clrTransparent);
+    PixmapClear(MenuPixmap);
+    PixmapClear(MenuIconsPixmap);
+    PixmapClear(MenuIconsBgPixmap);
+    PixmapClear(MenuIconsOvlPixmap);
+    PixmapClear(ScrollbarPixmap);
+    PixmapClear(ContentHeadPixmap);
+    PixmapClear(ContentHeadIconsPixmap);
     DecorBorderClearByFrom(BorderMenuItem);
     DecorBorderClearByFrom(BorderContent);
     DecorBorderClearByFrom(BorderMMWidget);
@@ -2094,7 +2094,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
     m_MenuItemWidth = m_cWidth;
 
-    PixmapFill(ContentHeadIconsPixmap, clrTransparent);
+    PixmapClear(ContentHeadIconsPixmap);
 
     cString Fsk {""}, Text {""}, TextAdditional {""};
     std::vector<std::string> GenreIcons;
@@ -2338,7 +2338,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
-    PixmapFill(ContentHeadPixmap, clrTransparent);
+    PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
     const cString StrTime =
@@ -2655,7 +2655,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_ShowText = false;
     ItemBorderClear();
 
-    PixmapFill(ContentHeadIconsPixmap, clrTransparent);
+    PixmapClear(ContentHeadIconsPixmap);
 
     m_cLeft = Config.decorBorderMenuContentSize;
     m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
@@ -2930,7 +2930,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         dsyslog("flatPlus: SetRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
 #endif
 
-    PixmapFill(ContentHeadPixmap, clrTransparent);
+    PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
                                      Theme.Color(clrScrollbarBg));
 
@@ -3048,7 +3048,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     m_ShowText = true;
     ItemBorderClear();
 
-    PixmapFill(ContentHeadPixmap, clrTransparent);
+    PixmapClear(ContentHeadPixmap);
 
     const int Left {Config.decorBorderMenuContentSize};  // Config.decorBorderMenuContentSize
     const int Top {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Left};

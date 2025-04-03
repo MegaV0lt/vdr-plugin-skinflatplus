@@ -77,7 +77,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     ChannelIconsShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          ChannelResolutionAspectShow = atoi(Value);
-    else if (strcmp(Name, "ChannelShowStartTime") == 0)      ChannelShowStartTime = atoi(Value);
+    else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            ChannelShowNameWithShadow = atoi(Value);
+    else if (strcmp(Name, "ChannelShowStartTime") == 0)                 ChannelShowStartTime = atoi(Value);
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      ChannelTimeLeft = atoi(Value);
     else if (strcmp(Name, "ChannelWeatherShow") == 0)                   ChannelWeatherShow = atoi(Value);

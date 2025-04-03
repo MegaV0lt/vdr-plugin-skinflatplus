@@ -33,6 +33,7 @@ cFlatBaseRender::cFlatBaseRender() {
 
     m_FontBig = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
     m_FontMedium = cFont::CreateFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
+    m_FontBigHeight = m_FontBig->Height();
 
     // Top bar fonts
     const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
@@ -111,9 +112,9 @@ void cFlatBaseRender::TopBarCreate() {
     TopBarPixmap = CreatePixmap(m_Osd, "TopBarPixmap", 1, TopBarViewPort);
     TopBarIconBgPixmap = CreatePixmap(m_Osd, "TopBarIconBgPixmap", 2, TopBarViewPort);
     TopBarIconPixmap = CreatePixmap(m_Osd, "TopBarIconPixmap", 3, TopBarViewPort);
-    PixmapFill(TopBarPixmap, clrTransparent);
-    PixmapFill(TopBarIconBgPixmap, clrTransparent);
-    PixmapFill(TopBarIconPixmap, clrTransparent);
+    PixmapClear(TopBarPixmap);
+    PixmapClear(TopBarIconBgPixmap);
+    PixmapClear(TopBarIconPixmap);
 
     if (Config.DiskUsageShow == 3)  // 3 = Always
         TopBarEnableDiskUsage();
@@ -331,8 +332,8 @@ void cFlatBaseRender::TopBarUpdate() {
         const int FontClockTop {(m_TopBarHeight - m_TopBarFontClockHeight) / 2};
 
         PixmapFill(TopBarPixmap, Theme.Color(clrTopBarBg));
-        PixmapFill(TopBarIconPixmap, clrTransparent);
-        PixmapFill(TopBarIconBgPixmap, clrTransparent);
+        PixmapClear(TopBarIconPixmap);
+        PixmapClear(TopBarIconBgPixmap);
 
         const int TopBarLogoHeight {m_TopBarHeight - m_MarginItem2};      // Height of TopBar
         const int TopBarIconHeight {m_TopBarFontHeight - m_MarginItem2};  // Height of font in TopBar
@@ -349,7 +350,7 @@ void cFlatBaseRender::TopBarUpdate() {
         }
 
         if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {  // Show menu logo
-            PixmapFill(TopBarIconPixmap, clrTransparent);
+            PixmapClear(TopBarIconPixmap);
             int IconLeft {m_MarginItem};
             int ImageBGHeight {TopBarLogoHeight};
             int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
@@ -562,7 +563,7 @@ void cFlatBaseRender::ButtonsCreate() {
     ButtonsPixmap = CreatePixmap(m_Osd, "ButtonsPixmap", 1,
                                  cRect(Config.decorBorderButtonSize, m_ButtonsTop,
                                        m_ButtonsWidth - Config.decorBorderButtonSize * 2, m_ButtonsHeight));
-    PixmapFill(ButtonsPixmap, clrTransparent);
+    PixmapClear(ButtonsPixmap);
 }
 
 void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char *Yellow, const char *Blue) {
@@ -575,7 +576,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
     const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
     int ButtonWidth {WidthMargin / 4 - Config.decorBorderButtonSize * 2};
 
-    PixmapFill(ButtonsPixmap, clrTransparent);
+    PixmapClear(ButtonsPixmap);
     DecorBorderClearByFrom(BorderButton);
 
     m_ButtonsDrawn = false;
@@ -631,8 +632,8 @@ void cFlatBaseRender::MessageCreate() {
                                        m_OsdWidth - Config.decorBorderMessageSize * 2, m_MessageHeight};
     MessagePixmap = CreatePixmap(m_Osd, "MessagePixmap", 5, MessagePixmapViewPort);
     MessageIconPixmap = CreatePixmap(m_Osd, "MessageIconPixmap", 5, MessagePixmapViewPort);
-    PixmapFill(MessagePixmap, clrTransparent);
-    PixmapFill(MessageIconPixmap, clrTransparent);
+    PixmapClear(MessagePixmap);
+    PixmapClear(MessageIconPixmap);
 
     MessageScroller.SetOsd(m_Osd);
     MessageScroller.SetScrollStep(Config.ScrollerStep);
@@ -762,8 +763,8 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
 }
 
 void cFlatBaseRender::MessageClear() {
-    PixmapFill(MessagePixmap, clrTransparent);
-    PixmapFill(MessageIconPixmap, clrTransparent);
+    PixmapClear(MessagePixmap);
+    PixmapClear(MessageIconPixmap);
     DecorBorderClearByFrom(BorderMessage);
     DecorBorderRedrawAll();
     MessageScroller.Clear();
@@ -798,9 +799,9 @@ void cFlatBaseRender::ProgressBarCreate(const cRect &Rect, int MarginHor, int Ma
     ProgressBarPixmapBg = CreatePixmap(m_Osd, "ProgressBarPixmapBg", 2,
                                        cRect(Rect.Left() - MarginVer, Rect.Top() - MarginHor,
                                              Rect.Width() + MarginVer * 2, Rect.Height() + MarginHor * 2));
-    PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
-    PixmapFill(ProgressBarPixmap, clrTransparent);
-    PixmapFill(ProgressBarPixmapBg, clrTransparent);
+    PixmapClear(ProgressBarMarkerPixmap);
+    PixmapClear(ProgressBarPixmap);
+    PixmapClear(ProgressBarPixmapBg);
 }
 
 void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
@@ -1012,7 +1013,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
             m_ProgressBarColorBg);
 
     PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
-    PixmapFill(ProgressBarMarkerPixmap, clrTransparent);
+    PixmapClear(ProgressBarMarkerPixmap);
 
     // Eliminate the division operation in each iteration and potentially reduce the computational cost, especially for
     // large collections of marks.
@@ -1215,7 +1216,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         const int ScrollTop{std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
                                      Top + Height - ScrollHeight)};
 
-        PixmapFill(Pixmap, clrTransparent);
+        PixmapClear(Pixmap);
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
 
         /* Types
@@ -1386,7 +1387,7 @@ void cFlatBaseRender::DecorBorderRedrawAll() {
 }
 
 void cFlatBaseRender::DecorBorderClearAll() const {
-    PixmapFill(DecorPixmap, clrTransparent);
+    PixmapClear(DecorPixmap);
 }
 
 void cFlatBaseRender::DecorBorderDraw(const sDecorBorder &ib, bool Store) {
@@ -1406,7 +1407,7 @@ void cFlatBaseRender::DecorBorderDraw(const sDecorBorder &ib, bool Store) {
         DecorPixmap = CreatePixmap(m_Osd, "DecorPixmap", 4, cRect(0, 0, cOsd::OsdWidth(), cOsd::OsdHeight()));
         if (!DecorPixmap) return;
 
-        PixmapFill(DecorPixmap, clrTransparent);
+        PixmapClear(DecorPixmap);
     }
 
     switch (ib.Type) {
@@ -1530,12 +1531,13 @@ tColor cFlatBaseRender::Multiply(tColor Color, uint8_t Alpha) {
 } */
 
 tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
-    uint8_t A = (Color & 0xFF000000) >> 24;  // Narrowing conversion
+    uint8_t A = (Color & 0xFF000000) >> 24;
     uint8_t R = (Color & 0x00FF0000) >> 16;
     uint8_t G = (Color & 0x0000FF00) >> 8;
     uint8_t B = (Color & 0x000000FF);
 
-    return ArgbToColor(A *= am, R, G, B);
+    A = static_cast<uint8_t>(A * am);  // Explicitly cast the result to uint8_t
+    return ArgbToColor(A, R, G, B);
 }
 
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
@@ -1829,9 +1831,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
 
     const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;  // Use a more precise calculation
-    cFont *WeatherFont = cFont::CreateFont(Setup.FontOsd, fs);
-    cFont *WeatherFontSml = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0));
-    cFont *WeatherFontSign = cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5));
+    std::unique_ptr<cFont> WeatherFont {cFont::CreateFont(Setup.FontOsd, fs)};
+    std::unique_ptr<cFont> WeatherFontSml {cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0))};
+    std::unique_ptr<cFont> WeatherFontSign {cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5))};
 
     int left {m_MarginItem};
 
@@ -1859,7 +1861,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature
     WeatherWidget.AddText(TempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFont);
+                          Theme.Color(clrItemCurrentBg), WeatherFont.get());
     left += WeatherFont->Width(TempToday.c_str());
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, fs)};
@@ -1868,7 +1870,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature sign
     WeatherWidget.AddText(TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFontSign);
+                          Theme.Color(clrItemCurrentBg), WeatherFontSign.get());
     left += WeatherFontSign->Width(TempTodaySign) + m_MarginItem2;
 
     // Add weather icon
@@ -1881,11 +1883,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature min/max values
     WeatherWidget.AddText(*TempMaxToday, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
+                          Theme.Color(clrItemCurrentBg), WeatherFontSml.get(), WidthTempToday, WeatherFontSmlHeight,
                           taRight);
     WeatherWidget.AddText(*TempMinToday, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday,
-                          WeatherFontSmlHeight, taRight);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml.get(),
+                          WidthTempToday, WeatherFontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
@@ -1898,7 +1900,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation
     WeatherWidget.AddText(*PrecToday, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml.get());
     left += WeatherFontSml->Width(*PrecToday) + m_MarginItem * 4;
 
     WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
@@ -1914,11 +1916,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature min/max values
     WeatherWidget.AddText(*TempMaxTomorrow, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
+                          Theme.Color(clrChannelBg), WeatherFontSml.get(), WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
     WeatherWidget.AddText(*TempMinTomorrow, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow,
-                          WeatherFontSmlHeight, taRight);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml.get(),
+                          WidthTempTomorrow, WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
 
     // Add precipitation icon
@@ -1931,15 +1933,49 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation
     WeatherWidget.AddText(*PrecTomorrow, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml.get());
 
     // left += WeatherFontSml->Width(*PrecTomorrow);
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
     WeatherWidget.CreatePixmaps(false);
     WeatherWidget.Draw();
+}
 
-    delete WeatherFont;
-    delete WeatherFontSml;
-    delete WeatherFontSign;
+/**
+ * Draws a given text with a shadow effect.
+ *
+ * @param pixmap The pixmap to draw onto.
+ * @param pos The position to draw the text at.
+ * @param text The text to draw.
+ * @param TextColor The color of the text.
+ * @param ShadowColor The color of the shadow.
+ * @param font The font to use.
+ * @param ShadowSize The size of the shadow (number of steps).
+ * @param xOffset The x offset of the shadow (default 1).
+ * @param yOffset The y offset of the shadow (default 1).
+ *
+ * The shadow is drawn by repeatedly drawing the text with increasing alpha values
+ * at positions offset by (xOffset, yOffset) from the main text position.
+ * The main text is then drawn on top with the given color.
+ */
+void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
+                                         tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset,
+                                         int yOffset) {
+    const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
+    double CurrentAlpha {AlphaStep};  // Start with first step
+    tColor CurrentShadowColor {SetAlpha(ShadowColor, CurrentAlpha)};
+    // Loop through the shadow size to create the shadow effect
+    // Adjust the xOffset and yOffset for the shadow direction
+    for (int i {1}; i <= ShadowSize; ++i) {
+        pixmap->DrawText(cPoint(pos.X() + xOffset * i, pos.Y() + yOffset * i), text, CurrentShadowColor, clrTransparent,
+            font);
+
+        CurrentAlpha += AlphaStep;  // Increment for next iteration
+        if (CurrentAlpha > 1.0) CurrentAlpha = 1.0;  // Ensure it does not exceed 1.0
+        CurrentShadowColor = SetAlpha(ShadowColor, CurrentAlpha);
+    }
+
+    // Draw the main text
+    pixmap->DrawText(pos, text, TextColor, clrTransparent, font);
 }

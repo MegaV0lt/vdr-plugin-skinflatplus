@@ -61,7 +61,7 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
-    PixmapFill(PixmapImage, clrTransparent);
+    PixmapClear(PixmapImage);
 }
 
 void cComplexContent::CalculateDrawPortHeight() {

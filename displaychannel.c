@@ -45,7 +45,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
                                   Config.decorBorderChannelSize + m_ChannelHeight - height,
                                   m_HeightBottom * 2, m_HeightBottom * 2};
-    ChanLogoBGPixmap = CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2, ChanLogoViewPort);
+    ChanLogoBgPixmap = CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2, ChanLogoViewPort);
     ChanLogoPixmap = CreatePixmap(m_Osd, "ChanLogoPixmap", 3, ChanLogoViewPort);
 
     height += Config.decorProgressChannelSize + m_MarginItem2;
@@ -59,19 +59,21 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ProgressBarDrawBgColor();
 
     // Pixmap for channel number and name
-    const int HeightTop {m_FontBig->Height()};
+    // TODO: Different position for channel number and name when without background
+    // Top of ChanInfoTopViewPort depending on setting ChannelShowWithName
+    const int HeightTop {m_FontBigHeight + (Config.ChannelShowNameWithShadow ? m_FontBigHeight / 10 : 0)};
     height += HeightTop;
-    ChanInfoTopPixmap =
-        CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1,
-                     cRect(Config.decorBorderChannelSize, Config.decorBorderChannelSize + m_ChannelHeight - height,
-                           m_ChannelWidth, HeightTop));
+    const cRect ChanInfoTopViewPort {Config.decorBorderChannelSize,
+                                     Config.decorBorderChannelSize + m_ChannelHeight - height,
+                                     m_ChannelWidth, HeightTop};
+    ChanInfoTopPixmap = CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1, ChanInfoTopViewPort);
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
-    PixmapFill(ChanIconsPixmap, clrTransparent);
-    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
-    PixmapFill(ChanLogoBGPixmap, clrTransparent);
-    PixmapFill(ChanLogoPixmap, clrTransparent);
-    PixmapFill(ChanInfoTopPixmap, clrTransparent);
+    PixmapClear(ChanIconsPixmap);
+    PixmapClear(ChanEpgImagesPixmap);
+    PixmapClear(ChanLogoBgPixmap);
+    PixmapClear(ChanLogoPixmap);
+    PixmapClear(ChanInfoTopPixmap);
 
     Scrollers.SetOsd(m_Osd);
     Scrollers.SetScrollStep(Config.ScrollerStep);
@@ -81,10 +83,12 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (Config.ChannelWeatherShow)
         DrawWidgetWeather();
 
+    // Decor border depending on setting 'ChannelShowNameWithShadow'
     const sDecorBorder ib {Config.decorBorderChannelSize,
-                           Config.decorBorderChannelSize + m_ChannelHeight - height,
+                           ChanInfoTopViewPort.Y() + (Config.ChannelShowNameWithShadow ? HeightTop : 0),
                            m_ChannelWidth,
-                           HeightTop + m_HeightBottom + Config.decorProgressChannelSize + m_MarginItem2,
+                           m_HeightBottom + Config.decorProgressChannelSize + m_MarginItem2 +
+                               (Config.ChannelShowNameWithShadow ? 0 : HeightTop),
                            Config.decorBorderChannelSize,
                            Config.decorBorderChannelType,
                            Config.decorBorderChannelFg,
@@ -97,18 +101,18 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
         Scrollers.Clear();
         m_Osd->DestroyPixmap(ChanInfoTopPixmap);
         m_Osd->DestroyPixmap(ChanInfoBottomPixmap);
+        m_Osd->DestroyPixmap(ChanLogoBgPixmap);
         m_Osd->DestroyPixmap(ChanLogoPixmap);
-        m_Osd->DestroyPixmap(ChanLogoBGPixmap);
         m_Osd->DestroyPixmap(ChanIconsPixmap);
         m_Osd->DestroyPixmap(ChanEpgImagesPixmap);
     // }
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
-    if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBGPixmap || !ChanLogoPixmap)
+    if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBgPixmap || !ChanLogoPixmap)
         return;
 
-    PixmapFill(ChanIconsPixmap, clrTransparent);
+    PixmapClear(ChanIconsPixmap);
     m_LastScreenWidth = -1;
 
     bool IsGroup {false};
@@ -146,10 +150,27 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
     const int left {m_MarginItem * 10};  // 50 Pixel
-    PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
-    ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
-                                Theme.Color(clrChannelBg), m_FontBig);
 
+    if (Config.ChannelShowNameWithShadow) {
+        PixmapClear(ChanInfoTopPixmap);
+        const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
+        // Ensure shadow size is reasonable
+        const int MinShadowSize {3};   // Shadow should have at least 3 pixel
+        const int MaxShadowSize {10};  // Shadow should not be too large
+        const int BoundedShadowSize {std::max(MinShadowSize, std::min(ShadowSize, MaxShadowSize))};
+        // Set shadow color to the same as background color and remove transparency
+        const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
+        dsyslog("flatPlus: SetChannel() m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
+
+        // Draw text with shadow
+        DrawTextWithShadow(ChanInfoTopPixmap, cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
+                           ShadowColor, m_FontBig, BoundedShadowSize);
+    } else {
+        // Channel name on background
+        PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
+        ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
+                                    Theme.Color(clrChannelBg), m_FontBig);
+    }
 #ifdef SHOW_TRANSPONDERINFO
     if (!isempty(*TransponderInfo)) {
         const int top {m_FontBig->Height() - m_FontHeight};
@@ -159,9 +180,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     }
 #endif
 
-    PixmapFill(ChanLogoPixmap, clrTransparent);
-    PixmapFill(ChanLogoBGPixmap, clrTransparent);
-
+    PixmapClear(ChanLogoPixmap);
+    PixmapClear(ChanLogoBgPixmap);
+    // Draw channel logo and background
     if (!IsGroup) {
         const int ImageHeight {m_HeightImageLogo - m_MarginItem2};
         int ImageBgHeight {ImageHeight};
@@ -172,7 +193,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
-            ChanLogoBGPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+            ChanLogoBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         }
 
         img = ImgLoader.LoadLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
@@ -194,8 +215,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
     // if (!ChanIconsPixmap) return;  // Remove redundant check since caller already checks
 
-    if (!Resolution)
-        PixmapFill(ChanIconsPixmap, clrTransparent);
+    if (Resolution)  // Clear only when resolution has changed
+        PixmapClear(ChanIconsPixmap);
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
     int left {m_ChannelWidth - m_MarginItem2};
@@ -262,11 +283,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
-
     Scrollers.Clear();
-
-    PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
-    PixmapFill(ChanIconsPixmap, clrTransparent);
 
     // Epg related variables
     cString Epg {""}, EpgShort {""};
@@ -292,6 +309,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.ChannelShowStartTime)
         left += m_Font->Width("00:00  ");
 
+    PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (uint i {0}; i < 2; i++) {
         const bool IsPresent = i ? false : true;
         const cEvent *Event = IsPresent ? Present : Following;
@@ -394,6 +412,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }  // if (Event)
     }  // for
 
+    PixmapClear(ChanIconsPixmap);
     if (Config.ChannelIconsShow && m_CurChannel)
         ChannelIconsDraw(m_CurChannel, false);
 
@@ -402,7 +421,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.TVScraperChanInfoShowPoster)
         GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
 
-    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+    PixmapClear(ChanEpgImagesPixmap);
     PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
     DecorBorderClearByFrom(BorderTVSPoster);
     if (!isempty(*MediaPath)) {
@@ -570,16 +589,16 @@ void cFlatDisplayChannel::Flush() {
         ProgressBarDraw(Current, Total);
     }
 
-    if (Config.SignalQualityShow)
-        SignalQualityDraw();
-
     if (Config.ChannelIconsShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
         if (m_ScreenWidth != m_LastScreenWidth) {
             m_LastScreenWidth = m_ScreenWidth;
-            ChannelIconsDraw(m_CurChannel, true);
+            ChannelIconsDraw(m_CurChannel, true);  // Redraw and clear ChanInfoTopPixmap
         }
     }
+
+    if (Config.SignalQualityShow)
+        SignalQualityDraw();
 
     if (Config.ChannelDvbapiInfoShow)
         DvbapiInfoDraw();

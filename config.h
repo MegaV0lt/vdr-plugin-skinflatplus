@@ -217,6 +217,7 @@ class cFlatConfig {
         int ChannelSimpleAspectFormat {true};
         int ChannelTimeLeft {0};
         int ChannelDvbapiInfoShow {1};
+        int ChannelShowNameWithShadow {false};  // Show channel name and number with shadow instead of background
         int ChannelShowStartTime {true};
 
         int ChannelWeatherShow {1};

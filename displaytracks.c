@@ -37,8 +37,8 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     const cRect TraksPixmapViewPort{left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight};
     TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1, TraksPixmapViewPort);
     TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1, TraksPixmapViewPort);
-    PixmapFill(TracksPixmap, clrTransparent);
-    PixmapFill(TracksLogoPixmap, clrTransparent);
+    PixmapClear(TracksPixmap);
+    PixmapClear(TracksLogoPixmap);
 
     SetItem(Title, -1, false);
 
@@ -104,7 +104,7 @@ void cFlatDisplayTracks::SetTrack(int Index, const char * const *Tracks) {
 void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     if (!TracksLogoPixmap) return;
 
-    PixmapFill(TracksLogoPixmap, clrTransparent);
+    PixmapClear(TracksLogoPixmap);
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
     if (AudioChannel == -1 && img_ac3) {

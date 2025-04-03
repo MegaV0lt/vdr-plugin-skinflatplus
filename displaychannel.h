@@ -35,7 +35,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         cPixmap *ChanInfoTopPixmap {nullptr};
         cPixmap *ChanInfoBottomPixmap {nullptr};
         cPixmap *ChanLogoPixmap {nullptr};
-        cPixmap *ChanLogoBGPixmap {nullptr};
+        cPixmap *ChanLogoBgPixmap {nullptr};
         cPixmap *ChanIconsPixmap {nullptr};
         cPixmap *ChanEpgImagesPixmap {nullptr};
 
