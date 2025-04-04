@@ -202,11 +202,10 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 }
 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
-    // Is the menu scrolling or content?
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
         const bool IsScrolled {ComplexContent.Scroll(Up, Page)};
         if (IsScrolled) {
-            const int ScrollOffset {ComplexContent.ScrollOffset()};  // Cache value
+            const int ScrollOffset {ComplexContent.ScrollOffset()};
             DrawScrollbar(
                 ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
                 ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
@@ -216,7 +215,6 @@ void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
         cSkinDisplayMenu::Scroll(Up, Page);
     }
 }
-
 int cFlatDisplayMenu::MaxItems() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::MaxItems()");
@@ -2114,13 +2112,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
             if (!isempty(*Audio)) {
-                if (!isempty(*TextAdditional))
-                    TextAdditional.Append("\n");
+                if (!isempty(*TextAdditional)) TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
             }
             if (!isempty(*Subtitle)) {
-                if (!isempty(*TextAdditional))
-                    TextAdditional.Append("\n");
+                if (!isempty(*TextAdditional)) TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
         }  // if Components
@@ -2225,23 +2221,20 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         // Handle media content
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
+        const cRect ContentPos {m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2};
         if (!isempty(*MediaPath)) {
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {  // Insert image with floating text
-                ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                ComplexContent.AddImageWithFloatedText(img, CIP_Right, *Text, ContentPos,
+                                                       Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg),
+                                                       m_Font);
             } else if (!isempty(*Text)) {  // No image; insert text
-                ComplexContent.AddText(
-                    *Text, true,
-                    cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+                ComplexContent.AddText(*Text, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                       Theme.Color(clrMenuEventBg), m_Font);
             }
         } else if (!isempty(*Text)) {  // No image; insert text
-            ComplexContent.AddText(
-                *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+            ComplexContent.AddText(*Text, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                   Theme.Color(clrMenuEventBg), m_Font);
         }
 
         // Add movie information if available
@@ -2252,10 +2245,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
             ContentTop += 6;
-            ComplexContent.AddText(
-                *MovieInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            ComplexContent.AddText(*MovieInfo, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                   Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 
         // Add series information if available
@@ -2266,10 +2257,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
             ContentTop += 6;
-            ComplexContent.AddText(
-                *SeriesInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            ComplexContent.AddText(*SeriesInfo, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                   Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
@@ -2291,10 +2280,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
             ContentTop += 6;
-            ComplexContent.AddText(
-                *Reruns, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            ComplexContent.AddText(*Reruns, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                   Theme.Color(clrMenuEventBg), m_FontMedium);
         }
 
         // Add video information if available
@@ -2305,10 +2292,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
             ContentTop += 6;
-            ComplexContent.AddText(
-                *TextAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            ComplexContent.AddText(*TextAdditional, true, ContentPos, Theme.Color(clrMenuEventFontInfo),
+                                   Theme.Color(clrMenuEventBg), m_FontMedium);
         }
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
