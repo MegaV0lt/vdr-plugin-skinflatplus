@@ -1382,6 +1382,7 @@ void cFlatBaseRender::DecorBorderClearAll() const {
 
 void cFlatBaseRender::DecorBorderDraw(const sDecorBorder &ib, bool Store) {
     if (ib.Size == 0 || ib.Type <= 0) return;
+    if (ib.Width == 0 || ib.Height == 0) return;  // Avoid division by zero
 
     if (Store)
         Borders.emplace_back(ib);
@@ -1581,7 +1582,6 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
             pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
         }
     } */
-    if (Width == 0) return;  // Avoid division by zero
 
     const int absWidth = std::abs(Width);
     const int start = (Width < 0) ? absWidth : 0;
@@ -1609,6 +1609,7 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
     } */
+
     const int absWidth {std::abs(Width)};
     const int absHeight {std::abs(Height)};
     const int start {0};
@@ -1641,6 +1642,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
+
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
     double Alpha {0.0};
@@ -1654,6 +1656,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
 
 void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
+
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
     double Alpha {0.0};
