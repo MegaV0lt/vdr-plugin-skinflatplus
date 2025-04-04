@@ -834,6 +834,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
         return;
     }
 
+    if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
+
     const int big {rect.Height()};
     const int Middle {big / 2};
     const int Percent {static_cast<int>(rect.Width() * static_cast<double>(Current) / Total)};
@@ -1000,6 +1002,9 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
                                            tColor ColorCurrent) {
 #endif
     if (!ProgressBarPixmap || !ProgressBarMarkerPixmap)
+        return;
+
+    if (Total == 0)  // Avoid DIV/0
         return;
 
     m_ProgressBarColorMark = Color;
@@ -1583,10 +1588,10 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
         }
     } */
 
-    const int absWidth = std::abs(Width);
-    const int start = (Width < 0) ? absWidth : 0;
-    const int end = (Width < 0) ? 0 : absWidth;
-    const int step = (Width < 0) ? -1 : 1;
+    const int absWidth {std::abs(Width)};
+    const int start {(Width < 0) ? absWidth : 0};
+    const int end {(Width < 0) ? 0 : absWidth};
+    const int step {(Width < 0) ? -1 : 1};
     const double AlphaStep {1.0 / absWidth};  // Normalized step (0.0-1.0)
 
     double Alpha{0.0};
