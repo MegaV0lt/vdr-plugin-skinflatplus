@@ -109,6 +109,10 @@ cFlatDisplayChannel::~cFlatDisplayChannel() {
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::SetChannel(%s, %d)", Channel->Name(), Number);
+#endif
+
     if (!ChanIconsPixmap || !ChanInfoTopPixmap || !ChanLogoBgPixmap || !ChanLogoPixmap)
         return;
 
@@ -213,6 +217,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 }
 
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::ChannelIconsDraw()");
+#endif
     // if (!ChanIconsPixmap) return;  // Remove redundant check since caller already checks
 
     if (Resolution)  // Clear only when resolution has changed
@@ -452,6 +459,10 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayChannel::SignalQualityDraw() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::SignalQualityDraw()");
+#endif
+
     if (!ChanInfoBottomPixmap) return;
 
     const int SignalStrength {cDevice::ActualDevice()->SignalStrength()};

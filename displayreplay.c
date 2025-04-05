@@ -656,6 +656,10 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::ResolutionAspectDraw()");
+#endif
+
     if (m_ModeOnly || !IconsPixmap || m_ScreenWidth <= 0 || m_ScreenHeight <= 0) return;
 
     // First line for current, total and cutted length, second line for end time
