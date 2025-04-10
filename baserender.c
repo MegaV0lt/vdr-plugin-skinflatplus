@@ -347,7 +347,7 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }
 
-        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {  // Show menu logo
+        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {  // Show menu channel logo
             PixmapClear(TopBarIconPixmap);
             int IconLeft {m_MarginItem};
             int ImageBGHeight {TopBarLogoHeight};
@@ -1539,31 +1539,15 @@ tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
 void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
-    double Alpha {0.0};
-    tColor col {};  // Init outside of loop
-    /* if (Height < 0) {
-        Height *= -1;
-        for (int i {Height}, j {0}; i >= 0; --i, ++j) {
-            Alpha = 255.0 / Height * j;
-            // col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
-            col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
-            pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
-        }
-    } else {
-        for (int i {0}; i < Height; ++i) {
-            Alpha = 255.0 / Height * i;
-            col = SetAlpha(ColorBg, Alpha * (1.0 / 255.0));
-            pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
-        }
-    } */
     const int start {(Height < 0) ? Height * -1 : 0};
     const int end {(Height < 0) ? 0 : Height};
     const int step {(Height < 0) ? -1 : 1};
     // const int offset {(Height < 0) ? 0 : 1};
     const double AlphaStep {1.0 / std::abs(Height)};  // Normalized step (0.0-1.0)
+    tColor col {};  // Init outside of loop
+
     for (int i {start}, j {0}; (Height < 0) ? i >= end : i < end; i += step, ++j) {
-        Alpha = AlphaStep * j;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * j);
         pixmap->DrawRectangle(cRect(Left, Top + i, Width, 1), col);
     }
 }
@@ -1571,35 +1555,15 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
 void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
-    /* double Alpha {0.0};
-    tColor col {};  // Init outside of loop
-    if (Width < 0) {
-        Width *= -1;
-        for (int i {Width}, j {0}; i >= 0; --i, ++j) {
-            Alpha = 255.0 / Width * j;
-            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
-            pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
-        }
-    } else {
-        for (int i {0}; i < Width; ++i) {
-            Alpha = 255.0 / Width * i;
-            col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
-            pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
-        }
-    } */
-
     const int absWidth {std::abs(Width)};
     const int start {(Width < 0) ? absWidth : 0};
     const int end {(Width < 0) ? 0 : absWidth};
     const int step {(Width < 0) ? -1 : 1};
     const double AlphaStep {1.0 / absWidth};  // Normalized step (0.0-1.0)
-
-    double Alpha{0.0};
     tColor col {};  // Init outside of loop
 
     for (int i {start}, j {0}; (Width < 0) ? i >= end : i < end; i += step, ++j) {
-        Alpha = AlphaStep * j;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * j);
         pixmap->DrawRectangle(cRect(Left + i, Top, 1, Height), col);
     }
 }
@@ -1607,9 +1571,7 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
 void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
-    /* double Alpha {0.0};
-    tColor col {};  // Init outside of loop
-    for (int i {0}; i < Width; ++i) {
+    /* for (int i {0}; i < Width; ++i) {
         Alpha = 255.0 / Width * i;
         col = SetAlpha(ColorBg, 100.0 * (1.0 / 255.0) * Alpha * (1.0 / 100.0));
         pixmap->DrawRectangle(cRect(Left + i, Top + i, Width - i, Height - i), col);
@@ -1621,26 +1583,22 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
     const int end {absWidth};
     const int step {1};
     const double AlphaStep {1.0 / absWidth};  // Normalized step (0.0-1.0)
-
-    double Alpha {0.0};
     tColor col {};
 
     for (int i {start}, j {0}; i < end; i += step, ++j) {
-        Alpha = AlphaStep * j;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * j);
         pixmap->DrawRectangle(cRect(Left + i, Top + i, absWidth - i, absHeight - i), col);
     }
 }
 
 void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
-    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
-    double Alpha {0.0};
+    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawRectangle(cRect(Left, Top + Height - j, j, j), col);
     }
 }
@@ -1649,12 +1607,10 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-
-    double Alpha {0.0};
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawRectangle(cRect(Left + Width - j, Top, j, j), col);
     }
 }
@@ -1663,12 +1619,10 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-
-    double Alpha {0.0};
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawRectangle(cRect(Left, Top, j, j), col);
     }
 }
@@ -1676,13 +1630,12 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
 void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
-    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
-    double Alpha {0.0};
+    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawEllipse(cRect(Left + i, Top + i, j, j), col, type);
     }
 }
@@ -1690,13 +1643,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
-    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
-    double Alpha {0.0};
+    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawEllipse(cRect(Left, Top + Height - j, j, j), col, type);
     }
 }
@@ -1704,13 +1656,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
-    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
-    double Alpha {0.0};
+    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawEllipse(cRect(Left + Width - j, Top, j, j), col, type);
     }
 }
@@ -1718,13 +1669,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
 void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                              int type) {
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
-    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
 
-    double Alpha {0.0};
+    const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
     tColor col {};  // Init outside of loop
+
     for (int i {0}, j = Width; i < Width; ++i, --j) {
-        Alpha = AlphaStep * i;
-        col = SetAlpha(ColorBg, Alpha);
+        col = SetAlpha(ColorBg, AlphaStep * i);
         pixmap->DrawEllipse(cRect(Left, Top, j, j), col, type);
     }
 }
@@ -1969,9 +1919,10 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
     double CurrentAlpha {AlphaStep};  // Start with first step
     tColor CurrentShadowColor {SetAlpha(ShadowColor, CurrentAlpha)};
-    // Loop through the shadow size to create the shadow effect
+    // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
-    for (int i {1}; i <= ShadowSize; ++i) {
+    for (int i {ShadowSize}; i >= 1; --i) {
+        // dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, CurrentAlpha);
         pixmap->DrawText(cPoint(pos.X() + xOffset * i, pos.Y() + yOffset * i), text, CurrentShadowColor, clrTransparent,
             font);
 

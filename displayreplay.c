@@ -390,6 +390,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         left += CurrentWidth;
     }
 
+    // Check if m_Recording is null and return if so
+    if (!m_Recording) return;
+
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
     const int NumFrames {m_Recording->NumFrames()};  // Total frames in recording
@@ -582,7 +585,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // Config.PlaybackShowEndTime
 
     //* Draw Banner/Poster (Update only every 5 seconds)
-    if (m_Recording && (m_LastPosterBannerUpdate + 5 < CurTime)) {
+    if (m_LastPosterBannerUpdate + 5 < CurTime) {
         m_LastPosterBannerUpdate = CurTime;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
@@ -624,7 +627,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 DecorBorderDraw(ib);
             }
         }
-    }  // m_Recording
+    }  // m_LastPosterBannerUpdate
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {

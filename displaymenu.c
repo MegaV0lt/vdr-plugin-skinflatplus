@@ -671,6 +671,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     } else {  // flatPlus short
+        //? m_WidthScrollBar is already substarcted
         Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10 * 2;
 
         if (Config.MenuChannelView == 3 || Config.MenuChannelView == 4)  // flatPlus short, flatPlus short + EPG
@@ -701,6 +702,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                     Config.MenuChannelView == 4) {  // flatPlus short, flatPlus short + EPG
                     PBTop = Top + m_FontHeight + m_FontSmlHeight;
                     PBLeft = Left - Width - m_MarginItem;
+                    //? m_WidthScrollBar is already substarcted
                     PBWidth = m_MenuItemWidth - LeftName - m_MarginItem2 - Config.decorBorderMenuItemSize -
                               m_WidthScrollBar;
 
@@ -708,6 +710,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                         PBWidth += m_WidthScrollBar;
                 }
 
+                //? m_WidthScrollBar is already substarcted
                 Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
                 const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize};
                 if (Current)
@@ -1267,8 +1270,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
         Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
-
+        //? m_WidthScrollBar is already substracted
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
+        // w = m_MenuItemWidth / 10 * 2;
 
         cString ChannelName {""};
         if (Config.MenuEventView == 2 || Config.MenuEventView == 3) {  // flatPlus short, flatPlus short + EPG
@@ -1291,6 +1295,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {  // Draw progress of event
+            //? m_WidthScrollBar is already substarcted
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
@@ -1801,32 +1806,26 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Buffer = cString::sprintf("%d", Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight,
                                  taLeft);
-            Left += DigitsMaxWidth;  // m_Font->Width("9999  ");
+            Left += DigitsMaxWidth;
 
             if (ImgRecNew)
                 MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
 
             Left += ImgRecNewWidth + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
-            // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
-            //                     m_MenuItemWidth - Left - m_MarginItem);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                                  DigitsMaxWidth, m_FontHeight);
 
-            Left += DigitsMaxWidth;  // m_Font->Width(" 9999 ");
+            Left += DigitsMaxWidth;
             int LeftWidth {Config.decorBorderMenuItemSize + m_FontHeight + (m_Font->Width("9999") * 2) +
                            ImgRecNewWidth + m_MarginItem * 5};  // For folder with recordings
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
                 LeftWidth += m_Font->Width("(99.99.99)") + m_FontHeight + m_MarginItem2;
                 Buffer = cString::sprintf("(%s)", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
-                // MenuPixmap->DrawText(
-                //    cPoint(LeftWidth - m_Font->Width(*Buffer) - m_FontHeight2 - m_MarginItem2, Top), *Buffer,
-                //    ColorExtraTextFg, ColorBg, m_Font);
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
                 Left += m_Font->Width(*Buffer) + m_MarginItem;
                 if (IsRecordingOld(Recording, Level)) {
-                    // Left = LeftWidth - m_FontHeight2 - m_MarginItem2;
                     IconName = "recording_old";
                     DrawRecordingIcon(IconName, Left, Top, Current);
                     Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
@@ -1934,8 +1933,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             Left += ImgRecNewSmlWidth + m_MarginItem;
             Buffer = cString::sprintf("%d", New);
-            // MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
-            //                     m_MenuItemWidth - Left - m_MarginItem);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
                                  DigitsMaxWidth, m_FontSmlHeight);
             Left += DigitsMaxWidth;
@@ -2140,9 +2137,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
-            // const std::string StrQuery = Event->Title();
             Epgsearch_searchresults_v1_0 data {
-                // .query = (char *)StrQuery.c_str(),  // Search term
                 .query = const_cast<char *>(Event->Title()),  // Search term //? Is this save?
                 .mode = 0,                          // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
                 .channelNr = 0,                     // Channel number to search in (0=any)
@@ -2627,7 +2622,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         // y = ComplexContent.BottomContent() + m_FontHeight;
         y += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
 #ifdef DEBUGFUNCSCALL
-        // Alternate way to get y, but what if different image size?
+        // Alternate way to get y
         y2 += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
         dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", ComplexContent.BottomContent() + m_FontHeight, y2);
 #endif

@@ -227,17 +227,17 @@ static const cString SeenIconNames[]{"recording_seen_0", "recording_seen_1", "re
 
 class cFlat : public cSkin {
  public:
-        cFlat();
-        virtual const char *Description();
-        virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
-        virtual cSkinDisplayMenu *DisplayMenu();
-        virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
-        virtual cSkinDisplayVolume *DisplayVolume();
-        virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-        virtual cSkinDisplayMessage *DisplayMessage();
+    cFlat();
+    virtual const char *Description();
+    virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
+    virtual cSkinDisplayMenu *DisplayMenu();
+    virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
+    virtual cSkinDisplayVolume *DisplayVolume();
+    virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
+    virtual cSkinDisplayMessage *DisplayMessage();
 
  private:
-        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
+    cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
 };
 
 // Based on VDR's cTextWrapper
@@ -273,7 +273,7 @@ inline void PixmapClear(cPixmap *Pixmap) {
 }
 /**
  * Sets the alpha value of the given `cPixmap` object.
- * 
+ *
  * @param Pixmap - A pointer to the `cPixmap` object.
  * @param Alpha - The alpha value to be set (0-255, where 0 represents full transparency).
  */
