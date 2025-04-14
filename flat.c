@@ -386,19 +386,18 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
 }
 
 /**
- * Adjusts the MediaSize (width & height) to fit the ContentSize (width & height)
- * while preserving the aspect ratio.
- *
- * The MediaSize is shrunk to fit the ContentSize according to the following rules:
- * - For posters with an aspect ratio smaller than 1 (e.g. 680x1000 = 0.68),
- *   the height is limited to 70% of the ContentSize height.
- * - For portraits with an aspect ratio smaller than 4 (e.g. 1920x1080 = 1.77),
- *   the width is limited to 1/3 of the ContentSize width.
- * - For banners with an aspect ratio of 4 or larger (e.g. 758x140 = 5.41),
- *   the width is limited to 758 pixels at a height of 1920 pixels.
- *
- * @param MediaSize[in/out] The size of the image to be adjusted.
- * @param ContentSize[in] The size of the parent widget that contains the image.
+ * Adjusts the size of a media object based on its aspect ratio and the 
+ * constraints provided by the content size. This function ensures that 
+ * the media's aspect ratio is preserved while fitting within the 
+ * specified dimensions. It categorizes media as poster, portrait, or 
+ * banner based on its aspect ratio and adjusts its size accordingly.
+ * 
+ * @param MediaSize A reference to the size of the media to be adjusted.
+ * @param ContentSize The size constraints within which the media should fit.
+ * 
+ * - Posters are adjusted to a maximum height of 70% of the content height.
+ * - Portraits are adjusted to a maximum width of 1/3 of the content width.
+ * - Banners are adjusted to maintain a target ratio of 758 width at 1920.
  */
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
@@ -417,21 +416,24 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     static constexpr double PORTRAIT_WIDTH_RATIO = 1.0 / 3.0;      // Max 1/3 of pixmap width
     static constexpr double BANNER_TARGET_RATIO = 758.0 / 1920.0;  // To get 758 width @ 1920
 
-    // TODO: Set to max size by default or also allow smaller media site?
+    //* Set to default size
     const uint Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(
+        /* MediaSize.SetHeight(
             std::min(MediaSize.Height(),
-                     static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO)));
+                     static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO))); */
+        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO));
     } else if (Aspect < BANNER_ASPECT_THRESHOLD) {  //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(
+        /* MediaSize.SetWidth(
             std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO)));
+                     static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO))); */
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO));
     } else {                                        //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(
+        /* MediaSize.SetWidth(
             std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO)));
+                     static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO))); */
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO));
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());

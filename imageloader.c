@@ -21,6 +21,18 @@ cImageLoader::cImageLoader() {}
 
 cImageLoader::~cImageLoader() {}
 
+/**
+ * @brief Load a logo from a file and scale it to the given width and height.
+ *
+ * This function tries to load the logo from the configured logo path and
+ * scales it to the given width and height. If the logo is not found, the
+ * function logs an error message and returns nullptr.
+ *
+ * @param logo The name of the logo (without path).
+ * @param width The desired width of the logo.
+ * @param height The desired height of the logo.
+ * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
+ */
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
 

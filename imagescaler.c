@@ -48,11 +48,12 @@ static float sincf(float x) {
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
     const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
-    int d {0}, e {0}, offset {0};  // Init outside of loop
+    const int d {2 * dst_size};  // Sample position denominator
+    int e {0}, offset {0};       // Init outside of loop
     float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
     std::array<float, 4> h_arr {0.0f, 0.0f, 0.0f, 0.0f};
     for (int i {0}; i < dst_size; ++i) {
-        d = 2 * dst_size;                       // Sample position denominator
+        // d = 2 * dst_size;                       // Sample position denominator
         e = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         offset = e / d;                         // Truncated sample position
         // Exact sample position is (float) e/d = offset + sub_offset

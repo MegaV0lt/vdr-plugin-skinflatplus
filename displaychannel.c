@@ -165,8 +165,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         const int BoundedShadowSize {std::max(MinShadowSize, std::min(ShadowSize, MaxShadowSize))};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
+#ifdef DBUGFUNCSCALL
         dsyslog("flatPlus: SetChannel() m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
-
+#endif
         // Draw text with shadow
         DrawTextWithShadow(ChanInfoTopPixmap, cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                            ShadowColor, m_FontBig, BoundedShadowSize);
