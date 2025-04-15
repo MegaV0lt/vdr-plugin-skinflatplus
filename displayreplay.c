@@ -747,6 +747,7 @@ void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("recording_ok_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_warning_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_error_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
 
     ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);

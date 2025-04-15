@@ -397,9 +397,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     } else {
                         img = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
                     }
-                    if (img)
-                        MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2),
-                                                   *img);
                     break;
                 case '#':
                     if (Current) {
@@ -409,7 +406,6 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     } else {
                         img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
                     }
-                    if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
                     break;
                 case '!':
                     if (Current) {
@@ -419,12 +415,13 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     } else {
                         img = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
                     }
-                    if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
                     break;
                 // case ' ':
                 default:
                     break;
                 }
+                // Draw the icon
+                if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
                     const cString IconName = *GetIconName(*MainMenuText(s));
@@ -438,17 +435,16 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         img = ImgLoader.LoadIcon(*IconName, m_FontHeight - m_MarginItem2,
                                                  m_FontHeight - m_MarginItem2);
 
+                    if (!img) {
+                        img = ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2,
+                                                 m_FontHeight - m_MarginItem2);
+                    }
+                    // Draw the icon
                     if (img) {
                         MenuIconsPixmap->DrawImage(
                             cPoint(xt + Config.decorBorderMenuItemSize + m_MarginItem, y + m_MarginItem), *img);
-                    } else {
-                        img = ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2,
-                                                 m_FontHeight - m_MarginItem2);
-                        if (img) {
-                            MenuIconsPixmap->DrawImage(
-                                cPoint(xt + Config.decorBorderMenuItemSize + m_MarginItem, y + m_MarginItem), *img);
-                        }
                     }
+
                     const int AvailableTextWidth {m_MenuItemWidth - m_WidthScrollBar};
                     MenuPixmap->DrawText(
                         cPoint(m_FontHeight + m_MarginItem2 + xt + Config.decorBorderMenuItemSize, y), s, ColorFg,
@@ -594,41 +590,23 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     }
 
-    if (img) {
-        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-        ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-
-        MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        Left += ImageBgWidth + m_MarginItem2;
-    } else {
+    if (!img) {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
             if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem2;
-            }
         } else if (IsGroup) {
             img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem2;
-            }
         } else {
             if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                Left += ImageBgWidth + m_MarginItem2;
-            }
         }
+    }
+    if (img) {  // Draw the logo
+        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
+        ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+        MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        Left += ImageBgWidth + m_MarginItem2;
     }
 
     // Event from channel
@@ -1002,29 +980,20 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     }
 
     img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-    if (img) {
-        ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-        MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-    } else {
+    if (!img) {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
             if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-            }
         } else {
             if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
             if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-            }
         }
+    }
+    if (img) {  // Draw the logo
+        ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+        ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
+        MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
     Left += ImageBgWidth + m_MarginItem2;
 
@@ -1240,38 +1209,25 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             // Load named logo only for channels
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         }
-        if (img) {
-            ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-            MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        } else {
-            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
 
+        if (!img) {
+            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
             if (IsRadioChannel) {
                 if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (img) {
-                    ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                    MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                }
             } else if (IsGroup) {
                 img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (img) {
-                    ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                    MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                }
             } else {
                 if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
                 if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (img) {
-                    ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
-                    ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
-                    MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-                }
             }
         }
+        if (img) {  // Draw the logo
+            ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
+            ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
+            MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
+        }
+
         Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
         //? m_WidthScrollBar is already substracted
@@ -1387,17 +1343,13 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (TimerMatch == tmFull) {
             if (Current) img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
             if (!img) img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
-            if (img) {
-                ImageTop = Top;
-                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
-            }
         } else if (TimerMatch == tmPartial) {
             if (Current) img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
             if (!img) img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
-            if (img) {
-                ImageTop = Top;
-                MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
-            }
+        }
+        if (img) {  // Draw timer icon
+            ImageTop = Top;
+            MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
         }
     }  // TimerActive
 
@@ -2016,16 +1968,13 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     if (strlen(*Fsk) > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
+        if (!img) {
             isyslog("flatPlus: DrawContentHeadFskGenre() FSK icon not found: %s", *IconName);
             img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
-            if (img) {
-                ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                HeadIconLeft -= IconHeight + m_MarginItem;
-            }
+        }
+        if (img) {  // Draw the FSK icon
+            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+            HeadIconLeft -= IconHeight + m_MarginItem;
         }
     }
     bool IsUnknownDrawn {false};
@@ -2034,19 +1983,16 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     while (!GenreIcons.empty()) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (img) {
-            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-            HeadIconLeft -= IconHeight + m_MarginItem;
-        } else {
+        if (!img) {
             isyslog("flatPlus: Genre icon not found: %s", *IconName);
             if (!IsUnknownDrawn) {
                 img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
-                if (img) {
-                    ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
-                    HeadIconLeft -= IconHeight + m_MarginItem;
-                    IsUnknownDrawn = true;
-                }
+                IsUnknownDrawn = true;
             }
+        }
+        if (img) {  // Draw the genre icon
+            ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
+            HeadIconLeft -= IconHeight + m_MarginItem;
         }
         GenreIcons.pop_back();
     }

@@ -203,17 +203,13 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         }
 
         img = ImgLoader.LoadLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
-        if (img) {
+        if (!img)
+            img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
+
+        if (img) {  // Draw the logo
             ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
             ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
             ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        } else {  // Draw default logo
-            img = ImgLoader.LoadIcon((m_IsRadioChannel) ? "radio" : "tv", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (img) {
-                ImageTop = m_MarginItem + (ImageBgHeight - img->Height()) / 2;
-                ImageLeft = m_MarginItem2 + (ImageBgWidth - img->Width()) / 2;
-                ChanLogoPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-            }
         }
     }
 }
@@ -561,17 +557,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
     cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height())};
-    if (img) {
+    if (!img) {
+        img = ImgLoader.LoadIcon("crypt_unknown", ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height());
+        dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
+    }
+    if (img) {  // Draw the card system icon
         ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
         left += img->Width() + m_MarginItem;
-    } else {
-        IconName = "crypt_unknown";
-        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height());
-        if (img) {
-            ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
-            left += img->Width() + m_MarginItem;
-        }
-        dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
 
     DvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
