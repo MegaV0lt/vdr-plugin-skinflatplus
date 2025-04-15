@@ -2640,6 +2640,19 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
+        const cEvent *Event = RecInfo->GetEvent();
+        if (Event) {
+            // Genre
+            InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
+
+            if (Event->Contents(0))
+                Text.Append("\n");
+            // FSK
+            if (Event->ParentalRating()) {
+                Fsk = *Event->GetParentalRatingString();
+                Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Fsk));
+            }
+        }
 #ifdef DEBUGFUNCSCALL
         dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() @ %ld ms", Timer.Elapsed());
 #endif
@@ -2668,20 +2681,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
 #endif
-
-        const cEvent *Event = RecInfo->GetEvent();
-        if (Event) {
-            // Genre
-            InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
-
-            if (Event->Contents(0))
-                Text.Append("\n");
-            // FSK
-            if (Event->ParentalRating()) {
-                Fsk = *Event->GetParentalRatingString();
-                Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Fsk));
-            }
-        }
 
         InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
