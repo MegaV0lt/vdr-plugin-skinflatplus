@@ -2546,24 +2546,24 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     cImage *img {nullptr};
     cString Role {""};  // Actor role
     int Actor {0};
-    const int ActorsPerLine {6};  // TODO: Config option?
+    const uint ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem * 4};
     const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
-    const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  // Narrowing conversion  //! Same as ActorsPerLine
-    const uint PicLines {NumActors / PicsPerLine + (NumActors % PicsPerLine != 0)};
+    // const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  //! Same as ActorsPerLine
+    const uint PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
     int y {ContentTop};
 #ifdef DEBUGFUNCSCALL
     int y2 {ContentTop};  //! y2 is for testing
-    dsyslog("   ActorsPerLine/PicsPerLine: %d/%d", ActorsPerLine, PicsPerLine);
+    // dsyslog("   ActorsPerLine/PicsPerLine: %d/%d", ActorsPerLine, PicsPerLine);
     dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
 #endif
     if (NumActors > 50)
         dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
 
     for (uint row {0}; row < PicLines; ++row) {
-        for (uint col {0}; col < PicsPerLine; ++col) {
+        for (uint col {0}; col < ActorsPerLine; ++col) {
             if (Actor == NumActors)
                 break;
             img = ImgLoader.LoadFile(*ActorsPath[Actor], ActorWidth, ICON_HEIGHT_UNLIMITED);
