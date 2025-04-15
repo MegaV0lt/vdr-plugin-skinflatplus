@@ -134,6 +134,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     const char *GetGenreIcon(uchar genre) const;
     void InsertGenreInfo(const cEvent *Event, cString &Text) const;  // NOLINT
     void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const;  // NOLINT
+    void InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text);  // NOLINT
 
     time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 

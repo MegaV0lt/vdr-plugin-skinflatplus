@@ -10,6 +10,7 @@
 #include <fstream>
 #include <future>  // NOLINT
 #include <iostream>
+#include <unordered_map>
 #include <utility>
 #include <sstream>
 #include <locale>
@@ -452,11 +453,9 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 } else {
                     if (Config.MenuItemParseTilde) {
                         const char *TildePos {strchr(s, '~')};
-
                         if (TildePos) {
                             std::string_view sv1 {s, static_cast<size_t>(TildePos - s)};
                             std::string_view sv2 {TildePos + 1};
-
                             const std::string first {rtrim(sv1)};   // Trim possible space at end
                             const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -942,8 +941,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else if (Timer->FirstDay()) {  // Active timer 'FirstDay'
         IconName = "text_arrowturn";
         // ColorFg = Theme.Color(clrMenuTimerItemRecordingFont);
-    } else  // Active timer
+    } else {  // Active timer
         IconName = "timerActive";
+    }
 
     cImage *img {ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight)};
     if (img) {
@@ -1037,7 +1037,6 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         } else {
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
-
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
@@ -1073,11 +1072,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         } else {
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
-
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
-
                     const std::string first {rtrim(sv1)};   // Trim possible space at end
                     const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
@@ -2386,12 +2383,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
             // From SkinNopacity
 #if APIVERSNUM >= 20505
-            if (RecInfo && RecInfo->Errors() > 0) {
-                std::ostringstream RecErrors {""};
-                RecErrors.imbue(std::locale(""));  // Set to local locale
-                RecErrors << RecInfo->Errors();
-                Text.Append(cString::sprintf("%s: %s\n", tr("TS errors"), RecErrors.str().c_str()));
-            }
+            // Add TS Error information
+            InsertTSErrors(RecInfo, Text);
 #endif
 
             const cComponents *Components = RecInfo->Components();
@@ -2600,6 +2593,24 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     }  // for row
 }
 
+/**
+ * \brief Add the number of TS errors to the recording info display
+ *
+ * Add the number of TS errors to the recording info display.
+ * The method takes the recording information object and the text to add the errors to as parameters.
+ * If the recording information object is valid and the number of TS errors is greater than 0,
+ * the method adds a line to the text with the number of TS errors.
+ * The line is formatted as "TS errors: <number>".
+ */
+void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) {  // NOLINT
+    if (RecInfo && RecInfo->Errors() > 0) {
+        std::ostringstream RecErrors {""};
+        RecErrors.imbue(std::locale {""});  // Set to local locale
+        RecErrors << RecInfo->Errors();
+        Text.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
+    }
+}
+
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
@@ -2686,12 +2697,8 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         // From SkinNopacity
 #if APIVERSNUM >= 20505
-        if (RecInfo && RecInfo->Errors() > 0) {
-            std::ostringstream RecErrors {""};
-            RecErrors.imbue(std::locale {""});  // Set to local locale
-            RecErrors << RecInfo->Errors();
-            RecAdditional.Append(cString::sprintf("\n%s: %s", tr("TS errors"), RecErrors.str().c_str()));
-        }
+        // Add TS Error information
+        InsertTSErrors(RecInfo, RecAdditional);
 #endif
 
         const cComponents *Components = RecInfo->Components();

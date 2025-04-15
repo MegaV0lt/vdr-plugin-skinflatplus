@@ -690,11 +690,9 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         const char *TildePos {strchr(Text, '~')};
-
         if (TildePos) {
             std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
             std::string_view sv2 {TildePos + 1};
-
             const std::string first {rtrim(sv1)};   // Trim possible space at end
             const std::string second {ltrim(sv2)};  // Trim possible space at begin
 
