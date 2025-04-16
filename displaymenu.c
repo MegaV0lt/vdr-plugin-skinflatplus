@@ -2540,8 +2540,8 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     cString Role {""};  // Actor role
     int Actor {0};
     const uint ActorsPerLine {6};  // TODO: Config option?
-    const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem * 4};
-    const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
+    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;  // Narrowing conversion
+    const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
     // const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  //! Same as ActorsPerLine
     const uint PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};
     int ImgHeight {0}, MaxImgHeight {0};
