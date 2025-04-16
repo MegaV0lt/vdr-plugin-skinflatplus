@@ -630,34 +630,41 @@ void cFlatDisplayChannel::PreLoadImages() {
         }
     }  // for cChannel
 
-    height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
-    ImgLoader.LoadIcon("crypted", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("uncrypted", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("unknown_asp", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, height);
-    ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, height);
+    // Preload channel icons
+    if (Config.ChannelIconsShow) {
+        if (Config.SignalQualityShow || Config.ChannelDvbapiInfoShow)
+            height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
+        else
+            height = m_FontSmlHeight;
 
-    // Audio tracks (displaytracks.c)
-    ImgLoader.LoadIcon("tracks_ac3", ICON_WIDTH_UNLIMITED, m_FontHeight);
-    ImgLoader.LoadIcon("tracks_stereo", ICON_WIDTH_UNLIMITED, m_FontHeight);
+        ImgLoader.LoadIcon("crypted", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("uncrypted", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("unknown_asp", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, height);
+
+        // Audio tracks (displaytracks.c)
+        ImgLoader.LoadIcon("tracks_ac3", ICON_WIDTH_UNLIMITED, m_FontHeight);
+        ImgLoader.LoadIcon("tracks_stereo", ICON_WIDTH_UNLIMITED, m_FontHeight);
+    }
 }
