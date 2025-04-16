@@ -77,7 +77,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     ChannelIconsShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          ChannelResolutionAspectShow = atoi(Value);
-    else if (strcmp(Name, "ChannelShowStartTime") == 0)      ChannelShowStartTime = atoi(Value);
+    else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            ChannelShowNameWithShadow = atoi(Value);
+    else if (strcmp(Name, "ChannelShowStartTime") == 0)                 ChannelShowStartTime = atoi(Value);
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      ChannelTimeLeft = atoi(Value);
     else if (strcmp(Name, "ChannelWeatherShow") == 0)                   ChannelWeatherShow = atoi(Value);
@@ -472,6 +473,13 @@ bool PairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
     return i.first > j.first;
 }
 
+/**
+ * Round up a number to the nearest multiple of another number.
+ *
+ * @param[in] NumToRound The number to round up.
+ * @param[in] multiple The number to round up to. If zero, return NumToRound.
+ * @return the rounded up number.
+ */
 int RoundUp(int NumToRound, int multiple) {
     if (multiple == 0) return NumToRound;
 

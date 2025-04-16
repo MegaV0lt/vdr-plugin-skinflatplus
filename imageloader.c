@@ -21,6 +21,18 @@ cImageLoader::cImageLoader() {}
 
 cImageLoader::~cImageLoader() {}
 
+/**
+ * @brief Load a logo from a file and scale it to the given width and height.
+ *
+ * This function tries to load the logo from the configured logo path and
+ * scales it to the given width and height. If the logo is not found, the
+ * function logs an error message and returns nullptr.
+ *
+ * @param logo The name of the logo (without path).
+ * @param width The desired width of the logo.
+ * @param height The desired height of the logo.
+ * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
+ */
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
 
@@ -212,28 +224,31 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
 #endif
 
     //* Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
-    cString ManualPoster {""};
     for (const cString &Image : RecordingImages) {
-        ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/%s", *RecPath, *Image);
-            found = ManualPoster;
-            return true;
-        }
-        ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/../../../%s", *RecPath, *Image);
-            found = ManualPoster;
-            return true;
-        }
-        ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
-        if (std::filesystem::exists(*ManualPoster)) {
-            // dsyslog("flatPlus: Image found in %s/../../%s", *RecPath, *Image);
-            found = ManualPoster;
+        if (CheckImageExistence(RecPath, Image, found)) {
             return true;
         }
     }
 
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
+    return false;
+}
+
+bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
+    cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
+    ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
+    ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
+    if (std::filesystem::exists(*ManualPoster)) {
+        found = ManualPoster;
+        return true;
+    }
     return false;
 }

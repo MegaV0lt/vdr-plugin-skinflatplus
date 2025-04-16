@@ -25,14 +25,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                 m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
-    LabelPixmap =
-        CreatePixmap(m_Osd, "LabelPixmap", 1,
-                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
-    IconsPixmap =
-        CreatePixmap(m_Osd, "IconsPixmap", 2,
-                     cRect(Config.decorBorderReplaySize, m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                           m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight));
+    const cRect LabelPixmapViewPort{Config.decorBorderReplaySize,
+                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
+                                    m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight};
+    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, LabelPixmapViewPort);
+    IconsPixmap = CreatePixmap(m_Osd, "IconsPixmap", 2, LabelPixmapViewPort);
 
     /* Make Config.decorProgressReplaySize even
     https://stackoverflow.com/questions/4739388/make-an-integer-even
@@ -53,11 +50,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
 
     DimmPixmap = CreatePixmap(m_Osd, "DimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
 
-    PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+    PixmapClear(ChanEpgImagesPixmap);
     PixmapFill(LabelPixmap, Theme.Color(clrReplayBg));
-    PixmapFill(LabelJumpPixmap, clrTransparent);
-    PixmapFill(IconsPixmap, clrTransparent);
-    PixmapFill(DimmPixmap, clrTransparent);
+    PixmapClear(LabelJumpPixmap);
+    PixmapClear(IconsPixmap);
+    PixmapClear(DimmPixmap);
 
     m_FontSecs = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
 
@@ -81,12 +78,12 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: cFlatDisplayReplay::SetRecording()");
 #endif
 
-    if (!IconsPixmap || !LabelPixmap || m_ModeOnly) return;
+    if (m_ModeOnly || !IconsPixmap || !LabelPixmap) return;
 
     const cRecordingInfo *RecInfo = Recording->Info();
     m_Recording = Recording;
 
-    PixmapFill(IconsPixmap, clrTransparent);
+    PixmapClear(IconsPixmap);
 
     SetTitle(RecInfo->Title());
 
@@ -177,7 +174,7 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 }
 
 void cFlatDisplayReplay::Action() {
-    time_t CurTime;
+    time_t CurTime {0};
     while (Running()) {
         time(&CurTime);
         if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay) {
@@ -210,7 +207,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             while (Active())
                 cCondWait::SleepMs(10);
             if (m_DimmActive) {
-                PixmapFill(DimmPixmap, clrTransparent);
+                PixmapClear(DimmPixmap);
                 Flush();
             }
         }
@@ -221,9 +218,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem3)) / 2;
 
         if (m_ModeOnly)
-            PixmapFill(LabelPixmap, clrTransparent);
+            PixmapClear(LabelPixmap);
 
-        // PixmapFill(IconsPixmap, clrTransparent);  //* Moved to SetRecording
+        // PixmapClear(IconsPixmap);  //* Moved to SetRecording
         LabelPixmap->DrawRectangle(cRect(left - m_Font->Width("99") - m_MarginItem, 0,
                                          m_FontHeight * 4 + m_MarginItem * 6 + m_Font->Width("99") * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
@@ -244,20 +241,16 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             }
         }
         cImage *img {ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight)};
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left, 0), *img);
 
         img = ImgLoader.LoadIcon(*pause, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
 
         img = ImgLoader.LoadIcon(*play, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight2 + m_MarginItem2, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight2 + m_MarginItem2, 0), *img);
 
         img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
-        if (img)
-            IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
+        if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
     }
 
     if (m_ProgressShown) {
@@ -299,7 +292,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     if (m_DimmActive) {
-        PixmapFill(DimmPixmap, clrTransparent);
+        PixmapClear(DimmPixmap);
         Flush();
     }
 
@@ -339,9 +332,8 @@ void cFlatDisplayReplay::UpdateInfo() {
     dsyslog("flatPlus: cFlatDisplayReplay::UpdateInfo()");
 #endif
 
-    if (!LabelPixmap || !ChanEpgImagesPixmap || !IconsPixmap || m_ModeOnly) return;
+    if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
-    // const int FontAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize)};
     const int FontSecsAscender {GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};
     const int TopSecs {m_FontAscender - FontSecsAscender};
 
@@ -397,6 +389,9 @@ void cFlatDisplayReplay::UpdateInfo() {
                               m_Font, CurrentWidth, m_FontHeight);
         left += CurrentWidth;
     }
+
+    // Check if m_Recording is null and return if so
+    if (!m_Recording) return;
 
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
@@ -551,9 +546,9 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // HasMarks
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
-    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update once per second or 'm_Current' current changed
-    if (Config.PlaybackShowEndTime > 0 && (m_LastEndTimeUpdate != CurTime || strcmp(*m_Current, *m_LastCurrent) != 0)) {
-        // 1 = End time, 2 = End time and cutted end time
+    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' current changed
+    if (Config.PlaybackShowEndTime > 0 &&  // 1 = End time, 2 = End time and cutted end time
+        (m_LastEndTimeUpdate + 60 < CurTime || strcmp(*m_Current, *m_LastCurrent) != 0)) {
         m_LastEndTimeUpdate = CurTime;
         m_LastCurrent = m_Current;
         left = m_MarginItem;
@@ -589,56 +584,13 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     }  // Config.PlaybackShowEndTime
 
-    //* Draw Banner/Poster
-    if (m_Recording) {
+    //* Draw Banner/Poster (Update only every 5 seconds)
+    if (m_LastPosterBannerUpdate + 5 < CurTime) {
+        m_LastPosterBannerUpdate = CurTime;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
-        static cPlugin *pScraper = GetScraperPlugin();
-        if (Config.TVScraperReplayInfoShowPoster && pScraper) {
-            ScraperGetEventType call;
-            call.recording = m_Recording;
-            int seriesId {0}, episodeId {0}, movieId {0};
-
-            if (pScraper->Service("GetEventType", &call)) {
-                seriesId = call.seriesId;
-                episodeId = call.episodeId;
-                movieId = call.movieId;
-            }
-            if (call.type == tSeries) {
-                cSeries series;
-                series.seriesId = seriesId;
-                series.episodeId = episodeId;
-                if (pScraper->Service("GetSeries", &series)) {
-                    if (series.banners.size() > 1) {  // Use random banner
-                        // Gets 'entropy' from device that generates random numbers itself
-                        // to seed a mersenne twister (pseudo) random generator
-                        std::mt19937 generator(std::random_device {}());
-
-                        // Make sure all numbers have an equal chance.
-                        // Range is inclusive (so we need -1 for vector index)
-                        std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                        const std::size_t number {distribution(generator)};
-
-                        MediaPath = series.banners[number].path.c_str();
-                        MediaSize.Set(series.banners[number].width, series.banners[number].height);
-                        dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                                static_cast<int>(number + 1), *MediaPath,
-                                static_cast<int>(series.banners.size()));  // Log result
-                    } else if (series.banners.size() == 1) {               // Just one banner
-                        MediaPath = series.banners[0].path.c_str();
-                        MediaSize.Set(series.banners[0].width, series.banners[0].height);
-                    }
-                }
-            } else if (call.type == tMovie) {
-                cMovie movie;
-                movie.movieId = movieId;
-                if (pScraper->Service("GetMovie", &movie)) {
-                    MediaPath = movie.poster.path.c_str();
-                    MediaSize.Set(movie.poster.width, movie.poster.height);
-                }
-            }
-
+        if (Config.TVScraperReplayInfoShowPoster) {
+            GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
             if (isempty(*MediaPath)) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
@@ -651,7 +603,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             }
         }
 
-        PixmapFill(ChanEpgImagesPixmap, clrTransparent);
+        PixmapClear(ChanEpgImagesPixmap);
         PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (!isempty(*MediaPath)) {
@@ -675,7 +627,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 DecorBorderDraw(ib);
             }
         }
-    }  // m_Recording
+    }  // m_LastPosterBannerUpdate
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {
@@ -684,7 +636,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
     DecorBorderClearByFrom(BorderRecordJump);
 
     if (!Jump) {
-        PixmapFill(LabelJumpPixmap, clrTransparent);
+        PixmapClear(LabelJumpPixmap);
         return;
     }
     const int JumpWidth {m_Font->Width(Jump)};
@@ -707,51 +659,53 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 }
 
 void cFlatDisplayReplay::ResolutionAspectDraw() {
-    if (!IconsPixmap || m_ModeOnly) return;
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayReplay::ResolutionAspectDraw()");
+#endif
 
-    if (m_ScreenWidth > 0) {
-        // First line for current, total and cutted length, second line for end time
-        const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
+    if (m_ModeOnly || !IconsPixmap || m_ScreenWidth <= 0 || m_ScreenHeight <= 0) return;
 
-        int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
-        cImage *img {nullptr};
-        cString IconName {""};
-        if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
-            IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
+    // First line for current, total and cutted length, second line for end time
+    const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
 
-            IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
+    int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
+    cImage *img {nullptr};
+    cString IconName {""};
+    if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
+        IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
         }
 
-        if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
-            IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                left -= m_MarginItem2;
-            }
+        IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
         }
-        // Show audio icon (Dolby, Stereo)
-        if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
-            IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-            if (img) {
-                left -= img->Width();
-                IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-                // left -= m_MarginItem2;
-            }
+    }
+
+    if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
+        IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            left -= m_MarginItem2;
+        }
+    }
+
+    if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
+        IconName = *GetCurrentAudioIcon();  // Show audio icon (Dolby, Stereo)
+        img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+        if (img) {
+            left -= img->Width();
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            // left -= m_MarginItem2;
         }
     }
 }
@@ -761,8 +715,6 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
 }
 
 void cFlatDisplayReplay::Flush() {
-    TopBarUpdate();
-
     if (Config.RecordingResolutionAspectShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
         if (m_ScreenWidth != m_LastScreenWidth) {
@@ -771,6 +723,7 @@ void cFlatDisplayReplay::Flush() {
         }
     }
 
+    TopBarUpdate();
     m_Osd->Flush();
 }
 
@@ -794,6 +747,7 @@ void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("recording_ok_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_warning_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_error_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
 
     ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);

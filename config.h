@@ -194,7 +194,7 @@ class cFlatConfig {
 
         // General Config
         int ButtonsShowEmpty {true};
-        int ChannelIconsShow {true};
+        int ChannelIconsShow {true};  // Show format and aspect icons in channel status bar
 
         int SignalQualityShow {true};
         int SignalQualityUseColors {false};
@@ -217,6 +217,7 @@ class cFlatConfig {
         int ChannelSimpleAspectFormat {true};
         int ChannelTimeLeft {0};
         int ChannelDvbapiInfoShow {1};
+        int ChannelShowNameWithShadow {false};  // Show channel name and number with shadow instead of background
         int ChannelShowStartTime {true};
 
         int ChannelWeatherShow {1};
@@ -245,17 +246,17 @@ class cFlatConfig {
         int TopBarMenuIconShow {true};
         int TopBarHideClockText {0};
 
-        int MenuChannelView {1};
-        int MenuTimerView {1};
-        int MenuEventView {1};
+        int MenuChannelView {1};  // 0 = disable (vdr), 1 = long, 2 = long + epg, 3 = short, 4 = short +epg
+        int MenuTimerView {1};  // 0 = disable (vdr), 1 = long, 2 = short, 3 = short +epg
+        int MenuEventView {1};  // 0 = disable (vdr), 1 = long, 2 = short, 3 = short +epg
         int MenuEventRecordingViewJustify {0};  // 0 = disable, 1 = Justify wrapped text
-        int MenuRecordingView {1};
+        int MenuRecordingView {1};  // 0 = disable (vdr), 1 = long, 2 = short, 3 = short +epg
         int MenuFullOsd {0};
         int MenuEventViewAlwaysWithDate {1};
 
-        int MenuRecordingShowCount {1};
-        int MenuTimerShowCount {1};
-        int MenuChannelShowCount {1};
+        int MenuRecordingShowCount {1};  // Show number of recordings in menu recordings
+        int MenuTimerShowCount {1};      // Show number of timers in menu timers
+        int MenuChannelShowCount {1};    // Show number of channels in menu channels
 
         double MenuItemRecordingSeenThreshold {0.98 / 100.0};
         int MenuItemRecordingDefaultOldDays {-1};
@@ -263,10 +264,10 @@ class cFlatConfig {
         int MessageColorPosition {1};  // 0 = vertical, 1 = horizontal
 
         //* Hidden configs (only in setup.conf, no osd menu)
-        int MenuItemRecordingClearPercent {1};
+        int MenuItemRecordingClearPercent {1};    // Remove % sign in front of a edited recording
         int MenuItemRecordingShowFolderDate {1};  // 0 = disable, 1 = newest recording date, 2 = oldest recording date
-        int MenuItemParseTilde {1};
-        int ShortRecordingCount {0};
+        int MenuItemParseTilde {1};               // Display string after ~ in different color and remove ~
+        int ShortRecordingCount {0};              // Simpler display of counts in menu recordings
         int MainMenuWidgetActiveTimerShowRemoteRefreshTime {60 * 30};  // Every 30 minutes
         //* Hidden configs (only in setup.conf, no osd menu)
 
@@ -342,7 +343,7 @@ class cFlatConfig {
 
         int TVScraperEPGInfoShowActors {1};
         int TVScraperRecInfoShowActors {1};
-        int TVScraperShowMaxActors {-1};  // -1 Show all actors
+        int TVScraperShowMaxActors {-1};  // -1 Show all actors, 0 = disable, 1+ = max actors to show
 
         int DecorIndex {0};
 

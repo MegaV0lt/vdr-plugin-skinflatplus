@@ -248,6 +248,7 @@ void cFlatSetup::Store() {
     SetupStore("ChannelFormatShow", Config.ChannelFormatShow);
     SetupStore("ChannelIconsShow", Config.ChannelIconsShow);
     SetupStore("ChannelResolutionAspectShow", Config.ChannelResolutionAspectShow);
+    SetupStore("ChannelShowNameWithShadow", Config.ChannelShowNameWithShadow);
     SetupStore("ChannelShowStartTime", Config.ChannelShowStartTime);
     SetupStore("ChannelSimpleAspectFormat", Config.ChannelSimpleAspectFormat);
     SetupStore("ChannelTimeLeft", Config.ChannelTimeLeft);
@@ -453,6 +454,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    SetupConfig->ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     SetupConfig->ChannelIconsShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          SetupConfig->ChannelResolutionAspectShow = atoi(Value);
+    else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            SetupConfig->ChannelShowNameWithShadow = atoi(Value);
     else if (strcmp(Name, "ChannelShowStartTime") == 0)                 SetupConfig->ChannelShowStartTime = atoi(Value);
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            SetupConfig->ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      SetupConfig->ChannelTimeLeft = atoi(Value);
@@ -638,6 +640,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("ChannelFormatShow", SetupConfig->ChannelFormatShow, *Filename);
     Config.Store("ChannelIconsShow", SetupConfig->ChannelIconsShow, *Filename);
     Config.Store("ChannelResolutionAspectShow", SetupConfig->ChannelResolutionAspectShow, *Filename);
+    Config.Store("ChannelShowNameWithShadow", SetupConfig->ChannelShowNameWithShadow, *Filename);
     Config.Store("ChannelShowStartTime", SetupConfig->ChannelShowStartTime, *Filename);
     Config.Store("ChannelSimpleAspectFormat", SetupConfig->ChannelSimpleAspectFormat, *Filename);
     Config.Store("ChannelTimeLeft", SetupConfig->ChannelTimeLeft, *Filename);
@@ -918,6 +921,7 @@ cFlatSetupChannelInfo::cFlatSetupChannelInfo(cFlatConfig* data) : cMenuSetupSubM
 void cFlatSetupChannelInfo::Setup() {
     Clear();
 
+    Add(new cMenuEditBoolItem(tr("Show channel name and number with shadow"), &SetupConfig->ChannelShowNameWithShadow));
     Add(new cMenuEditBoolItem(tr("Show Channelinfo icons"), &SetupConfig->ChannelIconsShow));
     Add(new cMenuEditBoolItem(tr("Show event start time left"), &SetupConfig->ChannelShowStartTime));
     Add(new cMenuEditBoolItem(tr("Show signal quality"), &SetupConfig->SignalQualityShow));

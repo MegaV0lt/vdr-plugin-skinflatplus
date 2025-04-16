@@ -55,42 +55,53 @@ class cFlatBaseRender {
         void ButtonsCreate();
         void ButtonsSet(const char *Red, const char *Green = nullptr, const char *Yellow = nullptr,
                         const char *Blue = nullptr);
-        bool ButtonsDrawn();
+        bool ButtonsDrawn() const;
 
         void MessageCreate();
         void MessageSet(eMessageType Type, const char *Text);
         void MessageSetExtraTime(const char *Text);
         void MessageClear();
 
-        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, cRect rec, cRect recBg, int Current, int Total,
-                                tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
-                                int Type, bool SetBackground, bool IsSignal = false);
-        void ProgressBarCreate(cRect Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
+        void ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rec, const cRect &recBg, int Current,
+                                int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg, int Type,
+                                bool SetBackground, bool IsSignal = false);
+        void ProgressBarCreate(const cRect &Rect, int MarginHor, int MarginVer, tColor ColorFg, tColor ColorBarFg,
                                tColor ColorBg, int Type, bool SetBackground = false, bool IsSignal = false);
-        void ProgressBarDrawBgColor();
+        void ProgressBarDrawBgColor() const;
         void ProgressBarDraw(int Current, int Total);
 #if APIVERSNUM >= 30004
+        /**
+         * Draws marks on the progress bar with error indicators
+         * @param Errors Error markers to display (added in API v3.0.4)
+         */
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, const cErrors *Errors, tColor Color,
                                   tColor ColorCurrent);
 #else
+        /**
+         * Draws marks on the progress bar (legacy version)
+         * Note: Error indicators not supported in API versions before 3.0.4
+         */
         void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
 #endif
         void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
                            int Shown, bool CanScrollUp, bool CanScrollDown);
-        int ScrollBarWidth();
+        int ScrollBarWidth() const;
 
         void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
-        void DecorBorderClear(cRect Rect, int Size);
-        void DecorBorderClearAll();
+        void DecorBorderClear(const cRect &Rect, int Size);
+        void DecorBorderClearAll() const;
         void DecorBorderRedrawAll();
         void DecorBorderClearByFrom(int From);
 
-        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
+        int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0) const;
 
-        cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "");
-        cString FormatPrecipitation(const cString &FilePath);
+        cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "") const;
+        cString FormatPrecipitation(const cString &FilePath) const;
 
         void DrawWidgetWeather();
+        void DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
+                                tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset = 1,
+                                int yOffset = 1);
 
  protected:
         cOsd *m_Osd {nullptr};
@@ -98,8 +109,8 @@ class cFlatBaseRender {
         int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
         const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
 
-        const int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
-        const int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
+        static constexpr int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
+        static constexpr int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
 
         // Standard fonts
         cFont *m_Font {nullptr};
@@ -110,8 +121,11 @@ class cFlatBaseRender {
         int m_FontFixedHeight {0};
         int m_FontAscender {0};  // Ascender for font
 
+        cFont *m_FontBig {nullptr};      // Big font for channel name in displaychannel.c
+        cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
         cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
         cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
+        int m_FontBigHeight {0};
 
         // TopBar
         cPixmap *TopBarPixmap {nullptr};
@@ -169,13 +183,10 @@ class cFlatBaseRender {
         cPixmap *DecorPixmap {nullptr};
         std::vector<sDecorBorder> Borders;  // For clearing specific borders (Clear only 'MenuItems' and not 'TopBar')
 
-        // double ScrollbarSize();
-
         void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
 #if APIVERSNUM >= 30004
         void ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent);
 #endif
-        int ProgressBarMarkPos(int P, int Total);
 
         void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
         void DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);
@@ -198,4 +209,3 @@ class cFlatBaseRender {
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
 };
-

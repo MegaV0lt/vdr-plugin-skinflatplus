@@ -1,5 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-04-16: Version 1.1.10
+- [add] Render channel name and number with shadow
+- [add] Option to render channel name and number with shadow or background
+- [update] Use a bigger font for the channel number and name in the channel info
+- [update] Use a medium sized font for extra infos in channel and recording epg info
+- [update] Update poster/banner in replay every 5 seconds
+- [update] Some internal optimizations
+
 2025-03-03: Version 1.1.9
 - [fix] Fix order of timer count variables
 - [fix] Fix display of channel separators in plugin epg2vdr

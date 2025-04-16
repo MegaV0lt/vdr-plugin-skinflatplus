@@ -82,6 +82,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: CreatePixmap(\"%s\", %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
             Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
@@ -90,6 +91,10 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     } */
 
     if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+#ifdef DEBUGFUNCSCALL
+        if (Timer.Elapsed() > 0)
+            dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
+#endif
         return pixmap;
     }  // Everything runs according to the plan
 
@@ -114,20 +119,190 @@ cPlugin *GetScraperPlugin() {
         pScraper = cPluginManager::GetPlugin("scraper2vdr");
     return pScraper;
 }
+// Get MediaPath, Series/Movie info and add actors if wanted
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo, std::vector<cString> &ActorsPath,  // NOLINT
+                     std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,        // NOLINT
+                     const cRecording *Recording) {
+    static cPlugin *pScraper = GetScraperPlugin();
+    if (pScraper) {
+        ScraperGetEventType call;
+        if (Event)
+            call.event = Event;
+        else if (Recording)
+            call.recording = Recording;
+        else
+            return;  // Check if both are unset
+
+        int seriesId {0}, episodeId {0}, movieId {0};
+        if (pScraper->Service("GetEventType", &call)) {
+            seriesId = call.seriesId;
+            episodeId = call.episodeId;
+            movieId = call.movieId;
+        }
+        if (call.type == tSeries) {
+            cSeries series;
+            series.seriesId = seriesId;
+            series.episodeId = episodeId;
+            if (pScraper->Service("GetSeries", &series)) {
+                if (series.banners.size() > 1) {  // Use random banner
+                    // Gets 'entropy' from device that generates random numbers itself
+                    // to seed a mersenne twister (pseudo) random generator
+                    std::mt19937 generator(std::random_device {}());
+
+                    // Make sure all numbers have an equal chance.
+                    // Range is inclusive (so we need -1 for vector index)
+                    std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+                    const std::size_t number{distribution(generator)};
+                    MediaPath = series.banners[number].path.c_str();
+                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                            static_cast<int>(number + 1), *MediaPath,
+                            static_cast<int>(series.banners.size()));  // Log result
+                } else if (series.banners.size() == 1) {               // Just one banner
+                    MediaPath = series.banners[0].path.c_str();
+                }
+                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
+                    const int ActorsSize = series.actors.size();
+                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+                    ActorsName.reserve(ActorsSize);
+                    ActorsRole.reserve(ActorsSize);
+                    for (int i{0}; i < ActorsSize; ++i) {
+                        if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
+                            ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
+                            ActorsName.emplace_back(series.actors[i].name.c_str());
+                            ActorsRole.emplace_back(series.actors[i].role.c_str());
+                        }
+                    }
+                }
+                InsertSeriesInfos(series, SeriesInfo);  // Add series infos
+            }
+        } else if (call.type == tMovie) {
+            cMovie movie;
+            movie.movieId = movieId;
+            if (pScraper->Service("GetMovie", &movie)) {
+                MediaPath = movie.poster.path.c_str();
+                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
+                    const int ActorsSize = movie.actors.size();
+                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+                    ActorsName.reserve(ActorsSize);
+                    ActorsRole.reserve(ActorsSize);
+                    for (int i{0}; i < ActorsSize; ++i) {
+                        if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
+                            ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
+                            ActorsName.emplace_back(movie.actors[i].name.c_str());
+                            ActorsRole.emplace_back(movie.actors[i].role.c_str());
+                        }
+                    }
+                }
+                InsertMovieInfos(movie, MovieInfo);  // Add movie infos
+            }
+        }
+    }  // Scraper plugin
+}
+
+// Get MediaPath, MediaSize and MediaType
+int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event, const cRecording *Recording) {  // NOLINT
+    static cPlugin *pScraper = GetScraperPlugin();
+    if (pScraper) {
+        ScraperGetEventType call;
+        if (Event)
+            call.event = Event;
+        else if (Recording)
+            call.recording = Recording;
+        else
+            return 0;  // Check if both are unset
+
+        int seriesId {0}, episodeId {0}, movieId {0};
+        if (pScraper->Service("GetEventType", &call)) {
+            seriesId = call.seriesId;
+            episodeId = call.episodeId;
+            movieId = call.movieId;
+        }
+        if (call.type == tSeries) {
+            cSeries series;
+            series.seriesId = seriesId;
+            series.episodeId = episodeId;
+            if (pScraper->Service("GetSeries", &series)) {
+                if (series.banners.size() > 1) {  // Use random banner
+                    // Gets 'entropy' from device that generates random numbers itself
+                    // to seed a mersenne twister (pseudo) random generator
+                    std::mt19937 generator(std::random_device {}());
+
+                    // Make sure all numbers have an equal chance.
+                    // Range is inclusive (so we need -1 for vector index)
+                    std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+                    const std::size_t number {distribution(generator)};
+                    MediaPath = series.banners[number].path.c_str();
+                    MediaSize.Set(series.banners[number].width, series.banners[number].height);
+                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
+                            static_cast<int>(number + 1), *MediaPath,
+                            static_cast<int>(series.banners.size()));  // Log result
+                } else if (series.banners.size() == 1) {               // Just one banner
+                    MediaPath = series.banners[0].path.c_str();
+                    MediaSize.Set(series.banners[0].width, series.banners[0].height);
+                }
+                return 1;  // MediaType = 1;
+            }
+        } else if (call.type == tMovie) {
+            cMovie movie;
+            movie.movieId = movieId;
+            if (pScraper->Service("GetMovie", &movie)) {
+                MediaPath = movie.poster.path.c_str();
+                MediaSize.Set(movie.poster.width, movie.poster.height);
+                return 2;  // MediaType = 2;
+            }
+        }
+    }
+    return 0;  // tNone
+}
+
+void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
+    if (Series.name.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), Series.name.c_str()));
+    if (Series.firstAired.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("first aired: "), Series.firstAired.c_str()));
+    if (Series.network.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), Series.network.c_str()));
+    if (Series.genre.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Series.genre.c_str()));
+    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));  // TheTVDB
+    if (Series.status.length() > 0)
+        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), Series.status.c_str()));
+    if (Series.episode.season > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), Series.episode.season));
+    if (Series.episode.number > 0)
+        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("episode number: "), Series.episode.number));
+}
+
+void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
+    if (Movie.title.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), Movie.title.c_str()));
+    if (Movie.originalTitle.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("original title: "), Movie.originalTitle.c_str()));
+    if (Movie.collectionName.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("collection name: "), Movie.collectionName.c_str()));
+    if (Movie.genres.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Movie.genres.c_str()));
+    if (Movie.releaseDate.length() > 0)
+        MovieInfo.Append(cString::sprintf("%s%s\n", tr("release date: "), Movie.releaseDate.c_str()));
+    // TheMovieDB
+    if (Movie.popularity > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), Movie.popularity));
+    if (Movie.voteAverage > 0)
+        MovieInfo.Append(
+            cString::sprintf("%s%.0f%%\n", tr("vote average: "), Movie.voteAverage * 10));  // 10 Points = 100%
+}
 
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    static const double ScreenAspects[] {16.0 / 9.0, 4.0 / 3.0, 20.0 / 11.0, 15.0 / 11.0, 2.21};
-    static const cString ScreenAspectNames[] {"169", "43", "169w", "169w", "221"};
+    static const double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
+    static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (uint i {0}; i < ScreenAspectNums; ++i) {
-        if (ScreenAspect == ScreenAspects[i])
+        // if (ScreenAspect == ScreenAspects[i])
+        if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
             return ScreenAspectNames[i];
     }
 
-    dsyslog("flatPlus: Unknown screen aspect %.2f", ScreenAspect);
+    dsyslog("flatPlus: Unknown screen aspect (%.5f)", ScreenAspect);
     return "unknown_asp";
 }
 
@@ -197,22 +372,33 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     if (FrameTotal == 0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0!");
-        return "recording_seen_0";
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
+        return SeenIconNames[0];  // 0 = 0%
     }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
-    if (FrameSeen >= SeenThreshold) return "recording_seen_10";
+    if (FrameSeen >= SeenThreshold) return SeenIconNames[10];  // 10 = 100%
 
-    const int idx = std::min(static_cast<int>(FrameSeen * 10.0), 10);
-    const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
-                                   "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
-                                   "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+    const int idx = std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10);  // 0..10 rounded
     return SeenIconNames[idx];
 }
 
+/**
+ * Adjusts the size of a media object based on its aspect ratio and the 
+ * constraints provided by the content size. This function ensures that 
+ * the media's aspect ratio is preserved while fitting within the 
+ * specified dimensions. It categorizes media as poster, portrait, or 
+ * banner based on its aspect ratio and adjusts its size accordingly.
+ * 
+ * @param MediaSize A reference to the size of the media to be adjusted.
+ * @param ContentSize The size constraints within which the media should fit.
+ * 
+ * - Posters are adjusted to a maximum height of 70% of the content height.
+ * - Portraits are adjusted to a maximum width of 1/3 of the content width.
+ * - Banners are adjusted to maintain a target ratio of 758 width at 1920.
+ */
 void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
@@ -224,19 +410,30 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
         return;
     }
 
-    // TODO: Set to max size by default or also allow smaller media site?
-    const uint Aspect = MediaSize.Width() / MediaSize.Height();  // <1 = Poster, >1 = Portrait, >4 = Banner
+    static constexpr int POSTER_ASPECT_THRESHOLD = 1;              // Smaller than 1 = Poster
+    static constexpr int BANNER_ASPECT_THRESHOLD = 4;              // Smaller than 4 = Portrait, bigger than 4 = Banner
+    static constexpr double POSTER_HEIGHT_RATIO = 0.7;             // Max 70% of pixmap height
+    static constexpr double PORTRAIT_WIDTH_RATIO = 1.0 / 3.0;      // Max 1/3 of pixmap width
+    static constexpr double BANNER_TARGET_RATIO = 758.0 / 1920.0;  // To get 758 width @ 1920
+
+    //* Set to default size
+    const uint Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < 1) {         //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(
-            std::min(MediaSize.Height(), static_cast<int>(ContentSize.Height() * 0.7)));  // Max 70% of pixmap height
-    } else if (Aspect < 4) {  //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(
-            std::min(MediaSize.Width(), static_cast<int>(ContentSize.Width() / 3)));      // Max 1/3 of pixmap width
-    } else {                  //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(
+    if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
+        /* MediaSize.SetHeight(
+            std::min(MediaSize.Height(),
+                     static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO))); */
+        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO));
+    } else if (Aspect < BANNER_ASPECT_THRESHOLD) {  //* Portrait (For example 1920x1080 = 1.77)
+        /* MediaSize.SetWidth(
             std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * (1.0 / (1920.0 / 758)))));    // To get 758 width @ 1920
+                     static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO))); */
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO));
+    } else {                                        //* Banner (Usually 758x140 = 5.41)
+        /* MediaSize.SetWidth(
+            std::min(MediaSize.Width(),
+                     static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO))); */
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO));
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
@@ -400,22 +597,22 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     return EditedFrame;
 }
 
-void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
+void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlat::InsertCuttedLengthSize()");
+    dsyslog("flatPlus: cFlat::InsertCutLengthSize()");
 #endif
 
     cMarks Marks;
     bool HasMarks {false};
     const char *RecordingFileName {Recording->FileName()};
-    const bool IsPesRecording {(Recording->IsPesRecording()) ? true : false};
+    const bool IsPesRecording {Recording->IsPesRecording()};
     const double FramesPerSecond {Recording->FramesPerSecond()};
     std::unique_ptr<cIndexFile> index;  // Automatically deleted; no need for 'new'
     int LastIndex {0};
     uint16_t MaxFileNum {0};
 
     if (FramesPerSecond == 0.0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in InsertCuttedLengthSize() FramesPerSecond is 0.0!");
+        esyslog("flatPlus: Error in InsertCutLengthSize() FramesPerSecond is 0.0!");
         return;
     }
 
@@ -430,18 +627,20 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
         }
     }
 
+    if (MaxFileNum == 0) {
+        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum is 0!");
+        return;
+    }
+
     bool FsErr {false};
-    uint64_t FileSize[MaxFileNum];
-    FileSize[0] = 0;
-    int i {0}, rc {0};
+    std::vector<uint64_t> FileSize(MaxFileNum + 1, 0);
+    int rc {0};
     struct stat FileBuf;
     cString FileName {""};
-    do {
-        ++i;
-        if (IsPesRecording)
-            FileName = cString::sprintf("%s/%03d.vdr", RecordingFileName, i);
-        else
-            FileName = cString::sprintf("%s/%05d.ts", RecordingFileName, i);
+    for (uint16_t i {1}; i <= MaxFileNum && !rc; ++i) {
+        FileName = IsPesRecording
+            ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
+            : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
 
         rc = stat(*FileName, &FileBuf);
         if (rc == 0) {
@@ -450,18 +649,17 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
             esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
             FsErr = true;  // Remember failed status for later displaying an '!'
         }
-    } while (i < MaxFileNum && !rc);
+    }
 
-    int CuttedLength {0};
-    uint64_t RecSizeCutted {0};
+    int CutLength {0};
+    uint64_t RecSizeCut {0};
     if (HasMarks && index) {
         uint16_t FileNumber {0};
         off_t FileOffset {0};
         bool CutIn {true};
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};
-        cMark *Mark = Marks.First();
-        while (Mark) {
+        for (cMark *Mark = Marks.First(); Mark; Mark = Marks.Next(Mark)) {
             position = Mark->Position();
             index->Get(position, &FileNumber, &FileOffset);
             if (CutIn) {
@@ -469,42 +667,40 @@ void InsertCuttedLengthSize(const cRecording *Recording, cString &Text) {  // NO
                 CutIn = false;
                 CutInOffset = FileSize[FileNumber - 1] + FileOffset;
             } else {
-                CuttedLength += position - CutInFrame;
+                CutLength += position - CutInFrame;
                 CutIn = true;
-                RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+                RecSizeCut += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
             }
-            cMark *NextMark = Marks.Next(Mark);
-            Mark = NextMark;
         }
         if (!CutIn) {
-            CuttedLength += index->Last() - CutInFrame;
+            CutLength += index->Last() - CutInFrame;
             index->Get(index->Last() - 1, &FileNumber, &FileOffset);
-            RecSizeCutted += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
+            RecSizeCut += FileSize[FileNumber - 1] + FileOffset - CutInOffset;
         }
     }
 
-    if (index) {
+    if (index && LastIndex) {  // Do not show zero value
         Text.Append(
             cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
-        if (HasMarks)
+        if (HasMarks && CutLength > 0)  // Do not show zero value
             Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
-                                         *IndexToHMSF(CuttedLength, false, FramesPerSecond)));
+                                         *IndexToHMSF(CutLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
 
-    const uint64_t RecSize {FileSize[i]};  // In case of error show partial size
+    const uint64_t RecSize {FileSize[MaxFileNum]};  // Size of the recording in bytes
     if (RecSize > MEGABYTE(1023))          // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
         Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
 
-    if (HasMarks && (RecSizeCutted > 0)) {  // Do not show zero value
-        if (RecSizeCutted > MEGABYTE(1023))
+    if (HasMarks && (RecSizeCut)) {  // Do not show zero value
+        if (RecSizeCut > MEGABYTE(1023))
             Text.Append(
-                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCutted) / MEGABYTE(1024)));
+                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCut) / MEGABYTE(1024)));
         else
-            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCutted / MEGABYTE(1)));
+            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCut / MEGABYTE(1)));
     }
     Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
                                  Recording->Lifetime()));
@@ -546,9 +742,17 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return source.substr(StartPos, EndPos - StartPos);
 }
 
+/**
+ * @brief Get the size of a glyph in a given font and font height.
+ * @param[in] Name The name of the font to use.
+ * @param[in] CharCode The character code of the glyph to query.
+ * @param[in] FontHeight The height of the font in pixels.
+ * @return The size of the glyph in pixels, rounded up to the nearest integer.
+ * @note This function returns 0 if any error occurs during the execution of the function.
+ */
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
-    FT_Library library;
-    FT_Face face;
+    FT_Library library {nullptr};
+    FT_Face face {nullptr};
     int rc {FT_Init_FreeType(&library)};
     if (!rc) {
         rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
@@ -559,7 +763,8 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
                 FT_GlyphSlot slot {face->glyph};
                 rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
                 if (!rc) {
-                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversation
+                    // Convert from 26.6 fixed-point format to integer, rounding up
+                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversion
                     FT_Done_Face(face);
                     FT_Done_FreeType(library);
                     return GlyphSize;
@@ -568,17 +773,39 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
         }
     }
 
-    FT_Done_Face(face);
-    FT_Done_FreeType(library);
+    // Safe cleanup - only free initialized resources
+    if (face) FT_Done_Face(face);
+    if (library) FT_Done_FreeType(library);
+
     esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
     return 0;  // Return 0 if anything went wrong
 }
 
 
+/**
+ * @brief Justifies a line of text by inserting fill characters to fit a specified maximum width.
+ *
+ * This function adjusts the spacing within a line of text to ensure that it fits within the specified
+ * maximum width. The line is justified by inserting fill characters, typically spaces or hair spaces,
+ * between existing spaces or punctuation marks in the text. The function does not justify lines with
+ * fixed-width fonts or lines that cannot accommodate additional fill characters.
+ *
+ * @param Line The line of text to be justified, passed by reference and modified in place.
+ * @param Font The font used to calculate the width of characters and spaces. Must not be null.
+ * @param LineMaxWidth The maximum width in pixels that the justified line should fit within.
+ *
+ * @note The function returns immediately if the font is null, the line is empty, or the maximum
+ * width is non-positive. Additionally, no justification is performed if a fixed-width font is detected.
+ */
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
 #endif
+    if (!Font) {
+        esyslog("flatPlus: JustifyLine() called with null Font");
+        return;
+    }
+
     if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
@@ -601,10 +828,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
     const int LineWidth {Font->Width(Line.c_str())};   // Width in Pixel
-    if ((LineWidth + FillCharWidth) > LineMaxWidth) {  // Check if at least one 'FillChar' fits in to the line
-        // dsyslog("flatPlus: JustifyLine() ---Line too long for extra space---");
+    if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
         return;
-    }
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
         // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
@@ -612,7 +837,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    if (LineWidth > (LineMaxWidth * 0.8f)) {  // Lines shorter than 80% looking bad when justified
+    if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
 
@@ -635,7 +860,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
         //* Insert blocks at (space)
         std::size_t pos {0};  // Position also used in following loops
-        for (pos = Line.find(' '); pos != std::string::npos && (InsertedFillChar + FillCharBlock <= NeedFillChar);
+        for (pos = Line.find(' ');
+             pos != std::string::npos && pos > 0 && (InsertedFillChar + FillCharBlock <= NeedFillChar);
              pos = Line.find(' ', pos + FillCharsLength + 1)) {
             if (!isspace(Line[pos - 1])) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
@@ -648,14 +874,15 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert blocks at (.,?!;)
-        for (pos = Line.find_first_of(".,?!;");
-             pos != std::string::npos && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
-             pos = Line.find_first_of(".,?!;", pos + FillCharsLength + 1)) {
+        for (pos = Line.find_first_of(PUNCTUATION_CHARS);
+             pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
+             pos = Line.find_first_of(PUNCTUATION_CHARS, pos + FillCharsLength + 1)) {
             if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
                 // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
                 Line.insert(pos + 1, FillChars);
                 InsertedFillChar += FillCharBlock;
-                LineLength = Line.length();
+                // LineLength = Line.length();  // Recalculating the entire length
+                LineLength += FillCharsLength;  // Just add the length we inserted
             }
         }
 #ifdef DEBUGFUNCSCALL
@@ -663,9 +890,12 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert the remainder of 'NeedFillChar' from right to left
+        std::size_t PrevPos = std::string::npos;
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
+               pos < PrevPos &&  // Ensure position is decreasing (potential infinite loop)
                (InsertedFillChar < NeedFillChar)) {
-            if (!(isspace(Line[pos - 1]))) {
+            PrevPos = pos;
+            if (pos > 0 && !(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert char at %ld", pos);
                 Line.insert(pos, FillChar);
                 ++InsertedFillChar;
@@ -685,12 +915,20 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
 std::string_view ltrim(std::string_view str) {
     const auto pos(str.find_first_not_of(" \t\n\r\f\v"));
+    if (pos == std::string_view::npos) {
+        // String contains only whitespace, return empty string_view
+        return std::string_view {};
+    }
     str.remove_prefix(std::min(pos, str.length()));
     return str;
 }
 
 std::string_view rtrim(std::string_view str) {
     const auto pos(str.find_last_not_of(" \t\n\r\f\v"));
+    if (pos == std::string_view::npos) {
+        // String contains only whitespace, return empty string_view
+        return std::string_view {};
+    }
     str.remove_suffix(std::min(str.length() - pos - 1, str.length()));
     return str;
 }
@@ -718,20 +956,22 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     cTimeMs Timer;  // Start timer
 #endif
 
+    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+        return;
+
     free(m_Text);
     m_Text = (Text) ? strdup(Text) : nullptr;
     if (!m_Text)
         return;
-    m_Lines = 1;
-    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
-        return;
 
+    m_Lines = 1;
+
+    static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
     char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
     int cw {0}, l {0}, sl {0}, w {0};
     int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint sym {0};
     stripspace(m_Text);  // Strips trailing newlines
-
     for (char *p {m_Text}; *p;) {
         /* int */ sl = Utf8CharLen(p);
         /* uint */ sym = Utf8CharGet(p, sl);
@@ -758,7 +998,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
 
-                /* char * */ s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                /* char* */  s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
                 /* int */ l = p - m_Text;
                 strncpy(s, m_Text, l);  // Dest, Source, Size
                 s[l] = '\n';            // Insert line break.
@@ -770,8 +1010,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr("-.,:;!?_~", *p)) {  //! Breaks '...'
-            if (*p != *(p + 1)) {      // Next char is different, so use it for 'Delim'
+        if (strchr(DELIMITER_CHARS, *p)) {
+            if (*p != *(p + 1)) {  // Avoid breaks between repeated delimiters (like in "...")
                 Delim = p;
                 Blank = nullptr;
             } else {
@@ -783,7 +1023,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0)
+        dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 

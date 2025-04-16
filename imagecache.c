@@ -29,10 +29,7 @@ void cImageCache::Create() {
 }
 
 void cImageCache::Clear() {
-    for (uint i {0}; i < MaxImageCache; ++i) {
-        delete CacheImage[i];  //* 'delete' already checks for nullptr
-    }
-
+    std::for_each(std::begin(CacheImage), std::end(CacheImage), [](auto &p) { delete p; });
     m_InsertIndex = 0;
 }
 
@@ -55,7 +52,7 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
     return false;
 }
 
-cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
+cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) const {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (uint i {0}; i < MaxImageCache; ++i) {
         // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
@@ -67,14 +64,16 @@ cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) {
 }
 
 void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {
+    if (CacheImage[m_InsertIndex] != nullptr)
+        delete CacheImage[m_InsertIndex];
+
     CacheImage[m_InsertIndex] = Image;
     CacheName[m_InsertIndex].reserve(Name.length());
     CacheName[m_InsertIndex] = Name;
     CacheWidth[m_InsertIndex] = Width;
     CacheHeight[m_InsertIndex] = Height;
 
-    ++m_InsertIndex;
-    if (m_InsertIndex >= MaxImageCache) {
+    if (++m_InsertIndex >= MaxImageCache) {
         isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%d)", MaxImageCache);
         isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
         m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start

@@ -543,6 +543,9 @@ msgstr "Dimensione margine pulsanti"
 msgid "Imagecache entries"
 msgstr "Ingressi Imagecache"
 
+msgid "Show channel name and number with shadow"
+msgstr ""
+
 msgid "Show Channelinfo icons"
 msgstr "Mostra icone info canali"
 

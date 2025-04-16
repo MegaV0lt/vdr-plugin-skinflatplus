@@ -35,7 +35,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         cPixmap *ChanInfoTopPixmap {nullptr};
         cPixmap *ChanInfoBottomPixmap {nullptr};
         cPixmap *ChanLogoPixmap {nullptr};
-        cPixmap *ChanLogoBGPixmap {nullptr};
+        cPixmap *ChanLogoBgPixmap {nullptr};
         cPixmap *ChanIconsPixmap {nullptr};
         cPixmap *ChanEpgImagesPixmap {nullptr};
 
@@ -56,7 +56,6 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         cTextScrollers Scrollers;
 
         bool m_IsRadioChannel {false};
-        // bool m_IsGroup {false};
 
         void SignalQualityDraw();
         void ChannelIconsDraw(const cChannel *Channel, bool Resolution);

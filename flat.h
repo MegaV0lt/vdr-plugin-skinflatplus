@@ -17,10 +17,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <stdint.h>
+// #include <stdint.h>
 
 #include <memory>   // For 'unique_ptr<T>()' ...
 #include <cstring>  // string.h
+#include <cstdint>  // stdint.h
 #include <string>
 #include <string_view>
 #include <random>
@@ -35,6 +36,8 @@
 // Use (void) to silence unused warnings.
 #define assertm(exp, msg) assert(((void)msg, exp))
 // Includes and defines for assert()
+
+#include "./services/scraper2vdr.h"
 
 #include "./config.h"
 #include "./imagecache.h"
@@ -217,19 +220,24 @@ THEME_CLR(Theme, clrVolumeProgressBg,       0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
+// SeenIconNames for GetRecordingSeenIcon()
+static const cString SeenIconNames[]{"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
+                                     "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
+                                     "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+
 class cFlat : public cSkin {
  public:
-        cFlat();
-        virtual const char *Description();
-        virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
-        virtual cSkinDisplayMenu *DisplayMenu();
-        virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
-        virtual cSkinDisplayVolume *DisplayVolume();
-        virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-        virtual cSkinDisplayMessage *DisplayMessage();
+    cFlat();
+    virtual const char *Description();
+    virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
+    virtual cSkinDisplayMenu *DisplayMenu();
+    virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
+    virtual cSkinDisplayVolume *DisplayVolume();
+    virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
+    virtual cSkinDisplayMessage *DisplayMessage();
 
  private:
-        cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
+    cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
 };
 
 // Based on VDR's cTextWrapper
@@ -237,16 +245,16 @@ class cTextFloatingWrapper {
  public:
     cTextFloatingWrapper();
     ~cTextFloatingWrapper();
-    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
     ///< Wrapping is done by inserting the necessary number of newline characters into the string.
     ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
-    const char *Text();
+    void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
     ///< Returns the full wrapped text.
-    int Lines() { return m_Lines; }
+    const char *Text();
     ///< Returns the actual number of lines needed to display the full wrapped text.
-    const char *GetLine(int Line);
+    int Lines() const { return m_Lines; }
     ///< Returns the given Line. The first line is numbered 0.
+    const char *GetLine(int Line);
 
  private:
     char *m_Text {nullptr};
@@ -255,13 +263,20 @@ class cTextFloatingWrapper {
     int m_LastLine {-1};
 };
 
-
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
 inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
     if (Pixmap) Pixmap->Fill(Color);
 }
-
+inline void PixmapClear(cPixmap *Pixmap) {
+    if (Pixmap) Pixmap->Clear();
+}
+/**
+ * Sets the alpha value of the given `cPixmap` object.
+ *
+ * @param Pixmap - A pointer to the `cPixmap` object.
+ * @param Alpha - The alpha value to be set (0-255, where 0 represents full transparency).
+ */
 inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
@@ -270,6 +285,16 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth); 
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
 cPlugin *GetScraperPlugin();
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
+    std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
+    std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
+    const cRecording *Recording = nullptr);                              // NOLINT
+int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event = nullptr, const cRecording *Recording = nullptr);  // NOLINT
+
+void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
+void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT
+
+
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);
 cString GetFormatIcon(int ScreenWidth);
@@ -288,5 +313,9 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);
-void InsertCuttedLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
+void InsertCutLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
+
+// At class/file level
+static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
+static constexpr const char* PUNCTUATION_CHARS = ".,?!;";  // Punctuation characters for justifying

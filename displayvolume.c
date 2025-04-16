@@ -19,8 +19,9 @@ cFlatDisplayVolume::cFlatDisplayVolume() {
                    Config.decorBorderVolumeSize * 2};
     const int left {(m_OsdWidth - width - Config.decorBorderVolumeSize) / 2};
 
-    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, cRect(0, top, m_OsdWidth, m_LabelHeight));
-    MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, cRect(0, top, m_OsdWidth, m_LabelHeight));
+    const cRect LabelPixmapViewPort {0, top, m_OsdWidth, m_LabelHeight};
+    LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, LabelPixmapViewPort);
+    MuteLogoPixmap = CreatePixmap(m_Osd, "MuteLogoPixmap", 2, LabelPixmapViewPort);
 
     ProgressBarCreate(cRect(left, m_OsdHeight - 50 - Config.decorProgressVolumeSize, width,
                             Config.decorProgressVolumeSize),
@@ -36,8 +37,8 @@ cFlatDisplayVolume::~cFlatDisplayVolume() {
 void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     if (!LabelPixmap || !MuteLogoPixmap) return;
 
-    PixmapFill(LabelPixmap, clrTransparent);
-    PixmapFill(MuteLogoPixmap, clrTransparent);
+    PixmapClear(LabelPixmap);
+    PixmapClear(MuteLogoPixmap);
 
     const cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
     const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
