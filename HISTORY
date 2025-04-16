@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-04-xx: Version 1.1.10
+2025-04-16: Version 1.1.10
 - [add] Render channel name and number with shadow
 - [add] Option to render channel name and number with shadow or background
 - [update] Use a bigger font for the channel number and name in the channel info
