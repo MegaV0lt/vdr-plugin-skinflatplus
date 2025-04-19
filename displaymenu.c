@@ -2373,7 +2373,6 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
             InsertCutLengthSize(Recording, Text);  // Process marks and insert text
 
-            // From SkinNopacity
 #if APIVERSNUM >= 20505
             // Add TS Error information
             InsertTSErrors(RecInfo, Text);
@@ -2595,6 +2594,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
  * The line is formatted as "TS errors: <number>".
  */
 void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) {  // NOLINT
+    // From SkinNopacity
     if (RecInfo && RecInfo->Errors() > 0) {
         std::ostringstream RecErrors {""};
         RecErrors.imbue(std::locale {""});  // Set to local locale
@@ -2687,7 +2687,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
-        // From SkinNopacity
 #if APIVERSNUM >= 20505
         // Add TS Error information
         InsertTSErrors(RecInfo, RecAdditional);
