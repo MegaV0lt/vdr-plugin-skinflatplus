@@ -136,6 +136,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const;  // NOLINT
     void InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text);  // NOLINT
 
+    void AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent, int &ContentTop,  // NOLINT
+                      bool IsEvent = false);  // NOLINT
+
     time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 
     void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,

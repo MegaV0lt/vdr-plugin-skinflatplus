@@ -1995,6 +1995,33 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     }
 }
 
+/**
+ * Add extra information to the ComplexContent.
+ *
+ * @param Title The title of the extra information block.
+ * @param Text The text to display in the extra information block.
+ * @param ComplexContent The ComplexContent to add the extra information to.
+ * @param ContentTop The top position of the extra information block.
+ * @param IsEvent true if this block is for an event, false if it is for a recording.
+ */
+void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
+                                    int &ContentTop, bool IsEvent) {
+    const int kTitleLeftMargin {m_MarginItem * 10};  // 50 Pixel
+    const tColor ColorMenuBg {IsEvent ? Theme.Color(clrMenuEventBg) : Theme.Color(clrMenuRecBg)};
+    const tColor ColorMenuFontTitle {IsEvent ? Theme.Color(clrMenuEventFontTitle) : Theme.Color(clrMenuRecFontTitle)};
+    const tColor ColorTitleLine {IsEvent ? Theme.Color(clrMenuEventTitleLine) : Theme.Color(clrMenuRecTitleLine)};
+    const tColor ColorMenuFontInfo {IsEvent ? Theme.Color(clrMenuEventFontInfo) : Theme.Color(clrMenuRecFontInfo)};
+    ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+    ComplexContent.AddText(Title, false, cRect(kTitleLeftMargin, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
+                           m_Font);
+    ContentTop += m_FontHeight;
+    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
+    ContentTop += 6;
+    ComplexContent.AddText(*Text, true,
+                           cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                           ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
+}
+
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
@@ -2181,30 +2208,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         // Add movie information if available
         if (!isempty(*MovieInfo)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Movie information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *MovieInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop, true);
         }
 
         // Add series information if available
         if (!isempty(*SeriesInfo)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Series information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *SeriesInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop, true);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
@@ -2220,31 +2229,14 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         // Add reruns information if available
         if (!isempty(*Reruns)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Reruns"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *Reruns, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, ContentTop, true);
         }
 
         // Add video information if available
         if (!isempty(*TextAdditional)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Video information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *TextAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontMedium);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop, true);
         }
+
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
         // Determine if we need a second run
@@ -2808,30 +2800,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         // Add movie information if available
         if (!isempty(*MovieInfo)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Movie information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *MovieInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
+            AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop);
         }
 
         // Add series information if available
         if (!isempty(*SeriesInfo)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Series information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *SeriesInfo, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
+            AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
@@ -2847,30 +2821,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
         // Add recording information if available
         if (!isempty(*RecAdditional)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Recording information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *RecAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
+            AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent, ContentTop);
         }
 
         // Add video information if available
         if (!isempty(*TextAdditional)) {
-            ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-            ComplexContent.AddText(tr("Video information"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
-                                   Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
-            ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
-            ComplexContent.AddText(
-                *TextAdditional, true,
-                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontMedium);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop);
         }
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
