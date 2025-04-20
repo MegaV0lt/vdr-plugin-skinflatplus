@@ -1121,7 +1121,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         ItemBorderInsertUnique(ib);
 
     if (Config.MenuTimerView == 3 && Current)  {  // flatPlus short
-        const cEvent *Event = Timer->Event();
+        const cEvent *Event {Timer->Event()};
         DrawItemExtraEvent(Event, tr("timer not enabled"));
     }
 
@@ -3769,7 +3769,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel = (TimerRec[i])->Channel();
-                // const cEvent *Event = Timer->Event();
+                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3810,7 +3810,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel = (TimerActive[i])->Channel();
-                // const cEvent *Event = Timer->Event();
+                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3845,7 +3845,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }  // StrTimer = cString::sprintf("R: ");
 
                 const cChannel *Channel = (TimerRemoteRec[i])->Channel();
-                // const cEvent *Event = Timer->Event();
+                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3882,7 +3882,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }  // StrTimer = cString::sprintf("R: ");
 
                 const cChannel *Channel = (TimerRemoteActive[i])->Channel();
-                // const cEvent *Event = Timer->Event();
+                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
