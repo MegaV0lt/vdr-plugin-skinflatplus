@@ -2222,7 +2222,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         // Add actors if available
         const int NumActors = ActorsPath.size();  // Narrowing conversion
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0)
-            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
+            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors, true);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetEvent actor time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2364,8 +2364,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                 // Genre
                 InsertGenreInfo(Event, Text);  // Add genre info
 
-                if (Event->Contents(0))
-                    Text.Append("\n");
+                if (Event->Contents(0)) Text.Append("\n");
                 // FSK
                 if (Event->ParentalRating())
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
@@ -2476,36 +2475,22 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     DecorBorderDraw(ib);
 }
 
-    /**
-     * \brief Add actors' images and names to the recording info display
-     *
-     * Add actors' images and names to the recording info display.
-     * The method takes the content object, the paths to the actors' images,
-     * the actors' names, the actors' roles, and the number of actors as parameters.
-     *
-     * \param[in] ComplexContent  the content object to add the actors to
-     * \param[in] ActorsPath      the paths to the actors' images
-     * \param[in] ActorsName      the actors' names
-     * \param[in] ActorsRole      the actors' roles
-     * \param[in] NumActors       the number of actors
-     *
-     * The method first checks if the user has selected to show actors' images
-     * (Config.TVScraperEPGInfoShowActors or Config.TVScraperRecInfoShowActors).
-     * If not, the method returns immediately.
-     * If the user has selected to show actors' images, the method limits the
-     * number of actors to the value of Config.TVScraperShowMaxActors, if it is
-     * greater than 0 and less than the number of actors.
-     * Then the method creates a smaller font for the actors' names and roles,
-     * and calculates the width and margin of the actors' images and names.
-     * After that, the method loops through the actors and adds their images and
-     * names to the content object.
-     * The images are added with the AddImage method, and the names and roles
-     * are added with the AddText method.
-     * The method also adds a horizontal line above the actors' images and names.
-     */
+/**
+ * Add actors' images and names to the recording info display
+ *
+ * The method takes the content object, the paths to the actors' images,
+ * the actors' names, the actors' roles, and the number of actors as parameters.
+ *
+ * \param ComplexContent Complex content to add actors to.
+ * \param ActorsPath Path of actor images.
+ * \param ActorsName Vector of actor names.
+ * \param ActorsRole Vector of actor roles.
+ * \param NumActors Number of actors to add.
+ * \param IsEvent Is this for an event or a recording?
+ */
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
-                                 int NumActors) {
+                                 int NumActors, bool IsEvent) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
 #endif
@@ -2516,11 +2501,15 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;   // Limit to ShowMaxActors (-1 = Show all actors)
 
+    const tColor ColorMenuBg {IsEvent ? Theme.Color(clrMenuEventBg) : Theme.Color(clrMenuRecBg)};
+    const tColor ColorMenuFontTitle {IsEvent ? Theme.Color(clrMenuEventFontTitle) : Theme.Color(clrMenuRecFontTitle)};
+    const tColor ColorTitleLine {IsEvent ? Theme.Color(clrMenuEventTitleLine) : Theme.Color(clrMenuRecTitleLine)};
+    const tColor ColorMenuFontInfo {IsEvent ? Theme.Color(clrMenuEventFontInfo) : Theme.Color(clrMenuRecFontInfo)};
     int ContentTop {ComplexContent.BottomContent() + m_FontHeight};
-    ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0),
-                           Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
+    ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0), ColorMenuFontTitle,
+                           ColorMenuBg, m_Font);
     ContentTop += m_FontHeight;
-    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
+    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
     ContentTop += 6;
 
     // Smaller font for actors name and role
@@ -2555,13 +2544,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 ImgHeight = img->Height();
                 ComplexContent.AddText(*ActorsName[Actor], false, cRect(x, y + ImgHeight + m_MarginItem, ActorWidth, 0),
-                                       Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny,
-                                       ActorWidth, FontTinyHeight, taCenter);
+                                       ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, FontTinyHeight,
+                                       taCenter);
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + ImgHeight + m_MarginItem + FontTinyHeight, ActorWidth, 0),
-                    Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontTiny, ActorWidth,
-                    FontTinyHeight, taCenter);
+                    ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, FontTinyHeight, taCenter);
 #ifdef DEBUGFUNCSCALL
                 if (ImgHeight > MaxImgHeight) {
                     dsyslog("   Column %d: MaxImgHeight changed to %d", col, ImgHeight);
