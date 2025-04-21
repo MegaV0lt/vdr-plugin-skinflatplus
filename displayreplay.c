@@ -80,7 +80,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     if (m_ModeOnly || !IconsPixmap || !LabelPixmap) return;
 
-    const cRecordingInfo *RecInfo = Recording->Info();
+    const cRecordingInfo *RecInfo {Recording->Info()};
     m_Recording = Recording;
 
     PixmapClear(IconsPixmap);

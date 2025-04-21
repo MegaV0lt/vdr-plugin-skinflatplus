@@ -302,7 +302,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         if (Config.MenuChannelShowCount) {
             uint ChanCount {0};
             LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-            for (const cChannel *Channel = Channels->First(); Channel; Channel = Channels->Next(Channel)) {
+            for (const cChannel *Channel {Channels->First()}; Channel; Channel = Channels->Next(Channel)) {
                 if (!Channel->GroupSep()) ++ChanCount;
             }
             NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
@@ -614,7 +614,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     double progress {0.0};
     {
         LOCK_SCHEDULES_READ;
-        const cSchedule *Schedule = Schedules->GetSchedule(Channel);
+        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
         if (Schedule) {
             Event = Schedule->GetPresentEvent();
             if (Event) {
@@ -794,7 +794,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
             if (Event->ParentalRating())
                 Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Event->GetParentalRatingString()));
 
-            const cComponents *Components = Event->Components();
+            const cComponents *Components {Event->Components()};
             if (Components) {
                 cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
@@ -961,7 +961,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     }
     Left += ImageHeight + m_MarginItem2;
 
-    const cChannel *Channel = Timer->Channel();
+    const cChannel *Channel {Timer->Channel()};
     cString Buffer = cString::sprintf("%d", Channel->Number());
     const int Width {std::max(m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
 
@@ -2072,7 +2072,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Fsk));
         }
 
-        const cComponents *Components = Event->Components();
+        const cComponents *Components {Event->Components()};
         if (Components) {
             cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
@@ -2126,7 +2126,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
                         {
                             LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                            const cChannel *channel = Channels->GetByChannelID(r->event->ChannelID(), true, true);
+                            const cChannel *channel {Channels->GetByChannelID(r->event->ChannelID(), true, true)};
                             if (channel)
                                 Reruns.Append(
                                     cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
@@ -2345,7 +2345,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 
     cString Text {""};
     if (Recording) {
-        const cRecordingInfo *RecInfo = Recording->Info();
+        const cRecordingInfo *RecInfo {Recording->Info()};
 
         if (!isempty(RecInfo->Description()))
             Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
@@ -2354,12 +2354,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         if (Config.RecordingAdditionalInfoShow) {
             {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                const cChannel *channel = Channels->GetByChannelID(RecInfo->ChannelID());
+                const cChannel *channel {Channels->GetByChannelID(RecInfo->ChannelID())};
                 if (channel)
                     Text.Append(
                         cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
             }
-            const cEvent *Event = RecInfo->GetEvent();
+            const cEvent *Event {RecInfo->GetEvent()};
             if (Event) {
                 // Genre
                 InsertGenreInfo(Event, Text);  // Add genre info
@@ -2377,7 +2377,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             InsertTSErrors(RecInfo, Text);
 #endif
 
-            const cComponents *Components = RecInfo->Components();
+            const cComponents *Components {RecInfo->Components()};
             if (Components) {
                 cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
@@ -2621,7 +2621,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
     cString RecAdditional {""}, Text {""}, TextAdditional {""};
 
-    const cRecordingInfo *RecInfo = Recording->Info();
+    const cRecordingInfo *RecInfo {Recording->Info()};
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
@@ -2631,7 +2631,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        const cEvent *Event = RecInfo->GetEvent();
+        const cEvent *Event {RecInfo->GetEvent()};
         if (Event) {
             // Genre
             InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
@@ -2661,7 +2661,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         auto ChannelFuture = std::async(std::launch::async,
             [&RecAdditional](tChannelID channelId) {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                const cChannel *Channel = Channels->GetByChannelID(channelId);
+                const cChannel *Channel {Channels->GetByChannelID(channelId)};
                 if (Channel)
                     RecAdditional.Append(
                         cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
@@ -2680,7 +2680,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         InsertTSErrors(RecInfo, RecAdditional);
 #endif
 
-        const cComponents *Components = RecInfo->Components();
+        const cComponents *Components {RecInfo->Components()};
         if (Components) {
             cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
@@ -3134,7 +3134,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     std::string PlugMainEntry {""};
     PlugMainEntry.reserve(32);  // Space for menu entry
     for (uint i {0};; ++i) {
-        cPlugin *p = cPluginManager::GetPlugin(i);
+        cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
             MainMenuEntry = p->MainMenuEntry();
             if (MainMenuEntry) {
@@ -3237,7 +3237,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
         std::string RecFolder2 {""};
         RecFolder2.reserve(256);
         LOCK_RECORDINGS_READ;
-        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+        for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
             if (m_RecFolder == RecFolder2) {
                 ++RecCount;
@@ -3246,7 +3246,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
         }  // for
     } else {  // All recordings
         LOCK_RECORDINGS_READ;
-        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+        for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             ++RecCount;
             if (Rec->IsNew()) ++RecNewCount;
         }
@@ -3270,7 +3270,7 @@ void cFlatDisplayMenu::GetTimerCounts(uint &TimerActiveCount, uint &TimerCount) 
     TimerActiveCount = 0;
     TimerCount = 0;
     LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-    for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+    for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
         ++TimerCount;
         if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
     }
@@ -3384,7 +3384,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     RecFolder2.reserve(256);
 
     LOCK_RECORDINGS_READ;
-    for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+    for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
         if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
             if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
@@ -3565,7 +3565,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     // Check device which currently displays live tv
     int DeviceLiveTV {-1};
-    cDevice *PrimaryDevice = cDevice::PrimaryDevice();
+    cDevice *PrimaryDevice {cDevice::PrimaryDevice()};
     if (PrimaryDevice) {
         if (!PrimaryDevice->Replaying() || PrimaryDevice->Transferring())
             DeviceLiveTV = cDevice::ActualDevice()->DeviceNumber();
@@ -3579,10 +3579,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     {
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
             if (Timer->HasFlags(tfRecording)) {
-                if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
-                    const cDevice *RecDevice = RecordControl->Device();
+                if (cRecordControl *RecordControl {cRecordControls::GetRecordControl(Timer)}) {
+                    const cDevice *RecDevice {RecordControl->Device()};
                     // Before setting the RecDevices array element, add bounds check
                     if (RecDevice && RecDevice->DeviceNumber() < NumDevices) {
                         RecDevices[RecDevice->DeviceNumber()] = true;
@@ -3600,14 +3600,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             continue;
 
-        const cDevice *device = cDevice::GetDevice(i);
+        const cDevice *device {cDevice::GetDevice(i)};
         if (!device || !device->NumProvidedSystems())
             continue;
 
         ++ActualNumDevices;
         StrDevice = "";  // Reset string
 
-        const cChannel *channel = device->GetCurrentlyTunedTransponder();
+        const cChannel *channel {device->GetCurrentlyTunedTransponder()};
         if (channel && channel->Number() > 0)
             ChannelName = channel->Name();
         else
@@ -3696,7 +3696,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
     {
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-        for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+        for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
             if (Timer->HasFlags(tfActive) && !Timer->HasFlags(tfRecording)) {
                 if (Timer->Remote()) {
                     if (Config.MainMenuWidgetActiveTimerShowRemoteActive) {
@@ -3768,7 +3768,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     }  //? Fallback? // else StrTimer.Append("L: ");
                 }
 
-                const cChannel *Channel = (TimerRec[i])->Channel();
+                const cChannel *Channel {(TimerRec[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -3809,7 +3809,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     }  // StrTimer.Append("L: ");
                 }
 
-                const cChannel *Channel = (TimerActive[i])->Channel();
+                const cChannel *Channel {(TimerActive[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -3844,7 +3844,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     Width -= m_FontSmlHeight - m_MarginItem;
                 }  // StrTimer = cString::sprintf("R: ");
 
-                const cChannel *Channel = (TimerRemoteRec[i])->Channel();
+                const cChannel *Channel {(TimerRemoteRec[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -3881,7 +3881,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                     Width -= m_FontSmlHeight - m_MarginItem;
                 }  // StrTimer = cString::sprintf("R: ");
 
-                const cChannel *Channel = (TimerRemoteActive[i])->Channel();
+                const cChannel *Channel {(TimerRemoteActive[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
@@ -3933,7 +3933,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     div_t TimeHM {0, 0};
     {
         LOCK_RECORDINGS_READ;
-        for (const cRecording *Rec = Recordings->First(); Rec; Rec = Recordings->Next(Rec)) {
+        for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecStart = Rec->Start();
             TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);
             Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
@@ -4128,10 +4128,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ContentTop += 6;
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
-    const int updates = (isempty(*Content) ? -1 : atoi(*Content));
+    const int updates {(isempty(*Content) ? -1 : atoi(*Content))};
 
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
-    const int SecurityUpdates = (isempty(*Content) ? -1 : atoi(*Content));
+    const int SecurityUpdates {(isempty(*Content) ? -1 : atoi(*Content))};
 
     if (updates == -1 || SecurityUpdates == -1) {
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
@@ -4457,7 +4457,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
     int index {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
+    for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
         Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);

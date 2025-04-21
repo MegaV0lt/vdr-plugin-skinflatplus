@@ -90,7 +90,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
         return nullptr;
     } */
 
-    if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, DrawPort)) {
+    if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
         if (Timer.Elapsed() > 0)
             dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
@@ -104,7 +104,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     const int height {std::min(DrawPort.Size().Height(), osd->MaxPixmapSize().Height())};
     cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
-    if (cPixmap *pixmap = osd->CreatePixmap(Layer, ViewPort, NewDrawPort)) {
+    if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, NewDrawPort)}) {
         isyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
         return pixmap;
     }
@@ -114,7 +114,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 }
 
 cPlugin *GetScraperPlugin() {
-    static cPlugin *pScraper = cPluginManager::GetPlugin("tvscraper");
+    static cPlugin *pScraper {cPluginManager::GetPlugin("tvscraper")};
     if (!pScraper)  // If it doesn't exit, try scraper2vdr
         pScraper = cPluginManager::GetPlugin("scraper2vdr");
     return pScraper;
@@ -123,7 +123,7 @@ cPlugin *GetScraperPlugin() {
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo, std::vector<cString> &ActorsPath,  // NOLINT
                      std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,        // NOLINT
                      const cRecording *Recording) {
-    static cPlugin *pScraper = GetScraperPlugin();
+    static cPlugin *pScraper {GetScraperPlugin()};
     if (pScraper) {
         ScraperGetEventType call;
         if (Event)
@@ -162,7 +162,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     MediaPath = series.banners[0].path.c_str();
                 }
                 if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const int ActorsSize = series.actors.size();
+                    const int ActorsSize = series.actors.size();  // Narrowing conversatio
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
@@ -182,7 +182,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
             if (pScraper->Service("GetMovie", &movie)) {
                 MediaPath = movie.poster.path.c_str();
                 if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const int ActorsSize = movie.actors.size();
+                    const int ActorsSize = movie.actors.size();  // Narrowing conversation
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
@@ -202,7 +202,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 
 // Get MediaPath, MediaSize and MediaType
 int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event, const cRecording *Recording) {  // NOLINT
-    static cPlugin *pScraper = GetScraperPlugin();
+    static cPlugin *pScraper {GetScraperPlugin()};
     if (pScraper) {
         ScraperGetEventType call;
         if (Event)
@@ -343,7 +343,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
 #endif
     // Find radio and H.264/H.265 streams.
     //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
-    if (const auto *Components = Recording->Info()->Components()) {
+    if (const auto *Components {Recording->Info()->Components()}) {
         for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {
             switch (Components->Component(i)->stream) {
                 case sc_video_MPEG2: return "sd";
@@ -381,7 +381,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
     if (FrameSeen >= SeenThreshold) return SeenIconNames[10];  // 10 = 100%
 
-    const int idx = std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10);  // 0..10 rounded
+    const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0..10 rounded
     return SeenIconNames[idx];
 }
 
@@ -410,11 +410,11 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
         return;
     }
 
-    static constexpr int POSTER_ASPECT_THRESHOLD = 1;              // Smaller than 1 = Poster
-    static constexpr int BANNER_ASPECT_THRESHOLD = 4;              // Smaller than 4 = Portrait, bigger than 4 = Banner
-    static constexpr double POSTER_HEIGHT_RATIO = 0.7;             // Max 70% of pixmap height
-    static constexpr double PORTRAIT_WIDTH_RATIO = 1.0 / 3.0;      // Max 1/3 of pixmap width
-    static constexpr double BANNER_TARGET_RATIO = 758.0 / 1920.0;  // To get 758 width @ 1920
+    static constexpr int POSTER_ASPECT_THRESHOLD {1};              // Smaller than 1 = Poster
+    static constexpr int BANNER_ASPECT_THRESHOLD {4};              // Smaller than 4 = Portrait, bigger than 4 = Banner
+    static constexpr double POSTER_HEIGHT_RATIO {0.7};             // Max 70% of pixmap height
+    static constexpr double PORTRAIT_WIDTH_RATIO {1.0 / 3.0};      // Max 1/3 of pixmap width
+    static constexpr double BANNER_TARGET_RATIO {758.0 / 1920.0};  // To get 758 width @ 1920
 
     //* Set to default size
     const uint Aspect = MediaSize.Width() / MediaSize.Height();
@@ -444,7 +444,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
                       bool NewLine) {
     cString AudioType {""};
     for (int i {0}; i < Components->NumComponents(); ++i) {
-        const tComponent *p = Components->Component(i);
+        const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
             if (NewLine) Text.Append("\n");
@@ -556,7 +556,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 }
 
 int GetEpgsearchConflicts() {
-    cPlugin *pEpgSearch = cPluginManager::GetPlugin("epgsearch");
+    cPlugin *pEpgSearch {cPluginManager::GetPlugin("epgsearch")};
     if (pEpgSearch) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
@@ -572,7 +572,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     int EditedFrame {0};
     int p {0}, PrevPos {-1};
     bool InEdit {false};
-    for (const cMark *mi = marks->First(); mi; mi = marks->Next(mi)) {
+    for (const cMark *mi {marks->First()}; mi; mi = marks->Next(mi)) {
         p = mi->Position();
         if (InEdit) {
             EditedFrame += p - PrevPos;
@@ -659,7 +659,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         bool CutIn {true};
         int32_t CutInFrame {0}, position {0};
         uint64_t CutInOffset {0};
-        for (cMark *Mark = Marks.First(); Mark; Mark = Marks.Next(Mark)) {
+        for (cMark *Mark {Marks.First()}; Mark; Mark = Marks.Next(Mark)) {
             position = Mark->Position();
             index->Get(position, &FileNumber, &FileOffset);
             if (CutIn) {
@@ -707,7 +707,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
 
     // Add video format information (Format, Resolution, Framerate, …)
 #if APIVERSNUM >= 20605
-    const cRecordingInfo *RecInfo = Recording->Info();  // From skin ElchiHD
+    const cRecordingInfo *RecInfo {Recording->Info()};  // From skin ElchiHD
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
                                      RecInfo->FrameWidth(), RecInfo->FrameHeight()));
@@ -822,7 +822,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     //* Detect 'HairSpace'
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
-    const char *FillChar = (Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A";
+    const char *FillChar {(Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A"};
 
     const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
@@ -839,7 +839,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
-        const int FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
+        const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
 
         std::string FillChars {""};
         FillChars.reserve(FillCharBlock);

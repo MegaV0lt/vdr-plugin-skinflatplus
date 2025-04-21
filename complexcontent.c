@@ -99,7 +99,7 @@ bool cComplexContent::Scrollable(int height) {
 
     const int total {ScrollTotal()};
     // const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
-    const int shown = (height + m_ScrollSize - 1) / m_ScrollSize;  // Avoid floating-point and use integer division
+    const int shown {(height + m_ScrollSize - 1) / m_ScrollSize};  // Avoid floating-point and use integer division
     return total > shown;
 }
 
@@ -126,7 +126,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     }
 
     // const int FloatLines = ceil(image->Height() * 1.0 / m_ScrollSize);  // Narrowing conversion
-    const int FloatLines = (image->Height() + m_ScrollSize - 1) / m_ScrollSize;  // Use integer division
+    const int FloatLines {(image->Height() + m_ScrollSize - 1) / m_ScrollSize};  // Use integer division
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
     WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!

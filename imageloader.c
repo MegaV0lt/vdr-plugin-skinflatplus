@@ -113,7 +113,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 
     if (img) return img;
 
-    bool success = LoadImage(*File);
+    bool success {LoadImage(*File)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   load file from disk: %d ms", Timer.Elapsed());
@@ -184,7 +184,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     if (img) return img;  // Image found in imagecache
 
-    const bool success = LoadImage(*File);
+    const bool success {LoadImage(*File)};
     if (!success) {
         isyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return nullptr;

@@ -225,7 +225,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
     int left {m_ChannelWidth - m_MarginItem2};
-    const int ImageHeight = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
+    const int ImageHeight {std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem)};
 
     cImage *img {nullptr};
     if (Channel) {
@@ -316,8 +316,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (uint i {0}; i < 2; i++) {
-        const bool IsPresent = i ? false : true;
-        const cEvent *Event = IsPresent ? Present : Following;
+        const bool IsPresent {(i) ? false : true};
+        const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
             StartTime = *Event->GetTimeString();  // Start time (left side)
             StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (right side)
@@ -510,7 +510,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #endif
     if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
-    static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
+    static cPlugin *pDVBApi {cPluginManager::GetPlugin("dvbapi")};
     if (!pDVBApi) return;
 
     sDVBAPIEcmInfo ecmInfo {
@@ -549,7 +549,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
         TopOffset};  // One margin for progress bar to bottom
 
-    cString DvbapiInfoText = "DVBAPI: ";
+    cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont.get());
 
@@ -621,7 +621,7 @@ void cFlatDisplayChannel::PreLoadImages() {
 
     int index {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
+    for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);

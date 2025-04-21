@@ -256,7 +256,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
         // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex = (DiskFreePercent * 31) / 100;
+        const int IconIndex {(DiskFreePercent * 31) / 100};
         IconName = cString::sprintf("chart%db", IconIndex);  // chart0b - chart31b
 #ifdef DEBUGFUNCSCALL
         dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
@@ -301,7 +301,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         }
 
         // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex = (DiskUsagePercent * 31) / 100;
+        const int IconIndex {(DiskUsagePercent * 31) / 100};
         IconName = cString::sprintf("chart%d", IconIndex + 1);  // chart1 - chart32
     }
 
@@ -430,7 +430,7 @@ void cFlatBaseRender::TopBarUpdate() {
             // The result is then stored in the NumRec variable.
             auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
                 LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording))
                         ++NumRec;
                 }
@@ -1018,7 +1018,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
     // Eliminate the division operation in each iteration and potentially reduce the computational cost, especially for
     // large collections of marks.
-    const double PosScaleFactor = static_cast<double>(m_ProgressBarWidth) / Total;
+    const double PosScaleFactor {static_cast<double>(m_ProgressBarWidth) / Total};
     const int PosCurrent {static_cast<int>(Current * PosScaleFactor)};  // Not needed to calculate for every mark
     const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     if (!Marks || !Marks->First()) {
@@ -1033,7 +1033,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
         int PosMark {0}, PosMarkLast {0};
         bool Start {true};
-        for (const cMark *m = Marks->First(); m; m = Marks->Next(m)) {
+        for (const cMark *m {Marks->First()}; m; m = Marks->Next(m)) {
             PosMark = static_cast<int>(m->Position() * PosScaleFactor);
             ProgressBarDrawMark(PosMark, PosMarkLast, PosCurrent, Start, m->Position() == Current);
             PosMarkLast = PosMark;
@@ -1226,7 +1226,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         switch (Type) {
         default:
         case 0: {
-            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
+            const int LineWidth {(m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6};
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1236,7 +1236,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 1: {
             const int DotHeight {m_ScrollBarWidth / 2};
-            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
+            const int LineWidth {(m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6};
             Pixmap->DrawRectangle(cRect(Left, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1254,7 +1254,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         }
         case 2: {
             const int Middle {Left + m_ScrollBarWidth / 2};
-            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
+            const int LineWidth {(m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6};
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
             // Bar
             Pixmap->DrawRectangle(cRect(Left, ScrollTop, m_ScrollBarWidth, ScrollHeight), Config.decorScrollBarBarFg);
@@ -1263,7 +1263,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 3: {
             const int DotHeight {m_ScrollBarWidth / 2};
             const int Middle {Left + DotHeight};
-            const int LineWidth = (m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6;
+            const int LineWidth {(m_ScrollBarWidth <= 10) ? 2 : (m_ScrollBarWidth <= 20) ? 4 : 6};
             Pixmap->DrawRectangle(cRect(Middle - LineWidth / 2, Top, LineWidth, Height), Config.decorScrollBarFg);
 
             // Bar
@@ -1542,7 +1542,7 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
     const int step {(Height < 0) ? -1 : 1};
     // const int offset {(Height < 0) ? 0 : 1};
     const double AlphaStep {1.0 / std::abs(Height)};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {start}, j {0}; (Height < 0) ? i >= end : i < end; i += step, ++j) {
         col = SetAlpha(ColorBg, AlphaStep * j);
@@ -1558,7 +1558,7 @@ void cFlatBaseRender::DecorDrawGlowRectVer(cPixmap *pixmap, int Left, int Top, i
     const int end {(Width < 0) ? 0 : absWidth};
     const int step {(Width < 0) ? -1 : 1};
     const double AlphaStep {1.0 / absWidth};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {start}, j {0}; (Width < 0) ? i >= end : i < end; i += step, ++j) {
         col = SetAlpha(ColorBg, AlphaStep * j);
@@ -1581,7 +1581,7 @@ void cFlatBaseRender::DecorDrawGlowRectTL(cPixmap *pixmap, int Left, int Top, in
     const int end {absWidth};
     const int step {1};
     const double AlphaStep {1.0 / absWidth};  // Normalized step (0.0-1.0)
-    tColor col {};
+    tColor col {0};
 
     for (int i {start}, j {0}; i < end; i += step, ++j) {
         col = SetAlpha(ColorBg, AlphaStep * j);
@@ -1593,7 +1593,7 @@ void cFlatBaseRender::DecorDrawGlowRectTR(cPixmap *pixmap, int Left, int Top, in
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1605,7 +1605,7 @@ void cFlatBaseRender::DecorDrawGlowRectBL(cPixmap *pixmap, int Left, int Top, in
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1617,7 +1617,7 @@ void cFlatBaseRender::DecorDrawGlowRectBR(cPixmap *pixmap, int Left, int Top, in
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1630,7 +1630,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTL(cPixmap *pixmap, int Left, int Top,
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1643,7 +1643,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseTR(cPixmap *pixmap, int Left, int Top,
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1656,7 +1656,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBL(cPixmap *pixmap, int Left, int Top,
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1669,7 +1669,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     // if (!pixmap) return;  // Checked in DecorBorderDraw()
 
     const double AlphaStep {1.0 / Width};  // Normalized step (0.0-1.0)
-    tColor col {};  // Init outside of loop
+    tColor col {0};  // Init outside of loop
 
     for (int i {0}, j = Width; i < Width; ++i, --j) {
         col = SetAlpha(ColorBg, AlphaStep * i);
@@ -1713,7 +1713,7 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString del
     file.close();
 
     if (!isempty(*delimiter)) {
-        const std::size_t found = data.find(*delimiter);
+        const std::size_t found {data.find(*delimiter)};
         if (found != std::string::npos) {
             return data.substr(0, found).c_str();
         }
