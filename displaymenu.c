@@ -4263,7 +4263,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     int left {m_MarginItem};
     cString Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
     cString DayName {""}, PrecString(""), StrWeekDayName {""}, WeatherIcon {""};
-    time_t t {time(0)};
+    const time_t t {time(0)};
     time_t t2 {t};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
