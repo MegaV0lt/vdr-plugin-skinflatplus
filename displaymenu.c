@@ -2007,10 +2007,10 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
 void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
                                     int &ContentTop, bool IsEvent) {
     const int kTitleLeftMargin {m_MarginItem * 10};  // 50 Pixel
-    const tColor ColorMenuBg {IsEvent ? Theme.Color(clrMenuEventBg) : Theme.Color(clrMenuRecBg)};
-    const tColor ColorMenuFontTitle {IsEvent ? Theme.Color(clrMenuEventFontTitle) : Theme.Color(clrMenuRecFontTitle)};
-    const tColor ColorTitleLine {IsEvent ? Theme.Color(clrMenuEventTitleLine) : Theme.Color(clrMenuRecTitleLine)};
-    const tColor ColorMenuFontInfo {IsEvent ? Theme.Color(clrMenuEventFontInfo) : Theme.Color(clrMenuRecFontInfo)};
+    const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
+    const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
+    const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
+    const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
     ContentTop = ComplexContent.BottomContent() + m_FontHeight;
     ComplexContent.AddText(Title, false, cRect(kTitleLeftMargin, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
                            m_Font);
@@ -2501,10 +2501,10 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;   // Limit to ShowMaxActors (-1 = Show all actors)
 
-    const tColor ColorMenuBg {IsEvent ? Theme.Color(clrMenuEventBg) : Theme.Color(clrMenuRecBg)};
-    const tColor ColorMenuFontTitle {IsEvent ? Theme.Color(clrMenuEventFontTitle) : Theme.Color(clrMenuRecFontTitle)};
-    const tColor ColorTitleLine {IsEvent ? Theme.Color(clrMenuEventTitleLine) : Theme.Color(clrMenuRecTitleLine)};
-    const tColor ColorMenuFontInfo {IsEvent ? Theme.Color(clrMenuEventFontInfo) : Theme.Color(clrMenuRecFontInfo)};
+    const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
+    const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
+    const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
+    const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
     int ContentTop {ComplexContent.BottomContent() + m_FontHeight};
     ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0), ColorMenuFontTitle,
                            ColorMenuBg, m_Font);
