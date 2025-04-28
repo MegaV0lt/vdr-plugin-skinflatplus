@@ -187,4 +187,5 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
             ComplexContent.SetScrollSize(m_FontHeight);
         }
     }
+    int AddWidgetHeader(const char *Icon, const char *Title, int ContentTop, int wWidth);
 };

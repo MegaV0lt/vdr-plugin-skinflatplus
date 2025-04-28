@@ -3555,20 +3555,34 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     DecorBorderDraw(ib);
 }
 
+/**
+ * Add a header line to the main menu widget content, with the given icon and title.
+ * @param Icon The name of the icon to use, or nullptr for no icon.
+ * @param Title The title text to display.
+ * @param ContentTop The current top position of the content.
+ * @param wWidth The width of the content widget.
+ * @return The new top position of the content.
+ */
+int cFlatDisplayMenu::AddWidgetHeader(const char *Icon, const char *Title, int ContentTop, int wWidth) {
+    cImage *img {ImgLoader.LoadIcon(Icon, m_FontHeight, m_FontHeight - m_MarginItem2)};
+    if (img)
+        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
+
+    ContentWidget.AddText(Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
+                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
+    ContentTop += m_FontHeight;
+    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
+    ContentTop += 6;
+
+    return ContentTop;
+}
+
 int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop) {
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/dvb_devices", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("DVB Devices"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/dvb_devices", tr("DVB Devices"), ContentTop, wWidth);
 
     // Check device which currently displays live tv
     int DeviceLiveTV {-1};
@@ -3683,15 +3697,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/active_timers", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("Timer"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/active_timers", tr("Timer"), ContentTop, wWidth);
 
     // Look for timers
     cVector<const cTimer *> TimerRec;
@@ -3752,6 +3758,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     } else {
         int count {-1}, RemoteCount {-1};
         cString StrTimer {""};
+        cImage *img {nullptr};
         // First recording timer
         if (Config.MainMenuWidgetActiveTimerShowRecording) {
             const int TimerRecSize {TimerRec.Size()};
@@ -3922,15 +3929,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/last_recordings", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("Last Recordings"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/last_recordings", tr("Last Recordings"), ContentTop, wWidth);
 
     // Get all Recordings including start time and build string for displaying
     std::vector<std::pair<time_t, cString>> Recs;
@@ -3974,15 +3973,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/timer_conflicts", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("Timer Conflicts"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/timer_conflicts", tr("Timer Conflicts"), ContentTop, wWidth);
 
     const int NumConflicts {GetEpgsearchConflicts()};  // Get conflicts from plugin Epgsearch
     if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty)
@@ -4008,15 +3999,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/system_information", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("System Information"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/system_information", tr("System Information"), ContentTop, wWidth);
 
     const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
@@ -4124,15 +4107,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/system_updates", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("System Updates"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
     const int updates {(isempty(*Content) ? -1 : atoi(*Content))};
@@ -4165,15 +4140,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
-    cImage *img {ImgLoader.LoadIcon("widgets/temperatures", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(tr("Temperatures"), false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
 
     const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
@@ -4245,15 +4212,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
     if (isempty(*Title)) Title = tr("no title available");
 
-    cImage *img {ImgLoader.LoadIcon("widgets/command_output", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
-    ContentWidget.AddText(*Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 
     std::string Output {""};
     Output.reserve(32);
@@ -4297,16 +4256,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
     const int FontTempSmlHeight {m_FontTempSml->Height()};
 
-    cImage *img {ImgLoader.LoadIcon("widgets/weather", m_FontHeight, m_FontHeight - m_MarginItem2)};
-    if (img)
-        ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
-    ContentWidget.AddText(*Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
-                          Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
-    ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+
+    ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);
 
     int left {m_MarginItem};
     cString Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
@@ -4315,6 +4267,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     time_t t2 {t};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
+    cImage *img {nullptr};
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
         // Read icon
         Icon = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index));
