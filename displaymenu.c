@@ -1005,7 +1005,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         name = WeekDayName(Timer->Day());
     } else {
         struct tm tm_r;
-        time_t Day {Timer->Day()};
+        const time_t Day {Timer->Day()};
         localtime_r(&Day, &tm_r);
         char Buffer[16];
         strftime(Buffer, sizeof(Buffer), "%Y%m%d", &tm_r);
@@ -1302,12 +1302,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     if (WithDate && Event && Selectable) {
         struct tm tm_r;
-        time_t Day {Event->StartTime()};
+        const time_t Day {Event->StartTime()};
         localtime_r(&Day, &tm_r);
         char buf[8];
         strftime(buf, sizeof(buf), "%2d", &tm_r);
 
-        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(Event->StartTime()), buf);
+        const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(Day), buf);
         if (MenuEventViewShort && Channel) {  // flatPlus short, flatPlus short + EPG
             w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
             MenuPixmap->DrawText(cPoint(LeftSecond, Top + m_FontHeight), *DateString, ColorFg, ColorBg, m_FontSml, w);
