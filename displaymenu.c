@@ -3374,6 +3374,13 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
     }
 }
 
+/**
+ * Returns the start time of the newest or oldest recording in the folder.
+ * The folder is determined by the Level parameter.
+ * If Config.MenuItemRecordingShowFolderDate is 0, the start time of the given Recording is returned.
+ * If Config.MenuItemRecordingShowFolderDate is 1, the newest recording is returned.
+ * If Config.MenuItemRecordingShowFolderDate is 2, the oldest recording is returned.
+ */
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const {
     time_t RecStart {Recording->Start()};
 
