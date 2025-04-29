@@ -12,6 +12,7 @@
 #include <array>
 #include <cstdlib>
 #include <cmath>
+// #include <memory>
 
 ImageScaler::ImageScaler() :
     m_memory(nullptr),
@@ -30,12 +31,7 @@ ImageScaler::ImageScaler() :
     m_dst_y(0) {
 }
 
-ImageScaler::~ImageScaler() {
-    if (m_memory) {
-        free(m_memory);
-        m_memory = nullptr;
-    }
-}
+ImageScaler::~ImageScaler() = default;  // No need for manual memory management
 
 // sin(x)/(x)
 static float sincf(float x) {
@@ -121,25 +117,17 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
     m_src_width  = src_width;
     m_src_height = src_height;
 
-    if (m_memory) {
-        // Free memory only if it was allocated before
-        free(m_memory);
-        m_memory = nullptr;
-    }
-
     // Narrowing conversion
     const size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
     const size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
     const size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
-    char *p = reinterpret_cast<char *>(malloc(hor_filters_size + ver_filters_size + buffer_size));
-    if (!p) exit(EXIT_FAILURE);  // Unable to allocate memory!
+    // Use a std::unique_ptr to manage memory
+    m_memory = std::unique_ptr<char[]>(new char[hor_filters_size + ver_filters_size + buffer_size]);
 
-    m_memory = p;
-
-    m_hor_filters = reinterpret_cast<Filter *>(p);
-    m_ver_filters = reinterpret_cast<Filter *>(p + hor_filters_size);
-    m_buffer      = reinterpret_cast<TmpPixel *>(p + hor_filters_size + ver_filters_size);
+    m_hor_filters = reinterpret_cast<Filter *>(m_memory.get());
+    m_ver_filters = reinterpret_cast<Filter *>(m_memory.get() + hor_filters_size);
+    m_buffer      = reinterpret_cast<TmpPixel *>(m_memory.get() + hor_filters_size + ver_filters_size);
 
     CalculateFilters(m_hor_filters, m_dst_width , m_src_width);
     CalculateFilters(m_ver_filters, m_dst_height, m_src_height);
@@ -162,11 +150,11 @@ inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
 
 /**
  * Processes the next source line for vertical image scaling
- * 
+ *
  * Applies vertical filtering coefficients to calculate output pixels
  * using a 4-tap filter. Each output pixel is computed as weighted sum
  * of 4 input pixels using pre-calculated coefficients.
- * 
+ *
  * The filter coefficients (h0-h3) are optimized for minimal ringing
  * while preserving sharpness.
  */

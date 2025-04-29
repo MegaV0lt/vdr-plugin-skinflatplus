@@ -7,6 +7,9 @@
  */
 #pragma once
 
+#include <cstdint>
+#include <memory>
+
 /*!
  * this class scales images consisting of 4 components (RGBA)
  * to an arbitrary size using a 4-tap filter
@@ -15,7 +18,7 @@ class ImageScaler {
  public:
     struct Filter {
         unsigned  m_offset;
-        short     m_coeff[4];
+        int16_t   m_coeff[4];
     };
 
     ImageScaler();
@@ -84,7 +87,8 @@ class ImageScaler {
     unsigned PackPixel(const TmpPixel &pixel);
 
     TmpPixel   m_hbuf[4];      //! Ring buffer for 4 input pixels
-    char      *m_memory;       //! Buffer container
+    // char      *m_memory;
+    std::unique_ptr<char[]> m_memory;  //! Buffer container - use std::unique_ptr to manage memory
     Filter    *m_hor_filters;  //! Buffer for horizontal filters (one for each output image column)
     Filter    *m_ver_filters;  //! Buffer for vertical   filters (one for each output image row)
     TmpPixel  *m_buffer;       //! Buffer contains 4 horizontally filtered input lines, multiplexed
