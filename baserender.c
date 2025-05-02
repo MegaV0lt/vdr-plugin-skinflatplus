@@ -477,10 +477,11 @@ void cFlatBaseRender::TopBarUpdate() {
         MiddleWidth += ExtraMaxWidth;
         Right -= ExtraMaxWidth + m_MarginItem;
 
+        const int MiddleX {TopBarWidth / 2 - MiddleWidth / 2};
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
         const int TitleRight {TitleLeft + TitleWidth};
-        if (TitleRight < (TopBarWidth / 2 - MiddleWidth / 2))
-            Right = TopBarWidth / 2 - MiddleWidth / 2;
+        if (TitleRight < MiddleX)
+            Right = MiddleX;
         else if (TitleRight < Right)
             Right = TitleRight + m_MarginItem;
 
@@ -1020,7 +1021,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     // large collections of marks.
     const double PosScaleFactor {static_cast<double>(m_ProgressBarWidth) / Total};
     const int PosCurrent {static_cast<int>(Current * PosScaleFactor)};  // Not needed to calculate for every mark
-    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  // 20% of progressbar height with an minimum of 4 pixel
     if (!Marks || !Marks->First()) {
         // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
         m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;

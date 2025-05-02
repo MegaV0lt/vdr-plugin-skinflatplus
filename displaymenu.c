@@ -2248,11 +2248,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         m_cWidth += m_WidthScrollBar;  // For second run readd scrollbar width
     } while (true);  // Loop will break internally
 
-    if (Config.MenuContentFullSize || Scrollable)
-        ComplexContent.CreatePixmaps(true);
-    else
-        ComplexContent.CreatePixmaps(false);
-
+    ComplexContent.CreatePixmaps(Config.MenuContentFullSize || Scrollable);
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
@@ -2827,11 +2823,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         m_cWidth += m_WidthScrollBar;  // For second run readd scrollbar width
     } while (true);  // Loop will break internally
 
-    if (Config.MenuContentFullSize || Scrollable)
-        ComplexContent.CreatePixmaps(true);
-    else
-        ComplexContent.CreatePixmaps(false);
-
+    ComplexContent.CreatePixmaps(Config.MenuContentFullSize || Scrollable);
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
@@ -2983,12 +2975,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     ComplexContent.SetPosition(cRect(Left, Top, Width, Height));
     ComplexContent.SetBGColor(Theme.Color(clrMenuTextBg));
     ComplexContent.SetScrollingActive(true);
-
-    if (Config.MenuContentFullSize || Scrollable)
-        ComplexContent.CreatePixmaps(true);
-    else
-        ComplexContent.CreatePixmaps(false);
-
+    ComplexContent.CreatePixmaps(Config.MenuContentFullSize || Scrollable);
     ComplexContent.Draw();
 
     if (Scrollable) {
