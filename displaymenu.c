@@ -1569,14 +1569,12 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
 void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
     constexpr float ICON_FORMAT_HEIGHT_RATIO {1.0 / 3.0};
     const cString IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
-    if (!isempty(*IconName)) {
-        const int ImageHeight = m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
-        const cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight)};
-        if (img) {
-            const int ImageTop {Top + m_FontHeight - m_FontAscender};
-            const int ImageLeft {Left + m_FontHeight - img->Width()};
-            MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
-        }
+    const int ImageHeight = m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
+    const cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight)};
+    if (img) {
+        const int ImageTop {Top + m_FontHeight - m_FontAscender};
+        const int ImageLeft {Left + m_FontHeight - img->Width()};
+        MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 }
 
@@ -1748,7 +1746,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             IconName = "folder";
             DrawRecordingIcon(IconName, Left, Top, Current);
 
-            const int DigitsMaxWidth {m_Font->Width("9999") + m_MarginItem};  // Use same width for recs and new recs
+            const int DigitsWidth {m_Font->Width("9999")};
+            const int DigitsMaxWidth {DigitsWidth + m_MarginItem};  // Use same width for recs and new recs
             Buffer = cString::sprintf("%d", Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight,
                                  taLeft);
@@ -1763,7 +1762,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                  DigitsMaxWidth, m_FontHeight);
 
             Left += DigitsMaxWidth;
-            int LeftWidth {Config.decorBorderMenuItemSize + m_FontHeight + (m_Font->Width("9999") * 2) +
+            int LeftWidth {Config.decorBorderMenuItemSize + m_FontHeight + (DigitsWidth * 2) +
                            ImgRecNewWidth + m_MarginItem * 5};  // For folder with recordings
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
@@ -2477,12 +2476,12 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
  * The method takes the content object, the paths to the actors' images,
  * the actors' names, the actors' roles, and the number of actors as parameters.
  *
- * \param ComplexContent Complex content to add actors to.
- * \param ActorsPath Path of actor images.
- * \param ActorsName Vector of actor names.
- * \param ActorsRole Vector of actor roles.
- * \param NumActors Number of actors to add.
- * \param IsEvent Is this for an event or a recording?
+ * @param ComplexContent Complex content to add actors to.
+ * @param ActorsPath Path of actor images.
+ * @param ActorsName Vector of actor names.
+ * @param ActorsRole Vector of actor roles.
+ * @param NumActors Number of actors to add.
+ * @param IsEvent Is this for an event or a recording?
  */
 void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
                                  std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,
@@ -2569,7 +2568,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
 }
 
 /**
- * \brief Add the number of TS errors to the recording info display
+ * @brief Add the number of TS errors to the recording info display
  *
  * Add the number of TS errors to the recording info display.
  * The method takes the recording information object and the text to add the errors to as parameters.
