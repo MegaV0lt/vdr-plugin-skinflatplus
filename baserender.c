@@ -1075,7 +1075,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         for (int i {0}; i < ErrorsSize; ++i) {
             Pos = static_cast<int>(Errors->At(i) * PosScaleFactor);  // Position on progressbar in pixel
             if (Pos != LastPos) {                            // Draw mark if pos is not the same as the last one
-                ProgressBarDrawError(Pos, sml, Theme.Color(clrReplayErrorMark), Pos == PosCurrent);
+                ProgressBarDrawError(Pos, sml, Pos == PosCurrent);
                 LastPos = Pos;
             }
         }
@@ -1154,9 +1154,10 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
 }
 
 #if APIVERSNUM >= 30004
-void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor ColorError, bool IsCurrent) {
+void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, bool IsCurrent) {
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks()'
 
+    const tColor ColorError {Theme.Color(clrReplayErrorMark)};
     const int Middle {m_ProgressBarHeight / 2};
     if (IsCurrent) {  //* Draw current position marker in color of error mark
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
