@@ -43,8 +43,8 @@ class cSimpleContent {
         Wrapper.Set(*m_Text, m_Font, m_Position.Width());
         std::string Line;
         Line.reserve(128);
-        const int Lines = Wrapper.Lines();
-        const int FontHeight = m_Font->Height();
+        const int Lines {Wrapper.Lines()};
+        const int FontHeight {m_Font->Height()};
 
         for (int i {0}; i < Lines; ++i) {
             Line = Wrapper.GetLine(i);

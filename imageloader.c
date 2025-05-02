@@ -103,8 +103,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     cTimeMs Timer;  // Start timer
 #endif
 
-    cImage *img {nullptr};
-    img = ImgCache.GetImage(*File, width, height);
+    cImage *img {ImgCache.GetImage(*File, width, height)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   search in cache: %d ms", Timer.Elapsed());
@@ -168,14 +167,13 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     if (width == 0 || height == 0) return nullptr;
 
     const cString File = cFile;
-    cImage *img {nullptr};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::LoadFile() '%s'", *File);
     cTimeMs Timer;  // Start timer
 #endif
 
-    img = ImgCache.GetImage(*File, width, height);
+    cImage *img {ImgCache.GetImage(*File, width, height)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   search in cache: %ld ms", Timer.Elapsed());
