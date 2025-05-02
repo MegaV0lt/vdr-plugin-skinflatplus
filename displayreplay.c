@@ -88,7 +88,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     SetTitle(RecInfo->Title());
 
     // First line for current, total and cutted length, second for end time
-    const int SmallTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
+    const int SmallTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};  // Top for bottom line
 
     // Show if still recording
     int left {m_MarginItem};  // Position for recording symbol/short text/date
@@ -96,8 +96,8 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
         if (img) {
-            const int ImageTop {SmallTop};
-            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            // const int ImageTop {SmallTop};
+            IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
             left += img->Width() + m_MarginItem;
         }
     }
@@ -161,8 +161,8 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.LoadIcon(*RecErrIcon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            const int ImageTop {SmallTop};
-            IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
+            // const int ImageTop {SmallTop};
+            IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
         }
     }  // PlaybackShowRecordingErrors
 #endif
@@ -666,7 +666,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
     if (m_ModeOnly || !IconsPixmap || m_ScreenWidth <= 0 || m_ScreenHeight <= 0) return;
 
     // First line for current, total and cutted length, second line for end time
-    const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};
+    const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};  // Top of bottom line
 
     int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
     cImage *img {nullptr};
