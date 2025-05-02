@@ -293,7 +293,7 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
         return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    static const double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
+    static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
     static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (uint i {0}; i < ScreenAspectNums; ++i) {
@@ -319,7 +319,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
                                      "528x576",   "480x576",   "352x576"};
-    static const int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
+    static constexpr int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
     const uint ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
     for (uint i {0}; i < ResNums; ++i) {
         if (ScreenWidth == ResWidths[i])

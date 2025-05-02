@@ -318,4 +318,4 @@ std::string XmlSubstring(const std::string &source, const char* StrStart, const 
 
 // At class/file level
 static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
-static constexpr const char* PUNCTUATION_CHARS = ".,?!;";  // Punctuation characters for justifying
+static const const char* PUNCTUATION_CHARS = ".,?!;";  // Punctuation characters for justifying

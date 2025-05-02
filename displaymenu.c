@@ -1567,7 +1567,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
  * @param Top The y-coordinate where the icon should be drawn.
  */
 void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
-    const float ICON_FORMAT_HEIGHT_RATIO {1.0 / 3.0};
+    constexpr float ICON_FORMAT_HEIGHT_RATIO {1.0 / 3.0};
     const cString IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
     if (!isempty(*IconName)) {
         const int ImageHeight = m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
@@ -1679,7 +1679,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_MenuItemLastHeight = y + m_ItemRecordingHeight;
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
-    const float ICON_CUT_HEIGHT_RATIO {2.0 / 3.0};
+    constexpr float ICON_CUT_HEIGHT_RATIO {2.0 / 3.0};
     //* Preload for calculation of position
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
