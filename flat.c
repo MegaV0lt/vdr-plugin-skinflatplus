@@ -895,7 +895,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         std::size_t PrevPos = std::string::npos;
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
                pos < PrevPos &&  // Ensure position is decreasing (potential infinite loop)
-               (InsertedFillChar < NeedFillChar)) {
+               (InsertedFillChar < NeedFillChar) &&  // Check if we still need to insert fill characters
+               pos != LineLength - 1) {  // Do not insert at last position of line
             PrevPos = pos;
             if (pos > 0 && !(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert char at %ld", pos);
