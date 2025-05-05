@@ -386,15 +386,15 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
 }
 
 /**
- * Adjusts the size of a media object based on its aspect ratio and the 
- * constraints provided by the content size. This function ensures that 
- * the media's aspect ratio is preserved while fitting within the 
- * specified dimensions. It categorizes media as poster, portrait, or 
+ * Adjusts the size of a media object based on its aspect ratio and the
+ * constraints provided by the content size. This function ensures that
+ * the media's aspect ratio is preserved while fitting within the
+ * specified dimensions. It categorizes media as poster, portrait, or
  * banner based on its aspect ratio and adjusts its size accordingly.
- * 
+ *
  * @param MediaSize A reference to the size of the media to be adjusted.
  * @param ContentSize The size constraints within which the media should fit.
- * 
+ *
  * - Posters are adjusted to a maximum height of 70% of the content height.
  * - Portraits are adjusted to a maximum width of 1/3 of the content width.
  * - Banners are adjusted to maintain a target ratio of 758 width at 1920.
@@ -837,6 +837,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
+    static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
+    static const char* PUNCTUATION_CHARS = ".,?!;";      // Punctuation characters for justifying
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'

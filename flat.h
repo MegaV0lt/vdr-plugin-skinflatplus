@@ -315,7 +315,3 @@ int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);
 void InsertCutLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
-
-// At class/file level
-static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
-static const const char* PUNCTUATION_CHARS = ".,?!;";  // Punctuation characters for justifying
