@@ -1256,13 +1256,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
-            if ((now >= (Event->StartTime() - 2 * 60))) {
-                const int total = Event->EndTime() - Event->StartTime();  // Narrowing conversion
+            const time_t EventStartTime {Event->StartTime()};
+            if ((now >= (EventStartTime - 2 * 60))) {
+                const int total = Event->EndTime() - EventStartTime;  // Narrowing conversion
                 if (total >= 0) {
                     // Calculate progress bar
                     const double duration = Event->Duration();
                     const double progress =
-                        (duration > 0) ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
+                        (duration > 0) ? std::min(100.0, std::max(0.0, (now - EventStartTime) * 100.0 / duration))
                                        : 0.0;
 
                     int PBLeft {Left};
