@@ -694,13 +694,13 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
         if (TildePos) {
             std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
             std::string_view sv2 {TildePos + 1};
-            const std::string first {rtrim(sv1)};   // Trim possible space at end
-            const std::string second {ltrim(sv2)};  // Trim possible space at begin
+            std::string_view first {rtrim(sv1)};   // Trim possible space at end
+            std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.data(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
-            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.c_str(),
+            const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.data(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
             if ((TextWidth > MaxWidth) && Config.ScrollerEnable)

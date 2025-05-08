@@ -456,14 +456,14 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         if (TildePos) {
                             std::string_view sv1 {s, static_cast<size_t>(TildePos - s)};
                             std::string_view sv2 {TildePos + 1};
-                            const std::string first {rtrim(sv1)};   // Trim possible space at end
-                            const std::string second {ltrim(sv2)};  // Trim possible space at begin
+                            std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                            std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
+                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.data(), ColorFg,
                                                  ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
-                            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.c_str(),
+                            const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.data(),
                                                  ColorExtraTextFg, ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize - l);
                         } else {  // ~ not found
@@ -1040,13 +1040,13 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
-                    const std::string first {rtrim(sv1)};   // Trim possible space at end
-                    const std::string second {ltrim(sv2)};  // Trim possible space at begin
+                    std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                    std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                    MenuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, m_Font,
+                    MenuPixmap->DrawText(cPoint(Left, Top), first.data(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-                    MenuPixmap->DrawText(cPoint(Left + l, Top), second.c_str(), ColorExtraTextFg, ColorBg, m_Font,
+                    const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+                    MenuPixmap->DrawText(cPoint(Left + l, Top), second.data(), ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top), File, ColorFg, ColorBg, m_Font,
@@ -1075,13 +1075,13 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
-                    const std::string first {rtrim(sv1)};   // Trim possible space at end
-                    const std::string second {ltrim(sv2)};  // Trim possible space at begin
+                    std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                    std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.c_str(), ColorFg, ColorBg, m_FontSml,
+                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.data(), ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_FontSml->Width(first.c_str()) + m_FontSml->Width('X')};
-                    MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.c_str(), ColorExtraTextFg,
+                    const int l {m_FontSml->Width(first.data()) + m_FontSml->Width('X')};
+                    MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.data(), ColorExtraTextFg,
                                          ColorBg, m_FontSml, m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), File, ColorFg, ColorBg, m_FontSml,
@@ -1470,10 +1470,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 const std::size_t found {sep.find(" -")};
                 if (found >= 10) {
                     // dsyslog("flatPlus: SetItemEvent() Date string found at %ld", found);
-                    const std::string date {sep.substr(found - 10, 10)};
+                    std::string_view date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
-                    const cString DateSpace = cString::sprintf(" %s ", date.c_str());
+                    const cString DateSpace = cString::sprintf(" %s ", date.data());
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {
@@ -3081,7 +3081,7 @@ void cFlatDisplayMenu::ItemBorderClear() {
  * @return the processed menu text
  */
 cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
-    const std::string text {skipspace(*Text)};
+    std::string_view text {skipspace(*Text)};
     bool found {false};
     const std::size_t TextLength {text.length()};
     uint i {0};  // 'i' used also after loop
@@ -3094,13 +3094,13 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
             break;
     }
 
-    return found ? skipspace(text.substr(i).c_str()) : text.c_str();
+    return found ? skipspace(text.substr(i).data()) : text.data();
 }
 
 cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     // Check for standard menu entries
-    std::string s {""};
-    s.reserve(32);  // Space for translated menu entry
+    std::string_view s {""};
+    // s.reserve(32);  // Space for translated menu entry
     for (uint i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(*items[i]);
         if (s == element) {
@@ -3109,8 +3109,8 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     }
 
     // Check for special main menu entries "stop recording", "stop replay"
-    const std::string StopRecording {skipspace(trVDR(" Stop recording "))};
-    const std::string StopReplay {skipspace(trVDR(" Stop replaying"))};
+    std::string_view StopRecording {skipspace(trVDR(" Stop recording "))};
+    std::string_view StopReplay {skipspace(trVDR(" Stop replaying"))};
     if (element.compare(0, StopRecording.size(), StopRecording) == 0)
         return "menuIcons/StopRecording";
     if (element.compare(0, StopReplay.size(), StopReplay) == 0)
@@ -3118,8 +3118,8 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
 
     // Check for plugins
     const char *MainMenuEntry {nullptr};
-    std::string PlugMainEntry {""};
-    PlugMainEntry.reserve(32);  // Space for menu entry
+    std::string_view PlugMainEntry {""};
+    // PlugMainEntry.reserve(32);  // Space for menu entry
     for (uint i {0};; ++i) {
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
@@ -3185,8 +3185,8 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     if (!Recording) return "";
 
     std::string_view RecName {Recording->Name()};
-    std::string RecNamePart {""};
-    RecNamePart.reserve(64);
+    std::string_view RecNamePart {""};
+    // RecNamePart.reserve(64);
 
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
@@ -3203,13 +3203,14 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     }
 
     if (Config.MenuItemRecordingClearPercent && IsFolder && !RecNamePart.empty() && RecNamePart[0] == '%') {
-        RecNamePart.erase(0, 1);
+        RecNamePart = RecNamePart.substr(1);  // Remove leading '%'
+        // RecNamePart.erase(0, 1);
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecNamePart '%s'", RecNamePart.c_str());
+    dsyslog("   RecNamePart '%s'", RecNamePart.data());
 #endif
 
-    return RecNamePart.c_str();
+    return RecNamePart.data();
 }
 
 cString cFlatDisplayMenu::GetRecCounts() {
@@ -3221,8 +3222,8 @@ cString cFlatDisplayMenu::GetRecCounts() {
     uint RecCount {0}, RecNewCount {0};
     m_LastRecFolder = m_RecFolder;
     if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
-        std::string RecFolder2 {""};
-        RecFolder2.reserve(256);
+        std::string_view RecFolder2 {""};
+        // RecFolder2.reserve(256);
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
@@ -3373,9 +3374,9 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
-    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
-    std::string RecFolder2 {""};
-    RecFolder2.reserve(256);
+    std::string_view RecFolder {*GetRecordingName(Recording, Level, true)};
+    std::string_view RecFolder2 {""};
+    // RecFolder2.reserve(256);
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
