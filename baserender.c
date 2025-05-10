@@ -407,8 +407,9 @@ void cFlatBaseRender::TopBarUpdate() {
 
                 if (ImgCon) {
                     Buffer = cString::sprintf("%d", NumConflicts);
-                    Right -= ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
-                    MiddleWidth += ImgCon->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of conflicts
+                    Right -= ImgCon->Width() + BufferWidth + m_MarginItem;
+                    MiddleWidth += ImgCon->Width() + BufferWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecConflictsShow
@@ -446,8 +447,9 @@ void cFlatBaseRender::TopBarUpdate() {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
                 if (ImgRec) {  // Load recording icon
                     Buffer = cString::sprintf("%d", NumRec);
-                    Right -= ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
-                    MiddleWidth += ImgRec->Width() + m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of recordings
+                    Right -= ImgRec->Width() + BufferWidth + m_MarginItem;
+                    MiddleWidth += ImgRec->Width() + BufferWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecordingShow

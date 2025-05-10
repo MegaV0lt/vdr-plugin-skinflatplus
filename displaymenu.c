@@ -621,9 +621,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 // Calculate progress bar
                 const time_t now {time(0)};
                 const double duration = Event->Duration();
-                progress = (duration > 0)
-                               ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
-                               : 0.0;
+                // progress = (duration > 0)
+                //               ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
+                //               : 0.0;
+                const double progress =
+                    (duration > 0) ? std::clamp((now - Event->StartTime()) * 100.0 / duration, 0.0, 100.0) : 0.0;
                 EventTitle = Event->Title();
             }
         }
@@ -1262,9 +1264,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 if (total >= 0) {
                     // Calculate progress bar
                     const double duration = Event->Duration();
+                    // const double progress =
+                    //    (duration > 0) ? std::min(100.0, std::max(0.0, (now - EventStartTime) * 100.0 / duration))
+                    //                   : 0.0;
                     const double progress =
-                        (duration > 0) ? std::min(100.0, std::max(0.0, (now - EventStartTime) * 100.0 / duration))
-                                       : 0.0;
+                        (duration > 0) ? std::clamp((now - EventStartTime) * 100.0 / duration, 0.0, 100.0) : 0.0;
 
                     int PBLeft {Left};
                     int PBTop {y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
@@ -4333,25 +4337,28 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
+            const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};  // Max. width of temperature string
+            const int TempSmlSpaceWidth {m_FontTempSml->Width(" ")};     // Space between temperature and precipitation
             ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
+                                  TempSmlWidth, FontTempSmlHeight, taRight);
             ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  m_FontTempSml->Width("-99,9°C"), FontTempSmlHeight, taRight);
+                                  TempSmlWidth, FontTempSmlHeight, taRight);
 
-            left += m_FontTempSml->Width("-99,9°C ") + m_MarginItem;
+            left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
 
             img = ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
             }
+            const int TempSmlWidth2 {m_FontTempSml->Width("100%")};  // Max. width of precipitation string
             ContentWidget.AddText(*PrecString, false,
                                   cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  m_FontTempSml->Width("100%"), FontTempSmlHeight, taRight);
-            left += m_FontTempSml->Width("100% ") + m_MarginItem;
+                                  TempSmlWidth2, FontTempSmlHeight, taRight);
+            left += TempSmlWidth2 + TempSmlSpaceWidth + m_MarginItem;
 
             ContentWidget.AddText(
                 *Summary, false,

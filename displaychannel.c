@@ -162,7 +162,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         // Ensure shadow size is reasonable
         const int MinShadowSize {3};   // Shadow should have at least 3 pixel
         const int MaxShadowSize {10};  // Shadow should not be too large
-        const int BoundedShadowSize {std::max(MinShadowSize, std::min(ShadowSize, MaxShadowSize))};
+        // const int BoundedShadowSize {std::max(MinShadowSize, std::min(ShadowSize, MaxShadowSize))};
+        const int BoundedShadowSize {std::clamp(ShadowSize, MinShadowSize, MaxShadowSize)};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
 #ifdef DBUGFUNCSCALL
