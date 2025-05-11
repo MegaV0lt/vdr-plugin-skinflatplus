@@ -19,15 +19,16 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     TopBarCreate();
     MessageCreate();
 
+    const int EffectiveOsdWidth {m_OsdWidth - Config.decorBorderReplaySize * 2};
     m_TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
-                m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
-                m_OsdWidth - 40 - Config.decorBorderChannelEPGSize * 2,
-                m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
+                  m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
+                  EffectiveOsdWidth - 40,
+                  m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
     const cRect LabelPixmapViewPort{Config.decorBorderReplaySize,
                                     m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                                    m_OsdWidth - Config.decorBorderReplaySize * 2, m_LabelHeight};
+                                    EffectiveOsdWidth, m_LabelHeight};
     LabelPixmap = CreatePixmap(m_Osd, "LabelPixmap", 1, LabelPixmapViewPort);
     IconsPixmap = CreatePixmap(m_Osd, "IconsPixmap", 2, LabelPixmapViewPort);
 
@@ -38,7 +39,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     ProgressBarCreate(
         cRect(Config.decorBorderReplaySize,
               m_OsdHeight - m_LabelHeight - ProgressBarHeight - Config.decorBorderReplaySize - m_MarginItem,
-              m_OsdWidth - Config.decorBorderReplaySize * 2, ProgressBarHeight),
+              EffectiveOsdWidth, ProgressBarHeight),
         m_MarginItem, 0, Config.decorProgressReplayFg, Config.decorProgressReplayBarFg, Config.decorProgressReplayBg,
         Config.decorProgressReplayType);
 
@@ -46,7 +47,7 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
                                    cRect(Config.decorBorderReplaySize,
                                          m_OsdHeight - m_LabelHeight - ProgressBarHeight * 2 - m_MarginItem3 -
                                              m_FontHeight - Config.decorBorderReplaySize * 2,
-                                         m_OsdWidth - Config.decorBorderReplaySize * 2, m_FontHeight));
+                                         EffectiveOsdWidth, m_FontHeight));
 
     DimmPixmap = CreatePixmap(m_Osd, "DimmPixmap", MAXPIXMAPLAYERS-1, cRect(0, 0, m_OsdWidth, m_OsdHeight));
 
@@ -215,8 +216,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
     int left {0};
     const int FontWidth99 {m_Font->Width("99")};  // Width of '99'
+    const int EffectiveOsdWidth {m_OsdWidth - Config.decorBorderReplaySize * 2};
     if (Setup.ShowReplayMode) {
-        left = (m_OsdWidth - Config.decorBorderReplaySize * 2 - (m_FontHeight * 4 + m_MarginItem3)) / 2;
+        left = (EffectiveOsdWidth - (m_FontHeight * 4 + m_MarginItem3)) / 2;
 
         if (m_ModeOnly)
             PixmapClear(LabelPixmap);
@@ -258,7 +260,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         const sDecorBorder ib {Config.decorBorderReplaySize,
                                m_OsdHeight - m_LabelHeight - m_ProgressBarHeight -
                                    Config.decorBorderReplaySize - m_MarginItem,
-                               m_OsdWidth - Config.decorBorderReplaySize * 2,
+                               EffectiveOsdWidth,
                                m_LabelHeight + m_ProgressBarHeight + m_MarginItem,
                                Config.decorBorderReplaySize,
                                Config.decorBorderReplayType,
@@ -279,7 +281,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         } else {
             const sDecorBorder ib {Config.decorBorderReplaySize,
                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                                   m_OsdWidth - Config.decorBorderReplaySize * 2,
+                                   EffectiveOsdWidth,
                                    m_LabelHeight,
                                    Config.decorBorderReplaySize,
                                    Config.decorBorderReplayType,
@@ -516,8 +518,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                                   Theme.Color(clrReplayBg), m_Font, CuttedWidth, m_FontHeight);
         }
     } else {  // Not cutted
-        int right =
-            m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - TotalWidth;
+        int right {m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - TotalWidth};
         if (Config.TimeSecsScale < 1.0) {
             std::string_view tot {*m_Total};
             const std::size_t found {tot.find_last_of(':')};
@@ -748,6 +749,11 @@ void cFlatDisplayReplay::PreLoadImages() {
     ImgLoader.LoadIcon("pause_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
     ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
+
+    /* const std::vector<std::string> icons = {"rewind", "pause", "play", "forward"};
+    for (const auto &icon : icons) {
+        ImgLoader.LoadIcon(icon, m_FontHeight, m_FontHeight);
+    } */
 
     constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
