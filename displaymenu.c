@@ -1178,9 +1178,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int LeftSecond {Left};
     int Top {y}, w {0};
     int ImageTop {Top};
-    cString Buffer {""};
     cImage *img {nullptr};
     if (Channel) {
+        cString Buffer {""};
         if (Current)
             m_ItemEventLastChannelName = Channel->Name();
 
@@ -1357,6 +1357,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     Left += ImageHeight + m_MarginItem;
     if (Event && Selectable) {
+        cString Buffer {""};
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = nullptr;
             if (Current) img = ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
