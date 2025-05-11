@@ -34,7 +34,7 @@ ImageScaler::ImageScaler() :
 ImageScaler::~ImageScaler() = default;  // No need for manual memory management
 
 // sin(x)/(x)
-static float sincf(float x) {
+inline float sincf(float x) {
     if (fabsf(x) < 0.05f)
         return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
 
@@ -44,6 +44,8 @@ static float sincf(float x) {
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
     const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
+    constexpr float PI {3.14159265359f};
+    constexpr float SCALE_FACTOR {2048.0};
     const int d {2 * dst_size};  // Sample position denominator
     int e {0}, offset {0};       // Init outside of loop
     float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
@@ -58,7 +60,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         // Calculate filter coefficients
         for (uint j {0}; j < 4; ++j) {
-            t = 3.14159265359f * (sub_offset + (1 - j));
+            t = PI * (sub_offset + (1 - j));
             h_arr[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
 
@@ -80,7 +82,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         }
 
         // Coefficients are normalized to sum up to 2048
-        norm = 2048.0f / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
+        norm = SCALE_FACTOR / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
 
         --offset;  // Offset of fist used pixel
 
@@ -138,7 +140,8 @@ static unsigned shift_clamp(int x) {
     // x = (x + 2^21) >> 22;
     // But that's equivalent to this:
     x = (x + 2097152) >> 22;
-    return (x < 0) ? 0 : (x > 255) ? 255 : x;
+    // return (x < 0) ? 0 : (x > 255) ? 255 : x;
+    return std::clamp(x, 0, 255);
 }
 
 inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
@@ -164,7 +167,8 @@ void ImageScaler::NextSourceLine() {
     m_src_y++;
 
     if (m_dst_y > m_dst_height) {
-        esyslog("ImageScaler::NextSourceLine: m_dst_y (%d) > m_dst_height (%d)", m_dst_y, m_dst_height);
+        esyslog("ImageScaler::NextSourceLine: Buffer overrun detected! m_dst_y (%d) > m_dst_height (%d)", m_dst_y,
+                m_dst_height);
         return;  // Protect against buffer overrun
     }
 

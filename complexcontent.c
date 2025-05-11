@@ -251,12 +251,10 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
         // Page up
         NewY = std::min(AktHeight + ScreenHeight, 0);  // Clamp to top boundary
         scrolled = true;
-    } else if (Up && !Page) {
+    } else if (Up && !Page && AktHeight < 0) {
         // Line up
-        if (AktHeight < 0) {
-            NewY = std::min(AktHeight + LineHeight, 0);
-            scrolled = true;
-        }
+        NewY = std::min(AktHeight + LineHeight, 0);
+        scrolled = true;
     } else if (!Up && Page) {
         // Page down
         const int maxScroll = -(TotalHeight - ScreenHeight);
@@ -276,7 +274,8 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
     if (scrolled) {
         Pixmap->SetDrawPortPoint(cPoint(0, NewY));
         PixmapImage->SetDrawPortPoint(cPoint(0, NewY));
+        return true;
     }
 
-    return scrolled;
+    return false;
 }

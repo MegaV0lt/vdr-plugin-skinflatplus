@@ -747,7 +747,7 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    const uint threshold {75};  //? Add config option?
+    constexpr uint threshold {75};  //? Add config option?
     const std::size_t TextLength {strlen(Text)};
     if (TextLength > threshold) {  // Message is longer than threshold and uses almost the full screen
         // Narrowing conversion
