@@ -624,8 +624,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 // progress = (duration > 0)
                 //               ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
                 //               : 0.0;
-                const double progress =
-                    (duration > 0) ? std::clamp((now - Event->StartTime()) * 100.0 / duration, 0.0, 100.0) : 0.0;
+                progress = (duration > 0) ? std::clamp((now - Event->StartTime()) * 100.0 / duration, 0.0, 100.0) : 0.0;
                 EventTitle = Event->Title();
             }
         }

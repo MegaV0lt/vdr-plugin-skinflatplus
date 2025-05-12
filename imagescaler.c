@@ -164,7 +164,7 @@ inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
 void ImageScaler::NextSourceLine() {
     m_dst_x = 0;
     m_src_x = 0;
-    m_src_y++;
+    ++m_src_y;
 
     if (m_dst_y > m_dst_height) {
         esyslog("ImageScaler::NextSourceLine: Buffer overrun detected! m_dst_y (%d) > m_dst_height (%d)", m_dst_y,
@@ -172,14 +172,14 @@ void ImageScaler::NextSourceLine() {
         return;  // Protect against buffer overrun
     }
 
-    int h0 {0}, h1 {0}, h2 {0}, h3 {0};  // Init outside of loop
+    int16_t h0 {0}, h1 {0}, h2 {0}, h3 {0};  // Init outside of loop
     while (m_ver_filters[m_dst_y].m_offset == m_src_y) {
-        /* const int */       h0  = m_ver_filters[m_dst_y].m_coeff[0];
-        /* const int */       h1  = m_ver_filters[m_dst_y].m_coeff[1];
-        /* const int */       h2  = m_ver_filters[m_dst_y].m_coeff[2];
-        /* const int */       h3  = m_ver_filters[m_dst_y].m_coeff[3];
-        const TmpPixel       *src = m_buffer;
-        unsigned             *dst = m_dst_image + m_dst_stride * m_dst_y;
+        h0 = m_ver_filters[m_dst_y].m_coeff[0];
+        h1 = m_ver_filters[m_dst_y].m_coeff[1];
+        h2 = m_ver_filters[m_dst_y].m_coeff[2];
+        h3 = m_ver_filters[m_dst_y].m_coeff[3];
+        const TmpPixel *src {m_buffer};  // Pointer to the buffer containing filtered input lines
+        unsigned *dst {m_dst_image + m_dst_stride * m_dst_y};  // Pointer to the destination image line
 
         for (unsigned i {0}; i < m_dst_width; ++i) {
             const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
@@ -187,6 +187,6 @@ void ImageScaler::NextSourceLine() {
             dst[i] = PackPixel(t);
         }
 
-        m_dst_y++;
+        ++m_dst_y;
     }
 }
