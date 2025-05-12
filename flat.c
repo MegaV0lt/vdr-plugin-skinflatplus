@@ -834,9 +834,13 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
-        const std::string FillChars(FillChar, FillCharBlock);  // Create 'FillChars' block for inserting
-        const std::size_t FillCharsLength {FillChars.length()};
+        std::string FillChars {""};
+        FillChars.reserve(FillCharBlock);
+        for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+            FillChars.append(FillChar);
+        }
 
+        const std::size_t FillCharsLength {FillChars.length()};
         std::size_t LineLength {Line.length()};
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
         int InsertedFillChar {0};
