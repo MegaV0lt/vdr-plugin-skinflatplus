@@ -816,7 +816,6 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {(Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A"};
-
     const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
@@ -835,12 +834,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
-
-        std::string FillChars {""};
-        FillChars.reserve(FillCharBlock);
-        for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
-            FillChars.append(FillChar);
-        }
+        const std::string FillChars(FillChar, FillCharBlock);  // Create 'FillChars' block for inserting
         const std::size_t FillCharsLength {FillChars.length()};
 
         std::size_t LineLength {Line.length()};
@@ -876,7 +870,6 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
                 Line.insert(pos + 1, FillChars);
                 InsertedFillChar += FillCharBlock;
-                // LineLength = Line.length();  // Recalculating the entire length
                 LineLength += FillCharsLength;  // Just add the length we inserted
             }
         }
