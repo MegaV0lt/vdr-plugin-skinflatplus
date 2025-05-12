@@ -60,7 +60,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     // Pixmap for channel number and name
     // TODO: Different position for channel number and name when without background
-    // Top of ChanInfoTopViewPort depending on setting ChannelShowWithName
+    // Top of ChanInfoTopViewPort depending on setting ChannelShowNameWithShadow
     const int HeightTop {m_FontBigHeight +
                         (Config.ChannelShowNameWithShadow ? m_FontBigHeight / 10 + Config.decorBorderChannelSize : 0)};
     height += HeightTop;

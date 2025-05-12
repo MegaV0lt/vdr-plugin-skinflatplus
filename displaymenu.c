@@ -425,21 +425,16 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 if (img) MenuIconsPixmap->DrawImage(cPoint(XOff, y + (m_FontHeight - img->Height()) / 2), *img);
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
+                    const int IconSize {m_FontHeight - m_MarginItem2};
                     const cString IconName = *GetIconName(*MainMenuText(s));
                     cImage *img {nullptr};
                     if (Current) {
                         const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight - m_MarginItem2,
-                                                 m_FontHeight - m_MarginItem2);
+                        img = ImgLoader.LoadIcon(*IconNameCur, IconSize, IconSize);
                     }
-                    if (!img)
-                        img = ImgLoader.LoadIcon(*IconName, m_FontHeight - m_MarginItem2,
-                                                 m_FontHeight - m_MarginItem2);
+                    if (!img) img = ImgLoader.LoadIcon(*IconName, IconSize, IconSize);
 
-                    if (!img) {
-                        img = ImgLoader.LoadIcon("menuIcons/blank", m_FontHeight - m_MarginItem2,
-                                                 m_FontHeight - m_MarginItem2);
-                    }
+                    if (!img) { img = ImgLoader.LoadIcon("menuIcons/blank", IconSize, IconSize); }
                     // Draw the icon
                     if (img) {
                         MenuIconsPixmap->DrawImage(
@@ -447,9 +442,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     }
 
                     const int AvailableTextWidth {m_MenuItemWidth - m_WidthScrollBar};
-                    MenuPixmap->DrawText(
-                        cPoint(m_FontHeight + m_MarginItem2 + xt + Config.decorBorderMenuItemSize, y), s, ColorFg,
-                        ColorBg, m_Font, AvailableTextWidth - xt - m_MarginItem2 - m_FontHeight);
+                    MenuPixmap->DrawText(cPoint(m_FontHeight + m_MarginItem2 + xt + Config.decorBorderMenuItemSize, y),
+                                         s, ColorFg, ColorBg, m_Font, AvailableTextWidth - xt - IconSize);
                 } else {
                     if (Config.MenuItemParseTilde) {
                         const char *TildePos {strchr(s, '~')};
@@ -621,9 +615,6 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                 // Calculate progress bar
                 const time_t now {time(0)};
                 const double duration = Event->Duration();
-                // progress = (duration > 0)
-                //               ? std::min(100.0, std::max(0.0, (now - Event->StartTime()) * 100.0 / duration))
-                //               : 0.0;
                 progress = (duration > 0) ? std::clamp((now - Event->StartTime()) * 100.0 / duration, 0.0, 100.0) : 0.0;
                 EventTitle = Event->Title();
             }
@@ -1326,18 +1317,21 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     }
 
     int ImageHeight {m_FontHeight};
-    if (MenuEventViewShort && Channel && Event && Selectable) {  // flatPlus short, flatPlus short + EPG
-        Left = LeftSecond;
-        Top += m_FontHeight;
-        ImageHeight = m_FontSmlHeight;
-        MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_FontSml);
-        Left += m_FontSml->Width(*Event->GetTimeString()) + m_MarginItem;
-    /* } else if (MenuEventViewShort && Event && Selectable) {
-            MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_Font);
-            Left += m_Font->Width(*Event->GetTimeString()) + m_MarginItem; */
-    } else if (Event && Selectable) {  //? Same as above
-        MenuPixmap->DrawText(cPoint(Left, Top), *Event->GetTimeString(), ColorFg, ColorBg, m_Font);
-        Left += m_Font->Width(*Event->GetTimeString()) + m_MarginItem;
+    if (Event && Selectable) {
+        const cString EventTimeString{*Event->GetTimeString()};
+        if (MenuEventViewShort && Channel /* && Event && Selectable */) {  // flatPlus short, flatPlus short + EPG
+            Left = LeftSecond;
+            Top += m_FontHeight;
+            ImageHeight = m_FontSmlHeight;
+            MenuPixmap->DrawText(cPoint(Left, Top), *EventTimeString, ColorFg, ColorBg, m_FontSml);
+            Left += m_FontSml->Width(*EventTimeString) + m_MarginItem;
+            /* } else if (MenuEventViewShort && Event && Selectable) {
+                    MenuPixmap->DrawText(cPoint(Left, Top), *EventTimeString, ColorFg, ColorBg, m_Font);
+                    Left += m_Font->Width(*EventTimeString) + m_MarginItem; */
+        } else /* if (Event && Selectable) */ {  //? Same as above
+            MenuPixmap->DrawText(cPoint(Left, Top), *EventTimeString, ColorFg, ColorBg, m_Font);
+            Left += m_Font->Width(*EventTimeString) + m_MarginItem;
+        }
     }
 
     if (TimerActive) {  // Show timer icon only if timer is active
@@ -1628,7 +1622,7 @@ void cFlatDisplayMenu::DrawRecordingIcon(const cString &IconName, int &Left, int
     if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
     if (img) {
         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-        Left += /* img->Width() */ m_FontHeight + m_MarginItem;
+        Left += m_FontHeight + m_MarginItem;
     }
 }
 
@@ -2523,7 +2517,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     const uint ActorsPerLine {6};  // TODO: Config option?
     const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;  // Narrowing conversion
     const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
-    // const uint PicsPerLine = (m_cWidth - m_MarginItem2) / ActorWidth;  //! Same as ActorsPerLine
     const uint PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
@@ -2711,7 +2704,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
-
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
@@ -3105,7 +3097,6 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
 cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     // Check for standard menu entries
     std::string_view s {""};
-    // s.reserve(32);  // Space for translated menu entry
     for (uint i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(*items[i]);
         if (s == element) {
@@ -3124,7 +3115,6 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     // Check for plugins
     const char *MainMenuEntry {nullptr};
     std::string_view PlugMainEntry {""};
-    // PlugMainEntry.reserve(32);  // Space for menu entry
     for (uint i {0};; ++i) {
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
@@ -3191,8 +3181,6 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
 
     std::string_view RecName {Recording->Name()};
     std::string_view RecNamePart {""};
-    // RecNamePart.reserve(64);
-
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
@@ -3209,7 +3197,6 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
 
     if (Config.MenuItemRecordingClearPercent && IsFolder && !RecNamePart.empty() && RecNamePart[0] == '%') {
         RecNamePart = RecNamePart.substr(1);  // Remove leading '%'
-        // RecNamePart.erase(0, 1);
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   RecNamePart '%s'", RecNamePart.data());
@@ -3228,7 +3215,6 @@ cString cFlatDisplayMenu::GetRecCounts() {
     m_LastRecFolder = m_RecFolder;
     if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
         std::string_view RecFolder2 {""};
-        // RecFolder2.reserve(256);
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
@@ -3381,7 +3367,6 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     std::string_view RecFolder {*GetRecordingName(Recording, Level, true)};
     std::string_view RecFolder2 {""};
-    // RecFolder2.reserve(256);
 
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {

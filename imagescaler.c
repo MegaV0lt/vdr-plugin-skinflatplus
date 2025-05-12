@@ -51,7 +51,6 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
     std::array<float, 4> h_arr {0.0f, 0.0f, 0.0f, 0.0f};
     for (int i {0}; i < dst_size; ++i) {
-        // d = 2 * dst_size;                       // Sample position denominator
         e = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         offset = e / d;                         // Truncated sample position
         // Exact sample position is (float) e/d = offset + sub_offset
@@ -140,7 +139,6 @@ static unsigned shift_clamp(int x) {
     // x = (x + 2^21) >> 22;
     // But that's equivalent to this:
     x = (x + 2097152) >> 22;
-    // return (x < 0) ? 0 : (x > 255) ? 255 : x;
     return std::clamp(x, 0, 255);
 }
 

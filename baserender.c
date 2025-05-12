@@ -1544,7 +1544,6 @@ void cFlatBaseRender::DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, i
     const int start {(Height < 0) ? Height * -1 : 0};
     const int end {(Height < 0) ? 0 : Height};
     const int step {(Height < 0) ? -1 : 1};
-    // const int offset {(Height < 0) ? 0 : 1};
     const double AlphaStep {1.0 / std::abs(Height)};  // Normalized step (0.0-1.0)
     tColor col {0};  // Init outside of loop
 
@@ -1924,7 +1923,9 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
-        // dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, CurrentAlpha);
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, CurrentAlpha);
+#endif
         pixmap->DrawText(cPoint(pos.X() + xOffset * i, pos.Y() + yOffset * i), text, CurrentShadowColor, clrTransparent,
             font);
 

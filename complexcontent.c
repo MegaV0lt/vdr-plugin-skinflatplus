@@ -84,7 +84,6 @@ int cComplexContent::ContentHeight(bool Full) {
     if (Full) return Height();
 
     CalculateDrawPortHeight();
-    // return (m_DrawPortHeight > Height()) ? Height() : m_DrawPortHeight;
     return std::min(m_DrawPortHeight, Height());
 }
 

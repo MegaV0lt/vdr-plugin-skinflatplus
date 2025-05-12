@@ -26,7 +26,7 @@
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
     sc_reserved        = 0x00,
-    sc_video_MPEG2     = 0x01,
+    sc_video_MPEG2     = 0x01,  // MPEG 1 Layer 2 video
     sc_audio_MP2       = 0x02,  // MPEG 1 Layer 2 audio
     sc_subtitle        = 0x03,
     sc_audio_AC3       = 0x04,
@@ -169,7 +169,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
-                    for (int i{0}; i < ActorsSize; ++i) {
+                    for (int i {0}; i < ActorsSize; ++i) {
                         if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
                             ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(series.actors[i].name.c_str());
@@ -189,7 +189,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
-                    for (int i{0}; i < ActorsSize; ++i) {
+                    for (int i {0}; i < ActorsSize; ++i) {
                         if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
                             ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(movie.actors[i].name.c_str());
@@ -300,7 +300,6 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (uint i {0}; i < ScreenAspectNums; ++i) {
-        // if (ScreenAspect == ScreenAspects[i])
         if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
             return ScreenAspectNames[i];
     }
@@ -423,19 +422,10 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     const uint Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
-        /* MediaSize.SetHeight(
-            std::min(MediaSize.Height(),
-                     static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO))); */
         MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO));
     } else if (Aspect < BANNER_ASPECT_THRESHOLD) {  //* Portrait (For example 1920x1080 = 1.77)
-        /* MediaSize.SetWidth(
-            std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO))); */
         MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO));
     } else {                                        //* Banner (Usually 758x140 = 5.41)
-        /* MediaSize.SetWidth(
-            std::min(MediaSize.Width(),
-                     static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO))); */
         MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO));
     }
 #ifdef DEBUGFUNCSCALL

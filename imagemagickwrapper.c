@@ -142,12 +142,15 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
 
     try {
         buffer.read(fullpath);
-    } catch (const Magick::Exception& e) {  // Log specific error
-        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Error: %s\n", e.what());
-        return false;
-    } catch (const std::exception& e) {  // Log general error
-        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Error: %s\n", e.what());
-        return false;
+    } catch (const Magick::Exception &e) {
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Magick::Exception: %s\n", e.what());
+        return false;  // Fehler signalisieren
+    } catch (const std::exception &e) {
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() std::exception: %s\n", e.what());
+        return false;  // Fehler signalisieren
+    } catch (...) {
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Unknown error occurred.");
+        return false;  // Fehler signalisieren
     }
 
     return true;

@@ -232,6 +232,18 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     return false;
 }
 
+/**
+ * @brief Check if a certain image exists in the recording's folder.
+ *
+ * Given a recording path and an image name, this function checks if the image exists in the recording's folder,
+ * in the parent folder, or in the grand parent folder. If the image is found, its full path is stored in @a found.
+ *
+ * @param RecPath The path to the recording.
+ * @param Image The image name to check for.
+ * @param found The full path to the found image, if any.
+ *
+ * @return true if the image exists, false otherwise.
+ */
 bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
     cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
     if (std::filesystem::exists(*ManualPoster)) {
