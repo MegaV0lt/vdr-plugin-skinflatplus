@@ -829,8 +829,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
-    static const char* PUNCTUATION_CHARS = ".,?!;";      // Punctuation characters for justifying
+    static constexpr float LINE_WIDTH_THRESHOLD {0.8f};  // Line width threshold for justifying
+    static const char *PUNCTUATION_CHARS {".,?!;"};      // Punctuation characters for justifying
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
         const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
         const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'

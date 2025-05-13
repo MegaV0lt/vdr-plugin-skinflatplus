@@ -3213,8 +3213,9 @@ cString cFlatDisplayMenu::GetRecCounts() {
 
     uint RecCount {0}, RecNewCount {0};
     m_LastRecFolder = m_RecFolder;
-    if (m_RecFolder != "" && m_LastItemRecordingLevel > 0) {
-        std::string_view RecFolder2 {""};
+    if (!m_RecFolder.empty() && m_LastItemRecordingLevel > 0) {
+        std::string RecFolder2 {""};
+        RecFolder2.reserve(256);  // Reserve space for the string
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
@@ -3265,7 +3266,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
 
-    const double days = difftime(now, LastRecTimeFromFolder) / (60 * 60 * 24);
+    const double days = difftime(now, LastRecTimeFromFolder) / SECSINDAY;
     return days > value;
 }
 
