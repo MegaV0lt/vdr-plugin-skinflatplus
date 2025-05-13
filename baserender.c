@@ -340,15 +340,7 @@ void cFlatBaseRender::TopBarUpdate() {
         if (Config.TopBarMenuIconShow) {
             int IconLeft {m_MarginItem};
             int IconTop {0};
-            if (m_TopBarMenuIconSet) {  // Show menu icon
-                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
-                if (img) {
-                    IconTop = (m_TopBarHeight - img->Height()) / 2;
-                    TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
-                    MenuIconWidth = img->Width() + m_MarginItem2;
-                }
-            } else if (m_TopBarMenuLogoSet) {  // Show menu channel logo
-                // PixmapClear(TopBarIconPixmap);
+            if (m_TopBarMenuLogoSet) {  // Show menu channel logo
                 int ImageBGHeight {TopBarLogoHeight};
                 int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
@@ -367,8 +359,15 @@ void cFlatBaseRender::TopBarUpdate() {
                     TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
                 }
                 MenuIconWidth = ImageBGWidth + m_MarginItem2;
+            } else if (m_TopBarMenuIconSet) {  // Show menu icon
+                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
+                if (img) {
+                    IconTop = (m_TopBarHeight - img->Height()) / 2;
+                    TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                    MenuIconWidth = img->Width() + m_MarginItem2;
+                }
             }
-        }
+        }  // Config.TopBarMenuIconShow
 
         const cString time {*TimeString(Now)};  // Reuse 'Now'
         cString Buffer {""};
