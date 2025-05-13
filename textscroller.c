@@ -64,11 +64,11 @@ void cTextScroll::Draw() const {
     if (TildePos && ColorExtraTextFg) {
         std::string_view sv1 {m_Text, static_cast<size_t>(TildePos - m_Text)};
         std::string_view sv2 {TildePos + 1};
-        std::string_view first {rtrim(sv1)};
+        const std::string first {rtrim(sv1)};
         std::string_view second {ltrim(sv2)};
 
-        Pixmap->DrawText(cPoint(0, 0), first.data(), ColorFg, ColorBg, m_Font);
-        const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+        Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
+        const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
         Pixmap->DrawText(cPoint(l, 0), second.data(), ColorExtraTextFg, ColorBg, m_Font);
     } else {
         Pixmap->DrawText(cPoint(0, 0), m_Text, ColorFg, ColorBg, m_Font);

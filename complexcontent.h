@@ -52,7 +52,7 @@ class cSimpleContent {
                 JustifyLine(Line, m_Font, m_Position.Width());
             }
             Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)),
-                            Line.data(), m_ColorFg, m_ColorBg, m_Font,
+                            Line.c_str(), m_ColorFg, m_ColorBg, m_Font,
                             m_TextWidth, m_TextHeight, m_TextAlignment);
         }
     }

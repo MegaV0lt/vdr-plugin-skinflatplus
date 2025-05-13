@@ -450,13 +450,13 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         if (TildePos) {
                             std::string_view sv1 {s, static_cast<size_t>(TildePos - s)};
                             std::string_view sv2 {TildePos + 1};
-                            std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                            const std::string first {rtrim(sv1)};  // Trim possible space at end
                             std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.data(), ColorFg,
+                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
                                                  ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
-                            const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+                            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.data(),
                                                  ColorExtraTextFg, ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize - l);
@@ -1032,12 +1032,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
-                    std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                    const std::string first {rtrim(sv1)};  // Trim possible space at end
                     std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                    MenuPixmap->DrawText(cPoint(Left, Top), first.data(), ColorFg, ColorBg, m_Font,
+                    MenuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_Font->Width(first.data()) + m_Font->Width('X')};
+                    const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
                     MenuPixmap->DrawText(cPoint(Left + l, Top), second.data(), ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
@@ -1067,12 +1067,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                 if (TildePos) {
                     std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
                     std::string_view sv2 {TildePos + 1};
-                    std::string_view first {rtrim(sv1)};   // Trim possible space at end
+                    const std::string first {rtrim(sv1)};  // Trim possible space at end
                     std::string_view second {ltrim(sv2)};  // Trim possible space at begin
 
-                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.data(), ColorFg, ColorBg, m_FontSml,
+                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.c_str(), ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_FontSml->Width(first.data()) + m_FontSml->Width('X')};
+                    const int l {m_FontSml->Width(first.c_str()) + m_FontSml->Width('X')};
                     MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.data(), ColorExtraTextFg,
                                          ColorBg, m_FontSml, m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
@@ -3180,7 +3180,7 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     if (!Recording) return "";
 
     std::string_view RecName {Recording->Name()};
-    std::string_view RecNamePart {""};
+    std::string RecNamePart {""};
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
@@ -3196,13 +3196,13 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     }
 
     if (Config.MenuItemRecordingClearPercent && IsFolder && !RecNamePart.empty() && RecNamePart[0] == '%') {
-        RecNamePart = RecNamePart.substr(1);  // Remove leading '%'
+        RecNamePart.erase(0, 1);  // Remove leading '%'
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecNamePart '%s'", RecNamePart.data());
+    dsyslog("   RecNamePart '%s'", RecNamePart.c_str());
 #endif
 
-    return RecNamePart.data();
+    return RecNamePart.c_str();
 }
 
 cString cFlatDisplayMenu::GetRecCounts() {

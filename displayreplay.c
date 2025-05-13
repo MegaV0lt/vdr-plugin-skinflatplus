@@ -363,15 +363,15 @@ void cFlatDisplayReplay::UpdateInfo() {
         std::string_view cur {*m_Current};
         const std::size_t found {cur.find_last_of(':')};
         if (found != std::string::npos) {
-            std::string_view hm {cur.substr(0, found)};
+            const std::string hm {cur.substr(0, found)};
             std::string_view secs {cur.substr(found, cur.length() - found)};
             // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
             const int FontSecsWidth {std::max(m_FontSecs->Width(secs.data()) + m_MarginItem, m_LastCurrentWidth)};
             m_LastCurrentWidth = FontSecsWidth;
 
-            LabelPixmap->DrawText(cPoint(left, 0), hm.data(), Theme.Color(clrReplayFont),
-                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.data()), m_FontHeight);
-            left += m_Font->Width(hm.data());
+            LabelPixmap->DrawText(cPoint(left, 0), hm.c_str(), Theme.Color(clrReplayFont),
+                                  Theme.Color(clrReplayBg), m_Font, m_Font->Width(hm.c_str()), m_FontHeight);
+            left += m_Font->Width(hm.c_str());
             LabelPixmap->DrawText(cPoint(left, TopSecs), secs.data(),
                                   Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
                                   FontSecsWidth, FontSecsHight);
@@ -439,20 +439,20 @@ void cFlatDisplayReplay::UpdateInfo() {
             std::string_view tot {*m_Total};  // Total length
             const std::size_t found {tot.find_last_of(':')};
             if (found != std::string::npos) {
-                std::string_view hm {tot.substr(0, found)};
+                const std::string hm {tot.substr(0, found)};
                 std::string_view secs {tot.substr(found, tot.length() - found)};
-                const int HmWidth {m_Font->Width(hm.data())};  // Width of hours and minutes
+                const int HmWidth {m_Font->Width(hm.c_str())};  // Width of hours and minutes
                 const int SecsWidth {m_FontSecs->Width(secs.data())};  // Width of seconds
 
                 std::string_view cutt {*cutted};  // Cutted length
                 const std::size_t found2 {cutt.find_last_of(':')};
                 if (found2 != std::string::npos) {
-                    std::string_view hm2 {cutt.substr(0, found)};
+                    const std::string hm2 {cutt.substr(0, found)};
                     std::string_view secs2 {cutt.substr(found, cutt.length() - found)};
 
                     right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
                             HmWidth - SecsWidth - Spacer -
-                            ImgCuttedWidth - m_MarginItem - m_Font->Width(hm2.data()) -
+                            ImgCuttedWidth - m_MarginItem - m_Font->Width(hm2.c_str()) -
                             m_FontSecs->Width(secs2.data());
                 } else {
                     right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
@@ -464,7 +464,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                     IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right, 0), hm.data(), Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs),
                                       secs.data(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
@@ -498,11 +498,11 @@ void cFlatDisplayReplay::UpdateInfo() {
             std::string_view cutt {*cutted};
             const std::size_t found {cutt.find_last_of(':')};
             if (found != std::string::npos) {
-                std::string_view hm {cutt.substr(0, found)};
+                const std::string hm {cutt.substr(0, found)};
                 std::string_view secs {cutt.substr(found, cutt.length() - found)};
-                const int HmWidth {m_Font->Width(hm.data())};  // Width of hours and minutes
+                const int HmWidth {m_Font->Width(hm.c_str())};  // Width of hours and minutes
 
-                LabelPixmap->DrawText(cPoint(right, 0), hm.data(),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_Font,
                                       HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs),
@@ -523,9 +523,9 @@ void cFlatDisplayReplay::UpdateInfo() {
             std::string_view tot {*m_Total};
             const std::size_t found {tot.find_last_of(':')};
             if (found != std::string::npos) {
-                std::string_view hm {tot.substr(0, found)};
+                const std::string hm {tot.substr(0, found)};
                 std::string_view secs {tot.substr(found, tot.length() - found)};
-                const int HmWidth {m_Font->Width(hm.data())};  // Width of hours and minutes
+                const int HmWidth {m_Font->Width(hm.c_str())};  // Width of hours and minutes
                 const int SecsWidth {m_FontSecs->Width(secs.data())};  // Width of seconds
 
                 right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
@@ -534,7 +534,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                     IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
                 }
-                LabelPixmap->DrawText(cPoint(right, 0), hm.data(), Theme.Color(clrReplayFont),
+                LabelPixmap->DrawText(cPoint(right, 0), hm.c_str(), Theme.Color(clrReplayFont),
                                       Theme.Color(clrReplayBg), m_Font, HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs),
                                       secs.data(), Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_FontSecs,
