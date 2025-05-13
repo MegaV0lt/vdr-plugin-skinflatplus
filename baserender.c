@@ -479,7 +479,7 @@ void cFlatBaseRender::TopBarUpdate() {
         MiddleWidth += ExtraMaxWidth;
         Right -= ExtraMaxWidth + m_MarginItem;
 
-        const int MiddleX {TopBarWidth / 2 - MiddleWidth / 2};
+        const int MiddleX {(TopBarWidth - MiddleWidth) / 2};
         const int TitleLeft {MenuIconWidth + m_MarginItem2};
         const int TitleRight {TitleLeft + TitleWidth};
         if (TitleRight < MiddleX)
