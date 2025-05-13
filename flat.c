@@ -1007,8 +1007,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             if (*p != *(p + 1)) {  // Avoid breaks between repeated delimiters (like in "...")
                 Delim = p;
                 Blank = nullptr;
-            } else {
 #ifdef DEBUGFUNCSCALL
+            } else {
                 dsyslog("   Skipping double delimiter char '%c'", *p);
 #endif
             }
