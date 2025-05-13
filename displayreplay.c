@@ -741,52 +741,30 @@ void cFlatDisplayReplay::Flush() {
 }
 
 void cFlatDisplayReplay::PreLoadImages() {
-    ImgLoader.LoadIcon("rewind", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("pause", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("forward", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("rewind_sel", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("pause_sel", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-    ImgLoader.LoadIcon("forward_sel", m_FontHeight, m_FontHeight);
-
-    /* const std::vector<std::string> icons = {"rewind", "pause", "play", "forward"};
+    const cString icons[] {"rewind",     "pause",     "play",     "forward",
+                           "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
     for (const auto &icon : icons) {
         ImgLoader.LoadIcon(icon, m_FontHeight, m_FontHeight);
-    } */
+    }
 
     constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
-    ImgLoader.LoadIcon("recording_pos", ICON_WIDTH_UNLIMITED, GlyphSize);
-    ImgLoader.LoadIcon("recording_total", ICON_WIDTH_UNLIMITED, GlyphSize);
-    ImgLoader.LoadIcon("recording_cutted_extra", ICON_WIDTH_UNLIMITED, GlyphSize);
+    const cString icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
+    for (const auto &icon : icons1) {
+        ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, GlyphSize);
+    }
 
-    ImgLoader.LoadIcon("recording_untested_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_ok_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_warning_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_error_replay", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("timerRecording", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);  // Small image
+    const cString icons2[] {"recording_untested_replay", "recording_ok_replay", "recording_warning_replay",
+                            "recording_error_replay",    "timerRecording"};
+    for (const auto &icon : icons2) {
+        ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    }
 
-    ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
-    ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    const cString icons3[] {"43",        "169",       "169w",         "221",        "7680x4320",   "3840x2160",
+                            "1920x1080", "1440x1080", "1280x720",     "960x720",    "704x576",     "720x576",
+                            "544x576",   "528x576",   "480x576",      "352x576",    "unknown_res", "uhd",
+                            "hd",        "sd",        "audio_stereo", "audio_dolby"};
+    for (const auto &icon : icons3) {
+        ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
+    }
 }
