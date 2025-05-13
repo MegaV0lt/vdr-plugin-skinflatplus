@@ -210,19 +210,19 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         if (Config.DiskUsageFree == 1) {  // Show in free mode
             const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: 0%% %s", tr("Disk"), tr("free"));
+                Extra1 = cString::sprintf("%s: ~ 0%% %s", tr("Disk"), tr("free"));
                 Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // Short format
-                Extra1 = cString::sprintf("0%% %s", tr("free"));
+                Extra1 = cString::sprintf("~ 0%% %s", tr("free"));
                 Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
             IconName = "chart31b";
         } else {  // Show in occupied mode
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: 100%% %s", tr("Disk"), tr("occupied"));
+                Extra1 = cString::sprintf("%s: ~ 100%% %s", tr("Disk"), tr("occupied"));
                 Extra2 = "? GB ≈ ??:??";  //* Can not be calculated if disk is full (DIV/0)
             } else {  // Short format
-                Extra1 = cString::sprintf("100%% %s", tr("occupied"));
+                Extra1 = cString::sprintf("~ 100%% %s", tr("occupied"));
                 Extra2 = "≈ ??:??";
             }
             IconName = "chart32";
@@ -337,38 +337,37 @@ void cFlatBaseRender::TopBarUpdate() {
         const int TopBarIconHeight {m_TopBarFontHeight - m_MarginItem2};  // Height of font in TopBar
 
         cImage *img {nullptr};
-        if (m_TopBarMenuIconSet && Config.TopBarMenuIconShow) {  // Show menu icon
-            img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
-            if (img) {
-                const int IconLeft {m_MarginItem};
-                const int IconTop {(m_TopBarHeight - img->Height()) / 2};
-                TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
-                MenuIconWidth = img->Width() + m_MarginItem2;
-            }
-        }
-
-        if (m_TopBarMenuLogoSet && Config.TopBarMenuIconShow) {  // Show menu channel logo
-            PixmapClear(TopBarIconPixmap);
+        if (Config.TopBarMenuIconShow) {
             int IconLeft {m_MarginItem};
-            int ImageBGHeight {TopBarLogoHeight};
-            int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
             int IconTop {0};
+            if (m_TopBarMenuIconSet) {  // Show menu icon
+                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
+                if (img) {
+                    IconTop = (m_TopBarHeight - img->Height()) / 2;
+                    TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                    MenuIconWidth = img->Width() + m_MarginItem2;
+                }
+            } else if (m_TopBarMenuLogoSet) {  // Show menu channel logo
+                // PixmapClear(TopBarIconPixmap);
+                int ImageBGHeight {TopBarLogoHeight};
+                int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
-            img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
-            if (img) {
-                ImageBGHeight = img->Height();
-                ImageBGWidth = img->Width();
-                IconTop = (m_TopBarHeight - ImageBGHeight) / 2;
-                TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
-            }
+                img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
+                if (img) {
+                    ImageBGHeight = img->Height();
+                    ImageBGWidth = img->Width();
+                    IconTop = (m_TopBarHeight - ImageBGHeight) / 2;
+                    TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                }
 
-            img = ImgLoader.LoadLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
-            if (img) {
-                IconTop += (ImageBGHeight - img->Height()) / 2;
-                IconLeft += (ImageBGWidth - img->Width()) / 2;
-                TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                img = ImgLoader.LoadLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
+                if (img) {
+                    IconTop += (ImageBGHeight - img->Height()) / 2;
+                    IconLeft += (ImageBGWidth - img->Width()) / 2;
+                    TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
+                }
+                MenuIconWidth = ImageBGWidth + m_MarginItem2;
             }
-            MenuIconWidth = ImageBGWidth + m_MarginItem2;
         }
 
         const cString time {*TimeString(Now)};  // Reuse 'Now'
