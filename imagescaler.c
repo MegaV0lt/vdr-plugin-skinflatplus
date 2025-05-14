@@ -33,7 +33,15 @@ ImageScaler::ImageScaler() :
 
 ImageScaler::~ImageScaler() = default;  // No need for manual memory management
 
-// sin(x)/(x)
+/**
+ * Computes the normalized sinc function, sin(x)/x.
+ *
+ * For small values of x, a Taylor series approximation is used to avoid
+ * division by zero and improve numerical stability.
+ *
+ * @param x The input value for which the sinc function is calculated.
+ * @return The value of sin(x)/x, or an approximation for small x.
+ */
 inline float sincf(float x) {
     if (fabsf(x) < 0.05f)
         return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
@@ -41,6 +49,26 @@ inline float sincf(float x) {
     return sin(x) / x;
 }
 
+/**
+ * Calculates horizontal and vertical filter coefficients for image scaling
+ *
+ * The image is upscaled by a factor of dst_size/src_size, which is a
+ * rational number. The filter coefficients are calculated using the
+ * sinc-low pass filter and a cosine window. The filter coefficients are
+ * normalized to sum up to 2048.
+ *
+ * The function stores the filter coefficients in the array filters, which
+ * has size dst_size. The coefficients are stored in the order
+ * h0, h1, h2, h3 for each filter. The offset of the first unused pixel is
+ * stored in the member m_offset of the Filter struct.
+ *
+ * The function also sets an end marker in the last element of the array
+ * filters, which is used to detect the end of the array.
+ *
+ * @param filters pointer to an array of Filter structs
+ * @param dst_size destination image size
+ * @param src_size source image size
+ */
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
     const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
 
@@ -98,6 +126,22 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     filters[dst_size].m_offset = (unsigned) -1;
 }
 
+/**
+ * Sets the parameters for the image scaling operation.
+ *
+ * This function initializes the destination image buffer, stride, and dimensions,
+ * as well as the source image dimensions. It recalculates the horizontal and vertical
+ * filter coefficients if the image dimensions have changed. The function uses a 
+ * unique_ptr for managing memory allocation required for filter coefficients and 
+ * temporary buffer storage.
+ *
+ * @param dst_image Pointer to the destination image buffer.
+ * @param dst_stride The stride (row length in memory) of the destination image.
+ * @param dst_width The width of the destination image.
+ * @param dst_height The height of the destination image.
+ * @param src_width The width of the source image.
+ * @param src_height The height of the source image.
+ */
 void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height,
                                      unsigned src_width, unsigned src_height) {
     m_src_x = 0;
@@ -142,6 +186,16 @@ static unsigned shift_clamp(int x) {
     return std::clamp(x, 0, 255);
 }
 
+/**
+ * Packs a TmpPixel into a single 32-bit unsigned integer.
+ *
+ * This function takes a TmpPixel, representing a pixel with four color components,
+ * and packs it into a single 32-bit unsigned integer. The color components are
+ * shifted into place and clamped to the range 0..255 to avoid overflows.
+ *
+ * @param pixel The TmpPixel to pack.
+ * @return A 32-bit unsigned integer representing the packed pixel.
+ */
 inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
     return shift_clamp(pixel[0]) |
            (shift_clamp(pixel[1]) << 8) |
