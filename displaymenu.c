@@ -3367,21 +3367,16 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
     std::string_view RecFolder {*GetRecordingName(Recording, Level, true)};
-    std::string_view RecFolder2 {""};
-
+    time_t RecStartNewest {0}, RecStartOldest {0};
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-        RecFolder2 = *GetRecordingName(Rec, Level, true);
-        if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
-            if (Config.MenuItemRecordingShowFolderDate == 1) {  // Newest
-                RecStart = std::max(RecStart, Rec->Start());
-            } else if (Config.MenuItemRecordingShowFolderDate == 2) {  // Oldest
-                RecStart = std::min(RecStart, Rec->Start());
-            }
+        if (RecFolder == *GetRecordingName(Rec, Level, true)) {  // Recordings must be in the same folder
+            RecStartNewest = std::max(RecStartNewest, Rec->Start());
+            RecStartOldest = std::min(RecStartOldest, Rec->Start());
         }
     }
 
-    return RecStart;
+    return (Config.MenuItemRecordingShowFolderDate == 1) ? RecStartNewest : RecStartOldest;
 }
 
 int cFlatDisplayMenu::GetTextAreaWidth() const {
