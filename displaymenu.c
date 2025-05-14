@@ -310,7 +310,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         break;
     case mcTimer:
         if (Config.MenuTimerShowCount) {
-            GetTimerCounts(m_LastTimerActiveCount, m_LastTimerCount);  // Update timer counts
+            UpdateTimerCounts(m_LastTimerActiveCount, m_LastTimerCount);  // Update timer counts
             NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerActiveCount, m_LastTimerCount);
         }
         break;
@@ -3020,7 +3020,7 @@ void cFlatDisplayMenu::Flush() {
 
     if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
         uint TimerActiveCount {0}, TimerCount {0};
-        GetTimerCounts(TimerActiveCount, TimerCount);
+        UpdateTimerCounts(TimerActiveCount, TimerCount);
 
         if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
             m_LastTimerActiveCount = TimerActiveCount;
@@ -3246,7 +3246,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
     return RecCounts;
 }
 
-void cFlatDisplayMenu::GetTimerCounts(uint &TimerActiveCount, uint &TimerCount) const {
+void cFlatDisplayMenu::UpdateTimerCounts(uint &TimerActiveCount, uint &TimerCount) const {
     TimerActiveCount = 0;
     TimerCount = 0;
     LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
