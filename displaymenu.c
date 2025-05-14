@@ -1767,7 +1767,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
                 LeftWidth += m_Font->Width("(99.99.99)") + m_FontHeight + m_MarginItem2;
-                Buffer = cString::sprintf("(%s)", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+                Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
                 Left += m_Font->Width(*Buffer) + m_MarginItem;
                 if (IsRecordingOld(Recording, Level)) {
@@ -1883,7 +1883,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += DigitsMaxWidth;
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
-                Buffer = cString::sprintf("(%s)", *ShortDateString(GetLastRecTimeFromFolder(Recording, Level)));
+                Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_FontSml);
                 if (IsRecordingOld(Recording, Level)) {
                     Left += m_FontSml->Width(*Buffer);
