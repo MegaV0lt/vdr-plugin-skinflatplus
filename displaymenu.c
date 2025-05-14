@@ -3325,14 +3325,16 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) const {
     bool FirstContent {true};
+    cString ContentString {""};
     for (int i {0}; Event->Contents(i); ++i) {
-        if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
+        ContentString = Event->ContentToString(Event->Contents(i));
+        if (ContentString[0] != '\0') {  // Skip empty (user defined) content
             if (!FirstContent)
                 Text.Append(", ");
             else
                 Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
 
-            Text.Append(Event->ContentToString(Event->Contents(i)));
+            Text.Append(ContentString);
             FirstContent = false;
         }
     }
@@ -3340,14 +3342,16 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) const
 
 void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const {
     bool FirstContent {true};
+    cString ContentString {""};
     for (int i {0}; Event->Contents(i); ++i) {
-        if (!isempty(Event->ContentToString(Event->Contents(i)))) {  // Skip empty (user defined) content
+        ContentString = Event->ContentToString(Event->Contents(i));
+        if (ContentString[0] != '\0') {  // Skip empty (user defined) content
             if (!FirstContent)
                 Text.Append(", ");
             else
                 Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
 
-            Text.Append(Event->ContentToString(Event->Contents(i)));
+            Text.Append(ContentString);
             FirstContent = false;
             GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
         }
