@@ -464,7 +464,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
         case sc_audio_MP2:
         case sc_audio_AC3:
         case sc_audio_HEAAC:
-            if (!isempty(*Audio)) Audio.Append(", ");
+            if (Audio[0] != '\0') Audio.Append(", ");
             switch (p->stream) {
             case sc_audio_MP2:
                 // Workaround for wrongfully used stream type X 02 05 for AC3
@@ -479,7 +479,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
                 Audio.Append(cString::sprintf("%s (%s)", p->language, *AudioType));
             break;
         case sc_subtitle:
-            if (!isempty(*Subtitle)) Subtitle.Append(", ");
+            if (Subtitle[0] != '\0') Subtitle.Append(", ");
             if (p->description)
                 Subtitle.Append(cString::sprintf("%s (%s)", p->description, p->language));
             else

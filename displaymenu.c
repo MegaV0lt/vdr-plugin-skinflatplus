@@ -791,8 +791,8 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                 cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
 
-                if (!isempty(*Audio)) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                if (!isempty(*Subtitle)) Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
+                if (Audio[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
+                if (Subtitle[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }  // if Components
         }      // EpgAdditionalInfoShow
     } else {
@@ -830,7 +830,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
             }
         }  // TVScraperEPGInfoShowPoster
 
-        if (!isempty(*MediaPath)) {
+        if (MediaPath[0] != '\0') {
             cImage *img {ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight)};
             if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
@@ -1255,9 +1255,6 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 if (total >= 0) {
                     // Calculate progress bar
                     const double duration = Event->Duration();
-                    // const double progress =
-                    //    (duration > 0) ? std::min(100.0, std::max(0.0, (now - EventStartTime) * 100.0 / duration))
-                    //                   : 0.0;
                     const double progress =
                         (duration > 0) ? std::clamp((now - EventStartTime) * 100.0 / duration, 0.0, 100.0) : 0.0;
 
@@ -1367,7 +1364,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const cString ShortText = (Event->ShortText()) ? Event->ShortText() : "";
         if (MenuEventViewShort && Channel) {   // flatPlus short, flatPlus short + EPG
             if (Current) {
-                if (!isempty(*ShortText)) {
+                if (ShortText[0] != '\0') {
                     Buffer = cString::sprintf("%s~%s", *Title, *ShortText);
                     if (m_FontSml->Width(*Buffer) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                         MenuItemScroller.AddScroller(
@@ -1395,7 +1392,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             } else {  // Not current
                 MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_FontSml,
                                      m_MenuItemWidth - Left - m_MarginItem);
-                if (!isempty(*ShortText)) {
+                if (ShortText[0] != '\0') {
                     Left += m_FontSml->Width(*Title) + m_Font->Width('~');
                     MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1410,7 +1407,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
-            if (!isempty(*ShortText)) {
+            if (ShortText[0] != '\0') {
                 Top += m_FontHeight;
                 if (Current && m_FontSml->Width(*ShortText) > (m_MenuItemWidth - Left - m_MarginItem) &&
                     Config.ScrollerEnable) {
@@ -1424,7 +1421,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
         } else {
             if (Current) {
-                if (!isempty(*ShortText)) {
+                if (ShortText[0] != '\0') {
                     Buffer = cString::sprintf("%s~%s", *Title, *ShortText);
                     if (m_Font->Width(*Buffer) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                         MenuItemScroller.AddScroller(
@@ -1450,7 +1447,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             } else {
                 MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
-                if (!isempty(*ShortText)) {
+                if (ShortText[0] != '\0') {
                     Left += m_Font->Width(*Title) + m_Font->Width('~');
                     MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1460,15 +1457,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     } else if (Event) {
         // dsyslog("flatPlus: SetItemEvent() Try to extract date from event title '%s'", Event->Title());
         if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
-            // dsyslog("flatPlus: SetItemEvent() Channel is group separator!");
+            // dsyslog("   Channel is group separator!");
         } else {
             // Extract date from separator
             // epgsearch program '----------------------------------------         Fr. 21.02.2025 ----------------------------------------'  //NOLINT
             std::string_view sep {Event->Title()};  // Event->Title should always set to something
             if (sep.length() > 12) {
                 const std::size_t found {sep.find(" -")};
-                if (found >= 10) {
-                    // dsyslog("flatPlus: SetItemEvent() Date string found at %ld", found);
+                if (found != std::string_view::npos && found >= 10) {
+                    // dsyslog("   Date string found at %ld", found);
                     std::string_view date {sep.substr(found - 10, 10)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
@@ -1476,12 +1473,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {
-                    // dsyslog("flatPlus: SetItemEvent() Date string not found!");
+                    // dsyslog("   Date string not found!");
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
             } else {
-                // dsyslog("flatPlus: SetItemEvent() Event title too short!");
+                // dsyslog("   Event title too short!");
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
@@ -1732,7 +1729,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowFormatIcons)
                 DrawRecordingFormatIcon(Recording, Left, Top);  // Show (SD), HD or UHD Logo
 
-            Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
+            Left += ImgRecCutWidth + (ImgRecCutWidth / 2) + m_MarginItem;  // Ensures exact 100% increase
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
@@ -1851,7 +1848,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowFormatIcons)
                 DrawRecordingFormatIcon(Recording, Left, Top);  // Show (SD), HD or UHD Logo
 
-            Left += (ImgRecCutWidth * 1.5f) + m_MarginItem;  // 0.666 * 1.5 = 0.999
+            Left += ImgRecCutWidth + (ImgRecCutWidth / 2) + m_MarginItem;  // Ensures exact 100% increase
 
         } else if (Total > 0) {  // Folder with recordings
             IconName = "folder";
@@ -2076,13 +2073,13 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
-            if (!isempty(*Audio)) {
-                if (!isempty(*TextAdditional))
+            if (Audio[0] != '\0') {
+                if (TextAdditional[0] != '\0')
                     TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
             }
-            if (!isempty(*Subtitle)) {
-                if (!isempty(*TextAdditional))
+            if (Subtitle[0] != '\0') {
+                if (TextAdditional[0] != '\0')
                     TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
@@ -2145,7 +2142,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
-
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
@@ -2176,7 +2172,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         ContentTop = m_MarginItem;
 
         // Add description header if needed
-        if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
+        if ((Text[0] != '\0') || (MediaPath[0] != '\0')) {  // Insert description line
             ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
             ContentTop += m_FontHeight;
@@ -2186,32 +2182,32 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 
         // Handle media content
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
-        if (!isempty(*MediaPath)) {
+        if (MediaPath[0] != '\0') {
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
-            } else if (!isempty(*Text)) {  // No image; insert text
+            } else if (Text[0] != '\0') {  // No image; insert text
                 ComplexContent.AddText(
                     *Text, true,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             }
-        } else if (!isempty(*Text)) {  // No image; insert text
+        } else if (Text[0] != '\0') {  // No image; insert text
             ComplexContent.AddText(
                 *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 
         // Add movie information if available
-        if (!isempty(*MovieInfo)) {
+        if (MovieInfo[0] != '\0') {
             AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop, true);
         }
 
         // Add series information if available
-        if (!isempty(*SeriesInfo)) {
+        if (SeriesInfo[0] != '\0') {
             AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop, true);
         }
 #ifdef DEBUGEPGTIME
@@ -2227,12 +2223,12 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
 #endif
 
         // Add reruns information if available
-        if (!isempty(*Reruns)) {
+        if (Reruns[0] != '\0') {
             AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, ContentTop, true);
         }
 
         // Add video information if available
-        if (!isempty(*TextAdditional)) {
+        if (TextAdditional[0] != '\0') {
             AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop, true);
         }
 
@@ -2377,9 +2373,9 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                 cString Audio {""}, Subtitle {""};
                 InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
 
-                if (!isempty(*Audio))
+                if (Audio[0] != '\0')
                     Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                if (!isempty(*Subtitle))
+                if (Subtitle[0] != '\0')
                     Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
             if (RecInfo->Aux())
@@ -2409,7 +2405,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             MediaWidth = m_cWidth / 2 - m_MarginItem3;
         }
 
-        if (isempty(*MediaPath)) {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
             const cString RecPath = Recording->FileName();
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
@@ -2427,7 +2423,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         }
     }  // TVScraperRecInfoShowPoster
 
-    if (!isempty(*MediaPath)) {
+    if (MediaPath[0] != '\0') {
         img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
@@ -2679,13 +2675,13 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             cString Audio {""}, Subtitle {""};
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
-            if (!isempty(*Audio)) {
-                if (!isempty(*TextAdditional))
+            if (Audio[0] != '\0') {
+                if (TextAdditional[0] != '\0')
                     TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
             }
-            if (!isempty(*Subtitle)) {
-                if (!isempty(*TextAdditional))
+            if (Subtitle[0] != '\0') {
+                if (TextAdditional[0] != '\0')
                     TextAdditional.Append("\n");
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
@@ -2727,7 +2723,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (FirstRun && (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors)) {
             GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName,
                 ActorsRole, nullptr, Recording);
-            if (isempty(*MediaPath)) {  // Prio for tvscraper poster
+            if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
                     const cString RecPath = Recording->FileName();
                     ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
                 }
@@ -2740,7 +2736,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         ContentTop = m_MarginItem;
 
         // Add description header if needed
-        if (!isempty(*Text) || !isempty(*MediaPath)) {  // Insert description line
+        if ((Text[0] != '\0') || (MediaPath[0] != '\0')) {  // Insert description line
             ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
             ContentTop += m_FontHeight;
@@ -2749,7 +2745,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         }
 
         // Handle media content
-        if (!isempty(*MediaPath)) {
+        if (MediaPath[0] != '\0') {
             img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
@@ -2766,27 +2762,25 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
                     img, CIP_Right, *Text,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
-            } else if (!isempty(*Text)) {  // No image; insert text
+            } else if (Text[0] != '\0') {  // No image; insert text
                 ComplexContent.AddText(
                     *Text, true,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             }
-        } else if (!isempty(*Text)) {  // No image; insert text
+        } else if (Text[0] != '\0') {  // No image; insert text
             ComplexContent.AddText(
                 *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
         // Add movie information if available
-        if (!isempty(*MovieInfo)) {
+        if (MovieInfo[0] != '\0')
             AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop);
-        }
 
         // Add series information if available
-        if (!isempty(*SeriesInfo)) {
+        if (SeriesInfo[0] != '\0')
             AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop);
-        }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2800,14 +2794,12 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #endif
 
         // Add recording information if available
-        if (!isempty(*RecAdditional)) {
+        if (RecAdditional[0] != '\0')
             AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent, ContentTop);
-        }
 
         // Add video information if available
-        if (!isempty(*TextAdditional)) {
+        if (TextAdditional[0] != '\0')
             AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop);
-        }
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
@@ -3762,7 +3754,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel {(TimerRec[i])->Channel()};
-                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3803,7 +3794,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel {(TimerActive[i])->Channel()};
-                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3875,7 +3865,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }  // StrTimer = cString::sprintf("R: ");
 
                 const cChannel *Channel {(TimerRemoteActive[i])->Channel()};
-                // const cEvent *Event {Timer->Event()};
                 if (Channel)
                     StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
                 else
@@ -3930,19 +3919,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     // Sort by RecStart and add entrys to ContentWidget
     std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
     int index {0};
-    cString Rec {""};
     while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
         const auto& PairRec = Recs.back();
-        Rec = PairRec.second;
-        Recs.pop_back();  // Delete after value is copied
 
         ContentWidget.AddText(
-            *Rec, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+            *PairRec.second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
+        Recs.pop_back();  // Delete
         ++index;
     }
     return ContentWidget.ContentHeight(false);
@@ -4089,10 +4076,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
-    const int updates {(isempty(*Content) ? -1 : atoi(*Content))};
+    const int updates {(Content[0] == '\0') ? -1 : atoi(*Content)};
 
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
-    const int SecurityUpdates {(isempty(*Content) ? -1 : atoi(*Content))};
+    const int SecurityUpdates {(Content[0] == '\0') ? -1 : atoi(*Content)};
 
     if (updates == -1 || SecurityUpdates == -1) {
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
@@ -4128,16 +4115,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     int CountTemps {0};
 
     const cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
-    if (!isempty(*TempCPU)) ++CountTemps;
+    if (TempCPU[0] != '\0') ++CountTemps;
 
     const cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
-    if (!isempty(*TempCase)) ++CountTemps;
+    if (TempCase[0] != '\0') ++CountTemps;
 
     const cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
-    if (!isempty(*TempMB)) ++CountTemps;
+    if (TempMB[0] != '\0') ++CountTemps;
 
     const cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
-    if (!isempty(*TempGPU)) ++CountTemps;
+    if (TempGPU[0] != '\0') ++CountTemps;
 
     if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
@@ -4148,28 +4135,28 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
         const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
-        if (!isempty(*TempCPU)) {
+        if (TempCPU[0] != '\0') {
             str = cString::sprintf("%s: %s", tr("CPU"), *TempCPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (!isempty(*TempCase)) {
+        if (TempCase[0] != '\0') {
             str = cString::sprintf("%s: %s", tr("PC-Case"), *TempCase);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (!isempty(*TempMB)) {
+        if (TempMB[0] != '\0') {
             str = cString::sprintf("%s: %s", tr("MB"), *TempMB);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (!isempty(*TempGPU)) {
+        if (TempGPU[0] != '\0') {
             str = cString::sprintf("%s: %s", tr("GPU"), *TempGPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4189,7 +4176,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
-    if (isempty(*Title)) Title = tr("no title available");
+    if (Title[0] == '\0') Title = tr("no title available");
 
     ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 
@@ -4224,7 +4211,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     // Read location
     cString Location = *ReadAndExtractData(cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH));
-    if (isempty(*Location))
+    if (Location[0] == '\0')
         Location = tr("Unknown");
 
     // Read temperature
@@ -4264,7 +4251,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         PrecString =
             *FormatPrecipitation(cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index));
 
-        if (isempty(*Icon) || isempty(*Summary) || isempty(*TempMax) || isempty(*TempMin) || (isempty(*PrecString)))
+        if ((Icon[0] == '\0') || (Summary[0] == '\0') || (TempMax[0] == '\0') || (TempMin[0] == '\0') ||
+            (PrecString[0] == '\0'))
             continue;
 
         tm_r.tm_mday += index;

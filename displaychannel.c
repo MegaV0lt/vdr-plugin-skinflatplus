@@ -178,7 +178,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
                                     Theme.Color(clrChannelBg), m_FontBig);
     }
 #ifdef SHOW_TRANSPONDERINFO
-    if (!isempty(*TransponderInfo)) {
+    if (TransponderInfo[0] != '\0') {
+        // Transponder info on background
         const int top {m_FontBig->Height() - m_FontHeight};
         ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), top),
                                     *TransponderInfo, Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg),
@@ -429,7 +430,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapClear(ChanEpgImagesPixmap);
     PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
     DecorBorderClearByFrom(BorderTVSPoster);
-    if (!isempty(*MediaPath)) {
+    if (MediaPath[0] != '\0') {
         SetMediaSize(MediaSize, m_TVSRect.Size());  // Check for too big images
         MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperChanInfoPosterSize * 100);
         MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperChanInfoPosterSize * 100);

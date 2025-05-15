@@ -326,7 +326,7 @@ void cFlatDisplayReplay::SetTotal(const char *Total) {
     if (m_ModeOnly) return;
 
     m_Total = Total;
-    if (!isempty(*m_Current))  // Do not call 'UpdateInfo()' when 'm_Current' is not set
+    if (m_Current[0] != '\0')  // Do not call 'UpdateInfo()' when 'm_Current' is not set
         UpdateInfo();
 }
 
@@ -604,7 +604,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         cSize MediaSize {0, 0};
         if (Config.TVScraperReplayInfoShowPoster) {
             GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-            if (isempty(*MediaPath)) {  // Prio for tvscraper poster
+            if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                     img = ImgLoader.LoadFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
@@ -619,7 +619,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         PixmapClear(ChanEpgImagesPixmap);
         PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
-        if (!isempty(*MediaPath)) {
+        if (MediaPath[0] != '\0') {
             SetMediaSize(MediaSize, m_TVSRect.Size());  // Check for too big images
             MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
             MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
