@@ -3382,7 +3382,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
         }
     }
 
-    if (RecStartNewest == 0 && RecStartOldest <= now) return RecStart;  // No recordings in folder
+    if (RecStartNewest == 0 && RecStartOldest == now) return RecStart;  // No recordings in folder
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   RecStartNewest %s, RecStartOldest %s", *ShortDateString(RecStartNewest),
