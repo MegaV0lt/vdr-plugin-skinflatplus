@@ -3359,19 +3359,35 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
  * If Config.MenuItemRecordingShowFolderDate is 2, the oldest recording is returned.
  */
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const {
-    time_t RecStart {Recording->Start()};
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::GetLastRecTimeFromFolder() Level %d", Level);
+#endif
 
+    time_t RecStart {Recording->Start()};
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
-    std::string_view RecFolder {*GetRecordingName(Recording, Level, true)};
-    time_t RecStartNewest {0}, RecStartOldest {0};
+    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
+    if (RecFolder.empty()) return RecStart;  // No folder
+
+    std::string RecFolder2 {""};
+    RecFolder2.reserve(256);  // Reserve space for the string
+    const time_t now {time(0)};
+    time_t RecStartNewest {0}, RecStartOldest {now};
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-        if (RecFolder == *GetRecordingName(Rec, Level, true)) {  // Recordings must be in the same folder
+        RecFolder2 = *GetRecordingName(Rec, Level, true);
+        if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
             RecStartNewest = std::max(RecStartNewest, Rec->Start());
             RecStartOldest = std::min(RecStartOldest, Rec->Start());
         }
     }
+
+    if (RecStartNewest == 0 && RecStartOldest <= now) return RecStart;  // No recordings in folder
+
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   RecStartNewest %s, RecStartOldest %s", *ShortDateString(RecStartNewest),
+            *ShortDateString(RecStartOldest));
+#endif
 
     return (Config.MenuItemRecordingShowFolderDate == 1) ? RecStartNewest : RecStartOldest;
 }
