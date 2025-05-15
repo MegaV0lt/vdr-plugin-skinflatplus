@@ -3181,6 +3181,7 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
 
     std::string_view RecName {Recording->Name()};
     std::string RecNamePart {""};
+    RecNamePart.reserve(256);  // Reserve space for the string
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
