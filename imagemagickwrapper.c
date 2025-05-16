@@ -46,6 +46,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 #ifndef IMAGEMAGICK7
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #endif
+    // Use integer arithmetic instead of floating-point division
+    constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
     cImage *image = new cImage(cSize(width, height));
     if (!image) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image");
@@ -65,7 +67,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 #ifdef IMAGEMAGICK7
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
         // Use integer arithmetic instead of floating-point division
-        constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
         const uint64_t QuantumScaleInt {(255ULL * SCALE_FACTOR) / QuantumRange};
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
@@ -80,7 +81,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         }
 #else
         // Use integer arithmetic instead of floating-point division
-        constexpr uint64_t SCALE_FACTOR {1UL << 16};
         const uint64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
         for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
             scaler.PutSourcePixel(static_cast<int>((pixels->blue * SCALE_FACTOR) / RGBScaleInt),
@@ -93,7 +93,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 #ifdef IMAGEMAGICK7
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
     // Use integer arithmetic instead of floating-point division
-    constexpr u_int64_t SCALE_FACTOR {1UL << 16};
     const u_int64_t QuantumScaleInt {(255UL * SCALE_FACTOR) / QuantumRange};
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
@@ -108,7 +107,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 #else
     // Use integer arithmetic instead of floating-point division
-    constexpr u_int64_t SCALE_FACTOR {1UL << 16};
     const u_int64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
     for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
         *imgData++ =
