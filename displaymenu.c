@@ -1458,27 +1458,24 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         // dsyslog("flatPlus: SetItemEvent() Try to extract date from event title '%s'", Event->Title());
         if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
             // dsyslog("   Channel is group separator!");
-        } else {
-            // Extract date from separator
+        } else {  // Extract date from separator
             // epgsearch program '----------------------------------------         Fr. 21.02.2025 ----------------------------------------'  //NOLINT
             std::string_view sep {Event->Title()};  // Event->Title should always set to something
-            if (sep.length() > 12) {
+            if (sep.length() > 16) {  // Date with day and search string ' -'
                 const std::size_t found {sep.find(" -")};
-                if (found != std::string_view::npos && found >= 10) {
+                if (found != std::string_view::npos && found >= 14) {
                     // dsyslog("   Date string found at %ld", found);
-                    std::string_view date {sep.substr(found - 10, 10)};
+                    const std::string date {sep.substr(found - 14, 14)};
                     const int LineTop {Top + (m_FontHeight - 3) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
-                    const cString DateSpace = cString::sprintf(" %s ", date.data());
+                    const cString DateSpace = cString::sprintf(" %s ", date.c_str());
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
-                } else {
-                    // dsyslog("   Date string not found!");
+                } else {  // Date string not found
                     MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
-            } else {
-                // dsyslog("   Event title too short!");
+            } else {  // Event title too short
                 MenuPixmap->DrawText(cPoint(Left, Top), Event->Title(), ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
