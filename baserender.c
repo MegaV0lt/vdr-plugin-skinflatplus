@@ -703,26 +703,10 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.data(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
-            if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
-                MessageScroller.AddScroller(Text,
-                                            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
-                                                  m_OsdHeight - Config.MessageOffset - m_MessageHeight -
-                                                      Config.decorBorderMessageSize + m_MarginItem,
-                                                  MaxWidth, m_FontHeight),
-                                            Theme.Color(clrMessageFont), clrTransparent, m_Font);
-            else
-                MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
-                                        Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
+                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
         }
-    } else {
-        if ((TextWidth > MaxWidth) && Config.ScrollerEnable)
-            MessageScroller.AddScroller(Text,
-                                        cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
-                                              m_OsdHeight - Config.MessageOffset - m_MessageHeight -
-                                                  Config.decorBorderMessageSize + m_MarginItem,
-                                              MaxWidth, m_FontHeight),
-                                        Theme.Color(clrMessageFont), clrTransparent, m_Font);
-        else
+    } else {  // Default: Not scrolling, not parsing tilde
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
     }
