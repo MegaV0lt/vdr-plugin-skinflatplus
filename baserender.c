@@ -1271,6 +1271,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         case 5: {
             const int DotHeight {m_ScrollBarWidth / 2};
             const int out {(m_ScrollBarWidth > 10) ? 2 : 1};
+            const int out2 {out * 2};
             // Outline
             Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, out), Config.decorScrollBarFg);
             Pixmap->DrawRectangle(cRect(Left, Top + Height - out, m_ScrollBarWidth, out), Config.decorScrollBarFg);
@@ -1278,15 +1279,14 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
             Pixmap->DrawRectangle(cRect(Left + m_ScrollBarWidth - out, Top, out, Height), Config.decorScrollBarFg);
 
             // Bar
-            Pixmap->DrawRectangle(cRect(Left + out, ScrollTop + DotHeight + out, m_ScrollBarWidth - out * 2,
-                                        ScrollHeight - DotHeight * 2 - out * 2),
+            Pixmap->DrawRectangle(cRect(Left + out, ScrollTop + DotHeight + out, m_ScrollBarWidth - out2,
+                                        ScrollHeight - DotHeight * 2 - out2),
                                   Config.decorScrollBarBarFg);
             // Dot
-            Pixmap->DrawEllipse(
-                cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
-                Config.decorScrollBarBarFg, 0);
+            Pixmap->DrawEllipse(cRect(Left + out, ScrollTop + out, m_ScrollBarWidth - out2, m_ScrollBarWidth - out2),
+                                Config.decorScrollBarBarFg, 0);
             Pixmap->DrawEllipse(cRect(Left + out, ScrollTop + ScrollHeight - DotHeight * 2 + out,
-                                      m_ScrollBarWidth - out * 2, m_ScrollBarWidth - out * 2),
+                                      m_ScrollBarWidth - out2, m_ScrollBarWidth - out2),
                                 Config.decorScrollBarBarFg, 0);
             break;
         }
