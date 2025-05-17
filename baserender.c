@@ -1139,7 +1139,7 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, bool IsCurren
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
         ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
     } else {
-        const int MarkerWidth {1}, MarkerWidth3 {3};
+        constexpr int MarkerWidth {1}, MarkerWidth3 {3};
         const int Type {Config.PlaybackShowErrorMarks};
         switch (Type) {  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
         case 1:
