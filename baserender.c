@@ -1772,13 +1772,16 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const int WeatherFontHeight {WeatherFont->Height()};  // Used multiple times
     const int WeatherFontSmlHeight {WeatherFontSml->Height()};
 
+    const int TempTodayWidth {WeatherFont->Width(TempToday.c_str())};
+    const int TempTodaySignWidth {WeatherFontSign->Width(TempTodaySign)};
+    const int PrecTodayWidth {WeatherFontSml->Width(*PrecToday)};
+    const int PrecTomorrowWidth {WeatherFontSml->Width(*PrecTomorrow)};
+
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
-    const int wWidth {m_MarginItem + WeatherFont->Width(TempToday.c_str()) +
-                      WeatherFontSign->Width(TempTodaySign) + m_MarginItem2 + WeatherFontHeight +
+    const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
                       m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
-                      WeatherFontSml->Width(*PrecToday) + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem +
-                      WidthTempTomorrow + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
-                      WeatherFontSml->Width(*PrecTomorrow) + m_MarginItem2};
+                      PrecTodayWidth + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow +
+                      m_MarginItem + WeatherFontHeight - m_MarginItem2 + PrecTomorrowWidth + m_MarginItem2};
     const int wLeft {m_OsdWidth - wWidth - 20};
 
     WeatherWidget.Clear();
@@ -1790,7 +1793,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add temperature
     WeatherWidget.AddText(TempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFont.get());
-    left += WeatherFont->Width(TempToday.c_str());
+    left += TempTodayWidth;
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, fs)};
     const int FontAscender2 {GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5))};
@@ -1799,7 +1802,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add temperature sign
     WeatherWidget.AddText(TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFontSign.get());
-    left += WeatherFontSign->Width(TempTodaySign) + m_MarginItem2;
+    left += TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
     cString WeatherIcon = cString::sprintf("widgets/%s", *IconToday);
@@ -1829,7 +1832,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     WeatherWidget.AddText(*PrecToday, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml.get());
-    left += WeatherFontSml->Width(*PrecToday) + m_MarginItem * 4;
+    left += PrecTodayWidth + m_MarginItem * 4;
 
     WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
                           Theme.Color(clrChannelBg));
@@ -1863,7 +1866,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml.get());
 
-    // left += WeatherFontSml->Width(*PrecTomorrow);
+    // left += PrecTomorrowWidth;
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
 
     WeatherWidget.CreatePixmaps(false);
