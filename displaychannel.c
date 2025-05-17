@@ -312,6 +312,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 
+    const int SmlSpaceWidth2 {m_FontSml->Width("  ")};
+
     if (Config.ChannelShowStartTime)
         left += m_Font->Width("00:00  ");
 
@@ -322,7 +324,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         if (Event) {
             StartTime = *Event->GetTimeString();  // Start time (left side)
             StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (right side)
-            StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
+            StrTimeWidth = m_FontSml->Width(*StrTime) + SmlSpaceWidth2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
@@ -360,7 +362,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 SeenDur = cString::sprintf("%d min", EventDuration);
             }  // if (IsPresent)
 
-            SeenDurWidth = m_FontSml->Width(*SeenDur) + m_FontSml->Width("  ");
+            SeenDurWidth = m_FontSml->Width(*SeenDur) + SmlSpaceWidth2;
             SeenDurMaxWidth = std::max(StrTimeWidth, SeenDurWidth);
             MaxAvailWidth = m_ChannelWidth - left - SeenDurMaxWidth;
 #ifdef DEBUGFUNCSCALL

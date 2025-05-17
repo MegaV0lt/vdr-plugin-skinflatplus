@@ -450,13 +450,11 @@ void cFlatDisplayReplay::UpdateInfo() {
                     const std::string hm2 {cutt.substr(0, found)};
                     std::string_view secs2 {cutt.substr(found, cutt.length() - found)};
 
-                    right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
-                            HmWidth - SecsWidth - Spacer -
+                    right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - HmWidth - SecsWidth - Spacer -
                             ImgCuttedWidth - m_MarginItem - m_Font->Width(hm2.c_str()) -
                             m_FontSecs->Width(secs2.data());
                 } else {
-                    right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
-                            HmWidth - SecsWidth - Spacer -
+                    right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - HmWidth - SecsWidth - Spacer -
                             ImgCuttedWidth - m_MarginItem - CuttedWidth;
                 }
 
@@ -528,8 +526,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 const int HmWidth {m_Font->Width(hm.c_str())};  // Width of hours and minutes
                 const int SecsWidth {m_FontSecs->Width(secs.data())};  // Width of seconds
 
-                right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem -
-                        HmWidth - SecsWidth;
+                right = m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - HmWidth - SecsWidth;
                 if (img) {  // Draw preloaded 'recording_total' icon
                     IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
                     right += ImgWidth + m_MarginItem;  // 'ImgWidth' is already set
@@ -659,8 +656,8 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
                               JumpWidth, m_FontHeight, taCenter);
 
     const sDecorBorder ib {left + Config.decorBorderReplaySize,
-                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 -
-                               m_FontHeight - Config.decorBorderReplaySize * 2,
+                           m_OsdHeight - m_LabelHeight - m_ProgressBarHeight * 2 - m_MarginItem3 - m_FontHeight -
+                               Config.decorBorderReplaySize * 2,
                            JumpWidth,
                            m_FontHeight,
                            Config.decorBorderReplaySize,
