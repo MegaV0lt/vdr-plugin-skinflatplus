@@ -2599,7 +2599,6 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     m_MenuItemWidth = m_cWidth;
 
     cString RecAdditional {""}, Text {""}, TextAdditional {""};
-
     const cRecordingInfo *RecInfo {Recording->Info()};
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
@@ -3595,7 +3594,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int i {0}; i < NumDevices; ++i) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
-            continue;
+            break;  // Not enough space to display anything meaningful
 
         const cDevice *device {cDevice::GetDevice(i)};
         if (!device || !device->NumProvidedSystems())
