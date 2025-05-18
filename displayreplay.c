@@ -569,7 +569,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         } */
 
         const int Rest {NumFrames - m_CurrentFrame};
-        const cString TimeStr = cString::sprintf("%s" , *TimeString(time(0) + (Rest / FramesPerSecond)));  // HH:MM
+        const cString TimeStr = cString::sprintf("%s" , *TimeString(CurTime + (Rest / FramesPerSecond)));  // HH:MM
         cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
         const int EndTimeWidth {m_Font->Width(EndTime)};  // Width of 'ends at:' text
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
@@ -579,7 +579,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         //* Draw end time of cutted recording with cutted symbol
         if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit > 0) {
             const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
-            EndTime = *TimeString(time(0) + (RestCutted / FramesPerSecond));  // HH:MM
+            EndTime = *TimeString(CurTime + (RestCutted / FramesPerSecond));  // HH:MM
             if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
                 img = ImgLoader.LoadIcon("recording_cutted_extra", ICON_WIDTH_UNLIMITED, GlyphSize);
                 if (img) {
