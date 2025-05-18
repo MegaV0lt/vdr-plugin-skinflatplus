@@ -2102,11 +2102,11 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                 cList<Epgsearch_searchresults_v1_0::cServiceSearchResult> *list = data.pResultList;
                 if (list && (list->Count() > 1)) {
                     int i {0};
+                    const tChannelID ChannelID {Event->ChannelID()};
+                    const time_t StartTime {Event->StartTime()};
                     for (Epgsearch_searchresults_v1_0::cServiceSearchResult *r = list->First(); r && i < 5;
                          r = list->Next(r)) {
-                        if ((Event->ChannelID() == r->event->ChannelID()) &&
-                            (Event->StartTime() == r->event->StartTime()))
-                            continue;
+                        if ((ChannelID == r->event->ChannelID()) && (StartTime == r->event->StartTime())) continue;
                         ++i;
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
                         {
