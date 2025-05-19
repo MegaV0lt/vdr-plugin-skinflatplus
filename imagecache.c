@@ -42,7 +42,7 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
             dsyslog("flatPlus: RemoveFromCache - %s", CacheName[i].c_str());
             delete CacheImage[i];
             CacheImage[i] = nullptr;
-            CacheName[i] = "";
+            CacheName[i] = "-Empty!-";  // Mark as empty because "" is for end of cache
             CacheWidth[i] = -1;
             CacheHeight[i] = -1;
             return true;
@@ -54,7 +54,9 @@ bool cImageCache::RemoveFromCache(const std::string &Name) {
 cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) const {
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (uint i {0}; i < MaxImageCache; ++i) {
-        // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
+        if (CacheName[i].empty())
+            break;  // No more images in cache;
+        // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", i, CacheName[i].c_str(),
         //          CacheWidth[i], CacheHeight[i]);
         if (CacheName[i] == Name && CacheWidth[i] == Width && CacheHeight[i] == Height)
             return CacheImage[i];

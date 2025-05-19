@@ -221,7 +221,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    //* Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
+    const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     for (const cString &Image : RecordingImages) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;

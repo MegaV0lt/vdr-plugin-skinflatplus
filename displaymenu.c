@@ -4373,6 +4373,7 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     ImgLoader.LoadIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
 
+    // Channel icons
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     cImage *img {ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight)};
@@ -4380,13 +4381,6 @@ void cFlatDisplayMenu::PreLoadImages() {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
     }
-
-    ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-    ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-    ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
-    ImgLoader.LoadIcon("timerInactive", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
     //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
     int index {0};
@@ -4400,9 +4394,31 @@ void cFlatDisplayMenu::PreLoadImages() {
         }
     }  // for channel
 
+    ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+
+    // Plugin icons
+    for (int i {0};; ++i) {
+        cString PluginName {""}, PluginNameCur {""};
+        cPlugin *p {cPluginManager::GetPlugin(i)};
+        if (p) {
+            PluginName = cString::sprintf("pluginIcons/%s", p->Name());
+            PluginNameCur = cString::sprintf("pluginIcons/%s_cur", *PluginName);
+            ImgLoader.LoadIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+            ImgLoader.LoadIcon(*PluginNameCur, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+        } else {
+            break;}
+    }
+
+    // Top bar icons
     ImgLoader.LoadIcon("radio", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
     ImgLoader.LoadIcon("changroup", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
     ImgLoader.LoadIcon("tv", ICON_WIDTH_UNLIMITED, m_TopBarHeight - m_MarginItem2);
+
+    ImgLoader.LoadIcon("timerInactive", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
+    ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
 
     ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
@@ -4428,6 +4444,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
     ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 
+    // Widget icons
     if (Config.MainMenuWidgetDVBDevicesShow) {
         ImgLoader.LoadIcon("widgets/dvb_devices", ImageHeight, ImageHeight - m_MarginItem2);
     }

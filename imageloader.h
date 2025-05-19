@@ -12,7 +12,7 @@
 #include <vdr/osd.h>
 #include <vdr/skins.h>
 
-#include <list>
+// #include <list>
 
 #include <Magick++.h>
 
@@ -33,7 +33,6 @@ class cImageLoader : public cImageMagickWrapper {
 
  private:
     const cString m_LogoExtension {"png"};
-    const std::list<cString> RecordingImages {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     void ToLowerCase(std::string &str);  // NOLINT
     bool CheckImageExistence(const cString &RecPath, const cString &Image, cString &found);  // NOLINT
 };

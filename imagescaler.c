@@ -78,7 +78,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     int e {0}, offset {0};       // Init outside of loop
     float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
     std::array<float, 4> h_arr {0.0f, 0.0f, 0.0f, 0.0f};
-    for (uint i {0}; i < dst_size; ++i) {
+    for (int i {0}; i < dst_size; ++i) {
         e = (2 * i + 1) * src_size - dst_size;  // Sample position enumerator
         offset = e / d;                         // Truncated sample position
         // Exact sample position is (float) e/d = offset + sub_offset
@@ -131,8 +131,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
  *
  * This function initializes the destination image buffer, stride, and dimensions,
  * as well as the source image dimensions. It recalculates the horizontal and vertical
- * filter coefficients if the image dimensions have changed. The function uses a 
- * unique_ptr for managing memory allocation required for filter coefficients and 
+ * filter coefficients if the image dimensions have changed. The function uses a
+ * unique_ptr for managing memory allocation required for filter coefficients and
  * temporary buffer storage.
  *
  * @param dst_image Pointer to the destination image buffer.
@@ -233,7 +233,7 @@ void ImageScaler::NextSourceLine() {
         const TmpPixel *src {m_buffer};  // Pointer to the buffer containing filtered input lines
         unsigned *dst {m_dst_image + m_dst_stride * m_dst_y};  // Pointer to the destination image line
 
-        for (unsigned i {0}; i < m_dst_width; ++i) {
+        for (uint i {0}; i < m_dst_width; ++i) {
             const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
             src += 4;
             dst[i] = PackPixel(t);
