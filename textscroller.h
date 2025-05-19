@@ -78,6 +78,6 @@ class cTextScrollers : public cThread {
     int m_ScrollStep {0}, m_ScrollDelay {0};
     int m_ScrollType {0};
     int m_Layer {0};
-    virtual void Action();
+    void Action() override;
     void StartScrolling();
 };

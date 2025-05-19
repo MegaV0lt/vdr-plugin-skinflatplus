@@ -228,13 +228,13 @@ static const cString SeenIconNames[]{"recording_seen_0", "recording_seen_1", "re
 class cFlat : public cSkin {
  public:
     cFlat();
-    virtual const char *Description();
-    virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
-    virtual cSkinDisplayMenu *DisplayMenu();
-    virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
-    virtual cSkinDisplayVolume *DisplayVolume();
-    virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-    virtual cSkinDisplayMessage *DisplayMessage();
+    const char *Description() override;
+    cSkinDisplayChannel *DisplayChannel(bool WithInfo) override;
+    cSkinDisplayMenu *DisplayMenu() override;
+    cSkinDisplayReplay *DisplayReplay(bool ModeOnly) override;
+    cSkinDisplayVolume *DisplayVolume() override;
+    cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) override;
+    cSkinDisplayMessage *DisplayMessage() override;
 
  private:
     cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()

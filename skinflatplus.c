@@ -23,25 +23,25 @@ static const char *DESCRIPTION    = "Skin flatPlus";
 class cPluginFlat : public cPlugin {
  public:
         cPluginFlat();
-        virtual ~cPluginFlat();
-        virtual const char *Version() { return VERSION; }
-        virtual const char *Description() { return DESCRIPTION; }
-        virtual const char *CommandLineHelp();
-        virtual bool ProcessArgs(int argc, char *argv[]);
-        virtual bool Initialize();
-        virtual bool Start();
-        virtual void Stop();
-        virtual void Housekeeping();
-        // virtual void MainThreadHook();  // Deprecated in VDR 2.7.4
-        virtual cString Active();
-        virtual time_t WakeupTime();
-        virtual const char *MainMenuEntry() { return nullptr; }
-        virtual cOsdObject *MainMenuAction();
-        virtual cMenuSetupPage *SetupMenu();
-        virtual bool SetupParse(const char *Name, const char *Value);
-        virtual bool Service(const char *Id, void *Data = nullptr);
-        virtual const char **SVDRPHelpPages();
-        virtual cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode);  // NOLINT
+        ~cPluginFlat() override;
+        const char *Version() override { return VERSION; }
+        const char *Description() override { return DESCRIPTION; }
+        const char *CommandLineHelp() override;
+        bool ProcessArgs(int argc, char *argv[]) override;
+        bool Initialize() override;
+        bool Start() override;
+        void Stop() override;
+        void Housekeeping() override;
+        // void MainThreadHook() override;  // Deprecated in VDR 2.7.4
+        cString Active() override;
+        time_t WakeupTime() override;
+        const char *MainMenuEntry() override { return nullptr; }
+        cOsdObject *MainMenuAction() override;
+        cMenuSetupPage *SetupMenu() override;
+        bool SetupParse(const char *Name, const char *Value) override;
+        bool Service(const char *Id, void *Data = nullptr) override;
+        const char **SVDRPHelpPages() override;
+        cString SVDRPCommand(const char *Command, const char *Option, int &ReplyCode) override;  // NOLINT
 
  private:
         cFlat *flat;

@@ -25,38 +25,38 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     using cSkinDisplayMenu::SetItemEvent;
 #endif
     cFlatDisplayMenu();
-    virtual ~cFlatDisplayMenu();
-    virtual void Scroll(bool Up, bool Page);
-    virtual int MaxItems();
-    virtual void Clear();
+    ~cFlatDisplayMenu() override;
+    void Scroll(bool Up, bool Page) override;
+    int MaxItems() override;
+    void Clear() override;
 
-    virtual void SetMenuCategory(eMenuCategory MenuCategory);
-    // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
+    void SetMenuCategory(eMenuCategory MenuCategory) override;
+    // void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0) override;
 
-    virtual void SetTitle(const char *Title);
+    void SetTitle(const char *Title) override;
     virtual void SetButtons(const char *Red, const char *Green = nullptr,
                             const char *Yellow = nullptr, const char *Blue = nullptr);
-    virtual void SetMessage(eMessageType Type, const char *Text);
-    virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
+    void SetMessage(eMessageType Type, const char *Text) override;
+    void SetItem(const char *Text, int Index, bool Current, bool Selectable) override;
 
     virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
                               const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
                               bool TimerActive);
-    virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
+    bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) override;
     virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
                                 bool WithProvider);
     virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
                                   int Level, int Total, int New);
 
-    virtual void SetMenuSortMode(eMenuSortMode MenuSortMode);
+    void SetMenuSortMode(eMenuSortMode MenuSortMode) override;
 
-    virtual void SetScrollbar(int Total, int Offset);
-    virtual void SetEvent(const cEvent *Event);
-    virtual void SetRecording(const cRecording *Recording);
-    virtual void SetText(const char *Text, bool FixedFont);
-    virtual int GetTextAreaWidth() const;
-    virtual const cFont *GetTextAreaFont(bool FixedFont) const;
-    virtual void Flush();
+    void SetScrollbar(int Total, int Offset) override;
+    void SetEvent(const cEvent *Event) override;
+    void SetRecording(const cRecording *Recording) override;
+    void SetText(const char *Text, bool FixedFont) override;
+    int GetTextAreaWidth() const override;
+    const cFont *GetTextAreaFont(bool FixedFont) const override;
+    void Flush() override;
 
     void PreLoadImages();
 
