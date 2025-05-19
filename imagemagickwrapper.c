@@ -43,11 +43,15 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         else
             height = h * width / w;
     }
-#ifndef IMAGEMAGICK7
+#ifdef IMAGEMAGICK7
+    // Use integer arithmetic instead of floating-point division
+    const uint64_t QuantumScaleInt {(255ULL * SCALE_FACTOR) / QuantumRange};
+#else
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
-#endif
     // Use integer arithmetic instead of floating-point division
     constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
+    const uint64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
+#endif
     cImage *image = new cImage(cSize(width, height));
     if (!image) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image");
@@ -66,8 +70,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-        // Use integer arithmetic instead of floating-point division
-        const uint64_t QuantumScaleInt {(255ULL * SCALE_FACTOR) / QuantumRange};
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
@@ -80,8 +82,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
             }
         }
 #else
-        // Use integer arithmetic instead of floating-point division
-        const uint64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
         for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
             scaler.PutSourcePixel(static_cast<int>((pixels->blue * SCALE_FACTOR) / RGBScaleInt),
                                   static_cast<int>((pixels->green * SCALE_FACTOR) / RGBScaleInt),
@@ -92,8 +92,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 #ifdef IMAGEMAGICK7
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    // Use integer arithmetic instead of floating-point division
-    const u_int64_t QuantumScaleInt {(255UL * SCALE_FACTOR) / QuantumRange};
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
@@ -106,8 +104,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         }
     }
 #else
-    // Use integer arithmetic instead of floating-point division
-    const u_int64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
     for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
         *imgData++ =
             ((~static_cast<int>((pixels->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
