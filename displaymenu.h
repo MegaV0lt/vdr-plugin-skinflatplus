@@ -34,19 +34,17 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     // void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0) override;
 
     void SetTitle(const char *Title) override;
-    virtual void SetButtons(const char *Red, const char *Green = nullptr,
-                            const char *Yellow = nullptr, const char *Blue = nullptr);
+    void SetButtons(const char *Red, const char *Green = nullptr, const char *Yellow = nullptr,
+                    const char *Blue = nullptr) override;
     void SetMessage(eMessageType Type, const char *Text) override;
     void SetItem(const char *Text, int Index, bool Current, bool Selectable) override;
 
-    virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                              const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
-                              bool TimerActive);
+    bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable, const cChannel *Channel,
+                      bool WithDate, eTimerMatch TimerMatch, bool TimerActive) override;
     bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) override;
-    virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
-                                bool WithProvider);
-    virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
-                                  int Level, int Total, int New);
+    bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable, bool WithProvider) override;
+    bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable, int Level, int Total,
+                          int New) override;
 
     void SetMenuSortMode(eMenuSortMode MenuSortMode) override;
 
