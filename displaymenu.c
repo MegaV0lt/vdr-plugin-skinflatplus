@@ -4400,13 +4400,11 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     // Plugin icons
     for (int i {0};; ++i) {
-        cString PluginName {""}, PluginNameCur {""};
+        cString PluginName {""};
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
             PluginName = cString::sprintf("pluginIcons/%s", p->Name());
-            PluginNameCur = cString::sprintf("pluginIcons/%s_cur", *PluginName);
             ImgLoader.LoadIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
-            ImgLoader.LoadIcon(*PluginNameCur, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
         } else {
             break;}
     }
