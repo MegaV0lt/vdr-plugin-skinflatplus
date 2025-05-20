@@ -208,10 +208,19 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     return nullptr;
 }
 
+/**
+ * @brief Convert a string to lower case.
+ *
+ * This function is used to convert file names to lower case when searching for images
+ * in the recording directory. This is done to allow for case insensitive search.
+ *
+ * @param str The string to convert to lower case
+ */
 void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
         if (ch <= 'Z' && ch >= 'A')  // Check for 'Z' first. Small letters start at 97
-            ch += 32;  // Or: ch ^= 1 << 5;
+            ch |= 0x20;  // Bitwise OR operation. ASCII values of uppercase letters are contiguous and can
+                         // be converted to lowercase by setting the 5th bit (0x20)
     }
 }
 
