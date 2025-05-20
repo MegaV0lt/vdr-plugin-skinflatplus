@@ -4238,6 +4238,21 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     cImage *img {nullptr};
+    const int Middle {(m_FontHeight - FontTempSmlHeight) / 2};  // Vertical center
+    // Calculate width of fixed strings only once
+    const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};  // Max. width of temperature string
+    int TempSmlSpaceWidth {0};                                 // Space between temperature and precipitation
+    int TempSmlPrecWidth {0};                                  // Max. width of precipitation string
+    int TempBarWidth {0};                                      // Width of the char '|'
+    int TempMaxStringWidth {0};                                // Width to fit the temperature string in
+    if (Config.MainMenuWidgetWeatherType == 0) {  // Short
+        TempBarWidth = m_Font->Width('|');
+        TempMaxStringWidth = m_FontTempSml->Width("XXXX");
+    } else {  // Long
+        TempSmlSpaceWidth = m_FontTempSml->Width(" ");
+        TempSmlPrecWidth = m_FontTempSml->Width("100%");
+        TempMaxStringWidth = m_Font->Width("XXXX");
+    }
     for (int index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
         // Read icon
         Icon = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index));
@@ -4263,14 +4278,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         /* time_t */ t2 = mktime(&tm_r);
 
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
-            if (left + m_FontHeight2 + m_FontTempSml->Width("-99,9°C") + m_FontTempSml->Width("XXXX") +
-                    m_MarginItem * 6 >
-                wWidth)
+            if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth)
                 break;
             if (index > 0) {
                 ContentWidget.AddText("|", false, cRect(left, ContentTop, 0, 0), Theme.Color(clrMenuEventFontInfo),
                                       Theme.Color(clrMenuEventBg), m_Font);
-                left += m_Font->Width('|') + m_MarginItem2;
+                left += TempBarWidth + m_MarginItem2;
             }
 
             WeatherIcon = cString::sprintf("widgets/%s", *Icon);
@@ -4294,8 +4307,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
             }
-            ContentWidget.AddText(*PrecString, false,
-                                  cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
+            ContentWidget.AddText(*PrecString, false, cRect(left, ContentTop + Middle, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
             left += m_FontTempSml->Width(*PrecString) + m_MarginItem2;
         } else {  // Long
@@ -4308,7 +4320,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             ContentWidget.AddText(*DayName, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font,
                                   wWidth - m_MarginItem2);
-            left += m_Font->Width("XXXX") + m_MarginItem;
+            left += TempMaxStringWidth + m_MarginItem;
 
             WeatherIcon = cString::sprintf("widgets/%s", *Icon);
             img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
@@ -4316,8 +4328,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};  // Max. width of temperature string
-            const int TempSmlSpaceWidth {m_FontTempSml->Width(" ")};     // Space between temperature and precipitation
             ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
                                   TempSmlWidth, FontTempSmlHeight, taRight);
@@ -4332,17 +4342,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
             }
-            const int TempSmlWidth2 {m_FontTempSml->Width("100%")};  // Max. width of precipitation string
-            ContentWidget.AddText(*PrecString, false,
-                                  cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), 0, 0),
+            ContentWidget.AddText(*PrecString, false, cRect(left, ContentTop + Middle, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlWidth2, FontTempSmlHeight, taRight);
-            left += TempSmlWidth2 + TempSmlSpaceWidth + m_MarginItem;
+                                  TempSmlPrecWidth, FontTempSmlHeight, taRight);
+            left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
 
-            ContentWidget.AddText(
-                *Summary, false,
-                cRect(left, ContentTop + (m_FontHeight / 2 - FontTempSmlHeight / 2), wWidth - left, m_FontHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
+            ContentWidget.AddText(*Summary, false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                  wWidth - left);
 
             ContentTop += m_FontHeight;
         }
