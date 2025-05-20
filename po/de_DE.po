@@ -874,7 +874,7 @@ msgid "Enable main menu widgets"
 msgstr "Hauptmenü-Widgets anzeigen"
 
 msgid "Main menu item scale"
-msgstr "Hauptmenü Widgets: Breite (%)"
+msgstr "Hauptmenü: Breite (%)"
 
 msgid "Widget weather"
 msgstr "Wetter-Widget"
