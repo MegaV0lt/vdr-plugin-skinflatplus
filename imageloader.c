@@ -212,7 +212,6 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
  * @brief Convert a string to lower case.
  *
  * This function is used to convert file names to lower case when searching for images
- * in the recording directory. This is done to allow for case insensitive search.
  *
  * @param str The string to convert to lower case
  */
@@ -230,7 +229,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
+    static const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     for (const cString &Image : RecordingImages) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;
