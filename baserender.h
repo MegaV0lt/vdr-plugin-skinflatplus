@@ -100,7 +100,7 @@ class cFlatBaseRender {
 
         void DrawWidgetWeather();
         void DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
-                                tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset = 1,
+                                tColor ShadowColor, const cFont *font, int ShadowSize = 3, int xOffset = 1,
                                 int yOffset = 1);
 
  protected:

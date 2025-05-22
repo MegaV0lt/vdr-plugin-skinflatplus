@@ -1891,23 +1891,25 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
  * The main text is then drawn on top with the given color.
  */
 void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
-                                         tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset,
-                                         int yOffset) {
+                                         tColor ShadowColor, const cFont *font, int ShadowSize = 3, int xOffset = 1,
+                                         int yOffset = 1) {
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
-    double CurrentAlpha {AlphaStep};  // Start with first step
-    tColor CurrentShadowColor {SetAlpha(ShadowColor, CurrentAlpha)};
+    const double MaxAlpha {1.0};                // Maximum alpha value
+    const int BaseX {pos.X()};                  // Cache position for faster access
+    const int BaseY {pos.Y()};
+
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
+        const double Alpha {std::min(i * AlphaStep, MaxAlpha)};  // Ensure it does not exceed 1.0
+        const tColor CurrentShadowColor {SetAlpha(ShadowColor, Alpha)};
+        const int ShadowX {BaseX + (xOffset * i)};
+        const int ShadowY {BaseY + (yOffset * i)};
 #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, CurrentAlpha);
+        dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, Alpha);
 #endif
-        pixmap->DrawText(cPoint(pos.X() + xOffset * i, pos.Y() + yOffset * i), text, CurrentShadowColor, clrTransparent,
-            font);
 
-        CurrentAlpha += AlphaStep;  // Increment for next iteration
-        if (CurrentAlpha > 1.0) CurrentAlpha = 1.0;  // Ensure it does not exceed 1.0
-        CurrentShadowColor = SetAlpha(ShadowColor, CurrentAlpha);
+        pixmap->DrawText(cPoint(ShadowX, ShadowY), text, CurrentShadowColor, clrTransparent, font);
     }
 
     // Draw the main text
