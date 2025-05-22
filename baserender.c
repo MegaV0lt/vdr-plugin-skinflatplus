@@ -1891,8 +1891,8 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
  * The main text is then drawn on top with the given color.
  */
 void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
-                                         tColor ShadowColor, const cFont *font, int ShadowSize = 3, int xOffset = 1,
-                                         int yOffset = 1) {
+                                         tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset,
+                                         int yOffset) {
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
     const double MaxAlpha {1.0};                // Maximum alpha value
     const int BaseX {pos.X()};                  // Cache position for faster access
