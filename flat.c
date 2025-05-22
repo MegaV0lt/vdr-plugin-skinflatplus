@@ -85,8 +85,8 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
-        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Size().Width(),
-                DrawPort.Size().Height());
+        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Width(),
+                DrawPort.Height());
         return nullptr;
     } */
 
@@ -98,12 +98,10 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
         return pixmap;
     }  // Everything runs according to the plan
 
-    const cSize DrawPortSize {DrawPort.Size()};
-    esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPortSize.Width(),
-            DrawPortSize.Height());
+    esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Width(), DrawPort.Height());
     const cSize MaxPixmapSize {osd->MaxPixmapSize()};
-    const int width {std::min(DrawPortSize.Width(), MaxPixmapSize.Width())};
-    const int height {std::min(DrawPortSize.Height(), MaxPixmapSize.Height())};
+    const int width {std::min(DrawPort.Width(), MaxPixmapSize.Width())};
+    const int height {std::min(DrawPort.Height(), MaxPixmapSize.Height())};
 
     cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
