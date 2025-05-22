@@ -221,9 +221,9 @@ THEME_CLR(Theme, clrVolumeBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 // SeenIconNames for GetRecordingSeenIcon()
-static const cString SeenIconNames[]{"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
-                                     "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
-                                     "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+static const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
+                                      "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
+                                      "recording_seen_8", "recording_seen_9", "recording_seen_10"};
 
 class cFlat : public cSkin {
  public:

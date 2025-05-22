@@ -738,29 +738,29 @@ void cFlatDisplayReplay::Flush() {
 }
 
 void cFlatDisplayReplay::PreLoadImages() {
-    const cString icons[] {"rewind",     "pause",     "play",     "forward",
-                           "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
+    static const cString icons[] {"rewind",     "pause",     "play",     "forward",
+                                  "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
     for (const auto &icon : icons) {
         ImgLoader.LoadIcon(icon, m_FontHeight, m_FontHeight);
     }
 
     constexpr ulong CharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, Setup.FontOsdSize);  // Narrowing conversion
-    const cString icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
+    static const cString icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
     for (const auto &icon : icons1) {
         ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, GlyphSize);
     }
 
-    const cString icons2[] {"recording_untested_replay", "recording_ok_replay", "recording_warning_replay",
-                            "recording_error_replay",    "timerRecording"};
+    static const cString icons2[] {"recording_untested_replay", "recording_ok_replay", "recording_warning_replay",
+                                   "recording_error_replay",    "timerRecording"};
     for (const auto &icon : icons2) {
         ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     }
 
-    const cString icons3[] {"43",        "169",       "169w",         "221",        "7680x4320",   "3840x2160",
-                            "1920x1080", "1440x1080", "1280x720",     "960x720",    "704x576",     "720x576",
-                            "544x576",   "528x576",   "480x576",      "352x576",    "unknown_res", "uhd",
-                            "hd",        "sd",        "audio_stereo", "audio_dolby"};
+    static const cString icons3[] {"43",        "169",       "169w",         "221",        "7680x4320",   "3840x2160",
+                                   "1920x1080", "1440x1080", "1280x720",     "960x720",    "704x576",     "720x576",
+                                   "544x576",   "528x576",   "480x576",      "352x576",    "unknown_res", "uhd",
+                                   "hd",        "sd",        "audio_stereo", "audio_dolby"};
     for (const auto &icon : icons3) {
         ImgLoader.LoadIcon(icon, ICON_WIDTH_UNLIMITED, m_FontSmlHeight);
     }
