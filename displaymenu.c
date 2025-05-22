@@ -362,7 +362,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     if (m_IsScrolling)
         m_MenuItemWidth -= m_WidthScrollBar;
 
-    tColor ColorFg = Theme.Color(clrItemFont);
+    /* tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
@@ -372,7 +372,14 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-    }
+    } */
+    const auto [ColorFg, ColorBg, ColorExtraTextFg] =
+        Current ? std::make_tuple(Theme.Color(clrItemCurrentFont), Theme.Color(clrItemCurrentBg),
+                                  Theme.Color(clrMenuItemExtraTextCurrentFont))
+        : Selectable
+            ? std::make_tuple(Theme.Color(clrItemSelableFont), Theme.Color(clrItemSelableBg),
+                              Theme.Color(clrMenuItemExtraTextFont))
+            : std::make_tuple(Theme.Color(clrItemFont), Theme.Color(clrItemBg), Theme.Color(clrMenuItemExtraTextFont));
 
     const int y {Index * m_ItemHeight};
     if (y + m_ItemHeight > m_MenuItemLastHeight)
@@ -907,7 +914,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     if (m_IsScrolling)
         m_MenuItemWidth -= m_WidthScrollBar;
 
-    tColor ColorFg = Theme.Color(clrItemFont);
+    /* tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
@@ -917,7 +924,14 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-    }
+    } */
+    auto [ColorFg, ColorBg, ColorExtraTextFg] =
+        Current ? std::make_tuple(Theme.Color(clrItemCurrentFont), Theme.Color(clrItemCurrentBg),
+                                  Theme.Color(clrMenuItemExtraTextCurrentFont))
+        : Selectable
+            ? std::make_tuple(Theme.Color(clrItemSelableFont), Theme.Color(clrItemSelableBg),
+                              Theme.Color(clrMenuItemExtraTextFont))
+            : std::make_tuple(Theme.Color(clrItemFont), Theme.Color(clrItemBg), Theme.Color(clrMenuItemExtraTextFont));
 
     const int y {Index * m_ItemTimerHeight};
     if (y + m_ItemTimerHeight > m_MenuItemLastHeight)
@@ -1154,7 +1168,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (m_IsScrolling)
         m_MenuItemWidth -= m_WidthScrollBar;
 
-    tColor ColorFg = Theme.Color(clrItemFont);
+    /* tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
@@ -1164,7 +1178,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-    }
+    } */
+    const auto [ColorFg, ColorBg, ColorExtraTextFg] =
+        Current ? std::make_tuple(Theme.Color(clrItemCurrentFont), Theme.Color(clrItemCurrentBg),
+                                  Theme.Color(clrMenuItemExtraTextCurrentFont))
+        : Selectable
+            ? std::make_tuple(Theme.Color(clrItemSelableFont), Theme.Color(clrItemSelableBg),
+                              Theme.Color(clrMenuItemExtraTextFont))
+            : std::make_tuple(Theme.Color(clrItemFont), Theme.Color(clrItemBg), Theme.Color(clrMenuItemExtraTextFont));
+
 
     const int y {Index * m_ItemEventHeight};
     if (y + m_ItemEventHeight > m_MenuItemLastHeight)
@@ -1662,7 +1684,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (m_IsScrolling)
         m_MenuItemWidth -= m_WidthScrollBar;
 
-    tColor ColorFg = Theme.Color(clrItemFont);
+    /* tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
     tColor ColorExtraTextFg = Theme.Color(clrMenuItemExtraTextFont);
     if (Current) {
@@ -1672,7 +1694,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-    }
+    } */
+    const auto [ColorFg, ColorBg, ColorExtraTextFg] =
+        Current ? std::make_tuple(Theme.Color(clrItemCurrentFont), Theme.Color(clrItemCurrentBg),
+                                  Theme.Color(clrMenuItemExtraTextCurrentFont))
+        : Selectable
+            ? std::make_tuple(Theme.Color(clrItemSelableFont), Theme.Color(clrItemSelableBg),
+                              Theme.Color(clrMenuItemExtraTextFont))
+            : std::make_tuple(Theme.Color(clrItemFont), Theme.Color(clrItemBg), Theme.Color(clrMenuItemExtraTextFont));
 
     const int y {Index * m_ItemRecordingHeight};
     if (y + m_ItemRecordingHeight > m_MenuItemLastHeight)
