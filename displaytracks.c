@@ -55,7 +55,7 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     if (!TracksPixmap) return;
 
     const int y {(Index + 1) * m_ItemHeight};
-    tColor ColorFg = Theme.Color(clrTrackItemFont);
+    /* tColor ColorFg = Theme.Color(clrTrackItemFont);
     tColor ColorBg = Theme.Color(clrTrackItemBg);
     if (Current) {
         ColorFg = Theme.Color(clrTrackItemCurrentFont);
@@ -64,7 +64,11 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     } else if (Index >= 0) {
         ColorFg = Theme.Color(clrTrackItemSelableFont);
         ColorBg = Theme.Color(clrTrackItemSelableBg);
-    }
+    } */
+    const auto [ColorFg, ColorBg] =
+        Current      ? std::make_pair(Theme.Color(clrTrackItemCurrentFont), Theme.Color(clrTrackItemCurrentBg))
+        : Index >= 0 ? std::make_pair(Theme.Color(clrTrackItemSelableFont), Theme.Color(clrTrackItemSelableBg))
+                     : std::make_pair(Theme.Color(clrTrackItemFont), Theme.Color(clrTrackItemBg));
 
     if (Index == -1)
         TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, m_Font, m_MaxItemWidth,

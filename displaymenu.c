@@ -531,7 +531,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (m_IsScrolling)
         m_MenuItemWidth -= m_WidthScrollBar;
 
-    tColor ColorFg = Theme.Color(clrItemFont);
+    /* tColor ColorFg = Theme.Color(clrItemFont);
     tColor ColorBg = Theme.Color(clrItemBg);
     if (Current) {
         ColorFg = Theme.Color(clrItemCurrentFont);
@@ -539,7 +539,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     } else if (Selectable) {
         ColorFg = Theme.Color(clrItemSelableFont);
         ColorBg = Theme.Color(clrItemSelableBg);
-    }
+    } */
+
+    const auto [ColorFg, ColorBg] =
+        Current      ? std::make_pair(Theme.Color(clrItemCurrentFont), Theme.Color(clrItemCurrentBg))
+        : Selectable ? std::make_pair(Theme.Color(clrItemSelableFont), Theme.Color(clrItemSelableBg))
+                     : std::make_pair(Theme.Color(clrItemFont), Theme.Color(clrItemBg));
 
     const int y {Index * m_ItemChannelHeight};
     if (y + m_ItemChannelHeight > m_MenuItemLastHeight)
