@@ -76,6 +76,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     PixmapClear(MenuIconsPixmap);
     PixmapClear(MenuIconsBgPixmap);
     PixmapClear(MenuIconsOvlPixmap);
+    PixmapClear(ContentHeadPixmap);
     PixmapClear(ContentHeadIconsPixmap);
     PixmapClear(ScrollbarPixmap);
 
@@ -103,9 +104,9 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
         m_Osd->DestroyPixmap(MenuIconsPixmap);
         m_Osd->DestroyPixmap(MenuIconsBgPixmap);
         m_Osd->DestroyPixmap(MenuIconsOvlPixmap);
-        m_Osd->DestroyPixmap(ScrollbarPixmap);
         m_Osd->DestroyPixmap(ContentHeadPixmap);
         m_Osd->DestroyPixmap(ContentHeadIconsPixmap);
+        m_Osd->DestroyPixmap(ScrollbarPixmap);
     // }
 }
 
