@@ -38,8 +38,9 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     ButtonsCreate();
     MessageCreate();
 
-    m_RecFolder.reserve(256);
-    m_LastRecFolder.reserve(256);
+    static constexpr size_t kBufferSize {256};
+    m_RecFolder.reserve(kBufferSize);
+    m_LastRecFolder.reserve(kBufferSize);
 
     m_VideoDiskUsageState = -1;
 
@@ -85,7 +86,8 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     MenuItemScroller.SetScrollType(Config.ScrollerType);
 
-    ItemsBorder.reserve(64);
+    static constexpr size_t kDefaultItemBorderSize {64};
+    ItemsBorder.reserve(kDefaultItemBorderSize);
 
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
     cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
