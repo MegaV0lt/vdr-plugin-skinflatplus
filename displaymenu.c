@@ -90,7 +90,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     ItemsBorder.reserve(kDefaultItemBorderSize);
 
     // Call to get values for 'DiskUsage' and have it outside of SetItem()
-    cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);
+    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);  // Called in Flush()
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
