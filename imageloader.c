@@ -103,7 +103,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     cTimeMs Timer;  // Start timer
 #endif
 
-    cImage *img {ImgCache.GetImage(*File, width, height)};
+    cImage *img {ImgCache.GetIcon(*File, width, height)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   search in cache: %d ms", Timer.Elapsed());
@@ -126,7 +126,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         Timer.Set();  // Reset timer
 #endif
 
-        img = ImgCache.GetImage(*File, width, height);
+        img = ImgCache.GetIcon(*File, width, height);
 
 #ifdef DEBUGIMAGELOADTIME
         dsyslog("   search in cache: %d ms", Timer.Elapsed());
@@ -159,7 +159,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         return nullptr;
     }
 
-    ImgCache.InsertImage(img, *File, width, height);
+    ImgCache.InsertIcon(img, *File, width, height);
     return img;
 }
 
