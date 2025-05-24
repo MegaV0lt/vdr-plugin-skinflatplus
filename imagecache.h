@@ -43,10 +43,8 @@ class cImageCache {
       return m_InsertIconIndex + 1;
     }
 
-    cImage *GetImage(const std::string &Name, int Width, int Height) const;
-    cImage *GetIcon(const std::string &Name, int Width, int Height) const;
-    void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
-    void InsertIcon(cImage *Image, const std::string &Name, int Width, int Height);
+    cImage *GetImage(const std::string &Name, int Width, int Height, bool IsIcon = false) const;
+    void InsertImage(cImage *Image, const std::string &Name, int Width, int Height, bool IsIcon = false);
 
     void PreLoadImage();
 
