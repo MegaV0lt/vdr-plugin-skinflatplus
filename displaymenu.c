@@ -3197,30 +3197,30 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     if (!Recording) return "";
 
     std::string_view RecName {Recording->Name()};
-    std::string RecNamePart {""};
-    RecNamePart.reserve(256);  // Reserve space for the string
+    cString RecNamePart {""};
+    // RecNamePart.reserve(256);  // Reserve space for the string
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
         if (end == std::string::npos) {
-            if (i == Level) RecNamePart = RecName.substr(start);
+            if (i == Level) RecNamePart = cString(std::string(RecName.substr(start)).c_str());
             break;
         }
         if (i == Level) {
-            RecNamePart = RecName.substr(start, end - start);
+            RecNamePart = cString(std::string(RecName.substr(start, end - start)).c_str());
             break;
         }
         start = end + 1;
     }
 
-    if (Config.MenuItemRecordingClearPercent && IsFolder && !RecNamePart.empty() && RecNamePart[0] == '%') {
-        RecNamePart.erase(0, 1);  // Remove leading '%'
+    if (Config.MenuItemRecordingClearPercent && IsFolder && RecNamePart[0] != '\0' && RecNamePart[0] == '%') {
+        RecNamePart = cString(*RecNamePart + 1);  // Remove leading '%'
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecNamePart '%s'", RecNamePart.c_str());
+    dsyslog("   RecNamePart '%s'", *RecNamePart);
 #endif
 
-    return RecNamePart.c_str();
+    return RecNamePart;
 }
 
 cString cFlatDisplayMenu::GetRecCounts() {
