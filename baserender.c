@@ -729,12 +729,12 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    constexpr uint threshold {75};  //? Add config option?
+    static constexpr uint kThreshold {75};  //? Add config option?
     const std::size_t TextLength {strlen(Text)};
-    if (TextLength > threshold) {  // Message is longer than threshold and uses almost the full screen
+    if (TextLength > kThreshold) {  // Message is longer than kThreshold and uses almost the full screen
         // Narrowing conversion
         const int ExtraTime {
-            std::min(static_cast<int>((TextLength - threshold) / (threshold / Setup.OSDMessageTime)),
+            std::min(static_cast<int>((TextLength - kThreshold) / (kThreshold / Setup.OSDMessageTime)),
                      Setup.OSDMessageTime * 3)};  // Max. extra time to add
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Adding %d seconds to message time (%d)", ExtraTime + 1, m_OSDMessageTime);
@@ -1139,32 +1139,32 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, bool IsCurren
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
         ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
     } else {
-        constexpr int MarkerWidth {1}, MarkerWidth3 {3};
+        static constexpr int kMarkerWidth {1}, kMarkerWidth3 {3};
         const int Type {Config.PlaybackShowErrorMarks};
         switch (Type) {  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
         case 1:
         case 2: {
             const int Top = Middle - (SmallLine * (Type == 1 ? 0.75 : 0.5));
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 1 ? 1.5 : 1)),
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 1 ? 1.5 : 1)),
                                              ColorError);
             }
             break;
         case 3:
         case 4: {
             const int Top = Middle - (SmallLine * (Type == 3 ? 0.75 : 0.5));
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 3 ? 1.5 : 1)),
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 3 ? 1.5 : 1)),
                                              ColorError);
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Top, MarkerWidth3, 1), ColorError);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Top, kMarkerWidth3, 1), ColorError);
             ProgressBarPixmap->DrawRectangle(
-                cRect(Pos - 1, Middle + (SmallLine * (Type == 3 ? 0.75 : 0.5)), MarkerWidth3, 1), ColorError);
+                cRect(Pos - 1, Middle + (SmallLine * (Type == 3 ? 0.75 : 0.5)), kMarkerWidth3, 1), ColorError);
             }
             break;
         case 5:
         case 6: {
             const int Top = Middle - (SmallLine * (Type == 5 ? 0.75 : 0.5));
-            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, MarkerWidth, SmallLine * (Type == 5 ? 1.5 : 1)),
+            ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 5 ? 1.5 : 1)),
                                              ColorError);
-            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, MarkerWidth3, 2), ColorError);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, kMarkerWidth3, 2), ColorError);
             }
             break;
         default: esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type); break;

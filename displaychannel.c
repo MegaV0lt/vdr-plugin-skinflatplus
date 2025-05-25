@@ -160,9 +160,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         PixmapClear(ChanInfoTopPixmap);
         const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
         // Ensure shadow size is reasonable
-        constexpr int MinShadowSize {3};   // Shadow should have at least 3 pixel
-        constexpr int MaxShadowSize {10};  // Shadow should not be too large
-        const int BoundedShadowSize {std::clamp(ShadowSize, MinShadowSize, MaxShadowSize)};
+        static constexpr int kMinShadowSize {3};   // Shadow should have at least 3 pixel
+        static constexpr int kMaxShadowSize {10};  // Shadow should not be too large
+        const int BoundedShadowSize {std::clamp(ShadowSize, kMinShadowSize, kMaxShadowSize)};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
 #ifdef DBUGFUNCSCALL
@@ -546,8 +546,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     }
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
-    constexpr ulong CharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
-    const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, ProgressBarHeight);  // Narrowing conversion
+    static constexpr ulong kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
+    const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);  // Narrowing conversion
     const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
         TopOffset};  // One margin for progress bar to bottom

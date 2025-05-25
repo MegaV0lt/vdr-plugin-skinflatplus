@@ -86,7 +86,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         sub_offset = (e - offset * d) * (1.0f / d);
 
         // Calculate filter coefficients
-        for (uint j {0}; j < 4; ++j) {
+        for (unsigned int j {0}; j < 4; ++j) {
             t = PI * (sub_offset + (1 - j));
             h_arr[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
@@ -115,7 +115,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
 
-        for (uint j {0}; j < 4; ++j) {
+        for (unsigned int j {0}; j < 4; ++j) {
             t = norm * h_arr[j];
             filters[i].m_coeff[(offset + j) & 3] =
                 static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
@@ -123,7 +123,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
     }
 
     // Set end marker
-    filters[dst_size].m_offset = (unsigned) -1;
+    filters[dst_size].m_offset = (unsigned int) -1;
 }
 
 /**
@@ -142,8 +142,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
  * @param src_width The width of the source image.
  * @param src_height The height of the source image.
  */
-void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, unsigned dst_width, unsigned dst_height,
-                                     unsigned src_width, unsigned src_height) {
+void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_stride, unsigned int dst_width, unsigned int dst_height,
+                                     unsigned int src_width, unsigned int src_height) {
     m_src_x = 0;
     m_src_y = 0;
     m_dst_x = 0;
@@ -179,7 +179,7 @@ void ImageScaler::SetImageParameters(unsigned *dst_image, unsigned dst_stride, u
 }
 
 // Shift range to 0..255 and clamp overflows
-static unsigned shift_clamp(int x) {
+static unsigned int shift_clamp(int x) {
     // x = (x + 2^21) >> 22;
     // But that's equivalent to this:
     x = (x + 2097152) >> 22;
@@ -196,7 +196,7 @@ static unsigned shift_clamp(int x) {
  * @param pixel The TmpPixel to pack.
  * @return A 32-bit unsigned integer representing the packed pixel.
  */
-inline unsigned ImageScaler::PackPixel(const TmpPixel &pixel) {
+inline unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
     return shift_clamp(pixel[0]) |
            (shift_clamp(pixel[1]) << 8) |
            (shift_clamp(pixel[2]) << 16) |
@@ -231,9 +231,9 @@ void ImageScaler::NextSourceLine() {
         h2 = m_ver_filters[m_dst_y].m_coeff[2];
         h3 = m_ver_filters[m_dst_y].m_coeff[3];
         const TmpPixel *src {m_buffer};  // Pointer to the buffer containing filtered input lines
-        unsigned *dst {m_dst_image + m_dst_stride * m_dst_y};  // Pointer to the destination image line
+        unsigned int *dst {m_dst_image + m_dst_stride * m_dst_y};  // Pointer to the destination image line
 
-        for (uint i {0}; i < m_dst_width; ++i) {
+        for (unsigned int i {0}; i < m_dst_width; ++i) {
             const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
             src += 4;
             dst[i] = PackPixel(t);

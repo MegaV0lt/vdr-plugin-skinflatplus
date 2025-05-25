@@ -35,9 +35,9 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return nullptr;
     }
     if (PreserveAspect) {
-        constexpr unsigned SCALE_FACTOR {1000};
-        unsigned scale_w = SCALE_FACTOR * width / w;
-        unsigned scale_h = SCALE_FACTOR * height / h;
+        static constexpr uint SCALE_FACTOR {1000};
+        uint scale_w = SCALE_FACTOR * width / w;
+        uint scale_h = SCALE_FACTOR * height / h;
         if (scale_w > scale_h)
             width = w * height / h;
         else
@@ -49,7 +49,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 #else
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
     // Use integer arithmetic instead of floating-point division
-    constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
+    static constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
     const uint64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
 #endif
     cImage *image = new cImage(cSize(width, height));
@@ -123,8 +123,8 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
 #else
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    constexpr u_int64_t SCALE_FACTOR = 1UL << 16;
-    const u_int64_t QuantumScaleInt = (255UL * SCALE_FACTOR) / QuantumRange;
+    static constexpr uint64_t SCALE_FACTOR = 1UL << 16;
+    const uint64_t QuantumScaleInt = (255UL * SCALE_FACTOR) / QuantumRange;
 #endif
     for (int iy {0}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix) {

@@ -1279,7 +1279,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
             const time_t now {time(0)};
             const time_t EventStartTime {Event->StartTime()};
-            constexpr int kTwoMinutes = 2 * 60;
+            static constexpr int kTwoMinutes {2 * 60};
             if ((now >= (EventStartTime - kTwoMinutes))) {
                 const int total = Event->EndTime() - EventStartTime;  // Narrowing conversion
                 if (total >= 0) {
@@ -1591,7 +1591,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
  * @param Top The y-coordinate where the icon should be drawn.
  */
 void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
-    constexpr float ICON_FORMAT_HEIGHT_RATIO {1.0 / 3.0};
+    static constexpr float ICON_FORMAT_HEIGHT_RATIO {1.0 / 3.0};
     const cString IconName = *GetRecordingFormatIcon(Recording);  // Show (SD), HD or UHD Logo
     const int ImageHeight = m_FontHeight * ICON_FORMAT_HEIGHT_RATIO;  // 1/3 height. Narrowing conversion
     const cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight)};
@@ -1708,7 +1708,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_MenuItemLastHeight = y + m_ItemRecordingHeight;
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
-    constexpr float ICON_CUT_HEIGHT_RATIO {2.0 / 3.0};
+    static constexpr float ICON_CUT_HEIGHT_RATIO {2.0 / 3.0};
     //* Preload for calculation of position
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
