@@ -35,42 +35,46 @@ void cImageCache::Clear() {
     m_InsertIconIndex = 0;
 }
 
-bool cImageCache::RemoveFromCache(const std::string &Name) {
-    std::string_view BaseFileName {""};
-    for (uint i {0}; i < MaxImageCache; ++i) {
-        BaseFileName = ImageCache[i].Name.substr(ImageCache[i].Name.find_last_of('/') + 1);  // Part after the last '/'
-
-        if (BaseFileName == Name) {
-            dsyslog("flatPlus: RemoveFromCache - %s", ImageCache[i].Name.c_str());
-            delete ImageCache[i].Image;
-            ImageCache[i].Image = nullptr;
-            ImageCache[i].Name = "-Empty!-";  // Mark as empty because "" is for end of cache
-            ImageCache[i].Width = -1;
-            ImageCache[i].Height = -1;
+bool cImageCache::RemoveFromCache(const cString &Name) {
+    std::string_view BaseFileName {""}, DataNameView {""};
+    std::string_view NameView {Name};
+    for (auto &data : ImageCache) {
+        DataNameView = *data.Name;
+        if (DataNameView.empty()) break;  // No more images in cache
+        BaseFileName = DataNameView.substr(DataNameView.find_last_of('/') + 1);  // Part after the last '/'
+        if (BaseFileName == NameView) {
+            dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
+            delete data.Image;
+            data.Image = nullptr;
+            data.Name = "-Empty!-";  // Mark as empty because "" is for end of cache
+            data.Width = -1;
+            data.Height = -1;
             return true;
         }
     }
     return false;
 }
 
-cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height, bool IsIcon) const {
+cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
+    std::string_view DataNameView {""};
+    std::string_view NameView {Name};
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
     for (const auto &data : IsIcon ? IconCache : ImageCache) {
+        DataNameView = *data.Name;
         // dsyslog("flatPlus: Imagecache image %s Width %d Height %d", data.Name.c_str(), data.Width, data.Height);
-        if (data.Name.empty()) break;  // No more mages in cache;
-        if (data.Name == Name && data.Width == Width && data.Height == Height) { return data.Image; }
+        if (DataNameView.empty()) break;  // No more mages in cache;
+        if (DataNameView == NameView && data.Width == Width && data.Height == Height) { return data.Image; }
     }
     return nullptr;
 }
 
-void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height, bool IsIcon) {
+void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
     // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
-    if (IsIcon) {
+    if (IsIcon) {  // Insert into icon cache
         if (IconCache[m_InsertIconIndex].Image != nullptr)
-            delete IconCache[m_InsertIconIndex].Image;
+            delete IconCache[m_InsertIconIndex].Image;  // Delete old image if exists
 
-        IconCache[m_InsertIconIndex].Image = Image;
-        IconCache[m_InsertIconIndex].Name.reserve(Name.length());
+        IconCache[m_InsertIconIndex].Image = Image;     // Store image in cache
         IconCache[m_InsertIconIndex].Name = Name;
         IconCache[m_InsertIconIndex].Width = Width;
         IconCache[m_InsertIconIndex].Height = Height;
@@ -80,12 +84,11 @@ void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width,
             isyslog("flatPlus: Refilling iconcache keeping %d pre loaded icons", m_InsertIconIndexBase);
             m_InsertIconIndex = m_InsertIconIndexBase;  // Keep images loaded at start
         }
-    } else {
+    } else {  // Insert into image cache
         if (ImageCache[m_InsertIndex].Image != nullptr)
-            delete ImageCache[m_InsertIndex].Image;
+            delete ImageCache[m_InsertIndex].Image;  // Delete old image if exists
 
-        ImageCache[m_InsertIndex].Image = Image;
-        ImageCache[m_InsertIndex].Name.reserve(Name.length());
+        ImageCache[m_InsertIndex].Image = Image;     // Store image in cache
         ImageCache[m_InsertIndex].Name = Name;
         ImageCache[m_InsertIndex].Width = Width;
         ImageCache[m_InsertIndex].Height = Height;

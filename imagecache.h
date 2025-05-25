@@ -11,7 +11,6 @@
 #include <vdr/skins.h>
 
 #include <array>
-#include <string>
 
 constexpr int MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
 constexpr int MaxIconCache {1024};   // Icon cache (Skin icons)
@@ -21,7 +20,7 @@ constexpr int LogoPreCache {192};    // First x channel logos
 
 struct ImageData {
     cImage* Image {nullptr};
-    std::string Name {""};  // Including full path
+    cString Name {""};  // Including full path
     int Width {-1};
     int Height {-1};
 };
@@ -33,7 +32,7 @@ class cImageCache {
 
     void Create();
     void Clear();
-    bool RemoveFromCache(const std::string &Name);
+    bool RemoveFromCache(const cString &Name);
 
     int GetCacheCount() const {
       return m_InsertIndex + 1;
@@ -43,8 +42,8 @@ class cImageCache {
       return m_InsertIconIndex + 1;
     }
 
-    cImage *GetImage(const std::string &Name, int Width, int Height, bool IsIcon = false) const;
-    void InsertImage(cImage *Image, const std::string &Name, int Width, int Height, bool IsIcon = false);
+    cImage *GetImage(const cString &Name, int Width, int Height, bool IsIcon = false) const;
+    void InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon = false);
 
     void PreLoadImage();
 
