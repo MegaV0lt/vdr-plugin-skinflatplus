@@ -559,6 +559,9 @@ msgstr "Tasten: Rand Größe"
 msgid "Imagecache entries"
 msgstr "Bildercache Einträge"
 
+msgid "Iconcache entries"
+msgstr "Iconcache Einträge"
+
 msgid "Show channel name and number with shadow"
 msgstr "Kanalname und Nummer mit Schatten"
 

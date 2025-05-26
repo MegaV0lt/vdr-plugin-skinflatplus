@@ -870,6 +870,8 @@ void cFlatSetupGeneral::Setup() {
 
     cString ImageCache = cString::sprintf("%s:\t%d / %d", tr("Imagecache entries"), ImgCache.GetCacheCount(), MaxImageCache);
     Add(new cOsdItem(ImageCache, osUnknown, true));
+    cString IconCache = cString::sprintf("%s:\t%d / %d", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), MaxIconCache);
+    Add(new cOsdItem(IconCache, osUnknown, true));
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
