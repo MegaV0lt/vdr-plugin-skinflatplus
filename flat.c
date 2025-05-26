@@ -201,7 +201,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
     }  // Scraper plugin
 }
 
-// Get MediaPath, MediaSize and MediaType
+// Get MediaPath, MediaSize and return MediaType
 int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event, const cRecording *Recording) {  // NOLINT
     static cPlugin *pScraper {GetScraperPlugin()};
     if (pScraper) {
@@ -492,7 +492,8 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     dsyslog("flatPlus: cFlat::InsertAuxInfo()");
 #endif
 
-    std::string Buffer {XmlSubstring(RecInfo->Aux(), "<epgsearch>", "</epgsearch>")};
+    const std::string AuxInfo {RecInfo->Aux()};  // Cache aux info
+    std::string Buffer {XmlSubstring(AuxInfo, "<epgsearch>", "</epgsearch>")};
     std::string Channel {""}, Searchtimer {""};
     if (!Buffer.empty()) {
         Channel.reserve(32);
@@ -503,7 +504,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
             Searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
     }
 
-    Buffer = XmlSubstring(RecInfo->Aux(), "<tvscraper>", "</tvscraper>");
+    Buffer = XmlSubstring(AuxInfo, "<tvscraper>", "</tvscraper>");
     std::string Causedby {""}, Reason {""};
     if (!Buffer.empty()) {
         Causedby.reserve(32);
@@ -512,7 +513,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Reason = XmlSubstring(Buffer, "<reason>", "</reason>");
     }
 
-    Buffer = XmlSubstring(RecInfo->Aux(), "<vdradmin-am>", "</vdradmin-am>");
+    Buffer = XmlSubstring(AuxInfo, "<vdradmin-am>", "</vdradmin-am>");
     std::string Pattern {""};
     if (!Buffer.empty()) {
         Pattern.reserve(32);
