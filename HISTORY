@@ -1,5 +1,10 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-xx-xx: Version 1.1.11
+- [update] Separate iconcache for skin icons
+- [update] Update disk usage display format in TopBar for improved clarity
+- [update] Some internal optimizations
+
 2025-04-16: Version 1.1.10
 - [add] Render channel name and number with shadow
 - [add] Option to render channel name and number with shadow or background
