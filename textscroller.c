@@ -185,7 +185,7 @@ void cTextScrollers::Action() {
 #endif
 
     // Wait 1 second so the osd is finished
-    for (uint i {0}; i < 10 && Running(); ++i) {
+    for (std::size_t i {0}; i < 10 && Running(); ++i) {
         cCondWait::SleepMs(100);
     }
 

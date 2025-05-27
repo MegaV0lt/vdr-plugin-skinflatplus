@@ -71,7 +71,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    uint m_LastTimerActiveCount {0}, m_LastTimerCount {0};
+    uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};
     cString m_LastTitle {""};
 
     int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
@@ -125,7 +125,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;
     cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
-    void UpdateTimerCounts(uint &TimerActiveCount, uint &TimerCount) const;  // NOLINT
+    void UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &TimerCount) const;  // NOLINT
 
     bool IsRecordingOld(const cRecording *Recording, int Level) const;
 

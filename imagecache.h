@@ -12,17 +12,17 @@
 
 #include <array>
 
-constexpr int MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
-constexpr int MaxIconCache {1024};   // Icon cache (Skin icons)
-constexpr int LogoPreCache {192};    // First x channel logos
+constexpr std::size_t MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
+constexpr std::size_t MaxIconCache {1024};   // Icon cache (Skin icons)
+constexpr std::size_t LogoPreCache {192};    // First x channel logos
 //! Note: 'LogoPreCache' is used twice! One for 'displaychannel' and one for 'menu'
 //! You must double the value for the real amount of pre cached logos
 
 struct ImageData {
     cImage* Image {nullptr};
     cString Name {""};  // Including full path
-    int Width {-1};
-    int Height {-1};
+    int16_t Width {-1};
+    int16_t Height {-1};
 };
 
 class cImageCache {
@@ -51,9 +51,9 @@ class cImageCache {
     std::array<ImageData, MaxImageCache> ImageCache;
     std::array<ImageData, MaxIconCache> IconCache;
 
-    uint m_InsertIndex {0};      // Imagecache index
-    uint m_InsertIndexBase {0};  // Imagecache after first fill at start
+    std::size_t m_InsertIndex {0};      // Imagecache index
+    std::size_t m_InsertIndexBase {0};  // Imagecache after first fill at start
 
-    uint m_InsertIconIndex {0};      // Imagecache index
-    uint m_InsertIconIndexBase {0};  // Imagecache after first fill at start
+    std::size_t m_InsertIconIndex {0};      // Imagecache index
+    std::size_t m_InsertIconIndexBase {0};  // Imagecache after first fill at start
 };

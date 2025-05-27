@@ -342,26 +342,16 @@ void cFlatConfig::DecorCheckAndInit() {
         decorScrollBarSize = decorScrollBarSizeUser;
     }
 
-    if (decorBorderChannelType == 0)
-        decorBorderChannelSize = 0;
-    if (decorBorderTopBarType == 0)
-        decorBorderTopBarSize = 0;
-    if (decorBorderMessageType == 0)
-        decorBorderMessageSize = 0;
-    if (decorBorderVolumeType == 0)
-        decorBorderVolumeSize = 0;
-    if (decorBorderTrackType == 0)
-        decorBorderTrackSize = 0;
-    if (decorBorderReplayType == 0)
-        decorBorderReplaySize = 0;
-    if (decorBorderMenuItemType == 0)
-        decorBorderMenuItemSize = 0;
-    if (decorBorderMenuContentHeadType == 0)
-        decorBorderMenuContentHeadSize = 0;
-    if (decorBorderMenuContentType == 0)
-        decorBorderMenuContentSize = 0;
-    if (decorBorderButtonType == 0)
-        decorBorderButtonSize = 0;
+    if (decorBorderChannelType == 0) decorBorderChannelSize = 0;
+    if (decorBorderTopBarType == 0) decorBorderTopBarSize = 0;
+    if (decorBorderMessageType == 0) decorBorderMessageSize = 0;
+    if (decorBorderVolumeType == 0) decorBorderVolumeSize = 0;
+    if (decorBorderTrackType == 0) decorBorderTrackSize = 0;
+    if (decorBorderReplayType == 0) decorBorderReplaySize = 0;
+    if (decorBorderMenuItemType == 0) decorBorderMenuItemSize = 0;
+    if (decorBorderMenuContentHeadType == 0) decorBorderMenuContentHeadSize = 0;
+    if (decorBorderMenuContentType == 0) decorBorderMenuContentSize = 0;
+    if (decorBorderButtonType == 0) decorBorderButtonSize = 0;
 }
 
 void cFlatConfig::ThemeInit() {
@@ -482,10 +472,6 @@ bool PairCompareIntString(const std::pair<int, std::string> &i, const std::pair<
  */
 int RoundUp(int NumToRound, int multiple) {
     if (multiple == 0) return NumToRound;
-
-    // const int remainder = NumToRound % multiple;
-    // if (remainder == 0) return NumToRound;
-    // return NumToRound + multiple - remainder;
 
     return (NumToRound + multiple - 1) / multiple * multiple;
 }
@@ -699,7 +685,7 @@ void cFlatConfig::RecordingOldLoadConfig() {
 
 int cFlatConfig::GetRecordingOldValue(const std::string &folder) {
     std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (uint i {0}; i < sz; ++i) {
+    for (std::size_t i {0}; i < sz; ++i) {
         if (RecordingOldFolder[i] == folder)
             return RecordingOldValue[i];
     }
@@ -748,7 +734,7 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     std::sort(files.begin(), files.end(), StringCompare);
     std::string FileName {""};
     const std::size_t FilesSize {files.size()};
-    for (uint i {0}; i < FilesSize; ++i) {
+    for (std::size_t i {0}; i < FilesSize; ++i) {
         FileName = files.at(i);
         Files.Append(strdup(FileName.c_str()));
     }

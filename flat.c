@@ -163,11 +163,11 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     MediaPath = series.banners[0].path.c_str();
                 }
                 if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const int ActorsSize = series.actors.size();  // Narrowing conversatio
+                    const std::size_t ActorsSize {series.actors.size()};
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
-                    for (int i {0}; i < ActorsSize; ++i) {
+                    for (std::size_t i {0}; i < ActorsSize; ++i) {
                         if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
                             ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(series.actors[i].name.c_str());
@@ -183,11 +183,11 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
             if (pScraper->Service("GetMovie", &movie)) {
                 MediaPath = movie.poster.path.c_str();
                 if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const int ActorsSize = movie.actors.size();  // Narrowing conversation
+                    const std::size_t ActorsSize {movie.actors.size()};
                     ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
-                    for (int i {0}; i < ActorsSize; ++i) {
+                    for (std::size_t i {0}; i < ActorsSize; ++i) {
                         if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
                             ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(movie.actors[i].name.c_str());
@@ -296,8 +296,8 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
 
     static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
     static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
-    const uint ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
-    for (uint i {0}; i < ScreenAspectNums; ++i) {
+    const uint16_t ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
+    for (std::size_t i {0}; i < ScreenAspectNums; ++i) {
         if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
             return ScreenAspectNames[i];
     }
@@ -319,9 +319,9 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
                                      "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
                                      "528x576",   "480x576",   "352x576"};
-    static constexpr int ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
-    const uint ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
-    for (uint i {0}; i < ResNums; ++i) {
+    static constexpr int16_t ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
+    const uint16_t ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
+    for (std::size_t i {0}; i < ResNums; ++i) {
         if (ScreenWidth == ResWidths[i])
             return ResNames[i];
     }
@@ -344,7 +344,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     // Find radio and H.264/H.265 streams.
     //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
-        for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {
+        for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // TODO: Use for_each
             switch (Components->Component(i)->stream) {
                 case sc_video_MPEG2: return "sd";
                 case sc_video_H264_AVC: return "hd";
@@ -417,7 +417,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     static constexpr double BANNER_TARGET_RATIO {758.0 / 1920.0};  // To get 758 width @ 1920
 
     //* Set to default size
-    const uint Aspect = MediaSize.Width() / MediaSize.Height();
+    const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO));
@@ -434,7 +434,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
     cString AudioType {""};
-    for (int i {0}; i < Components->NumComponents(); ++i) {
+    for (int16_t i {0}; i < Components->NumComponents(); ++i) {
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
@@ -815,10 +815,10 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {(Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A"};
-    const int FillCharWidth {Font->Width(FillChar)};      // Width in pixel
+    const int16_t FillCharWidth = Font->Width(FillChar);  // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
-    const int LineWidth {Font->Width(Line.c_str())};   // Width in Pixel
+    const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
         return;
 
@@ -831,18 +831,18 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     static constexpr float LINE_WIDTH_THRESHOLD {0.8f};  // Line width threshold for justifying
     static const char *PUNCTUATION_CHARS {".,?!;"};      // Punctuation characters for justifying
     if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
-        const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
-        const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
+        const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
+        const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
         std::string FillChars {""};
         FillChars.reserve(FillCharBlock);
-        for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+        for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
             FillChars.append(FillChar);
         }
 
         const std::size_t FillCharsLength {FillChars.length()};
         std::size_t LineLength {Line.length()};
         Line.reserve(LineLength + (NeedFillChar * FillCharLength));
-        int InsertedFillChar {0};
+        int16_t InsertedFillChar {0};
 #ifdef DEBUGFUNCSCALL
         dsyslog("   [Line: spaces %d, width %d, length %ld]\n"
                 "   [FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
@@ -960,13 +960,13 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 
     static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
     char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
-    int cw {0}, l {0}, sl {0}, w {0};
-    int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
-    uint sym {0};
+    int16_t cw {0}, l {0}, sl {0}, w {0};
+    int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;
+    uint32_t sym {0};
     stripspace(m_Text);  // Strips trailing newlines
     for (char *p {m_Text}; *p;) {
         /* int */ sl = Utf8CharLen(p);
-        /* uint */ sym = Utf8CharGet(p, sl);
+        /* uint32_t */ sym = Utf8CharGet(p, sl);
         if (sym == '\n') {
             ++m_Lines;
             if (m_Lines > UpperLines)
@@ -1039,7 +1039,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
         }
         if (!s) {
             s = m_Text;
-            for (int i {0}; i < Line; ++i) {
+            for (int16_t i {0}; i < Line; ++i) {
                 s = strchr(s, '\n');
                 if (s)
                     s++;

@@ -318,7 +318,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         left += m_Font->Width("00:00  ");
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
-    for (uint i {0}; i < 2; i++) {
+    for (int8_t i {0}; i < 2; i++) {
         const bool IsPresent {(i) ? false : true};
         const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
@@ -546,7 +546,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     }
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
-    static constexpr ulong kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
+    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);  // Narrowing conversion
     const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
@@ -622,7 +622,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
-    int index {0};
+    uint16_t index {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {

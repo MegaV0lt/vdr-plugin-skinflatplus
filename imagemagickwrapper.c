@@ -35,9 +35,9 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return nullptr;
     }
     if (PreserveAspect) {
-        static constexpr uint SCALE_FACTOR {1000};
-        uint scale_w = SCALE_FACTOR * width / w;
-        uint scale_h = SCALE_FACTOR * height / h;
+        static constexpr uint16_t SCALE_FACTOR {1000};
+        uint32_t scale_w = SCALE_FACTOR * width / w;
+        uint32_t scale_h = SCALE_FACTOR * height / h;
         if (scale_w > scale_h)
             width = w * height / h;
         else
@@ -70,8 +70,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 #ifdef IMAGEMAGICK7
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-        for (int iy {0}; iy < h; ++iy) {
-            for (int ix {0}; ix < w; ++ix) {
+        for (std::size_t iy {0}; iy < h; ++iy) {
+            for (std::size_t ix {0}; ix < w; ++ix) {
                 Color c = buffer.pixelColor(ix, iy);
                 r = static_cast<unsigned char>((c.quantumRed() * QuantumScaleInt) >> 16);
                 g = static_cast<unsigned char>((c.quantumGreen() * QuantumScaleInt) >> 16);
@@ -92,8 +92,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 #ifdef IMAGEMAGICK7
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    for (int iy {0}; iy < h; ++iy) {
-        for (int ix {0}; ix < w; ++ix) {
+    for (std::size_t iy {0}; iy < h; ++iy) {
+        for (std::size_t ix {0}; ix < w; ++ix) {
             Color c = buffer.pixelColor(ix, iy);
             r = static_cast<unsigned char>((c.quantumRed() * QuantumScaleInt) >> 16);
             g = static_cast<unsigned char>((c.quantumGreen() * QuantumScaleInt) >> 16);

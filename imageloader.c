@@ -46,7 +46,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     std::string LogoLower {""};
     bool success {false};
     cImage *img {nullptr};
-    for (uint i {0}; i < 3; ++i) {      // Run up to three times (0..2)
+    for (int8_t i {0}; i < 3; ++i) {      // Run up to three times (0..2)
         if (i == 1) {                   // Second try (Plain logo not found)
             LogoLower.reserve(64);  // Filename without path
             LogoLower = logo;

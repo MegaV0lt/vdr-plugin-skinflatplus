@@ -412,7 +412,7 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }  // Config.TopBarRecConflictsShow
 
-        uint NumRec {0};
+        uint16_t NumRec {0};  // 65535 should be enough for the number of recordings
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
 #ifdef DEBUGFUNCSCALL
@@ -586,7 +586,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     int x {0};
 
-    for (int i {0}; i < 4; i++) {  // Four buttons
+    for (int8_t i {0}; i < 4; i++) {  // Four buttons
         // If there is enough space for the last button, add its width to the
         // right edge of the buttons area. This is done to align the last button
         // to the right edge of the screen.
@@ -614,7 +614,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             m_ButtonsDrawn = true;
         }
         x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;  // Add button width and margin
-    }  // for (int i = 0; i < 4; i++)
+    }  // for (int8_t i = 0; i < 4; i++)
 }
 
 bool cFlatBaseRender::ButtonsDrawn() const {
@@ -729,7 +729,7 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     dsyslog("flatPlus: cFlatBaseRender::MessageSetExtraTime()");
 #endif
 
-    static constexpr uint kThreshold {75};  //? Add config option?
+    static constexpr uint16_t kThreshold {75};  //? Add config option?
     const std::size_t TextLength {strlen(Text)};
     if (TextLength > kThreshold) {  // Message is longer than kThreshold and uses almost the full screen
         // Narrowing conversion
@@ -1894,7 +1894,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
                                          tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset,
                                          int yOffset) {
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
-    const double MaxAlpha {1.0};                // Maximum alpha value
+    static constexpr double MaxAlpha {1.0};     // Maximum alpha value
     const int BaseX {pos.X()};                  // Cache position for faster access
     const int BaseY {pos.Y()};
 

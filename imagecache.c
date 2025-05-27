@@ -80,8 +80,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
         IconCache[m_InsertIconIndex].Height = Height;
 
         if (++m_InsertIconIndex >= MaxIconCache) {
-            isyslog("flatPlus: Iconcache overflow, increase MaxIconCache (%d)", MaxIconCache);
-            isyslog("flatPlus: Refilling iconcache keeping %d pre loaded icons", m_InsertIconIndexBase);
+            isyslog("flatPlus: Iconcache overflow, increase MaxIconCache (%ld)", MaxIconCache);
+            isyslog("flatPlus: Refilling iconcache keeping %ld pre loaded icons", m_InsertIconIndexBase);
             m_InsertIconIndex = m_InsertIconIndexBase;  // Keep images loaded at start
         }
     } else {  // Insert into image cache
@@ -94,8 +94,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
         ImageCache[m_InsertIndex].Height = Height;
 
         if (++m_InsertIndex >= MaxImageCache) {
-            isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%d)", MaxImageCache);
-            isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
+            isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%ld)", MaxImageCache);
+            isyslog("flatPlus: Refilling imagecache keeping %ld pre loaded images", m_InsertIndexBase);
             m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
         }
     }
@@ -122,5 +122,5 @@ void cImageCache::PreLoadImage() {
     m_InsertIndexBase = GetCacheCount();
     m_InsertIconIndexBase = GetIconCacheCount();
     dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
-    dsyslog("flatPlus: Imagecache pre loaded %d images and %d icons", m_InsertIndexBase, m_InsertIconIndexBase);
+    dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
 }

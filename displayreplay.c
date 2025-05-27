@@ -342,7 +342,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                            ? GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)
                            : 0)};  // Top position for seconds
     const int FontSecsHight {m_FontSecs->Height()};  // Height of seconds font
-    static constexpr ulong kCharCode {0x0030};  // U+0030 DIGIT ZERO
+    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     const int TopOffset {m_FontAscender - GlyphSize};
 
@@ -744,7 +744,7 @@ void cFlatDisplayReplay::PreLoadImages() {
         ImgLoader.LoadIcon(icon, m_FontHeight, m_FontHeight);
     }
 
-    static constexpr ulong kCharCode {0x0030};  // U+0030 DIGIT ZERO
+    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     static const cString icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
     for (const auto &icon : icons1) {
