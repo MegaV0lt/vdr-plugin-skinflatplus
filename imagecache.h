@@ -11,12 +11,19 @@
 #include <vdr/skins.h>
 
 #include <array>
-#include <string>
 
-constexpr int MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
-constexpr int LogoPreCache {192};    // First x channel logos
+constexpr std::size_t MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
+constexpr std::size_t MaxIconCache {1024};   // Icon cache (Skin icons)
+constexpr std::size_t LogoPreCache {192};    // First x channel logos
 //! Note: 'LogoPreCache' is used twice! One for 'displaychannel' and one for 'menu'
 //! You must double the value for the real amount of pre cached logos
+
+struct ImageData {
+    cImage* Image {nullptr};
+    cString Name {""};  // Including full path
+    int16_t Width {-1};
+    int16_t Height {-1};
+};
 
 class cImageCache {
  public:
@@ -25,23 +32,28 @@ class cImageCache {
 
     void Create();
     void Clear();
-    bool RemoveFromCache(const std::string &Name);
+    bool RemoveFromCache(const cString &Name);
 
     int GetCacheCount() const {
       return m_InsertIndex + 1;
     }
 
-    cImage *GetImage(const std::string &Name, int Width, int Height) const;
-    void InsertImage(cImage *Image, const std::string &Name, int Width, int Height);
+    int GetIconCacheCount() const {
+      return m_InsertIconIndex + 1;
+    }
+
+    cImage *GetImage(const cString &Name, int Width, int Height, bool IsIcon = false) const;
+    void InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon = false);
 
     void PreLoadImage();
 
  private:
-    std::array<cImage*, MaxImageCache> CacheImage;
-    std::array<std::string, MaxImageCache> CacheName;  // Including full path
-    std::array<int, MaxImageCache> CacheWidth;
-    std::array<int, MaxImageCache> CacheHeight;
+    std::array<ImageData, MaxImageCache> ImageCache;
+    std::array<ImageData, MaxIconCache> IconCache;
 
-    uint m_InsertIndex {0};      // Imagecache index
-    uint m_InsertIndexBase {0};  // Imagecache after first fill at start
+    std::size_t m_InsertIndex {0};      // Imagecache index
+    std::size_t m_InsertIndexBase {0};  // Imagecache after first fill at start
+
+    std::size_t m_InsertIconIndex {0};      // Imagecache index
+    std::size_t m_InsertIconIndexBase {0};  // Imagecache after first fill at start
 };

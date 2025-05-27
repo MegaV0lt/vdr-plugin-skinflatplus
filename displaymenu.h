@@ -25,38 +25,36 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     using cSkinDisplayMenu::SetItemEvent;
 #endif
     cFlatDisplayMenu();
-    virtual ~cFlatDisplayMenu();
-    virtual void Scroll(bool Up, bool Page);
-    virtual int MaxItems();
-    virtual void Clear();
+    ~cFlatDisplayMenu() override;
+    void Scroll(bool Up, bool Page) override;
+    int MaxItems() override;
+    void Clear() override;
 
-    virtual void SetMenuCategory(eMenuCategory MenuCategory);
-    // virtual void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0);
+    void SetMenuCategory(eMenuCategory MenuCategory) override;
+    // void SetTabs(int Tab1, int Tab2 = 0, int Tab3 = 0, int Tab4 = 0, int Tab5 = 0) override;
 
-    virtual void SetTitle(const char *Title);
-    virtual void SetButtons(const char *Red, const char *Green = nullptr,
-                            const char *Yellow = nullptr, const char *Blue = nullptr);
-    virtual void SetMessage(eMessageType Type, const char *Text);
-    virtual void SetItem(const char *Text, int Index, bool Current, bool Selectable);
+    void SetTitle(const char *Title) override;
+    void SetButtons(const char *Red, const char *Green = nullptr, const char *Yellow = nullptr,
+                    const char *Blue = nullptr) override;
+    void SetMessage(eMessageType Type, const char *Text) override;
+    void SetItem(const char *Text, int Index, bool Current, bool Selectable) override;
 
-    virtual bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable,
-                              const cChannel *Channel, bool WithDate, eTimerMatch TimerMatch,
-                              bool TimerActive);
-    virtual bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable);
-    virtual bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable,
-                                bool WithProvider);
-    virtual bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
-                                  int Level, int Total, int New);
+    bool SetItemEvent(const cEvent *Event, int Index, bool Current, bool Selectable, const cChannel *Channel,
+                      bool WithDate, eTimerMatch TimerMatch, bool TimerActive) override;
+    bool SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) override;
+    bool SetItemChannel(const cChannel *Channel, int Index, bool Current, bool Selectable, bool WithProvider) override;
+    bool SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable, int Level, int Total,
+                          int New) override;
 
-    virtual void SetMenuSortMode(eMenuSortMode MenuSortMode);
+    void SetMenuSortMode(eMenuSortMode MenuSortMode) override;
 
-    virtual void SetScrollbar(int Total, int Offset);
-    virtual void SetEvent(const cEvent *Event);
-    virtual void SetRecording(const cRecording *Recording);
-    virtual void SetText(const char *Text, bool FixedFont);
-    virtual int GetTextAreaWidth() const;
-    virtual const cFont *GetTextAreaFont(bool FixedFont) const;
-    virtual void Flush();
+    void SetScrollbar(int Total, int Offset) override;
+    void SetEvent(const cEvent *Event) override;
+    void SetRecording(const cRecording *Recording) override;
+    void SetText(const char *Text, bool FixedFont) override;
+    int GetTextAreaWidth() const override;
+    const cFont *GetTextAreaFont(bool FixedFont) const override;
+    void Flush() override;
 
     void PreLoadImages();
 
@@ -73,7 +71,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    uint m_LastTimerActiveCount {0}, m_LastTimerCount {0};
+    uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};
     cString m_LastTitle {""};
 
     int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
@@ -127,7 +125,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;
     cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
 
-    void GetTimerCounts(uint &TimerActiveCount, uint &TimerCount) const;  // NOLINT
+    void UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &TimerCount) const;  // NOLINT
 
     bool IsRecordingOld(const cRecording *Recording, int Level) const;
 
@@ -135,6 +133,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void InsertGenreInfo(const cEvent *Event, cString &Text) const;  // NOLINT
     void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const;  // NOLINT
     void InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text);  // NOLINT
+
+    void AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent, int &ContentTop,  // NOLINT
+                      bool IsEvent = false);  // NOLINT
 
     time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 
@@ -149,12 +150,12 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText);
     void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                    std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
-                   int NumActors);  // Add Actors to complexcontent
+                   int NumActors, bool IsEvent = false);  // Add Actors to complexcontent
 
     void DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current);
     void DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top);
     void DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current);
-    void DrawRecordingIcon(const cString &IconName, int &Left, int Top, bool Current);  // NOLINT
+    void DrawRecordingIcon(const char *IconName, int &Left, int Top, bool Current);  // NOLINT
     void DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft, int HeadIconTop, const cString &Fsk,  // NOLINT
                                  std::vector<std::string> &GenreIcons);  // NOLINT
 
@@ -184,4 +185,5 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
             ComplexContent.SetScrollSize(m_FontHeight);
         }
     }
+    int AddWidgetHeader(const char *Icon, const char *Title, int ContentTop, int wWidth);
 };

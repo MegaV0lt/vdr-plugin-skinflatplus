@@ -34,7 +34,7 @@ cImageLoader::~cImageLoader() {}
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
 cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
-    if (width == 0 || height == 0) return nullptr;
+    if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::LoadLogo() '%s' %dx%d", logo, width, height);
@@ -46,7 +46,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     std::string LogoLower {""};
     bool success {false};
     cImage *img {nullptr};
-    for (uint i {0}; i < 3; ++i) {      // Run up to three times (0..2)
+    for (int8_t i {0}; i < 3; ++i) {      // Run up to three times (0..2)
         if (i == 1) {                   // Second try (Plain logo not found)
             LogoLower.reserve(64);  // Filename without path
             LogoLower = logo;
@@ -94,7 +94,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
 }
 
 cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
-    if (width == 0 || height == 0) return nullptr;
+    if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
 
     cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
@@ -103,8 +103,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     cTimeMs Timer;  // Start timer
 #endif
 
-    cImage *img {nullptr};
-    img = ImgCache.GetImage(*File, width, height);
+    cImage *img {ImgCache.GetImage(*File, width, height, true)};  // Check if image is in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   search in cache: %d ms", Timer.Elapsed());
@@ -113,7 +112,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 
     if (img) return img;
 
-    bool success = LoadImage(*File);
+    bool success {LoadImage(*File)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   load file from disk: %d ms", Timer.Elapsed());
@@ -127,7 +126,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         Timer.Set();  // Reset timer
 #endif
 
-        img = ImgCache.GetImage(*File, width, height);
+        img = ImgCache.GetImage(*File, width, height, true);  // Check if image is in imagecache
 
 #ifdef DEBUGIMAGELOADTIME
         dsyslog("   search in cache: %d ms", Timer.Elapsed());
@@ -160,22 +159,21 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         return nullptr;
     }
 
-    ImgCache.InsertImage(img, *File, width, height);
+    ImgCache.InsertImage(img, *File, width, height, true);  // Add image to iconcache
     return img;
 }
 
 cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
-    if (width == 0 || height == 0) return nullptr;
+    if (width < 0 || height < 0 || isempty(cFile)) return nullptr;
 
     const cString File = cFile;
-    cImage *img {nullptr};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::LoadFile() '%s'", *File);
     cTimeMs Timer;  // Start timer
 #endif
 
-    img = ImgCache.GetImage(*File, width, height);
+    cImage *img {ImgCache.GetImage(*File, width, height)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("   search in cache: %ld ms", Timer.Elapsed());
@@ -184,7 +182,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     if (img) return img;  // Image found in imagecache
 
-    const bool success = LoadImage(*File);
+    const bool success {LoadImage(*File)};
     if (!success) {
         isyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
         return nullptr;
@@ -210,10 +208,18 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
     return nullptr;
 }
 
+/**
+ * @brief Convert a string to lower case.
+ *
+ * This function is used to convert file names to lower case when searching for images
+ *
+ * @param str The string to convert to lower case
+ */
 void cImageLoader::ToLowerCase(std::string &str) {
     for (auto &ch : str) {
         if (ch <= 'Z' && ch >= 'A')  // Check for 'Z' first. Small letters start at 97
-            ch += 32;  // Or: ch ^= 1 << 5;
+            ch |= 0x20;  // Bitwise OR operation. ASCII values of uppercase letters are contiguous and can
+                         // be converted to lowercase by setting the 5th bit (0x20)
     }
 }
 
@@ -223,7 +229,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    //* Search for cover_vdr.jpg, poster.jpg, banner.jpg and fanart.jpg
+    static const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
     for (const cString &Image : RecordingImages) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;
@@ -234,6 +240,18 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     return false;
 }
 
+/**
+ * @brief Check if a certain image exists in the recording's folder.
+ *
+ * Given a recording path and an image name, this function checks if the image exists in the recording's folder,
+ * in the parent folder, or in the grand parent folder. If the image is found, its full path is stored in @a found.
+ *
+ * @param RecPath The path to the recording.
+ * @param Image The image name to check for.
+ * @param found The full path to the found image, if any.
+ *
+ * @return true if the image exists, false otherwise.
+ */
 bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
     cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
     if (std::filesystem::exists(*ManualPoster)) {

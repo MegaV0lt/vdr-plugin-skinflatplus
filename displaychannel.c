@@ -60,7 +60,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     // Pixmap for channel number and name
     // TODO: Different position for channel number and name when without background
-    // Top of ChanInfoTopViewPort depending on setting ChannelShowWithName
+    // Top of ChanInfoTopViewPort depending on setting ChannelShowNameWithShadow
     const int HeightTop {m_FontBigHeight +
                         (Config.ChannelShowNameWithShadow ? m_FontBigHeight / 10 + Config.decorBorderChannelSize : 0)};
     height += HeightTop;
@@ -160,13 +160,13 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         PixmapClear(ChanInfoTopPixmap);
         const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
         // Ensure shadow size is reasonable
-        const int MinShadowSize {3};   // Shadow should have at least 3 pixel
-        const int MaxShadowSize {10};  // Shadow should not be too large
-        const int BoundedShadowSize {std::max(MinShadowSize, std::min(ShadowSize, MaxShadowSize))};
+        static constexpr int kMinShadowSize {3};   // Shadow should have at least 3 pixel
+        static constexpr int kMaxShadowSize {10};  // Shadow should not be too large
+        const int BoundedShadowSize {std::clamp(ShadowSize, kMinShadowSize, kMaxShadowSize)};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
 #ifdef DBUGFUNCSCALL
-        dsyslog("flatPlus: SetChannel() m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
+        dsyslog("   m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
 #endif
         // Draw text with shadow
         DrawTextWithShadow(ChanInfoTopPixmap, cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
@@ -178,7 +178,8 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
                                     Theme.Color(clrChannelBg), m_FontBig);
     }
 #ifdef SHOW_TRANSPONDERINFO
-    if (!isempty(*TransponderInfo)) {
+    if (TransponderInfo[0] != '\0') {
+        // Transponder info on background
         const int top {m_FontBig->Height() - m_FontHeight};
         ChanInfoTopPixmap->DrawText(cPoint(m_ChannelWidth - left - m_Font->Width(*ChannelString), top),
                                     *TransponderInfo, Theme.Color(clrChannelFontTitle), Theme.Color(clrChannelBg),
@@ -225,7 +226,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
     int left {m_ChannelWidth - m_MarginItem2};
-    const int ImageHeight = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
+    const int ImageHeight {std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem)};
 
     cImage *img {nullptr};
     if (Channel) {
@@ -311,17 +312,19 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 
+    const int SmlSpaceWidth2 {m_FontSml->Width("  ")};
+
     if (Config.ChannelShowStartTime)
         left += m_Font->Width("00:00  ");
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
-    for (uint i {0}; i < 2; i++) {
-        const bool IsPresent = i ? false : true;
-        const cEvent *Event = IsPresent ? Present : Following;
+    for (int8_t i {0}; i < 2; i++) {
+        const bool IsPresent {(i) ? false : true};
+        const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
             StartTime = *Event->GetTimeString();  // Start time (left side)
             StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (right side)
-            StrTimeWidth = m_FontSml->Width(*StrTime) + m_FontSml->Width("  ");
+            StrTimeWidth = m_FontSml->Width(*StrTime) + SmlSpaceWidth2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
@@ -359,7 +362,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 SeenDur = cString::sprintf("%d min", EventDuration);
             }  // if (IsPresent)
 
-            SeenDurWidth = m_FontSml->Width(*SeenDur) + m_FontSml->Width("  ");
+            SeenDurWidth = m_FontSml->Width(*SeenDur) + SmlSpaceWidth2;
             SeenDurMaxWidth = std::max(StrTimeWidth, SeenDurWidth);
             MaxAvailWidth = m_ChannelWidth - left - SeenDurMaxWidth;
 #ifdef DEBUGFUNCSCALL
@@ -429,7 +432,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     PixmapClear(ChanEpgImagesPixmap);
     PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
     DecorBorderClearByFrom(BorderTVSPoster);
-    if (!isempty(*MediaPath)) {
+    if (MediaPath[0] != '\0') {
         SetMediaSize(MediaSize, m_TVSRect.Size());  // Check for too big images
         MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperChanInfoPosterSize * 100);
         MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperChanInfoPosterSize * 100);
@@ -510,7 +513,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #endif
     if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
 
-    static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
+    static cPlugin *pDVBApi {cPluginManager::GetPlugin("dvbapi")};
     if (!pDVBApi) return;
 
     sDVBAPIEcmInfo ecmInfo {
@@ -543,13 +546,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     }
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
-    constexpr ulong CharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
-    const int GlyphSize = GetGlyphSize(Setup.FontOsd, CharCode, ProgressBarHeight);  // Narrowing conversion
+    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
+    const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);  // Narrowing conversion
     const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
         TopOffset};  // One margin for progress bar to bottom
 
-    cString DvbapiInfoText = "DVBAPI: ";
+    cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), DvbapiInfoFont.get());
 
@@ -619,9 +622,9 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
-    int index {0};
+    uint16_t index {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel = Channels->First(); Channel && index < LogoPreCache;
+    for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);

@@ -43,8 +43,8 @@ class cSimpleContent {
         Wrapper.Set(*m_Text, m_Font, m_Position.Width());
         std::string Line;
         Line.reserve(128);
-        const int Lines = Wrapper.Lines();
-        const int FontHeight = m_Font->Height();
+        const int Lines {Wrapper.Lines()};
+        const int FontHeight {m_Font->Height()};
 
         for (int i {0}; i < Lines; ++i) {
             Line = Wrapper.GetLine(i);
@@ -52,7 +52,7 @@ class cSimpleContent {
                 JustifyLine(Line, m_Font, m_Position.Width());
             }
             Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)),
-                            Line.data(), m_ColorFg, m_ColorBg, m_Font,
+                            Line.c_str(), m_ColorFg, m_ColorBg, m_Font,
                             m_TextWidth, m_TextHeight, m_TextAlignment);
         }
     }

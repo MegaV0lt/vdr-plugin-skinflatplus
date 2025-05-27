@@ -12,10 +12,10 @@
 class cFlatDisplayVolume : public cFlatBaseRender, public cSkinDisplayVolume {
  public:
         cFlatDisplayVolume();
-        virtual ~cFlatDisplayVolume();
-        virtual void SetVolume(int Current, int Total, bool Mute);
-        // virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush();
+        ~cFlatDisplayVolume() override;
+        void SetVolume(int Current, int Total, bool Mute) override;
+        // void SetAudioChannel(int AudioChannel) override;
+        void Flush() override;
 
         void PreLoadImages();
 

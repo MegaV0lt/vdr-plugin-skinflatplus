@@ -12,10 +12,10 @@
 class cFlatDisplayTracks : public cFlatBaseRender, public cSkinDisplayTracks {
  public:
         cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-        virtual ~cFlatDisplayTracks();
-        virtual void SetTrack(int Index, const char * const *Tracks);
-        virtual void SetAudioChannel(int AudioChannel);
-        virtual void Flush();
+        ~cFlatDisplayTracks() override;
+        void SetTrack(int Index, const char * const *Tracks) override;
+        void SetAudioChannel(int AudioChannel) override;
+        void Flush() override;
 
  private:
         cPixmap *TracksPixmap {nullptr};

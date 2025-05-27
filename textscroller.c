@@ -65,11 +65,11 @@ void cTextScroll::Draw() const {
         std::string_view sv1 {m_Text, static_cast<size_t>(TildePos - m_Text)};
         std::string_view sv2 {TildePos + 1};
         const std::string first {rtrim(sv1)};
-        const std::string second {ltrim(sv2)};
+        std::string_view second {ltrim(sv2)};
 
         Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
         const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-        Pixmap->DrawText(cPoint(l, 0), second.c_str(), ColorExtraTextFg, ColorBg, m_Font);
+        Pixmap->DrawText(cPoint(l, 0), second.data(), ColorExtraTextFg, ColorBg, m_Font);
     } else {
         Pixmap->DrawText(cPoint(0, 0), m_Text, ColorFg, ColorBg, m_Font);
     }
@@ -185,7 +185,7 @@ void cTextScrollers::Action() {
 #endif
 
     // Wait 1 second so the osd is finished
-    for (uint i {0}; i < 10 && Running(); ++i) {
+    for (std::size_t i {0}; i < 10 && Running(); ++i) {
         cCondWait::SleepMs(100);
     }
 

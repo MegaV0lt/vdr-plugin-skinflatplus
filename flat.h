@@ -221,20 +221,20 @@ THEME_CLR(Theme, clrVolumeBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
 // SeenIconNames for GetRecordingSeenIcon()
-static const cString SeenIconNames[]{"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
-                                     "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
-                                     "recording_seen_8", "recording_seen_9", "recording_seen_10"};
+static const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
+                                      "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
+                                      "recording_seen_8", "recording_seen_9", "recording_seen_10"};
 
 class cFlat : public cSkin {
  public:
     cFlat();
-    virtual const char *Description();
-    virtual cSkinDisplayChannel *DisplayChannel(bool WithInfo);
-    virtual cSkinDisplayMenu *DisplayMenu();
-    virtual cSkinDisplayReplay *DisplayReplay(bool ModeOnly);
-    virtual cSkinDisplayVolume *DisplayVolume();
-    virtual cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks);
-    virtual cSkinDisplayMessage *DisplayMessage();
+    const char *Description() override;
+    cSkinDisplayChannel *DisplayChannel(bool WithInfo) override;
+    cSkinDisplayMenu *DisplayMenu() override;
+    cSkinDisplayReplay *DisplayReplay(bool ModeOnly) override;
+    cSkinDisplayVolume *DisplayVolume() override;
+    cSkinDisplayTracks *DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) override;
+    cSkinDisplayMessage *DisplayMessage() override;
 
  private:
     cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
@@ -315,7 +315,3 @@ int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);
 void InsertCutLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
-
-// At class/file level
-static constexpr float LINE_WIDTH_THRESHOLD = 0.8f;  // Line width threshold for justifying
-static constexpr const char* PUNCTUATION_CHARS = ".,?!;";  // Punctuation characters for justifying

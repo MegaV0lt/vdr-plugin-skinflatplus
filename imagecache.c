@@ -20,66 +20,90 @@ cImageCache::cImageCache() {}
 cImageCache::~cImageCache() {}
 
 void cImageCache::Create() {
-    std::fill(std::begin(CacheImage), std::end(CacheImage), nullptr);
-    std::fill(std::begin(CacheName), std::end(CacheName), "");
-    std::fill(std::begin(CacheWidth), std::end(CacheWidth), -1);
-    std::fill(std::begin(CacheHeight), std::end(CacheHeight), -1);
+    std::fill(std::begin(ImageCache), std::end(ImageCache), ImageData{nullptr, "", -1, -1});
+    std::fill(std::begin(IconCache), std::end(IconCache), ImageData{nullptr, "", -1, -1});
 
     m_InsertIndex = 0;
+    m_InsertIconIndex = 0;
 }
 
 void cImageCache::Clear() {
-    std::for_each(std::begin(CacheImage), std::end(CacheImage), [](auto &p) { delete p; });
+    std::for_each(std::begin(ImageCache), std::end(ImageCache), [](auto &data) { delete data.Image; });
+    std::for_each(std::begin(IconCache), std::end(IconCache), [](auto &data) { delete data.Image; });
+
     m_InsertIndex = 0;
+    m_InsertIconIndex = 0;
 }
 
-bool cImageCache::RemoveFromCache(const std::string &Name) {
-    std::string BaseFileName {""};
-    BaseFileName.reserve(32);
-    for (uint i {0}; i < MaxImageCache; ++i) {
-        BaseFileName = CacheName[i].substr(CacheName[i].find_last_of('/') + 1);  // Part after the last '/'
-
-        if (BaseFileName == Name) {
-            dsyslog("flatPlus: RemoveFromCache - %s", CacheName[i].c_str());
-            delete CacheImage[i];
-            CacheImage[i] = nullptr;
-            CacheName[i] = "";
-            CacheWidth[i] = -1;
-            CacheHeight[i] = -1;
+bool cImageCache::RemoveFromCache(const cString &Name) {
+    std::string_view BaseFileName {""}, DataNameView {""};
+    std::string_view NameView {Name};
+    for (auto &data : ImageCache) {
+        DataNameView = *data.Name;
+        if (DataNameView.empty()) break;  // No more images in cache
+        BaseFileName = DataNameView.substr(DataNameView.find_last_of('/') + 1);  // Part after the last '/'
+        if (BaseFileName == NameView) {
+            dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
+            delete data.Image;
+            data.Image = nullptr;
+            data.Name = "-Empty!-";  // Mark as empty because "" is for end of cache
+            data.Width = -1;
+            data.Height = -1;
             return true;
         }
     }
     return false;
 }
 
-cImage* cImageCache::GetImage(const std::string &Name, int Width, int Height) const {
+cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
+    std::string_view DataNameView {""};
+    std::string_view NameView {Name};
     // dsyslog("flatPlus: Imagecache search for image %s Width %d Height %d", Name.c_str(), Width, Height);
-    for (uint i {0}; i < MaxImageCache; ++i) {
-        // dsyslog("flatPlus: Imagecache index %d image %s Width %d Height %d", index, CacheName[i].c_str(),
-        //          CacheWidth[i], CacheHeight[i]);
-        if (CacheName[i] == Name && CacheWidth[i] == Width && CacheHeight[i] == Height)
-            return CacheImage[i];
+    for (const auto &data : IsIcon ? IconCache : ImageCache) {
+        DataNameView = *data.Name;
+        // dsyslog("flatPlus: Imagecache image %s Width %d Height %d", data.Name.c_str(), data.Width, data.Height);
+        if (DataNameView.empty()) break;  // No more mages in cache;
+        if (DataNameView == NameView && data.Width == Width && data.Height == Height) { return data.Image; }
     }
     return nullptr;
 }
 
-void cImageCache::InsertImage(cImage *Image, const std::string &Name, int Width, int Height) {
-    if (CacheImage[m_InsertIndex] != nullptr)
-        delete CacheImage[m_InsertIndex];
+void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
+    // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
+    if (IsIcon) {  // Insert into icon cache
+        if (IconCache[m_InsertIconIndex].Image != nullptr)
+            delete IconCache[m_InsertIconIndex].Image;  // Delete old image if exists
 
-    CacheImage[m_InsertIndex] = Image;
-    CacheName[m_InsertIndex].reserve(Name.length());
-    CacheName[m_InsertIndex] = Name;
-    CacheWidth[m_InsertIndex] = Width;
-    CacheHeight[m_InsertIndex] = Height;
+        IconCache[m_InsertIconIndex].Image = Image;     // Store image in cache
+        IconCache[m_InsertIconIndex].Name = Name;
+        IconCache[m_InsertIconIndex].Width = Width;
+        IconCache[m_InsertIconIndex].Height = Height;
 
-    if (++m_InsertIndex >= MaxImageCache) {
-        isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%d)", MaxImageCache);
-        isyslog("flatPlus: Refilling imagecache keeping %d pre loaded images", m_InsertIndexBase);
-        m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
+        if (++m_InsertIconIndex >= MaxIconCache) {
+            isyslog("flatPlus: Iconcache overflow, increase MaxIconCache (%ld)", MaxIconCache);
+            isyslog("flatPlus: Refilling iconcache keeping %ld pre loaded icons", m_InsertIconIndexBase);
+            m_InsertIconIndex = m_InsertIconIndexBase;  // Keep images loaded at start
+        }
+    } else {  // Insert into image cache
+        if (ImageCache[m_InsertIndex].Image != nullptr)
+            delete ImageCache[m_InsertIndex].Image;  // Delete old image if exists
+
+        ImageCache[m_InsertIndex].Image = Image;     // Store image in cache
+        ImageCache[m_InsertIndex].Name = Name;
+        ImageCache[m_InsertIndex].Width = Width;
+        ImageCache[m_InsertIndex].Height = Height;
+
+        if (++m_InsertIndex >= MaxImageCache) {
+            isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%ld)", MaxImageCache);
+            isyslog("flatPlus: Refilling imagecache keeping %ld pre loaded images", m_InsertIndexBase);
+            m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
+        }
     }
 }
 
+// Preload images and icons
+// This function is called at startup to load images and icons into the cache
+// to speed up the display of the menu and other components.
 void cImageCache::PreLoadImage() {
     cTimeMs Timer;  // Start timer
 
@@ -96,6 +120,7 @@ void cImageCache::PreLoadImage() {
     DisplayVolume.PreLoadImages();
 
     m_InsertIndexBase = GetCacheCount();
-    dsyslog("flatPlus: Imagecache pre load images time: %ld ms", Timer.Elapsed());
-    dsyslog("flatPlus: Imagecache pre loaded images %d / %d", m_InsertIndexBase, MaxImageCache);
+    m_InsertIconIndexBase = GetIconCacheCount();
+    dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
 }

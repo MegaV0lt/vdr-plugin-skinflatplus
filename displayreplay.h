@@ -13,16 +13,16 @@
 class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, public cThread {
  public:
         explicit cFlatDisplayReplay(bool ModeOnly);
-        virtual ~cFlatDisplayReplay();
-        virtual void SetRecording(const cRecording *Recording);
-        virtual void SetTitle(const char *Title);
-        virtual void SetMode(bool Play, bool Forward, int Speed);
-        virtual void SetProgress(int Current, int Total);
-        virtual void SetCurrent(const char *Current);
-        virtual void SetTotal(const char *Total);
-        virtual void SetJump(const char *Jump);
-        virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush();
+        ~cFlatDisplayReplay() override;
+        void SetRecording(const cRecording *Recording) override;
+        void SetTitle(const char *Title) override;
+        void SetMode(bool Play, bool Forward, int Speed) override;
+        void SetProgress(int Current, int Total) override;
+        void SetCurrent(const char *Current) override;
+        void SetTotal(const char *Total) override;
+        void SetJump(const char *Jump) override;
+        void SetMessage(eMessageType Type, const char *Text) override;
+        void Flush() override;
 
         void PreLoadImages();
 
@@ -62,5 +62,5 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         void UpdateInfo();
         void ResolutionAspectDraw();
 
-        virtual void Action();
+        void Action() override;
 };

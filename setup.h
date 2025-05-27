@@ -15,11 +15,11 @@
 class cFlatSetup : public cMenuSetupPage {
  public:
         cFlatSetup();
-        virtual ~cFlatSetup();
+        ~cFlatSetup() override;
 
  protected:
-        virtual void Store();
-        virtual eOSState ProcessKey(eKeys Key);
+        void Store() override;
+        eOSState ProcessKey(eKeys Key) override;
 
  private:
         cFlatConfig SetupConfig;
@@ -42,7 +42,7 @@ class cMenuSetupSubMenu : public cOsdMenu {
 class cFlatSetupGeneral : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupGeneral(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -56,7 +56,7 @@ class cFlatSetupGeneral : public cMenuSetupSubMenu {
 class cFlatSetupChannelInfo : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupChannelInfo(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -65,7 +65,7 @@ class cFlatSetupChannelInfo : public cMenuSetupSubMenu {
 class cFlatSetupMenu : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupMenu(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -74,7 +74,7 @@ class cFlatSetupMenu : public cMenuSetupSubMenu {
 class cFlatSetupReplay : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupReplay(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -83,7 +83,7 @@ class cFlatSetupReplay : public cMenuSetupSubMenu {
 class cFlatSetupVolume : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupVolume(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -92,7 +92,7 @@ class cFlatSetupVolume : public cMenuSetupSubMenu {
 class cFlatSetupTracks : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupTracks(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -101,7 +101,7 @@ class cFlatSetupTracks : public cMenuSetupSubMenu {
 class cFlatSetupTVScraper : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupTVScraper(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();
@@ -110,7 +110,7 @@ class cFlatSetupTVScraper : public cMenuSetupSubMenu {
 class cFlatSetupMMWidget : public cMenuSetupSubMenu {
  public:
         explicit cFlatSetupMMWidget(cFlatConfig *data);
-        virtual eOSState ProcessKey(eKeys Key);
+        eOSState ProcessKey(eKeys Key) override;
 
  protected:
         void Setup();

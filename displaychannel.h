@@ -17,11 +17,11 @@
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  public:
         explicit cFlatDisplayChannel(bool WithInfo);
-        virtual ~cFlatDisplayChannel();
-        virtual void SetChannel(const cChannel *Channel, int Number);
-        virtual void SetEvents(const cEvent *Present, const cEvent *Following);
-        virtual void SetMessage(eMessageType Type, const char *Text);
-        virtual void Flush();
+        ~cFlatDisplayChannel() override;
+        void SetChannel(const cChannel *Channel, int Number) override;
+        void SetEvents(const cEvent *Present, const cEvent *Following) override;
+        void SetMessage(eMessageType Type, const char *Text) override;
+        void Flush() override;
 
         void PreLoadImages();
 
