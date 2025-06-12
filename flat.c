@@ -948,18 +948,46 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     cTimeMs Timer;  // Start timer
 #endif
 
-    if (WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
+    if (!Text || WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
         return;
 
-    free(m_Text);
+    /* free(m_Text);
     m_Text = (Text) ? strdup(Text) : nullptr;
     if (!m_Text)
+        return; */
+
+    free(m_Text);  // Free previous text if any
+    m_Text = nullptr;  // Reset pointer to avoid dangling pointer
+
+    // Calculate needed size of buffer including space for '\n' and '\0'
+    const size_t TextLen {strlen(Text)};
+    // Estimate number of lines based on text length and width
+    const size_t MaxLines = TextLen / (WidthLower / Font->Width('x')) + 1 + UpperLines;
+    if (MaxLines <= 0) {
+        esyslog("flatPlus: cTextFloatingWrapper::Set() Invalid MaxLines: %ld", MaxLines);
+        return;  // Avoid zero or negative lines
+    }
+    const size_t NeededSize {TextLen + MaxLines + 2};  // +2 for '\n' and '\0'
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   TextLen: %ld, MaxLines: %ld, NeededSize: %ld", TextLen, MaxLines, NeededSize);
+#endif
+
+    // Allocate buffer
+    m_Text = static_cast<char*>(malloc(NeededSize));
+    if (!m_Text)
         return;
+
+    // Copy text to buffer
+    /* strncpy(m_Text, Text, TextLen); */
+    // Use memcpy instead of strncpy to avoid potential buffer overflow
+    memcpy(m_Text, Text, TextLen);
+    m_Text[TextLen] = '\0';
 
     m_Lines = 1;
 
     static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
-    char *Blank {nullptr}, *Delim {nullptr}, *s {nullptr};
+    std::size_t CurLength {strlen(m_Text)};
+    char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
     int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;
     uint32_t sym {0};
@@ -968,8 +996,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         /* int */ sl = Utf8CharLen(p);
         /* uint32_t */ sym = Utf8CharGet(p, sl);
         if (sym == '\n') {
-            ++m_Lines;
-            if (m_Lines > UpperLines)
+            if (++m_Lines > UpperLines)
                 Width = WidthLower;
             w = 0;
             Blank = Delim = nullptr;
@@ -990,14 +1017,25 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
 
-                /* char* */  s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
-                /* int */ l = p - m_Text;
-                strncpy(s, m_Text, l);  // Dest, Source, Size
+                // /* char* */  s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
+                // /* int */ l = p - m_Text;
+                /* strncpy(s, m_Text, l);  // Dest, Source, Size
                 s[l] = '\n';            // Insert line break.
                 strcpy(s + l + 1, p);   // Dest, Source
                 free(m_Text);
                 m_Text = s;
                 p = m_Text + l;
+                continue; */
+
+                NewText = static_cast<char*>(realloc(m_Text, CurLength + 2));
+                if (NewText) {
+                    l = p - m_Text;
+                    m_Text = NewText;
+                    memmove(m_Text + l + 1, p, CurLength - l + 1);
+                    m_Text[l] = '\n';
+                    p = m_Text + l;
+                    ++CurLength;  // Increase current length by 1 for the inserted '\n'
+                }
                 continue;
             }
         }
@@ -1008,7 +1046,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 Blank = nullptr;
 #ifdef DEBUGFUNCSCALL
             } else {
-                dsyslog("   Skipping double delimiter char '%c'", *p);
+                dsyslog("   Skipping repeating delimiter char '%c'", *p);
 #endif
             }
         }
