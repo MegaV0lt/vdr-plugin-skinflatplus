@@ -26,8 +26,8 @@
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
     sc_reserved        = 0x00,
-    sc_video_MPEG2     = 0x01,  // MPEG 1 Layer 2 video
-    sc_audio_MP2       = 0x02,  // MPEG 1 Layer 2 audio
+    sc_video_MPEG2     = 0x01,  // MPEG2 video
+    sc_audio_MP2       = 0x02,  // MPEG1 Layer 2 audio
     sc_subtitle        = 0x03,
     sc_audio_AC3       = 0x04,
     sc_video_H264_AVC  = 0x05,
@@ -951,42 +951,32 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     if (!Text || WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
         return;
 
-    /* free(m_Text);
-    m_Text = (Text) ? strdup(Text) : nullptr;
-    if (!m_Text)
-        return; */
-
     free(m_Text);  // Free previous text if any
     m_Text = nullptr;  // Reset pointer to avoid dangling pointer
+    m_Lines = 0;       // Reset line count
 
-    // Calculate needed size of buffer including space for '\n' and '\0'
+    // Estimate needed size of buffer including space for '\n' and '\0'
     const size_t TextLen {strlen(Text)};
-    // Estimate number of lines based on text length and width
-    const size_t MaxLines = TextLen / (WidthLower / Font->Width('x')) + 1 + UpperLines;
-    if (MaxLines <= 0) {
-        esyslog("flatPlus: cTextFloatingWrapper::Set() Invalid MaxLines: %ld", MaxLines);
-        return;  // Avoid zero or negative lines
-    }
-    const size_t NeededSize {TextLen + MaxLines + 2};  // +2 for '\n' and '\0'
+    if (TextLen == 0) return;  // Avoid processing empty text
+    // Estimate number of lines. More conservative size estimation
+    const size_t EstimatedLines = (TextLen / 10) + UpperLines + 10;  // Add safety margin
+    size_t Capacity {TextLen + EstimatedLines + 2};
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   TextLen: %ld, MaxLines: %ld, NeededSize: %ld", TextLen, MaxLines, NeededSize);
+    dsyslog("   TextLen: %ld, EstimatedLines: %ld, Capacity: %ld", TextLen, EstimatedLines, Capacity);
 #endif
 
     // Allocate buffer
-    m_Text = static_cast<char*>(malloc(NeededSize));
+    m_Text = static_cast<char*>(malloc(Capacity));
     if (!m_Text)
         return;
 
-    // Copy text to buffer
-    /* strncpy(m_Text, Text, TextLen); */
-    // Use memcpy instead of strncpy to avoid potential buffer overflow
+    // Copy text to buffer. Use memcpy instead of strncpy to avoid potential buffer overflow
     memcpy(m_Text, Text, TextLen);
     m_Text[TextLen] = '\0';
 
     m_Lines = 1;
-
     static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
-    std::size_t CurLength {strlen(m_Text)};
+    size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
     int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;
@@ -996,8 +986,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         /* int */ sl = Utf8CharLen(p);
         /* uint32_t */ sym = Utf8CharGet(p, sl);
         if (sym == '\n') {
-            if (++m_Lines > UpperLines)
-                Width = WidthLower;
+            if (++m_Lines > UpperLines) Width = WidthLower;
             w = 0;
             Blank = Delim = nullptr;
             p++;
@@ -1027,15 +1016,21 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 p = m_Text + l;
                 continue; */
 
-                NewText = static_cast<char*>(realloc(m_Text, CurLength + 2));
-                if (NewText) {
-                    l = p - m_Text;
+                l = p - m_Text;  // Calculate offset of current position
+                // Instead of realloc per line, only grow buffer in powers of two
+                if (CurLength + 2 > Capacity) {
+                    Capacity = std::max(Capacity * 2, CurLength + 8);
+                    NewText = static_cast<char*>(realloc(m_Text, Capacity));
+                    if (!NewText) {
+                        esyslog("flatPlus: cTextFloatingWrapper::Set() realloc failed");
+                        return;
+                    }
                     m_Text = NewText;
-                    memmove(m_Text + l + 1, p, CurLength - l + 1);
-                    m_Text[l] = '\n';
                     p = m_Text + l;
-                    ++CurLength;  // Increase current length by 1 for the inserted '\n'
                 }
+                memmove(m_Text + l + 1, p, CurLength - l + 1);
+                m_Text[l] = '\n';
+                ++CurLength;
                 continue;
             }
         }
