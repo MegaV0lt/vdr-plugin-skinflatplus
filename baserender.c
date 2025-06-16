@@ -953,7 +953,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
 
         if (Current > 0) {
             DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top(), PercentPos, big, ColorBarFg);
-            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + (sml / 2), PercentPos, big * -1, ColorBarFg);
+            DecorDrawGlowRectHor(Pixmap, rect.Left(), rect.Top() + Middle + (sml / 2), PercentPos, big * -1,
+                                 ColorBarFg);
         }
         break;
     }

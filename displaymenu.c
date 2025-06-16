@@ -95,11 +95,16 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
-    if (m_FontTempSml)  // Created in 'DrawMainMenuWidgetWeather()'
+    if (m_FontTempSml) {  // Created in 'DrawMainMenuWidgetWeather()'
         delete m_FontTempSml;
+        m_FontTempSml = nullptr;
+    }
 
-    if (m_FontTiny)  // Created in 'AddActors()'
+
+    if (m_FontTiny) {  // Created in 'AddActors()'
         delete m_FontTiny;
+        m_FontTiny = nullptr;
+    }
 
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
@@ -2476,7 +2481,8 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ContentTop += 6;
 
     // Smaller font for actors name and role
-    m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+    if (!m_FontTiny)  // Create tiny font only once
+        m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
     const int FontTinyHeight {m_FontTiny->Height()};
 
     cImage *img {nullptr};
@@ -4206,7 +4212,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     //* Declared in 'baserender.h'
     // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
-    m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+    if (!m_FontTempSml)  // Font not yet created
+        m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
     const int FontTempSmlHeight {m_FontTempSml->Height()};
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);

@@ -64,8 +64,10 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
 }
 
 cFlatDisplayReplay::~cFlatDisplayReplay() {
-    if (m_FontSecs)
+    if (m_FontSecs) {
         delete m_FontSecs;
+        m_FontSecs = nullptr;
+    }
 
     m_Osd->DestroyPixmap(LabelPixmap);
     m_Osd->DestroyPixmap(LabelJumpPixmap);
