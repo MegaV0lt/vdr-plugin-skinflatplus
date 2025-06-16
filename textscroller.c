@@ -134,6 +134,7 @@ void cTextScrollers::Clear() {
     // No need to iterate over the vector in this case
     for (auto &scroller : Scrollers) {
         delete scroller;
+        scroller = nullptr;  // Avoid dangling pointer
     }
 
     Scrollers.clear();

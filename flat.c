@@ -326,7 +326,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
             return ResNames[i];
     }
 
-    dsyslog("flatPlus: Unkown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
+    dsyslog("flatPlus: Unknown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
     return "unknown_res";
 }
 
