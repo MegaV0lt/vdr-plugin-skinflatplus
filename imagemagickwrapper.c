@@ -7,8 +7,8 @@
  */
 #include "./imagemagickwrapper.h"
 
-// #include <sstream>
-// #include <string>
+#include <memory>
+#include <cstring>
 
 #include "./imagescaler.h"
 
@@ -18,11 +18,8 @@
 #endif
 #endif
 
-cImageMagickWrapper::cImageMagickWrapper() {
-}
-
-cImageMagickWrapper::~cImageMagickWrapper() {
-}
+cImageMagickWrapper::cImageMagickWrapper() {}
+cImageMagickWrapper::~cImageMagickWrapper() {}
 
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {
     const int w = buffer.columns();  // Narrowing conversion
@@ -34,6 +31,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() Invalid target dimensions: %dx%d", width, height);
         return nullptr;
     }
+
     if (PreserveAspect) {
         static constexpr uint16_t SCALE_FACTOR {1000};
         uint32_t scale_w = SCALE_FACTOR * width / w;
@@ -43,112 +41,139 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         else
             height = h * width / w;
     }
-#ifdef IMAGEMAGICK7
-    // Use integer arithmetic instead of floating-point division
-    const uint64_t QuantumScaleInt {(255ULL * SCALE_FACTOR) / QuantumRange};
-#else
-    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
-    // Use integer arithmetic instead of floating-point division
-    static constexpr uint64_t SCALE_FACTOR {1ULL << 16};  // Use a power of 2 for efficient scaling
-    const uint64_t RGBScaleInt {((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL};
-#endif
-    cImage *image = new cImage(cSize(width, height));
-    if (!image) {
-        esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image");
-        return nullptr;
-    }
 
+    // Allocate image with RAII
+    auto image = std::make_unique<cImage>(cSize(width, height));
+    // tColor *imgData = reinterpret_cast<tColor *>(image->Data());
     tColor *imgData = (tColor *)image->Data();
     if (!imgData) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image data");
-        delete image;  // Clean up allocated memory
         return nullptr;
     }
+
+#ifdef IMAGEMAGICK7
+    using Quantum = Magick::Quantum;
+    static constexpr uint64_t SCALE16 = 1ULL << 16;
+    const uint64_t QuantumScaleInt = (255ULL * SCALE16) / QuantumRange;
+    const Quantum *px = buffer.getConstPixels(0, 0, w, h);
+    if (!px) {
+        esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
+        return nullptr;
+    }
+
+    // MagickCore expects: [r,g,b,a] or [cmyk a] etc--RGB(A) order. Confirm layout!
+    const int quantum_channels = buffer.channels();
+
+    // When scaling/resizing required
+    if (w != width || h != height) {
+        ImageScaler scaler;
+        scaler.SetImageParameters(imgData, width, width, height, w, h);
+
+        const Quantum *src = px;
+        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+        for (int iy {0}; iy < h; ++iy) {
+            for (int ix {0}; ix < w; ++ix) {
+                r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
+                g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
+                b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+                o = quantum_channels > 3
+                    ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                    : 0xff;
+                scaler.PutSourcePixel(b, g, r, o);
+                src += quantum_channels;
+            }
+        }
+        return image.release();
+    }
+
+    // "Fast path": sizes match, just convert directly
+    {
+        const Quantum *src = px;
+        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+        for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel) {
+            r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
+            g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
+            b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+            o = quantum_channels > 3
+                ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                : 0xff;
+            *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
+            src += quantum_channels;
+        }
+        return image.release();
+    }
+#else
+    // ImageMagick <=6: use PixelPacket
+    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+    if (!pixels) {
+        esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
+        return nullptr;
+    }
+    const Magick::PixelPacket *src = pixels;
+    static constexpr uint64_t SCALE_FACTOR = 1ULL << 16;
+    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL;
 
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
-#ifdef IMAGEMAGICK7
-        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-        for (std::size_t iy {0}; iy < h; ++iy) {
-            for (std::size_t ix {0}; ix < w; ++ix) {
-                Color c = buffer.pixelColor(ix, iy);
-                r = static_cast<unsigned char>((c.quantumRed() * QuantumScaleInt) >> 16);
-                g = static_cast<unsigned char>((c.quantumGreen() * QuantumScaleInt) >> 16);
-                b = static_cast<unsigned char>((c.quantumBlue() * QuantumScaleInt) >> 16);
-                o = static_cast<unsigned char>((c.quantumAlpha() * QuantumScaleInt) >> 16);
-                scaler.PutSourcePixel(static_cast<int>(b), static_cast<int>(g), static_cast<int>(r),
-                                      static_cast<int>(o));
-            }
+        int blue {}, green {}, red {}, alpha {};  // Initialise outside of for loop
+        for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
+            blue  = (src->blue   * SCALE_FACTOR) / RGBScaleInt;
+            green = (src->green  * SCALE_FACTOR) / RGBScaleInt;
+            red   = (src->red    * SCALE_FACTOR) / RGBScaleInt;
+            alpha = ~(static_cast<unsigned char>((src->opacity * SCALE_FACTOR) / RGBScaleInt));
+            scaler.PutSourcePixel(blue, green, red, alpha);
         }
-#else
-        for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
-            scaler.PutSourcePixel(static_cast<int>((pixels->blue * SCALE_FACTOR) / RGBScaleInt),
-                                  static_cast<int>((pixels->green * SCALE_FACTOR) / RGBScaleInt),
-                                  static_cast<int>((pixels->red * SCALE_FACTOR) / RGBScaleInt),
-                                  ~static_cast<unsigned char>((pixels->opacity * SCALE_FACTOR) / RGBScaleInt));
-#endif
-        return image;
+        return image.release();
     }
-#ifdef IMAGEMAGICK7
-    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    for (std::size_t iy {0}; iy < h; ++iy) {
-        for (std::size_t ix {0}; ix < w; ++ix) {
-            Color c = buffer.pixelColor(ix, iy);
-            r = static_cast<unsigned char>((c.quantumRed() * QuantumScaleInt) >> 16);
-            g = static_cast<unsigned char>((c.quantumGreen() * QuantumScaleInt) >> 16);
-            b = static_cast<unsigned char>((c.quantumBlue() * QuantumScaleInt) >> 16);
-            o = static_cast<unsigned char>((c.quantumAlpha() * QuantumScaleInt) >> 16);
-            *imgData++ = (static_cast<int>(o) << 24) | (static_cast<int>(r) << 16) | (static_cast<int>(g) << 8) |
-                         static_cast<int>(b);
-        }
-    }
-#else
-    for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
+
+    // Fast path: sizes match, just go
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((pixels->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
-             (static_cast<int>((pixels->green * SCALE_FACTOR) / RGBScaleInt) << 8) |
-             (static_cast<int>((pixels->red * SCALE_FACTOR) / RGBScaleInt) << 16) |
-             static_cast<int>((pixels->blue * SCALE_FACTOR) / RGBScaleInt));
+            ((~static_cast<int>((src->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
+             (static_cast<int>((src->red      * SCALE_FACTOR) / RGBScaleInt) << 16) |
+             (static_cast<int>((src->green    * SCALE_FACTOR) / RGBScaleInt) << 8)  |
+             (static_cast<int>((src->blue     * SCALE_FACTOR) / RGBScaleInt)));
+    }
+    return image.release();
 #endif
-    return image;
 }
 
 cImage cImageMagickWrapper::CreateImageCopy() {
-    const int w = buffer.columns();  // Narrowing conversion
+    const int w = buffer.columns();
     const int h = buffer.rows();
     cImage image(cSize(w, h));
-    tColor col {0};
-#ifndef IMAGEMAGICK7
-    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
-#else
-    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    static constexpr uint64_t SCALE_FACTOR = 1UL << 16;
-    const uint64_t QuantumScaleInt = (255UL * SCALE_FACTOR) / QuantumRange;
-#endif
-    for (int iy {0}; iy < h; ++iy) {
-        for (int ix {0}; ix < w; ++ix) {
+    tColor *imgData = (tColor *)image.Data();
 #ifdef IMAGEMAGICK7
-            Color c = buffer.pixelColor(ix, iy);
-            r = static_cast<unsigned char>((c.quantumRed() * QuantumScaleInt) >> 16);
-            g = static_cast<unsigned char>((c.quantumGreen() * QuantumScaleInt) >> 16);
-            b = static_cast<unsigned char>((c.quantumBlue() * QuantumScaleInt) >> 16);
-            o = static_cast<unsigned char>((c.quantumAlpha() * QuantumScaleInt) >> 16);
-            col = (static_cast<int>(o) << 24) | (static_cast<int>(r) << 16) | (static_cast<int>(g) << 8) |
-                         static_cast<int>(b);
-
-#else
-            col = (~static_cast<int>(pixels->opacity * 255 / MaxRGB) << 24) |
-                  (static_cast<int>(pixels->green * 255 / MaxRGB) << 8) |
-                  (static_cast<int>(pixels->red * 255 / MaxRGB) << 16) |
-                  (static_cast<int>(pixels->blue * 255 / MaxRGB));
-#endif
-            image.SetPixel(cPoint(ix, iy), col);
-#ifndef IMAGEMAGICK7
-            ++pixels;
-#endif
-        }
+    using Quantum = Magick::Quantum;
+    static constexpr uint64_t SCALE16 = 1UL << 16;
+    const uint64_t QuantumScaleInt = (255UL * SCALE16) / QuantumRange;
+    const Quantum *src = buffer.getConstPixels(0, 0, w, h);
+    if (!src) return image;
+    const int quantum_channels = buffer.channels();
+    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, src += quantum_channels) {
+        r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
+        g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
+        b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+        o = quantum_channels > 3
+                ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                : 0xff;
+        *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
     }
+#else
+    const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
+    if (!src) return image;
+    static constexpr uint64_t SCALE_FACTOR = 1UL << 16;
+    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL;
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
+        *imgData++ =
+            ((~static_cast<int>((src->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
+            (static_cast<int>((src->red       * SCALE_FACTOR) / RGBScaleInt) << 16) |
+            (static_cast<int>((src->green     * SCALE_FACTOR) / RGBScaleInt) << 8)  |
+            (static_cast<int>((src->blue      * SCALE_FACTOR) / RGBScaleInt)));
+    }
+#endif
     return image;
 }
 
@@ -179,9 +204,9 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
 
 Color cImageMagickWrapper::Argb2Color(tColor col) {
     tIndex alpha = (col & 0xFF000000) >> 24;
-    tIndex red = (col & 0x00FF0000) >> 16;
+    tIndex red   = (col & 0x00FF0000) >> 16;
     tIndex green = (col & 0x0000FF00) >> 8;
-    tIndex blue = (col & 0x000000FF);
+    tIndex blue  = (col & 0x000000FF);
 #ifdef IMAGEMAGICK7
     Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
                 QuantumRange * alpha / 255);
