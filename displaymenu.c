@@ -3470,22 +3470,14 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
          [this](int left, int width, int top) { return DrawMainMenuWidgetCommand(left, width, top); }},
         {"weather", [this](int left, int width, int top) { return DrawMainMenuWidgetWeather(left, width, top); }}};
 
-    int ContentTop {0};
-    // Helper function to update ContentTop
-    auto UpdateContentTop = [&](int height) {
-        if (height > 0) {
-            ContentTop = height + m_MarginItem;
-        }
-    };
 
     // Sort the widgets based on their positions
     std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
 
-    int AddHeight {0};
+    int AddHeight {0}, ContentTop {0};
     // Process widgets
-    while (!widgets.empty()) {
+    for (const auto& PairWidget : widgets) {
         // Using a reference to avoid copy:
-        const auto& PairWidget = widgets.back();
         const std::string &widget = PairWidget.second;
 
         // Look up the widget drawer function
@@ -3493,14 +3485,13 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
         if (drawerIt != WidgetDrawers.end()) {
             // Call the drawer function and update ContentTop
             AddHeight = drawerIt->second(wLeft, wWidth, ContentTop);
-            UpdateContentTop(AddHeight);
+            if (AddHeight > 0)
+                ContentTop = AddHeight + m_MarginItem;
         } else {
             // Handle unknown widget type
             esyslog("flatPlus: DrawMainMenuWidget() Unknown widget type: %s", widget.c_str());
         }
-
-        widgets.pop_back();
-    }
+    }  // for widgets
 
     ContentWidget.CreatePixmaps(false);
     ContentWidget.Draw();
