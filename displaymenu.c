@@ -309,9 +309,11 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     case mcChannel:
         if (Config.MenuChannelShowCount) {
             uint16_t ChanCount {0};  // Number of channels (Max. 65535)
-            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-            for (const cChannel *Channel {Channels->First()}; Channel; Channel = Channels->Next(Channel)) {
-                if (!Channel->GroupSep()) ++ChanCount;
+            {
+                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+                for (const cChannel *Channel {Channels->First()}; Channel; Channel = Channels->Next(Channel))
+                    if (!Channel->GroupSep())
+                        ++ChanCount;
             }
             NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
         }  // Config.MenuChannelShowCount
