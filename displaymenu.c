@@ -19,6 +19,7 @@
 #include "./services/scraper2vdr.h"
 
 #include "./flat.h"
+#include "./fontcache.h"
 
 #ifndef VDRLOGO
 #define VDRLOGO "vdrlogo_default"
@@ -95,17 +96,6 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
     MenuItemScroller.Clear();
-    if (m_FontTempSml) {  // Created in 'DrawMainMenuWidgetWeather()'
-        delete m_FontTempSml;
-        m_FontTempSml = nullptr;
-    }
-
-
-    if (m_FontTiny) {  // Created in 'AddActors()'
-        delete m_FontTiny;
-        m_FontTiny = nullptr;
-    }
-
     // if (m_Osd) {
         m_Osd->DestroyPixmap(MenuPixmap);
         m_Osd->DestroyPixmap(MenuIconsPixmap);
@@ -2480,9 +2470,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
     ContentTop += 6;
 
-    // Smaller font for actors name and role
-    if (!m_FontTiny)  // Create tiny font only once
-        m_FontTiny = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+    m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
     const int FontTinyHeight {m_FontTiny->Height()};
 
     cImage *img {nullptr};
@@ -4202,9 +4190,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     const cString TempToday = *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH));
 
     //* Declared in 'baserender.h'
-    // Deleted in '~cFlatDisplayMenu', because of segfault when deleted here or in 'DrawMainMenuWidgets'
-    if (!m_FontTempSml)  // Font not yet created
-        m_FontTempSml = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+    m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
     const int FontTempSmlHeight {m_FontTempSml->Height()};
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);

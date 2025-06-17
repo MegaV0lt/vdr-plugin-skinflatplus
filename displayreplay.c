@@ -7,6 +7,7 @@
  */
 #include "./displayreplay.h"
 #include "./flat.h"
+#include "./fontcache.h"
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
@@ -57,18 +58,13 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     PixmapClear(IconsPixmap);
     PixmapClear(DimmPixmap);
 
-    m_FontSecs = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
+    m_FontSecs = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0);
 
     if (Config.PlaybackWeatherShow)
         DrawWidgetWeather();
 }
 
 cFlatDisplayReplay::~cFlatDisplayReplay() {
-    if (m_FontSecs) {
-        delete m_FontSecs;
-        m_FontSecs = nullptr;
-    }
-
     m_Osd->DestroyPixmap(LabelPixmap);
     m_Osd->DestroyPixmap(LabelJumpPixmap);
     m_Osd->DestroyPixmap(IconsPixmap);

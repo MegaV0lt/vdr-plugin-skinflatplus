@@ -20,26 +20,27 @@
 #include <locale>
 
 #include "./flat.h"
+#include "./fontcache.h"
 
 cFlatBaseRender::cFlatBaseRender() {
     // Standard fonts
-    m_Font = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize);
-    m_FontSml = cFont::CreateFont(Setup.FontSml, Setup.FontSmlSize);
-    m_FontFixed = cFont::CreateFont(Setup.FontFix, Setup.FontFixSize);
+    m_Font = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize);
+    m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
+    m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
     m_FontHeight = m_Font->Height();
     m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = m_FontSml->Height();
     m_FontFixedHeight = m_FontFixed->Height();
 
-    m_FontBig = cFont::CreateFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
-    m_FontMedium = cFont::CreateFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
+    m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
+    m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     m_FontBigHeight = m_FontBig->Height();
 
     // Top bar fonts
     const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
-    m_TopBarFont = cFont::CreateFont(Setup.FontOsd, fs);
-    m_TopBarFontClock = cFont::CreateFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
-    m_TopBarFontSml = cFont::CreateFont(Setup.FontOsd, fs / 2);
+    m_TopBarFont = FontCache.GetFont(Setup.FontOsd, fs);
+    m_TopBarFontClock = FontCache.GetFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
+    m_TopBarFontSml = FontCache.GetFont(Setup.FontOsd, fs / 2);
     m_TopBarFontHeight = m_TopBarFont->Height();
     m_TopBarFontSmlHeight = m_TopBarFontSml->Height();
     m_TopBarFontClockHeight = m_TopBarFontClock->Height();
@@ -55,16 +56,6 @@ cFlatBaseRender::cFlatBaseRender() {
 }
 
 cFlatBaseRender::~cFlatBaseRender() {
-    delete m_Font;
-    delete m_FontSml;
-    delete m_FontFixed;
-    delete m_FontMedium;
-    delete m_FontBig;
-
-    delete m_TopBarFont;
-    delete m_TopBarFontSml;
-    delete m_TopBarFontClock;
-
     // if (m_Osd) {
         MessageScroller.Clear();
         m_Osd->DestroyPixmap(TopBarPixmap);
@@ -586,7 +577,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     int x {0};
 
-    for (int8_t i {0}; i < 4; i++) {  // Four buttons
+    for (int i {0}; i < 4; i++) {  // Four buttons
         // If there is enough space for the last button, add its width to the
         // right edge of the buttons area. This is done to align the last button
         // to the right edge of the screen.

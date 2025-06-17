@@ -93,7 +93,7 @@ DEFINES += -DWIDGETFOLDER='"$(SKINFLATPLUS_WIDGETDIR)"'
 ### The object files (add further files here):
 
 OBJS = config.o setup.o imagecache.o imagescaler.o imagemagickwrapper.o imageloader.o baserender.o complexcontent.o textscroller.o displaychannel.o displaymenu.o displaymessage.o \
-	   displayreplay.o displaytracks.o displayvolume.o flat.o $(PLUGIN).o
+	   displayreplay.o displaytracks.o displayvolume.o fontcache.o flat.o $(PLUGIN).o
 
 ### The main target:
 

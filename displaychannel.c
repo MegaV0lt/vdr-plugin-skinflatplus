@@ -7,6 +7,7 @@
  */
 #include "./displaychannel.h"
 #include "./flat.h"
+#include "./fontcache.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     CreateFullOsd();
@@ -474,10 +475,9 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalStrength = SignalStrength;
     m_LastSignalQuality = SignalQuality;
 
-    // Use std::unique_ptr for automatic cleanup
-    std::unique_ptr<cFont> SignalFont(cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize));
-    if (!SignalFont) {  // Add null check
-        esyslog("flatPlus: Failed to create font for signal quality display");
+    m_SignalFont = FontCache.GetFont(Setup.FontOsd, Config.decorProgressSignalSize);
+    if (!m_SignalFont) {  // Add null check
+        esyslog("flatPlus: Failed to get font for signal quality display");
         return;
     }
 
@@ -486,8 +486,8 @@ void cFlatDisplayChannel::SignalQualityDraw() {
              (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont.get());
-    const int ProgressLeft {left + std::max(SignalFont->Width("STR "), SignalFont->Width("SNR ")) + m_MarginItem};
+                                   Theme.Color(clrChannelBg), m_SignalFont);
+    const int ProgressLeft {left + std::max(m_SignalFont->Width("STR "), m_SignalFont->Width("SNR ")) + m_MarginItem};
     const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
@@ -496,7 +496,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
 
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont.get());
+                                   Theme.Color(clrChannelBg), m_SignalFont);
     ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
@@ -538,10 +538,9 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     int left {m_SignalStrengthRight + m_MarginItem2};
     const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
 
-    // Use std::unique_ptr for automatic cleanup
-    std::unique_ptr<cFont> DvbapiInfoFont(cFont::CreateFont(Setup.FontOsd, ProgressBarHeight));
-    if (!DvbapiInfoFont) {  // Add null check
-        esyslog("flatPlus: Failed to create font for dvbapi info display");
+    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, ProgressBarHeight);
+    if (!m_DvbapiInfoFont) {  // Add null check
+        esyslog("flatPlus: Failed to get font for dvbapi info display");
         return;
     }
 
@@ -554,14 +553,14 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get());
+                                   Theme.Color(clrChannelBg), m_DvbapiInfoFont);
 
-    left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
+    left += m_DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height())};
+    cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_DvbapiInfoFont->Height())};
     if (!img) {
-        img = ImgLoader.LoadIcon("crypt_unknown", ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height());
+        img = ImgLoader.LoadIcon("crypt_unknown", ICON_WIDTH_UNLIMITED, m_DvbapiInfoFont->Height());
         dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
     if (img) {  // Draw the card system icon
@@ -577,10 +576,10 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     // so that we can ensure that the text is drawn at the correct position
     // even if the text changes (e.g. when the channel is changed).
     // This is done by storing the maximum width of the text seen so far.
-    m_LastDvbapiInfoTextWidth = std::max(DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
+    m_LastDvbapiInfoTextWidth = std::max(m_DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get(), m_LastDvbapiInfoTextWidth);
+                                   Theme.Color(clrChannelBg), m_DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
 }
 
 void cFlatDisplayChannel::Flush() {
