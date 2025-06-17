@@ -1947,11 +1947,13 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
             HeadIconLeft -= IconHeight + m_MarginItem;
         }
     }
+    if (GenreIcons.size() > 1) {  // Only bother to sort/unique if really needed
+        std::sort(GenreIcons.begin(), GenreIcons.end());
+        GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
+    }
     bool IsUnknownDrawn {false};
-    std::sort(GenreIcons.begin(), GenreIcons.end());
-    GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
-    while (!GenreIcons.empty()) {
-        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcons.back().c_str());
+    for (auto &GenreIcon : GenreIcons) {
+        IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcon.c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
         if (!img) {
             isyslog("flatPlus: Genre icon not found: %s", *IconName);
@@ -1964,8 +1966,8 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
             HeadIconLeft -= IconHeight + m_MarginItem;
         }
-        GenreIcons.pop_back();
     }
+    GenreIcons.clear();  // Clear the vector after use to free memory
 }
 
 /**
