@@ -1938,10 +1938,9 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     if (strlen(*Fsk) > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (!img) {
-            isyslog("flatPlus: DrawContentHeadFskGenre() FSK icon not found: %s", *IconName);
+        if (!img)
             img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
-        }
+
         if (img) {  // Draw the FSK icon
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
             HeadIconLeft -= IconHeight + m_MarginItem;
@@ -1955,12 +1954,9 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     for (auto &GenreIcon : GenreIcons) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcon.c_str());
         img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (!img) {
-            isyslog("flatPlus: Genre icon not found: %s", *IconName);
-            if (!IsUnknownDrawn) {
-                img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
-                IsUnknownDrawn = true;
-            }
+        if (!img && !IsUnknownDrawn) {
+            img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
+            IsUnknownDrawn = true;
         }
         if (img) {  // Draw the genre icon
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
