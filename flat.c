@@ -766,7 +766,7 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
  * @return The size of the glyph in pixels, rounded up to the nearest integer.
  * @note This function returns 0 if any error occurs during the execution of the function.
  */
-uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
+/* uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
     FT_Library library {nullptr};
     FT_Face face {nullptr};
     int rc {FT_Init_FreeType(&library)};
@@ -795,8 +795,27 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 
     esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
     return 0;  // Return 0 if anything went wrong
-}
+} */
 
+// Optimized GetGlyphSize
+uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
+    auto &cache = glyphMetricsCache();
+    FT_Face face = cache.GetFace(*cFont::GetFontFileName(Name));
+    if (!face) {
+        esyslog("flatPlus: GetGlyphSize() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
+        return 0;
+    }
+    if (FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0) != 0) {
+        esyslog("flatPlus: GetGlyphSize() error: can't set char size (font = %s)", *cFont::GetFontFileName(Name));
+        return 0;
+    }
+    FT_GlyphSlot slot = face->glyph;
+    if (FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT) != 0) {
+        esyslog("flatPlus: GetGlyphSize() error: can't load glyph (font = %s)", *cFont::GetFontFileName(Name));
+        return 0;
+    }
+    return (slot->metrics.height + 63) / 64;
+}
 
 /**
  * @brief Justifies a line of text by inserting fill characters to fit a specified maximum width.
