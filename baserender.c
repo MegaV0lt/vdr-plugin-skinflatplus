@@ -1751,12 +1751,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
 
     const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;  // Use a more precise calculation
-    std::unique_ptr<cFont> WeatherFont {cFont::CreateFont(Setup.FontOsd, fs)};
-    std::unique_ptr<cFont> WeatherFontSml {cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.0))};
-    std::unique_ptr<cFont> WeatherFontSign {cFont::CreateFont(Setup.FontOsd, fs * (1.0 / 2.5))};
+    cFont *WeatherFont {FontCache.GetFont(Setup.FontOsd, fs)};
+    cFont *WeatherFontSml {FontCache.GetFont(Setup.FontOsd, fs * (1.0 / 2.0))};
+    cFont *WeatherFontSign {FontCache.GetFont(Setup.FontOsd, fs * (1.0 / 2.5))};
 
     int left {m_MarginItem};
-
     const int WidthTempToday {
         std::max(WeatherFontSml->Width(*TempMaxToday), WeatherFontSml->Width(*TempMinToday))};
     const int WidthTempTomorrow {
@@ -1784,7 +1783,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature
     WeatherWidget.AddText(TempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFont.get());
+                          Theme.Color(clrItemCurrentBg), WeatherFont);
     left += TempTodayWidth;
 
     const int FontAscender {GetFontAscender(Setup.FontOsd, fs)};
@@ -1793,7 +1792,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature sign
     WeatherWidget.AddText(TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFontSign.get());
+                          Theme.Color(clrItemCurrentBg), WeatherFontSign);
     left += TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
@@ -1806,10 +1805,10 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature min/max values
     WeatherWidget.AddText(*TempMaxToday, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), WeatherFontSml.get(), WidthTempToday, WeatherFontSmlHeight,
+                          Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
                           taRight);
     WeatherWidget.AddText(*TempMinToday, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml.get(),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml,
                           WidthTempToday, WeatherFontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
 
@@ -1823,7 +1822,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation
     WeatherWidget.AddText(*PrecToday, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml.get());
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
 
     WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
@@ -1839,10 +1838,10 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add temperature min/max values
     WeatherWidget.AddText(*TempMaxTomorrow, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), WeatherFontSml.get(), WidthTempTomorrow, WeatherFontSmlHeight,
+                          Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
     WeatherWidget.AddText(*TempMinTomorrow, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml.get(),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml,
                           WidthTempTomorrow, WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
 
@@ -1856,7 +1855,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation
     WeatherWidget.AddText(*PrecTomorrow, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml.get());
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
 
     // left += PrecTomorrowWidth;
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);
