@@ -14,6 +14,10 @@
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>  // For glyph metrics
 
+#include <mutex>  // NOLINT. Needed for std::mutex
+#include <shared_mutex>
+#include <atomic>
+
 #include "./displaychannel.h"
 #include "./displaymenu.h"
 #include "./displaymessage.h"
@@ -114,12 +118,32 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
-cPlugin *GetScraperPlugin() {
+/* cPlugin *GetScraperPlugin() {
     static cPlugin *pScraper {cPluginManager::GetPlugin("tvscraper")};
     if (!pScraper)  // If it doesn't exit, try scraper2vdr
         pScraper = cPluginManager::GetPlugin("scraper2vdr");
     return pScraper;
+} */
+
+// Optimized Scraper Plugin Lookup (thread safe, only looked up once)
+static cPlugin *GetScraperPlugin() {
+    static std::atomic<cPlugin *> pScraper {nullptr};
+    cPlugin* plugin = pScraper.load(std::memory_order_acquire);
+    if (!plugin) {
+        // Thread safe initialization
+        static std::mutex init_mutex;
+        std::lock_guard<std::mutex> lock(init_mutex);
+        plugin = pScraper.load(std::memory_order_relaxed);
+        if (!plugin) {
+            plugin = cPluginManager::GetPlugin("tvscraper");
+            if (!plugin)
+                plugin = cPluginManager::GetPlugin("scraper2vdr");
+            pScraper.store(plugin, std::memory_order_release);
+        }
+    }
+    return plugin;
 }
+
 // Get MediaPath, Series/Movie info and add actors if wanted
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo, std::vector<cString> &ActorsPath,  // NOLINT
                      std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,        // NOLINT

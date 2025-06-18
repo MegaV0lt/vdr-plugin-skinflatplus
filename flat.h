@@ -284,7 +284,7 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
-cPlugin *GetScraperPlugin();
+static cPlugin *GetScraperPlugin();
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
     std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
     std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
