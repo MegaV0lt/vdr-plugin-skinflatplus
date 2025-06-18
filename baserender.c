@@ -418,14 +418,18 @@ void cFlatBaseRender::TopBarUpdate() {
             // recordings and waits for the result. This is necessary because the
             // cTimers::GetTimers() function can only be called from the main thread.
             // The result is then stored in the NumRec variable.
-            auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
+            /* auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
                 LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
                 for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording))
                         ++NumRec;
                 }
             });
-            RecCounterFuture.get();
+            RecCounterFuture.get(); */
+            //* FAST RECORD COUNT: Use cached background thread or event value
+            RecCountCache.UpdateIfNeeded();
+            NumRec = s_NumRecordings.load(std::memory_order_relaxed);
+            //* END FAST RECORD COUNT
 
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0)

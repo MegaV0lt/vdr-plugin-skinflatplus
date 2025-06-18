@@ -209,3 +209,29 @@ class cFlatBaseRender {
         // tColor Multiply(tColor Color, uint8_t Alpha);
         tColor SetAlpha(tColor Color, double am);
 };
+
+// Recording Timer Count: Cache with event update or periodic refresh
+#include <atomic>
+static std::atomic<uint16_t> s_NumRecordings {0};
+
+class RecTimerCounter {
+ public:
+    std::atomic<time_t> lastUpdate;
+    static constexpr int kUpdateIntervalSec = 2;
+    RecTimerCounter() : lastUpdate(0) {}
+
+    void UpdateIfNeeded() {
+        time_t now = time(0);
+        if (now - lastUpdate.load() >= kUpdateIntervalSec) {
+            uint16_t count {0};
+            { LOCK_TIMERS_READ;
+                for (const cTimer* Timer=Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                    if (Timer->HasFlags(tfRecording)) ++count;
+                }
+            }
+            s_NumRecordings.store(count, std::memory_order_relaxed);
+            lastUpdate = now;
+        }
+    }
+};
+static RecTimerCounter RecCountCache;
