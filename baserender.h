@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "./imageloader.h"
@@ -32,6 +33,49 @@ struct sDecorBorder {
     int From {0};
 };
 
+// Font/image caches for session-level reuse (Weather Widget + others)
+class FontImageWeatherCache {
+ public:
+    static constexpr int kMaxDays {8};  // Max number of weather entries to cache
+    struct WeatherDayData {
+        std::string Temp;       // Temperature for day 0 only
+        cString Icon;           // Weather icon
+        cString TempMax;        // Max temperature
+        cString TempMin;        // Min temperature
+        cString Precipitation;  // Precipitation
+        cString Summary;        // Summary
+    } Days[kMaxDays];           // Array of weather data for multiple days
+
+    cString Location;           // Location name
+    cString TempTodaySign;      // Temperature sign for today
+    time_t LastReadMTime {0};
+
+    cFont* WeatherFont {nullptr};
+    cFont* WeatherFontSml {nullptr};
+    cFont* WeatherFontSign {nullptr};
+
+    int FontHeight {0};
+    int FontSmlHeight {0};
+    int FontSignHeight {0};
+
+    int FontAscender {0}, FontSignAscender {0};  // Ascender for font and sign
+
+    int TempTodayWidth {0};
+    int TempTodaySignWidth {0};
+    int PrecTodayWidth {0};
+    int PrecTomorrowWidth {0};
+    int WidthTempToday {0};     // Max width of temp today
+    int WidthTempTomorrow {0};  // Max width of temp tomorrow
+
+    bool valid {false};         // Indicates if the cache is valid
+
+    FontImageWeatherCache() = default;  // Constructor
+    void Clear() { valid = false; }
+};  // class FontImageWeatherCache
+static FontImageWeatherCache WeatherCache;
+
+// Base class for rendering OSD elements in the flatPlus skin
+// Provides methods for creating and managing OSD elements like top bar, buttons, messages, progress
 class cFlatBaseRender {
  public:
     cImageLoader ImgLoader;
@@ -93,10 +137,10 @@ class cFlatBaseRender {
     void DecorBorderRedrawAll();
     void DecorBorderClearByFrom(int From);
 
-    int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0) const;
+    static int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
     cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "") const;
-    cString FormatPrecipitation(const cString &FilePath) const;
+    bool BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time);  // Read weather data  // NOLINT
 
     void DrawWidgetWeather();
     void DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
@@ -208,7 +252,7 @@ class cFlatBaseRender {
     void TopBarEnableDiskUsage();
     // tColor Multiply(tColor Color, uint8_t Alpha);
     tColor SetAlpha(tColor Color, double am);
-};
+};  // class cFlatBaseRender
 
 // Recording Timer Count: Cache with event update or periodic refresh
 #include <atomic>
@@ -216,9 +260,9 @@ static std::atomic<uint16_t> s_NumRecordings {0};
 
 class RecTimerCounter {
  public:
-    std::atomic<time_t> LastUpdate;
-    static constexpr int kUpdateIntervalSec = 2;
-    RecTimerCounter() : LastUpdate(0) {}
+    std::atomic<time_t> LastUpdate;  // Last time the count was updated
+    static constexpr int kUpdateIntervalSec {2};
+    RecTimerCounter() : LastUpdate(0) {}  // Constructor
 
     void UpdateIfNeeded() {
         time_t now {time(0)};
@@ -233,5 +277,5 @@ class RecTimerCounter {
             LastUpdate = now;
         }
     }
-};
+};  // class RecTimerCounter
 static RecTimerCounter RecCountCache;

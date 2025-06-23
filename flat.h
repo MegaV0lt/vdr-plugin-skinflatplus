@@ -19,9 +19,11 @@
 #include <unistd.h>
 // #include <stdint.h>
 
-#include <memory>   // For 'unique_ptr<T>()' ...
+// #include <memory>   // For 'unique_ptr<T>()' ...
+#include <atomic>   // For 'std::atomic<bool>' and 'std::atomic<int>'
 #include <cstring>  // string.h
 #include <cstdint>  // stdint.h
+#include <mutex>    // For 'std::mutex' and 'std::lock_guard'  // NOLINT
 #include <string>
 #include <string_view>
 #include <random>
@@ -239,7 +241,7 @@ class cFlat : public cSkin {
 
  private:
     cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
-};
+};  // class cFlat
 
 // Based on VDR's cTextWrapper
 class cTextFloatingWrapper {
@@ -262,42 +264,9 @@ class cTextFloatingWrapper {
     char *m_EoL {nullptr};
     int m_Lines {0};
     int m_LastLine {-1};
-};
+};  // class cTextFloatingWrapper
 
-// Expensive FreeType Library/Face Handling (cache faces)
-class GlyphMetricsCache {
- public:
-    GlyphMetricsCache() {
-        FT_Init_FreeType(&library_);
-    }
-    ~GlyphMetricsCache() {
-        for (auto &pair : faces_) {
-            FT_Done_Face(pair.second);
-        }
-        FT_Done_FreeType(library_);
-    }
-    FT_Face GetFace(const std::string& FontName) {
-        std::unique_lock lock(mutex_);
-        auto it = faces_.find(FontName);
-        if (it != faces_.end())
-            return it->second;
-        FT_Face face {nullptr};
-        if (FT_New_Face(library_, FontName.c_str(), 0, &face))
-            return nullptr;
-        faces_[FontName] = face;
-        return face;
-    }
 
- private:
-    FT_Library library_ {nullptr};
-    std::unordered_map<std::string, FT_Face> faces_;
-    std::mutex mutex_;
-};
-
-static GlyphMetricsCache &glyphMetricsCache() {
-    static GlyphMetricsCache s_cache;
-    return s_cache;
-}
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
@@ -320,7 +289,9 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
-static cPlugin *GetScraperPlugin();
+// Make the variable accessible from other files
+extern cPlugin *GetScraperPlugin();
+
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
     std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
     std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT

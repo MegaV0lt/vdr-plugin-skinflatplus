@@ -24,6 +24,7 @@
 #include "./displayreplay.h"
 #include "./displaytracks.h"
 #include "./displayvolume.h"
+#include "./glyphmetricscache.h"
 
 #include "./services/epgsearch.h"
 
@@ -126,22 +127,20 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 } */
 
 // Optimized Scraper Plugin Lookup (thread safe, only looked up once)
-static cPlugin *GetScraperPlugin() {
-    static std::atomic<cPlugin *> pScraper {nullptr};
-    cPlugin* plugin = pScraper.load(std::memory_order_acquire);
-    if (!plugin) {
+static cPlugin *g_scraper_plugin {nullptr};
+
+cPlugin *GetScraperPlugin() {
+    if (!g_scraper_plugin) {
         // Thread safe initialization
         static std::mutex init_mutex;
         std::lock_guard<std::mutex> lock(init_mutex);
-        plugin = pScraper.load(std::memory_order_relaxed);
-        if (!plugin) {
-            plugin = cPluginManager::GetPlugin("tvscraper");
-            if (!plugin)
-                plugin = cPluginManager::GetPlugin("scraper2vdr");
-            pScraper.store(plugin, std::memory_order_release);
+        if (!g_scraper_plugin) {
+            g_scraper_plugin = cPluginManager::GetPlugin("tvscraper");
+            if (!g_scraper_plugin)
+                g_scraper_plugin = cPluginManager::GetPlugin("scraper2vdr");
         }
     }
-    return plugin;
+    return g_scraper_plugin;
 }
 
 // Get MediaPath, Series/Movie info and add actors if wanted
@@ -797,9 +796,15 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return 0;  // Return 0 if anything went wrong
 } */
 
+GlyphMetricsCache &glyphMetricsCache() {
+    static GlyphMetricsCache s_cache;
+    return s_cache;
+}
+
 // Optimized GetGlyphSize
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
-    auto &cache = glyphMetricsCache();
+    GlyphMetricsCache &cache = glyphMetricsCache();
+
     FT_Face face = cache.GetFace(*cFont::GetFontFileName(Name));
     if (!face) {
         esyslog("flatPlus: GetGlyphSize() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));

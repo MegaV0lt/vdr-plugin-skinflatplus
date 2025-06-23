@@ -45,12 +45,12 @@ cFont* cFontCache::GetFont(const std::string& Name, int Size) {
         return nullptr;
     }
 
-    for (const auto& data : FontCache) {
+    for (const auto &data : FontCache) {
         if (data.name.empty())
             break;
         if (data.name == Name && data.size == Size && data.font != nullptr) {
 #ifdef DEBUGFUNCSCALL
-            dsyslog("flatPlus: FontCache - Font found in cache: Name=%s, Size=%d", Name.c_str(), Size);
+            dsyslog("flatPlus: Font found in FontCache: Name=%s, Size=%d", Name.c_str(), Size);
 #endif
             return data.font;
         }

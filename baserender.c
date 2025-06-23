@@ -21,6 +21,7 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
+#include "./glyphmetricscache.h"
 
 cFlatBaseRender::cFlatBaseRender() {
     // Standard fonts
@@ -1649,28 +1650,22 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
-int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) const {
-    FT_Library library {nullptr};
-    FT_Face face {nullptr};
-    const cString FontFileName = *cFont::GetFontFileName(Name);
-    int Ascender {CharHeight};
+int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
+    GlyphMetricsCache &cache = glyphMetricsCache();
+    FT_Face face {cache.GetFace(*cFont::GetFontFileName(Name))};
+    if (!face) {
+        esyslog("flatPlus: GetFontAscender() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
+        return CharHeight;
+    }
 
-    if (FT_Init_FreeType(&library) == 0) {
-        if (FT_New_Face(library, *FontFileName, 0, &face) == 0) {
-            if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
-                Ascender = face->available_sizes->height;
-            } else if (FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0) == 0) {
-                Ascender = face->size->metrics.ascender / 64;
-            } else {
-                esyslog("ERROR: FreeType: error during FT_Set_Char_Size (font = %s)", *FontFileName);
-            }
-            FT_Done_Face(face);
-        } else {
-            esyslog("ERROR: FreeType: load error (font = %s)", *FontFileName);
-        }
-        FT_Done_FreeType(library);
+    int Ascender {CharHeight};
+    if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
+        Ascender = face->available_sizes->height;
+    } else if (FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0) == 0) {
+        Ascender = face->size->metrics.ascender / 64;
     } else {
-        esyslog("ERROR: FreeType: initialization error (font = %s)", *FontFileName);
+        esyslog("flatPlus: GetFontAscender() FreeType error during FT_Set_Char_Size (font = %s)",
+                *cFont::GetFontFileName(Name));
     }
 
     return Ascender;
@@ -1694,21 +1689,119 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString del
     return data.c_str();
 }
 
-cString cFlatBaseRender::FormatPrecipitation(const cString &FilePath) const {
-    std::ifstream file(*FilePath);
-    if (!file.is_open()) return "";
+// --- Disk read batching and stat cache for weather widget and main menu widget
+bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time) {  // NOLINT
+    constexpr int kMaxDays {8};
+    const std::string prefix = std::string(WIDGETOUTPUTPATH) + "/weather/";
+    time_t latest {0};
+    double p {0.0};  // Precipitation value
 
-    std::string data {""};
-    data.reserve(16);
-    std::getline(file, data);
-    file.close();
+    // Read all files and cache data
+    for (uint day {0}; day < kMaxDays; ++day) {
+        // Build file names
+        std::string DaySting = std::to_string(day);  // Convert day to string
+        std::string iconFile = (day == 0)
+            ? prefix + "weather.0.icon-act"
+            : prefix + "weather." + DaySting + ".icon";
+        std::string tempMaxFile = prefix + "weather." + DaySting + ".tempMax";
+        std::string tempMinFile = prefix + "weather." + DaySting + ".tempMin";
+        std::string precFile = prefix + "weather." + DaySting + ".precipitation";
+        std::string summaryFile = prefix + "weather." + DaySting + ".summary";
 
-    double p {0.0};
-    std::istringstream istr(data);
-    istr.imbue(std::locale("C"));
-    istr >> p;
-    p = RoundUp(p * 100.0, 10);
-    return cString::sprintf("%.0f%%", p);
+        std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile), fsum(summaryFile);
+
+        if (day == 0) {  // Only for day 0, read temp and location file
+            std::string tempFile = prefix + "weather.0.temp";
+            std::string locationFile = prefix + "weather.location";
+            std::ifstream ftemp(tempFile), floc(locationFile);
+            // Check if all files exist
+            if (!ftemp.is_open() || !floc.is_open() || !ficon.is_open() || !fmax.is_open() || !fmin.is_open() ||
+                !fprec.is_open() || !fsum.is_open()) {
+                dsyslog("flatPlus: BatchReadWeatherData() File not found for day 0");
+                return false;  // Break if any file is missing
+            }
+
+            // Check file mtime for 'Temp' only as all files are written together
+            struct stat s;
+            if (stat(tempFile.c_str(), &s) == 0 && s.st_mtime > latest) latest = s.st_mtime;
+            // Check if data is already cached
+            if (latest == out.LastReadMTime) {
+                break;  // If latest mtime matches cached, skip reading files
+            }
+            std::string temp, icon, tempMax, tempMin, precipitation, location, summary;
+            getline(ftemp, temp);    out.Days[day].Temp = temp;
+            getline(ficon, icon);    out.Days[day].Icon = icon.c_str();
+            getline(fmax, tempMax);  out.Days[day].TempMax = tempMax.c_str();
+            getline(fmin, tempMin);  out.Days[day].TempMin = tempMin.c_str();
+            getline(fprec, precipitation);
+            std::istringstream istr(precipitation); istr.imbue(std::locale("C")); istr >> p;
+            out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+            getline(floc, location); out.Location = location.c_str();
+            getline(fsum, summary);  out.Days[day].Summary = summary.c_str();
+
+            // Check if 'Temp' is valid
+            if (temp.empty()) {
+                dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
+                return false;
+            }
+
+            // Temp sign extraction
+            auto &tt = out.Days[day].Temp;
+            size_t deg = tt.find("°");
+            if (deg != std::string::npos) {
+                out.TempTodaySign = tt.substr(deg).c_str();  // Get the sign (°C or °F)
+                tt = tt.substr(0, deg);                      // Get the temperature without the sign
+            } else {
+                out.TempTodaySign = "";
+            }
+        } else {
+            // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
+            if (!ficon.is_open() || !fmax.is_open() || !fmin.is_open() || !fprec.is_open() || !fsum.is_open())
+                break;  // Break if any file is missing (No more day to expect)
+
+            std::string icon, tempMax, tempMin, precipitation, summary;
+            out.Days[day].Temp = "";  // No temp file for days 1-7
+            getline(ficon, icon);   out.Days[day].Icon = icon.c_str();
+            getline(fmax, tempMax); out.Days[day].TempMax = tempMax.c_str();
+            getline(fmin, tempMin); out.Days[day].TempMin = tempMin.c_str();
+            getline(fprec, precipitation);
+            std::istringstream istr(precipitation); istr.imbue(std::locale("C")); istr >> p;
+            out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+            getline(fsum, summary); out.Days[day].Summary = summary.c_str();
+        }
+    }
+
+    out.LastReadMTime = latest;
+    out_latest_time = latest;
+    return true;
+}
+// Font caching for WeatherWidget: reuse across draws/sizes
+static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  // NOLINT
+    // Only update fonts if missing or font size changed
+    if (cache.WeatherFont && cache.FontHeight == (FontCache.GetFont(Setup.FontOsd, fs)->Height())) return;
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: EnsureWeatherWidgetFonts() Updating fonts for WeatherWidget");
+#endif
+
+    cache.WeatherFont      = FontCache.GetFont(Setup.FontOsd, fs);
+    cache.WeatherFontSml   = FontCache.GetFont(Setup.FontOsd, fs / 2);
+    cache.WeatherFontSign  = FontCache.GetFont(Setup.FontOsd, fs / 2.5);
+
+    cache.FontAscender     = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs);
+    cache.FontSignAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs / 2.5);
+
+    cache.FontHeight       = cache.WeatherFont->Height();
+    cache.FontSmlHeight    = cache.WeatherFontSml->Height();
+    cache.FontSignHeight   = cache.WeatherFontSign->Height();
+
+    cache.TempTodayWidth     = cache.WeatherFont->Width(cache.Days[0].Temp.c_str());
+    cache.TempTodaySignWidth = cache.WeatherFontSign->Width(cache.TempTodaySign);
+    cache.PrecTodayWidth     = cache.WeatherFontSml->Width(cache.Days[0].Precipitation);
+    cache.PrecTomorrowWidth  = cache.WeatherFontSml->Width(cache.Days[1].Precipitation);
+    cache.WidthTempToday     = std::max(cache.WeatherFontSml->Width(cache.Days[0].TempMax),
+                                        cache.WeatherFontSml->Width(cache.Days[0].TempMin));
+    cache.WidthTempTomorrow  = std::max(cache.WeatherFontSml->Width(cache.Days[1].TempMax),
+                                        cache.WeatherFontSml->Width(cache.Days[1].TempMin));
 }
 
 void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
@@ -1716,61 +1809,42 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
 #endif
 
-    // Read temperature and sign
-    std::string TempToday {
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH))};
+    static int LastOsdHeight {0};
+    const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;
 
-    // Check if empty
-    if (TempToday.empty()) return;
-
-    cString TempTodaySign {""};
-    const std::size_t found {TempToday.find("°")};
-    if (found != std::string::npos) {
-        TempTodaySign = TempToday.substr(found).c_str();  // Get the sign (°C or °F)
-        TempToday = TempToday.substr(0, found);  // Get the temperature
+    // Only reload/calc data/fonts if input files or screen size changed, else use prepared/cached
+    time_t NewestFiletime {WeatherCache.LastReadMTime};  // Last read time from cache
+    if ((LastOsdHeight != fs) || !WeatherCache.valid || !BatchReadWeatherData(WeatherCache, NewestFiletime) ||
+        (WeatherCache.LastReadMTime != NewestFiletime)) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather() Need to refresh/calc");
+#endif
+        // Need to refresh/calc
+        if (!BatchReadWeatherData(WeatherCache, NewestFiletime)) return;
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather() Data read");
+#endif
+        EnsureWeatherWidgetFonts(WeatherCache, fs);
+        WeatherCache.LastReadMTime = NewestFiletime;
+        LastOsdHeight = fs;
+        WeatherCache.valid = true;
     }
 
-    // Read icons
-    const cString IconToday =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.icon-act", WIDGETOUTPUTPATH));
-    const cString IconTomorrow =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.icon", WIDGETOUTPUTPATH));
-
-    // Read max temperatures
-    const cString TempMaxToday =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.tempMax", WIDGETOUTPUTPATH));
-    const cString TempMaxTomorrow =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.tempMax", WIDGETOUTPUTPATH));
-
-    // Read min temperatures
-    const cString TempMinToday =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.tempMin", WIDGETOUTPUTPATH));
-    const cString TempMinTomorrow =
-        *ReadAndExtractData(cString::sprintf("%s/weather/weather.1.tempMin", WIDGETOUTPUTPATH));
-
-    // Read precipitation
-    const cString PrecToday =
-        *FormatPrecipitation(cString::sprintf("%s/weather/weather.0.precipitation", WIDGETOUTPUTPATH));
-    const cString PrecTomorrow =
-        *FormatPrecipitation(cString::sprintf("%s/weather/weather.1.precipitation", WIDGETOUTPUTPATH));
-
-    const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;  // Use a more precise calculation
-    cFont *WeatherFont {FontCache.GetFont(Setup.FontOsd, fs)};
-    cFont *WeatherFontSml {FontCache.GetFont(Setup.FontOsd, fs * (1.0 / 2.0))};
-    cFont *WeatherFontSign {FontCache.GetFont(Setup.FontOsd, fs * (1.0 / 2.5))};
+    const auto &dat = WeatherCache;  // Weather data reference
+    cFont* WeatherFont {WeatherCache.WeatherFont};
+    cFont* WeatherFontSml {WeatherCache.WeatherFontSml};
+    cFont* WeatherFontSign {WeatherCache.WeatherFontSign};
 
     int left {m_MarginItem};
-    const int WidthTempToday {
-        std::max(WeatherFontSml->Width(*TempMaxToday), WeatherFontSml->Width(*TempMinToday))};
-    const int WidthTempTomorrow {
-        std::max(WeatherFontSml->Width(*TempMaxTomorrow), WeatherFontSml->Width(*TempMinTomorrow))};
-    const int WeatherFontHeight {WeatherFont->Height()};  // Used multiple times
-    const int WeatherFontSmlHeight {WeatherFontSml->Height()};
+    const int WeatherFontHeight {WeatherCache.FontHeight};
+    const int WeatherFontSmlHeight {WeatherCache.FontSmlHeight};
 
-    const int TempTodayWidth {WeatherFont->Width(TempToday.c_str())};
-    const int TempTodaySignWidth {WeatherFontSign->Width(TempTodaySign)};
-    const int PrecTodayWidth {WeatherFontSml->Width(*PrecToday)};
-    const int PrecTomorrowWidth {WeatherFontSml->Width(*PrecTomorrow)};
+    const int TempTodayWidth {WeatherCache.TempTodayWidth};
+    const int TempTodaySignWidth {WeatherCache.TempTodaySignWidth};
+    const int PrecTodayWidth {WeatherCache.PrecTodayWidth};
+    const int PrecTomorrowWidth {WeatherCache.PrecTomorrowWidth};
+    const int WidthTempToday {WeatherCache.WidthTempToday};        // Max width of temp today
+    const int WidthTempTomorrow {WeatherCache.WidthTempTomorrow};  // Max width of temp tomorrow
 
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
@@ -1779,6 +1853,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                       m_MarginItem + WeatherFontHeight - m_MarginItem2 + PrecTomorrowWidth + m_MarginItem2};
     const int wLeft {m_OsdWidth - wWidth - 20};
 
+    // Setup widget
     WeatherWidget.Clear();
     WeatherWidget.SetOsd(m_Osd);
     WeatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, WeatherFontHeight));
@@ -1786,21 +1861,20 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     WeatherWidget.SetScrollingActive(false);
 
     // Add temperature
-    WeatherWidget.AddText(TempToday.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(dat.Days[0].Temp.c_str(), false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFont);
     left += TempTodayWidth;
 
-    const int FontAscender {GetFontAscender(Setup.FontOsd, fs)};
-    const int FontAscender2 {GetFontAscender(Setup.FontOsd, fs * (1.0 / 2.5))};
-    const int t {(WeatherFontHeight - FontAscender) - (WeatherFontSign->Height() - FontAscender2)};
+    const int t {(WeatherFontHeight - WeatherCache.FontAscender) -
+                 (WeatherCache.FontSignHeight - WeatherCache.FontSignAscender)};
 
     // Add temperature sign
-    WeatherWidget.AddText(TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(dat.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFontSign);
     left += TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
-    cString WeatherIcon = cString::sprintf("widgets/%s", *IconToday);
+    cString WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[0].Icon);
     cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
@@ -1808,10 +1882,10 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add temperature min/max values
-    WeatherWidget.AddText(*TempMaxToday, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(dat.Days[0].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(*TempMinToday, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(dat.Days[0].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml,
                           WidthTempToday, WeatherFontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
@@ -1824,7 +1898,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add precipitation
-    WeatherWidget.AddText(*PrecToday, false,
+    WeatherWidget.AddText(dat.Days[0].Precipitation, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
@@ -1833,18 +1907,18 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           Theme.Color(clrChannelBg));
 
     // Add weather icon tomorrow
-    WeatherIcon = cString::sprintf("widgets/%s", *IconTomorrow);
+    WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[1].Icon);
     img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
     }
 
-    // Add temperature min/max values
-    WeatherWidget.AddText(*TempMaxTomorrow, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    // Add temperature min/max values tomorrow
+    WeatherWidget.AddText(dat.Days[1].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrChannelBg), WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(*TempMinTomorrow, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(dat.Days[1].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml,
                           WidthTempTomorrow, WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
@@ -1856,8 +1930,8 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         left += WeatherFontHeight - m_MarginItem2;
     }
 
-    // Add precipitation
-    WeatherWidget.AddText(*PrecTomorrow, false,
+    // Add precipitation tomorrow
+    WeatherWidget.AddText(dat.Days[1].Precipitation, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), WeatherFontSml);
 

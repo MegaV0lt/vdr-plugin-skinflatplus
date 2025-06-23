@@ -4181,25 +4181,37 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    // Read location
-    cString Location = *ReadAndExtractData(cString::sprintf("%s/weather/weather.location", WIDGETOUTPUTPATH));
-    if (Location[0] == '\0')
+    time_t NewestFiletime {WeatherCache.LastReadMTime};  // Last read time from cache
+    if (!WeatherCache.valid || !BatchReadWeatherData(WeatherCache, NewestFiletime) ||
+        (WeatherCache.LastReadMTime != NewestFiletime)) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DrawMainMenuWidgetWeather() Need to refresh/calc");
+#endif
+        // Need to refresh/calc
+        if (!BatchReadWeatherData(WeatherCache, NewestFiletime)) return -1;  // Error reading weather data
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cFlatBaseRender::DrawMainMenuWidgetWeather() Data read");
+#endif
+        WeatherCache.LastReadMTime = NewestFiletime;
+        WeatherCache.valid = true;
+    }
+
+    cString Location = WeatherCache.Location;  // Read location
+    if (isempty(Location))
         Location = tr("Unknown");
 
-    // Read temperature
-    const cString TempToday = *ReadAndExtractData(cString::sprintf("%s/weather/weather.0.temp", WIDGETOUTPUTPATH));
+    const cString TempToday = WeatherCache.Days[0].Temp.c_str();  // Read temperature
 
     //* Declared in 'baserender.h'
     m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
     const int FontTempSmlHeight {m_FontTempSml->Height()};
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
-
     ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);
 
     int left {m_MarginItem};
     cString Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
-    cString DayName {""}, PrecString(""), StrWeekDayName {""}, WeatherIcon {""};
+    cString DayName {""}, PrecString(""), WeatherIcon {""};
     const time_t t {time(0)};
     time_t t2 {t};
     struct tm tm_r;
@@ -4220,25 +4232,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         TempSmlPrecWidth = m_FontTempSml->Width("100%");
         TempMaxStringWidth = m_Font->Width("XXXX");
     }
+
     for (int16_t index {0}; index < Config.MainMenuWidgetWeatherDays; ++index) {
-        // Read icon
-        Icon = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.icon", WIDGETOUTPUTPATH, index));
+        Icon = WeatherCache.Days[index].Icon;                 // Read icon
+        Summary = WeatherCache.Days[index].Summary;           // Read summary
+        TempMax = WeatherCache.Days[index].TempMax;           // Read max temperature
+        TempMin = WeatherCache.Days[index].TempMin;           // Read min temperature
+        PrecString = WeatherCache.Days[index].Precipitation;  // Read precipitation
 
-        // Read summary
-        Summary = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.summary", WIDGETOUTPUTPATH, index));
-
-        // Read max temperature
-        TempMax = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.tempMax", WIDGETOUTPUTPATH, index));
-
-        // Read min temperature
-        TempMin = *ReadAndExtractData(cString::sprintf("%s/weather/weather.%d.tempMin", WIDGETOUTPUTPATH, index));
-
-        // Read precipitation
-        PrecString =
-            *FormatPrecipitation(cString::sprintf("%s/weather/weather.%d.precipitation", WIDGETOUTPUTPATH, index));
-
-        if ((Icon[0] == '\0') || (Summary[0] == '\0') || (TempMax[0] == '\0') || (TempMin[0] == '\0') ||
-            (PrecString[0] == '\0'))
+        if (isempty(Icon) || isempty(Summary) || isempty(TempMax) || isempty(TempMin) ||
+            isempty(PrecString))  // Check if all data is available
             continue;
 
         tm_r.tm_mday += index;
@@ -4282,11 +4285,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 break;
 
             left = m_MarginItem;
-            StrWeekDayName = WeekDayName(t2);
-            DayName = cString::sprintf("%s ", *StrWeekDayName);
-            ContentWidget.AddText(*DayName, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font,
-                                  wWidth - m_MarginItem2);
+            ContentWidget.AddText(
+                *WeekDayName(t2), false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font, wWidth - m_MarginItem2);
             left += TempMaxStringWidth + m_MarginItem;
 
             WeatherIcon = cString::sprintf("widgets/%s", *Icon);
