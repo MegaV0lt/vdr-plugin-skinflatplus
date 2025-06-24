@@ -7,6 +7,8 @@
  */
 #include "./setup.h"
 
+#include "./fontcache.h"
+
 cStringList Bordertypes;
 cStringList DiskUsages;
 cStringList Progresstypes;
@@ -872,6 +874,9 @@ void cFlatSetupGeneral::Setup() {
     Add(new cOsdItem(ImageCache, osUnknown, true));
     cString IconCache = cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), MaxIconCache);
     Add(new cOsdItem(IconCache, osUnknown, true));
+
+    cString FontCacheNum = cString::sprintf("%s:\t%d", tr("Fontcache entries"), FontCache.GetCacheCount());
+    Add(new cOsdItem(FontCacheNum, osUnknown, true));
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
