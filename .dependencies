@@ -13,7 +13,7 @@ imageloader.o: imageloader.c imageloader.h imagemagickwrapper.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
 baserender.o: baserender.c baserender.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h \
- textscroller.h complexcontent.h fontcache.h
+ textscroller.h complexcontent.h fontcache.h glyphmetricscache.h
 complexcontent.o: complexcontent.c complexcontent.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h
 textscroller.o: textscroller.c textscroller.h flat.h \
@@ -44,6 +44,6 @@ flat.o: flat.c flat.h services/scraper2vdr.h config.h imagecache.h \
  displaychannel.h baserender.h imageloader.h imagemagickwrapper.h \
  textscroller.h complexcontent.h services/dvbapi.h displaymenu.h \
  displaymessage.h displayreplay.h displaytracks.h displayvolume.h \
- services/epgsearch.h
+ glyphmetricscache.h services/epgsearch.h
 skinflatplus.o: skinflatplus.c flat.h services/scraper2vdr.h config.h \
  imagecache.h setup.h imageloader.h imagemagickwrapper.h

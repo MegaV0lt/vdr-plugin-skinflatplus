@@ -2,6 +2,9 @@ VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2025-xx-xx: Version 1.2.0
 - [add] Add Cache for fonts to prevent repeated calls to 'CreateFont'
+- [add] Introduce GlyphMetricsCache for efficient font face management
+- [add] Implement FontImageWeatherCache for caching weather data and improve performance in weather data retrieval
+- [update] Optimize scraper plugin lookup for thread safety and performance improvements
 - [update] Some internal optimizations
 
 2025-05-27: Version 1.1.11
@@ -80,7 +83,7 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2024-11-07: Version 1.1.1
 - [fix] Fix font alignment for 'actor name / actor role'
-- [Add] Types for error marks: '|' , 'I' and '+' in small and big variant
+- [add] Types for error marks: '|' , 'I' and '+' in small and big variant
 - [update] Show 'cutted end time' only when not equal to 'end time'
 - [update] Some internal optimizations
 

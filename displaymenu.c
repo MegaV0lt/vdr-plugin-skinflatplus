@@ -4181,7 +4181,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    time_t NewestFiletime {WeatherCache.LastReadMTime};  // Last read time from cache
+    time_t NewestFiletime {0};  // Last read time
     if (!WeatherCache.valid || !BatchReadWeatherData(WeatherCache, NewestFiletime) ||
         (WeatherCache.LastReadMTime != NewestFiletime)) {
 #ifdef DEBUGFUNCSCALL
@@ -4200,7 +4200,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     if (isempty(Location))
         Location = tr("Unknown");
 
-    const cString TempToday = WeatherCache.Days[0].Temp.c_str();  // Read temperature
+    const cString TempToday =
+        cString::sprintf("%s %s", WeatherCache.Days[0].Temp.c_str(), WeatherCache.TempTodaySign);  // Read temperature
 
     //* Declared in 'baserender.h'
     m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
