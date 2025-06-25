@@ -174,18 +174,19 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 
 void cFlatDisplayReplay::Action() {
     time_t CurTime {0};
-    while (Running()) {
-        time(&CurTime);
-        if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay) {
-            m_DimmActive = true;
-            for (int alpha {0}; (alpha <= Config.RecordingDimmOnPauseOpaque) && Running(); alpha += 2) {
-                PixmapFill(DimmPixmap, ArgbToColor(alpha, 0, 0, 0));
-                Flush();
-            }
-            Cancel(-1);
-            return;
+    time(&CurTime);
+    if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
+        m_DimmActive = true;
+        // Use batch: fade in, then go back to sleep
+        int step {4};
+        for (int alpha {0}; alpha <= Config.RecordingDimmOnPauseOpaque && Running(); alpha += step) {
+            PixmapFill(DimmPixmap, ArgbToColor(alpha, 0, 0, 0));
+            Flush();
+            cCondWait::SleepMs(6);  // not too fast
         }
-        cCondWait::SleepMs(100);
+        Cancel(-1);
+    } else {
+        cCondWait::SleepMs(100);  // Sleep once per activation, not a busy loop
     }
 }
 
