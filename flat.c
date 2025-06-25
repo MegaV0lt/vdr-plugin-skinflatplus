@@ -119,13 +119,6 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
-/* cPlugin *GetScraperPlugin() {
-    static cPlugin *pScraper {cPluginManager::GetPlugin("tvscraper")};
-    if (!pScraper)  // If it doesn't exit, try scraper2vdr
-        pScraper = cPluginManager::GetPlugin("scraper2vdr");
-    return pScraper;
-} */
-
 // Optimized Scraper Plugin Lookup (thread safe, only looked up once)
 static cPlugin *g_scraper_plugin {nullptr};
 
@@ -757,6 +750,11 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     return source.substr(StartPos, EndPos - StartPos);
 }
 
+// Optimized GetGlyphSize with caching
+GlyphMetricsCache &glyphMetricsCache() {
+    static GlyphMetricsCache s_cache;
+    return s_cache;
+}
 /**
  * @brief Get the size of a glyph in a given font and font height.
  * @param[in] Name The name of the font to use.
@@ -765,43 +763,6 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
  * @return The size of the glyph in pixels, rounded up to the nearest integer.
  * @note This function returns 0 if any error occurs during the execution of the function.
  */
-/* uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
-    FT_Library library {nullptr};
-    FT_Face face {nullptr};
-    int rc {FT_Init_FreeType(&library)};
-    if (!rc) {
-        rc = FT_New_Face(library, cFont::GetFontFileName(Name), 0, &face);
-        if (!rc) {
-            // We don't need to set the charmap, because we already load the glyphs with the correct charmap.
-            rc = FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0);
-            if (!rc) {
-                FT_GlyphSlot slot {face->glyph};
-                rc = FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT);
-                if (!rc) {
-                    // Convert from 26.6 fixed-point format to integer, rounding up
-                    const uint32_t GlyphSize = (slot->metrics.height + 63) / 64;  // Narrowing conversion
-                    FT_Done_Face(face);
-                    FT_Done_FreeType(library);
-                    return GlyphSize;
-                }
-            }
-        }
-    }
-
-    // Safe cleanup - only free initialized resources
-    if (face) FT_Done_Face(face);
-    if (library) FT_Done_FreeType(library);
-
-    esyslog("flatPlus: GetGlyphSize() error %d (font = %s)", rc, *cFont::GetFontFileName(Name));
-    return 0;  // Return 0 if anything went wrong
-} */
-
-GlyphMetricsCache &glyphMetricsCache() {
-    static GlyphMetricsCache s_cache;
-    return s_cache;
-}
-
-// Optimized GetGlyphSize
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
     GlyphMetricsCache &cache = glyphMetricsCache();
 
