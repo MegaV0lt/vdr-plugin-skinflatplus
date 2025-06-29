@@ -7,9 +7,18 @@
  */
 #include "./config.h"
 
+#include <vdr/tools.h>
+
+#include <dirent.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <algorithm>
 #include <utility>
 #include <vector>
+
+#include "./flat.h"
 
 cFlatConfig::cFlatConfig() {
     RecordingOldFolder.reserve(64);  // Set to at least 64 entry's

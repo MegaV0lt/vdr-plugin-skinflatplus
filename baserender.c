@@ -7,17 +7,28 @@
  */
 #include "./baserender.h"
 
-#include <vdr/menu.h>
+#include <sys/stat.h>
+#include <vdr/font.h>
+#include <vdr/osd.h>
+#include <vdr/timers.h>
+#include <vdr/tools.h>
+#include <vdr/videodir.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#include <algorithm>
+#include <cmath>
+#include <cstring>
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
-#include <future>  // NOLINT
-#include <iostream>
-#include <utility>
-#include <sstream>
 #include <locale>
+#include <mutex>  // NOLINT
+#include <random>
+#include <sstream>
+#include <string_view>
+#include <vector>
 
 #include "./flat.h"
 #include "./fontcache.h"
@@ -35,6 +46,14 @@ cFlatBaseRender::cFlatBaseRender() {
 
     m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
+    if (Config.MainMenuWidgetWeatherShow) {
+        m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+        m_FontTempSmlHeight = m_FontTempSml->Height();
+    }
+    if (Config.TVScraperEPGInfoShowActors || Config.TVScraperRecInfoShowActors) {
+        m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+        m_FontTinyHeight = m_FontTiny->Height();
+    }
     m_FontBigHeight = m_FontBig->Height();
 
     // Top bar fonts
@@ -226,8 +245,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         return;
     }  // DiskFreePercent == 0 (Show something if disk is full)
 
-    const double AllGB {FreeGB / DiskFreePercent * 100.0};
-    const double AllMinutes{static_cast<double>(FreeMinutes) / DiskFreePercent * 100.0};
+    const double GBScale {100.0 / DiskFreePercent};
+    const double AllGB {FreeGB * GBScale};  // All disk space in GB
+    const double AllMinutes{static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
 
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
@@ -790,7 +810,13 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
 }
 
 void cFlatBaseRender::ProgressBarDrawBgColor() const {
-    PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
+    // PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
+    static tColor LastBg {0};
+    if (m_ProgressBarColorBg != LastBg) {
+        dsyslog("flatPlus: cFlatBaseRender::ProgressBarDrawBgColor() Fill ProgressBarPixmapBg");
+        PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
+        LastBg = m_ProgressBarColorBg;
+    }
 }
 
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rect, const cRect &rectBg,
@@ -1183,7 +1209,16 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         const int ScrollTop{std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
                                      Top + Height - ScrollHeight)};
 
-        PixmapClear(Pixmap);
+        // PixmapClear(Pixmap);
+        static int lastTotal = -1, lastShown = -1, lastOffset = -1;
+        if (Total != lastTotal || Shown != lastShown || Offset != lastOffset) {
+            dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Clear scrollbar pixmap");
+            PixmapClear(Pixmap);
+            lastTotal = Total;
+            lastShown = Shown;
+            lastOffset = Offset;
+        }
+
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
 
         /* Types
@@ -1677,7 +1712,6 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString del
     std::string data {""};
     data.reserve(16);
     std::getline(file, data);
-    file.close();
 
     if (!isempty(*delimiter)) {
         const std::size_t found {data.find(*delimiter)};

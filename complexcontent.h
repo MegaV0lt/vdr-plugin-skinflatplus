@@ -7,12 +7,13 @@
  */
 #pragma once
 
-#include <cstring>  // string.h
-#include <list>
+#include <vdr/osd.h>
+#include <vdr/font.h>
+#include <vdr/tools.h>
+
 #include <string>
 #include <vector>
 
-#include "./imageloader.h"
 #include "./flat.h"
 
 enum eContentType {

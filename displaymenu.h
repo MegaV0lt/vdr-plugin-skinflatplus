@@ -7,14 +7,16 @@
  */
 #pragma once
 
-#include <vdr/menu.h>
+#include <vdr/skins.h>
+#include <vdr/channels.h>
+#include <vdr/epg.h>
+#include <vdr/font.h>
+#include <vdr/recording.h>
+#include <vdr/timers.h>
 #include <vdr/tools.h>
 
-#include <iomanip>
-#include <iostream>
-#include <list>
-#include <sstream>
 #include <string>
+#include <vector>
 
 #include "./baserender.h"
 #include "./complexcontent.h"

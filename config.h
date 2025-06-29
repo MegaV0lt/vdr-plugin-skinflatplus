@@ -8,11 +8,10 @@
 #pragma once
 
 #include <vdr/plugin.h>
+#include <vdr/tools.h>
 
 #include <string>
 #include <vector>
-
-#include "./flat.h"
 
 #define PLUGINCONFIGPATH (cPlugin::ConfigDirectory(PLUGIN_NAME_I18N))
 #define PLUGINRESOURCEPATH (cPlugin::ResourceDirectory(PLUGIN_NAME_I18N))

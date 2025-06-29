@@ -7,6 +7,19 @@
  */
 #include "./setup.h"
 
+#include <vdr/i18n.h>
+#include <vdr/plugin.h>
+#include <vdr/skins.h>
+#include <vdr/tools.h>
+
+#include <unistd.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+#include "./flat.h"
 #include "./fontcache.h"
 
 cStringList Bordertypes;

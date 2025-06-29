@@ -9,36 +9,16 @@
 
 #include <vdr/plugin.h>
 #include <vdr/skins.h>
-#include <vdr/videodir.h>
+#include <vdr/epg.h>
+#include <vdr/recording.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-// #include <stdint.h>
-
-// #include <memory>   // For 'unique_ptr<T>()' ...
-#include <atomic>   // For 'std::atomic<bool>' and 'std::atomic<int>'
-#include <cstring>  // string.h
 #include <cstdint>  // stdint.h
-#include <mutex>    // For 'std::mutex' and 'std::lock_guard'  // NOLINT
 #include <string>
 #include <string_view>
-#include <random>
-#include <unordered_map>
-#include <filesystem>  // C++17
-
-// Includes and defines for assert()
-#include <iostream>
-// uncomment to disable assert()
-// #define NDEBUG
-#include <cassert>
-
-// Use (void) to silence unused warnings.
-#define assertm(exp, msg) assert(((void)msg, exp))
-// Includes and defines for assert()
+#include <vector>
 
 #include "./services/scraper2vdr.h"
 
@@ -322,3 +302,25 @@ int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);
 void InsertCutLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
+
+class cPluginSkinFlatPlus : public cPlugin {
+ private:
+    static cPlugin *s_pEpgSearchPlugin;
+    static bool s_bEpgSearchPluginChecked;
+
+ public:
+    static cPlugin* GetEpgSearchPlugin() {
+        if (!s_bEpgSearchPluginChecked) {
+            s_pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
+            s_bEpgSearchPluginChecked = true;
+            dsyslog("flatPlus: EpgSearch plugin %s", s_pEpgSearchPlugin ? "found" : "not found");
+        }
+        return s_pEpgSearchPlugin;
+    }
+
+    // Call this when plugins might change (rare)
+    static void InvalidatePluginCache() {
+        s_bEpgSearchPluginChecked = false;
+        s_pEpgSearchPlugin = nullptr;
+    }
+};

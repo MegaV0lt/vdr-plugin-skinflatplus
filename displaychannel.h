@@ -8,11 +8,7 @@
 #pragma once
 
 #include <vdr/status.h>
-
 #include "./baserender.h"
-#include "./flat.h"
-#include "./services/dvbapi.h"
-#include "./services/scraper2vdr.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  public:

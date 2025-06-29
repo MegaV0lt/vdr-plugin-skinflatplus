@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <vdr/thread.h>
+
 #include "./baserender.h"
 #include "./services/scraper2vdr.h"
 

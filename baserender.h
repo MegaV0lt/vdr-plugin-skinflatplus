@@ -7,6 +7,8 @@
  */
 #pragma once
 
+#include <atomic>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -170,6 +172,8 @@ class cFlatBaseRender {
     cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
     cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
     int m_FontBigHeight {0};
+    int m_FontTempSmlHeight {0};
+    int m_FontTinyHeight {0};
 
     // TopBar
     cPixmap *TopBarPixmap {nullptr};
@@ -255,7 +259,6 @@ class cFlatBaseRender {
 };  // class cFlatBaseRender
 
 // Recording Timer Count: Cache with event update or periodic refresh
-#include <atomic>
 static std::atomic<uint16_t> s_NumRecordings {0};
 
 class RecTimerCounter {

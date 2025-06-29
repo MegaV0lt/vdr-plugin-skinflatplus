@@ -6,13 +6,17 @@
  * $Id$
  */
 #include "./displaychannel.h"
+
+#include <vdr/device.h>
+
+#include <algorithm>
+
 #include "./flat.h"
 #include "./fontcache.h"
+#include "./services/dvbapi.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     CreateFullOsd();
-    // if (!m_Osd) return;
-
     TopBarCreate();
     MessageCreate();
 
@@ -511,9 +515,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DvbapiInfoDraw()");
 #endif
-    if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
+    static cPlugin *pDVBApi {nullptr};
+    static bool dvbapiChecked {false};
 
-    static cPlugin *pDVBApi {cPluginManager::GetPlugin("dvbapi")};
+    if (!dvbapiChecked) {
+        pDVBApi = cPluginManager::GetPlugin("dvbapi");
+        dvbapiChecked = true;
+    }
     if (!pDVBApi) return;
 
     sDVBAPIEcmInfo ecmInfo {
@@ -522,7 +530,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         .hops = -1
     };
 
-    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
+    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: Failed to get ECM info from dvbapi service");
+#endif
+        return;
+}
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
@@ -536,20 +549,27 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         return;
 
     int left {m_SignalStrengthRight + m_MarginItem2};
+    static int CachedProgressBarHeight {-1};
+    static int CachedFontAscender {0};
+    static int CachedGlyphSize {0};
     const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
+    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
+
+    if (CachedProgressBarHeight != ProgressBarHeight) {
+        CachedProgressBarHeight = ProgressBarHeight;
+        CachedFontAscender = GetFontAscender(Setup.FontOsd, ProgressBarHeight);
+        CachedGlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
+    }
+
+    const int TopOffset {(CachedFontAscender - CachedGlyphSize) / 2};  // Center vertically
+    const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
+        TopOffset};  // One margin for progress bar to bottom
 
     m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, ProgressBarHeight);
     if (!m_DvbapiInfoFont) {  // Add null check
         esyslog("flatPlus: Failed to get font for dvbapi info display");
         return;
     }
-
-    const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
-    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
-    const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);  // Narrowing conversion
-    const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
-    const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
-        TopOffset};  // One margin for progress bar to bottom
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),

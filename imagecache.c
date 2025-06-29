@@ -68,36 +68,30 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
     return nullptr;
 }
 
+void cImageCache::InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t MaxSize, size_t BaseIndex,
+                                  cImage *Image, const cString &Name, int Width, int Height) {
+    if (Cache[InsertIndex].Image != nullptr)
+        delete Cache[InsertIndex].Image;  // Delete old image if exists
+
+    Cache[InsertIndex].Image = Image;  // Store image in cache
+    Cache[InsertIndex].Name = Name;
+    Cache[InsertIndex].Width = Width;
+    Cache[InsertIndex].Height = Height;
+
+    if (++InsertIndex >= MaxSize) {
+        isyslog("flatPlus: Cache overflow, increase Cachesize (%ld)", MaxSize);
+        isyslog("flatPlus: Refilling cache keeping %ld pre loaded icons", BaseIndex);
+        InsertIndex = BaseIndex;  // Keep images loaded at start
+    }
+}
+
 void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
     // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
     if (IsIcon) {  // Insert into icon cache
-        if (IconCache[m_InsertIconIndex].Image != nullptr)
-            delete IconCache[m_InsertIconIndex].Image;  // Delete old image if exists
-
-        IconCache[m_InsertIconIndex].Image = Image;     // Store image in cache
-        IconCache[m_InsertIconIndex].Name = Name;
-        IconCache[m_InsertIconIndex].Width = Width;
-        IconCache[m_InsertIconIndex].Height = Height;
-
-        if (++m_InsertIconIndex >= MaxIconCache) {
-            isyslog("flatPlus: Iconcache overflow, increase MaxIconCache (%ld)", MaxIconCache);
-            isyslog("flatPlus: Refilling iconcache keeping %ld pre loaded icons", m_InsertIconIndexBase);
-            m_InsertIconIndex = m_InsertIconIndexBase;  // Keep images loaded at start
-        }
+        InsertIntoCache(IconCache.data(), m_InsertIconIndex, MaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
+                        Height);
     } else {  // Insert into image cache
-        if (ImageCache[m_InsertIndex].Image != nullptr)
-            delete ImageCache[m_InsertIndex].Image;  // Delete old image if exists
-
-        ImageCache[m_InsertIndex].Image = Image;     // Store image in cache
-        ImageCache[m_InsertIndex].Name = Name;
-        ImageCache[m_InsertIndex].Width = Width;
-        ImageCache[m_InsertIndex].Height = Height;
-
-        if (++m_InsertIndex >= MaxImageCache) {
-            isyslog("flatPlus: Imagecache overflow, increase MaxImageCache (%ld)", MaxImageCache);
-            isyslog("flatPlus: Refilling imagecache keeping %ld pre loaded images", m_InsertIndexBase);
-            m_InsertIndex = m_InsertIndexBase;  // Keep images loaded at start
-        }
+        InsertIntoCache(ImageCache.data(), m_InsertIndex, MaxImageCache, m_InsertIndexBase, Image, Name, Width, Height);
     }
 }
 

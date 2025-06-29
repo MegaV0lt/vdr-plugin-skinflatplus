@@ -7,16 +7,24 @@
  */
 #include "./flat.h"
 
+#include <vdr/device.h>
+#include <vdr/font.h>
 #include <vdr/osd.h>
-#include <vdr/menu.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <freetype/ftglyph.h>  // For glyph metrics
+#include <sys/stat.h>
 
+#include <algorithm>
+#include <cctype>
+#include <cerrno>
+#include <cmath>
+#include <cstdlib>
+#include <filesystem>
+#include <memory>
 #include <mutex>  // NOLINT. Needed for std::mutex
-#include <shared_mutex>
-#include <atomic>
+#include <random>
 
 #include "./displaychannel.h"
 #include "./displaymenu.h"
@@ -118,6 +126,10 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
     return nullptr;
 }
+
+bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
+cPlugin* cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
+
 
 // Optimized Scraper Plugin Lookup (thread safe, only looked up once)
 static cPlugin *g_scraper_plugin {nullptr};
@@ -564,10 +576,11 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 }
 
 int GetEpgsearchConflicts() {
-    cPlugin *pEpgSearch {cPluginManager::GetPlugin("epgsearch")};
-    if (pEpgSearch) {
+    // cPlugin *pEpgSearch {cPluginManager::GetPlugin("epgsearch")};
+    cPlugin *pEpgSearchPlugin = cPluginSkinFlatPlus::GetEpgSearchPlugin();
+    if (pEpgSearchPlugin) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
-        pEpgSearch->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
+        pEpgSearchPlugin->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
         if (ServiceData.relevantConflicts > 0)
             return ServiceData.relevantConflicts;
     }  // pEpgSearch

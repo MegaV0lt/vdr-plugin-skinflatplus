@@ -7,13 +7,29 @@
  */
 #include "./displaymenu.h"
 
+#include <vdr/device.h>
+#include <vdr/epg.h>
+#include <vdr/i18n.h>
+#include <vdr/menu.h>
+#include <vdr/plugin.h>
+#include <vdr/recorder.h>
+#include <vdr/recording.h>
+#include <vdr/timers.h>
+#include <vdr/videodir.h>
+
+#include <dirent.h>
 #include <fstream>
-#include <future>  // NOLINT
-#include <iostream>
+#include <future>  // std::async  // NOLINT
+#include <functional>
+#include <locale>
+#include <sstream>
+#include <string_view>
 #include <unordered_map>
 #include <utility>
-#include <sstream>
-#include <locale>
+
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
 
 #include "./services/epgsearch.h"
 #include "./services/scraper2vdr.h"
@@ -1299,7 +1315,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     int ImageHeight {m_FontHeight};
     if (Event && Selectable) {
-        const cString EventTimeString{*Event->GetTimeString()};
+        const cString EventTimeString {*Event->GetTimeString()};
         if (MenuEventViewShort && Channel /* && Event && Selectable */) {  // flatPlus short, flatPlus short + EPG
             Left = LeftSecond;
             Top += m_FontHeight;
@@ -1980,9 +1996,10 @@ void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cCom
     ContentTop += m_FontHeight;
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
     ContentTop += 6;
-    ComplexContent.AddText(*Text, true,
-                           cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                           ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
+    if (Text[0] != '\0')
+        ComplexContent.AddText(*Text, true,
+                               cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                               ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
@@ -2065,7 +2082,8 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString Reruns {""};
     if (Config.EpgRerunsShow) {
         // Lent from nopacity
-        cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
+        // cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
+        cPlugin *pEpgSearchPlugin = cPluginSkinFlatPlus::GetEpgSearchPlugin();
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
             Epgsearch_searchresults_v1_0 data {
                 .query = const_cast<char *>(Event->Title()),  // Search term //? Is this save?
@@ -2459,7 +2477,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;   // Limit to ShowMaxActors (-1 = Show all actors)
 
-    const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
+    /* const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
     const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
@@ -2468,10 +2486,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                            ColorMenuBg, m_Font);
     ContentTop += m_FontHeight;
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
-    ContentTop += 6;
+    ContentTop += 6; */
+    int ContentTop {0};  // Calculated by 'AddExtraInfo()'
+    AddExtraInfo("Actors", "", ComplexContent, ContentTop, IsEvent);
 
-    m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
-    const int FontTinyHeight {m_FontTiny->Height()};
+    const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
+    const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
 
     cImage *img {nullptr};
     cString Role {""};  // Actor role
@@ -2500,12 +2520,12 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 ImgHeight = img->Height();
                 ComplexContent.AddText(*ActorsName[Actor], false, cRect(x, y + ImgHeight + m_MarginItem, ActorWidth, 0),
-                                       ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, FontTinyHeight,
+                                       ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight,
                                        taCenter);
                 Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
                 ComplexContent.AddText(
-                    *Role, false, cRect(x, y + ImgHeight + m_MarginItem + FontTinyHeight, ActorWidth, 0),
-                    ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, FontTinyHeight, taCenter);
+                    *Role, false, cRect(x, y + ImgHeight + m_MarginItem + m_FontTinyHeight, ActorWidth, 0),
+                    ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight, taCenter);
 #ifdef DEBUGFUNCSCALL
                 if (ImgHeight > MaxImgHeight) {
                     dsyslog("   Column %ld: MaxImgHeight changed to %d", col, ImgHeight);
@@ -2518,10 +2538,10 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         }  // for col
         x = m_MarginItem;
         // y = ComplexContent.BottomContent() + m_FontHeight;
-        y += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
+        y += MaxImgHeight + m_MarginItem + (m_FontTinyHeight * 2) + m_FontHeight;
 #ifdef DEBUGFUNCSCALL
         // Alternate way to get y
-        y2 += MaxImgHeight + m_MarginItem + (FontTinyHeight * 2) + m_FontHeight;
+        y2 += MaxImgHeight + m_MarginItem + (m_FontTinyHeight * 2) + m_FontHeight;
         dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", ComplexContent.BottomContent() + m_FontHeight, y2);
 #endif
         MaxImgHeight = 0;  // Reset value for next row
@@ -2955,7 +2975,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
-    const char* SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
+    static const char* SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
     if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider)
         TopBarSetMenuIconRight(SortIcons[MenuSortMode - 1]);
 }
@@ -3545,7 +3565,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
             if (Timer->HasFlags(tfRecording)) {
-                if (cRecordControl *RecordControl {cRecordControls::GetRecordControl(Timer)}) {
+                if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
                     const cDevice *RecDevice {RecordControl->Device()};
                     // Before setting the RecDevices array element, add bounds check
                     if (RecDevice && RecDevice->DeviceNumber() < NumDevices) {
@@ -4201,11 +4221,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         Location = tr("Unknown");
 
     const cString TempToday =
-        cString::sprintf("%s %s", WeatherCache.Days[0].Temp.c_str(), WeatherCache.TempTodaySign);  // Read temperature
-
-    //* Declared in 'baserender.h'
-    m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
-    const int FontTempSmlHeight {m_FontTempSml->Height()};
+        cString::sprintf("%s %s", WeatherCache.Days[0].Temp.c_str(), *WeatherCache.TempTodaySign);  // Read temperature
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
     ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);
@@ -4218,7 +4234,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     struct tm tm_r;
     localtime_r(&t, &tm_r);
     cImage *img {nullptr};
-    const int Middle {(m_FontHeight - FontTempSmlHeight) / 2};  // Vertical center
+    const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
     // Calculate width of fixed strings only once
     const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};  // Max. width of temperature string
     int TempSmlSpaceWidth {0};                                 // Space between temperature and precipitation
@@ -4266,10 +4282,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             const int wtemp {std::max(m_FontTempSml->Width(*TempMax), m_FontTempSml->Width(*TempMin))};
             ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
-                                  FontTempSmlHeight, taRight);
-            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
+                                  m_FontTempSmlHeight, taRight);
+            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
-                                  FontTempSmlHeight, taRight);
+                                  m_FontTempSmlHeight, taRight);
 
             left += wtemp + m_MarginItem;
 
@@ -4299,10 +4315,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
             ContentWidget.AddText(*TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlWidth, FontTempSmlHeight, taRight);
-            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + FontTempSmlHeight, 0, 0),
+                                  TempSmlWidth, m_FontTempSmlHeight, taRight);
+            ContentWidget.AddText(*TempMin, false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlWidth, FontTempSmlHeight, taRight);
+                                  TempSmlWidth, m_FontTempSmlHeight, taRight);
 
             left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
 
@@ -4313,7 +4329,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
             ContentWidget.AddText(*PrecString, false, cRect(left, ContentTop + Middle, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlPrecWidth, FontTempSmlHeight, taRight);
+                                  TempSmlPrecWidth, m_FontTempSmlHeight, taRight);
             left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
 
             ContentWidget.AddText(*Summary, false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),

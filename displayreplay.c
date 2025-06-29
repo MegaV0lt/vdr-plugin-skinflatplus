@@ -173,8 +173,7 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 }
 
 void cFlatDisplayReplay::Action() {
-    time_t CurTime {0};
-    time(&CurTime);
+    time_t CurTime {time(0)};
     if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
         m_DimmActive = true;
         // Use batch: fade in, then go back to sleep
