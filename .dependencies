@@ -1,11 +1,11 @@
 config.o: config.c config.h flat.h services/scraper2vdr.h imagecache.h
 setup.o: setup.c setup.h config.h flat.h services/scraper2vdr.h \
- imagecache.h services/scraper2vdr.h
-imagecache.o: imagecache.c imagecache.h config.h flat.h \
- services/scraper2vdr.h displaychannel.h baserender.h imageloader.h \
- imagemagickwrapper.h textscroller.h complexcontent.h services/dvbapi.h \
- services/scraper2vdr.h displaymenu.h displaymessage.h displayreplay.h \
- displaytracks.h displayvolume.h
+ imagecache.h fontcache.h
+imagecache.o: imagecache.c imagecache.h config.h displaychannel.h \
+ baserender.h imageloader.h imagemagickwrapper.h flat.h \
+ services/scraper2vdr.h textscroller.h complexcontent.h displaymenu.h \
+ displaymessage.h displayreplay.h services/scraper2vdr.h displaytracks.h \
+ displayvolume.h
 imagescaler.o: imagescaler.c imagescaler.h
 imagemagickwrapper.o: imagemagickwrapper.c imagemagickwrapper.h \
  imagescaler.h
@@ -14,14 +14,14 @@ imageloader.o: imageloader.c imageloader.h imagemagickwrapper.h flat.h \
 baserender.o: baserender.c baserender.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h \
  textscroller.h complexcontent.h fontcache.h glyphmetricscache.h
-complexcontent.o: complexcontent.c complexcontent.h imageloader.h \
- imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h
+complexcontent.o: complexcontent.c complexcontent.h flat.h \
+ services/scraper2vdr.h config.h imagecache.h
 textscroller.o: textscroller.c textscroller.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
 displaychannel.o: displaychannel.c displaychannel.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
- config.h imagecache.h textscroller.h complexcontent.h services/dvbapi.h \
- services/scraper2vdr.h fontcache.h
+ config.h imagecache.h textscroller.h complexcontent.h fontcache.h \
+ services/dvbapi.h
 displaymenu.o: displaymenu.c displaymenu.h baserender.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h \
  textscroller.h complexcontent.h services/epgsearch.h \
@@ -42,8 +42,8 @@ displayvolume.o: displayvolume.c displayvolume.h baserender.h \
 fontcache.o: fontcache.c fontcache.h
 flat.o: flat.c flat.h services/scraper2vdr.h config.h imagecache.h \
  displaychannel.h baserender.h imageloader.h imagemagickwrapper.h \
- textscroller.h complexcontent.h services/dvbapi.h displaymenu.h \
- displaymessage.h displayreplay.h displaytracks.h displayvolume.h \
- glyphmetricscache.h services/epgsearch.h
+ textscroller.h complexcontent.h displaymenu.h displaymessage.h \
+ displayreplay.h displaytracks.h displayvolume.h glyphmetricscache.h \
+ services/epgsearch.h
 skinflatplus.o: skinflatplus.c flat.h services/scraper2vdr.h config.h \
  imagecache.h setup.h imageloader.h imagemagickwrapper.h

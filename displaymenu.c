@@ -2477,16 +2477,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     if (ShowMaxActors > 0 && ShowMaxActors < NumActors)
         NumActors = ShowMaxActors;   // Limit to ShowMaxActors (-1 = Show all actors)
 
-    /* const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
-    const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
-    const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
-    const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
-    int ContentTop {ComplexContent.BottomContent() + m_FontHeight};
-    ComplexContent.AddText(tr("Actors"), false, cRect(m_MarginItem * 10, ContentTop, 0, 0), ColorMenuFontTitle,
-                           ColorMenuBg, m_Font);
-    ContentTop += m_FontHeight;
-    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
-    ContentTop += 6; */
     int ContentTop {0};  // Calculated by 'AddExtraInfo()'
     AddExtraInfo("Actors", "", ComplexContent, ContentTop, IsEvent);
 

@@ -813,7 +813,7 @@ void cFlatBaseRender::ProgressBarDrawBgColor() const {
     // PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
     static tColor LastBg {0};
     if (m_ProgressBarColorBg != LastBg) {
-        dsyslog("flatPlus: cFlatBaseRender::ProgressBarDrawBgColor() Fill ProgressBarPixmapBg");
+        // dsyslog("flatPlus: cFlatBaseRender::ProgressBarDrawBgColor() Fill ProgressBarPixmapBg");
         PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
         LastBg = m_ProgressBarColorBg;
     }
@@ -1212,7 +1212,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         // PixmapClear(Pixmap);
         static int lastTotal = -1, lastShown = -1, lastOffset = -1;
         if (Total != lastTotal || Shown != lastShown || Offset != lastOffset) {
-            dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Clear scrollbar pixmap");
+            // dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Clear scrollbar pixmap");
             PixmapClear(Pixmap);
             lastTotal = Total;
             lastShown = Shown;
