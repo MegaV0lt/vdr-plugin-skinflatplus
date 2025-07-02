@@ -47,7 +47,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     if (Config.MainMenuWidgetWeatherShow) {
-        m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * (1.0 / 2.0));
+        m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize / 2);
         m_FontTempSmlHeight = m_FontTempSml->Height();
     }
     if (Config.TVScraperEPGInfoShowActors || Config.TVScraperRecInfoShowActors) {
@@ -1705,22 +1705,26 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 
     return Ascender;
 }
-cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath, cString delimiter) const {
-    std::ifstream file(*FilePath);
-    if (!file.is_open()) return "";
+cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
+    if (isempty(*FilePath)) return "";
 
-    std::string data {""};
-    data.reserve(16);
-    std::getline(file, data);
+    // std::ifstream file(*FilePath);
+    // if (!file.is_open()) return "";
+    FILE *fp = fopen(*FilePath, "r");
+    if (fp == nullptr) return "";   // File doesn't exist
 
-    if (!isempty(*delimiter)) {
-        const std::size_t found {data.find(*delimiter)};
-        if (found != std::string::npos) {
-            return data.substr(0, found).c_str();
-        }
+    // Read the first line
+    cReadLine ReadLine;
+    char *s = ReadLine.Read(fp);  // ReadLine will read from the file pointer
+    if (fp != nullptr) {
+        fclose(fp);
     }
 
-    return data.c_str();
+    /* std::string data {""};
+    data.reserve(64);  // Reserve space for the string to avoid multiple reallocations
+    std::getline(file, data); */
+
+    return s == nullptr ? "" : cString(s);
 }
 
 // --- Disk read batching and stat cache for weather widget and main menu widget
@@ -1728,47 +1732,52 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     constexpr int kMaxDays {8};
     const std::string prefix = std::string(WIDGETOUTPUTPATH) + "/weather/";
     time_t latest {0};
-    double p {0.0};  // Precipitation value
+
+    // Moved outside the loop to avoid re-creation in each iteration
+    std::string temp, icon, tempMax, tempMin, precipitation, location, summary;
+    std::string DayString, tempFile, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile, locationFile;
+
+    // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
+    std::istringstream istr;
+    istr.imbue(std::locale("C"));
 
     // Read all files and cache data
     for (uint day {0}; day < kMaxDays; ++day) {
-        // Build file names
-        std::string DaySting = std::to_string(day);  // Convert day to string
-        std::string iconFile = (day == 0)
-            ? prefix + "weather.0.icon-act"
-            : prefix + "weather." + DaySting + ".icon";
-        std::string tempMaxFile = prefix + "weather." + DaySting + ".tempMax";
-        std::string tempMinFile = prefix + "weather." + DaySting + ".tempMin";
-        std::string precFile = prefix + "weather." + DaySting + ".precipitation";
-        std::string summaryFile = prefix + "weather." + DaySting + ".summary";
-
-        std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile), fsum(summaryFile);
+        DayString = std::to_string(day);  // Convert day to string
+        iconFile = prefix + (day == 0 ? "weather.0.icon-act" : "weather." + DayString + ".icon");
+        tempMaxFile = prefix + "weather." + DayString + ".tempMax";
+        tempMinFile = prefix + "weather." + DayString + ".tempMin";
+        precFile = prefix + "weather." + DayString + ".precipitation";
+        summaryFile = prefix + "weather." + DayString + ".summary";
 
         if (day == 0) {  // Only for day 0, read temp and location file
-            std::string tempFile = prefix + "weather.0.temp";
-            std::string locationFile = prefix + "weather.location";
-            std::ifstream ftemp(tempFile), floc(locationFile);
-            // Check if all files exist
+            tempFile = prefix + "weather.0.temp";
+            locationFile = prefix + "weather.location";
+
+            // Check file mtime for 'Temp' only as all files are written together
+            struct stat s;
+            if (stat(tempFile.c_str(), &s) == 0) latest = s.st_mtime;
+            // Check if data is already cached
+            if (latest == out.LastReadMTime) {
+                break;  // If latest mtime matches cached, skip reading files
+            }
+
+            std::ifstream ftemp(tempFile), ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile),
+                fprec(precFile), fsum(summaryFile), floc(locationFile);
+
             if (!ftemp.is_open() || !floc.is_open() || !ficon.is_open() || !fmax.is_open() || !fmin.is_open() ||
                 !fprec.is_open() || !fsum.is_open()) {
                 dsyslog("flatPlus: BatchReadWeatherData() File not found for day 0");
                 return false;  // Break if any file is missing
             }
 
-            // Check file mtime for 'Temp' only as all files are written together
-            struct stat s;
-            if (stat(tempFile.c_str(), &s) == 0 && s.st_mtime > latest) latest = s.st_mtime;
-            // Check if data is already cached
-            if (latest == out.LastReadMTime) {
-                break;  // If latest mtime matches cached, skip reading files
-            }
-            std::string temp, icon, tempMax, tempMin, precipitation, location, summary;
             getline(ftemp, temp);    out.Days[day].Temp = temp;
             getline(ficon, icon);    out.Days[day].Icon = icon.c_str();
             getline(fmax, tempMax);  out.Days[day].TempMax = tempMax.c_str();
             getline(fmin, tempMin);  out.Days[day].TempMin = tempMin.c_str();
             getline(fprec, precipitation);
-            std::istringstream istr(precipitation); istr.imbue(std::locale("C")); istr >> p;
+            istr.str(precipitation); istr.clear();  // Clear the error state of the stream
+            double p {}; istr >> p;
             out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             getline(floc, location); out.Location = location.c_str();
             getline(fsum, summary);  out.Days[day].Summary = summary.c_str();
@@ -1790,16 +1799,19 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             }
         } else {
             // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
+            std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile),
+                fsum(summaryFile);
+
             if (!ficon.is_open() || !fmax.is_open() || !fmin.is_open() || !fprec.is_open() || !fsum.is_open())
                 break;  // Break if any file is missing (No more day to expect)
 
-            std::string icon, tempMax, tempMin, precipitation, summary;
             out.Days[day].Temp = "";  // No temp file for days 1-7
             getline(ficon, icon);   out.Days[day].Icon = icon.c_str();
             getline(fmax, tempMax); out.Days[day].TempMax = tempMax.c_str();
             getline(fmin, tempMin); out.Days[day].TempMin = tempMin.c_str();
             getline(fprec, precipitation);
-            std::istringstream istr(precipitation); istr.imbue(std::locale("C")); istr >> p;
+            istr.str(precipitation); istr.clear();  // Clear the stream state before reusing
+            double p {}; istr >> p;
             out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             getline(fsum, summary); out.Days[day].Summary = summary.c_str();
         }
@@ -1809,6 +1821,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     out_latest_time = latest;
     return true;
 }
+
 // Font caching for WeatherWidget: reuse across draws/sizes
 static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  // NOLINT
     // Only update fonts if missing or font size changed
@@ -1996,18 +2009,21 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, const char *text, tColor TextColor,
                                          tColor ShadowColor, const cFont *font, int ShadowSize, int xOffset,
                                          int yOffset) {
+    double Alpha {0.0};
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
     static constexpr double MaxAlpha {1.0};     // Maximum alpha value
+    int ShadowX {0}, ShadowY {0};               // Shadow position variables
     const int BaseX {pos.X()};                  // Cache position for faster access
     const int BaseY {pos.Y()};
+    tColor CurrentShadowColor {0};              // Current shadow color with alpha
 
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
-        const double Alpha {std::min(i * AlphaStep, MaxAlpha)};  // Ensure it does not exceed 1.0
-        const tColor CurrentShadowColor {SetAlpha(ShadowColor, Alpha)};
-        const int ShadowX {BaseX + (xOffset * i)};
-        const int ShadowY {BaseY + (yOffset * i)};
+        Alpha = std::min(i * AlphaStep, MaxAlpha);  // Ensure it does not exceed 1.0
+        CurrentShadowColor = SetAlpha(ShadowColor, Alpha);
+        ShadowX = BaseX + (xOffset * i);
+        ShadowY = BaseY + (yOffset * i);
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: DrawTextWithShadow() ShadowColor %08X, Alpha %f", CurrentShadowColor, Alpha);
 #endif

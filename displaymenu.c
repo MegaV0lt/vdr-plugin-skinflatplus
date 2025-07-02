@@ -4406,9 +4406,9 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
 
-    ImgLoader.LoadIcon("sd", ImageHeight, ImageHeight * (1.0 / 3.0));
-    ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight * (1.0 / 3.0));
-    ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight * (1.0 / 3.0));
+    ImgLoader.LoadIcon("sd", ImageHeight, ImageHeight / 3);
+    ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight / 3);
+    ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight / 3);
 
     ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
     ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);

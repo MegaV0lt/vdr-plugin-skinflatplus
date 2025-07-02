@@ -141,7 +141,7 @@ class cFlatBaseRender {
 
     static int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
-    cString ReadAndExtractData(const cString &FilePath, const cString delimiter = "") const;
+    cString ReadAndExtractData(const cString &FilePath) const;
     bool BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time);  // Read weather data  // NOLINT
 
     void DrawWidgetWeather();
