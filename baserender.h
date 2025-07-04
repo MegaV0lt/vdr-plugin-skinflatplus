@@ -9,7 +9,7 @@
 
 #include <atomic>
 #include <ctime>
-#include <string>
+// #include <string>
 #include <vector>
 
 #include "./imageloader.h"
@@ -40,7 +40,7 @@ class FontImageWeatherCache {
  public:
     static constexpr int kMaxDays {8};  // Max number of weather entries to cache
     struct WeatherDayData {
-        std::string Temp;       // Temperature for day 0 only
+        cString Temp;           // Temperature for day 0 only
         cString Icon;           // Weather icon
         cString TempMax;        // Max temperature
         cString TempMin;        // Min temperature
@@ -141,7 +141,7 @@ class cFlatBaseRender {
 
     static int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
 
-    cString ReadAndExtractData(const cString &FilePath) const;
+    cString ReadAndExtractData(const cString &FilePath) const;  // Read file and return its content as cString
     bool BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time);  // Read weather data  // NOLINT
 
     void DrawWidgetWeather();

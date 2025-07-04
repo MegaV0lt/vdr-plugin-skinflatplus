@@ -2478,7 +2478,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
         NumActors = ShowMaxActors;   // Limit to ShowMaxActors (-1 = Show all actors)
 
     int ContentTop {0};  // Calculated by 'AddExtraInfo()'
-    AddExtraInfo("Actors", "", ComplexContent, ContentTop, IsEvent);
+    AddExtraInfo(tr("Actors"), "", ComplexContent, ContentTop, IsEvent);
 
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
@@ -2495,7 +2495,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     int y {ContentTop};
 #ifdef DEBUGFUNCSCALL
     int y2 {ContentTop};  //! y2 is for testing
-    // dsyslog("   ActorsPerLine/PicsPerLine: %d/%d", ActorsPerLine, PicsPerLine);
     dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
 #endif
     if (NumActors > 50)
@@ -3953,25 +3952,27 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
-    std::vector<std::string> files;
+    std::vector<cString> files;
     files.reserve(32);  // Set to at least 32 entry's
 
     cReadDir d(*ConfigsPath);
     struct dirent *e;
-    std::string FileName {""}, num {""};
-    FileName.reserve(128);
-    num.reserve(16);
-    std::size_t found {0};
+    cString num {""};
+    std::string_view FileName {""};
+    size_t found {std::string_view::npos};
     while ((e = d.Next()) != nullptr) {
         FileName = e->d_name;
         found = FileName.find('_');
-        if (found != std::string::npos) {  // File name contains '_'
-            num = FileName.substr(0, found);
-            if (atoi(num.c_str()) > 0)  // Number is greater than zero
-                files.emplace_back(FileName);
+        if (found != std::string_view::npos) {  // File name contains '_'
+            std::unique_ptr<char[]> temp(new char[found + 1]);  // +1 for '\0' termination
+            std::memcpy(temp.get(), FileName.data(), found);
+            temp[found] = '\0';         // Terminate the string
+            num = cString(temp.get());  // String is now null-terminated
+            if (atoi(*num) > 0)   // Number is greater than zero
+                files.emplace_back(FileName.data());  // Store the file name
         }
     }
-    std::sort(files.begin(), files.end(), StringCompare);
+    std::sort(files.begin(), files.end(), /* StringCompare */ CompareStrings);  // Sort the files by number
 
     cString str {""};
     if (files.size() == 0) {
@@ -3980,13 +3981,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        std::string item {""}, ItemContent {""}, ItemFilename {""};
-        item.reserve(17);
-        ItemContent.reserve(16);
-        ItemFilename.reserve(128);
-        int Column {1};
-        int ContentLeft {m_MarginItem};
-
         // Items are stored in an array, in which case they need to be marked differently
         // Using the trNOOP() macro, the actual translation is then done when such a text is used
         // https://github.com/vdr-projects/vdr/wiki/The-VDR-Plugin-System#internationalization
@@ -4013,27 +4007,32 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
             {"security_updates", trNOOP("Security Updates")}
         };
 
-        for (const auto &FileName : files) {
+        cString item {""}, ItemContent {""}, ItemFilename {""};
+        std::string_view FileNameView {""};  // Use std::string_view for better performance
+        int Column {1};
+        int ContentLeft {m_MarginItem};
+        for (const cString &FileName : files) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
-            found = FileName.find('_');
-            item = FileName.substr(found + 1);
-            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileName.c_str());
+            FileNameView = *FileName;  // Convert cString to std::string_view
+            found = FileNameView.find('_');
+            item = FileNameView.substr(found + 1).data();  // Extract the item name
+            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileNameView.data());
 
-            std::ifstream file(ItemFilename.c_str());
-            if (!file.is_open()) continue;
-
-            std::getline(file, ItemContent);
+            ItemContent = ReadAndExtractData(ItemFilename);
+            if (isempty(*ItemContent)) continue;
 
             for (const auto &data : items) {
-                if (item.compare(data.key) == 0) {
-                    str = cString::sprintf("%s: %s", tr(data.label), ItemContent.c_str());
+                // if (item.compare(data.key) == 0) {
+                if (strcmp(*item, data.key) == 0) {
+                    str = cString::sprintf("%s: %s", tr(data.label), *ItemContent);
                     ContentWidget.AddText(*str, false,
                                           cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                           wWidth - m_MarginItem2);
                     // Items 'sys_version' and 'kernel_version' are printed on one line
-                    if (Column == 1 && !(item.compare(items[0].key) == 0 || item.compare(items[1].key) == 0)) {
+                    // if (Column == 1 && !(item.compare(items[0].key) == 0 || item.compare(items[1].key) == 0)) {
+                    if (Column == 1 && !(strcmp(*item, items[0].key) == 0 || strcmp(*item, items[1].key) == 0)) {
                         Column = 2;
                         ContentLeft = wWidth / 2;
                     } else {
@@ -4044,7 +4043,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                     break;
                 }
             }
-            file.close();
         }
     }
 
@@ -4211,7 +4209,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         Location = tr("Unknown");
 
     const cString TempToday =
-        cString::sprintf("%s %s", WeatherCache.Days[0].Temp.c_str(), *WeatherCache.TempTodaySign);  // Read temperature
+        cString::sprintf("%s %s", *WeatherCache.Days[0].Temp, *WeatherCache.TempTodaySign);  // Read temperature
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
     ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);
