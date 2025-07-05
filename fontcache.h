@@ -10,13 +10,12 @@
 #include <vdr/font.h>
 
 #include <array>
-#include <string>
 
 class cFontCache {
  private:
     struct FontData {
         cFont *font {nullptr};
-        std::string name {};  // Empty string
+        cString name {""};  // Empty string initialized
         int size {-1};
     };
 
@@ -30,8 +29,8 @@ class cFontCache {
 
     void Create();
     void Clear();
-    cFont* GetFont(const std::string& Name, int Size);
-    void InsertFont(const std::string& Name, int Size);
+    cFont* GetFont(const cString &Name, int Size);
+    void InsertFont(const cString &Name, int Size);
     int GetCacheCount() const;
 };
 
