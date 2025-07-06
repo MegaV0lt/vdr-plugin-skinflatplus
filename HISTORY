@@ -7,6 +7,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] Cache for weather data to prevent repeated calls to 'GetWeatherData'
 - [update] Optimize scraper plugin lookup for thread safety and performance improvements
 - [update] Optimize epgsearch plugin lookup for performance improvements
+- [update] Optimize dvbapi plugin lookup for performance improvements
 - [update] Some internal optimizations
 
 2025-05-27: Version 1.1.11

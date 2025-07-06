@@ -92,7 +92,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 }
 
 int cFontCache::GetCacheCount() const {
-    int count{0};
+    int count {0};
     for (const auto& data : FontCache) {
         if (isempty(*data.name))
             break;

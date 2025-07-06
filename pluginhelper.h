@@ -20,6 +20,13 @@ class cFlatPluginHelper {
     cFlatPluginHelper() : m_pEpgSearchPlugin(nullptr), m_bEpgSearchPluginChecked(false) {}
 
  public:
+    /*!
+     * @brief Returns the singleton instance of cFlatPluginHelper.
+     *
+     * Ensures that only one instance of cFlatPluginHelper is created.
+     *
+     * @return The singleton instance of cFlatPluginHelper.
+     */
     static cFlatPluginHelper* Instance() {
         if (!s_instance) s_instance = new cFlatPluginHelper();
         return s_instance;

@@ -12,6 +12,7 @@
 
 #include <unordered_map>
 #include <mutex>  // NOLINT std::mutex
+#include <string>
 
 // Expensive FreeType Library/Face Handling (cache faces)
 class GlyphMetricsCache {
@@ -25,13 +26,13 @@ class GlyphMetricsCache {
         }
         FT_Done_FreeType(library_);
     }
-    FT_Face GetFace(const cString& FontName) {
+    FT_Face GetFace(const std::string& FontName) {
         std::unique_lock lock(mutex_);
-        auto it = faces_.find(*FontName);
+        auto it = faces_.find(FontName);
         if (it != faces_.end())
             return it->second;
         FT_Face face {nullptr};
-        if (FT_New_Face(library_, *FontName, 0, &face))
+        if (FT_New_Face(library_, FontName.c_str(), 0, &face))
             return nullptr;
         faces_[FontName] = face;
         return face;
@@ -39,9 +40,9 @@ class GlyphMetricsCache {
 
  private:
     FT_Library library_ {nullptr};
-    std::unordered_map<cString, FT_Face> faces_;
+    std::unordered_map<std::string, FT_Face> faces_;
     std::mutex mutex_;
 };  // class GlyphMetricsCache
 
-// Zugriffsfunktion:
+// Accessor:
 GlyphMetricsCache &glyphMetricsCache();
