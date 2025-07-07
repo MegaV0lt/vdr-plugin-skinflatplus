@@ -1762,16 +1762,6 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 return false;  // If stat fails, return false
             }
 
-            // Check if any file is missing
-            /* std::ifstream ftemp(tempFile), ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile),
-                fsum(summaryFile), floc(locationFile);
-
-            if (!ftemp.is_open() || !floc.is_open() || !ficon.is_open() || !fmax.is_open() || !fmin.is_open() ||
-                !fprec.is_open() || !fsum.is_open()) {
-                dsyslog("flatPlus: BatchReadWeatherData() File not found for day 0");
-                return false;  // Break if any file is missing
-            } */
-
             // Get data for day 0
             out.Days[day].Temp = ReadAndExtractData(tempFile);
             // Check if 'Temp' is valid
@@ -1802,11 +1792,6 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
         } else {
-            /* std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile), fsum(summaryFile);
-
-            if (!ficon.is_open() || !fmax.is_open() || !fmin.is_open() || !fprec.is_open() || !fsum.is_open())
-            break;  // Break if any file is missing (No more day to expect) */
-
             // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
             out.Days[day].Temp = "";  // No temp file for days 1-7
             out.Days[day].Icon = ReadAndExtractData(iconFile);

@@ -1028,16 +1028,6 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 if (Delim)
                     p = Delim + 1;  // Let's fall back to the most recent delimiter
 
-                // /* char* */  s = MALLOC(char, strlen(m_Text) + 2);  // The additional '\n' plus the terminating '\0'
-                // /* int */ l = p - m_Text;
-                /* strncpy(s, m_Text, l);  // Dest, Source, Size
-                s[l] = '\n';            // Insert line break.
-                strcpy(s + l + 1, p);   // Dest, Source
-                free(m_Text);
-                m_Text = s;
-                p = m_Text + l;
-                continue; */
-
                 l = p - m_Text;  // Calculate offset of current position
                 // Instead of realloc per line, only grow buffer in powers of two
                 if (CurLength + 2 > Capacity) {

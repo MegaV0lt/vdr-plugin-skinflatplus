@@ -105,9 +105,6 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     static constexpr size_t kDefaultItemBorderSize {64};
     ItemsBorder.reserve(kDefaultItemBorderSize);
-
-    // Call to get values for 'DiskUsage' and have it outside of SetItem()
-    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);  // Called in Flush()
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
@@ -3956,11 +3953,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
-    /* if (!cReadDir::Exists(*ConfigsPath)) {
-        // Handle error: directory does not exist
-        dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Directory does not exist: %s", *ConfigsPath);
-        return -1;
-    } */
 
     cReadDir dir(*ConfigsPath);
     if (!dir.Ok()) {
