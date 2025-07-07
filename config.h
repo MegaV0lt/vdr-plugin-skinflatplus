@@ -17,7 +17,7 @@
 #define PLUGINRESOURCEPATH (cPlugin::ResourceDirectory(PLUGIN_NAME_I18N))
 #define WIDGETOUTPUTPATH "/tmp/skinflatplus/widgets"
 
-
+bool CompareNumStrings(const cString &left, const cString &right);
 bool StringCompare(const std::string &left, const std::string &right);
 bool PairCompareTimeString(const std::pair<time_t, cString>&i, const std::pair<time_t, cString>&j);
 bool PairCompareIntString(const std::pair<int, std::string>&i, const std::pair<int, std::string>&j);  // NOLINT

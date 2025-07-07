@@ -452,6 +452,19 @@ void cFlatConfig::Init() {
     DecorCheckAndInit();
 }
 
+// Sort strings by number in name
+bool CompareNumStrings(const cString &a, const cString &b) {
+    std::string_view sa = *a;
+    std::string_view sb = *b;
+    auto get_num = [](std::string_view s) {
+        size_t pos = s.find('_');
+        if (pos != std::string_view::npos)
+            return atoi(std::string(s.substr(0, pos)).c_str());
+        return 0;
+    };
+    return get_num(sa) < get_num(sb);
+}
+
 bool StringCompare(const std::string &left, const std::string &right) {
     auto lit {left.begin()}, rit {right.begin()};
     auto lend {left.end()}, rend {right.end()};

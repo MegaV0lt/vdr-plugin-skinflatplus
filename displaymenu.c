@@ -3942,6 +3942,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() ContentTop: %d", ContentTop);
+#endif
+
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
@@ -3952,16 +3956,27 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
+    /* if (!cReadDir::Exists(*ConfigsPath)) {
+        // Handle error: directory does not exist
+        dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Directory does not exist: %s", *ConfigsPath);
+        return -1;
+    } */
+
+    cReadDir dir(*ConfigsPath);
+    if (!dir.Ok()) {
+        // Handle error: unable to read directory
+        dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Unable to read directory: %s", *ConfigsPath);
+        return -1;
+    }
     std::vector<cString> files;
     files.reserve(32);  // Set to at least 32 entry's
 
-    cReadDir d(*ConfigsPath);
-    struct dirent *e;
+    struct dirent *entry;
     cString num {""};
     std::string_view FileName {""};
     size_t found {std::string_view::npos};
-    while ((e = d.Next()) != nullptr) {
-        FileName = e->d_name;
+    while ((entry = dir.Next()) != nullptr) {
+        FileName = entry->d_name;
         found = FileName.find('_');
         if (found != std::string_view::npos) {  // File name contains '_'
             std::unique_ptr<char[]> temp(new char[found + 1]);  // +1 for '\0' termination
@@ -3972,12 +3987,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                 files.emplace_back(FileName.data());  // Store the file name
         }
     }
-    std::sort(files.begin(), files.end(), /* StringCompare */ CompareStrings);  // Sort the files by number
-
-    cString str {""};
+    dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Found %ld files", files.size());
+    std::sort(files.begin(), files.end(), CompareNumStrings);  // Sort the files by number
+    dsyslog("  Fiels sorted");
+    cString Buffer {""};
     if (files.size() == 0) {
-        str = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
-        ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+        Buffer = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
+        ContentWidget.AddText(*Buffer, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
@@ -4025,8 +4041,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
             for (const auto &data : items) {
                 // if (item.compare(data.key) == 0) {
                 if (strcmp(*item, data.key) == 0) {
-                    str = cString::sprintf("%s: %s", tr(data.label), *ItemContent);
-                    ContentWidget.AddText(*str, false,
+                    Buffer = cString::sprintf("%s: %s", tr(data.label), *ItemContent);
+                    ContentWidget.AddText(*Buffer, false,
                                           cRect(ContentLeft, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                           wWidth - m_MarginItem2);
@@ -4205,7 +4221,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     }
 
     cString Location = WeatherCache.Location;  // Read location
-    if (isempty(Location))
+    if (isempty(*Location))
         Location = tr("Unknown");
 
     const cString TempToday =
@@ -4216,7 +4232,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left {m_MarginItem};
     cString Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
-    cString DayName {""}, PrecString(""), WeatherIcon {""};
+    cString DayName {""}, PrecString {""}, WeatherIcon {""};
     const time_t t {time(0)};
     time_t t2 {t};
     struct tm tm_r;
@@ -4245,12 +4261,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         TempMin = WeatherCache.Days[index].TempMin;           // Read min temperature
         PrecString = WeatherCache.Days[index].Precipitation;  // Read precipitation
 
-        if (isempty(Icon) || isempty(Summary) || isempty(TempMax) || isempty(TempMin) ||
-            isempty(PrecString))  // Check if all data is available
-            continue;
-
         tm_r.tm_mday += index;
         /* time_t */ t2 = mktime(&tm_r);
+
+        if (isempty(*Icon) || isempty(*Summary) || isempty(*TempMax) || isempty(*TempMin) ||
+            isempty(*PrecString))  // Check if all data is available
+            continue;
 
         if (Config.MainMenuWidgetWeatherType == 0) {  // Short
             if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth)

@@ -1722,6 +1722,10 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
 
 // --- Disk read batching and stat cache for weather widget and main menu widget
 bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time) {  // NOLINT
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::BatchReadWeatherData()");
+#endif
+
     constexpr int kMaxDays {8};
     const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
     time_t latest {0};
@@ -1759,16 +1763,22 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             }
 
             // Check if any file is missing
-            std::ifstream ftemp(tempFile), ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile),
+            /* std::ifstream ftemp(tempFile), ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile),
                 fsum(summaryFile), floc(locationFile);
 
             if (!ftemp.is_open() || !floc.is_open() || !ficon.is_open() || !fmax.is_open() || !fmin.is_open() ||
                 !fprec.is_open() || !fsum.is_open()) {
                 dsyslog("flatPlus: BatchReadWeatherData() File not found for day 0");
                 return false;  // Break if any file is missing
-            }
+            } */
 
+            // Get data for day 0
             out.Days[day].Temp = ReadAndExtractData(tempFile);
+            // Check if 'Temp' is valid
+            if (isempty(*out.Days[day].Temp)) {
+                dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
+                return false;
+            }
             out.Days[day].Icon = ReadAndExtractData(iconFile);
             out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
             out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
@@ -1778,12 +1788,6 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             out.Location = ReadAndExtractData(locationFile);
             out.Days[day].Summary = ReadAndExtractData(summaryFile);
-
-            // Check if 'Temp' is valid
-            if (isempty(*out.Days[day].Temp)) {
-                dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
-                return false;
-            }
 
             // Temp sign extraction
             std::string_view tt = *out.Days[day].Temp;
@@ -1798,12 +1802,12 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
         } else {
-            // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
-            std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile), fsum(summaryFile);
+            /* std::ifstream ficon(iconFile), fmax(tempMaxFile), fmin(tempMinFile), fprec(precFile), fsum(summaryFile);
 
             if (!ficon.is_open() || !fmax.is_open() || !fmin.is_open() || !fprec.is_open() || !fsum.is_open())
-                break;  // Break if any file is missing (No more day to expect)
+            break;  // Break if any file is missing (No more day to expect) */
 
+            // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
             out.Days[day].Temp = "";  // No temp file for days 1-7
             out.Days[day].Icon = ReadAndExtractData(iconFile);
             out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
@@ -1813,6 +1817,12 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             double p {}; istr >> p;
             out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             out.Days[day].Summary = ReadAndExtractData(summaryFile);
+
+            // Check if 'TempMax' is valid
+            if (isempty(*out.Days[day].TempMax)) {
+                isyslog("flatPlus: BatchReadWeatherData() No or inkomplete data for day %d", day);
+                break;  // No more days to expect (User may configured less than 7 days)
+            }
         }
     }
 
@@ -1877,6 +1887,12 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     const auto &dat = WeatherCache;  // Weather data reference
+
+    // Check if data is valid
+    if (isempty(*dat.Days[0].Temp) || isempty(dat.Days[1].TempMax)) {
+        dsyslog("flatPlus: DrawWidgetWeather() Missing data!");
+        return;
+    }
     cFont *WeatherFont {WeatherCache.WeatherFont};
     cFont *WeatherFontSml {WeatherCache.WeatherFontSml};
     cFont *WeatherFontSign {WeatherCache.WeatherFontSign};
