@@ -3917,12 +3917,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
-    ContentTop = AddWidgetHeader("widgets/timer_conflicts", tr("Timer Conflicts"), ContentTop, wWidth);
-
     const int NumConflicts {GetEpgsearchConflicts()};  // Get conflicts from plugin Epgsearch
     if (NumConflicts == 0 && Config.MainMenuWidgetTimerConflictsHideEmpty)
-        return 0;
+        return -1;  // No conflicts and hide empty
 
+    ContentTop = AddWidgetHeader("widgets/timer_conflicts", tr("Timer Conflicts"), ContentTop, wWidth);
     if (NumConflicts == 0) {
         ContentWidget.AddText(tr("no timer conflicts"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -3979,9 +3978,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                 files.emplace_back(FileName.data());  // Store the file name
         }
     }
-    dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Found %ld files", files.size());
+
+    // dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Found %ld files", files.size());
     std::sort(files.begin(), files.end(), CompareNumStrings);  // Sort the files by number
-    dsyslog("  Fiels sorted");
+
     cString Buffer {""};
     if (files.size() == 0) {
         Buffer = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
@@ -4031,7 +4031,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
             if (isempty(*ItemContent)) continue;
 
             for (const auto &data : items) {
-                // if (item.compare(data.key) == 0) {
                 if (strcmp(*item, data.key) == 0) {
                     Buffer = cString::sprintf("%s: %s", tr(data.label), *ItemContent);
                     ContentWidget.AddText(*Buffer, false,
@@ -4039,7 +4038,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                                           Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                           wWidth - m_MarginItem2);
                     // Items 'sys_version' and 'kernel_version' are printed on one line
-                    // if (Column == 1 && !(item.compare(items[0].key) == 0 || item.compare(items[1].key) == 0)) {
                     if (Column == 1 && !(strcmp(*item, items[0].key) == 0 || strcmp(*item, items[1].key) == 0)) {
                         Column = 2;
                         ContentLeft = wWidth / 2;
@@ -4061,22 +4059,22 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
-    ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
-
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
     const int updates {(Content[0] == '\0') ? -1 : atoi(*Content)};
 
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
     const int SecurityUpdates {(Content[0] == '\0') ? -1 : atoi(*Content)};
 
-    if (updates == -1 || SecurityUpdates == -1) {
+    if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero) {
+        return -1;  // Nothing to display
+    } else if (updates == -1 || SecurityUpdates == -1)  {
+        ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
-    } else if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero) {
-        return 0;
     } else {
+        ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
         cString str = cString::sprintf("%s: %d", tr("Updates"), updates);
         ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
