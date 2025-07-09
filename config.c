@@ -466,11 +466,10 @@ bool CompareNumStrings(const cString &a, const cString &b) {
 }
 
 bool StringCompare(const std::string &left, const std::string &right) {
-    auto lit {left.begin()}, rit {right.begin()};
-    auto lend {left.end()}, rend {right.end()};
-    while (lit != lend && rit != rend) {
-        if (tolower(*lit) < tolower(*rit)) return true;
-        if (tolower(*lit) > tolower(*rit)) return false;
+    auto len = std::min(left.size(), right.size());
+    auto lit = left.cbegin(), rit = right.cbegin();
+    while (len-- > 0) {
+        if (tolower(*lit) != tolower(*rit)) return tolower(*lit) < tolower(*rit);
         ++lit;
         ++rit;
     }
