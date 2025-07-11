@@ -405,8 +405,10 @@ void cFlatSetupGeneral::LoadConfigFile() {
             }
         }  // while
         fclose(f);
-    } else
+    } else {
         dsyslog("flatPlus: Failed to load config: file <%s> not found", *Filename);
+        return;
+    }
     cString msg = cString::sprintf("%s %s %s", tr("configfile"), ConfigFiles[ConfigFileSelection], tr("loaded"));
     Skins.Message(mtInfo, msg);
 }

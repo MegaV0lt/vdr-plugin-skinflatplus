@@ -1709,13 +1709,13 @@ int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharW
 cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     if (isempty(*FilePath)) return "";
 
-    FILE *fp = fopen(*FilePath, "r");
-    if (fp == nullptr) return "";  // File doesn't exist
+    FILE *f = fopen(*FilePath, "r");
+    if (f == nullptr) return "";  // File doesn't exist
 
     // Read the first line
     cReadLine ReadLine;
-    const char *s = ReadLine.Read(fp);  // ReadLine will read from the file pointer
-    if (fp != nullptr) { fclose(fp); }
+    const char *s = ReadLine.Read(f);  // ReadLine will read from the file pointer
+    if (f != nullptr) { fclose(f); }
 
     return (s == nullptr) ? "" : cString(s);
 }

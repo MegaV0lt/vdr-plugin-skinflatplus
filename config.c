@@ -21,8 +21,8 @@
 #include "./flat.h"
 
 cFlatConfig::cFlatConfig() {
-    RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
-    RecordingOldValue.reserve(64);
+    // RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
+    // RecordingOldValue.reserve(64);
 }
 
 cFlatConfig::~cFlatConfig() {
@@ -204,8 +204,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
 
 void cFlatConfig::ThemeCheckAndInit() {
     if (strcmp(Theme.Name(), *ThemeCurrent) != 0) {
-        dsyslog("flatPlus: Load theme: %s", *ThemeCurrent);
         ThemeCurrent = Theme.Name();
+        dsyslog("flatPlus: Load theme: %s", *ThemeCurrent);
         ThemeInit();
     }
 }
@@ -505,6 +505,12 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 
     cString FileName {""};
     cReadDir d(*DecorPath);
+    if (d.Ok() == false) {
+        // Handle error
+        esyslog("flatPlus: DecorDescriptions() Unable to read directory: %s", *DecorPath);
+        return;
+    }
+
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         FileName = AddDirectory(*DecorPath, e->d_name);
@@ -524,32 +530,42 @@ void cFlatConfig::DecorDescriptions(cStringList &Decors) {
 
 cString cFlatConfig::DecorDescription(cString File) {
     cString description {""};
+    if (isempty(*File)) {
+        esyslog("flatPlus: DecorDescription() File name is empty");
+        return description;
+    }
+
     FILE *f = fopen(File, "r");
-    if (f) {
-        int line {0};
-        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
-        cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != nullptr) {
-            ++line;
-            p = strchr(s, '#');
-            if (p) *p = 0;
-            s = stripspace(skipspace(s));
-            if (!isempty(s)) {
-                n = s;
-                v = strchr(s, '=');
-                if (v) {
-                    *v++ = 0;
-                    n = stripspace(skipspace(n));
-                    v = stripspace(skipspace(v));
-                    if (strstr(n, "Description") == n) {
-                        description = strdup(v);
-                        break;
-                    }
+    if (!f) {
+        esyslog("flatPlus: DecorDescription() Unable to open file: %s", *File);
+        return description;
+    }
+
+    int line {0};
+    char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
+    cReadLine ReadLine;
+
+    while ((s = ReadLine.Read(f)) != nullptr) {
+        ++line;
+        p = strchr(s, '#');
+        if (p) *p = 0;
+        s = stripspace(skipspace(s));
+        if (!isempty(s)) {
+            n = s;
+            v = strchr(s, '=');
+            if (v) {
+                *v++ = 0;
+                n = stripspace(skipspace(n));
+                v = stripspace(skipspace(v));
+                if (strstr(n, "Description") == n) {
+                    description = v;  // Store the description
+                    break;
                 }
             }
-        }  // while
-        fclose(f);
+        }
     }
+
+    fclose(f);
     return description;
 }
 
@@ -560,6 +576,12 @@ void cFlatConfig::DecorLoadCurrent() {
 
     cString FileName {""};
     cReadDir d(*DecorPath);
+    if (d.Ok() == false) {
+        // Handle error
+        esyslog("flatPlus: DecorLoadCurrent() Unable to read directory: %s", *DecorPath);
+        return;
+    }
+
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         FileName = AddDirectory(*DecorPath, e->d_name);
@@ -578,7 +600,11 @@ void cFlatConfig::DecorLoadFile(cString File) {
     dsyslog("flatPlus: Load decor file: %s", *File);
 
     FILE *f = fopen(File, "r");
-    if (f) {
+    if (f == nullptr) {
+        // Handle error
+        esyslog("flatPlus: Load decor file: %s failed", *File);
+        return;
+    } else {
         int line {0}, value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
@@ -671,13 +697,16 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-void cFlatConfig::RecordingOldLoadConfig() {
+/* void cFlatConfig::RecordingOldLoadConfig() {
     dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
     RecordingOldFolder.clear();
     RecordingOldValue.clear();
 
     FILE *f = fopen(RecordingOldConfigFile, "r");
-    if (f) {
+    if (!f) {
+        dsyslog("flatPlus: Recording old config file not found: %s", *RecordingOldConfigFile);
+        return;
+    } else {
         int line {0}, value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
@@ -702,15 +731,50 @@ void cFlatConfig::RecordingOldLoadConfig() {
         }  // while
         fclose(f);
     }
+} */
+
+int cFlatConfig::GetRecordingOldValue(const std::string &folder) const {
+    auto it = RecordingOldFolderMap.find(folder);
+    return it != RecordingOldFolderMap.end() ? it->second : -1;
 }
 
-int cFlatConfig::GetRecordingOldValue(const std::string &folder) {
-    std::vector<std::string>::size_type sz = RecordingOldFolder.size();
-    for (std::size_t i {0}; i < sz; ++i) {
-        if (RecordingOldFolder[i] == folder)
-            return RecordingOldValue[i];
+void cFlatConfig::RecordingOldLoadConfig() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
+#endif
+
+    FILE *f = fopen(RecordingOldConfigFile, "r");
+    if (!f) {
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: Recording old config file not found: %s", *RecordingOldConfigFile);
+#endif
+        return;
+    } else {
+        int line {0}, value {0};
+        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
+        cReadLine ReadLine;
+        while ((s = ReadLine.Read(f)) != nullptr) {
+            ++line;
+            p = strchr(s, '#');
+            if (p) *p = 0;
+            s = stripspace(skipspace(s));
+            if (!isempty(s)) {
+                n = s;
+                v = strchr(s, '=');
+                if (v) {
+                    *v++ = 0;
+                    n = stripspace(skipspace(n));
+                    v = stripspace(skipspace(v));
+                    value = atoi(v);
+#ifdef DEBUGFUNCSCALL
+                    dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
+#endif
+                    RecordingOldFolderMap.emplace(n, value);
+                }
+            }
+        }  // while
+        fclose(f);
     }
-    return -1;
 }
 
 void cFlatConfig::SetLogoPath(cString path) {
@@ -718,9 +782,9 @@ void cFlatConfig::SetLogoPath(cString path) {
 }
 
 cString cFlatConfig::CheckSlashAtEnd(std::string path) {
-    if (!path.empty() && path.back() == '/') {
+    if (!path.empty() && path.back() == '/')
         path.pop_back();  // Use pop_back for efficiency
-    }
+
     return path.c_str();
 }
 
@@ -734,8 +798,10 @@ void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
 
 void cFlatConfig::Store(const char *Name, const char *Value, const char *Filename) {
     FILE *f = fopen(Filename, "a");
-    if (!f) return;
-
+    if (!f) {
+        esyslog("flatPlus: Error storing config: %s = %s", Name, Value);
+        return;  // throw std::runtime_error("Failed to open file");
+    }
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);
 }
@@ -747,6 +813,11 @@ void cFlatConfig::GetConfigFiles(cStringList &Files) {
     Files.Clear();
 
     cReadDir d(*ConfigsPath);
+    if (d.Ok() == false) {
+        // Handle error
+        esyslog("flatPlus: GetConfigFiles() Error getting config files");
+        return;
+    }
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         files.emplace_back(e->d_name);

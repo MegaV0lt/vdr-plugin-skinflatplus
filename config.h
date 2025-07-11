@@ -10,6 +10,7 @@
 #include <vdr/plugin.h>
 #include <vdr/tools.h>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -43,15 +44,16 @@ class cFlatConfig {
         void GetConfigFiles(cStringList &Files);  // NOLINT
 
         void RecordingOldLoadConfig();
-        int GetRecordingOldValue(const std::string &folder);
+        int GetRecordingOldValue(const std::string &folder) const;
 
         cString ThemeCurrent {""};
         cString LogoPath {""};
         cString IconPath {""};
         cString RecordingOldConfigFile {""};
 
-        std::vector<std::string> RecordingOldFolder;
-        std::vector<int> RecordingOldValue;
+        // std::vector<std::string> RecordingOldFolder;
+        // std::vector<int> RecordingOldValue;
+        std::map<std::string, int> RecordingOldFolderMap;
 
         // BORDER TYPES
         // 0 = none

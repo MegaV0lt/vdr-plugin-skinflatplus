@@ -130,10 +130,14 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
 cPlugin* cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
 
-
-// Optimized Scraper Plugin Lookup (thread safe, only looked up once)
+// Optimized Scraper Plugin Lookup
 static cPlugin *g_scraper_plugin {nullptr};
 
+/**
+ * Return the scraper plugin (either tvscraper or scraper2vdr).
+ * This function is thread safe and only looks up the plugin once.
+ * @return The scraper plugin or nullptr if neither tvscraper nor scraper2vdr is found.
+ */
 cPlugin *GetScraperPlugin() {
     if (!g_scraper_plugin) {
         // Thread safe initialization

@@ -3953,8 +3953,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
     const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
-    cReadDir dir(*ConfigsPath);
-    if (!dir.Ok()) {
+    cReadDir d(*ConfigsPath);
+    if (d.Ok() == false) {
         // Handle error: unable to read directory
         dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Unable to read directory: %s", *ConfigsPath);
         return -1;
@@ -3966,7 +3966,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     cString num {""};
     std::string_view FileName {""};
     size_t found {std::string_view::npos};
-    while ((entry = dir.Next()) != nullptr) {
+    while ((entry = d.Next()) != nullptr) {
         FileName = entry->d_name;
         found = FileName.find('_');
         if (found != std::string_view::npos) {  // File name contains '_'
@@ -4344,6 +4344,12 @@ void cFlatDisplayMenu::PreLoadImages() {
     File.reserve(256);
     cString FileName {""};
     cReadDir d(*Path);
+    if (d.Ok() == false) {
+        // Handle error
+        esyslog("flatPlus: PreLoadImages() Unable to read directory: %s", *Path);
+        return;
+    }
+
     struct dirent *e;
     while ((e = d.Next()) != nullptr) {
         File = e->d_name;

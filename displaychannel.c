@@ -1,3 +1,4 @@
+#include "displayreplay.h"
 /*
  * Skin flatPlus: A plugin for the Video Disk Recorder
  *
@@ -532,10 +533,13 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
 #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: Failed to get ECM info from dvbapi service");
+        const int *caids = m_CurChannel->Caids();
+        if (caids != nullptr && caids[0] != 0) {
+            dsyslog("flatPlus: No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
+        }
 #endif
         return;
-}
+    }
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());

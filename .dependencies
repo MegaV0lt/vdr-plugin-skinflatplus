@@ -18,10 +18,10 @@ complexcontent.o: complexcontent.c complexcontent.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
 textscroller.o: textscroller.c textscroller.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
-displaychannel.o: displaychannel.c displaychannel.h baserender.h \
+displaychannel.o: displaychannel.c displayreplay.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
- config.h imagecache.h textscroller.h complexcontent.h fontcache.h \
- services/dvbapi.h
+ config.h imagecache.h textscroller.h complexcontent.h \
+ services/scraper2vdr.h displaychannel.h fontcache.h services/dvbapi.h
 displaymenu.o: displaymenu.c displaymenu.h baserender.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h \
  textscroller.h complexcontent.h services/epgsearch.h \

@@ -52,6 +52,8 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     if (!TracksPixmap) return;
 
+    if (Current) m_CurrentIndex = Index;
+
     const int y {(Index + 1) * m_ItemHeight};
     const auto [ColorFg, ColorBg] =
         Current      ? std::make_pair(Theme.Color(clrTrackItemCurrentFont), Theme.Color(clrTrackItemCurrentBg))
