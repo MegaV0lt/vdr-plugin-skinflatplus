@@ -40,16 +40,16 @@ class FontImageWeatherCache {
  public:
     static constexpr int kMaxDays {8};  // Max number of weather entries to cache
     struct WeatherDayData {
-        cString Temp;           // Temperature for day 0 only
-        cString Icon;           // Weather icon
-        cString TempMax;        // Max temperature
-        cString TempMin;        // Min temperature
-        cString Precipitation;  // Precipitation
-        cString Summary;        // Summary
-    } Days[kMaxDays];           // Array of weather data for multiple days
+        cString Icon {""};           // Weather icon
+        cString TempMax {""};        // Max temperature
+        cString TempMin {""};        // Min temperature
+        cString Precipitation {""};  // Precipitation
+        cString Summary {""};        // Summary
+    } Days[kMaxDays];                // Array of weather data for multiple days
 
-    cString Location;           // Location name
-    cString TempTodaySign;      // Temperature sign for today
+    cString Location {""};           // Location name
+    cString Temp {""};               // Aktual temperature for day 0 only
+    cString TempTodaySign {""};      // Temperature sign for today
     time_t LastReadMTime {0};
 
     cFont* WeatherFont {nullptr};

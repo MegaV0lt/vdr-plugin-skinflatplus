@@ -480,7 +480,7 @@ bool PairCompareTimeString(const std::pair<time_t, cString> &i, const std::pair<
     return i.first < j.first;
 }
 
-bool PairCompareIntString(const std::pair<int, std::string> &i, const std::pair<int, std::string> &j) {
+bool PairCompareIntString(const std::pair<int, const char*> &i, const std::pair<int, const char*> &j) {
     return i.first < j.first;  // ascending
 }
 

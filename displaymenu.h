@@ -108,7 +108,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     cString m_ItemEventLastChannelName {""};
 
-    std::string m_RecFolder {""}, m_LastRecFolder {""};
+    cString m_RecFolder {""}, m_LastRecFolder {""};
     int m_LastItemRecordingLevel {0};
 
     void ItemBorderInsertUnique(const sDecorBorder &ib);
@@ -116,12 +116,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void ItemBorderDrawAllWithoutScrollbar();
     void ItemBorderClear();
 
-    const cString items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                             "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                             "Replay",   "Miscellaneous", "Plugins", "Restart"};
-
     cString MainMenuText(const cString &Text) const;
-    cString GetIconName(const std::string &element) const;
+    cString GetIconName(const cString &element) const;
     cString GetMenuIconName() const;
 
     cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;

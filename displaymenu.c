@@ -55,10 +55,6 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     ButtonsCreate();
     MessageCreate();
 
-    static constexpr std::size_t kBufferSize {256};
-    m_RecFolder.reserve(kBufferSize);
-    m_LastRecFolder.reserve(kBufferSize);
-
     m_VideoDiskUsageState = -1;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
@@ -3057,12 +3053,17 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     return found ? skipspace(text.substr(i).data()) : text.data();
 }
 
-cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
+cString cFlatDisplayMenu::GetIconName(const cString &element) const {
+    std::string_view ElementView {*element};  // TODO: Use cString
+    static const cString items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                    "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                    "Replay",   "Miscellaneous", "Plugins", "Restart"};
+
     // Check for standard menu entries
     std::string_view s {""};
     for (std::size_t i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(*items[i]);
-        if (s == element) {
+        if (s == ElementView) {
             return cString::sprintf("menuIcons/%s", *items[i]);
         }
     }
@@ -3070,9 +3071,9 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
     // Check for special main menu entries "stop recording", "stop replay"
     std::string_view StopRecording {skipspace(trVDR(" Stop recording "))};
     std::string_view StopReplay {skipspace(trVDR(" Stop replaying"))};
-    if (element.compare(0, StopRecording.size(), StopRecording) == 0)
+    if (ElementView.compare(0, StopRecording.size(), StopRecording) == 0)
         return "menuIcons/StopRecording";
-    if (element.compare(0, StopReplay.size(), StopReplay) == 0)
+    if (ElementView.compare(0, StopReplay.size(), StopReplay) == 0)
         return "menuIcons/StopReplay";
 
     // Check for plugins
@@ -3084,7 +3085,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
             MainMenuEntry = p->MainMenuEntry();
             if (MainMenuEntry) {
                 PlugMainEntry = MainMenuEntry;
-                if (element.compare(0, PlugMainEntry.size(), PlugMainEntry) == 0) {
+                if (ElementView.compare(0, PlugMainEntry.size(), PlugMainEntry) == 0) {
                     return cString::sprintf("pluginIcons/%s", p->Name());
                 }
             }
@@ -3093,7 +3094,7 @@ cString cFlatDisplayMenu::GetIconName(const std::string &element) const {
         }
     }
 
-    return cString::sprintf("extraIcons/%s", element.c_str());
+    return cString::sprintf("extraIcons/%s", *element);
 }
 
 cString cFlatDisplayMenu::GetMenuIconName() const {
@@ -3144,11 +3145,10 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
 
     std::string_view RecName {Recording->Name()};
     cString RecNamePart {""};
-    // RecNamePart.reserve(256);  // Reserve space for the string
     std::size_t start {0}, end {0};
     for (int i {0}; i <= Level; ++i) {
         end = RecName.find(FOLDERDELIMCHAR, start);
-        if (end == std::string::npos) {
+        if (end == std::string_view::npos) {
             if (i == Level) RecNamePart = cString(std::string(RecName.substr(start)).c_str());
             break;
         }
@@ -3172,18 +3172,17 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
 cString cFlatDisplayMenu::GetRecCounts() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d",
-            m_RecFolder.c_str(), m_LastItemRecordingLevel);
+            *m_RecFolder, m_LastItemRecordingLevel);
 #endif
 
     uint16_t RecCount {0}, RecNewCount {0};
     m_LastRecFolder = m_RecFolder;
-    if (!m_RecFolder.empty() && m_LastItemRecordingLevel > 0) {
-        std::string RecFolder2 {""};
-        RecFolder2.reserve(256);  // Reserve space for the string
+    if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
+        cString RecFolder2 {""};
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
-            if (m_RecFolder == RecFolder2) {
+            if (strcmp(m_RecFolder, RecFolder2) == 0) {
                 ++RecCount;
                 if (Rec->IsNew()) ++RecNewCount;
             }
@@ -3221,15 +3220,13 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
-    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
-
-    int16_t value = Config.GetRecordingOldValue(RecFolder);
+    const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+    int16_t value = Config.GetRecordingOldValue(*RecFolder);
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
     if (value < 0) return false;
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
-
     const double days = difftime(now, LastRecTimeFromFolder) / SECSINDAY;
     return days > value;
 }
@@ -3337,17 +3334,16 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     time_t RecStart {Recording->Start()};
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
-    const std::string RecFolder {*GetRecordingName(Recording, Level, true)};
-    if (RecFolder.empty()) return RecStart;  // No folder
+    const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+    if (isempty(*RecFolder)) return RecStart;  // No folder
 
-    std::string RecFolder2 {""};
-    RecFolder2.reserve(256);  // Reserve space for the string
+    cString RecFolder2 {""};
     const time_t now {time(0)};
     time_t RecStartNewest {0}, RecStartOldest {now};
     LOCK_RECORDINGS_READ;
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
-        if (RecFolder == RecFolder2) {  // Recordings must be in the same folder
+        if (strcmp(RecFolder, RecFolder2) == 0) {  // Recordings must be in the same folder
             RecStartNewest = std::max(RecStartNewest, Rec->Start());
             RecStartOldest = std::min(RecStartOldest, Rec->Start());
         }
@@ -3413,13 +3409,13 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     ContentWidget.SetBGColor(Theme.Color(clrMenuRecBg));
     ContentWidget.SetScrollingActive(false);
 
-    std::vector<std::pair<int, std::string>> widgets;
+    std::vector<std::pair<int, const char*>> widgets;
     widgets.reserve(10);  // Set to at least 10 entry's
 
     struct WidgetConfig {
-        int& ShowFlag;
-        int& position;
-        const char* name;
+        int &ShowFlag;
+        int &position;
+        const char *name;
     };
 
     const WidgetConfig WidgetConfigs[] {
@@ -3437,7 +3433,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     // Populates the widgets vector with enabled widgets based on configuration
     // Iterates through predefined widget configurations and adds widgets to the vector
     // if their corresponding show flag is enabled, preserving their configured position
-    for (const auto& cfg : WidgetConfigs) {
+    for (const auto &cfg : WidgetConfigs) {
         if (cfg.ShowFlag) {
             widgets.emplace_back(std::make_pair(cfg.position, cfg.name));
         }
@@ -3447,7 +3443,8 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     using WidgetDrawFunction = std::function<int(int, int, int)>;
 
     // Create a map that associates widget names with their drawing functions
-    std::unordered_map<std::string, WidgetDrawFunction> WidgetDrawers = {
+    // Works as long all strings are different. Else we must use std::string
+    std::unordered_map<const char*, WidgetDrawFunction> WidgetDrawers = {
         {"dvb_devices",
          [this](int left, int width, int top) { return DrawMainMenuWidgetDVBDevices(left, width, top); }},
         {"active_timer",
@@ -3472,12 +3469,11 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
 
     int AddHeight {0}, ContentTop {0};
     // Process widgets
-    for (const auto& PairWidget : widgets) {
-        // Using a reference to avoid copy:
-        const std::string &widget = PairWidget.second;
+    for (const auto &PairWidget : widgets) {
+        std::string_view widget = PairWidget.second;
 
         // Look up the widget drawer function
-        auto drawerIt = WidgetDrawers.find(widget);
+        auto drawerIt = WidgetDrawers.find(widget.data());
         if (drawerIt != WidgetDrawers.end()) {
             // Call the drawer function and update ContentTop
             AddHeight = drawerIt->second(wLeft, wWidth, ContentTop);
@@ -3485,7 +3481,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
                 ContentTop = AddHeight + m_MarginItem;
         } else {
             // Handle unknown widget type
-            esyslog("flatPlus: DrawMainMenuWidget() Unknown widget type: %s", widget.c_str());
+            esyslog("flatPlus: DrawMainMenuWidget() Unknown widget type: %s", widget.data());
         }
     }  // for widgets
 
@@ -3895,20 +3891,20 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         }
     }
     // Sort by RecStart and add entrys to ContentWidget
-    std::sort(Recs.begin(), Recs.end(), PairCompareTimeString);
-    int index {0};
-    while (!Recs.empty() && index < Config.MainMenuWidgetLastRecMaxCount) {
+    // Use 'partial_sort()' to limit the number of entries to Config.MainMenuWidgetLastRecMaxCount
+    std::partial_sort(Recs.begin(), Recs.begin() + Config.MainMenuWidgetLastRecMaxCount, Recs.end(),
+                      PairCompareTimeString);
+    for (size_t index {0}; index < static_cast<size_t>(Config.MainMenuWidgetLastRecMaxCount) && index < Recs.size();
+         ++index) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
-        const auto& PairRec = Recs.back();
+        const auto &PairRec = Recs[index];
 
         ContentWidget.AddText(
             *PairRec.second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
-        Recs.pop_back();  // Delete
-        ++index;
     }
     return ContentWidget.ContentHeight(false);
 }
@@ -4215,7 +4211,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         Location = tr("Unknown");
 
     const cString TempToday =
-        cString::sprintf("%s %s", *WeatherCache.Days[0].Temp, *WeatherCache.TempTodaySign);  // Read temperature
+        cString::sprintf("%s %s", *WeatherCache.Temp, *WeatherCache.TempTodaySign);  // Read temperature
 
     const cString Title = cString::sprintf("%s - %s %s", tr("Weather"), *Location, *TempToday);
     ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);

@@ -1,4 +1,3 @@
-#include "displayreplay.h"
 /*
  * Skin flatPlus: A plugin for the Video Disk Recorder
  *

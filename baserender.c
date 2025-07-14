@@ -76,8 +76,9 @@ cFlatBaseRender::cFlatBaseRender() {
 }
 
 cFlatBaseRender::~cFlatBaseRender() {
-    // if (m_Osd) {
+    if (m_Osd) {
         MessageScroller.Clear();
+        // DestroyPixmap checks if pixmap exists
         m_Osd->DestroyPixmap(TopBarPixmap);
         m_Osd->DestroyPixmap(TopBarIconPixmap);
         m_Osd->DestroyPixmap(TopBarIconBgPixmap);
@@ -89,7 +90,7 @@ cFlatBaseRender::~cFlatBaseRender() {
         m_Osd->DestroyPixmap(DecorPixmap);
 
         delete m_Osd;
-    // }
+    }
 }
 
 void cFlatBaseRender::CreateFullOsd() {
@@ -833,6 +834,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
     }
 
     if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
+
+    if (Current > Total) Current = Total;  // Clamp Current to Total to avoid drawing outside bounds
 
     const int big {rect.Height()};
     const int Middle {big / 2};
@@ -1763,9 +1766,9 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             }
 
             // Get data for day 0
-            out.Days[day].Temp = ReadAndExtractData(tempFile);
+            out.Temp = ReadAndExtractData(tempFile);
             // Check if 'Temp' is valid
-            if (isempty(*out.Days[day].Temp)) {
+            if (isempty(*out.Temp)) {
                 dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
                 return false;
             }
@@ -1780,20 +1783,19 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             out.Days[day].Summary = ReadAndExtractData(summaryFile);
 
             // Temp sign extraction
-            std::string_view tt = *out.Days[day].Temp;
+            std::string_view tt = *out.Temp;
             auto deg = tt.find("°");  // Find the degree sign
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
                 std::unique_ptr<char[]> temp(new char[deg + 1]);     // +1 for '\0' termination
                 std::memcpy(temp.get(), tt.data(), deg);
-                temp[deg] = '\0';                          // Terminate the string
-                out.Days[day].Temp = cString(temp.get());  // Set the temperature without the sign
+                temp[deg] = '\0';                // Terminate the string
+                out.Temp = cString(temp.get());  // Set the temperature without the sign
             } else {
                 out.TempTodaySign = "";
             }
         } else {
             // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
-            out.Days[day].Temp = "";  // No temp file for days 1-7
             out.Days[day].Icon = ReadAndExtractData(iconFile);
             out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
             out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
@@ -1830,12 +1832,15 @@ static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  //
 
     cache.FontAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs);
     cache.FontSignAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs / 2.5);
-
+    if (!cache.WeatherFont || !cache.WeatherFontSml || !cache.WeatherFontSign) {
+        esyslog("flatPlus: EnsureWeatherWidgetFonts() Font pointer is null!");
+        return;
+    }
     cache.FontHeight = cache.WeatherFont->Height();
     cache.FontSmlHeight = cache.WeatherFontSml->Height();
     cache.FontSignHeight = cache.WeatherFontSign->Height();
 
-    cache.TempTodayWidth = cache.WeatherFont->Width(cache.Days[0].Temp);
+    cache.TempTodayWidth = cache.WeatherFont->Width(cache.Temp);
     cache.TempTodaySignWidth = cache.WeatherFontSign->Width(cache.TempTodaySign);
     cache.PrecTodayWidth = cache.WeatherFontSml->Width(cache.Days[0].Precipitation);
     cache.PrecTomorrowWidth = cache.WeatherFontSml->Width(cache.Days[1].Precipitation);
@@ -1874,7 +1879,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const auto &dat = WeatherCache;  // Weather data reference
 
     // Check if data is valid
-    if (isempty(*dat.Days[0].Temp) || isempty(dat.Days[1].TempMax)) {
+    if (isempty(*dat.Temp) || isempty(*dat.Days[1].TempMax)) {
         dsyslog("flatPlus: DrawWidgetWeather() Missing data!");
         return;
     }
@@ -1908,7 +1913,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     WeatherWidget.SetScrollingActive(false);
 
     // Add temperature
-    WeatherWidget.AddText(*dat.Days[0].Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(*dat.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFont);
     left += TempTodayWidth;
 
