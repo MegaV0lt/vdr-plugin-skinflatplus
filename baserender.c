@@ -1780,6 +1780,9 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             double p {}; istr >> p;
             out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             out.Location = ReadAndExtractData(locationFile);
+            if (isempty(*out.Location))
+                out.Location = tr("Unknown");
+
             out.Days[day].Summary = ReadAndExtractData(summaryFile);
 
             // Temp sign extraction
@@ -1840,14 +1843,7 @@ static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  //
     cache.FontSmlHeight = cache.WeatherFontSml->Height();
     cache.FontSignHeight = cache.WeatherFontSign->Height();
 
-    cache.TempTodayWidth = cache.WeatherFont->Width(cache.Temp);
     cache.TempTodaySignWidth = cache.WeatherFontSign->Width(cache.TempTodaySign);
-    cache.PrecTodayWidth = cache.WeatherFontSml->Width(cache.Days[0].Precipitation);
-    cache.PrecTomorrowWidth = cache.WeatherFontSml->Width(cache.Days[1].Precipitation);
-    cache.WidthTempToday = std::max(cache.WeatherFontSml->Width(cache.Days[0].TempMax),
-                                    cache.WeatherFontSml->Width(cache.Days[0].TempMin));
-    cache.WidthTempTomorrow = std::max(cache.WeatherFontSml->Width(cache.Days[1].TempMax),
-                                       cache.WeatherFontSml->Width(cache.Days[1].TempMin));
 }
 
 void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
@@ -1883,20 +1879,23 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         dsyslog("flatPlus: DrawWidgetWeather() Missing data!");
         return;
     }
-    cFont *WeatherFont {WeatherCache.WeatherFont};
-    cFont *WeatherFontSml {WeatherCache.WeatherFontSml};
-    cFont *WeatherFontSign {WeatherCache.WeatherFontSign};
+    cFont *WeatherFont {dat.WeatherFont};
+    cFont *WeatherFontSml {dat.WeatherFontSml};
+    cFont *WeatherFontSign {dat.WeatherFontSign};
 
     int left {m_MarginItem};
-    const int WeatherFontHeight {WeatherCache.FontHeight};
-    const int WeatherFontSmlHeight {WeatherCache.FontSmlHeight};
+    const int WeatherFontHeight {dat.FontHeight};
+    const int WeatherFontSmlHeight {dat.FontSmlHeight};
 
-    const int TempTodayWidth {WeatherCache.TempTodayWidth};
-    const int TempTodaySignWidth {WeatherCache.TempTodaySignWidth};
-    const int PrecTodayWidth {WeatherCache.PrecTodayWidth};
-    const int PrecTomorrowWidth {WeatherCache.PrecTomorrowWidth};
-    const int WidthTempToday {WeatherCache.WidthTempToday};        // Max width of temp today
-    const int WidthTempTomorrow {WeatherCache.WidthTempTomorrow};  // Max width of temp tomorrow
+    const int TempTodaySignWidth {dat.TempTodaySignWidth};
+
+    const int TempTodayWidth = dat.WeatherFont->Width(dat.Temp);
+    const int PrecTodayWidth = dat.WeatherFontSml->Width(dat.Days[0].Precipitation);
+    const int PrecTomorrowWidth = dat.WeatherFontSml->Width(dat.Days[1].Precipitation);
+    const int WidthTempToday = std::max(dat.WeatherFontSml->Width(dat.Days[0].TempMax),
+                                        dat.WeatherFontSml->Width(dat.Days[0].TempMin));  // Max width temp today
+    const int WidthTempTomorrow = std::max(dat.WeatherFontSml->Width(dat.Days[1].TempMax),
+                                           dat.WeatherFontSml->Width(dat.Days[1].TempMin));  // Max width temp tomorrow
 
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +

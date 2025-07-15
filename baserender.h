@@ -48,7 +48,7 @@ class FontImageWeatherCache {
     } Days[kMaxDays];                // Array of weather data for multiple days
 
     cString Location {""};           // Location name
-    cString Temp {""};               // Aktual temperature for day 0 only
+    cString Temp {""};               // Actual temperature for day 0 only
     cString TempTodaySign {""};      // Temperature sign for today
     time_t LastReadMTime {0};
 
@@ -62,14 +62,9 @@ class FontImageWeatherCache {
 
     int FontAscender {0}, FontSignAscender {0};  // Ascender for font and sign
 
-    int TempTodayWidth {0};
     int TempTodaySignWidth {0};
-    int PrecTodayWidth {0};
-    int PrecTomorrowWidth {0};
-    int WidthTempToday {0};     // Max width of temp today
-    int WidthTempTomorrow {0};  // Max width of temp tomorrow
 
-    bool valid {false};         // Indicates if the cache is valid
+    bool valid {false};  // Indicates if the cache is valid
 
     FontImageWeatherCache() = default;  // Constructor
     void Clear() { valid = false; }
