@@ -3054,38 +3054,27 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
 }
 
 cString cFlatDisplayMenu::GetIconName(const cString &element) const {
-    std::string_view ElementView {*element};  // TODO: Use cString
-    static const cString items[16] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                    "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                    "Replay",   "Miscellaneous", "Plugins", "Restart"};
+    static const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
     // Check for standard menu entries
-    std::string_view s {""};
+    const char *s {nullptr};
     for (std::size_t i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
-        s = trVDR(*items[i]);
-        if (s == ElementView) {
-            return cString::sprintf("menuIcons/%s", *items[i]);
+        s = trVDR(items[i]);
+        if (strcmp(element, s) == 0) {
+            return cString::sprintf("menuIcons/%s", items[i]);
         }
     }
 
-    // Check for special main menu entries "stop recording", "stop replay"
-    std::string_view StopRecording {skipspace(trVDR(" Stop recording "))};
-    std::string_view StopReplay {skipspace(trVDR(" Stop replaying"))};
-    if (ElementView.compare(0, StopRecording.size(), StopRecording) == 0)
-        return "menuIcons/StopRecording";
-    if (ElementView.compare(0, StopReplay.size(), StopReplay) == 0)
-        return "menuIcons/StopReplay";
-
     // Check for plugins
     const char *MainMenuEntry {nullptr};
-    std::string_view PlugMainEntry {""};
     for (std::size_t i {0};; ++i) {
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
             MainMenuEntry = p->MainMenuEntry();
             if (MainMenuEntry) {
-                PlugMainEntry = MainMenuEntry;
-                if (ElementView.compare(0, PlugMainEntry.size(), PlugMainEntry) == 0) {
+                if (strcmp(element, MainMenuEntry) == 0) {
                     return cString::sprintf("pluginIcons/%s", p->Name());
                 }
             }
@@ -3093,6 +3082,14 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
             break;  // Plugin not found
         }
     }
+
+    // Check for special main menu entries "stop recording", "stop replay"
+    const cString StopRecording {skipspace(trVDR(" Stop recording "))};
+    const cString StopReplay {skipspace(trVDR(" Stop replaying"))};
+    if (strcmp(element, StopRecording) == 0)
+        return "menuIcons/StopRecording";
+    if (strcmp(element, StopReplay) == 0)
+        return "menuIcons/StopReplay";
 
     return cString::sprintf("extraIcons/%s", *element);
 }

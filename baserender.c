@@ -1807,7 +1807,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Check if 'TempMax' is valid
             if (isempty(*out.Days[day].TempMax)) {
-                isyslog("flatPlus: BatchReadWeatherData() No or inkomplete data for day %d", day);
+                isyslog("flatPlus: BatchReadWeatherData() No or incomplete data for day %d", day);
                 break;  // No more days to expect (User may configured less than 7 days)
             }
         }
