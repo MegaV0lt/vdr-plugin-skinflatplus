@@ -375,7 +375,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 }
                 MenuIconWidth = ImageBGWidth + m_MarginItem2;
             } else if (m_TopBarMenuIconSet) {  // Show menu icon
-                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
+                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, kIconMaxSize, TopBarLogoHeight);
                 if (img) {
                     IconTop = (m_TopBarHeight - img->Height()) / 2;
                     TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
@@ -471,7 +471,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         cImage *ImgExtra {nullptr};
         if (m_TopBarExtraIconSet) {  // Load extra icon (Disk usage) with full height of TopBar
-            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, ICON_WIDTH_UNLIMITED, m_TopBarHeight);
+            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, kIconMaxSize, m_TopBarHeight);
             if (ImgExtra) {
                 Right -= ImgExtra->Width() + m_MarginItem;
                 MiddleWidth += ImgExtra->Width() + m_MarginItem;
@@ -482,7 +482,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {  // Load sort icon
-            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, ICON_WIDTH_UNLIMITED, TopBarLogoHeight);
+            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, kIconMaxSize, TopBarLogoHeight);
             if (ImgIconRight) {
                 TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
@@ -1690,7 +1690,7 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 }
 
 int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
-    GlyphMetricsCache &cache = glyphMetricsCache();
+    GlyphMetricsCache &cache = glyphMetricsCache();  // Use the cache
     FT_Face face {cache.GetFace(*cFont::GetFontFileName(Name))};
     if (!face) {
         esyslog("flatPlus: GetFontAscender() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
@@ -1734,7 +1734,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     time_t latest {0};
 
     // Moved outside the loop to avoid re-creation in each iteration
-    cString DayString, tempFile, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile, locationFile;
+    cString DayPrefix, tempFile, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile, locationFile;
     cString precipitation;
 
     // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
@@ -1743,12 +1743,12 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
     // Read all files and cache data
     for (uint day {0}; day < kMaxDays; ++day) {
-        DayString = cString::sprintf("%d", day);
-        iconFile = cString::sprintf("%s%s%s", *prefix, *DayString, day == 0 ? ".icon-act" : ".icon");
-        tempMaxFile = cString::sprintf("%s%s%s", *prefix, *DayString, ".tempMax");
-        tempMinFile = cString::sprintf("%s%s%s", *prefix, *DayString, ".tempMin");
-        precFile = cString::sprintf("%s%s%s", *prefix, *DayString, ".precipitation");
-        summaryFile = cString::sprintf("%s%s%s", *prefix, *DayString, ".summary");
+        DayPrefix = cString::sprintf("%s%d", *prefix, day);
+        iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
+        tempMaxFile = cString::sprintf("%s%s", *DayPrefix, ".tempMax");
+        tempMinFile = cString::sprintf("%s%s", *DayPrefix, ".tempMin");
+        precFile = cString::sprintf("%s%s", *DayPrefix, ".precipitation");
+        summaryFile = cString::sprintf("%s%s", *DayPrefix, ".summary");
 
         if (day == 0) {  // Only for day 0, read temp and location file
             tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
@@ -1756,14 +1756,14 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Check file mtime for 'Temp' only as all files are written together
             struct stat s;
-            if (stat(*tempFile, &s) == 0) {
-                latest = s.st_mtime;
-                // Check if data is already cached
-                if (latest == out.LastReadMTime) break;  // If latest mtime matches cached, skip reading files
-            } else {
+            if (stat(*tempFile, &s) != 0) {
                 dsyslog("flatPlus: BatchReadWeatherData() Error reading file mtime for %s", *tempFile);
-                return false;  // If stat fails, return false
+                return false;
             }
+
+            latest = s.st_mtime;
+            // Check if data is already cached
+            if (latest == out.LastReadMTime) break;  // If latest mtime matches cached, skip reading files
 
             // Get data for day 0
             out.Temp = ReadAndExtractData(tempFile);
@@ -1772,13 +1772,26 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
                 return false;
             }
+
             out.Days[day].Icon = ReadAndExtractData(iconFile);
             out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
             out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
+
             precipitation = ReadAndExtractData(precFile);
-            istr.str(*precipitation); istr.clear();  // Clear the error state of the stream
-            double p {}; istr >> p;
-            out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+            if (!isempty(*precipitation)) {
+                istr.str(*precipitation);
+                istr.clear();  // Clear the error state of the stream
+                double p {0.0};
+                if (istr >> p) {  // Check if parsing succeeded
+                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+                } else {
+                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
+                    out.Days[day].Precipitation = "0%";  // Default fallback
+                }
+            } else {
+                out.Days[day].Precipitation = "0%";  // Default fallback
+            }
+
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location))
                 out.Location = tr("Unknown");
@@ -1790,34 +1803,44 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             auto deg = tt.find("°");  // Find the degree sign
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
-                std::unique_ptr<char[]> temp(new char[deg + 1]);     // +1 for '\0' termination
-                std::memcpy(temp.get(), tt.data(), deg);
-                temp[deg] = '\0';                // Terminate the string
-                out.Temp = cString(temp.get());  // Set the temperature without the sign
+                out.Temp = cString(std::string(tt.substr(0, deg)).c_str());
             } else {
                 out.TempTodaySign = "";
             }
         } else {
-            // For days 1-7, only read icon, tempMax, tempMin, precipitation, and summary
+            // For days 1-7, only read icon, tempMax, tempMin, precipitation and summary
             out.Days[day].Icon = ReadAndExtractData(iconFile);
-            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
-            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
-            precipitation = ReadAndExtractData(precFile);
-            istr.str(*precipitation); istr.clear();  // Clear the error state of the stream
-            double p {}; istr >> p;
-            out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
-            out.Days[day].Summary = ReadAndExtractData(summaryFile);
-
-            // Check if 'TempMax' is valid
-            if (isempty(*out.Days[day].TempMax)) {
-                isyslog("flatPlus: BatchReadWeatherData() No or incomplete data for day %d", day);
+            // Check if 'Icon' is valid
+            if (isempty(*out.Days[day].Icon)) {
+                isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
                 break;  // No more days to expect (User may configured less than 7 days)
             }
+
+            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
+            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
+
+            precipitation = ReadAndExtractData(precFile);
+            if (!isempty(*precipitation)) {
+                istr.str(*precipitation);
+                istr.clear();  // Clear the error state of the stream
+                double p {0.0};
+                if (istr >> p) {  // Check if parsing succeeded
+                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+                } else {
+                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
+                    out.Days[day].Precipitation = "0%";  // Default fallback
+                }
+            } else {
+                out.Days[day].Precipitation = "0%";  // Default fallback
+            }
+
+            out.Days[day].Summary = ReadAndExtractData(summaryFile);
         }
     }
 
     out.LastReadMTime = latest;
     out_latest_time = latest;
+
     return true;
 }
 
@@ -1855,16 +1878,16 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;
 
     // Only reload/calc data/fonts if input files or screen size changed, else use prepared/cached
-    time_t NewestFiletime {WeatherCache.LastReadMTime};  // Last read time from cache
+    time_t NewestFiletime {0};
     if ((LastOsdHeight != fs) || !WeatherCache.valid || !BatchReadWeatherData(WeatherCache, NewestFiletime) ||
         (WeatherCache.LastReadMTime != NewestFiletime)) {
 #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather() Need to refresh/calc");
+        dsyslog("   Need to refresh/calc cache");
 #endif
         // Need to refresh/calc
         if (!BatchReadWeatherData(WeatherCache, NewestFiletime)) return;
 #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather() Data read");
+        dsyslog("   Data read");
 #endif
         EnsureWeatherWidgetFonts(WeatherCache, fs);
         WeatherCache.LastReadMTime = NewestFiletime;
@@ -1879,6 +1902,18 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         dsyslog("flatPlus: DrawWidgetWeather() Missing data!");
         return;
     }
+#ifdef DEBUGFUNCSCALL
+    // Log weather cache data for debugging
+    dsyslog("flatPlus: DrawWidgetWeather() Temp: %s, Location: %s", *dat.Temp, *dat.Location);
+    for (int i = 0; i < 7; i++) {
+        if (!isempty(*dat.Days[i].Icon)) {
+            dsyslog("   Day %d: Icon: %s, TempMax: %s, TempMin: %s, Precipitation: %s, Summary: %s", i,
+                    *dat.Days[i].Icon, *dat.Days[i].TempMax, *dat.Days[i].TempMin, *dat.Days[i].Precipitation,
+                    *dat.Days[i].Summary);
+        }
+    }
+#endif
+
     cFont *WeatherFont {dat.WeatherFont};
     cFont *WeatherFontSml {dat.WeatherFontSml};
     cFont *WeatherFontSign {dat.WeatherFontSign};
@@ -1912,7 +1947,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     WeatherWidget.SetScrollingActive(false);
 
     // Add temperature
-    WeatherWidget.AddText(*dat.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+    WeatherWidget.AddText(dat.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), WeatherFont);
     left += TempTodayWidth;
 
@@ -1941,9 +1976,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
-    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
-    if (img) {
-        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+    cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    if (ImgUmbrella) {
+        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - m_MarginItem2;
     }
 
@@ -1973,9 +2008,8 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += WidthTempTomorrow + m_MarginItem;
 
     // Add precipitation icon
-    img = ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
-    if (img) {
-        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+    if (ImgUmbrella) {
+        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - m_MarginItem2;
     }
 

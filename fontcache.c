@@ -41,19 +41,16 @@ void cFontCache::Clear() {
     m_InsertIndex = 0;
 }
 
-cFont* cFontCache::GetFont(const cString& Name, int Size) {
-    std::string_view NameView {*Name};  // Convert cString to std::string_view for easier handling
-    if (NameView.empty() || Size <= 0) {  // Invalid parameters
+cFont* cFontCache::GetFont(const cString &Name, int Size) {
+    if (isempty(*Name) || Size <= 0) {  // Invalid parameters
         esyslog("flatPlus: FontCache - Invalid parameters: Name=%s, Size=%d", *Name, Size);
         return nullptr;
     }
 
-    std::string_view DataNameView {};  // Use std::string_view for comparison
     for (const auto &data : FontCache) {
-        DataNameView = *data.name;
-        if (DataNameView.empty())
+        if (isempty(*data.name))  // End of cache, insert new font
             break;
-        if (DataNameView == NameView && data.size == Size && data.font != nullptr) {
+        if ((strcmp(*data.name, *Name) == 0) && data.size == Size && data.font != nullptr) {
 #ifdef DEBUGFUNCSCALL
             dsyslog("flatPlus: Font found in FontCache: Name=%s, Size=%d", *Name, Size);
 #endif

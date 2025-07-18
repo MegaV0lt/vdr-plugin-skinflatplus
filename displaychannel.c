@@ -235,7 +235,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     cImage *img {nullptr};
     if (Channel) {
-        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", ICON_WIDTH_UNLIMITED, ImageHeight);
+        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", kIconMaxSize, ImageHeight);
         if (img) {
             left -= img->Width();
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -249,7 +249,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             // If Config.ChannelSimpleAspectFormat is enabled, the aspect ratio is only shown for
             // sd program, else format (HD/UHD) is shown
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -257,7 +257,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -267,7 +267,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -277,7 +277,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         // Show audio icon (Dolby, Stereo)
         if (Config.ChannelResolutionAspectShow) {  //? Add separate config option (Config.ChannelAudioIconShow)
             IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -581,9 +581,9 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     left += m_DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, m_DvbapiInfoFont->Height())};
+    cImage *img {ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_DvbapiInfoFont->Height())};
     if (!img) {
-        img = ImgLoader.LoadIcon("crypt_unknown", ICON_WIDTH_UNLIMITED, m_DvbapiInfoFont->Height());
+        img = ImgLoader.LoadIcon("crypt_unknown", kIconMaxSize, m_DvbapiInfoFont->Height());
         dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
     if (img) {  // Draw the card system icon
@@ -644,14 +644,14 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
-    uint16_t index {0};
+    uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
+    for (const cChannel *Channel {Channels->First()}; Channel && i < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)
-                ++index;
+                ++i;
         }
     }  // for cChannel
 
@@ -662,34 +662,34 @@ void cFlatDisplayChannel::PreLoadImages() {
         else
             height = m_FontSmlHeight;
 
-        ImgLoader.LoadIcon("crypted", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("uncrypted", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("unknown_asp", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("crypted", kIconMaxSize, height);
+        ImgLoader.LoadIcon("uncrypted", kIconMaxSize, height);
+        ImgLoader.LoadIcon("unknown_asp", kIconMaxSize, height);
+        ImgLoader.LoadIcon("43", kIconMaxSize, height);
+        ImgLoader.LoadIcon("169", kIconMaxSize, height);
+        ImgLoader.LoadIcon("169w", kIconMaxSize, height);
+        ImgLoader.LoadIcon("221", kIconMaxSize, height);
+        ImgLoader.LoadIcon("7680x4320", kIconMaxSize, height);
+        ImgLoader.LoadIcon("3840x2160", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1920x1080", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1440x1080", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1280x720", kIconMaxSize, height);
+        ImgLoader.LoadIcon("960x720", kIconMaxSize, height);
+        ImgLoader.LoadIcon("704x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("720x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("544x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("528x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("480x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("352x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("unknown_res", kIconMaxSize, height);
+        ImgLoader.LoadIcon("uhd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("hd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("sd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("audio_dolby", kIconMaxSize, height);
+        ImgLoader.LoadIcon("audio_stereo", kIconMaxSize, height);
 
         // Audio tracks (displaytracks.c)
-        ImgLoader.LoadIcon("tracks_ac3", ICON_WIDTH_UNLIMITED, m_FontHeight);
-        ImgLoader.LoadIcon("tracks_stereo", ICON_WIDTH_UNLIMITED, m_FontHeight);
+        ImgLoader.LoadIcon("tracks_ac3", kIconMaxSize, m_FontHeight);
+        ImgLoader.LoadIcon("tracks_stereo", kIconMaxSize, m_FontHeight);
     }
 }

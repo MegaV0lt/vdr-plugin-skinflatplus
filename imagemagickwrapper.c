@@ -33,9 +33,9 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 
     if (PreserveAspect) {
-        static constexpr uint16_t SCALE_FACTOR {1000};
-        uint32_t scale_w = SCALE_FACTOR * width / w;
-        uint32_t scale_h = SCALE_FACTOR * height / h;
+        static constexpr uint16_t kScaleFactor {1000};
+        uint32_t scale_w = kScaleFactor * width / w;
+        uint32_t scale_h = kScaleFactor * height / h;
         if (scale_w > scale_h)
             width = w * height / h;
         else
@@ -53,8 +53,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
-    static constexpr uint64_t SCALE16 = 1ULL << 16;
-    const uint64_t QuantumScaleInt = (255ULL * SCALE16) / QuantumRange;
+    static constexpr uint64_t kScale16 = 1ULL << 16;
+    const uint64_t QuantumScaleInt = (255ULL * kScale16) / QuantumRange;
     const Quantum *px = buffer.getConstPixels(0, 0, w, h);
     if (!px) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
@@ -110,18 +110,18 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return nullptr;
     }
     const Magick::PixelPacket *src = pixels;
-    static constexpr uint64_t SCALE_FACTOR = 1ULL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL;
+    static constexpr uint64_t kScaleFactor = 1ULL << 16;
+    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
 
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
         int blue {}, green {}, red {}, alpha {};  // Initialise outside of for loop
         for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-            blue  = (src->blue   * SCALE_FACTOR) / RGBScaleInt;
-            green = (src->green  * SCALE_FACTOR) / RGBScaleInt;
-            red   = (src->red    * SCALE_FACTOR) / RGBScaleInt;
-            alpha = ~(static_cast<unsigned char>((src->opacity * SCALE_FACTOR) / RGBScaleInt));
+            blue  = (src->blue   * kScaleFactor) / RGBScaleInt;
+            green = (src->green  * kScaleFactor) / RGBScaleInt;
+            red   = (src->red    * kScaleFactor) / RGBScaleInt;
+            alpha = ~(static_cast<unsigned char>((src->opacity * kScaleFactor) / RGBScaleInt));
             scaler.PutSourcePixel(blue, green, red, alpha);
         }
         return image.release();
@@ -130,10 +130,10 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     // Fast path: sizes match, just go
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
-             (static_cast<int>((src->red      * SCALE_FACTOR) / RGBScaleInt) << 16) |
-             (static_cast<int>((src->green    * SCALE_FACTOR) / RGBScaleInt) << 8)  |
-             (static_cast<int>((src->blue     * SCALE_FACTOR) / RGBScaleInt)));
+            ((~static_cast<int>((src->opacity * kScaleFactor) / RGBScaleInt) << 24) |
+             (static_cast<int>((src->red      * kScaleFactor) / RGBScaleInt) << 16) |
+             (static_cast<int>((src->green    * kScaleFactor) / RGBScaleInt) << 8)  |
+             (static_cast<int>((src->blue     * kScaleFactor) / RGBScaleInt)));
     }
     return image.release();
 #endif
@@ -146,8 +146,8 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     tColor *imgData = (tColor *)image.Data();
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
-    static constexpr uint64_t SCALE16 = 1UL << 16;
-    const uint64_t QuantumScaleInt = (255UL * SCALE16) / QuantumRange;
+    static constexpr uint64_t kScale16 = 1UL << 16;
+    const uint64_t QuantumScaleInt = (255UL * kScale16) / QuantumRange;
     const Quantum *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     const int quantum_channels = buffer.channels();
@@ -164,14 +164,14 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 #else
     const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
-    static constexpr uint64_t SCALE_FACTOR = 1UL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * SCALE_FACTOR) / 256UL;
+    static constexpr uint64_t kScaleFactor = 1UL << 16;
+    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * SCALE_FACTOR) / RGBScaleInt) << 24) |
-            (static_cast<int>((src->red       * SCALE_FACTOR) / RGBScaleInt) << 16) |
-            (static_cast<int>((src->green     * SCALE_FACTOR) / RGBScaleInt) << 8)  |
-            (static_cast<int>((src->blue      * SCALE_FACTOR) / RGBScaleInt)));
+            ((~static_cast<int>((src->opacity * kScaleFactor) / RGBScaleInt) << 24) |
+            (static_cast<int>((src->red       * kScaleFactor) / RGBScaleInt) << 16) |
+            (static_cast<int>((src->green     * kScaleFactor) / RGBScaleInt) << 8)  |
+            (static_cast<int>((src->blue      * kScaleFactor) / RGBScaleInt)));
     }
 #endif
     return image;

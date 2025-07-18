@@ -150,8 +150,7 @@ class cFlatBaseRender {
     int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
     const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
 
-    static constexpr int ICON_WIDTH_UNLIMITED {999};   // Max icon width (999)
-    static constexpr int ICON_HEIGHT_UNLIMITED {999};  // Max icon height (999)
+    static constexpr int kIconMaxSize {999};   // Max icon width or height (999)
 
     // Standard fonts
     cFont *m_Font {nullptr};

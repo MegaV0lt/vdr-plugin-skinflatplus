@@ -93,12 +93,12 @@ cSkinDisplayMessage *cFlat::DisplayMessage() {
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap(\"%s\", %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
+    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
             Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
     cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
-        esyslog("flatPlus: No osd! Could not create pixmap \"%s\" with size %ix%i", *Name, DrawPort.Width(),
+        esyslog("flatPlus: No osd! Could not create pixmap '%s' with size %ix%i", *Name, DrawPort.Width(),
                 DrawPort.Height());
         return nullptr;
     } */
@@ -111,7 +111,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
         return pixmap;
     }  // Everything runs according to the plan
 
-    esyslog("flatPlus: Could not create pixmap \"%s\" of size %ix%i", *Name, DrawPort.Width(), DrawPort.Height());
+    esyslog("flatPlus: Could not create pixmap '%s' of size %ix%i", *Name, DrawPort.Width(), DrawPort.Height());
     const cSize MaxPixmapSize {osd->MaxPixmapSize()};
     const int width {std::min(DrawPort.Width(), MaxPixmapSize.Width())};
     const int height {std::min(DrawPort.Height(), MaxPixmapSize.Height())};
@@ -119,11 +119,11 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     cRect NewDrawPort {DrawPort};
     NewDrawPort.SetSize(width, height);
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, NewDrawPort)}) {
-        isyslog("flatPlus: Created pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
+        isyslog("flatPlus: Created pixmap '%s' with reduced size %ix%i", *Name, width, height);
         return pixmap;
     }
 
-    esyslog("flatPlus: Could not create pixmap \"%s\" with reduced size %ix%i", *Name, width, height);
+    esyslog("flatPlus: Could not create pixmap '%s' with reduced size %ix%i", *Name, width, height);
     return nullptr;
 }
 
@@ -403,6 +403,11 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
+    static const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2",
+                                          "recording_seen_3", "recording_seen_4", "recording_seen_5",
+                                          "recording_seen_6", "recording_seen_7", "recording_seen_8",
+                                          "recording_seen_9", "recording_seen_10"};
+
     if (FrameTotal == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
         return SeenIconNames[0];  // 0 = 0%
@@ -410,7 +415,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
-    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f\n", SeenThreshold);
+    // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f", SeenThreshold);
     if (FrameSeen >= SeenThreshold) return SeenIconNames[10];  // 10 = 100%
 
     const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0..10 rounded
@@ -442,21 +447,21 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
         return;
     }
 
-    static constexpr int POSTER_ASPECT_THRESHOLD {1};              // Smaller than 1 = Poster
-    static constexpr int BANNER_ASPECT_THRESHOLD {4};              // Smaller than 4 = Portrait, bigger than 4 = Banner
-    static constexpr double POSTER_HEIGHT_RATIO {0.7};             // Max 70% of pixmap height
-    static constexpr double PORTRAIT_WIDTH_RATIO {1.0 / 3.0};      // Max 1/3 of pixmap width
-    static constexpr double BANNER_TARGET_RATIO {758.0 / 1920.0};  // To get 758 width @ 1920
+    static constexpr int kPosterAspectThreshold {1};              // Smaller than 1 = Poster
+    static constexpr int kBannerAspectThreshold {4};              // Smaller than 4 = Portrait, bigger than 4 = Banner
+    static constexpr double kPosterHeightRatio {0.7};             // Max 70% of pixmap height
+    static constexpr double kPortraitWidthRatio {1.0 / 3.0};      // Max 1/3 of pixmap width
+    static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
     //* Set to default size
     const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < POSTER_ASPECT_THRESHOLD) {         //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * POSTER_HEIGHT_RATIO));
-    } else if (Aspect < BANNER_ASPECT_THRESHOLD) {  //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * PORTRAIT_WIDTH_RATIO));
+    if (Aspect < kPosterAspectThreshold) {         //* Poster (For example 680x1000 = 0.68)
+        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio));
+    } else if (Aspect < kBannerAspectThreshold) {  //* Portrait (For example 1920x1080 = 1.77)
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kPortraitWidthRatio));
     } else {                                        //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * BANNER_TARGET_RATIO));
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kBannerTargetRatio));
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
@@ -671,7 +676,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         if (rc == 0) {
             FileSize[i] = FileSize[i - 1] + FileBuf.st_size;
         } else if (ENOENT != errno) {
-            esyslog("flatPlus: Error determining file size of \"%s\" %d (%s)", *FileName, errno, strerror(errno));
+            esyslog("flatPlus: Error determining file size of '%s' %d (%s)", *FileName, errno, strerror(errno));
             FsErr = true;  // Remember failed status for later displaying an '!'
         }
     }
@@ -854,9 +859,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    static constexpr float LINE_WIDTH_THRESHOLD {0.8f};  // Line width threshold for justifying
-    static const char *PUNCTUATION_CHARS {".,?!;"};      // Punctuation characters for justifying
-    if (LineWidth > (LineMaxWidth * LINE_WIDTH_THRESHOLD)) {  // Lines shorter than 80% looking bad when justified
+    static constexpr float kLineWidthThreshold {0.8f};  // Line width threshold for justifying
+    static const char *kPunctuationChars {".,?!;"};     // Punctuation characters for justifying
+    if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) {  // Lines shorter than 80% looking bad when justified
         const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
         const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
         std::string FillChars {""};
@@ -892,9 +897,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert blocks at (.,?!;)
-        for (pos = Line.find_first_of(PUNCTUATION_CHARS);
+        for (pos = Line.find_first_of(kPunctuationChars);
              pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
-             pos = Line.find_first_of(PUNCTUATION_CHARS, pos + FillCharsLength + 1)) {
+             pos = Line.find_first_of(kPunctuationChars, pos + FillCharsLength + 1)) {
             if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
                 // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
                 Line.insert(pos + 1, FillChars);
@@ -1001,7 +1006,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     m_Text[TextLen] = '\0';
 
     m_Lines = 1;
-    static const char* const DELIMITER_CHARS {"-.,:;!?_~"};
+    static const char* const kDelimiterChars {"-.,:;!?_~"};
     size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
@@ -1051,7 +1056,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
             }
         }
         w += cw;
-        if (strchr(DELIMITER_CHARS, *p)) {
+        if (strchr(kDelimiterChars, *p)) {
             if (*p != *(p + 1)) {  // Avoid breaks between repeated delimiters (like in "...")
                 Delim = p;
                 Blank = nullptr;
