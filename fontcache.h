@@ -10,14 +10,17 @@
 #include <vdr/font.h>
 
 #include <array>
+#include <map>
+#include <string>
 
 class cFontCache {
  private:
     struct FontData {
         cFont *font {nullptr};
-        cString name {""};  // Empty string initialized
-        int size {0};       // Initialized to 0
-        int height {0};     // Height of the font, initialized to 0
+        cString name {""};
+        int size {0};
+        int height {0};
+        mutable std::map<std::string, int> StringWidthCache;  // Cache for string widths
     };
 
     static constexpr std::size_t MaxFontCache {32};
@@ -34,6 +37,7 @@ class cFontCache {
     int GetFontHeight(const cString &Name, int Size) const;
     void InsertFont(const cString &Name, int Size);
     int GetCacheCount() const;
+    int GetStringWidth(const cString &Name, int Height, const cString &Text) const;
 };
 
 extern cFontCache FontCache;

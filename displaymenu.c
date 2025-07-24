@@ -524,7 +524,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     }
 
     //* At least four digits width in channel list because of different sort modes
-    Width = std::max(m_Font->Width("9999"), Width);
+    Width = std::max(FontCache.GetStringWidth(m_FontName, m_FontHeight, "9999"), Width);
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -903,7 +903,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     const cChannel *Channel {Timer->Channel()};
     cString Buffer = cString::sprintf("%d", Channel->Number());
-    const int Width {std::max(m_Font->Width("999"), m_Font->Width(*Buffer))};  // Minimal width for channel number
+    const int Width {std::max(FontCache.GetStringWidth(m_FontName, m_FontHeight, "999"),
+                              m_Font->Width(*Buffer))};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -963,12 +964,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         Buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
-        Left += m_Font->Width("XXX 99.  ");
+        Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "XXX 99.  ");
         Buffer =
             cString::sprintf("%02d:%02d - %02d:%02d", TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
-        Left += m_Font->Width("99:99 - 99:99  ");
+        Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "99:99 - 99:99  ");
 
         if (Current && m_Font->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(
@@ -1109,7 +1110,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString Buffer {""};
         if (Current) m_ItemEventLastChannelName = Channel->Name();
 
-        w = m_Font->Width("9999");
+        w = FontCache.GetStringWidth(m_FontName, m_FontHeight, "9999");
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
             Buffer = cString::sprintf("%d", Channel->Number());
@@ -1236,11 +1237,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         const cString DateString = cString::sprintf("%s %s. ", *WeekDayName(Day), buf);
         if (MenuEventViewShort && Channel) {  // flatPlus short, flatPlus short + EPG
-            w = m_FontSml->Width("XXX 99. ") + m_MarginItem;
+            w = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "XXX 99. ") + m_MarginItem;
             MenuPixmap->DrawText(cPoint(LeftSecond, Top + m_FontHeight), *DateString, ColorFg, ColorBg, m_FontSml, w);
             LeftSecond += w + m_MarginItem;
         } else {
-            w = m_Font->Width("XXX 99. ") + m_MarginItem;
+            w = FontCache.GetStringWidth(m_FontName, m_FontHeight, "XXX 99. ") + m_MarginItem;
             MenuPixmap->DrawText(cPoint(Left, Top), *DateString, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
 
@@ -1659,7 +1660,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         } else if (Total > 0) {  // Folder with recordings
             DrawRecordingIcon("folder", Left, Top, Current);
 
-            const int DigitsWidth {m_Font->Width("9999")};
+            const int DigitsWidth {
+                FontCache.GetStringWidth(m_FontName, m_FontHeight, "9999")};
             const int DigitsMaxWidth {DigitsWidth + m_MarginItem};  // Use same width for recs and new recs
             Buffer = cString::sprintf("%d", Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight,
@@ -1677,7 +1679,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                            m_MarginItem * 5};  // For folder with recordings
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
-                LeftWidth += m_Font->Width("(99.99.99)") + m_FontHeight + m_MarginItem2;
+                LeftWidth +=
+                    FontCache.GetStringWidth(m_FontName, m_FontHeight, "99.99.99") + m_FontHeight + m_MarginItem2;
                 Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
                 Left += m_Font->Width(*Buffer) + m_MarginItem;
@@ -1772,7 +1775,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
 
             Top += m_FontHeight;
-            const int DigitsMaxWidth {m_FontSml->Width("9999") + m_MarginItem};  // Use same width for recs and new recs
+            const int DigitsMaxWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "9999") +
+                                      m_MarginItem};  // Use same width for recs and new recs
             Buffer = cString::sprintf("%d", Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
                                  m_FontSmlHeight, taRight);
@@ -2169,7 +2173,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
                                          Theme.Color(clrMenuEventFontInfo), clrTransparent, m_FontSml);
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
-            const int DotsWidth {m_FontSml->Width("...")};
+            const int DotsWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "...")};
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                         MaxWidth - DotsWidth);
@@ -2287,7 +2291,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     ComplexContent.SetBGColor(Theme.Color(clrMenuRecBg));
 
     cString MediaPath {""};
-    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};  // Use content hight
+    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2};  // Use content height
     int MediaType {0};  // 0 = None, 1 = Series, 2 = Movie
     cImage *img {nullptr};
     if (Config.TVScraperRecInfoShowPoster) {
@@ -2721,7 +2725,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             left += MaxWidth;
         } else {  // Add ... if info ist too long
             dsyslog("flatPlus: Short text too long! (%d) Setting MaxWidth to %d", ShortTextWidth, MaxWidth);
-            const int DotsWidth {m_FontSml->Width("...")};
+            const int DotsWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "...")};
             ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem + m_FontSmlHeight + m_FontHeight), *ShortText,
                                         Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml,
                                         MaxWidth - DotsWidth);
@@ -4111,12 +4115,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2)};
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
-    const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};     // Max. width of temperature string
+    const int TempSmlWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "-99,9°C")};  // Width
     const int16_t MainMenuWidgetWeatherDays =
         std::min(Config.MainMenuWidgetWeatherDays, dat.kMaxDays);     // Narrowing conversion
     if (Config.MainMenuWidgetWeatherType == 0) {                      // Short
-        const int TempBarWidth {m_Font->Width('|')};                  // Width of the char '|'
-        const int TempMaxStringWidth {m_FontTempSml->Width("XXXX")};  // Width to fit the temperature string in
+        const int TempBarWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "|")};  // Width of the char '|'
+        const int TempMaxStringWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight,
+                                                               "XXXX")};  // Width to fit the temperature string in
         for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
             if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth) break;
 
@@ -4158,62 +4163,67 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
             left += m_FontTempSml->Width(PrecString.data()) + m_MarginItem2;
         }  // for Config.MainMenuWidgetWeatherDays
-    } else {  // Long
-        const time_t now {time(0)};
-        time_t t2 {0};
+        }
+        else {  // Long
+            const time_t now {time(0)};
+            time_t t2 {0};
 
-        const int TempSmlSpaceWidth {m_FontTempSml->Width(" ")};    // Space between temperature and precipitation
-        const int TempSmlPrecWidth {m_FontTempSml->Width("100%")};  // Max. width of precipitation string
-        const int TempMaxStringWidth {m_Font->Width("XXXX")};
-        for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
-            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
+            const int TempSmlSpaceWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight,
+                                                                  " ")};  // Space between temperature and precipitation
+            const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight,
+                                                                 "100%")};  // Max. width of precipitation string
+            const int TempMaxStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "XXXX")};
+            for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
+                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
-            Icon = *dat.Days[i].Icon;                 // Read icon
-            Summary = *dat.Days[i].Summary;           // Read summary
-            TempMax = *dat.Days[i].TempMax;           // Read max temperature
-            TempMin = *dat.Days[i].TempMin;           // Read min temperature
-            PrecString = *dat.Days[i].Precipitation;  // Read precipitation
+                Icon = *dat.Days[i].Icon;                 // Read icon
+                Summary = *dat.Days[i].Summary;           // Read summary
+                TempMax = *dat.Days[i].TempMax;           // Read max temperature
+                TempMin = *dat.Days[i].TempMin;           // Read min temperature
+                PrecString = *dat.Days[i].Precipitation;  // Read precipitation
 
-            if (Icon.empty() || Summary.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty()) continue;
+                if (Icon.empty() || Summary.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty())
+                    continue;
 
-            t2 = now + (i * SECSINDAY);  // Calculate time for the current day
-            left = m_MarginItem;
-            ContentWidget.AddText(
-                *WeekDayName(t2), false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
-                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font, wWidth - m_MarginItem2);
-            left += TempMaxStringWidth + m_MarginItem;
+                t2 = now + (i * SECSINDAY);  // Calculate time for the current day
+                left = m_MarginItem;
+                ContentWidget.AddText(
+                    *WeekDayName(t2), false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
+                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font, wWidth - m_MarginItem2);
+                left += TempMaxStringWidth + m_MarginItem;
 
-            WeatherIcon = *cString::sprintf("widgets/%s", Icon.data());
-            img = ImgLoader.LoadIcon(WeatherIcon.data(), m_FontHeight, m_FontHeight - m_MarginItem2);
-            if (img) {
-                ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-                left += m_FontHeight + m_MarginItem;
-            }
-            ContentWidget.AddText(TempMax.data(), false, cRect(left, ContentTop, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlWidth, m_FontTempSmlHeight, taRight);
-            ContentWidget.AddText(TempMin.data(), false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlWidth, m_FontTempSmlHeight, taRight);
+                WeatherIcon = *cString::sprintf("widgets/%s", Icon.data());
+                img = ImgLoader.LoadIcon(WeatherIcon.data(), m_FontHeight, m_FontHeight - m_MarginItem2);
+                if (img) {
+                    ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
+                    left += m_FontHeight + m_MarginItem;
+                }
+                ContentWidget.AddText(TempMax.data(), false, cRect(left, ContentTop, 0, 0),
+                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                      TempSmlWidth, m_FontTempSmlHeight, taRight);
+                ContentWidget.AddText(TempMin.data(), false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
+                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                      TempSmlWidth, m_FontTempSmlHeight, taRight);
 
-            left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
+                left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
 
-            if (ImgUmbrella) {
-                ContentWidget.AddImage(ImgUmbrella, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-                left += m_FontHeight - m_MarginItem;
-            }
-            ContentWidget.AddText(PrecString.data(), false, cRect(left, ContentTop + Middle, 0, 0),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  TempSmlPrecWidth, m_FontTempSmlHeight, taRight);
-            left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
+                if (ImgUmbrella) {
+                    ContentWidget.AddImage(ImgUmbrella,
+                                           cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
+                    left += m_FontHeight - m_MarginItem;
+                }
+                ContentWidget.AddText(PrecString.data(), false, cRect(left, ContentTop + Middle, 0, 0),
+                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                      TempSmlPrecWidth, m_FontTempSmlHeight, taRight);
+                left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
 
-            ContentWidget.AddText(Summary.data(), false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),
-                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                  wWidth - left);
+                ContentWidget.AddText(
+                    Summary.data(), false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),
+                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
 
-            ContentTop += m_FontHeight;
-        }  // for Config.MainMenuWidgetWeatherDays
-    }
+                ContentTop += m_FontHeight;
+            }  // for Config.MainMenuWidgetWeatherDays
+        }
 
     return ContentWidget.ContentHeight(false);
 #ifdef DEBUGFUNCSCALL

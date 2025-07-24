@@ -311,16 +311,16 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int MaxAvailWidth {0};
 
     bool IsRec {false};
-    const int RecWidth {m_FontSml->Width("REC")};
+    const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
 
     int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 
-    const int SmlSpaceWidth2 {m_FontSml->Width("  ")};
+    const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "  ")};
 
     if (Config.ChannelShowStartTime)
-        left += m_Font->Width("00:00  ");
+        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00  ");
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
@@ -485,13 +485,17 @@ void cFlatDisplayChannel::SignalQualityDraw() {
         return;
     }
 
+    const int SignalFontHeight {m_SignalFont->Height()};
     const int left {m_MarginItem2};
     int top {m_HeightBottom -
              (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), m_SignalFont);
-    const int ProgressLeft {left + std::max(m_SignalFont->Width("STR "), m_SignalFont->Width("SNR ")) + m_MarginItem};
+    const int ProgressLeft {left +
+                            std::max(FontCache.GetStringWidth(m_FontName, SignalFontHeight, "STR "),
+                                     FontCache.GetStringWidth(m_FontName, SignalFontHeight, "SNR ")) +
+                            m_MarginItem};
     const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,

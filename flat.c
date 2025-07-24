@@ -56,17 +56,11 @@ cTheme Theme;
 static bool m_MenuActive {false};
 // time_t m_RemoteTimersLastRefresh {0};
 
-cFlat::cFlat() : cSkin("flatPlus", &::Theme) {
-    Display_Menu = nullptr;
-}
+cFlat::cFlat() : cSkin("flatPlus", &::Theme) { Display_Menu = nullptr; }
 
-const char *cFlat::Description() {
-    return "flatPlus";
-}
+const char *cFlat::Description() { return "flatPlus"; }
 
-cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) {
-    return new cFlatDisplayChannel(WithInfo);
-}
+cSkinDisplayChannel *cFlat::DisplayChannel(bool WithInfo) { return new cFlatDisplayChannel(WithInfo); }
 
 cSkinDisplayMenu *cFlat::DisplayMenu() {
     cFlatDisplayMenu *menu = new cFlatDisplayMenu;
@@ -75,26 +69,20 @@ cSkinDisplayMenu *cFlat::DisplayMenu() {
     return menu;
 }
 
-cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) {
-    return new cFlatDisplayReplay(ModeOnly);
-}
+cSkinDisplayReplay *cFlat::DisplayReplay(bool ModeOnly) { return new cFlatDisplayReplay(ModeOnly); }
 
-cSkinDisplayVolume *cFlat::DisplayVolume() {
-    return new cFlatDisplayVolume;
-}
+cSkinDisplayVolume *cFlat::DisplayVolume() { return new cFlatDisplayVolume; }
 
-cSkinDisplayTracks *cFlat::DisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) {
+cSkinDisplayTracks *cFlat::DisplayTracks(const char *Title, int NumTracks, const char *const *Tracks) {
     return new cFlatDisplayTracks(Title, NumTracks, Tracks);
 }
 
-cSkinDisplayMessage *cFlat::DisplayMessage() {
-    return new cFlatDisplayMessage;
-}
+cSkinDisplayMessage *cFlat::DisplayMessage() { return new cFlatDisplayMessage; }
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d, drawport height %d)", *Name,
-            Layer, ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d, drawport height %d)", *Name, Layer,
+            ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
     cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
@@ -105,8 +93,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
-        if (Timer.Elapsed() > 0)
-            dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
 #endif
         return pixmap;
     }  // Everything runs according to the plan
@@ -128,7 +115,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 }
 
 bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
-cPlugin* cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
+cPlugin *cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
 
 // Optimized Scraper Plugin Lookup
 static cPlugin *g_scraper_plugin {nullptr};
@@ -145,16 +132,16 @@ cPlugin *GetScraperPlugin() {
         std::lock_guard<std::mutex> lock(init_mutex);
         if (!g_scraper_plugin) {
             g_scraper_plugin = cPluginManager::GetPlugin("tvscraper");
-            if (!g_scraper_plugin)
-                g_scraper_plugin = cPluginManager::GetPlugin("scraper2vdr");
+            if (!g_scraper_plugin) g_scraper_plugin = cPluginManager::GetPlugin("scraper2vdr");
         }
     }
     return g_scraper_plugin;
 }
 
 // Get MediaPath, Series/Movie info and add actors if wanted
-void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo, std::vector<cString> &ActorsPath,  // NOLINT
-                     std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,        // NOLINT
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,                              // NOLINT
+                     std::vector<cString> &ActorsPath,                                                         // NOLINT
+                     std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,  // NOLINT
                      const cRecording *Recording) {
     static cPlugin *pScraper {GetScraperPlugin()};
     if (pScraper) {
@@ -186,7 +173,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     // Range is inclusive (so we need -1 for vector index)
                     std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
 
-                    const std::size_t number{distribution(generator)};
+                    const std::size_t number {distribution(generator)};
                     MediaPath = series.banners[number].path.c_str();
                     dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
                             static_cast<int>(number + 1), *MediaPath,
@@ -234,7 +221,8 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 }
 
 // Get MediaPath, MediaSize and return MediaType
-int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event, const cRecording *Recording) {  // NOLINT
+int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event,  // NOLINT
+                            const cRecording *Recording) {
     static cPlugin *pScraper {GetScraperPlugin()};
     if (pScraper) {
         ScraperGetEventType call;
@@ -323,8 +311,7 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
 }
 
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
-    if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720)
-        return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
+    if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720) return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
     static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
     static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
@@ -354,8 +341,7 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     static constexpr int16_t ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
     const uint16_t ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
     for (std::size_t i {0}; i < ResNums; ++i) {
-        if (ScreenWidth == ResWidths[i])
-            return ResNames[i];
+        if (ScreenWidth == ResWidths[i]) return ResNames[i];
     }
 
     dsyslog("flatPlus: Unknown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
@@ -378,10 +364,10 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     if (const auto *Components {Recording->Info()->Components()}) {
         for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // TODO: Use for_each
             switch (Components->Component(i)->stream) {
-                case sc_video_MPEG2: return "sd";
-                case sc_video_H264_AVC: return "hd";
-                case sc_video_H265_HEVC: return "uhd";
-                default: break;
+            case sc_video_MPEG2: return "sd";
+            case sc_video_H264_AVC: return "hd";
+            case sc_video_H265_HEVC: return "uhd";
+            default: break;
             }
         }
     }
@@ -396,10 +382,10 @@ cString GetCurrentAudioIcon() {
 }
 
 cString GetRecordingErrorIcon(int RecInfoErrors) {
-    return (RecInfoErrors == 0) ? "recording_ok"
-           : (RecInfoErrors < 0) ? "recording_untested"
+    return (RecInfoErrors == 0)                                                     ? "recording_ok"
+           : (RecInfoErrors < 0)                                                    ? "recording_untested"
            : (RecInfoErrors < Config.MenuItemRecordingShowRecordingErrorsThreshold) ? "recording_warning"
-           : "recording_error";
+                                                                                    : "recording_error";
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
@@ -442,7 +428,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
             ContentSize.Width(), ContentSize.Height());
 #endif
 
-    if (MediaSize.Height() == 0)  {  // Avoid DIV/0
+    if (MediaSize.Height() == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in SetMediaSize() MediaSize.Height() is 0!");
         return;
     }
@@ -456,11 +442,11 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     //* Set to default size
     const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
     //* Aspect of image is preserved in cImageLoader::LoadFile()
-    if (Aspect < kPosterAspectThreshold) {         //* Poster (For example 680x1000 = 0.68)
+    if (Aspect < kPosterAspectThreshold) {  //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio));
     } else if (Aspect < kBannerAspectThreshold) {  //* Portrait (For example 1920x1080 = 1.77)
         MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kPortraitWidthRatio));
-    } else {                                        //* Banner (Usually 758x140 = 5.41)
+    } else {  //* Banner (Usually 758x140 = 5.41)
         MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kBannerTargetRatio));
     }
 #ifdef DEBUGFUNCSCALL
@@ -537,8 +523,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Searchtimer.reserve(32);
         Channel = XmlSubstring(Buffer, "<channel>", "</channel>");
         Searchtimer = XmlSubstring(Buffer, "<searchtimer>", "</searchtimer>");
-        if (Searchtimer.empty())
-            Searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
+        if (Searchtimer.empty()) Searchtimer = XmlSubstring(Buffer, "<Search timer>", "</Search timer>");
     }
 
     Buffer = XmlSubstring(AuxInfo, "<tvscraper>", "</tvscraper>");
@@ -558,14 +543,13 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
     }
 
     if (InfoLine) {
-        if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) ||
-             !Pattern.empty())
+        if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) || !Pattern.empty())
             Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show info line
     }
 
     if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
         Text.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), Channel.c_str(),
-                                         tr("search pattern"), Searchtimer.c_str()));
+                                     tr("search pattern"), Searchtimer.c_str()));
     }
 
     if (!Causedby.empty() && !Reason.empty()) {  // TVScraper
@@ -590,8 +574,7 @@ int GetEpgsearchConflicts() {
     if (pEpgSearchPlugin) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearchPlugin->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
-        if (ServiceData.relevantConflicts > 0)
-            return ServiceData.relevantConflicts;
+        if (ServiceData.relevantConflicts > 0) return ServiceData.relevantConflicts;
     }  // pEpgSearch
     return 0;
 }
@@ -612,8 +595,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
                 return EditedFrame;
             }
         } else {
-            if (Frame <= p)
-                return EditedFrame;
+            if (Frame <= p) return EditedFrame;
 
             PrevPos = p;
             InEdit = true;
@@ -621,8 +603,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
     }
     if (InEdit) {
         EditedFrame += LastFrame - PrevPos;  // The last sequence had no actual "end" mark
-        if (Frame < LastFrame)
-            EditedFrame -= LastFrame - Frame;
+        if (Frame < LastFrame) EditedFrame -= LastFrame - Frame;
     }
     return EditedFrame;
 }
@@ -668,9 +649,8 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     struct stat FileBuf;
     cString FileName {""};
     for (uint16_t i {1}; i <= MaxFileNum && !rc; ++i) {
-        FileName = IsPesRecording
-            ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
-            : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
+        FileName = IsPesRecording ? cString::sprintf("%s/%03d.vdr", RecordingFileName, i)
+                                  : cString::sprintf("%s/%05d.ts", RecordingFileName, i);
 
         rc = stat(*FileName, &FileBuf);
         if (rc == 0) {
@@ -710,16 +690,14 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
 
     if (index && LastIndex) {  // Do not show zero value
-        Text.Append(
-            cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
+        Text.Append(cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
         if (HasMarks && CutLength > 0)  // Do not show zero value
-            Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"),
-                                         *IndexToHMSF(CutLength, false, FramesPerSecond)));
+            Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"), *IndexToHMSF(CutLength, false, FramesPerSecond)));
         Text.Append("\n");
     }
 
     const uint64_t RecSize {FileSize[MaxFileNum]};  // Size of the recording in bytes
-    if (RecSize > MEGABYTE(1023))          // Show a '!' when an error occurred detecting filesize
+    if (RecSize > MEGABYTE(1023))                   // Show a '!' when an error occurred detecting filesize
         Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
                                      static_cast<float>(RecSize) / MEGABYTE(1024)));
     else
@@ -824,13 +802,13 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
 #endif
+    if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
+        return;
+
     if (!Font) {
         esyslog("flatPlus: JustifyLine() called with null Font");
         return;
     }
-
-    if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
-        return;
 
     if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
         return;
@@ -850,7 +828,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
     const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
-    if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
+    if ((LineWidth + FillCharWidth) > LineMaxWidth)       // Check if at least one 'FillChar' fits in to the line
         return;
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
@@ -859,11 +837,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    static constexpr float kLineWidthThreshold {0.8f};  // Line width threshold for justifying
-    static const char *kPunctuationChars {".,?!;"};     // Punctuation characters for justifying
+    static constexpr float kLineWidthThreshold {0.8f};       // Line width threshold for justifying
+    static const char *kPunctuationChars {".,?!;"};          // Punctuation characters for justifying
     if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) {  // Lines shorter than 80% looking bad when justified
         const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-        const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);  // For inserting multiple 'FillChar'
+        const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
         std::string FillChars {""};
         FillChars.reserve(FillCharBlock);
         for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
@@ -914,9 +892,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         //* Insert the remainder of 'NeedFillChar' from right to left
         std::size_t PrevPos = std::string::npos;
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
-               pos < PrevPos &&  // Ensure position is decreasing (potential infinite loop)
+               pos < PrevPos &&                      // Ensure position is decreasing (potential infinite loop)
                (InsertedFillChar < NeedFillChar) &&  // Check if we still need to insert fill characters
-               pos != LineLength - 1) {  // Do not insert at last position of line
+               pos != LineLength - 1) {              // Do not insert at last position of line
             PrevPos = pos;
             if (pos > 0 && !(isspace(Line[pos - 1]))) {
                 // dsyslog("flatPlus:  Insert char at %ld", pos);
@@ -925,10 +903,10 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
             }
         }
 #ifdef DEBUGFUNCSCALL
-    if (InsertedFillChar < NeedFillChar)
-        dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
-    else
-        dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
+        if (InsertedFillChar < NeedFillChar)
+            dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
+        else
+            dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
 #endif
     } else {
         // dsyslog("flatPlus: JustifyLine() Line too short for justifying: LineWidth %d, LineMaxWidth * 0.8: %.0f",
@@ -979,10 +957,9 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     cTimeMs Timer;  // Start timer
 #endif
 
-    if (!Text || WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0)
-        return;
+    if (!Text || WidthUpper < 0 || WidthLower <= 0 || UpperLines < 0) return;
 
-    free(m_Text);  // Free previous text if any
+    free(m_Text);      // Free previous text if any
     m_Text = nullptr;  // Reset pointer to avoid dangling pointer
     m_Lines = 0;       // Reset line count
 
@@ -997,16 +974,15 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 #endif
 
     // Allocate buffer
-    m_Text = static_cast<char*>(malloc(Capacity));
-    if (!m_Text)
-        return;
+    m_Text = static_cast<char *>(malloc(Capacity));
+    if (!m_Text) return;
 
     // Copy text to buffer. Use memcpy instead of strncpy to avoid potential buffer overflow
     memcpy(m_Text, Text, TextLen);
     m_Text[TextLen] = '\0';
 
     m_Lines = 1;
-    static const char* const kDelimiterChars {"-.,:;!?_~"};
+    static const char *const kDelimiterChars {"-.,:;!?_~"};
     size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
@@ -1031,17 +1007,16 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                 *Blank = '\n';
                 p = Blank;
                 continue;
-            } else if (w > 0) {  // There has to be at least one character before the newline.
-                                 // Here's the ugly part, where we don't have any whitespace to
-                                 // punch in a newline, so we need to make room for it:
-                if (Delim)
-                    p = Delim + 1;  // Let's fall back to the most recent delimiter
+            } else if (w > 0) {            // There has to be at least one character before the newline.
+                                           // Here's the ugly part, where we don't have any whitespace to
+                                           // punch in a newline, so we need to make room for it:
+                if (Delim) p = Delim + 1;  // Let's fall back to the most recent delimiter
 
                 l = p - m_Text;  // Calculate offset of current position
                 // Instead of realloc per line, only grow buffer in powers of two
                 if (CurLength + 2 > Capacity) {
                     Capacity = std::max(Capacity * 2, CurLength + 8);
-                    NewText = static_cast<char*>(realloc(m_Text, Capacity));
+                    NewText = static_cast<char *>(realloc(m_Text, Capacity));
                     if (!NewText) {
                         esyslog("flatPlus: cTextFloatingWrapper::Set() realloc failed");
                         return;
@@ -1069,8 +1044,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0)
-        dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -1087,8 +1061,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
     if (Line < m_Lines) {
         if (m_EoL) {
             *m_EoL = '\n';
-            if (Line == m_LastLine + 1)
-                s = m_EoL + 1;
+            if (Line == m_LastLine + 1) s = m_EoL + 1;
             m_EoL = nullptr;
         }
         if (!s) {
@@ -1102,8 +1075,7 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
             }
         }
         if (s) {
-            if ((m_EoL = strchr(s, '\n')) != nullptr)
-                *m_EoL = 0;
+            if ((m_EoL = strchr(s, '\n')) != nullptr) *m_EoL = 0;
         }
         m_LastLine = Line;
     }

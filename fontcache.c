@@ -7,6 +7,8 @@
  */
 #include <vdr/tools.h>
 
+#include <map>
+#include <string>
 #include <string_view>
 
 #include "./fontcache.h"
@@ -38,6 +40,7 @@ void cFontCache::Clear() {
         data.name = "";
         data.size = 0;
         data.height = 0;
+        data.StringWidthCache.clear();
     }
     m_InsertIndex = 0;
 }
@@ -53,7 +56,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
     for (const auto &data : FontCache) {
         DataNameView = *data.name;
         if (DataNameView.empty()) break;  // End of cache, insert new font
-          
+
         if (DataNameView == NameView && data.size == Size && data.font != nullptr) {
 #ifdef DEBUGFUNCSCALL
             dsyslog("flatPlus: Found in FontCache: Name=%s, Size=%d", *Name, Size);
@@ -70,7 +73,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
 
 int cFontCache::GetFontHeight(const cString &Name, int Size) const {
     std::string_view NameView {*Name};
-    for (const auto& data : FontCache) {
+    for (const auto &data : FontCache) {
         if (std::string_view {*data.name} == NameView && data.size == Size) {
             return data.height;
         }
@@ -86,6 +89,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
         FontCache[m_InsertIndex].name = "";
         FontCache[m_InsertIndex].size = -1;
         FontCache[m_InsertIndex].height = 0;
+        FontCache[m_InsertIndex].StringWidthCache.clear();
     }
 
     FontCache[m_InsertIndex].font = cFont::CreateFont(*Name, Size);
@@ -106,10 +110,32 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 
 int cFontCache::GetCacheCount() const {
     int count {0};
-    for (const auto& data : FontCache) {
+    for (const auto &data : FontCache) {
         if (isempty(*data.name))
             break;
         ++count;
     }
     return count;
+}
+
+int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &Text) const {
+    std::string_view NameView {*Name};
+    for (auto &data : FontCache) {
+        if (std::string_view {*data.name} == NameView && data.height == Height) {
+            if (data.font) {
+                const std::string TextStr {*Text};
+                auto it = data.StringWidthCache.find(TextStr);
+                if (it != data.StringWidthCache.end()) {
+                    return it->second;  // Return cached width
+                } else {
+                    const int width {data.font->Width(*Text)};
+                    data.StringWidthCache[TextStr] = width;  // Cache the width
+                    return width;
+                }
+            }
+        }
+    }
+
+    dsyslog("flatPlus: cFontCache::GetStringWidth() Font not found or invalid");
+    return 0;  // Font not found or invalid
 }

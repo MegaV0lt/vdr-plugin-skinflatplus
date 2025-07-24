@@ -156,6 +156,10 @@ class cFlatBaseRender {
     cFont *m_Font {nullptr};
     cFont *m_FontSml {nullptr};
     cFont *m_FontFixed {nullptr};
+
+    cString m_FontName {""};
+    cString m_FontSmlName {""};
+
     int m_FontHeight {0}, m_FontHeight2 {0};
     int m_FontSmlHeight {0};
     int m_FontFixedHeight {0};
@@ -165,6 +169,9 @@ class cFlatBaseRender {
     cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
     cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
     cFont *m_FontTiny {nullptr};     // Very small font for actor name and role
+
+    cString m_FontTempSmlName {""};
+
     int m_FontBigHeight {0};
     int m_FontTempSmlHeight {0};
     int m_FontTinyHeight {0};

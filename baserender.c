@@ -39,6 +39,8 @@ cFlatBaseRender::cFlatBaseRender() {
     m_Font = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
+    m_FontName = Setup.FontOsd;
+    m_FontSmlName = Setup.FontSml;
     m_FontHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize);
     m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize);
@@ -48,6 +50,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     if (Config.MainMenuWidgetWeatherShow) {
         m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize / 2);
+        m_FontTempSmlName = Setup.FontOsd;
         m_FontTempSmlHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize / 2);
     }
     if (Config.TVScraperEPGInfoShowActors || Config.TVScraperRecInfoShowActors) {
