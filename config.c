@@ -452,7 +452,9 @@ void cFlatConfig::Init() {
     DecorCheckAndInit();
 }
 
-// Sort strings by number in name
+// Compare two strings by the numerical value in front of the first '_'.
+// If there is no '_', the string is considered to have a value of 0.
+// Used for sorting widgets.
 bool CompareNumStrings(const cString &a, const cString &b) {
     std::string_view sa = *a;
     std::string_view sb = *b;
@@ -476,12 +478,26 @@ bool StringCompare(const std::string &left, const std::string &right) {
     return left.size() < right.size();
 }
 
+/**
+ * Compares two pairs of (time_t, cString) by comparing their time_t values in descending order.
+ *
+ * @param[in] i The first pair to compare.
+ * @param[in] j The second pair to compare.
+ * @return true if i.first is greater than j.first, false otherwise.
+ */
 bool PairCompareTimeString(const std::pair<time_t, cString> &i, const std::pair<time_t, cString> &j) {
-    return i.first < j.first;
+    return i.first > j.first;  // Descending
 }
 
+/**
+ * Compares two pairs of (int, const char*) by comparing their int values in ascending order.
+ *
+ * @param[in] i The first pair to compare.
+ * @param[in] j The second pair to compare.
+ * @return true if i.first is less than j.first, false otherwise.
+ */
 bool PairCompareIntString(const std::pair<int, const char*> &i, const std::pair<int, const char*> &j) {
-    return i.first < j.first;  // ascending
+    return i.first < j.first;  // Ascending
 }
 
 /**

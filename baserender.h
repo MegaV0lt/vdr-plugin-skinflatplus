@@ -38,7 +38,7 @@ struct sDecorBorder {
 // Font/image caches for session-level reuse (Weather Widget + others)
 class FontImageWeatherCache {
  public:
-    static constexpr int kMaxDays {8};  // Max number of weather entries to cache
+    static const int kMaxDays {8};   // Source provides up to 8 days of weather data
     struct WeatherDayData {
         cString Icon {""};           // Weather icon
         cString TempMax {""};        // Max temperature

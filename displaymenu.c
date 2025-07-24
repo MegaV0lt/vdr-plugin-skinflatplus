@@ -3053,16 +3053,19 @@ cString cFlatDisplayMenu::GetRecCounts() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d", *m_RecFolder,
             m_LastItemRecordingLevel);
+    cTimeMs Timer;  // Set timer
 #endif
 
     uint16_t RecCount {0}, RecNewCount {0};
     m_LastRecFolder = m_RecFolder;
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
         cString RecFolder2 {""};
+        std::string_view sv1(m_RecFolder), sv2;  // For efficient comparison
         LOCK_RECORDINGS_READ;
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
-            if (strcmp(m_RecFolder, RecFolder2) == 0) {
+            sv2 = *RecFolder2;
+            if (sv1 == sv2) {  // Compare recording folder with current folder
                 ++RecCount;
                 if (Rec->IsNew()) ++RecNewCount;
             }
@@ -3086,10 +3089,20 @@ cString cFlatDisplayMenu::GetRecCounts() {
         RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
     }  // Config.ShortRecordingCount */
 
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   RecCounts '%s'", *RecCounts);
+    dsyslog("   GetRecCounts() took %ld ms", Timer.Elapsed());
+#endif
+
     return RecCounts;
 }
 
 void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &TimerCount) const {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::UpdateTimerCounts()");
+    cTimeMs Timer;  // Set Timer
+#endif
+
     TimerActiveCount = 0;
     TimerCount = 0;
     LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
@@ -3097,6 +3110,10 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
         ++TimerCount;
         if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   TimerActiveCount %d, TimerCount %d", TimerActiveCount, TimerCount);
+    dsyslog("   UpdateTimerCounts() took %ld ms", Timer.Elapsed());
+#endif
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
@@ -3208,6 +3225,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetLastRecTimeFromFolder() Level %d", Level);
+    cTimeMs Timer;  // Set Timer
 #endif
 
     time_t RecStart {Recording->Start()};
@@ -3233,6 +3251,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 #ifdef DEBUGFUNCSCALL
     dsyslog("   RecStartNewest %s, RecStartOldest %s", *ShortDateString(RecStartNewest),
             *ShortDateString(RecStartOldest));
+    dsyslog("   GetLastRecTimeFromFolder time %ld ms", Timer.Elapsed());
 #endif
 
     return (Config.MenuItemRecordingShowFolderDate == 1) ? RecStartNewest : RecStartOldest;
@@ -4093,11 +4112,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
     const int TempSmlWidth {m_FontTempSml->Width("-99,9°C")};     // Max. width of temperature string
-
+    const int16_t MainMenuWidgetWeatherDays =
+        std::min(Config.MainMenuWidgetWeatherDays, dat.kMaxDays);     // Narrowing conversion
     if (Config.MainMenuWidgetWeatherType == 0) {                      // Short
         const int TempBarWidth {m_Font->Width('|')};                  // Width of the char '|'
         const int TempMaxStringWidth {m_FontTempSml->Width("XXXX")};  // Width to fit the temperature string in
-        for (int16_t i {0}; i < Config.MainMenuWidgetWeatherDays; ++i) {
+        for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
+            if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth) break;
+
             Icon = *dat.Days[i].Icon;                 // Read icon
             TempMax = *dat.Days[i].TempMax;           // Read max temperature
             TempMin = *dat.Days[i].TempMin;           // Read min temperature
@@ -4105,8 +4127,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
             if (Icon.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty())  // Check if data is available
                 continue;
-
-            if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth) break;
 
             if (i > 0) {
                 ContentWidget.AddText("|", false, cRect(left, ContentTop, 0, 0), Theme.Color(clrMenuEventFontInfo),
@@ -4145,7 +4165,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         const int TempSmlSpaceWidth {m_FontTempSml->Width(" ")};    // Space between temperature and precipitation
         const int TempSmlPrecWidth {m_FontTempSml->Width("100%")};  // Max. width of precipitation string
         const int TempMaxStringWidth {m_Font->Width("XXXX")};
-        for (int16_t i {0}; i < Config.MainMenuWidgetWeatherDays; ++i) {
+        for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
+            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
+
             Icon = *dat.Days[i].Icon;                 // Read icon
             Summary = *dat.Days[i].Summary;           // Read summary
             TempMax = *dat.Days[i].TempMax;           // Read max temperature
@@ -4153,8 +4175,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             PrecString = *dat.Days[i].Precipitation;  // Read precipitation
 
             if (Icon.empty() || Summary.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty()) continue;
-
-            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
             t2 = now + (i * SECSINDAY);  // Calculate time for the current day
             left = m_MarginItem;

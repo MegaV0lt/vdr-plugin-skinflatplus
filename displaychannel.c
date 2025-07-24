@@ -573,6 +573,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         esyslog("flatPlus: Failed to get font for dvbapi info display");
         return;
     }
+    const int DvbapiInfoFontHeight = FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight);
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
@@ -581,9 +582,9 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     left += m_DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img {ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_DvbapiInfoFont->Height())};
+    cImage *img {ImgLoader.LoadIcon(*IconName, kIconMaxSize, DvbapiInfoFontHeight)};
     if (!img) {
-        img = ImgLoader.LoadIcon("crypt_unknown", kIconMaxSize, m_DvbapiInfoFont->Height());
+        img = ImgLoader.LoadIcon("crypt_unknown", kIconMaxSize, DvbapiInfoFontHeight);
         dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
     if (img) {  // Draw the card system icon

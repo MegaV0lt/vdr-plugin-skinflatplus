@@ -454,7 +454,7 @@ void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
     static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
     //* Set to default size
-    const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();
+    const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
     //* Aspect of image is preserved in cImageLoader::LoadFile()
     if (Aspect < kPosterAspectThreshold) {         //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio));

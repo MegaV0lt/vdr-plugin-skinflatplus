@@ -340,8 +340,9 @@ void cFlatDisplayReplay::UpdateInfo() {
                        ((Config.TimeSecsScale < 1.0)
                            ? GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)
                            : 0)};  // Top position for seconds
-    const int FontSecsHight {m_FontSecs->Height()};  // Height of seconds font
-    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
+    const int FontSecsHight {FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale *
+                                                                        100.0)};      // Height of seconds font
+    static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     const int TopOffset {m_FontAscender - GlyphSize};
 

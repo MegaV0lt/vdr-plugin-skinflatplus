@@ -16,7 +16,8 @@ class cFontCache {
     struct FontData {
         cFont *font {nullptr};
         cString name {""};  // Empty string initialized
-        int size {-1};
+        int size {0};       // Initialized to 0
+        int height {0};     // Height of the font, initialized to 0
     };
 
     static constexpr std::size_t MaxFontCache {32};
@@ -30,6 +31,7 @@ class cFontCache {
     void Create();
     void Clear();
     cFont* GetFont(const cString &Name, int Size);
+    int GetFontHeight(const cString &Name, int Size) const;
     void InsertFont(const cString &Name, int Size);
     int GetCacheCount() const;
 };
