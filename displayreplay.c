@@ -173,19 +173,23 @@ void cFlatDisplayReplay::SetTitle(const char *Title) {
 }
 
 void cFlatDisplayReplay::Action() {
-    time_t CurTime {time(0)};
-    if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
-        m_DimmActive = true;
-        // Use batch: fade in, then go back to sleep
-        int step {4};
-        for (int alpha {0}; alpha <= Config.RecordingDimmOnPauseOpaque && Running(); alpha += step) {
-            PixmapFill(DimmPixmap, ArgbToColor(alpha, 0, 0, 0));
-            Flush();
-            cCondWait::SleepMs(6);  // not too fast
+    if (m_DimmActive) return;  // Already dimmed, no need to start thread again
+
+    // Start dimming thread
+    while (Running()) {
+        time_t CurTime {time(0)};
+        if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
+            m_DimmActive = true;
+            // Use batch: fade in, then go back to sleep
+            const int step {4};
+            for (int alpha {0}; alpha <= Config.RecordingDimmOnPauseOpaque && Running(); alpha += step) {
+                PixmapFill(DimmPixmap, ArgbToColor(alpha, 0, 0, 0));
+                Flush();
+                cCondWait::SleepMs(6);  // Not too fast
+            }
+            Cancel(-1);
         }
-        Cancel(-1);
-    } else {
-        cCondWait::SleepMs(100);  // Sleep once per activation, not a busy loop
+        cCondWait::SleepMs(100);  // Sleep for 100ms before checking again
     }
 }
 
@@ -199,7 +203,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
     if (Config.RecordingDimmOnPause) {
         if (Play == false) {
-            time(&m_DimmStartTime);
+            time(&m_DimmStartTime);  // Set start time for dimming
             if (!Start())
                 esyslog("flatPlus: cFlatDisplayReplay::SetMode() Could not start thread in DisplayReplay");
         } else {
@@ -207,6 +211,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             while (Active())
                 cCondWait::SleepMs(10);
             if (m_DimmActive) {
+                m_DimmActive = false;  // Reset dimming state to false
                 PixmapClear(DimmPixmap);
                 Flush();
             }
@@ -294,6 +299,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
     if (m_DimmActive) {
+        m_DimmActive = false;  // Reset dimming state to false
         PixmapClear(DimmPixmap);
         Flush();
     }
@@ -336,12 +342,10 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
-    const int TopSecs {m_FontAscender -
-                       ((Config.TimeSecsScale < 1.0)
-                           ? GetFontAscender(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale * 100.0)
-                           : 0)};  // Top position for seconds
-    const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.TimeSecsScale *
-                                                                        100.0)};      // Height of seconds font
+    const int FontSecsSize {static_cast<int>(Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};  // Size for seconds
+    const int TopSecs {m_FontAscender - ((Config.TimeSecsScale < 1.0) ? GetFontAscender(Setup.FontOsd, FontSecsSize)
+                                                                      : 0)};          // Top position for seconds
+    const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, FontSecsSize)};  // Height of seconds font
     static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     const int TopOffset {m_FontAscender - GlyphSize};
