@@ -525,6 +525,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (!dvbapiChecked) {
         pDVBApi = cPluginManager::GetPlugin("dvbapi");
         dvbapiChecked = true;
+        dsyslog("flatPlus: DVBApi plugin %s", pDVBApi ? "found and loaded" : "not found");
     }
     if (!pDVBApi) return;
 

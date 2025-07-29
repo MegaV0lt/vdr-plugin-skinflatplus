@@ -23,7 +23,6 @@
 #include <cstdlib>
 #include <filesystem>
 #include <memory>
-#include <mutex>  // NOLINT. Needed for std::mutex
 #include <random>
 
 #include "./displaychannel.h"
@@ -114,36 +113,19 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
+// Optimized EpgSearch Plugin Lookup
 bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
 cPlugin *cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
-
 // Optimized Scraper Plugin Lookup
-static cPlugin *g_scraper_plugin {nullptr};
-
-/**
- * Return the scraper plugin (either tvscraper or scraper2vdr).
- * This function is thread safe and only looks up the plugin once.
- * @return The scraper plugin or nullptr if neither tvscraper nor scraper2vdr is found.
- */
-cPlugin *GetScraperPlugin() {
-    if (!g_scraper_plugin) {
-        // Thread safe initialization
-        static std::mutex init_mutex;
-        std::lock_guard<std::mutex> lock(init_mutex);
-        if (!g_scraper_plugin) {
-            g_scraper_plugin = cPluginManager::GetPlugin("tvscraper");
-            if (!g_scraper_plugin) g_scraper_plugin = cPluginManager::GetPlugin("scraper2vdr");
-        }
-    }
-    return g_scraper_plugin;
-}
+bool cPluginSkinFlatPlus::s_bScraperPluginChecked = false;
+cPlugin *cPluginSkinFlatPlus::s_pScraperPlugin = nullptr;
 
 // Get MediaPath, Series/Movie info and add actors if wanted
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,                              // NOLINT
                      std::vector<cString> &ActorsPath,                                                         // NOLINT
                      std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,  // NOLINT
                      const cRecording *Recording) {
-    static cPlugin *pScraper {GetScraperPlugin()};
+    static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (pScraper) {
         ScraperGetEventType call;
         if (Event)
@@ -223,7 +205,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 // Get MediaPath, MediaSize and return MediaType
 int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event,  // NOLINT
                             const cRecording *Recording) {
-    static cPlugin *pScraper {GetScraperPlugin()};
+    static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (pScraper) {
         ScraperGetEventType call;
         if (Event)
@@ -569,8 +551,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 }
 
 int GetEpgsearchConflicts() {
-    // cPlugin *pEpgSearch {cPluginManager::GetPlugin("epgsearch")};
-    cPlugin *pEpgSearchPlugin = cPluginSkinFlatPlus::GetEpgSearchPlugin();
+    cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
     if (pEpgSearchPlugin) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearchPlugin->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);

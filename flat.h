@@ -16,6 +16,7 @@
 #include FT_FREETYPE_H
 
 #include <cstdint>  // stdint.h
+#include <mutex>    // NOLINT. Needed for std::mutex
 #include <string>
 #include <string_view>
 #include <vector>
@@ -264,9 +265,6 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
-// Make the variable accessible from other files
-extern cPlugin *GetScraperPlugin();
-
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
     std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
     std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
@@ -301,21 +299,39 @@ std::string XmlSubstring(const std::string &source, const char* StrStart, const 
 class cPluginSkinFlatPlus : public cPlugin {
  private:
     static cPlugin *s_pEpgSearchPlugin;
+    static cPlugin *s_pScraperPlugin;
     static bool s_bEpgSearchPluginChecked;
+    static bool s_bScraperPluginChecked;
 
  public:
     static cPlugin* GetEpgSearchPlugin() {
         if (!s_bEpgSearchPluginChecked) {
             s_pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
             s_bEpgSearchPluginChecked = true;
-            dsyslog("flatPlus: EpgSearch plugin %s", s_pEpgSearchPlugin ? "found" : "not found");
+            dsyslog("flatPlus: EpgSearch plugin %s", s_pEpgSearchPlugin ? "found and loaded" : "not found");
         }
         return s_pEpgSearchPlugin;
+    }
+
+    static cPlugin *GetScraperPlugin() {
+        if (!s_bScraperPluginChecked) {
+            // Thread safe initialization
+            static std::mutex init_mutex;
+            std::lock_guard<std::mutex> lock(init_mutex);
+            s_pScraperPlugin = cPluginManager::GetPlugin("tvscraper");
+            if (!s_pScraperPlugin) s_pScraperPlugin = cPluginManager::GetPlugin("scraper2vdr");
+            s_bScraperPluginChecked = true;
+            dsyslog("flatPlus: TVScraper or Scraper2vdr plugin %s",
+                    s_pScraperPlugin ? "found and loaded" : "not found");
+        }
+        return s_pScraperPlugin;
     }
 
     // Call this when plugins might change (rare)
     static void InvalidatePluginCache() {
         s_bEpgSearchPluginChecked = false;
+        s_bScraperPluginChecked = false;
         s_pEpgSearchPlugin = nullptr;
+        s_pScraperPlugin = nullptr;
     }
 };

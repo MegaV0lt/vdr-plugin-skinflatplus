@@ -1815,7 +1815,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             out.Days[day].Icon = ReadAndExtractData(iconFile);
             // Check if 'Icon' is valid
             if (isempty(*out.Days[day].Icon)) {
-                isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
+                // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
                 break;  // No more days to expect (User may configured less than 8 days)
             }
 

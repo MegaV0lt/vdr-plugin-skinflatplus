@@ -159,7 +159,7 @@ void cFlatSetup::Setup() {
     Add(new cOsdItem(tr("Volume settings"), osUnknown, true));
     Add(new cOsdItem(tr("Tracks settings"), osUnknown, true));
 
-    static cPlugin *pScraper = GetScraperPlugin();
+    static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (pScraper)
         Add(new cOsdItem(tr("TVScraper / scraper2vdr settings"), osUnknown, true));
     else

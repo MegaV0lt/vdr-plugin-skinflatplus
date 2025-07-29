@@ -87,7 +87,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
         FontCache[m_InsertIndex].name = "";
-        FontCache[m_InsertIndex].size = -1;
+        FontCache[m_InsertIndex].size = 0;
         FontCache[m_InsertIndex].height = 0;
         FontCache[m_InsertIndex].StringWidthCache.clear();
     }

@@ -1998,8 +1998,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     cString Reruns {""};
     if (Config.EpgRerunsShow) {
         // Lent from nopacity
-        // cPlugin *pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
-        cPlugin *pEpgSearchPlugin = cPluginSkinFlatPlus::GetEpgSearchPlugin();
+        cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
         cString SearchTerm {Event->Title()};  // Search term
         if (pEpgSearchPlugin && !isempty(Event->Title())) {
             Epgsearch_searchresults_v1_0 data {
@@ -4110,8 +4109,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     ContentTop = AddWidgetHeader("widgets/weather", *Title, ContentTop, wWidth);
 
     int left {m_MarginItem};
-    std::string_view Icon {""}, Summary {""}, TempMax {""}, TempMin {""};
-    std::string_view DayName {""}, PrecString {""}, WeatherIcon {""};
+    cString WeatherIcon {""};
     cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2)};
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
@@ -4125,12 +4123,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
             if (left + m_FontHeight2 + TempSmlWidth + TempMaxStringWidth + m_MarginItem * 6 > wWidth) break;
 
-            Icon = *dat.Days[i].Icon;                 // Read icon
-            TempMax = *dat.Days[i].TempMax;           // Read max temperature
-            TempMin = *dat.Days[i].TempMin;           // Read min temperature
-            PrecString = *dat.Days[i].Precipitation;  // Read precipitation
-
-            if (Icon.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty())  // Check if data is available
+            if (isempty(*dat.Days[i].Icon) || isempty(*dat.Days[i].TempMax) || isempty(*dat.Days[i].TempMin) ||
+                isempty(*dat.Days[i].Precipitation))  // Check if data is available
                 continue;
 
             if (i > 0) {
@@ -4139,17 +4133,18 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 left += TempBarWidth + m_MarginItem2;
             }
 
-            WeatherIcon = *cString::sprintf("widgets/%s", Icon.data());
-            img = ImgLoader.LoadIcon(WeatherIcon.data(), m_FontHeight, m_FontHeight - m_MarginItem2);
+            WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[i].Icon);
+            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
             }
-            const int wtemp {std::max(m_FontTempSml->Width(TempMax.data()), m_FontTempSml->Width(TempMin.data()))};
-            ContentWidget.AddText(TempMax.data(), false, cRect(left, ContentTop, 0, 0),
+            const int wtemp {
+                std::max(m_FontTempSml->Width(*dat.Days[i].TempMax), m_FontTempSml->Width(*dat.Days[i].TempMin))};
+            ContentWidget.AddText(*dat.Days[i].TempMax, false, cRect(left, ContentTop, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   m_FontTempSmlHeight, taRight);
-            ContentWidget.AddText(TempMin.data(), false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
+            ContentWidget.AddText(*dat.Days[i].TempMin, false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wtemp,
                                   m_FontTempSmlHeight, taRight);
 
@@ -4159,71 +4154,64 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
                 ContentWidget.AddImage(ImgUmbrella, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight - m_MarginItem;
             }
-            ContentWidget.AddText(PrecString.data(), false, cRect(left, ContentTop + Middle, 0, 0),
+            ContentWidget.AddText(*dat.Days[i].Precipitation, false, cRect(left, ContentTop + Middle, 0, 0),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml);
-            left += m_FontTempSml->Width(PrecString.data()) + m_MarginItem2;
+            left += m_FontTempSml->Width(*dat.Days[i].Precipitation) + m_MarginItem2;
         }  // for Config.MainMenuWidgetWeatherDays
-        }
-        else {  // Long
-            const time_t now {time(0)};
-            time_t t2 {0};
+    } else {  // Long
+        const time_t now {time(0)};
+        time_t t2 {0};
+        // Space between temperature and precipitation
+        const int TempSmlSpaceWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, " ")};
+        // Max. width of precipitation string
+        const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "100%")};
+        const int TempMaxStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "XXX")};
+        for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
+            if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
-            const int TempSmlSpaceWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight,
-                                                                  " ")};  // Space between temperature and precipitation
-            const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight,
-                                                                 "100%")};  // Max. width of precipitation string
-            const int TempMaxStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "XXXX")};
-            for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
-                if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
+            if (isempty(*dat.Days[i].Icon) || isempty(*dat.Days[i].TempMax) || isempty(*dat.Days[i].TempMin) ||
+                isempty(*dat.Days[i].Summary) || isempty(*dat.Days[i].Precipitation))  // Check if data is available
+                continue;
 
-                Icon = *dat.Days[i].Icon;                 // Read icon
-                Summary = *dat.Days[i].Summary;           // Read summary
-                TempMax = *dat.Days[i].TempMax;           // Read max temperature
-                TempMin = *dat.Days[i].TempMin;           // Read min temperature
-                PrecString = *dat.Days[i].Precipitation;  // Read precipitation
+            t2 = now + (i * SECSINDAY);  // Calculate time for the current day
+            left = m_MarginItem;
+            ContentWidget.AddText(
+                *WeekDayName(t2), false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font, wWidth - m_MarginItem2);
+            left += TempMaxStringWidth + m_MarginItem;
 
-                if (Icon.empty() || Summary.empty() || TempMax.empty() || TempMin.empty() || PrecString.empty())
-                    continue;
+            WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[i].Icon);
+            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
+            if (img) {
+                ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
+                left += m_FontHeight + m_MarginItem;
+            }
+            ContentWidget.AddText(*dat.Days[i].TempMax, false, cRect(left, ContentTop, 0, 0),
+                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                    TempSmlWidth, m_FontTempSmlHeight, taRight);
+            ContentWidget.AddText(*dat.Days[i].TempMin, false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
+                                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                    TempSmlWidth, m_FontTempSmlHeight, taRight);
 
-                t2 = now + (i * SECSINDAY);  // Calculate time for the current day
-                left = m_MarginItem;
-                ContentWidget.AddText(
-                    *WeekDayName(t2), false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontHeight),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font, wWidth - m_MarginItem2);
-                left += TempMaxStringWidth + m_MarginItem;
+            left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
 
-                WeatherIcon = *cString::sprintf("widgets/%s", Icon.data());
-                img = ImgLoader.LoadIcon(WeatherIcon.data(), m_FontHeight, m_FontHeight - m_MarginItem2);
-                if (img) {
-                    ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-                    left += m_FontHeight + m_MarginItem;
-                }
-                ContentWidget.AddText(TempMax.data(), false, cRect(left, ContentTop, 0, 0),
-                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                      TempSmlWidth, m_FontTempSmlHeight, taRight);
-                ContentWidget.AddText(TempMin.data(), false, cRect(left, ContentTop + m_FontTempSmlHeight, 0, 0),
-                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                      TempSmlWidth, m_FontTempSmlHeight, taRight);
+            if (ImgUmbrella) {
+                ContentWidget.AddImage(ImgUmbrella,
+                                        cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
+                left += m_FontHeight - m_MarginItem;
+            }
+            ContentWidget.AddText(*dat.Days[i].Precipitation, false, cRect(left, ContentTop + Middle, 0, 0),
+                                  Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
+                                  TempSmlPrecWidth, m_FontTempSmlHeight, taRight);
+            left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
 
-                left += TempSmlWidth + TempSmlSpaceWidth + m_MarginItem;
+            ContentWidget.AddText(
+                *dat.Days[i].Summary, false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
 
-                if (ImgUmbrella) {
-                    ContentWidget.AddImage(ImgUmbrella,
-                                           cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
-                    left += m_FontHeight - m_MarginItem;
-                }
-                ContentWidget.AddText(PrecString.data(), false, cRect(left, ContentTop + Middle, 0, 0),
-                                      Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml,
-                                      TempSmlPrecWidth, m_FontTempSmlHeight, taRight);
-                left += TempSmlPrecWidth + TempSmlSpaceWidth + m_MarginItem;
-
-                ContentWidget.AddText(
-                    Summary.data(), false, cRect(left, ContentTop + Middle, wWidth - left, m_FontHeight),
-                    Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontTempSml, wWidth - left);
-
-                ContentTop += m_FontHeight;
-            }  // for Config.MainMenuWidgetWeatherDays
-        }
+            ContentTop += m_FontHeight;
+        }  // for Config.MainMenuWidgetWeatherDays
+    }
 
     return ContentWidget.ContentHeight(false);
 #ifdef DEBUGFUNCSCALL
