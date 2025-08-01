@@ -1904,38 +1904,38 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         WeatherCache.valid = true;
     }
 
-    const auto &dat = WeatherCache;  // Weather data reference
+    const auto &wd = WeatherCache;  // Weather data reference
 
     // Check if data is valid
-    if (isempty(*dat.Temp) || isempty(*dat.Days[1].TempMax)) {
+    if (isempty(*wd.Temp) || isempty(*wd.Days[1].TempMax)) {
         dsyslog("flatPlus: DrawWidgetWeather() Missing data!");
         return;
     }
 #ifdef DEBUGFUNCSCALL
     // Log weather cache data for debugging
-    dsyslog("flatPlus: DrawWidgetWeather() Temp: %s, Location: %s", *dat.Temp, *dat.Location);
+    dsyslog("flatPlus: DrawWidgetWeather() Temp: %s, Location: %s", *wd.Temp, *wd.Location);
     for (int i = 0; i < 7; i++) {
-        if (!isempty(*dat.Days[i].Icon)) {
+        if (!isempty(*wd.Days[i].Icon)) {
             dsyslog("   Day %d: Icon: %s, TempMax: %s, TempMin: %s, Precipitation: %s, Summary: %s", i,
-                    *dat.Days[i].Icon, *dat.Days[i].TempMax, *dat.Days[i].TempMin, *dat.Days[i].Precipitation,
-                    *dat.Days[i].Summary);
+                    *wd.Days[i].Icon, *wd.Days[i].TempMax, *wd.Days[i].TempMin, *wd.Days[i].Precipitation,
+                    *wd.Days[i].Summary);
         }
     }
 #endif
 
     int left {m_MarginItem};
-    const int WeatherFontHeight {dat.FontHeight};
-    const int WeatherFontSmlHeight {dat.FontSmlHeight};
+    const int WeatherFontHeight {wd.FontHeight};
+    const int WeatherFontSmlHeight {wd.FontSmlHeight};
 
-    const int TempTodaySignWidth {dat.TempTodaySignWidth};
+    const int TempTodaySignWidth {wd.TempTodaySignWidth};
 
-    const int TempTodayWidth = dat.WeatherFont->Width(dat.Temp);
-    const int PrecTodayWidth = dat.WeatherFontSml->Width(dat.Days[0].Precipitation);
-    const int PrecTomorrowWidth = dat.WeatherFontSml->Width(dat.Days[1].Precipitation);
-    const int WidthTempToday = std::max(dat.WeatherFontSml->Width(dat.Days[0].TempMax),
-                                        dat.WeatherFontSml->Width(dat.Days[0].TempMin));  // Max width temp today
-    const int WidthTempTomorrow = std::max(dat.WeatherFontSml->Width(dat.Days[1].TempMax),
-                                           dat.WeatherFontSml->Width(dat.Days[1].TempMin));  // Max width temp tomorrow
+    const int TempTodayWidth = wd.WeatherFont->Width(wd.Temp);
+    const int PrecTodayWidth = wd.WeatherFontSml->Width(wd.Days[0].Precipitation);
+    const int PrecTomorrowWidth = wd.WeatherFontSml->Width(wd.Days[1].Precipitation);
+    const int WidthTempToday = std::max(wd.WeatherFontSml->Width(wd.Days[0].TempMax),
+                                        wd.WeatherFontSml->Width(wd.Days[0].TempMin));  // Max width temp today
+    const int WidthTempTomorrow = std::max(wd.WeatherFontSml->Width(wd.Days[1].TempMax),
+                                           wd.WeatherFontSml->Width(wd.Days[1].TempMin));  // Max width temp tomorrow
 
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
@@ -1952,20 +1952,20 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     WeatherWidget.SetScrollingActive(false);
 
     // Add temperature
-    WeatherWidget.AddText(dat.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), dat.WeatherFont);
+    WeatherWidget.AddText(wd.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), wd.WeatherFont);
     left += TempTodayWidth;
 
     const int t {(WeatherFontHeight - WeatherCache.FontAscender) -
                  (WeatherCache.FontSignHeight - WeatherCache.FontSignAscender)};
 
     // Add temperature sign
-    WeatherWidget.AddText(dat.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), dat.WeatherFontSign);
+    WeatherWidget.AddText(wd.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), wd.WeatherFontSign);
     left += TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
-    cString WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[0].Icon);
+    cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
     cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
@@ -1973,11 +1973,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add temperature min/max values
-    WeatherWidget.AddText(dat.Days[0].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), dat.WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
+    WeatherWidget.AddText(wd.Days[0].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrItemCurrentBg), wd.WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(dat.Days[0].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), dat.WeatherFontSml,
+    WeatherWidget.AddText(wd.Days[0].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml,
                           WidthTempToday, WeatherFontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
 
@@ -1989,16 +1989,16 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add precipitation
-    WeatherWidget.AddText(dat.Days[0].Precipitation, false,
+    WeatherWidget.AddText(wd.Days[0].Precipitation, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), dat.WeatherFontSml);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
 
     WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
                           Theme.Color(clrChannelBg));
 
     // Add weather icon tomorrow
-    WeatherIcon = cString::sprintf("widgets/%s", *dat.Days[1].Icon);
+    WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[1].Icon);
     img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
@@ -2006,11 +2006,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add temperature min/max values tomorrow
-    WeatherWidget.AddText(dat.Days[1].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), dat.WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
+    WeatherWidget.AddText(wd.Days[1].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
+                          Theme.Color(clrChannelBg), wd.WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(dat.Days[1].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), dat.WeatherFontSml,
+    WeatherWidget.AddText(wd.Days[1].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), wd.WeatherFontSml,
                           WidthTempTomorrow, WeatherFontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
 
@@ -2021,9 +2021,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 
     // Add precipitation tomorrow
-    WeatherWidget.AddText(dat.Days[1].Precipitation, false,
+    WeatherWidget.AddText(wd.Days[1].Precipitation, false,
                           cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
-                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), dat.WeatherFontSml);
+                          Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), wd.WeatherFontSml);
 
     // left += PrecTomorrowWidth;
     // WeatherWidget.AddRect(cRect(left, 0, wWidth - left, m_FontHeight), clrTransparent);

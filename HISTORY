@@ -1,14 +1,17 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-xx-xx: Version 1.2.0
+2025-08-01: Version 1.2.0
 - [add] Add Cache for fonts to prevent repeated calls to 'CreateFont'
 - [add] Display number of cached fonts in plugin settings
 - [add] Introduce GlyphMetricsCache for efficient font face management
+- [add] Cache fixed strings width to avoid repeated calculations
+- [add] Cache font height to avoid repeated calculations
 - [add] Implement FontImageWeatherCache for caching weather fonts and data to
         improve performance
 - [update] Optimize scraper plugin lookup for thread safety and performance improvements
 - [update] Optimize epgsearch plugin lookup for performance improvements
 - [update] Optimize dvbapi plugin lookup for performance improvements
+- [update] Improve text handling and memory management in cTextFloatingWrapper::Set method
 - [update] Add symlinks to default icons in icon theme dirs for faster loading
 - [update] Some internal optimizations
 
