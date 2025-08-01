@@ -11,8 +11,9 @@
 
 #include <vdr/osd.h>
 #include <vdr/skins.h>
+#include <vdr/tools.h>
 
-// #include <list>
+#include <string>
 
 #include <Magick++.h>
 

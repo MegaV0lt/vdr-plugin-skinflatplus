@@ -8,11 +8,7 @@
 #pragma once
 
 #include <vdr/status.h>
-
 #include "./baserender.h"
-#include "./flat.h"
-#include "./services/dvbapi.h"
-#include "./services/scraper2vdr.h"
 
 class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
  public:
@@ -44,9 +40,11 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         double m_ScreenAspect {0.0};
         int m_HeightBottom {0}, m_HeightImageLogo {0};
 
+        cFont *m_SignalFont {nullptr};
         int m_LastSignalStrength {-1}, m_LastSignalQuality {-1};
         int m_SignalStrengthRight {0};
 
+        cFont *m_DvbapiInfoFont {nullptr};
         int m_LastDvbapiInfoTextWidth {0};
 
         // TVScraper

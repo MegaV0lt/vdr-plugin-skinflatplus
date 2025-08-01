@@ -6,12 +6,17 @@
  * $Id$
  */
 #include "./displaychannel.h"
+
+#include <vdr/device.h>
+
+#include <algorithm>
+
 #include "./flat.h"
+#include "./fontcache.h"
+#include "./services/dvbapi.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     CreateFullOsd();
-    // if (!m_Osd) return;
-
     TopBarCreate();
     MessageCreate();
 
@@ -230,7 +235,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     cImage *img {nullptr};
     if (Channel) {
-        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", ICON_WIDTH_UNLIMITED, ImageHeight);
+        img = ImgLoader.LoadIcon((Channel->Ca()) ? "crypted" : "uncrypted", kIconMaxSize, ImageHeight);
         if (img) {
             left -= img->Width();
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -244,7 +249,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             // If Config.ChannelSimpleAspectFormat is enabled, the aspect ratio is only shown for
             // sd program, else format (HD/UHD) is shown
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -252,7 +257,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -262,7 +267,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -272,7 +277,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
         // Show audio icon (Dolby, Stereo)
         if (Config.ChannelResolutionAspectShow) {  //? Add separate config option (Config.ChannelAudioIconShow)
             IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, ImageHeight);
+            img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -306,16 +311,16 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int MaxAvailWidth {0};
 
     bool IsRec {false};
-    const int RecWidth {m_FontSml->Width("REC")};
+    const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
 
     int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 
-    const int SmlSpaceWidth2 {m_FontSml->Width("  ")};
+    const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "  ")};
 
     if (Config.ChannelShowStartTime)
-        left += m_Font->Width("00:00  ");
+        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00  ");
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
@@ -474,20 +479,23 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalStrength = SignalStrength;
     m_LastSignalQuality = SignalQuality;
 
-    // Use std::unique_ptr for automatic cleanup
-    std::unique_ptr<cFont> SignalFont(cFont::CreateFont(Setup.FontOsd, Config.decorProgressSignalSize));
-    if (!SignalFont) {  // Add null check
-        esyslog("flatPlus: Failed to create font for signal quality display");
+    m_SignalFont = FontCache.GetFont(Setup.FontOsd, Config.decorProgressSignalSize);
+    if (!m_SignalFont) {  // Add null check
+        esyslog("flatPlus: Failed to get font for signal quality display");
         return;
     }
 
+    const int SignalFontHeight {m_SignalFont->Height()};
     const int left {m_MarginItem2};
     int top {m_HeightBottom -
              (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "STR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont.get());
-    const int ProgressLeft {left + std::max(SignalFont->Width("STR "), SignalFont->Width("SNR ")) + m_MarginItem};
+                                   Theme.Color(clrChannelBg), m_SignalFont);
+    const int ProgressLeft {left +
+                            std::max(FontCache.GetStringWidth(m_FontName, SignalFontHeight, "STR "),
+                                     FontCache.GetStringWidth(m_FontName, SignalFontHeight, "SNR ")) +
+                            m_MarginItem};
     const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
@@ -496,7 +504,7 @@ void cFlatDisplayChannel::SignalQualityDraw() {
 
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), SignalFont.get());
+                                   Theme.Color(clrChannelBg), m_SignalFont);
     ProgressBar.SetY(top);
     ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
                        Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
@@ -511,9 +519,14 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DvbapiInfoDraw()");
 #endif
-    if (!ChanInfoBottomPixmap || !ChanIconsPixmap) return;
+    static cPlugin *pDVBApi {nullptr};
+    static bool dvbapiChecked {false};
 
-    static cPlugin *pDVBApi {cPluginManager::GetPlugin("dvbapi")};
+    if (!dvbapiChecked) {
+        pDVBApi = cPluginManager::GetPlugin("dvbapi");
+        dvbapiChecked = true;
+        dsyslog("flatPlus: DVBApi plugin %s", pDVBApi ? "found and loaded" : "not found");
+    }
     if (!pDVBApi) return;
 
     sDVBAPIEcmInfo ecmInfo {
@@ -522,7 +535,15 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         .hops = -1
     };
 
-    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) return;
+    if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
+#ifdef DEBUGFUNCSCALL
+        const int *caids = m_CurChannel->Caids();
+        if (caids != nullptr && caids[0] != 0) {
+            dsyslog("flatPlus: No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
+        }
+#endif
+        return;
+    }
 
 #ifdef DEBUGFUNCSCALL
     dsyslog("   ChannelSid: %d, Channel: %s", m_CurChannel->Sid(), m_CurChannel->Name());
@@ -536,32 +557,39 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         return;
 
     int left {m_SignalStrengthRight + m_MarginItem2};
+    static int CachedProgressBarHeight {-1};
+    static int CachedFontAscender {0};
+    static int CachedGlyphSize {0};
     const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
+    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
 
-    // Use std::unique_ptr for automatic cleanup
-    std::unique_ptr<cFont> DvbapiInfoFont(cFont::CreateFont(Setup.FontOsd, ProgressBarHeight));
-    if (!DvbapiInfoFont) {  // Add null check
-        esyslog("flatPlus: Failed to create font for dvbapi info display");
-        return;
+    if (CachedProgressBarHeight != ProgressBarHeight) {
+        CachedProgressBarHeight = ProgressBarHeight;
+        CachedFontAscender = GetFontAscender(Setup.FontOsd, ProgressBarHeight);
+        CachedGlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
     }
 
-    const int FontAscender {GetFontAscender(Setup.FontOsd, ProgressBarHeight)};
-    static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
-    const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);  // Narrowing conversion
-    const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
+    const int TopOffset {(CachedFontAscender - CachedGlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
         TopOffset};  // One margin for progress bar to bottom
 
+    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, ProgressBarHeight);
+    if (!m_DvbapiInfoFont) {  // Add null check
+        esyslog("flatPlus: Failed to get font for dvbapi info display");
+        return;
+    }
+    const int DvbapiInfoFontHeight = FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight);
+
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get());
+                                   Theme.Color(clrChannelBg), m_DvbapiInfoFont);
 
-    left += DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
+    left += m_DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
-    cImage *img {ImgLoader.LoadIcon(*IconName, ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height())};
+    cImage *img {ImgLoader.LoadIcon(*IconName, kIconMaxSize, DvbapiInfoFontHeight)};
     if (!img) {
-        img = ImgLoader.LoadIcon("crypt_unknown", ICON_WIDTH_UNLIMITED, DvbapiInfoFont->Height());
+        img = ImgLoader.LoadIcon("crypt_unknown", kIconMaxSize, DvbapiInfoFontHeight);
         dsyslog("flatPlus: Unknown card system: %s (CAID: %d)", *ecmInfo.cardsystem, ecmInfo.caid);
     }
     if (img) {  // Draw the card system icon
@@ -577,10 +605,10 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     // so that we can ensure that the text is drawn at the correct position
     // even if the text changes (e.g. when the channel is changed).
     // This is done by storing the maximum width of the text seen so far.
-    m_LastDvbapiInfoTextWidth = std::max(DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
+    m_LastDvbapiInfoTextWidth = std::max(m_DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
 
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
-                                   Theme.Color(clrChannelBg), DvbapiInfoFont.get(), m_LastDvbapiInfoTextWidth);
+                                   Theme.Color(clrChannelBg), m_DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
 }
 
 void cFlatDisplayChannel::Flush() {
@@ -622,14 +650,14 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
     ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
-    uint16_t index {0};
+    uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel {Channels->First()}; Channel && index < LogoPreCache;
+    for (const cChannel *Channel {Channels->First()}; Channel && i < LogoPreCache;
          Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img)
-                ++index;
+                ++i;
         }
     }  // for cChannel
 
@@ -640,34 +668,34 @@ void cFlatDisplayChannel::PreLoadImages() {
         else
             height = m_FontSmlHeight;
 
-        ImgLoader.LoadIcon("crypted", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("uncrypted", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("unknown_asp", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("43", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("169", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("169w", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("221", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("7680x4320", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("3840x2160", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1920x1080", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1440x1080", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("1280x720", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("960x720", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("704x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("720x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("544x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("528x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("480x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("352x576", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("unknown_res", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("uhd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("hd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("sd", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("audio_dolby", ICON_WIDTH_UNLIMITED, height);
-        ImgLoader.LoadIcon("audio_stereo", ICON_WIDTH_UNLIMITED, height);
+        ImgLoader.LoadIcon("crypted", kIconMaxSize, height);
+        ImgLoader.LoadIcon("uncrypted", kIconMaxSize, height);
+        ImgLoader.LoadIcon("unknown_asp", kIconMaxSize, height);
+        ImgLoader.LoadIcon("43", kIconMaxSize, height);
+        ImgLoader.LoadIcon("169", kIconMaxSize, height);
+        ImgLoader.LoadIcon("169w", kIconMaxSize, height);
+        ImgLoader.LoadIcon("221", kIconMaxSize, height);
+        ImgLoader.LoadIcon("7680x4320", kIconMaxSize, height);
+        ImgLoader.LoadIcon("3840x2160", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1920x1080", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1440x1080", kIconMaxSize, height);
+        ImgLoader.LoadIcon("1280x720", kIconMaxSize, height);
+        ImgLoader.LoadIcon("960x720", kIconMaxSize, height);
+        ImgLoader.LoadIcon("704x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("720x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("544x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("528x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("480x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("352x576", kIconMaxSize, height);
+        ImgLoader.LoadIcon("unknown_res", kIconMaxSize, height);
+        ImgLoader.LoadIcon("uhd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("hd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("sd", kIconMaxSize, height);
+        ImgLoader.LoadIcon("audio_dolby", kIconMaxSize, height);
+        ImgLoader.LoadIcon("audio_stereo", kIconMaxSize, height);
 
         // Audio tracks (displaytracks.c)
-        ImgLoader.LoadIcon("tracks_ac3", ICON_WIDTH_UNLIMITED, m_FontHeight);
-        ImgLoader.LoadIcon("tracks_stereo", ICON_WIDTH_UNLIMITED, m_FontHeight);
+        ImgLoader.LoadIcon("tracks_ac3", kIconMaxSize, m_FontHeight);
+        ImgLoader.LoadIcon("tracks_stereo", kIconMaxSize, m_FontHeight);
     }
 }

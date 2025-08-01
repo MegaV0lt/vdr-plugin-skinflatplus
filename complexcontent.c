@@ -7,6 +7,11 @@
  */
 #include "./complexcontent.h"
 
+#include <vdr/tools.h>
+
+#include <algorithm>
+#include <numeric>
+
 cComplexContent::cComplexContent() {
     Contents.reserve(128);  // Set to at least 128 entry's
 }
@@ -104,13 +109,14 @@ bool cComplexContent::Scrollable(int height) {
 
 void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg,
                               cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
-    // Method Chaining: Instead of using two separate lines, implement method chaining for a more concise approach:
-    Contents.emplace_back(cSimpleContent())
-        .SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
+    // Use emplace_back to construct a cSimpleContent in-place and then set its properties.
+    Contents.emplace_back();
+    Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
 }
 
 void cComplexContent::AddImage(cImage *image, const cRect &Position) {
-    Contents.emplace_back(cSimpleContent()).SetImage(image, Position);
+    Contents.emplace_back();
+    Contents.back().SetImage(image, Position);
 }
 
 void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
@@ -152,7 +158,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 }
 
 void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
-    Contents.emplace_back(cSimpleContent()).SetRect(Position, ColorBg);
+    Contents.emplace_back();
+    Contents.back().SetRect(Position, ColorBg);
 }
 
 void cComplexContent::Draw() {

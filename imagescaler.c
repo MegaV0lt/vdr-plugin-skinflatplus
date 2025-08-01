@@ -14,6 +14,12 @@
 #include <cmath>
 // #include <memory>
 
+#if defined(__GNUC__) || defined(__clang__)
+    #define ALWAYS_INLINE inline __attribute__((always_inline))
+#else
+    #define ALWAYS_INLINE inline
+#endif
+
 ImageScaler::ImageScaler() :
     m_memory(nullptr),
     m_hor_filters(nullptr),
@@ -42,9 +48,10 @@ ImageScaler::~ImageScaler() = default;  // No need for manual memory management
  * @param x The input value for which the sinc function is calculated.
  * @return The value of sin(x)/x, or an approximation for small x.
  */
-inline float sincf(float x) {
+ALWAYS_INLINE static float sincf(float x) {
+    // Use Taylor expansion for small x; accurate enough for filter design
     if (fabsf(x) < 0.05f)
-        return 1.0f - (1.0f / 6.0f) * x * x;  // Taylor series approximation to avoid 0/0
+        return 1.0f - (1.0f / 6.0f) * x * x;
 
     return sin(x) / x;
 }
@@ -70,7 +77,7 @@ inline float sincf(float x) {
  * @param src_size source image size
  */
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
-    const float fc {(dst_size >= src_size) ? 1.0f : (dst_size * 1.0f / src_size)};
+    const float fc {(dst_size >= src_size) ? 1.0f : (static_cast<float>(dst_size) / src_size)};
 
     constexpr float PI {3.14159265359f};  // Pi constant
     constexpr float SCALE_FACTOR {2048.0};
@@ -91,7 +98,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
             h_arr[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
 
-        // Ensure that filter does not reach out off image bounds:
+        // Clamp so we don't sample out of bounds
         while (offset < 1) {
             h_arr[0] += h_arr[1];
             h_arr[1] = h_arr[2];
@@ -99,7 +106,6 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
             h_arr[3] = 0.0f;
             ++offset;
         }
-
         while (offset + 3 > src_size) {
             h_arr[3] += h_arr[2];
             h_arr[2] = h_arr[1];
@@ -110,15 +116,12 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         // Coefficients are normalized to sum up to 2048
         norm = SCALE_FACTOR / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
-
         --offset;  // Offset of fist used pixel
-
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
-
         for (unsigned int j {0}; j < 4; ++j) {
             t = norm * h_arr[j];
             filters[i].m_coeff[(offset + j) & 3] =
-                static_cast<int>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
+                static_cast<int16_t>((t > 0.0f) ? (t + 0.5f) : (t - 0.5f));  // Consider ring buffer index permutations
         }
     }
 
@@ -142,8 +145,8 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
  * @param src_width The width of the source image.
  * @param src_height The height of the source image.
  */
-void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_stride, unsigned int dst_width, unsigned int dst_height,
-                                     unsigned int src_width, unsigned int src_height) {
+void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_stride, unsigned int dst_width,
+                                     unsigned int dst_height, unsigned int src_width, unsigned int src_height) {
     m_src_x = 0;
     m_src_y = 0;
     m_dst_x = 0;
@@ -168,7 +171,7 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     const size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     // Use a std::unique_ptr to manage memory
-    m_memory = std::unique_ptr<char[]>(new char[hor_filters_size + ver_filters_size + buffer_size]);
+    m_memory = std::make_unique<char[]>(hor_filters_size + ver_filters_size + buffer_size);
 
     m_hor_filters = reinterpret_cast<Filter *>(m_memory.get());
     m_ver_filters = reinterpret_cast<Filter *>(m_memory.get() + hor_filters_size);
@@ -178,12 +181,20 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     CalculateFilters(m_ver_filters, m_dst_height, m_src_height);
 }
 
-// Shift range to 0..255 and clamp overflows
-static unsigned int shift_clamp(int x) {
-    // x = (x + 2^21) >> 22;
-    // But that's equivalent to this:
-    x = (x + 2097152) >> 22;
-    return std::clamp(x, 0, 255);
+// Branchless shift and clamp [0,255] (for up to 31-bit signed input)
+ALWAYS_INLINE static unsigned int shift_clamp(int x) {
+// This is a branchless version of:
+// x = (x + 2^21) >> 22;
+// return std::clamp(x, 0, 255);
+// This avoids branches and uses bitwise operations for performance.
+constexpr int SHIFT_AMOUNT = 22;
+constexpr int ROUNDING = 1 << (SHIFT_AMOUNT - 1);  // 2^21
+x = (x + ROUNDING) >> SHIFT_AMOUNT;
+
+// Branchless [0,255] clamp for signed int (Common C idiom, fast)
+x &= -(x >= 0);              // Clamp <0 to 0 (if x<0, becomes 0)
+x -= (x > 255) * (x - 255);  // Oversaturate above 255 down to 255
+return static_cast<unsigned int>(x);
 }
 
 /**
@@ -196,7 +207,7 @@ static unsigned int shift_clamp(int x) {
  * @param pixel The TmpPixel to pack.
  * @return A 32-bit unsigned integer representing the packed pixel.
  */
-inline unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
+ALWAYS_INLINE unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
     return shift_clamp(pixel[0]) |
            (shift_clamp(pixel[1]) << 8) |
            (shift_clamp(pixel[2]) << 16) |
@@ -225,6 +236,7 @@ void ImageScaler::NextSourceLine() {
     }
 
     int16_t h0 {0}, h1 {0}, h2 {0}, h3 {0};  // Init outside of loop
+    // Filter coefficients (Read once for each vertical pass)
     while (m_ver_filters[m_dst_y].m_offset == m_src_y) {
         h0 = m_ver_filters[m_dst_y].m_coeff[0];
         h1 = m_ver_filters[m_dst_y].m_coeff[1];
@@ -232,13 +244,27 @@ void ImageScaler::NextSourceLine() {
         h3 = m_ver_filters[m_dst_y].m_coeff[3];
         const TmpPixel *src {m_buffer};  // Pointer to the buffer containing filtered input lines
         unsigned int *dst {m_dst_image + m_dst_stride * m_dst_y};  // Pointer to the destination image line
+        unsigned int i {0};
 
-        for (unsigned int i {0}; i < m_dst_width; ++i) {
-            const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
-            src += 4;
-            dst[i] = PackPixel(t);
+        // Unroll 4 pixels at a time for speed
+        for (; i + 3 < m_dst_width; i += 4) {
+            // Calculate four pixels at a time
+            const TmpPixel t0(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
+            const TmpPixel t1(src[4] * h0 + src[5] * h1 + src[6] * h2 + src[7] * h3);
+            const TmpPixel t2(src[8] * h0 + src[9] * h1 + src[10] * h2 + src[11] * h3);
+            const TmpPixel t3(src[12] * h0 + src[13] * h1 + src[14] * h2 + src[15] * h3);
+            dst[i] = PackPixel(t0);
+            dst[i+1] = PackPixel(t1);
+            dst[i+2] = PackPixel(t2);
+            dst[i+3] = PackPixel(t3);
+            src += 16;
         }
-
+        // If num pixels is not a multiple of 4, finish the remaining ones
+        for (; i < m_dst_width; ++i) {
+            const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
+            dst[i] = PackPixel(t);
+            src += 4;
+        }
         ++m_dst_y;
     }
 }

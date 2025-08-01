@@ -7,10 +7,10 @@
  */
 #include "./imageloader.h"
 
-#include <dirent.h>
-#include <math.h>
+#include <vdr/tools.h>
 
-#include <string>
+#include <algorithm>
+#include <filesystem>
 
 #include "./flat.h"
 

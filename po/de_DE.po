@@ -562,6 +562,9 @@ msgstr "Bildercache Einträge"
 msgid "Iconcache entries"
 msgstr "Iconcache Einträge"
 
+msgid "Fontcache entries"
+msgstr "Fontcache Einträge"
+
 msgid "Show channel name and number with shadow"
 msgstr "Kanalname und Nummer mit Schatten"
 

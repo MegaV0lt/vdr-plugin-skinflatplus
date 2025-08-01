@@ -134,6 +134,7 @@ void cTextScrollers::Clear() {
     // No need to iterate over the vector in this case
     for (auto &scroller : Scrollers) {
         delete scroller;
+        scroller = nullptr;  // Avoid dangling pointer
     }
 
     Scrollers.clear();
@@ -162,12 +163,11 @@ void cTextScrollers::AddScroller(const char *text, const cRect &position, tColor
 }
 
 void cTextScrollers::UpdateViewPortWidth(int w) {
-    std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};
-    for (it = Scrollers.begin(); it != end; ++it) {
-        cPixmap::Lock();
-        (*it)->UpdateViewPortWidth(w);
-        cPixmap::Unlock();
-    }
+    // Batch lock/unlock
+    cPixmap::Lock();
+    for (auto *scroller : Scrollers)
+        scroller->UpdateViewPortWidth(w);
+    cPixmap::Unlock();
 }
 
 void cTextScrollers::StartScrolling() {
@@ -175,7 +175,7 @@ void cTextScrollers::StartScrolling() {
     dsyslog("flatPlus: cTextScrollers::StartScrolling()");
 #endif
 
-    if (!Running() && Scrollers.size() > 0)
+    if (!Running() && !Scrollers.empty())
         Start();
 }
 
@@ -191,27 +191,19 @@ void cTextScrollers::Action() {
 
     if (!Running()) return;
 
-    std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};
-    for (it = Scrollers.begin(); it != end && Running(); ++it) {
-        // if (!Running()) return;
-
-        cPixmap::Lock();
-        (*it)->Reset();
-        cPixmap::Unlock();
-    }
+    cPixmap::Lock();
+    for (auto *scroller : Scrollers)
+        scroller->Reset();
+    cPixmap::Unlock();
 
     while (Running()) {
         // if (Running())  //? Check needed here?
             cCondWait::SleepMs(m_ScrollDelay);
 
-        // std::vector<cTextScroll *>::iterator it, end {Scrollers.end()};  // Reuse iterator above
-        for (it = Scrollers.begin(); it != end && Running(); ++it) {
-            // if (!Running()) return;
-
-            cPixmap::Lock();
-            (*it)->DoStep();
-            cPixmap::Unlock();
-        }
+        cPixmap::Lock();
+        for (auto *scroller : Scrollers)
+            scroller->DoStep();
+        cPixmap::Unlock();
 
         if (Running())
             m_Osd->Flush();

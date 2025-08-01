@@ -12,13 +12,11 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
     CreateFullOsd();
     TopBarCreate();
 
-    img_ac3 = ImgLoader.LoadIcon("tracks_ac3", ICON_WIDTH_UNLIMITED, m_FontHeight);
-    img_stereo = ImgLoader.LoadIcon("tracks_stereo", ICON_WIDTH_UNLIMITED, m_FontHeight);
+    img_ac3 = ImgLoader.LoadIcon("tracks_ac3", kIconMaxSize, m_FontHeight);
+    img_stereo = ImgLoader.LoadIcon("tracks_stereo", kIconMaxSize, m_FontHeight);
 
-    if (img_ac3)
-        m_Ac3Width = img_ac3->Width();
-    if (img_stereo)
-        m_StereoWidth = img_stereo->Width();
+    m_Ac3Width = (img_ac3) ? img_ac3->Width() : 0;
+    m_StereoWidth = (img_stereo) ? img_stereo->Width() : 0;
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     m_CurrentIndex = -1;
@@ -53,6 +51,8 @@ cFlatDisplayTracks::~cFlatDisplayTracks() {
 
 void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
     if (!TracksPixmap) return;
+
+    if (Current) m_CurrentIndex = Index;
 
     const int y {(Index + 1) * m_ItemHeight};
     const auto [ColorFg, ColorBg] =
@@ -102,10 +102,10 @@ void cFlatDisplayTracks::SetAudioChannel(int AudioChannel) {
     // From vdr: 0=stereo, 1=left, 2=right, -1=don't display the audio channel indicator.
     // From skinnopacity: -1 ac3, else stereo
     if (AudioChannel == -1 && img_ac3) {
-        const int IconLeft {m_MaxItemWidth - img_ac3->Width() - m_MarginItem};
+        const int IconLeft {m_MaxItemWidth - m_Ac3Width - m_MarginItem};
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_ac3);
     } else if (img_stereo) {
-        const int IconLeft {m_MaxItemWidth - img_stereo->Width() - m_MarginItem};
+        const int IconLeft {m_MaxItemWidth - m_StereoWidth - m_MarginItem};
         TracksLogoPixmap->DrawImage(cPoint(IconLeft, 0), *img_stereo);
     }
     return;

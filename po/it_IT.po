@@ -546,6 +546,9 @@ msgstr "Ingressi Imagecache"
 msgid "Iconcache entries"
 msgstr "Ingressi Iconcache"
 
+msgid "Fontcache entries"
+msgstr ""
+
 msgid "Show channel name and number with shadow"
 msgstr ""
 

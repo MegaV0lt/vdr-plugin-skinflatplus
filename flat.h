@@ -9,33 +9,17 @@
 
 #include <vdr/plugin.h>
 #include <vdr/skins.h>
-#include <vdr/videodir.h>
+#include <vdr/epg.h>
+#include <vdr/recording.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-// #include <stdint.h>
-
-#include <memory>   // For 'unique_ptr<T>()' ...
-#include <cstring>  // string.h
 #include <cstdint>  // stdint.h
+#include <mutex>    // NOLINT. Needed for std::mutex
 #include <string>
 #include <string_view>
-#include <random>
-#include <filesystem>  // C++17
-
-// Includes and defines for assert()
-#include <iostream>
-// uncomment to disable assert()
-// #define NDEBUG
-#include <cassert>
-
-// Use (void) to silence unused warnings.
-#define assertm(exp, msg) assert(((void)msg, exp))
-// Includes and defines for assert()
+#include <vector>
 
 #include "./services/scraper2vdr.h"
 
@@ -220,11 +204,6 @@ THEME_CLR(Theme, clrVolumeProgressBg,       0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderFg,         0xF0202020);
 THEME_CLR(Theme, clrVolumeBorderBg,         0xF0202020);
 
-// SeenIconNames for GetRecordingSeenIcon()
-static const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2", "recording_seen_3",
-                                      "recording_seen_4", "recording_seen_5", "recording_seen_6", "recording_seen_7",
-                                      "recording_seen_8", "recording_seen_9", "recording_seen_10"};
-
 class cFlat : public cSkin {
  public:
     cFlat();
@@ -238,7 +217,7 @@ class cFlat : public cSkin {
 
  private:
     cFlatDisplayMenu *Display_Menu;  // Using _ to avoid name conflict with DisplayMenu()
-};
+};  // class cFlat
 
 // Based on VDR's cTextWrapper
 class cTextFloatingWrapper {
@@ -261,7 +240,9 @@ class cTextFloatingWrapper {
     char *m_EoL {nullptr};
     int m_Lines {0};
     int m_LastLine {-1};
-};
+};  // class cTextFloatingWrapper
+
+
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
@@ -284,7 +265,6 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
-cPlugin *GetScraperPlugin();
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
     std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
     std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
@@ -315,3 +295,43 @@ int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);
 void InsertCutLengthSize(const cRecording *Recording, cString &Text);  // NOLINT
 std::string XmlSubstring(const std::string &source, const char* StrStart, const char* StrEnd);
+
+class cPluginSkinFlatPlus : public cPlugin {
+ private:
+    static cPlugin *s_pEpgSearchPlugin;
+    static cPlugin *s_pScraperPlugin;
+    static bool s_bEpgSearchPluginChecked;
+    static bool s_bScraperPluginChecked;
+
+ public:
+    static cPlugin* GetEpgSearchPlugin() {
+        if (!s_bEpgSearchPluginChecked) {
+            s_pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
+            s_bEpgSearchPluginChecked = true;
+            dsyslog("flatPlus: EpgSearch plugin %s", s_pEpgSearchPlugin ? "found and loaded" : "not found");
+        }
+        return s_pEpgSearchPlugin;
+    }
+
+    static cPlugin *GetScraperPlugin() {
+        if (!s_bScraperPluginChecked) {
+            // Thread safe initialization
+            static std::mutex init_mutex;
+            std::lock_guard<std::mutex> lock(init_mutex);
+            s_pScraperPlugin = cPluginManager::GetPlugin("tvscraper");
+            if (!s_pScraperPlugin) s_pScraperPlugin = cPluginManager::GetPlugin("scraper2vdr");
+            s_bScraperPluginChecked = true;
+            dsyslog("flatPlus: TVScraper or Scraper2vdr plugin %s",
+                    s_pScraperPlugin ? "found and loaded" : "not found");
+        }
+        return s_pScraperPlugin;
+    }
+
+    // Call this when plugins might change (rare)
+    static void InvalidatePluginCache() {
+        s_bEpgSearchPluginChecked = false;
+        s_bScraperPluginChecked = false;
+        s_pEpgSearchPlugin = nullptr;
+        s_pScraperPlugin = nullptr;
+    }
+};

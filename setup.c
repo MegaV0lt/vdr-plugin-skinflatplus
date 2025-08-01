@@ -7,6 +7,21 @@
  */
 #include "./setup.h"
 
+#include <vdr/i18n.h>
+#include <vdr/plugin.h>
+#include <vdr/skins.h>
+#include <vdr/tools.h>
+
+#include <unistd.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+#include "./flat.h"
+#include "./fontcache.h"
+
 cStringList Bordertypes;
 cStringList DiskUsages;
 cStringList Progresstypes;
@@ -144,7 +159,7 @@ void cFlatSetup::Setup() {
     Add(new cOsdItem(tr("Volume settings"), osUnknown, true));
     Add(new cOsdItem(tr("Tracks settings"), osUnknown, true));
 
-    static cPlugin *pScraper = GetScraperPlugin();
+    static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (pScraper)
         Add(new cOsdItem(tr("TVScraper / scraper2vdr settings"), osUnknown, true));
     else
@@ -390,8 +405,10 @@ void cFlatSetupGeneral::LoadConfigFile() {
             }
         }  // while
         fclose(f);
-    } else
+    } else {
         dsyslog("flatPlus: Failed to load config: file <%s> not found", *Filename);
+        return;
+    }
     cString msg = cString::sprintf("%s %s %s", tr("configfile"), ConfigFiles[ConfigFileSelection], tr("loaded"));
     Skins.Message(mtInfo, msg);
 }
@@ -872,6 +889,9 @@ void cFlatSetupGeneral::Setup() {
     Add(new cOsdItem(ImageCache, osUnknown, true));
     cString IconCache = cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), MaxIconCache);
     Add(new cOsdItem(IconCache, osUnknown, true));
+
+    cString FontCacheNum = cString::sprintf("%s:\t%d", tr("Fontcache entries"), FontCache.GetCacheCount());
+    Add(new cOsdItem(FontCacheNum, osUnknown, true));
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));
