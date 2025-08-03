@@ -31,6 +31,7 @@
 #include "./displayreplay.h"
 #include "./displaytracks.h"
 #include "./displayvolume.h"
+#include "./fontcache.h"
 #include "./glyphmetricscache.h"
 
 #include "./services/epgsearch.h"
@@ -791,8 +792,17 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    if (Font->Width("M") == Font->Width("i"))  // Check for fixed font
-        return;
+    // Use cached font metrics to determine if the font is fixed-width
+    const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, Font->Size())};
+    if (FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "M") ==
+        FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "i"))
+        return;  // Font is fixed-width, no justification needed
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   FontHeight %d, Width 'M' %d, Width 'i' %d",
+            FontHeight,
+            FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "M"),
+            FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "i"));
+#endif
 
     // Count spaces in line
     const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
@@ -804,8 +814,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     //* Detect 'HairSpace'
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
-    const char *FillChar {(Font->Width(" ") < Font->Width(u8"\U0000200A")) ? " " : u8"\U0000200A"};
-    const int16_t FillCharWidth = Font->Width(FillChar);  // Width in pixel
+    const char *FillChar {FontCache.GetStringWidth(Setup.FontOsd, FontHeight, " ") <
+                          FontCache.GetStringWidth(Setup.FontOsd, FontHeight, u8"\U0000200A")
+                              ? " "
+                              : u8"\U0000200A"};          // Use hair space if it is smaller than space
+    const int16_t FillCharWidth = FontCache.GetStringWidth(Setup.FontOsd, FontHeight, FillChar);  // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
     const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
