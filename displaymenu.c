@@ -115,6 +115,10 @@ cFlatDisplayMenu::~cFlatDisplayMenu() {
 }
 
 void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::SetMenuCategory(%d)", MenuCategory);
+#endif
+
     MenuItemScroller.Clear();
     ItemBorderClear();
     m_IsScrolling = false;
@@ -168,7 +172,7 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
                                      bool CanScrollDown, bool IsContent) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawScrollbar()");
-    dsyslog("   Total: %d Offset: %d Shown: %d Top: %d Height: %d", Total, Offset, Shown, Top, Height);
+    dsyslog("   Total: %d, Offset: %d, Shown: %d, Top: %d, Height: %d", Total, Offset, Shown, Top, Height);
 #endif
 
     if (!MenuPixmap) return;
@@ -276,7 +280,7 @@ void cFlatDisplayMenu::Clear() {
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s' m_MenuCategory %d", Title, m_MenuCategory);
+    dsyslog("flatPlus: cFlatDisplayMenu::SetTitle() '%s' m_MenuCategory: %d", Title, m_MenuCategory);
 #endif
 
     m_LastTitle = Title;
@@ -833,8 +837,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
 
 bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current, bool Selectable) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayMenu::SetItemTimer()");
-    dsyslog("   Index %d", Index);
+    dsyslog("flatPlus: cFlatDisplayMenu::SetItemTimer() Index: %d", Index);
 #endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap || !MenuIconsBgPixmap) return false;
@@ -1558,7 +1561,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                         int Level, int Total, int New) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetItemRecording()");
-    dsyslog("   Index %d, Level %d, Total %d, New %d", Index, Level, Total, New);
+    dsyslog("   Index: %d, Level: %d, Total: %d, New: %d", Index, Level, Total, New);
 #endif
 
     if (!MenuPixmap || !MenuIconsPixmap || !MenuIconsOvlPixmap) return false;
@@ -2541,9 +2544,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 
 #ifdef DEBUGFUNCSCALL
         dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
-#endif
         // TODO: Attempt to get channel name and number without LOCK_CHANNELS_READ
         dsyslog("flatPlus: SetRecording() Channelname %s", RecInfo->ChannelName());
+#endif
 
         InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
 
@@ -3095,8 +3098,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
     }  // Config.ShortRecordingCount */
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecCounts '%s'", *RecCounts);
-    dsyslog("   GetRecCounts() took %ld ms", Timer.Elapsed());
+    dsyslog("   RecCounts '%s', time: %ld ms", *RecCounts, Timer.Elapsed());
 #endif
 
     return RecCounts;
@@ -3116,8 +3118,7 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
         if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
     }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   TimerActiveCount %d, TimerCount %d", TimerActiveCount, TimerCount);
-    dsyslog("   UpdateTimerCounts() took %ld ms", Timer.Elapsed());
+    dsyslog("   TimerActiveCount: %d, TimerCount: %d, time: %ld ms", TimerActiveCount, TimerCount, Timer.Elapsed());
 #endif
 }
 
@@ -3229,7 +3230,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
  */
 time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatDisplayMenu::GetLastRecTimeFromFolder() Level %d", Level);
+    dsyslog("flatPlus: cFlatDisplayMenu::GetLastRecTimeFromFolder() Level: %d", Level);
     cTimeMs Timer;  // Set Timer
 #endif
 
@@ -3254,9 +3255,8 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     if (RecStartNewest == 0 && RecStartOldest == now) return RecStart;  // No recordings in folder
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecStartNewest %s, RecStartOldest %s", *ShortDateString(RecStartNewest),
-            *ShortDateString(RecStartOldest));
-    dsyslog("   GetLastRecTimeFromFolder time %ld ms", Timer.Elapsed());
+    dsyslog("   Newest: %s, Oldest: %s, time: %ld ms", *ShortDateString(RecStartNewest),
+            *ShortDateString(RecStartOldest), Timer.Elapsed());
 #endif
 
     return (Config.MenuItemRecordingShowFolderDate == 1) ? RecStartNewest : RecStartOldest;
@@ -3800,7 +3800,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
 
 int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("DrawMainMenuWidgetTimerConflicts(%d, %d, %d)\n", wLeft, wWidth, ContentTop);
+    dsyslog("DrawMainMenuWidgetTimerConflicts(%d, %d, %d)", wLeft, wWidth, ContentTop);
 #endif
 
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
