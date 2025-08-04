@@ -19,8 +19,7 @@
 
 #include <dirent.h>
 #include <fstream>
-#include <functional>
-#include <future>  // std::async  // NOLINT
+#include <functional>  // std::less
 #include <locale>
 #include <sstream>
 #include <string_view>
@@ -254,6 +253,10 @@ int cFlatDisplayMenu::ItemsHeight() {
 }
 
 void cFlatDisplayMenu::Clear() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::Clear()");
+#endif
+
     MenuItemScroller.Clear();
     PixmapClear(MenuPixmap);
     PixmapClear(MenuIconsPixmap);
@@ -276,6 +279,7 @@ void cFlatDisplayMenu::Clear() {
     TopBarClearMenuIconRight();
 
     m_ShowRecording = m_ShowEvent = m_ShowText = false;
+    m_EventInfoDrawn = m_RecordingInfoDrawn = false;
 }
 
 void cFlatDisplayMenu::SetTitle(const char *Title) {
@@ -293,18 +297,17 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
             uint16_t ChanCount {0};  // Number of channels (Max. 65535)
             {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                for (const cChannel *Channel {Channels->First()}; Channel; Channel = Channels->Next(Channel))
-                    if (!Channel->GroupSep()) ++ChanCount;
+                ChanCount = Channels->MaxNumber();  // Number of channels
             }
             NewTitle = cString::sprintf("%s (%d)", Title, ChanCount);
         }  // Config.MenuChannelShowCount
         break;
-    case mcTimer:
+    /* case mcTimer:  //* Is done in Flush()
         if (Config.MenuTimerShowCount) {
             UpdateTimerCounts(m_LastTimerActiveCount, m_LastTimerCount);  // Update timer counts
             NewTitle = cString::sprintf("%s (%d/%d)", Title, m_LastTimerActiveCount, m_LastTimerCount);
         }
-        break;
+        break; */
     case mcRecording:
         if (Config.MenuRecordingShowCount) { NewTitle = cString::sprintf("%s %s", Title, *GetRecCounts()); }
         break;
@@ -1930,16 +1933,27 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
 #endif
 
+    // All work is done in DrawEventInfo() to avoid 'invalid lock sequence' in VDR.
+    // Here we just save the cEvent object for later use.
+    m_Event = Event;
+    m_ShowEvent = false;
+    m_ShowRecording = false;
+    m_ShowText = false;
+}
+
+void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawEvent()");
+#endif
+
     if (!ContentHeadIconsPixmap || !ContentHeadPixmap || !Event) return;
 
 #ifdef DEBUGEPGTIME
     cTimeMs Timer;  // Set Timer
 #endif
 
-    m_ShowEvent = true;
-    m_ShowRecording = false;
-    m_ShowText = false;
     ItemBorderClear();
+    PixmapClear(ContentHeadIconsPixmap);
 
     m_cLeft = Config.decorBorderMenuContentSize;
     m_cTop = m_chTop + m_MarginItem3 + m_FontHeight + m_FontSmlHeight * 2 + Config.decorBorderMenuContentSize +
@@ -1952,8 +1966,6 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     if (!ButtonsDrawn()) m_cHeight += m_ButtonsHeight + Config.decorBorderButtonSize * 2;
 
     m_MenuItemWidth = m_cWidth;
-
-    PixmapClear(ContentHeadIconsPixmap);
 
     cString Fsk {""}, Text {""}, TextAdditional {""};
     std::vector<std::string> GenreIcons;
@@ -1995,7 +2007,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     DrawContentHeadFskGenre(IconHeight, HeadIconLeft, HeadIconTop, Fsk, GenreIcons);
 
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetEvent info-text time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawEvent info-text time @ %ld ms", Timer.Elapsed());
 #endif
 
     cString Reruns {""};
@@ -2042,7 +2054,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
         }
     }  // Config.EpgRerunsShow
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetEvent reruns time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawEvent reruns time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -2070,7 +2082,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName, ActorsRole, Event);
         }
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: SetEvent tvscraper time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawEvent tvscraper time @ %ld ms", Timer.Elapsed());
 #endif
         const int kTitleLeftMargin {m_MarginItem * 10};  // 50 pixel margin
         ContentTop = m_MarginItem;
@@ -2114,7 +2126,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
             AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop, true);
         }
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: SetEvent epg-text time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawEvent epg-text time @ %ld ms", Timer.Elapsed());
 #endif
 
         // Add actors if available
@@ -2146,7 +2158,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     ComplexContent.CreatePixmaps(Config.MenuContentFullSize || Scrollable);
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawEvent actor time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapClear(ContentHeadPixmap);
@@ -2220,8 +2232,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     DecorBorderDraw(ibContent);
 
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetEvent total time: %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawEvent total time: %ld ms", Timer.Elapsed());
 #endif
+
+    m_EventInfoDrawn = true;  // Set flag that event info is drawn
 }
 
 void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText) {
@@ -2470,16 +2484,25 @@ void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Te
 void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
+#endif
+
+    // All the work is done in DrawRecordingInfo() to prevent 'invalid lock sequence' in VDR.
+    // Here we only save the recording object for later use.
+    m_Recording = Recording;
+    m_ShowEvent = false;
+    m_ShowRecording = true;
+    m_ShowText = false;
+}
+
+void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawRecording()");
     cTimeMs Timer;  // Set Timer
 #endif
 
     if (!ContentHeadPixmap || !ContentHeadIconsPixmap || !Recording) return;
 
-    m_ShowEvent = false;
-    m_ShowRecording = true;
-    m_ShowText = false;
     ItemBorderClear();
-
     PixmapClear(ContentHeadIconsPixmap);
 
     m_cLeft = Config.decorBorderMenuContentSize;
@@ -2519,33 +2542,17 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() @ %ld ms", Timer.Elapsed());
 #endif
-        // Explanation for the following lines:
-        // The call to `Channels->GetByChannelID(RecInfo->ChannelID())` is a potential source of
-        // 'Invalid lock sequence' errors. This is because the `LOCK_CHANNELS_READ` call can cause a
-        // lock on the `Channels` object to be taken, but the `cChannels` object is already locked when
-        // the `cRecording` object is created. To avoid this, we use `std::async` to execute the code
-        // that gets the channel information in a separate thread. This allows the lock on the `Channels`
-        // object to be taken without causing an 'Invalid lock sequence' error.
-        //
-        // The `ChannelFuture.get()` call is used to wait for the asynchronous operation to complete.
-        // This ensures that the `RecAdditional` string is properly updated with the channel information
-        // before the `Text` string is updated with the `RecAdditional` string.
-        auto ChannelFuture = std::async(
-            std::launch::async,
-            [&RecAdditional](tChannelID channelId) {
-                LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                const cChannel *Channel {Channels->GetByChannelID(channelId)};
-                if (Channel)
-                    RecAdditional.Append(
-                        cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
-            },
-            RecInfo->ChannelID());
-        ChannelFuture.get();
+
+        {
+            LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
+            const cChannel *Channel {Channels->GetByChannelID(RecInfo->ChannelID())};
+            if (Channel)
+                RecAdditional.Append(
+                    cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
+        }
 
 #ifdef DEBUGFUNCSCALL
         dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
-        // TODO: Attempt to get channel name and number without LOCK_CHANNELS_READ
-        dsyslog("flatPlus: SetRecording() Channelname %s", RecInfo->ChannelName());
 #endif
 
         InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
@@ -2578,7 +2585,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     DrawContentHeadFskGenre(IconHeight, HeadIconLeft, HeadIconTop, Fsk, GenreIcons);
 
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetRecording info-text time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawRecording info-text time @ %ld ms", Timer.Elapsed());
 #endif
 
     std::vector<cString> ActorsPath, ActorsName, ActorsRole;
@@ -2610,7 +2617,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
             }
         }
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: SetRecording tvscraper time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawRecording tvscraper time @ %ld ms", Timer.Elapsed());
 #endif
         const int kTitleLeftMargin {m_MarginItem * 10};  // 50 pixel margin
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
@@ -2660,7 +2667,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         // Add series information if available
         if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop);
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: SetRecording epg-text time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawRecording epg-text time @ %ld ms", Timer.Elapsed());
 #endif
 
         // Add actors if available
@@ -2668,7 +2675,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
         if (Config.TVScraperRecInfoShowActors && NumActors > 0)
             AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: SetRecording actor time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawRecording actor time @ %ld ms", Timer.Elapsed());
 #endif
 
         // Add recording information if available
@@ -2692,7 +2699,7 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     ComplexContent.CreatePixmaps(Config.MenuContentFullSize || Scrollable);
     ComplexContent.Draw();
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawRecording complexcontent draw time @ %ld ms", Timer.Elapsed());
 #endif
 
     PixmapClear(ContentHeadPixmap);
@@ -2793,8 +2800,10 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     DecorBorderDraw(ibRecording, false);
 
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: SetRecording total time: %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawRecording total time: %ld ms", Timer.Elapsed());
 #endif
+
+    m_RecordingInfoDrawn = true;  // Recording info is drawn
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
@@ -2879,6 +2888,11 @@ void cFlatDisplayMenu::Flush() {
         //                           Config.decorBorderMenuItemSize * 2, 5), Theme.Color(clrItemSelableBg));
         m_MenuFullOsdIsDrawn = true;
     }
+
+    if (m_MenuCategory == mcEvent && !m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
+
+    if (m_MenuCategory == mcRecordingInfo && !m_RecordingInfoDrawn)
+        DrawRecordingInfo(m_Recording);  // Draw recording info
 
     if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
         uint16_t TimerActiveCount {0}, TimerCount {0};

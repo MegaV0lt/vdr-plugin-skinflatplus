@@ -73,6 +73,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
+    const cRecording *m_Recording {nullptr};  // Current recording
+    const cEvent *m_Event {nullptr};          // Current event
+
     uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};
     cString m_LastTitle {""};
 
@@ -97,6 +100,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     bool m_ShowEvent {false};
     bool m_ShowRecording {false};
     bool m_ShowText {false};
+
+    bool m_RecordingInfoDrawn {false};
+    bool m_EventInfoDrawn {false};
 
     cComplexContent ComplexContent;
 
@@ -149,6 +155,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
                    std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
                    int NumActors, bool IsEvent = false);  // Add Actors to complexcontent
+
+    void DrawEventInfo(const cEvent *Event);
+    void DrawRecordingInfo(const cRecording *Recording);
 
     void DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current);
     void DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top);
