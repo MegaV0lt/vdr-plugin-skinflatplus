@@ -583,7 +583,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString EventTitle {""};
     double progress {0.0};
     {
-        LOCK_SCHEDULES_READ;
+        LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
         const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
         if (Schedule) {
             Event = Schedule->GetPresentEvent();
@@ -3096,7 +3096,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
         cString RecFolder2 {""};
         std::string_view sv1(m_RecFolder), sv2;  // For efficient comparison
-        LOCK_RECORDINGS_READ;
+        LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
             sv2 = *RecFolder2;
@@ -3106,7 +3106,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
             }
         }  // for
     } else {  // All recordings
-        LOCK_RECORDINGS_READ;
+        LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             ++RecCount;
             if (Rec->IsNew()) ++RecNewCount;
@@ -3270,7 +3270,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     cString RecFolder2 {""};
     const time_t now {time(0)};
     time_t RecStartNewest {0}, RecStartOldest {now};
-    LOCK_RECORDINGS_READ;
+    LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
         if (strcmp(RecFolder, RecFolder2) == 0) {  // Recordings must be in the same folder
@@ -3797,7 +3797,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     cString DateTime {""}, Length {""}, StrRec {""};
     div_t TimeHM {0, 0};
     {
-        LOCK_RECORDINGS_READ;
+        LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecStart = Rec->Start();
             TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);

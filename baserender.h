@@ -272,7 +272,7 @@ class RecTimerCounter {
         time_t now {time(0)};
         if (now - LastUpdate.load() >= kUpdateIntervalSec) {
             uint16_t count {0};
-            { LOCK_TIMERS_READ;
+            { LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
                 for (const cTimer* Timer=Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording)) ++count;
                 }
