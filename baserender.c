@@ -441,21 +441,6 @@ void cFlatBaseRender::TopBarUpdate() {
             cTimeMs Timer;  // Start Timer
 #endif
 
-            // The code below is a workaround for a problem with the VDR thread handling.
-            // The VDR is not designed to handle multiple threads, which is why we have
-            // to use a workaround to get the number of current recordings.
-            // The following code creates a new thread that queries the number of
-            // recordings and waits for the result. This is necessary because the
-            // cTimers::GetTimers() function can only be called from the main thread.
-            // The result is then stored in the NumRec variable.
-            /* auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
-                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
-                    if (Timer->HasFlags(tfRecording))
-                        ++NumRec;
-                }
-            });
-            RecCounterFuture.get(); */
             //* FAST RECORD COUNT: Use cached background thread or event value
             RecCountCache.UpdateIfNeeded();
             NumRec = s_NumRecordings.load(std::memory_order_relaxed);

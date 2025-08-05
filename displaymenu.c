@@ -2786,20 +2786,6 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
                       ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
     }
 
-    /* RecordingBorder = {m_cLeft,
-                       m_cTop,
-                       m_cWidth,
-                       ComplexContent.Height(),
-                       Config.decorBorderMenuContentSize,
-                       Config.decorBorderMenuContentType,
-                       Config.decorBorderMenuContentFg,
-                       Config.decorBorderMenuContentBg,
-                       BorderMenuRecord};
-
-    sDecorBorder ibRecording = RecordingBorder;
-    ibRecording.Height = (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
-                                                                    : ComplexContent.ContentHeight(false); */
-
     const sDecorBorder RecordingBorder {m_cLeft,
                                         m_cTop,
                                         m_cWidth,
