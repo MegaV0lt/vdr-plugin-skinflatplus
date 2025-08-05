@@ -58,7 +58,11 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
         if (FullFillBackground) {
             PixmapFill(Pixmap, m_ColorBg);
         } else {
-            Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
+            const int HeightContent {ContentHeight(false)};
+            if (HeightContent > 0)  // Only draw background if content height is > 0
+                Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg);
+            else
+                PixmapClear(Pixmap);
         }
     } else {  // Log values and return
         esyslog(
@@ -80,7 +84,7 @@ void cComplexContent::CalculateDrawPortHeight() {
 int cComplexContent::BottomContent() const {
     // Using std::accumulate algorithm instead of manual loop
     return std::accumulate(Contents.begin(), Contents.end(), 0,
-    [](int max, const auto& content) {
+    [](int max, const auto &content) {
         return std::max(max, content.GetBottom());
     });
 }
@@ -164,7 +168,12 @@ void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
 
 void cComplexContent::Draw() {
     m_IsShown = true;
-    for (auto& content : Contents) {
+    if (Contents.empty()) {
+        esyslog("flatPlus: Error in cComplexContent::Draw() Contents is empty!");
+        return;
+    }
+
+    for (auto &content : Contents) {
         if (content.GetContentType() == CT_Image)
             content.Draw(PixmapImage);
         else

@@ -20,21 +20,22 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     m_CurrentIndex = -1;
-    m_MaxItemWidth = m_Font->Width(Title) + m_MarginItem * 4;
+    const int TitleWidth {m_Font->Width(Title)};
+    m_MaxItemWidth = TitleWidth + m_MarginItem * 4;
     for (int16_t i {0}; i < NumTracks; ++i)
         m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem2);
 
-    const int imgWidthMax {std::max(m_Ac3Width, m_StereoWidth)};
-    const int headerWidth {m_Font->Width(Title) + m_Font->Width(' ') + imgWidthMax};
-    m_MaxItemWidth = std::max(m_MaxItemWidth, headerWidth);
+    const int ImgWidthMax {std::max(m_Ac3Width, m_StereoWidth)};
+    const int HeaderWidth {TitleWidth + m_MarginItem2 + ImgWidthMax};
+    m_MaxItemWidth = std::max(m_MaxItemWidth, HeaderWidth);
 
     ItemsHeight = (NumTracks + 1) * m_ItemHeight;
     const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
     TopBarSetTitle(Title);
 
-    const cRect TraksPixmapViewPort{left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight};
-    TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1, TraksPixmapViewPort);
-    TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1, TraksPixmapViewPort);
+    const cRect TracksPixmapViewPort{left, m_OsdHeight - ItemsHeight - m_MarginItem, m_MaxItemWidth, ItemsHeight};
+    TracksPixmap = CreatePixmap(m_Osd, "TracksPixmap", 1, TracksPixmapViewPort);
+    TracksLogoPixmap = CreatePixmap(m_Osd, "TracksLogoPixmap", 1, TracksPixmapViewPort);
     PixmapClear(TracksPixmap);
     PixmapClear(TracksLogoPixmap);
 

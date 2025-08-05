@@ -721,7 +721,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
-            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
+            const int l {m_Font->Width(first.c_str()) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "M")};
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.data(),
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found

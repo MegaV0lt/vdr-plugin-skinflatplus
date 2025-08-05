@@ -5,6 +5,7 @@
  *
  * $Id$
  */
+#include "./fontcache.h"
 #include "./textscroller.h"
 
 void cTextScroll::SetText(const char *text, const cRect &position, tColor colorFg, tColor colorBg, cFont *font,
@@ -67,8 +68,9 @@ void cTextScroll::Draw() const {
         const std::string first {rtrim(sv1)};
         std::string_view second {ltrim(sv2)};
 
+        const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, m_Font->Size())};
         Pixmap->DrawText(cPoint(0, 0), first.c_str(), ColorFg, ColorBg, m_Font);
-        const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
+        const int l {m_Font->Width(first.c_str()) + FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "M")};
         Pixmap->DrawText(cPoint(l, 0), second.data(), ColorExtraTextFg, ColorBg, m_Font);
     } else {
         Pixmap->DrawText(cPoint(0, 0), m_Text, ColorFg, ColorBg, m_Font);

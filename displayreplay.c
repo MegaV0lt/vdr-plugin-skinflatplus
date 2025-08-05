@@ -219,7 +219,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
 
     int left {0};
-    const int FontWidth99 {FontCache.GetStringWidth(m_FontName, m_FontHeight, "99")};  // Width of '99'
+    const int FontWidth00 {FontCache.GetStringWidth(m_FontName, m_FontHeight, "00")};  // Width of '00'
     const int EffectiveOsdWidth {m_OsdWidth - Config.decorBorderReplaySize * 2};
     if (Setup.ShowReplayMode) {
         left = (EffectiveOsdWidth - (m_FontHeight * 4 + m_MarginItem3)) / 2;
@@ -228,8 +228,8 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             PixmapClear(LabelPixmap);
 
         // PixmapClear(IconsPixmap);  //* Moved to SetRecording
-        LabelPixmap->DrawRectangle(cRect(left - FontWidth99 - m_MarginItem, 0,
-                                         m_FontHeight * 4 + m_MarginItem * 6 + FontWidth99 * 2, m_FontHeight),
+        LabelPixmap->DrawRectangle(cRect(left - FontWidth00 - m_MarginItem, 0,
+                                         m_FontHeight * 4 + m_MarginItem * 6 + FontWidth00 * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
 
         cString rewind {"rewind"}, pause {"pause"}, play {"play"}, forward {"forward"};
@@ -273,9 +273,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         DecorBorderDraw(ib);
     } else {
         if (m_ModeOnly) {
-            const sDecorBorder ib {left - FontWidth99 - m_MarginItem + Config.decorBorderReplaySize,
+            const sDecorBorder ib {left - FontWidth00 - m_MarginItem + Config.decorBorderReplaySize,
                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                                   m_FontHeight * 4 + m_MarginItem * 6 + FontWidth99 * 2,
+                                   m_FontHeight * 4 + m_MarginItem * 6 + FontWidth00 * 2,
                                    m_FontHeight,
                                    Config.decorBorderReplaySize,
                                    Config.decorBorderReplayType,
