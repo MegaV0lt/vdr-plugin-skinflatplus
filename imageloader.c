@@ -10,7 +10,6 @@
 #include <vdr/tools.h>
 
 #include <algorithm>
-#include <filesystem>
 
 #include "./flat.h"
 
@@ -254,17 +253,17 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
  */
 bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
     cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }

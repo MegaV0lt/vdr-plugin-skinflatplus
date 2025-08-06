@@ -21,7 +21,6 @@
 #include <cerrno>
 #include <cmath>
 #include <cstdlib>
-#include <filesystem>
 #include <memory>
 #include <random>
 
@@ -81,8 +80,12 @@ cSkinDisplayMessage *cFlat::DisplayMessage() { return new cFlatDisplayMessage; }
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d, drawport height %d)", *Name, Layer,
-            ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height(), DrawPort.Height());
+    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d)", *Name, Layer,
+            ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height());
+    if (DrawPort.Width() > 0 && DrawPort.Height() > 0) {
+        dsyslog("   DrawPort: left %d, top %d, size %dx%d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
+                DrawPort.Height());
+    }
     cTimeMs Timer;  // Start Timer
 #endif
     /* if (!osd) {
@@ -93,7 +96,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
-        if (Timer.Elapsed() > 0) dsyslog("   CreatePixmap() took %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   CreatePixmap() Time: %ld ms", Timer.Elapsed());
 #endif
         return pixmap;
     }  // Everything runs according to the plan
@@ -170,7 +173,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
                     for (std::size_t i {0}; i < ActorsSize; ++i) {
-                        if (std::filesystem::exists(series.actors[i].actorThumb.path)) {
+                        if (LastModifiedTime(series.actors[i].actorThumb.path.c_str())) {
                             ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(series.actors[i].name.c_str());
                             ActorsRole.emplace_back(series.actors[i].role.c_str());
@@ -190,7 +193,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                     ActorsName.reserve(ActorsSize);
                     ActorsRole.reserve(ActorsSize);
                     for (std::size_t i {0}; i < ActorsSize; ++i) {
-                        if (std::filesystem::exists(movie.actors[i].actorThumb.path)) {
+                        if (LastModifiedTime(movie.actors[i].actorThumb.path.c_str())) {
                             ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
                             ActorsName.emplace_back(movie.actors[i].name.c_str());
                             ActorsRole.emplace_back(movie.actors[i].role.c_str());
