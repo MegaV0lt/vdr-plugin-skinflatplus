@@ -1631,8 +1631,15 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
+    cString RecName = *GetRecordingName(Recording, Level, Total == 0);
+    if (Config.MenuItemRecordingClearPercent && Total == 0) {  // Remove leading percent sign(s) from RecName
+        while (RecName[0] != '\0' && RecName[0] == '%') RecName = cString(*RecName + 1);
+    }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   RecName for display '%s'", *RecName);
+#endif
+
     cString Buffer {""};
-    const cString RecName = *GetRecordingName(Recording, Level, Total == 0);
     if (Config.MenuRecordingView == 1) {  // flatPlus long
         if (Total == 0) {                 // Recording
             DrawRecordingIcon("recording", Left, Top, Current);
@@ -2168,8 +2175,8 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #endif
 
     PixmapClear(ContentHeadPixmap);
-    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
-                                     Theme.Color(clrScrollbarBg));
+    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
+
     const cString StrTime =
         cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
@@ -2705,8 +2712,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #endif
 
     PixmapClear(ContentHeadPixmap);
-    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_FontHeight + m_FontSmlHeight * 2 + m_MarginItem2),
-                                     Theme.Color(clrScrollbarBg));
+    ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
 
     const cString StrTime =
         cString::sprintf("%s  %s  %s", *DateString(Recording->Start()), *TimeString(Recording->Start()),
@@ -3029,8 +3035,7 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
  *
  * This function extracts and returns the name segment of a recording based on the specified
  * folder level. It traverses the recording's name string, which is delimited by a specific
- * character, to locate the appropriate segment. If the segment is part of a folder and begins
- * with a '%', this character is optionally removed based on configuration.
+ * character, to locate the appropriate segment.
  *
  * @param Recording A pointer to the cRecording object whose name is to be retrieved.
  * @param Level The folder level at which to retrieve the name segment.
@@ -3059,12 +3064,8 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
         }
         start = end + 1;
     }
-
-    if (Config.MenuItemRecordingClearPercent && IsFolder && RecNamePart[0] != '\0' && RecNamePart[0] == '%') {
-        RecNamePart = cString(*RecNamePart + 1);  // Remove leading '%'
-    }
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   RecNamePart '%s'", *RecNamePart);
+    dsyslog("   RecNamePart: '%s'", *RecNamePart);
 #endif
 
     return RecNamePart;
@@ -3255,24 +3256,24 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
 
     cString RecFolder2 {""};
     const time_t now {time(0)};
-    time_t RecStartNewest {0}, RecStartOldest {now};
+    time_t RecNewest {0}, RecOldest {now};
     LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
         if (strcmp(RecFolder, RecFolder2) == 0) {  // Recordings must be in the same folder
-            RecStartNewest = std::max(RecStartNewest, Rec->Start());
-            RecStartOldest = std::min(RecStartOldest, Rec->Start());
+            RecNewest = std::max(RecNewest, Rec->Start());
+            RecOldest = std::min(RecOldest, Rec->Start());
         }
     }
 
-    if (RecStartNewest == 0 && RecStartOldest == now) return RecStart;  // No recordings in folder
+    if (RecNewest == 0 && RecOldest == now) return RecStart;  // No recordings in folder
 
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   Newest: %s, Oldest: %s, time: %ld ms", *ShortDateString(RecStartNewest),
-            *ShortDateString(RecStartOldest), Timer.Elapsed());
+    dsyslog("   Newest: %s, Oldest: %s, time: %ld ms", *ShortDateString(RecNewest),
+            *ShortDateString(RecOldest), Timer.Elapsed());
 #endif
 
-    return (Config.MenuItemRecordingShowFolderDate == 1) ? RecStartNewest : RecStartOldest;
+    return (Config.MenuItemRecordingShowFolderDate == 1) ? RecNewest : RecOldest;
 }
 
 int cFlatDisplayMenu::GetTextAreaWidth() const { return m_MenuWidth - m_MarginItem2; }
@@ -3514,25 +3515,26 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
 
         int left {m_MarginItem};
-        const int FontSmlWidthX {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "M")};  // Width of one M
+        const int FontSmlWidthDigit {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "0")};
         if (NumDevices <= 9) {
             ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
 
-            left += FontSmlWidthX * 2;
+            left += FontSmlWidthDigit * 2;
         } else {
             ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                                  FontSmlWidthX * 2, m_FontSmlHeight, taRight);
+                                  FontSmlWidthDigit * 2, m_FontSmlHeight, taRight);
 
-            left += FontSmlWidthX * 3;
+            left += FontSmlWidthDigit * 3;
         }
-        str = *(device->DeviceType());
+        str = *(device->DeviceType());  // Sometihng like 'DVB-S2'. Longest in dvbdevice.c is 'ATSCMH'
+        const int FontSmlWidthDevice {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "ATSCMH")};
         ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
-                              FontSmlWidthX * 7, m_FontSmlHeight, taLeft);
+                              FontSmlWidthDevice, m_FontSmlHeight, taLeft);
 
-        left += FontSmlWidthX * 8;
+        left += FontSmlWidthDevice + m_MarginItem;
         ContentWidget.AddText(*StrDevice, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
 
@@ -3633,11 +3635,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel {(TimerRec[i])->Channel()};
-                if (Channel)
-                    StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
-                else
-                    StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
-
+                StrTimer.Append(cString::sprintf("%s - ", Channel ? Channel->Name() : tr("Unknown")));
                 StrTimer.Append((TimerRec[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
@@ -3671,10 +3669,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }
 
                 const cChannel *Channel {(TimerActive[i])->Channel()};
-                if (Channel)
-                    StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
-                else
-                    StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
+                StrTimer.Append(cString::sprintf("%s - ", Channel ? Channel->Name() : tr("Unknown")));
                 StrTimer.Append((TimerActive[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
@@ -3704,11 +3699,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 
                 const cChannel *Channel {(TimerRemoteRec[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
-                if (Channel)
-                    StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
-                else
-                    StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
-
+                StrTimer.Append(cString::sprintf("%s - ", Channel ? Channel->Name() : tr("Unknown")));
                 StrTimer.Append((TimerRemoteRec[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
@@ -3738,11 +3729,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 }  // StrTimer = cString::sprintf("R: ");
 
                 const cChannel *Channel {(TimerRemoteActive[i])->Channel()};
-                if (Channel)
-                    StrTimer.Append(cString::sprintf("%s - ", Channel->Name()));
-                else
-                    StrTimer.Append(cString::sprintf("%s - ", tr("Unknown")));
-
+                StrTimer.Append(cString::sprintf("%s - ", Channel ? Channel->Name() : tr("Unknown")));
                 StrTimer.Append((TimerRemoteActive[i])->File());
 
                 ContentWidget.AddText(*StrTimer, false, cRect(Left, ContentTop, Width, m_FontSmlHeight),
@@ -4180,7 +4167,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         const int TempSmlSpaceWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, " ")};
         // Max. width of precipitation string
         const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "100%")};
-        const int DayStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "MMM ")};  // Mon, Mo.
+        const int DayStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "Mon")};  // Mon, Mo.
         for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
