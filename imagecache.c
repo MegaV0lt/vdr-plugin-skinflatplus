@@ -98,7 +98,6 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
         if (data.Image == nullptr && DataNameView.empty()) {
             break;  // No more valid images in cache
         }
-        DataNameView = *data.Name;
         if (DataNameView == NameView && data.Width == Width && data.Height == Height) {
             return data.Image.get();  // Return the cached image if found
         }
