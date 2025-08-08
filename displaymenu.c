@@ -1319,7 +1319,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                         MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_FontSml,
                                              m_MenuItemWidth - Left - m_MarginItem);
                         Left +=
-                            m_FontSml->Width(*Title) + FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "M");
+                            m_FontSml->Width(*Title) + FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "~");
                         MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_FontSml,
                                              m_MenuItemWidth - Left - m_MarginItem);
                     }
@@ -1338,7 +1338,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_FontSml,
                                      m_MenuItemWidth - Left - m_MarginItem);
                 if (ShortText[0] != '\0') {
-                    Left += m_FontSml->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "M");
+                    Left += m_FontSml->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~");
                     MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
@@ -1375,7 +1375,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     } else {
                         MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_Font,
                                              m_MenuItemWidth - Left - m_MarginItem);
-                        Left += m_Font->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "M");
+                        Left += m_Font->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~");
                         MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_Font,
                                              m_MenuItemWidth - Left - m_MarginItem);
                     }
@@ -1393,7 +1393,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuPixmap->DrawText(cPoint(Left, Top), *Title, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem);
                 if (ShortText[0] != '\0') {
-                    Left += m_Font->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "M");
+                    Left += m_Font->Width(*Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~");
                     MenuPixmap->DrawText(cPoint(Left, Top), *ShortText, ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
                 }
