@@ -96,7 +96,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     MenuItemScroller.SetScrollDelay(Config.ScrollerDelay);
     MenuItemScroller.SetScrollType(Config.ScrollerType);
 
-    static constexpr size_t kDefaultItemBorderSize {64};
+    static constexpr std::size_t kDefaultItemBorderSize {64};
     ItemsBorder.reserve(kDefaultItemBorderSize);
 }
 
@@ -3187,8 +3187,8 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
         ecgChildrenYouth,      ecgMusicBalletDance,   ecgArtsCulture, ecgSocialPoliticalEconomics,
         ecgEducationalScience, ecgLeisureHobbies,     ecgSpecial};
 
-    const size_t GenreNums {sizeof(BaseGenres) / sizeof(BaseGenres[0])};
-    for (size_t i {0}; i < GenreNums; ++i) {
+    const std::size_t GenreNums {sizeof(BaseGenres) / sizeof(BaseGenres[0])};
+    for (std::size_t i {0}; i < GenreNums; ++i) {
         if ((genre & 0xF0) == BaseGenres[i]) {
             // Return the first icon for the genre if field is empty
             return (isempty(icons[i][genre & 0x0F])) ? icons[i][0] : icons[i][genre & 0x0F];
@@ -3849,7 +3849,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     struct dirent *entry;
     cString num {""};
     std::string_view FileName {""};
-    size_t found {std::string_view::npos};
+    std::size_t found {std::string_view::npos};
     while ((entry = d.Next()) != nullptr) {
         FileName = entry->d_name;
         found = FileName.find('_');

@@ -961,11 +961,11 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     m_Lines = 0;       // Reset line count
 
     // Estimate needed size of buffer including space for '\n' and '\0'
-    const size_t TextLen {strlen(Text)};
+    const std::size_t TextLen {strlen(Text)};
     if (TextLen == 0) return;  // Avoid processing empty text
     // Estimate number of lines. More conservative size estimation
-    const size_t EstimatedLines = (TextLen / 10) + UpperLines + 10;  // Add safety margin
-    size_t Capacity {TextLen + EstimatedLines + 2};
+    const std::size_t EstimatedLines = (TextLen / 10) + UpperLines + 10;  // Add safety margin
+    std::size_t Capacity {TextLen + EstimatedLines + 2};
 #ifdef DEBUGFUNCSCALL
     dsyslog("   TextLen: %ld, EstimatedLines: %ld, Capacity: %ld", TextLen, EstimatedLines, Capacity);
 #endif
@@ -980,7 +980,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
 
     m_Lines = 1;
     static const char *const kDelimiterChars {"-.,:;!?_~"};
-    size_t CurLength {TextLen};  // Current length of the text
+    std::size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
     int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;

@@ -166,9 +166,9 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     m_src_height = src_height;
 
     // Narrowing conversion
-    const size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
-    const size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
-    const size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
+    const std::size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
+    const std::size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
+    const std::size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     // Use a std::unique_ptr to manage memory
     m_memory = std::make_unique<char[]>(hor_filters_size + ver_filters_size + buffer_size);

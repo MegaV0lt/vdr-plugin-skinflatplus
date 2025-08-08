@@ -58,6 +58,6 @@ class cImageCache {
     std::size_t m_InsertIconIndex {0};      // Iconcache index
     std::size_t m_InsertIconIndexBase {0};  // Icon cache after first fill at start
 
-    void InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t MaxSize, size_t BaseIndex, cImage *Image,  // NOLINT
-                         const cString &Name, int Width, int Height);
+    void InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, std::size_t MaxSize, std::size_t BaseIndex,  // NOLINT
+                         cImage *Image, const cString &Name, int Width, int Height);
 };

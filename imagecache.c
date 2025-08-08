@@ -68,7 +68,7 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         }
 
         // Find the last '/' and extract the base filename
-        size_t LastSlashPos = DataNameView.find_last_of('/');
+        std::size_t LastSlashPos = DataNameView.find_last_of('/');
         if (LastSlashPos != std::string_view::npos) {
             BaseFileName = DataNameView.substr(LastSlashPos + 1);
         } else {
@@ -106,8 +106,8 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
     return nullptr;
 }
 
-void cImageCache::InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t MaxSize, size_t BaseIndex,
-                                  cImage *Image, const cString &Name, int Width, int Height) {
+void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, std::size_t MaxSize,
+                                  std::size_t BaseIndex, cImage *Image, const cString &Name, int Width, int Height) {
     // std::unique_ptr will automatically delete the old image if one exists when a new one is assigned
     Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);  // Store image in cache
     Cache[InsertIndex].Name = Name;
