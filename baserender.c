@@ -656,7 +656,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
 #endif
 
-    if (!MessagePixmap || !MessageIconPixmap) return;
+    if (!MessagePixmap || !MessageIconPixmap || !Text) return;
 
     static const struct {
         tColor color;
@@ -699,15 +699,15 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     } else if (Config.MenuItemParseTilde) {
         const char *TildePos {strchr(Text, '~')};
         if (TildePos) {
-            std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
-            std::string_view sv2 {TildePos + 1};
-            const std::string first {rtrim(sv1)};  // Trim possible space at end
-            std::string_view second {ltrim(sv2)};  // Trim possible space at begin
+            cString first(Text, TildePos);
+            cString second(TildePos + 1);
+            first.CompactChars(' ');   // Remove extra spaces
+            second.CompactChars(' ');  // Remove extra spaces
 
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), *first,
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
-            const int l {m_Font->Width(first.c_str()) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "M")};
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.data(),
+            const int l {m_Font->Width(*first) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~")};
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), *second,
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
@@ -1788,7 +1788,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Temp sign extraction
             std::string_view tt = *out.Temp;
-            auto deg = tt.find("°");  // Find the degree sign
+            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
                 out.Temp = cString(std::string(tt.substr(0, deg)).c_str());

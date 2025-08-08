@@ -841,7 +841,7 @@ void cFlatSetupGeneral::Setup() {
     Add(new cMenuEditBoolItem(tr("Use Textscroller?"), &SetupConfig->ScrollerEnable));
     if (SetupConfig->ScrollerEnable) {
         Add(new cMenuEditIntItem(tr("Scroller step (in pixel)"), &SetupConfig->ScrollerStep, 1));
-        Add(new cMenuEditIntItem(tr("Scroller delay (in ms)"), &SetupConfig->ScrollerDelay, 1, 100));  // 1 ms ... 100 ms
+        Add(new cMenuEditIntItem(tr("Scroller delay (in ms)"), &SetupConfig->ScrollerDelay, 15, 100));  // 15 ms ... 100 ms
         Add(new cMenuEditStraItem(tr("Scroller type"), &SetupConfig->ScrollerType, ScrollerTypes.Size(), &ScrollerTypes[0]));
     } else {
         cString step = cString::sprintf("%s:\t%d", tr("Scroller step (in pixel)"), SetupConfig->ScrollerStep);

@@ -436,17 +436,17 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     if (Config.MenuItemParseTilde) {
                         const char *TildePos {strchr(s, '~')};
                         if (TildePos) {
-                            std::string_view sv1 {s, static_cast<size_t>(TildePos - s)};
-                            std::string_view sv2 {TildePos + 1};
-                            const std::string first {rtrim(sv1)};  // Trim possible space at end
-                            std::string_view second {ltrim(sv2)};  // Trim possible space at begin
+                            cString first(s, TildePos);
+                            cString second(TildePos + 1);
+                            first.CompactChars(' ');   // Remove extra spaces
+                            second.CompactChars(' ');  // Remove extra spaces
 
-                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), first.c_str(), ColorFg,
+                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), *first, ColorFg,
                                                  ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
-                            const int l {m_Font->Width(first.c_str()) +
-                                         FontCache.GetStringWidth(m_FontName, m_FontHeight, "M")};
-                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), second.data(),
+                            const int l {m_Font->Width(*first) +
+                                         FontCache.GetStringWidth(m_FontName, m_FontHeight, "~")};
+                            MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize + l, y), *second,
                                                  ColorExtraTextFg, ColorBg, m_Font,
                                                  m_MenuItemWidth - xt - Config.decorBorderMenuItemSize - l);
                         } else {  // ~ not found
@@ -987,16 +987,15 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
-                    std::string_view sv2 {TildePos + 1};
-                    const std::string first {rtrim(sv1)};  // Trim possible space at end
-                    std::string_view second {ltrim(sv2)};  // Trim possible space at begin
+                    cString first(File, TildePos);
+                    cString second(TildePos + 1);
+                    first.CompactChars(' ');   // Remove extra spaces
+                    second.CompactChars(' ');  // Remove extra spaces
 
-                    MenuPixmap->DrawText(cPoint(Left, Top), first.c_str(), ColorFg, ColorBg, m_Font,
+                    MenuPixmap->DrawText(cPoint(Left, Top), *first, ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_Font->Width(first.c_str()) +
-                                 FontCache.GetStringWidth(m_FontName, m_FontHeight, "M")};
-                    MenuPixmap->DrawText(cPoint(Left + l, Top), second.data(), ColorExtraTextFg, ColorBg, m_Font,
+                    const int l {m_Font->Width(*first) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~")};
+                    MenuPixmap->DrawText(cPoint(Left + l, Top), *second, ColorExtraTextFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top), File, ColorFg, ColorBg, m_Font,
@@ -1023,16 +1022,16 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    std::string_view sv1 {File, static_cast<size_t>(TildePos - File)};
-                    std::string_view sv2 {TildePos + 1};
-                    const std::string first {rtrim(sv1)};  // Trim possible space at end
-                    std::string_view second {ltrim(sv2)};  // Trim possible space at begin
+                    cString first(File, TildePos);
+                    cString second(TildePos + 1);
+                    first.CompactChars(' ');   // Remove extra spaces
+                    second.CompactChars(' ');  // Remove extra spaces
 
-                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), first.c_str(), ColorFg, ColorBg, m_FontSml,
+                    MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), *first, ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
-                    const int l {m_FontSml->Width(first.c_str()) +
-                                 FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "M")};
-                    MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), second.data(), ColorExtraTextFg, ColorBg,
+                    const int l {m_FontSml->Width(*first) +
+                                 FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "~")};
+                    MenuPixmap->DrawText(cPoint(Left + l, Top + m_FontHeight), *second, ColorExtraTextFg, ColorBg,
                                          m_FontSml, m_MenuItemWidth - Left - l - m_MarginItem);
                 } else {  // ~ not found
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), File, ColorFg, ColorBg, m_FontSml,

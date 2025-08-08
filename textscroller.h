@@ -53,6 +53,8 @@ class cTextScroll {
     bool m_IsReserveStep {false};
     bool m_ResetX {false};
     int m_ScrollType {0};
+    mutable int m_CachedMaxX {0};  // Stores pre-calculated MaxX
+    mutable bool m_CacheValid {false};  // Tracks if cache is valid
 };
 
 class cTextScrollers : public cThread {
