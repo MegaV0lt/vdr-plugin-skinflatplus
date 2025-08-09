@@ -408,7 +408,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
  * - Portraits are adjusted to a maximum width of 1/3 of the content width.
  * - Banners are adjusted to maintain a target ratio of 758 width at 1920.
  */
-void SetMediaSize(cSize &MediaSize, const cSize &ContentSize) {  // NOLINT
+void SetMediaSize(const cSize &ContentSize, cSize &MediaSize) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
             ContentSize.Width(), ContentSize.Height());
