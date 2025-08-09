@@ -485,7 +485,8 @@ void cFlatDisplayChannel::SignalQualityDraw() {
         return;
     }
 
-    const int SignalFontHeight {m_SignalFont->Height()};
+    // const int SignalFontHeight {m_SignalFont->Height()};
+    const int SignalFontHeight {FontCache.GetFontHeight(Setup.FontOsd, Config.decorProgressSignalSize)};
     const int left {m_MarginItem2};
     int top {m_HeightBottom -
              (Config.decorProgressSignalSize * 2 + m_MarginItem2)};  // One margin for progress bar to bottom
@@ -578,7 +579,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         esyslog("flatPlus: Failed to get font for dvbapi info display");
         return;
     }
-    const int DvbapiInfoFontHeight = FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight);
+    const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight)};
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),

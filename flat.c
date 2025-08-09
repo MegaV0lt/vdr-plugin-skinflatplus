@@ -401,8 +401,8 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
  * specified dimensions. It categorizes media as poster, portrait, or
  * banner based on its aspect ratio and adjusts its size accordingly.
  *
- * @param MediaSize A reference to the size of the media to be adjusted.
  * @param ContentSize The size constraints within which the media should fit.
+ * @param MediaSize A reference to the size of the media to be adjusted.
  *
  * - Posters are adjusted to a maximum height of 70% of the content height.
  * - Portraits are adjusted to a maximum width of 1/3 of the content width.
