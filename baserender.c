@@ -1743,13 +1743,11 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             locationFile = cString::sprintf("%s%s", *prefix, "location");
 
             // Check file mtime for 'Temp' only as all files are written together
-            struct stat s;
-            if (stat(*tempFile, &s) != 0) {
-                dsyslog("flatPlus: BatchReadWeatherData() Error reading file mtime for %s", *tempFile);
+            latest = LastModifiedTime(tempFile);  // Get the latest modification time of the temp file
+            if (latest == 0) {
+                dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
                 return false;
             }
-
-            latest = s.st_mtime;
             // Check if data is already cached
             if (latest == out.LastReadMTime) break;  // If latest mtime matches cached, skip reading files
 
