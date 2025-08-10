@@ -485,7 +485,6 @@ void cFlatDisplayChannel::SignalQualityDraw() {
         return;
     }
 
-    // const int SignalFontHeight {m_SignalFont->Height()};
     const int SignalFontHeight {FontCache.GetFontHeight(Setup.FontOsd, Config.decorProgressSignalSize)};
     const int left {m_MarginItem2};
     int top {m_HeightBottom -

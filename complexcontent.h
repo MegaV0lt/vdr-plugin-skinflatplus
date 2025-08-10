@@ -121,24 +121,24 @@ class cSimpleContent {
     int GetContentType() const { return m_ContentType; }
     int GetBottom() const {
         switch (m_ContentType) {
-            case CT_Text:
+        case CT_Text:
+                // FontCache is returning different values for the same font
+                // const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, m_Font->Size())};
                 return m_Position.Top() + m_Font->Height();
 
-            case CT_TextMultiline: {
+        case CT_TextMultiline:
+            {
                 cTextFloatingWrapper Wrapper;
                 Wrapper.Set(*m_Text, m_Font, m_Position.Width());
                 return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
             }
 
-            case CT_Image:
-                return m_Position.Top() + m_Image->Height();
+        case CT_Image: return m_Position.Top() + m_Image->Height();
 
-            case CT_Rect:
-                return m_Position.Top() + m_Position.Height();
+        case CT_Rect: return m_Position.Top() + m_Position.Height();
 
-            case CT_None:
-            default:
-                return 0;
+        case CT_None:
+        default: return 0;
         }
     }
     void Draw(cPixmap *Pixmap) const {
@@ -146,22 +146,16 @@ class cSimpleContent {
         // if (!m_Font || !m_Text) return;
 
         switch (m_ContentType) {
-            case CT_Text:
-                Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font,
-                               m_TextWidth, m_TextHeight, m_TextAlignment);
-                return;
+        case CT_Text:
+            Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight,
+                             m_TextAlignment);
+            return;
 
-            case CT_TextMultiline:
-                DrawMultilineText(Pixmap);
-                return;
+        case CT_TextMultiline: DrawMultilineText(Pixmap); return;
 
-            case CT_Rect:
-                Pixmap->DrawRectangle(m_Position, m_ColorBg);
-                return;
+        case CT_Rect: Pixmap->DrawRectangle(m_Position, m_ColorBg); return;
 
-            case CT_Image:
-                Pixmap->DrawImage(m_Position.Point(), *m_Image);
-                return;
+        case CT_Image: Pixmap->DrawImage(m_Position.Point(), *m_Image); return;
         }
     }
 };

@@ -82,6 +82,11 @@ int cFontCache::GetFontHeight(const cString &Name, int Size) const {
 }
 
 void cFontCache::InsertFont(const cString& Name, int Size) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFontCache::InsertFont() Name=%s, Size=%d", *Name, Size);
+#endif
+
+    if (isempty(*Name) || Size <= 0) return;  // Invalid parameters
     if (FontCache[m_InsertIndex].font != nullptr) {  // If the font already exists, delete it
         dsyslog("flatPlus: FontCache - Replacing existing font at index %zu", m_InsertIndex);
         delete FontCache[m_InsertIndex].font;

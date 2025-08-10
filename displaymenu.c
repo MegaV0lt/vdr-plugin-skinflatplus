@@ -2955,14 +2955,15 @@ void cFlatDisplayMenu::ItemBorderClear() { ItemsBorder.clear(); }
  * @return the processed menu text
  */
 cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::MainMenuText() '%s'", *Text);
+#endif
     std::string_view text {skipspace(*Text)};
     bool found {false};
     const std::size_t TextLength {text.length()};
     std::size_t i {0};  // 'i' used also after loop
-    char s;
     for (; i < TextLength; ++i) {
-        s = text.at(i);
-        if (isdigit(s) && i < 5)  // Up to 4 digits expected
+        if (isdigit(text.at(i)) && i < 5)  // Up to 4 digits expected
             found = true;
         else
             break;
@@ -2972,25 +2973,31 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
 }
 
 cString cFlatDisplayMenu::GetIconName(const cString &element) const {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
+#endif
+
     static const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                 "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                 "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
     // Check for standard menu entries
-    const char *s {nullptr};
+    std::string_view ElementView {*element}, s;
     for (std::size_t i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
         s = trVDR(items[i]);
-        if (strcmp(element, s) == 0) { return cString::sprintf("menuIcons/%s", items[i]); }
+        if (ElementView == s) { return cString::sprintf("menuIcons/%s", items[i]); }
     }
 
     // Check for plugins
-    const char *MainMenuEntry {nullptr};
+    cString MainMenuEntry {""};  // Main menu entry of plugin
+    std::string_view MainMenuEntryView;
     for (std::size_t i {0};; ++i) {
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
             MainMenuEntry = p->MainMenuEntry();
-            if (MainMenuEntry) {
-                if (strcmp(element, MainMenuEntry) == 0) { return cString::sprintf("pluginIcons/%s", p->Name()); }
+            if (!isempty(*MainMenuEntry)) {  // Plugin has a main menu entry
+                MainMenuEntryView = *MainMenuEntry;
+                if (ElementView == MainMenuEntryView) { return cString::sprintf("pluginIcons/%s", p->Name()); }
             }
         } else {
             break;  // Plugin not found
@@ -2998,11 +3005,12 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     }
 
     // Check for special main menu entries "stop recording", "stop replay"
-    const cString StopRecording {skipspace(trVDR(" Stop recording "))};
-    const cString StopReplay {skipspace(trVDR(" Stop replaying"))};
-    if (strcmp(element, StopRecording) == 0) return "menuIcons/StopRecording";
-    if (strcmp(element, StopReplay) == 0) return "menuIcons/StopReplay";
+    std::string_view StopRecording {skipspace(trVDR(" Stop recording "))};
+    if (ElementView == StopRecording) return "menuIcons/StopRecording";
+    std::string_view StopReplay {skipspace(trVDR(" Stop replaying"))};
+    if (ElementView == StopReplay) return "menuIcons/StopReplay";
 
+    // Nothing found, try to return a generic icon
     return cString::sprintf("extraIcons/%s", *element);
 }
 
@@ -3081,7 +3089,7 @@ cString cFlatDisplayMenu::GetRecCounts() {
     m_LastRecFolder = m_RecFolder;
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
         cString RecFolder2 {""};
-        std::string_view sv1(m_RecFolder), sv2;  // For efficient comparison
+        std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
         LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
             RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
@@ -3253,13 +3261,15 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     const cString RecFolder {*GetRecordingName(Recording, Level, true)};
     if (isempty(*RecFolder)) return RecStart;  // No folder
 
+    std::string_view sv1 {*RecFolder}, sv2;
     cString RecFolder2 {""};
     const time_t now {time(0)};
     time_t RecNewest {0}, RecOldest {now};
     LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level, true);
-        if (strcmp(RecFolder, RecFolder2) == 0) {  // Recordings must be in the same folder
+        sv2 = *RecFolder2;
+        if (sv1 == sv2) {  // Recordings must be in the same folder
             RecNewest = std::max(RecNewest, Rec->Start());
             RecOldest = std::min(RecOldest, Rec->Start());
         }
