@@ -902,6 +902,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                 // dsyslog("flatPlus:  Insert block at %ld", pos);
                 Line.insert(pos, FillChars);
                 InsertedFillChar += FillCharBlock;
+                LineLength += FillCharsLength;  // Just add the length we inserted
             }
         }
 #ifdef DEBUGFUNCSCALL
@@ -909,6 +910,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert blocks at (.,?!;)
+        pos = 0;  // Reset pos before the second loop
         for (pos = Line.find_first_of(kPunctuationChars);
              pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
              pos = Line.find_first_of(kPunctuationChars, pos + FillCharsLength + 1)) {
@@ -924,7 +926,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
         //* Insert the remainder of 'NeedFillChar' from right to left
-        std::size_t PrevPos = std::string::npos;
+        pos = LineLength;  // Reset pos to the end of the string before the third loop
+        std::size_t PrevPos {std::string::npos};
         while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
                pos < PrevPos &&                      // Ensure position is decreasing (potential infinite loop)
                (InsertedFillChar < NeedFillChar) &&  // Check if we still need to insert fill characters
@@ -947,7 +950,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         //        LineWidth, LineMaxWidth * 0.8);
     }
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Time: %d ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
 
