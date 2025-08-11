@@ -72,9 +72,10 @@ void cTextScroll::Draw() const {
         first.CompactChars(' ');  // Remove extra spaces
         second.CompactChars(' ');  // Remove extra spaces
 
-        const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, m_Font->Size())};
+        const cString FontName {GetFontName(m_Font->FontName())};
+        const int FontHeight {FontCache.GetFontHeight(FontName, m_Font->Size())};
         Pixmap->DrawText(cPoint(0, 0), *first, ColorFg, ColorBg, m_Font);
-        const int l {m_Font->Width(*first) + FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "~")};
+        const int l {m_Font->Width(*first) + FontCache.GetStringWidth(FontName, FontHeight, "~")};
         Pixmap->DrawText(cPoint(l, 0), *second, ColorExtraTextFg, ColorBg, m_Font);
     } else {
         Pixmap->DrawText(cPoint(0, 0), *m_Text, ColorFg, ColorBg, m_Font);
