@@ -24,6 +24,7 @@
 #include <sstream>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 
 #include <algorithm>
@@ -2988,20 +2989,35 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         if (ElementView == s) { return cString::sprintf("menuIcons/%s", items[i]); }
     }
 
-    // Check for plugins
-    cString MainMenuEntry {""};  // Main menu entry of plugin
-    std::string_view MainMenuEntryView;
-    for (std::size_t i {0};; ++i) {
-        cPlugin *p {cPluginManager::GetPlugin(i)};
-        if (p) {
-            MainMenuEntry = p->MainMenuEntry();
-            if (!isempty(*MainMenuEntry)) {  // Plugin has a main menu entry
-                MainMenuEntryView = *MainMenuEntry;
-                if (ElementView == MainMenuEntryView) { return cString::sprintf("pluginIcons/%s", p->Name()); }
+    // Static cache to store the names of plugins
+    static std::unordered_set<std::string> cache;
+
+    // Fill the cache with plugin menu names
+    if (cache.empty()) {  // Only fill cache once
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   Filling plugin name cache");
+#endif
+
+        for (std::size_t i {0};; ++i) {
+            cPlugin *p {cPluginManager::GetPlugin(i)};
+            if (p) {
+                if (!isempty(p->MainMenuEntry())) {  // Plugin has a main menu entry
+#ifdef DEBUGFUNCSCALL
+                    dsyslog("   Adding plugin '%s' with main menu entry '%d'",
+                            p->Name(), *p->MainMenuEntry());
+#endif
+
+                    cache.insert(p->Name());  // Store plugin menu name in cache
+                }
+            } else {
+                break;  // Plugin not found
             }
-        } else {
-            break;  // Plugin not found
         }
+    }
+
+    // Check if the element matches any plugin name in the cache
+    if (cache.find(*element) != cache.end()) {
+        return cString::sprintf("pluginIcons/%s", *element);
     }
 
     // Check for special main menu entries "stop recording", "stop replay"
@@ -4286,8 +4302,10 @@ void cFlatDisplayMenu::PreLoadImages() {
         cString PluginName {""};
         cPlugin *p {cPluginManager::GetPlugin(i)};
         if (p) {
-            PluginName = cString::sprintf("pluginIcons/%s", p->Name());
-            ImgLoader.LoadIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+            if (!isempty(p->MainMenuEntry())) {  // Plugin has a main menu entry
+                PluginName = cString::sprintf("pluginIcons/%s", p->Name());
+                ImgLoader.LoadIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+            }
         } else {
             break;
         }
