@@ -1952,7 +1952,7 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     // All work is done in DrawEventInfo() to avoid 'invalid lock sequence' in VDR.
     // Here we just save the cEvent object for later use.
     m_Event = Event;
-    m_ShowEvent = false;
+    m_ShowEvent = true;
     m_ShowRecording = false;
     m_ShowText = false;
 }

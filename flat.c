@@ -752,20 +752,52 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
     GlyphMetricsCache &cache = glyphMetricsCache();
 
     FT_Face face = cache.GetFace(*cFont::GetFontFileName(Name));
-    if (!face) {
-        esyslog("flatPlus: GetGlyphSize() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
+    if (face == nullptr) {
+        esyslog("flatPlus: GetGlyphSize() Error: Can't find face (Font = %s)", *cFont::GetFontFileName(Name));
         return 0;
     }
     if (FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0) != 0) {
-        esyslog("flatPlus: GetGlyphSize() error: can't set char size (font = %s)", *cFont::GetFontFileName(Name));
+        esyslog("flatPlus: GetGlyphSize() Error: Can't set char size (Font = %s)", *cFont::GetFontFileName(Name));
         return 0;
     }
     FT_GlyphSlot slot = face->glyph;
     if (FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT) != 0) {
-        esyslog("flatPlus: GetGlyphSize() error: can't load glyph (font = %s)", *cFont::GetFontFileName(Name));
+        esyslog("flatPlus: GetGlyphSize() Error: Can't load glyph (Font = %s)", *cFont::GetFontFileName(Name));
         return 0;
     }
     return (slot->metrics.height + 63) / 64;
+}
+
+/**
+ * @brief Get the name of a font from its file name.
+ * @param[in] FontFileName The file name of the font to query.
+ * @return The name of the font, including style name if applicable.
+ * @note This function caches the FreeType face for the given font file and returns the face->family_name
+ *       and face->style_name (if applicable) as a cString.
+ */
+cString GetFontName(const char *FontFileName) {
+    GlyphMetricsCache &cache = glyphMetricsCache();
+
+    if (FontFileName == nullptr) {
+        esyslog("flatPlus: GetFontName() Error: FontFileName is nullptr");
+        return "";
+    }
+    FT_Face face = cache.GetFace(FontFileName);
+    if (face == nullptr) {
+        esyslog("flatPlus: GetFontName() Error: Can't find face (Font = %s)", FontFileName);
+        return "";
+    }
+    if (face->family_name == nullptr) {
+        esyslog("flatPlus: GetFontName() Error: face->family_name is nullptr (Font = %s)", FontFileName);
+        return "";
+    }
+    cString FontName {face->family_name};  // Start with the family name of the font
+    if (face->style_name != nullptr) {
+        FontName.Append(cString::sprintf(":%s", face->style_name));  // Add style name if it exists
+    } else {
+        FontName.Append(":Regular");  // Default to "Regular" if no style name exists
+    }
+    return FontName;
 }
 
 /**
@@ -786,6 +818,7 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
+    cTimeMs Timer;  // Set Timer
 #endif
     if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
@@ -795,16 +828,20 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
+    // Get the font name (Ubuntu:Regular)
+    const cString FontName {*GetFontName(Font->FontName())};
+    // dsyslog("   FontName: '%s'", *FontName);
+
     // Use cached font metrics to determine if the font is fixed-width
-    const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, Font->Size())};
-    if (FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "M") ==
-        FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "i"))
+    const int FontHeight {FontCache.GetFontHeight(FontName, Font->Size())};
+    if (FontCache.GetStringWidth(FontName, FontHeight, "M") ==
+        FontCache.GetStringWidth(FontName, FontHeight, "i"))
         return;  // Font is fixed-width, no justification needed
 #ifdef DEBUGFUNCSCALL
     dsyslog("   FontHeight %d, Width 'M' %d, Width 'i' %d",
             FontHeight,
-            FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "M"),
-            FontCache.GetStringWidth(Setup.FontOsd, FontHeight, "i"));
+            FontCache.GetStringWidth(FontName, FontHeight, "M"),
+            FontCache.GetStringWidth(FontName, FontHeight, "i"));
 #endif
 
     // Count spaces in line
@@ -817,11 +854,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     //* Detect 'HairSpace'
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
-    const char *FillChar {FontCache.GetStringWidth(Setup.FontOsd, FontHeight, " ") <
-                          FontCache.GetStringWidth(Setup.FontOsd, FontHeight, u8"\U0000200A")
+    const char *FillChar {FontCache.GetStringWidth(FontName, FontHeight, " ") <
+                          FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
                               ? " "
                               : u8"\U0000200A"};          // Use hair space if it is smaller than space
-    const int16_t FillCharWidth = FontCache.GetStringWidth(Setup.FontOsd, FontHeight, FillChar);  // Width in pixel
+    const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
     const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
 
     const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
@@ -909,6 +946,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         // dsyslog("flatPlus: JustifyLine() Line too short for justifying: LineWidth %d, LineMaxWidth * 0.8: %.0f",
         //        LineWidth, LineMaxWidth * 0.8);
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Time: %d ms", Timer.Elapsed());
+#endif
 }
 
 std::string_view ltrim(std::string_view str) {
