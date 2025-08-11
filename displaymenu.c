@@ -24,7 +24,6 @@
 #include <sstream>
 #include <string_view>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 
 #include <algorithm>
@@ -2990,24 +2989,34 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     }
 
     // Static cache to store the names of plugins
-    static std::unordered_set<std::string> cache;
+    static std::unordered_map<std::string, cString> cache;
 
     // Fill the cache with plugin menu names
     if (cache.empty()) {  // Only fill cache once
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Filling plugin name cache");
 #endif
-
+        // Iterate through all plugins and check for main menu entries
+        const char *MainMenuEntry {""};
+        cache.reserve(20);  // Reserve space for 20 entries to avoid rehashing
         for (std::size_t i {0};; ++i) {
             cPlugin *p {cPluginManager::GetPlugin(i)};
-            if (p) {
-                if (!isempty(p->MainMenuEntry())) {  // Plugin has a main menu entry
 #ifdef DEBUGFUNCSCALL
-                    dsyslog("   Adding plugin '%s' with main menu entry '%d'",
-                            p->Name(), *p->MainMenuEntry());
+            dsyslog("   Plugin %ld: %p", i, p);
+            if (p != nullptr) {
+                dsyslog("   Plugin %ld name: %s", i, p->Name());
+                MainMenuEntry = p->MainMenuEntry();
+                dsyslog("   Plugin %ld main menu entry: %s", i, MainMenuEntry);
+            }
 #endif
+            if (p != nullptr) {  // Plugin found
+                MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
+                if (!isempty(MainMenuEntry)) {  // Plugin has a main menu entry
+#ifdef DEBUGFUNCSCALL
+                    dsyslog("   Adding plugin '%s' to cache", p->Name());
+#endif
+                    cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
 
-                    cache.insert(p->Name());  // Store plugin menu name in cache
                 }
             } else {
                 break;  // Plugin not found
@@ -3016,8 +3025,9 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     }
 
     // Check if the element matches any plugin name in the cache
-    if (cache.find(*element) != cache.end()) {
-        return cString::sprintf("pluginIcons/%s", *element);
+    auto it = cache.find(ElementView.data());
+    if (it != cache.end()) {
+        return cString::sprintf("pluginIcons/%s", *it->second);
     }
 
     // Check for special main menu entries "stop recording", "stop replay"
