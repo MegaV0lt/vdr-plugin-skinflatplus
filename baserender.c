@@ -799,9 +799,7 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
         m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
-void cFlatBaseRender::ProgressBarDrawBgColor() const {
-    PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
-}
+void cFlatBaseRender::ProgressBarDrawBgColor() const { PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg); }
 
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rect, const cRect &rectBg,
                                          int Current, int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
@@ -1762,69 +1760,46 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
-                out.Temp = out.Temp.Truncate(deg);  // Remove the sign from the temp string
+                out.Temp = out.Temp.Truncate(deg);                   // Remove the sign from the temp string
             } else {
                 out.TempTodaySign = "";
             }
 
-            out.Days[day].Icon = ReadAndExtractData(iconFile);
-            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
-            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
-
-            precipitation = ReadAndExtractData(precFile);
-            if (!isempty(*precipitation)) {
-                istr.str(*precipitation);
-                istr.clear();  // Clear the error state of the stream
-                double p {0.0};
-                if (istr >> p) {  // Check if parsing succeeded
-                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
-                } else {
-                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                    out.Days[day].Precipitation = "0%";  // Default fallback
-                }
-            } else {
-                out.Days[day].Precipitation = "0%";  // Default fallback
-            }
-
             const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
             out.Location = ReadAndExtractData(locationFile);
-            if (isempty(*out.Location))
-                out.Location = tr("Unknown");
+            if (isempty(*out.Location)) out.Location = tr("Unknown");
+        }  // End of day 0 specific data reading
 
-            out.Days[day].Summary = ReadAndExtractData(summaryFile);
-        } else {
-            // For days 1-7, only read icon, tempMax, tempMin, precipitation and summary
-            out.Days[day].Icon = ReadAndExtractData(iconFile);
-            if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
-                // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
-                break;  // No more days to expect (User may configured less than 8 days)
-            }
+        // Read data for icon, tempMax, tempMin, precipitation and summary
+        out.Days[day].Icon = ReadAndExtractData(iconFile);
+        if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
+            // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
+            break;  // No more days to expect (User may configured less than 8 days)
+        }
 
-            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
-            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
+        out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
+        out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
 
-            precipitation = ReadAndExtractData(precFile);
-            if (!isempty(*precipitation)) {
-                istr.str(*precipitation);
-                istr.clear();  // Clear the error state of the stream
-                double p {0.0};
-                if (istr >> p) {  // Check if parsing succeeded
-                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
-                } else {
-                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                    out.Days[day].Precipitation = "0%";  // Default fallback
-                }
+        precipitation = ReadAndExtractData(precFile);
+        if (!isempty(*precipitation)) {
+            istr.str(*precipitation);
+            istr.clear();  // Clear the error state of the stream
+            double p {0.0};
+            if (istr >> p) {  // Check if parsing succeeded
+                out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             } else {
+                dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
                 out.Days[day].Precipitation = "0%";  // Default fallback
             }
-
-            out.Days[day].Summary = ReadAndExtractData(summaryFile);
+        } else {
+            out.Days[day].Precipitation = "0%";  // Default fallback
         }
+
+        out.Days[day].Summary = ReadAndExtractData(summaryFile);
     }
 
     out.LastReadMTime = latest;
     out_latest_time = latest;
-
     return true;
 }
 
