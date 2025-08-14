@@ -1719,10 +1719,22 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 #endif
 
     static const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
-    time_t latest {0};
+
+    // First check if temp file exists and get its last modified time
+    const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
+    const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
+    if (latest == 0) {
+        dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
+        return false;  // If the temp file doesn't exist
+    }
+    // Check if data is already cached
+    if (latest == out.LastReadMTime) {  // If latest mtime matches cached, skip reading files
+        out_latest_time = latest;
+        return true;
+    }
 
     // Moved outside the loop to avoid re-creation in each iteration
-    cString DayPrefix, tempFile, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile, locationFile;
+    cString DayPrefix, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile;
     cString precipitation;
 
     // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
@@ -1739,24 +1751,20 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
         summaryFile = cString::sprintf("%s%s", *DayPrefix, ".summary");
 
         if (day == 0) {  // Only for day 0, read temp and location file
-            tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
-            locationFile = cString::sprintf("%s%s", *prefix, "location");
-
-            // Check file mtime for 'Temp' only as all files are written together
-            latest = LastModifiedTime(tempFile);  // Get the latest modification time of the temp file
-            if (latest == 0) {
-                dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
-                return false;
-            }
-            // Check if data is already cached
-            if (latest == out.LastReadMTime) break;  // If latest mtime matches cached, skip reading files
-
-            // Get data for day 0
             out.Temp = ReadAndExtractData(tempFile);
-            // Check if 'Temp' is valid
-            if (isempty(*out.Temp)) {
+            if (isempty(*out.Temp)) {  // Check if 'Temp' is valid
                 dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
                 return false;
+            }
+
+            // Temp sign extraction
+            std::string_view tt = *out.Temp;
+            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
+            if (deg != std::string_view::npos) {
+                out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
+                out.Temp = out.Temp.Truncate(deg);  // Remove the sign from the temp string
+            } else {
+                out.TempTodaySign = "";
             }
 
             out.Days[day].Icon = ReadAndExtractData(iconFile);
@@ -1778,26 +1786,16 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.Days[day].Precipitation = "0%";  // Default fallback
             }
 
+            const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location))
                 out.Location = tr("Unknown");
 
             out.Days[day].Summary = ReadAndExtractData(summaryFile);
-
-            // Temp sign extraction
-            std::string_view tt = *out.Temp;
-            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
-            if (deg != std::string_view::npos) {
-                out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
-                out.Temp = cString(std::string(tt.substr(0, deg)).c_str());
-            } else {
-                out.TempTodaySign = "";
-            }
         } else {
             // For days 1-7, only read icon, tempMax, tempMin, precipitation and summary
             out.Days[day].Icon = ReadAndExtractData(iconFile);
-            // Check if 'Icon' is valid
-            if (isempty(*out.Days[day].Icon)) {
+            if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
                 // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
                 break;  // No more days to expect (User may configured less than 8 days)
             }
