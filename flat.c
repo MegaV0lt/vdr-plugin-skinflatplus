@@ -21,8 +21,10 @@
 #include <cerrno>
 #include <cmath>
 #include <cstdlib>
+#include <iomanip>  // for std::setfill, std::setw, std::right
 #include <memory>
 #include <random>
+#include <sstream>
 
 #include "./displaychannel.h"
 #include "./displaymenu.h"
@@ -37,15 +39,15 @@
 
 /* Possible values of the stream content descriptor according to ETSI EN 300 468 */
 enum stream_content {
-    sc_reserved        = 0x00,
-    sc_video_MPEG2     = 0x01,  // MPEG2 video
-    sc_audio_MP2       = 0x02,  // MPEG1 Layer 2 audio
-    sc_subtitle        = 0x03,
-    sc_audio_AC3       = 0x04,
-    sc_video_H264_AVC  = 0x05,
-    sc_audio_HEAAC     = 0x06,
+    sc_reserved = 0x00,
+    sc_video_MPEG2 = 0x01,  // MPEG2 video
+    sc_audio_MP2 = 0x02,    // MPEG1 Layer 2 audio
+    sc_subtitle = 0x03,
+    sc_audio_AC3 = 0x04,
+    sc_video_H264_AVC = 0x05,
+    sc_audio_HEAAC = 0x06,
     sc_video_H265_HEVC = 0x09,  // Stream content 0x09, extension 0x00
-    sc_audio_AC4       = 0x19,  // Stream content 0x09, extension 0x10
+    sc_audio_AC4 = 0x19,        // Stream content 0x09, extension 0x10
 };
 
 class cFlatConfig Config;
@@ -80,8 +82,8 @@ cSkinDisplayMessage *cFlat::DisplayMessage() { return new cFlatDisplayMessage; }
 
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &ViewPort, const cRect &DrawPort) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d)", *Name, Layer,
-            ViewPort.Left(), ViewPort.Top(), ViewPort.Width(), ViewPort.Height());
+    dsyslog("flatPlus: CreatePixmap('%s', %d, left %d, top %d, size %dx%d)", *Name, Layer, ViewPort.Left(),
+            ViewPort.Top(), ViewPort.Width(), ViewPort.Height());
     if (DrawPort.Width() > 0 && DrawPort.Height() > 0) {
         dsyslog("   DrawPort: left %d, top %d, size %dx%d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
                 DrawPort.Height());
@@ -130,170 +132,164 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
                      std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,  // NOLINT
                      const cRecording *Recording) {
     static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
-    if (pScraper) {
-        ScraperGetEventType call;
-        if (Event)
-            call.event = Event;
-        else if (Recording)
-            call.recording = Recording;
-        else
-            return;  // Check if both are unset
+    if (!pScraper) return;
 
-        int seriesId {0}, episodeId {0}, movieId {0};
-        if (pScraper->Service("GetEventType", &call)) {
-            seriesId = call.seriesId;
-            episodeId = call.episodeId;
-            movieId = call.movieId;
+    ScraperGetEventType call;
+    if (Event)
+        call.event = Event;
+    else if (Recording)
+        call.recording = Recording;
+    else
+        return;  // Check if both are unset
+
+    if (!pScraper->Service("GetEventType", &call)) return;  // Check if service call was successful
+
+    if (call.type == tSeries) {
+        cSeries series;
+        series.seriesId = call.seriesId;
+        series.episodeId = call.episodeId;
+        if (!pScraper->Service("GetSeries", &series)) return;  // Check if service call was successful
+
+        if (series.banners.size() > 1) {  // Use random banner
+            // Gets 'entropy' from device that generates random numbers itself
+            // to seed a mersenne twister (pseudo) random generator
+            std::mt19937 generator(std::random_device {}());
+
+            // Make sure all numbers have an equal chance.
+            // Range is inclusive (so we need -1 for vector index)
+            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+            const std::size_t number {distribution(generator)};
+            MediaPath = series.banners[number].path.c_str();
+            dsyslog("flatPlus: Using random image %d (%s) out of %d available images", static_cast<int>(number + 1),
+                    *MediaPath,
+                    static_cast<int>(series.banners.size()));  // Log result
+        } else if (series.banners.size() == 1) {               // Just one banner
+            MediaPath = series.banners[0].path.c_str();
         }
-        if (call.type == tSeries) {
-            cSeries series;
-            series.seriesId = seriesId;
-            series.episodeId = episodeId;
-            if (pScraper->Service("GetSeries", &series)) {
-                if (series.banners.size() > 1) {  // Use random banner
-                    // Gets 'entropy' from device that generates random numbers itself
-                    // to seed a mersenne twister (pseudo) random generator
-                    std::mt19937 generator(std::random_device {}());
-
-                    // Make sure all numbers have an equal chance.
-                    // Range is inclusive (so we need -1 for vector index)
-                    std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                    const std::size_t number {distribution(generator)};
-                    MediaPath = series.banners[number].path.c_str();
-                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                            static_cast<int>(number + 1), *MediaPath,
-                            static_cast<int>(series.banners.size()));  // Log result
-                } else if (series.banners.size() == 1) {               // Just one banner
-                    MediaPath = series.banners[0].path.c_str();
+        if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
+            const std::size_t ActorsSize {series.actors.size()};
+            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+            ActorsName.reserve(ActorsSize);
+            ActorsRole.reserve(ActorsSize);
+            for (const auto &actor : series.actors) {
+                if (LastModifiedTime(actor.actorThumb.path.c_str())) {
+                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
+                    ActorsName.emplace_back(actor.name.c_str());
+                    ActorsRole.emplace_back(actor.role.c_str());
                 }
-                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const std::size_t ActorsSize {series.actors.size()};
-                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                    ActorsName.reserve(ActorsSize);
-                    ActorsRole.reserve(ActorsSize);
-                    for (std::size_t i {0}; i < ActorsSize; ++i) {
-                        if (LastModifiedTime(series.actors[i].actorThumb.path.c_str())) {
-                            ActorsPath.emplace_back(series.actors[i].actorThumb.path.c_str());
-                            ActorsName.emplace_back(series.actors[i].name.c_str());
-                            ActorsRole.emplace_back(series.actors[i].role.c_str());
-                        }
-                    }
-                }
-                InsertSeriesInfos(series, SeriesInfo);  // Add series infos
-            }
-        } else if (call.type == tMovie) {
-            cMovie movie;
-            movie.movieId = movieId;
-            if (pScraper->Service("GetMovie", &movie)) {
-                MediaPath = movie.poster.path.c_str();
-                if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-                    const std::size_t ActorsSize {movie.actors.size()};
-                    ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-                    ActorsName.reserve(ActorsSize);
-                    ActorsRole.reserve(ActorsSize);
-                    for (std::size_t i {0}; i < ActorsSize; ++i) {
-                        if (LastModifiedTime(movie.actors[i].actorThumb.path.c_str())) {
-                            ActorsPath.emplace_back(movie.actors[i].actorThumb.path.c_str());
-                            ActorsName.emplace_back(movie.actors[i].name.c_str());
-                            ActorsRole.emplace_back(movie.actors[i].role.c_str());
-                        }
-                    }
-                }
-                InsertMovieInfos(movie, MovieInfo);  // Add movie infos
             }
         }
-    }  // Scraper plugin
+        InsertSeriesInfos(series, SeriesInfo);  // Add series infos
+    } else if (call.type == tMovie) {
+        cMovie movie;
+        movie.movieId = call.movieId;
+        if (!pScraper->Service("GetMovie", &movie)) return;  // Check if service call was successful
+
+        MediaPath = movie.poster.path.c_str();
+        if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
+            const std::size_t ActorsSize {movie.actors.size()};
+            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
+            ActorsName.reserve(ActorsSize);
+            ActorsRole.reserve(ActorsSize);
+            for (const auto &actor : movie.actors) {
+                if (LastModifiedTime(actor.actorThumb.path.c_str())) {
+                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
+                    ActorsName.emplace_back(actor.name.c_str());
+                    ActorsRole.emplace_back(actor.role.c_str());
+                }
+            }
+        }
+        InsertMovieInfos(movie, MovieInfo);  // Add movie infos
+    }
 }
 
 // Get MediaPath, MediaSize and return MediaType
 int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event,  // NOLINT
                             const cRecording *Recording) {
     static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
-    if (pScraper) {
-        ScraperGetEventType call;
-        if (Event)
-            call.event = Event;
-        else if (Recording)
-            call.recording = Recording;
-        else
-            return 0;  // Check if both are unset
+    if (!pScraper) return 0;  // No scraper plugin available
 
-        int seriesId {0}, episodeId {0}, movieId {0};
-        if (pScraper->Service("GetEventType", &call)) {
-            seriesId = call.seriesId;
-            episodeId = call.episodeId;
-            movieId = call.movieId;
+    ScraperGetEventType call;
+    if (Event)
+        call.event = Event;
+    else if (Recording)
+        call.recording = Recording;
+    else
+        return 0;  // Check if both are unset
+
+    if (!pScraper->Service("GetEventType", &call)) return 0;  // Check if service call was successful
+
+    if (call.type == tSeries) {
+        cSeries series;
+        series.seriesId = call.seriesId;
+        series.episodeId = call.episodeId;
+        if (!pScraper->Service("GetSeries", &series)) return 0;  // Check if service call was successful
+
+        if (series.banners.size() > 1) {  // Use random banner
+            // Gets 'entropy' from device that generates random numbers itself
+            // to seed a mersenne twister (pseudo) random generator
+            std::mt19937 generator(std::random_device {}());
+
+            // Make sure all numbers have an equal chance.
+            // Range is inclusive (so we need -1 for vector index)
+            std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
+
+            const std::size_t number {distribution(generator)};
+            MediaPath = series.banners[number].path.c_str();
+            MediaSize.Set(series.banners[number].width, series.banners[number].height);
+            dsyslog("flatPlus: Using random image %d (%s) out of %d available images", static_cast<int>(number + 1),
+                    *MediaPath,
+                    static_cast<int>(series.banners.size()));  // Log result
+        } else if (series.banners.size() == 1) {               // Just one banner
+            MediaPath = series.banners[0].path.c_str();
+            MediaSize.Set(series.banners[0].width, series.banners[0].height);
         }
-        if (call.type == tSeries) {
-            cSeries series;
-            series.seriesId = seriesId;
-            series.episodeId = episodeId;
-            if (pScraper->Service("GetSeries", &series)) {
-                if (series.banners.size() > 1) {  // Use random banner
-                    // Gets 'entropy' from device that generates random numbers itself
-                    // to seed a mersenne twister (pseudo) random generator
-                    std::mt19937 generator(std::random_device {}());
-
-                    // Make sure all numbers have an equal chance.
-                    // Range is inclusive (so we need -1 for vector index)
-                    std::uniform_int_distribution<std::size_t> distribution(0, series.banners.size() - 1);
-
-                    const std::size_t number {distribution(generator)};
-                    MediaPath = series.banners[number].path.c_str();
-                    MediaSize.Set(series.banners[number].width, series.banners[number].height);
-                    dsyslog("flatPlus: Using random image %d (%s) out of %d available images",
-                            static_cast<int>(number + 1), *MediaPath,
-                            static_cast<int>(series.banners.size()));  // Log result
-                } else if (series.banners.size() == 1) {               // Just one banner
-                    MediaPath = series.banners[0].path.c_str();
-                    MediaSize.Set(series.banners[0].width, series.banners[0].height);
-                }
-                return 1;  // MediaType = 1;
-            }
-        } else if (call.type == tMovie) {
-            cMovie movie;
-            movie.movieId = movieId;
-            if (pScraper->Service("GetMovie", &movie)) {
-                MediaPath = movie.poster.path.c_str();
-                MediaSize.Set(movie.poster.width, movie.poster.height);
-                return 2;  // MediaType = 2;
-            }
+        return 1;  // MediaType = 1;
+    } else if (call.type == tMovie) {
+        cMovie movie;
+        movie.movieId = call.movieId;
+        if (pScraper->Service("GetMovie", &movie)) {
+            MediaPath = movie.poster.path.c_str();
+            MediaSize.Set(movie.poster.width, movie.poster.height);
+            return 2;  // MediaType = 2;
         }
     }
     return 0;  // tNone
 }
 
+/**
+ * @brief Insert series information from 'TheTVDB' into the given string.
+ *
+ * @param Series Reference to data structure containing information about the series.
+ * @param SeriesInfo String to append the information to.
+ *
+ */
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
-    if (Series.name.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("name: "), Series.name.c_str()));
-    if (Series.firstAired.length() > 0)
-        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("first aired: "), Series.firstAired.c_str()));
-    if (Series.network.length() > 0)
-        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("network: "), Series.network.c_str()));
-    if (Series.genre.length() > 0) SeriesInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Series.genre.c_str()));
-    if (Series.rating > 0) SeriesInfo.Append(cString::sprintf("%s%.1f\n", tr("rating: "), Series.rating));  // TheTVDB
-    if (Series.status.length() > 0)
-        SeriesInfo.Append(cString::sprintf("%s%s\n", tr("status: "), Series.status.c_str()));
-    if (Series.episode.season > 0)
-        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("season number: "), Series.episode.season));
-    if (Series.episode.number > 0)
-        SeriesInfo.Append(cString::sprintf("%s%d\n", tr("episode number: "), Series.episode.number));
+    std::ostringstream oss {""};
+    oss.imbue(std::locale {""});  // Set to local locale
+    if (Series.name.length() > 0) oss << tr("name: ") << Series.name << '\n';
+    if (Series.firstAired.length() > 0) oss << tr("firstAired: ") << Series.firstAired << '\n';
+    if (Series.network.length() > 0) oss << tr("network: ") << Series.network << '\n';
+    if (Series.genre.length() > 0) oss << tr("genre: ") << Series.genre << '\n';
+    if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << '\n';
+    if (Series.status.length() > 0) oss << tr("status: ") << Series.status << '\n';
+    if (Series.episode.season > 0) oss << tr("season number: ") << Series.episode.season << '\n';
+    if (Series.episode.number > 0) oss << tr("episode number: ") << Series.episode.number << '\n';
+    SeriesInfo.Append(oss.str().c_str());
 }
 
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
-    if (Movie.title.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("title: "), Movie.title.c_str()));
-    if (Movie.originalTitle.length() > 0)
-        MovieInfo.Append(cString::sprintf("%s%s\n", tr("original title: "), Movie.originalTitle.c_str()));
-    if (Movie.collectionName.length() > 0)
-        MovieInfo.Append(cString::sprintf("%s%s\n", tr("collection name: "), Movie.collectionName.c_str()));
-    if (Movie.genres.length() > 0) MovieInfo.Append(cString::sprintf("%s%s\n", tr("genre: "), Movie.genres.c_str()));
-    if (Movie.releaseDate.length() > 0)
-        MovieInfo.Append(cString::sprintf("%s%s\n", tr("release date: "), Movie.releaseDate.c_str()));
-    // TheMovieDB
-    if (Movie.popularity > 0) MovieInfo.Append(cString::sprintf("%s%.1f\n", tr("popularity: "), Movie.popularity));
-    if (Movie.voteAverage > 0)
-        MovieInfo.Append(
-            cString::sprintf("%s%.0f%%\n", tr("vote average: "), Movie.voteAverage * 10));  // 10 Points = 100%
+    std::ostringstream oss {""};
+    oss.imbue(std::locale {""});  // Set to local locale
+    if (Movie.title.length() > 0) oss << tr("title: ") << Movie.title << '\n';
+    if (Movie.originalTitle.length() > 0) oss << tr("original title: ") << Movie.originalTitle << '\n';
+    if (Movie.collectionName.length() > 0) oss << tr("collection name: ") << Movie.collectionName << '\n';
+    if (Movie.genres.length() > 0) oss << tr("genre: ") << Movie.genres << '\n';
+    if (Movie.releaseDate.length() > 0) oss << tr("release date: ") << Movie.releaseDate << '\n';
+    if (Movie.popularity > 0) oss << tr("popularity: ") << std::fixed << oss.precision(1) << Movie.popularity << '\n';
+    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << '\n';  // 10 Points = 100%
+    MovieInfo.Append(oss.str().c_str());
 }
 
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
@@ -348,7 +344,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     // Find radio and H.264/H.265 streams.
     //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
-        for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // TODO: Use for_each
+        for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // Not iterable
             switch (Components->Component(i)->stream) {
             case sc_video_MPEG2: return "sd";
             case sc_video_H264_AVC: return "hd";
@@ -442,58 +438,64 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize) {  // NOLINT
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
+    std::ostringstream ossText {""}, ossAudio {""}, ossSubtitle {""};
     cString AudioType {""};
-    for (int16_t i {0}; i < Components->NumComponents(); ++i) {
+    const int NumComponents {Components->NumComponents()};
+    for (int16_t i {0}; i < NumComponents; ++i) {
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
-            if (NewLine) Text.Append("\n");
+            if (NewLine) ossText << '\n';
             if (p->description)
-                Text.Append(cString::sprintf("%s: %s (MPEG2)", tr("Video"), p->description));
+                ossText << tr("Video") << ": " << p->description << " (MPEG2)";
             else
-                Text.Append(cString::sprintf("%s: MPEG2", tr("Video")));
+                ossText << tr("Video") << ": MPEG2";
             break;
         case sc_video_H264_AVC:
-            if (NewLine) Text.Append("\n");
+            if (NewLine) ossText << '\n';
             if (p->description)
-                Text.Append(cString::sprintf("%s: %s (H.264)", tr("Video"), p->description));
+                ossText << tr("Video") << ": " << p->description << " (H.264)";
             else
-                Text.Append(cString::sprintf("%s: H.264", tr("Video")));
+                ossText << tr("Video") << ": H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
-            if (NewLine) Text.Append("\n");
+            if (NewLine) ossText << '\n';
             if (p->description)
-                Text.Append(cString::sprintf("%s: %s (H.265)", tr("Video"), p->description));
+                ossText << tr("Video") << ": " << p->description << " (H.265)";
             else
-                Text.Append(cString::sprintf("%s: H.265", tr("Video")));
+                ossText << tr("Video") << ": H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
         case sc_audio_HEAAC:
-            if (Audio[0] != '\0') Audio.Append(", ");
-            switch (p->stream) {
-            case sc_audio_MP2:
-                // Workaround for wrongfully used stream type X 02 05 for AC3
-                AudioType = (p->type == 5) ? "AC3" : "MP2";
-                break;
-            case sc_audio_AC3: AudioType = "AC3"; break;
-            case sc_audio_HEAAC: AudioType = "HEAAC"; break;
-            }  // switch p->stream
-            if (p->description)
-                Audio.Append(cString::sprintf("%s (%s)", p->description, p->language));
-            else
-                Audio.Append(cString::sprintf("%s (%s)", p->language, *AudioType));
+            if (ossAudio.tellp() > 0) ossAudio << ", ";
+            if (p->description) {
+                ossAudio << p->description << " (" << p->language << ')';
+            } else {
+                switch (p->stream) {
+                case sc_audio_MP2:
+                    // Workaround for wrongfully used stream type X 02 05 for AC3
+                    AudioType = (p->type == 5) ? "AC3" : "MP2";
+                    break;
+                case sc_audio_AC3: AudioType = "AC3"; break;
+                case sc_audio_HEAAC: AudioType = "HEAAC"; break;
+                }  // switch p->stream
+                ossAudio << p->language << " (" << *AudioType << ')';
+            }  // if description
             break;
         case sc_subtitle:
-            if (Subtitle[0] != '\0') Subtitle.Append(", ");
+            if (ossSubtitle.tellp() > 0) ossSubtitle << ", ";
             if (p->description)
-                Subtitle.Append(cString::sprintf("%s (%s)", p->description, p->language));
+                ossSubtitle << p->description << " (" << p->language << ')';
             else
-                Subtitle.Append(p->language);
+                ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
             break;
         }  // switch
     }  // for
+    Text.Append(ossText.str().c_str());
+    Audio.Append(ossAudio.str().c_str());
+    Subtitle.Append(ossSubtitle.str().c_str());
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
@@ -528,30 +530,33 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         Pattern = XmlSubstring(Buffer, "<pattern>", "</pattern>");
     }
 
+    std::ostringstream oss {""};
     if (InfoLine) {
         if ((!Channel.empty() && !Searchtimer.empty()) || (!Causedby.empty() && !Reason.empty()) || !Pattern.empty())
-            Text.Append(cString::sprintf("\n\n%s:", tr("additional information")));  // Show info line
+            oss << "\n\n" << tr("additional information") << ':';  // Show info line
     }
 
     if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
-        Text.Append(cString::sprintf("\nEPGsearch: %s: %s, %s: %s", tr("channel"), Channel.c_str(),
-                                     tr("search pattern"), Searchtimer.c_str()));
+        oss << "\nEPGsearch: " << tr("channel") << ": " << Channel << ", " << tr("search pattern") << ": "
+            << Searchtimer;
     }
 
     if (!Causedby.empty() && !Reason.empty()) {  // TVScraper
-        Text.Append(cString::sprintf("\nTVScraper: %s: %s, %s: ", tr("caused by"), Causedby.c_str(), tr("reason")));
+        oss << "\nTVScraper: " << tr("caused by") << ": " << Causedby << ", " << tr("reason") << ": ";
         if (Reason == "improve")
-            Text.Append(tr("improve"));
+            oss << tr("improve");
         else if (Reason == "collection")
-            Text.Append(tr("collection"));
+            oss << tr("collection");
         else if (Reason == "TV show, missing episode")
-            Text.Append(tr("TV show, missing episode"));
+            oss << tr("TV show, missing episode");
         else
-            Text.Append(Reason.c_str());  // To be safe if there are more options
+            oss << Reason;  // To be safe if there are more options
     }
 
     if (!Pattern.empty())  // VDRAdmin
-        Text.Append(cString::sprintf("\nVDRadmin-AM: %s: %s", tr("search pattern"), Pattern.c_str()));
+        oss << "\nVDRadmin-AM: " << tr("search pattern") << ": " << Pattern;
+
+    Text.Append(oss.str().c_str());
 }
 
 int GetEpgsearchConflicts() {
@@ -674,53 +679,59 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         }
     }
 
+    std::ostringstream oss {""};
+    oss.imbue(std::locale {""});  // Set to local locale
     if (index && LastIndex) {  // Do not show zero value
-        Text.Append(cString::sprintf("%s: %s", tr("Length"), *IndexToHMSF(LastIndex, false, FramesPerSecond)));
+        oss << tr("Length") << ": " << *IndexToHMSF(LastIndex, false, FramesPerSecond);
         if (HasMarks && CutLength > 0)  // Do not show zero value
-            Text.Append(cString::sprintf(" (%s: %s)", tr("cutted"), *IndexToHMSF(CutLength, false, FramesPerSecond)));
-        Text.Append("\n");
+            oss << " (" << tr("cutted") << ": " << *IndexToHMSF(CutLength, false, FramesPerSecond) << ')';
+        oss << '\n';
     }
 
     const uint64_t RecSize {FileSize[MaxFileNum]};  // Size of the recording in bytes
     if (RecSize > MEGABYTE(1023))                   // Show a '!' when an error occurred detecting filesize
-        Text.Append(cString::sprintf("%s: %s%.2f GB", tr("Size"), (FsErr) ? "!" : "",
-                                     static_cast<float>(RecSize) / MEGABYTE(1024)));
+        oss << tr("Size") << ": " << (FsErr ? "!" : "") << std::fixed << std::setprecision(2)
+            << static_cast<float>(RecSize) / MEGABYTE(1024) << " GB";
     else
-        Text.Append(cString::sprintf("%s: %s%lld MB", tr("Size"), (FsErr) ? "!" : "", RecSize / MEGABYTE(1)));
+        oss << tr("Size") << ": " << (FsErr ? "!" : "") << std::fixed << std::setprecision(0)
+            << static_cast<float>(RecSize) / MEGABYTE(1) << " MB";
 
     if (HasMarks && (RecSizeCut)) {  // Do not show zero value
         if (RecSizeCut > MEGABYTE(1023))
-            Text.Append(
-                cString::sprintf(" (%s: %.2f GB)", tr("cutted"), static_cast<float>(RecSizeCut) / MEGABYTE(1024)));
+            oss << " (" << tr("cutted") << ": " << std::fixed << std::setprecision(2)
+                << static_cast<float>(RecSizeCut) / MEGABYTE(1024) << " GB)";
         else
-            Text.Append(cString::sprintf(" (%s: %lld MB)", tr("cutted"), RecSizeCut / MEGABYTE(1)));
+            oss << " (" << tr("cutted") << ": " << std::fixed << std::setprecision(0)
+                << static_cast<float>(RecSizeCut) / MEGABYTE(1) << " MB)";
     }
-    Text.Append(cString::sprintf("\n%s: %d, %s: %d", trVDR("Priority"), Recording->Priority(), trVDR("Lifetime"),
-                                 Recording->Lifetime()));
+    oss << '\n' << trVDR("Priority") << ": " << Recording->Priority() << ", " << trVDR("Lifetime") << ": "
+        << Recording->Lifetime();
 
     // Add video format information (Format, Resolution, Framerate, …)
 #if APIVERSNUM >= 20605
     const cRecordingInfo *RecInfo {Recording->Info()};  // From skin ElchiHD
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
-        Text.Append(cString::sprintf("\n%s: %s, %dx%d", tr("format"), (IsPesRecording) ? "PES" : "TS",
-                                     RecInfo->FrameWidth(), RecInfo->FrameHeight()));
-        Text.Append(cString::sprintf("@%.2g", FramesPerSecond));
+        oss << '\n'
+            << tr("format") << ": " << (IsPesRecording ? "PES" : "TS") << ", " << RecInfo->FrameWidth() << "x"
+            << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(2) << RecInfo->FramesPerSecond();
         if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
-            Text.Append(cString::sprintf("%c", RecInfo->ScanTypeChar()));
-        if (RecInfo->AspectRatio() != arUnknown) Text.Append(cString::sprintf(" %s", RecInfo->AspectRatioText()));
+            oss << RecInfo->ScanTypeChar();
+        if (RecInfo->AspectRatio() != arUnknown) oss << ' ' << RecInfo->AspectRatioText();
 
         if (LastIndex)  //* Bitrate in new line
-            Text.Append(cString::sprintf("\n%s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                                         static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
+            oss << '\n' << tr("bit rate") << ": Ø " << std::fixed << std::setprecision(2)
+                << static_cast<float>(RecSize) / LastIndex * RecInfo->FramesPerSecond() * 8 / MEGABYTE(1)
+                << " MBit/s (Video + Audio)";
     } else  // NOLINT
 #endif
     {
-        Text.Append(cString::sprintf("\n%s: %s", tr("format"), (IsPesRecording) ? "PES" : "TS"));
-
+        oss << '\n' << tr("format") << ": " << (IsPesRecording ? "PES" : "TS");
         if (LastIndex)  //* Bitrate at same line
-            Text.Append(cString::sprintf(", %s: Ø %.2f MBit/s (Video + Audio)", tr("bit rate"),
-                                         static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)));
+            oss << ", " << tr("bit rate") << ": Ø " << std::fixed << std::setprecision(2)
+                << static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)
+                << " MBit/s (Video + Audio)";
     }
+    Text.Append(oss.str().c_str());
 }
 
 // Returns the string between start and end or an empty string if not found
@@ -791,13 +802,11 @@ cString GetFontName(const char *FontFileName) {
         esyslog("flatPlus: GetFontName() Error: face->family_name is nullptr (Font = %s)", FontFileName);
         return "";
     }
-    cString FontName {face->family_name};  // Start with the family name of the font
-    if (face->style_name != nullptr) {
-        FontName.Append(cString::sprintf(":%s", face->style_name));  // Add style name if it exists
-    } else {
-        FontName.Append(":Regular");  // Default to "Regular" if no style name exists
-    }
-    return FontName;
+    std::ostringstream FontName {""};
+    FontName << face->family_name << ':'
+             << (face->style_name == nullptr ? "Regular" : face->style_name);  // Style name
+
+    return FontName.str().c_str();
 }
 
 /**
@@ -830,18 +839,13 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     // Get the font name (Ubuntu:Regular)
     const cString FontName {*GetFontName(Font->FontName())};
-    // dsyslog("   FontName: '%s'", *FontName);
-
     // Use cached font metrics to determine if the font is fixed-width
     const int FontHeight {FontCache.GetFontHeight(FontName, Font->Size())};
-    if (FontCache.GetStringWidth(FontName, FontHeight, "M") ==
-        FontCache.GetStringWidth(FontName, FontHeight, "i"))
+    if (FontCache.GetStringWidth(FontName, FontHeight, "M") == FontCache.GetStringWidth(FontName, FontHeight, "i"))
         return;  // Font is fixed-width, no justification needed
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   FontHeight %d, Width 'M' %d, Width 'i' %d",
-            FontHeight,
-            FontCache.GetStringWidth(FontName, FontHeight, "M"),
-            FontCache.GetStringWidth(FontName, FontHeight, "i"));
+    dsyslog("   FontName '%s', FontHeight %d, Width 'M' %d, Width 'i' %d", *FontName, FontHeight,
+            FontCache.GetStringWidth(FontName, FontHeight, "M"), FontCache.GetStringWidth(FontName, FontHeight, "i"));
 #endif
 
     // Count spaces in line
@@ -855,11 +859,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {FontCache.GetStringWidth(FontName, FontHeight, " ") <
-                          FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
+                                  FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
                               ? " "
-                              : u8"\U0000200A"};          // Use hair space if it is smaller than space
+                              : u8"\U0000200A"};  // Use hair space if it is smaller than space
     const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
-    const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
+    const std::size_t FillCharLength {strlen(FillChar)};                                     // Length in chars
 
     const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
     if ((LineWidth + FillCharWidth) > LineMaxWidth)       // Check if at least one 'FillChar' fits in to the line
