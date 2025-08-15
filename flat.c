@@ -278,7 +278,13 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     if (Series.episode.number > 0) oss << tr("episode number: ") << Series.episode.number << '\n';
     SeriesInfo.Append(oss.str().c_str());
 }
-
+/**
+ * @brief Insert movie information from 'TheMovieDB' into the given string.
+ *
+ * @param Movie Reference to data structure containing information about the movie.
+ * @param MovieInfo String to append the information to.
+ *
+ */
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
@@ -287,7 +293,8 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     if (Movie.collectionName.length() > 0) oss << tr("collection name: ") << Movie.collectionName << '\n';
     if (Movie.genres.length() > 0) oss << tr("genre: ") << Movie.genres << '\n';
     if (Movie.releaseDate.length() > 0) oss << tr("release date: ") << Movie.releaseDate << '\n';
-    if (Movie.popularity > 0) oss << tr("popularity: ") << std::fixed << oss.precision(1) << Movie.popularity << '\n';
+    if (Movie.popularity > 0)
+        oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
     if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << '\n';  // 10 Points = 100%
     MovieInfo.Append(oss.str().c_str());
 }
