@@ -134,8 +134,6 @@ class cFlatBaseRender {
     void DecorBorderRedrawAll();
     void DecorBorderClearByFrom(int From);
 
-    static int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
-
     cString ReadAndExtractData(const cString &FilePath) const;  // Read file and return its content as cString
     bool BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time);  // Read weather data  // NOLINT
 

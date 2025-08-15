@@ -32,15 +32,16 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
-#include "./glyphmetricscache.h"
 
 cFlatBaseRender::cFlatBaseRender() {
     // Standard fonts
     m_Font = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
+
     m_FontName = Setup.FontOsd;
     m_FontSmlName = Setup.FontSml;
+
     m_FontHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize);
     m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize);
@@ -69,7 +70,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_TopBarFontSmlHeight = FontCache.GetFontHeight(Setup.FontOsd, fs / 2);
     m_TopBarFontClockHeight = FontCache.GetFontHeight(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
 
-    m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
+    m_FontAscender = FontCache.GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
@@ -1676,26 +1677,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
-int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
-    GlyphMetricsCache &cache = glyphMetricsCache();  // Use the cache
-    FT_Face face {cache.GetFace(*cFont::GetFontFileName(Name))};
-    if (!face) {
-        esyslog("flatPlus: GetFontAscender() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
-        return CharHeight;
-    }
-
-    int Ascender {CharHeight};
-    if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
-        Ascender = face->available_sizes->height;
-    } else if (FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0) == 0) {
-        Ascender = face->size->metrics.ascender / 64;
-    } else {
-        esyslog("flatPlus: GetFontAscender() FreeType error during FT_Set_Char_Size (font = %s)",
-                *cFont::GetFontFileName(Name));
-    }
-
-    return Ascender;
-}
 cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     if (isempty(*FilePath)) return "";
 
@@ -1719,7 +1700,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     static const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
 
     // First check if temp file exists and get its last modified time
-    const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
+    static const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
     const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
     if (latest == 0) {
         dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
@@ -1821,8 +1802,8 @@ static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  //
     cache.WeatherFontSml = FontCache.GetFont(Setup.FontOsd, fs / 2);
     cache.WeatherFontSign = FontCache.GetFont(Setup.FontOsd, fs / 2.5);
 
-    cache.FontAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs);
-    cache.FontSignAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs / 2.5);
+    cache.FontAscender = FontCache.GetFontAscender(Setup.FontOsd, fs);
+    cache.FontSignAscender = FontCache.GetFontAscender(Setup.FontOsd, fs / 2.5);
     if (!cache.WeatherFont || !cache.WeatherFontSml || !cache.WeatherFontSign) {
         esyslog("flatPlus: EnsureWeatherWidgetFonts() Font pointer is null!");
         return;
@@ -1912,8 +1893,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           Theme.Color(clrItemCurrentBg), wd.WeatherFont);
     left += TempTodayWidth;
 
-    const int t {(WeatherFontHeight - WeatherCache.FontAscender) -
-                 (WeatherCache.FontSignHeight - WeatherCache.FontSignAscender)};
+    const int t {(WeatherFontHeight - wd.FontAscender) - (wd.FontSignHeight - wd.FontSignAscender)};
 
     // Add temperature sign
     WeatherWidget.AddText(wd.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),

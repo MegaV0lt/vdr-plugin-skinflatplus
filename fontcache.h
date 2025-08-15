@@ -20,6 +20,7 @@ class cFontCache {
         cString name {""};
         int size {0};
         int height {0};
+        int ascender;  // Ascender for the font, used for vertical alignment
         mutable std::map<std::string, int> StringWidthCache;  // Cache for string widths
     };
 
@@ -37,6 +38,8 @@ class cFontCache {
     int GetFontHeight(const cString &Name, int Size) const;
     void InsertFont(const cString &Name, int Size);
     int GetCacheCount() const;
+    int GetFontAscender(const cString& FontName, int FontSize);
+    int CalculateFontAscender(const cString& FontName, int FontSize) const;
     int GetStringWidth(const cString &Name, int Height, const cString &Text) const;
 };
 

@@ -565,7 +565,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     if (CachedProgressBarHeight != ProgressBarHeight) {
         CachedProgressBarHeight = ProgressBarHeight;
-        CachedFontAscender = GetFontAscender(Setup.FontOsd, ProgressBarHeight);
+        CachedFontAscender = FontCache.GetFontAscender(Setup.FontOsd, ProgressBarHeight);
         CachedGlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
     }
 

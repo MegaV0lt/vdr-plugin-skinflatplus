@@ -12,12 +12,11 @@
 #include <string_view>
 
 #include "./fontcache.h"
+#include "./glyphmetricscache.h"
 
 cFontCache FontCache;  // Global font cache object
 
-cFontCache::~cFontCache() {
-    Clear();
-}
+cFontCache::~cFontCache() { Clear(); }
 
 void cFontCache::Create() {
 #ifdef DEBUGFUNCSCALL
@@ -40,6 +39,7 @@ void cFontCache::Clear() {
         data.name = "";
         data.size = 0;
         data.height = 0;
+        data.ascender = 0;
         data.StringWidthCache.clear();
     }
     m_InsertIndex = 0;
@@ -48,7 +48,7 @@ void cFontCache::Clear() {
 cFont* cFontCache::GetFont(const cString &Name, int Size) {
     std::string_view NameView {*Name};
     if (NameView.empty() || Size <= 0) {  // Invalid parameters
-        esyslog("flatPlus: FontCache - Invalid parameters: Name=%s, Size=%d", *Name, Size);
+        esyslog("flatPlus: cFontCache::GetFont() Invalid parameters: Name=%s, Size=%d", *Name, Size);
         return nullptr;
     }
 
@@ -78,6 +78,7 @@ int cFontCache::GetFontHeight(const cString &Name, int Size) const {
             return data.height;
         }
     }
+    dsyslog("flatPlus: cFontCache::GetFontHeight() Font not found in cache: Name=%s, Size=%d", *Name, Size);
     return 0;  // Font not found in cache
 }
 
@@ -88,7 +89,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 
     if (isempty(*Name) || Size <= 0) return;  // Invalid parameters
     if (FontCache[m_InsertIndex].font != nullptr) {  // If the font already exists, delete it
-        dsyslog("flatPlus: FontCache - Replacing existing font at index %zu", m_InsertIndex);
+        dsyslog("flatPlus: cFontCache::InsertFont() Replacing existing font at index %zu", m_InsertIndex);
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
         FontCache[m_InsertIndex].name = "";
@@ -99,7 +100,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 
     FontCache[m_InsertIndex].font = cFont::CreateFont(*Name, Size);
     if (!FontCache[m_InsertIndex].font) {
-        esyslog("flatPlus: FontCache - Failed to create font %s size %d", *Name, Size);
+        esyslog("flatPlus: cFontCache::InsertFont() Failed to create font '%s' size %d", *Name, Size);
         return;
     }
 
@@ -108,7 +109,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
 
     if (++m_InsertIndex >= MaxFontCache) {
-        isyslog("flatPlus: FontCache overflow, increase MaxFontCache (%zu)", MaxFontCache);
+        isyslog("flatPlus: cFontCache::InsertFont() Cache overflow, increase MaxFontCache (%zu)", MaxFontCache);
         m_InsertIndex = 0;
     }
 }
@@ -121,6 +122,52 @@ int cFontCache::GetCacheCount() const {
         ++count;
     }
     return count;
+}
+
+int cFontCache::GetFontAscender(const cString& FontName, int FontSize) {
+    std::string_view FontNameView {*FontName};
+    if (FontNameView.empty() || FontSize <= 0) {
+        esyslog("flatPlus: cFontCache::GetFontAscender() Invalid parameters: FontName=%s, FontSize=%d", *FontName,
+                FontSize);
+        return FontSize;
+    }
+    for (auto& data : FontCache) {
+        if (std::string_view {*data.name} == FontNameView && data.size == FontSize) {
+            if (data.ascender != 0) {
+                // Return cached ascender value
+                return data.ascender;
+            } else {
+                // Calculate and cache ascender value
+                data.ascender = CalculateFontAscender(FontName, FontSize);
+                return data.ascender;
+            }
+        }
+    }
+    dsyslog("flatPlus: cFontCache::GetFontAscender() Font not found in cache: FontName=%s, FontSize=%d", *FontName,
+            FontSize);
+    return FontSize;  // Default fallback if font not found
+}
+
+int cFontCache::CalculateFontAscender(const cString& FontName, int FontSize) const {
+    GlyphMetricsCache& cache = glyphMetricsCache();
+    FT_Face face = cache.GetFace(*cFont::GetFontFileName(FontName));
+    if (!face) {
+        esyslog("flatPlus: cFontCache::GetFontAscender() FreeType error: Can't find face (Font = %s)",
+                *cFont::GetFontFileName(FontName));
+        return FontSize;
+    }
+
+    int ascender = FontSize;
+    if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
+        ascender = face->available_sizes->height;
+    } else if (FT_Set_Char_Size(face, FontSize * 64, FontSize * 64, 0, 0) == 0) {
+        ascender = face->size->metrics.ascender / 64;
+    } else {
+        esyslog("flatPlus: cFontCache::GetFontAscender() FreeType error during FT_Set_Char_Size (Font = %s)",
+                *cFont::GetFontFileName(FontName));
+    }
+
+    return ascender;
 }
 
 int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &Text) const {

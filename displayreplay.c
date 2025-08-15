@@ -343,8 +343,9 @@ void cFlatDisplayReplay::UpdateInfo() {
     if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
     const int FontSecsSize {static_cast<int>(Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};  // Size for seconds
-    const int TopSecs {m_FontAscender - ((Config.TimeSecsScale < 1.0) ? GetFontAscender(Setup.FontOsd, FontSecsSize)
-                                                                      : 0)};          // Top position for seconds
+    const int TopSecs {m_FontAscender - ((Config.TimeSecsScale < 1.0)
+                                             ? FontCache.GetFontAscender(Setup.FontOsd, FontSecsSize)
+                                             : 0)};                                   // Top position for seconds
     const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, FontSecsSize)};  // Height of seconds font
     static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
