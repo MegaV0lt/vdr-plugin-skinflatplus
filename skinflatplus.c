@@ -14,6 +14,7 @@
 #endif
 
 #include "./flat.h"
+#include "./fontcache.h"
 #include "./setup.h"
 #include "./imageloader.h"
 
@@ -108,6 +109,7 @@ bool cPluginFlat::Start() {
 
 void cPluginFlat::Stop() {
     ImgCache.Clear();
+    FontCache.Clear();
 }
 
 void cPluginFlat::Housekeeping() {

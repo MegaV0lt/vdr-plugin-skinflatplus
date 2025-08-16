@@ -34,7 +34,11 @@
 #include "./fontcache.h"
 
 cFlatBaseRender::cFlatBaseRender() {
-    // Standard fonts
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::cFlatBaseRender()");
+#endif
+
+    // Standard VDR fonts
     m_Font = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
@@ -47,6 +51,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSmlHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixedHeight = FontCache.GetFontHeight(Setup.FontFix, Setup.FontFixSize);
 
+    // Extra fonts for flatPlus
     m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     if (Config.MainMenuWidgetWeatherShow) {

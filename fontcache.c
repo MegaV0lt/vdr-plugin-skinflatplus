@@ -49,7 +49,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
     std::string_view NameView {*Name};
     if (NameView.empty() || Size <= 0) {  // Invalid parameters
         esyslog("flatPlus: cFontCache::GetFont() Invalid parameters: Name=%s, Size=%d", *Name, Size);
-        return nullptr;
+        return cFont::CreateFont("DummyFont", 16);  // Return dummy font
     }
 
     std::string_view DataNameView {""};
@@ -88,7 +88,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 #endif
 
     if (isempty(*Name) || Size <= 0) return;  // Invalid parameters
-    if (FontCache[m_InsertIndex].font != nullptr) {  // If the font already exists, delete it
+    if (FontCache[m_InsertIndex].font != nullptr) {  // If the slot is already used, delete it
         dsyslog("flatPlus: cFontCache::InsertFont() Replacing existing font at index %zu", m_InsertIndex);
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
@@ -97,12 +97,12 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
         FontCache[m_InsertIndex].height = 0;
         FontCache[m_InsertIndex].StringWidthCache.clear();
     }
-
+    // CreateFont() retuns a dummy font on failure
     FontCache[m_InsertIndex].font = cFont::CreateFont(*Name, Size);
-    if (!FontCache[m_InsertIndex].font) {
+    /* if (!FontCache[m_InsertIndex].font) {
         esyslog("flatPlus: cFontCache::InsertFont() Failed to create font '%s' size %d", *Name, Size);
         return;
-    }
+    } */
 
     FontCache[m_InsertIndex].name = Name;
     FontCache[m_InsertIndex].size = Size;
