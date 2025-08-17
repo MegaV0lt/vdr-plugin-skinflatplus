@@ -3016,7 +3016,6 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
                     dsyslog("   Adding plugin '%s' to cache", p->Name());
 #endif
                     cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
-
                 }
             } else {
                 break;  // Plugin not found
