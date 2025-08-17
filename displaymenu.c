@@ -326,7 +326,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     // - in any menu and Config.DiskUsageShow > 1
     // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
     if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
-        ((m_MenuCategory && (Config.DiskUsageShow > 1))))
+        ((m_MenuCategory > mcUndefined && (Config.DiskUsageShow > 1))))
         TopBarEnableDiskUsage();
 }
 

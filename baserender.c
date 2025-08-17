@@ -259,14 +259,12 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     }  // DiskFreePercent == 0 (Show something if disk is full)
 
     const double GBScale {100.0 / DiskFreePercent};
-    const double AllGB {FreeGB * GBScale};                                 // All disk space in GB
-    const double AllMinutes {static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
-
+    const double AllGB {FreeGB * GBScale};  // All disk space in GB
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskFreePercent %d, FreeMinutes %d", DiskFreePercent, FreeMinutes);
-        dsyslog("   FreeGB %.2f, AllGB %.2f, AllMinutes %.2f", FreeGB, AllGB, AllMinutes);
+        dsyslog("   FreeGB %.2f, AllGB %.2f", FreeGB, AllGB);
         dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", FreeHM.quot, FreeHM.rem);
 #endif
         if (Config.DiskUsageShort == false) {  // Long format
@@ -289,6 +287,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
     } else {  // Show in occupied mode
         const double OccupiedGB {AllGB - FreeGB};
+        const double AllMinutes {static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
         const int OccupiedMinutes = AllMinutes - FreeMinutes;  // Narrowing conversion
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskUsagePercent %d, OccupiedMinutes %d", DiskUsagePercent, OccupiedMinutes);
