@@ -713,42 +713,6 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-/* void cFlatConfig::RecordingOldLoadConfig() {
-    dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
-    RecordingOldFolder.clear();
-    RecordingOldValue.clear();
-
-    FILE *f = fopen(RecordingOldConfigFile, "r");
-    if (!f) {
-        dsyslog("flatPlus: Recording old config file not found: %s", *RecordingOldConfigFile);
-        return;
-    } else {
-        int line {0}, value {0};
-        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
-        cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != nullptr) {
-            ++line;
-            p = strchr(s, '#');
-            if (p) *p = 0;
-            s = stripspace(skipspace(s));
-            if (!isempty(s)) {
-                n = s;
-                v = strchr(s, '=');
-                if (v) {
-                    *v++ = 0;
-                    n = stripspace(skipspace(n));
-                    v = stripspace(skipspace(v));
-                    value = atoi(v);
-                    dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
-                    RecordingOldFolder.emplace_back(n);
-                    RecordingOldValue.emplace_back(value);
-                }
-            }
-        }  // while
-        fclose(f);
-    }
-} */
-
 int cFlatConfig::GetRecordingOldValue(const std::string &folder) const {
     auto it = RecordingOldFolderMap.find(folder);
     return it != RecordingOldFolderMap.end() ? it->second : -1;
