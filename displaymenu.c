@@ -3004,16 +3004,15 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 #ifdef DEBUGFUNCSCALL
             dsyslog("   Plugin %ld: %p", i, p);
             if (p != nullptr) {
-                dsyslog("   Plugin %ld name: %s", i, p->Name());
-                MainMenuEntry = p->MainMenuEntry();
-                dsyslog("   Plugin %ld main menu entry: %s", i, MainMenuEntry);
+                dsyslog("     Plugin name: %s", p->Name());
+                dsyslog("     Plugin main menu entry: %s", p->MainMenuEntry());
             }
 #endif
             if (p != nullptr) {  // Plugin found
                 MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
                 if (!isempty(MainMenuEntry)) {  // Plugin has a main menu entry
 #ifdef DEBUGFUNCSCALL
-                    dsyslog("   Adding plugin '%s' to cache", p->Name());
+                    dsyslog("     Adding plugin '%s' to cache", p->Name());
 #endif
                     cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
                 }
