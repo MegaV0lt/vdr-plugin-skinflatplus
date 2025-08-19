@@ -37,6 +37,7 @@ void cFontCache::Clear() {
             data.font = nullptr;
         }
         data.name = "";
+        data.FontFileName = "";
         data.size = 0;
         data.height = 0;
         data.ascender = 0;
@@ -71,6 +72,22 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
     return lastFont.font;
 }
 
+/**
+ * @brief Get the font name for a given font file name from the cache
+ * @param FontFileName The file name of the font
+ * @return The font name if found in the cache, otherwise an empty string
+ */
+cString cFontCache::GetFontName(const char *FontFileName) {
+    for (const auto &data : FontCache) {
+        if (std::string_view {*data.FontFileName} == std::string_view {FontFileName}) {
+            return data.FontFileName;
+        }
+    }
+    esyslog("flatPlus: cFontCache::GetFontName() Font name not found in cache: %s", FontFileName);
+    // If the font name is not found in the cache, return an empty string
+    return "";  // Font name not found in cache
+}
+
 int cFontCache::GetFontHeight(const cString &Name, int Size) const {
     std::string_view NameView {*Name};
     for (const auto &data : FontCache) {
@@ -93,18 +110,19 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
         FontCache[m_InsertIndex].name = "";
+        FontCache[m_InsertIndex].FontFileName = "";
         FontCache[m_InsertIndex].size = 0;
         FontCache[m_InsertIndex].height = 0;
         FontCache[m_InsertIndex].StringWidthCache.clear();
     }
     // CreateFont() retuns a dummy font on failure
     FontCache[m_InsertIndex].font = cFont::CreateFont(*Name, Size);
-    /* if (!FontCache[m_InsertIndex].font) {
-        esyslog("flatPlus: cFontCache::InsertFont() Failed to create font '%s' size %d", *Name, Size);
-        return;
-    } */
-
     FontCache[m_InsertIndex].name = Name;
+    FontCache[m_InsertIndex].FontFileName = FontCache[m_InsertIndex].font->FontName();
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   Font (%s) inserted at index %zu", *FontCache[m_InsertIndex].FontFileName, m_InsertIndex);
+#endif
+
     FontCache[m_InsertIndex].size = Size;
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
 

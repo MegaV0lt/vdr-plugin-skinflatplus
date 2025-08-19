@@ -787,36 +787,6 @@ uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontH
 }
 
 /**
- * @brief Get the name of a font from its file name.
- * @param[in] FontFileName The file name of the font to query.
- * @return The name of the font, including style name if applicable.
- * @note This function caches the FreeType face for the given font file and returns the face->family_name
- *       and face->style_name (if applicable) as a cString.
- */
-cString GetFontName(const char *FontFileName) {
-    GlyphMetricsCache &cache = glyphMetricsCache();
-
-    if (FontFileName == nullptr) {
-        esyslog("flatPlus: GetFontName() Error: FontFileName is nullptr");
-        return "";
-    }
-    FT_Face face = cache.GetFace(FontFileName);
-    if (face == nullptr) {
-        esyslog("flatPlus: GetFontName() Error: Can't find face (Font = %s)", FontFileName);
-        return "";
-    }
-    if (face->family_name == nullptr) {
-        esyslog("flatPlus: GetFontName() Error: face->family_name is nullptr (Font = %s)", FontFileName);
-        return "";
-    }
-    std::ostringstream FontName {""};
-    FontName << face->family_name << ':'
-             << (face->style_name == nullptr ? "Regular" : face->style_name);  // Style name
-
-    return FontName.str().c_str();
-}
-
-/**
  * @brief Justifies a line of text by inserting fill characters to fit a specified maximum width.
  *
  * This function adjusts the spacing within a line of text to ensure that it fits within the specified
@@ -845,7 +815,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     }
 
     // Get the font name (Ubuntu:Regular)
-    const cString FontName {*GetFontName(Font->FontName())};
+    const cString FontName {*FontCache.GetFontName(Font->FontName())};
     // Use cached font metrics to determine if the font is fixed-width
     const int FontHeight {FontCache.GetFontHeight(FontName, Font->Size())};
     if (FontCache.GetStringWidth(FontName, FontHeight, "M") == FontCache.GetStringWidth(FontName, FontHeight, "i"))
