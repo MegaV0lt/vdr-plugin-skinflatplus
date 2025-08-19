@@ -530,7 +530,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (IsGroup) {
         DrawProgress = false;
     } else {
-        Buffer = cString::sprintf("%d", Channel->Number());
+        Buffer = itoa(Channel->Number());
         Width = m_Font->Width(*Buffer);
     }
 
@@ -910,7 +910,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageHeight + m_MarginItem2;
 
     const cChannel *Channel {Timer->Channel()};
-    cString Buffer = cString::sprintf("%d", Channel->Number());
+    cString Buffer = itoa(Channel->Number());
     const int Width {std::max(FontCache.GetStringWidth(m_FontName, m_FontHeight, "000"),
                               m_Font->Width(*Buffer))};  // Minimal width for channel number
 
@@ -1122,7 +1122,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         w = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
-            Buffer = cString::sprintf("%d", Channel->Number());
+            Buffer = itoa(Channel->Number());
             w = std::max(w, m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
@@ -1684,7 +1684,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             const int DigitsWidth {
                 FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000")};
             const int DigitsMaxWidth {DigitsWidth + m_MarginItem};  // Use same width for recs and new recs
-            Buffer = cString::sprintf("%d", Total);
+            Buffer = itoa(Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight,
                                  taLeft);
             Left += DigitsMaxWidth;
@@ -1692,7 +1692,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (ImgRecNew) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
 
             Left += ImgRecNewWidth + m_MarginItem;
-            Buffer = cString::sprintf("%d", New);
+            Buffer = itoa(New);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, DigitsMaxWidth, m_FontHeight);
 
             Left += DigitsMaxWidth;
@@ -1798,7 +1798,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Top += m_FontHeight;
             const int DigitsMaxWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "0000") +
                                       m_MarginItem};  // Use same width for recs and new recs
-            Buffer = cString::sprintf("%d", Total);
+            Buffer = itoa(Total);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
                                  m_FontSmlHeight, taRight);
             Left += DigitsMaxWidth;
@@ -1806,7 +1806,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (ImgRecNewSml) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNewSml);
 
             Left += ImgRecNewSmlWidth + m_MarginItem;
-            Buffer = cString::sprintf("%d", New);
+            Buffer = itoa(New);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
                                  m_FontSmlHeight);
             Left += DigitsMaxWidth;
@@ -3543,9 +3543,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         }
 
         if (Config.MainMenuWidgetDVBDevicesNativeNumbering)
-            str = cString::sprintf("%d", i);  // Display Tuners 0..3
+            str = itoa(i);  // Display Tuners 0..3
         else
-            str = cString::sprintf("%d", i + 1);  // Display Tuners 1..4
+            str = itoa(i + 1);  // Display Tuners 1..4
 
         int left {m_MarginItem};
         const int FontSmlWidthDigit {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "0")};

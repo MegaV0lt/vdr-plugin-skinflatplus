@@ -417,6 +417,8 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
+        cString NumConflictsStr {""};  // Number of conflicts
+        int NumConflictsWidth {0};  // Width of number of conflicts
         int ImgConWidth {0};
         cImage *ImgCon {nullptr};
         if (Config.TopBarRecConflictsShow) {         // Load conflict icon
@@ -429,15 +431,17 @@ void cFlatBaseRender::TopBarUpdate() {
 
                 if (ImgCon) {
                     ImgConWidth = ImgCon->Width();
-                    Buffer = cString::sprintf("%d", NumConflicts);
-                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of conflicts
-                    Right -= ImgConWidth + BufferWidth + m_MarginItem;
-                    MiddleWidth += ImgConWidth + BufferWidth + m_MarginItem;
+                    NumConflictsStr = itoa(NumConflicts);  // Convert number of conflicts to string
+                    NumConflictsWidth = m_TopBarFontSml->Width(*NumConflictsStr);  // Width of number of conflicts
+                    Right -= ImgConWidth + NumConflictsWidth + m_MarginItem;
+                    MiddleWidth += ImgConWidth + NumConflictsWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecConflictsShow
 
         uint16_t NumRec {0};  // 65535 should be enough for the number of recordings
+        cString NumRecStr {""};
+        int NumRecWidth {0};  // Width of number of recordings
         int ImgRecWidth {0};
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
@@ -459,10 +463,10 @@ void cFlatBaseRender::TopBarUpdate() {
                 ImgRec = ImgLoader.LoadIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
                 if (ImgRec) {  // Load recording icon
                     ImgRecWidth = ImgRec->Width();
-                    Buffer = cString::sprintf("%d", NumRec);
-                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of recordings
-                    Right -= ImgRecWidth + BufferWidth + m_MarginItem;
-                    MiddleWidth += ImgRecWidth + BufferWidth + m_MarginItem;
+                    NumRecStr = itoa(NumRec);  // Convert number of recordings to string
+                    NumRecWidth = m_TopBarFontSml->Width(*NumRecStr);
+                    Right -= ImgRecWidth + NumRecWidth + m_MarginItem;
+                    MiddleWidth += ImgRecWidth + NumRecWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecordingShow
@@ -522,10 +526,9 @@ void cFlatBaseRender::TopBarUpdate() {
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgRec);
             Right += ImgRecWidth;
 
-            Buffer = cString::sprintf("%d", NumRec);
-            TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarRecordingActiveFg),
+            TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumRecStr, Theme.Color(clrTopBarRecordingActiveFg),
                                    Theme.Color(clrTopBarRecordingActiveBg), m_TopBarFontSml);
-            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+            Right += NumRecWidth + m_MarginItem;
         }
 
         if (NumConflicts && ImgCon) {  // Draw conflict icon and number of conflicts
@@ -533,14 +536,14 @@ void cFlatBaseRender::TopBarUpdate() {
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgCon);
             Right += ImgConWidth;
 
-            Buffer = cString::sprintf("%d", NumConflicts);
             if (NumConflicts < Config.TopBarRecConflictsHigh)
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictLowFg),
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr, Theme.Color(clrTopBarConflictLowFg),
                                        Theme.Color(clrTopBarConflictLowBg), m_TopBarFontSml);
             else
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictHighFg),
-                                       Theme.Color(clrTopBarConflictHighBg), m_TopBarFontSml);
-            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr,
+                                       Theme.Color(clrTopBarConflictHighFg), Theme.Color(clrTopBarConflictHighBg),
+                                       m_TopBarFontSml);
+            Right += NumConflictsWidth + m_MarginItem;
         }
 
         int TopBarMenuIconRightLeft {0};

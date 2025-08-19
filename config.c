@@ -805,7 +805,7 @@ cString cFlatConfig::CheckSlashAtEnd(std::string path) {
 }
 
 void cFlatConfig::Store(const char *Name, int Value, const char *Filename) {
-    Store(Name, cString::sprintf("%d", Value), Filename);
+    Store(Name, itoa(Value), Filename);
 }
 
 void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {

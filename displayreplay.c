@@ -236,7 +236,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (Speed == -1) {  // Replay or pause
             (Play) ? play = "play_sel" : pause = "pause_sel";
         } else {
-            const cString speed = cString::sprintf("%d", Speed);
+            const cString speed = itoa(Speed);
             if (Forward) {
                 forward = "forward_sel";
                 LabelPixmap->DrawText(cPoint(left + m_FontHeight * 4 + m_MarginItem * 4, 0), speed,
