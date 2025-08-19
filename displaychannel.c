@@ -103,15 +103,15 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
-    // if (m_Osd) {
-        Scrollers.Clear();
+    Scrollers.Clear();
+    if (m_Osd) {
         m_Osd->DestroyPixmap(ChanInfoTopPixmap);
         m_Osd->DestroyPixmap(ChanInfoBottomPixmap);
         m_Osd->DestroyPixmap(ChanLogoBgPixmap);
         m_Osd->DestroyPixmap(ChanLogoPixmap);
         m_Osd->DestroyPixmap(ChanIconsPixmap);
         m_Osd->DestroyPixmap(ChanEpgImagesPixmap);
-    // }
+    }
 }
 
 void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {

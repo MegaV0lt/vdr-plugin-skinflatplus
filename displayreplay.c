@@ -79,6 +79,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     if (m_ModeOnly || !IconsPixmap || !LabelPixmap) return;
 
+    if (!Recording || !Recording->Info()) return;
     const cRecordingInfo *RecInfo {Recording->Info()};
     m_Recording = Recording;
 
@@ -177,8 +178,8 @@ void cFlatDisplayReplay::Action() {
 
     // Start dimming thread
     while (Running()) {
-        time_t CurTime {time(0)};
-        if ((CurTime - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
+        time_t now {time(0)};
+        if ((now - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
             m_DimmActive = true;
             // Use batch: fade in, then go back to sleep
             const int step {4};
@@ -367,7 +368,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     if (Config.TimeSecsScale < 1.0) {
         std::string_view cur {*m_Current};
         const std::size_t found {cur.find_last_of(':')};
-        if (found != std::string::npos) {
+        if (found != std::string_view::npos) {
             cString hm {*m_Current};
             hm.Truncate(found);  // Hours and minutes
             std::string_view secs {cur.substr(found, cur.length() - found)};
@@ -408,6 +409,10 @@ void cFlatDisplayReplay::UpdateInfo() {
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
     const int NumFrames {m_Recording->NumFrames()};  // Total frames in recording
+    if (NumFrames <= 0) {
+        esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid NumFrames: %d", NumFrames);
+        return;
+    }
 
     if (marks && m_Recording->HasMarks()) {
 #if (APIVERSNUM >= 20608)
@@ -422,8 +427,8 @@ void cFlatDisplayReplay::UpdateInfo() {
     }
 
     const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    if (FramesPerSecond == 0.0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in cFlatDisplayReplay::UpdateInfo() FramesPerSecond is 0!");
+    if (FramesPerSecond <= 0.0) {  // Avoid DIV/0
+        esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid FramesPerSecond: %.2f", FramesPerSecond);
         return;
     }
 
@@ -445,7 +450,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         if (Config.TimeSecsScale < 1.0) {
             std::string_view tot {*m_Total};  // Total length
             const std::size_t found {tot.find_last_of(':')};
-            if (found != std::string::npos) {
+            if (found != std::string_view::npos) {
                 cString hm {*m_Total};
                 hm.Truncate(found);  // Hours and minutes
                 std::string_view secs {tot.substr(found, tot.length() - found)};
@@ -454,7 +459,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
                 std::string_view cutt {*cutted};  // Cutted length
                 const std::size_t found2 {cutt.find_last_of(':')};
-                if (found2 != std::string::npos) {
+                if (found2 != std::string_view::npos) {
                     cString hm2 {*cutted};
                     hm2.Truncate(found2);  // Hours and minutes
                     std::string_view secs2 {cutt.substr(found, cutt.length() - found)};
@@ -504,7 +509,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         if (Config.TimeSecsScale < 1.0) {
             std::string_view cutt {*cutted};
             const std::size_t found {cutt.find_last_of(':')};
-            if (found != std::string::npos) {
+            if (found != std::string_view::npos) {
                 cString hm {*cutted};
                 hm.Truncate(found);  // Hours and minutes
                 std::string_view secs {cutt.substr(found, cutt.length() - found)};
@@ -530,7 +535,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         if (Config.TimeSecsScale < 1.0) {
             std::string_view tot {*m_Total};
             const std::size_t found {tot.find_last_of(':')};
-            if (found != std::string::npos) {
+            if (found != std::string_view::npos) {
                 cString hm {*m_Total};
                 hm.Truncate(found);  // Hours and minutes
                 std::string_view secs {tot.substr(found, tot.length() - found)};
@@ -566,10 +571,10 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // HasMarks
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
-    const time_t CurTime {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' current changed
+    const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' current changed
     if (Config.PlaybackShowEndTime > 0 &&  // 1 = End time, 2 = End time and cutted end time
-        (m_LastEndTimeUpdate + 60 < CurTime || strcmp(*m_Current, *m_LastCurrent) != 0)) {
-        m_LastEndTimeUpdate = CurTime;
+        (m_LastEndTimeUpdate + 60 < now || strcmp(*m_Current, *m_LastCurrent) != 0)) {
+        m_LastEndTimeUpdate = now;
         m_LastCurrent = m_Current;
         left = m_MarginItem;
         //* Image instead of 'ends at:' text
@@ -580,9 +585,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         } */
 
         const int Rest {NumFrames - m_CurrentFrame};
-        const cString TimeStr = cString::sprintf("%s" , *TimeString(CurTime + (Rest / FramesPerSecond)));  // HH:MM
+        const cString TimeStr = (Rest >= 0) ? *TimeString(now + (Rest / FramesPerSecond)) : "??:??";  // HH:MM
         cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
-        const int EndTimeWidth {m_Font->Width(EndTime)};  // Width of 'ends at:' text
+        const int EndTimeWidth {m_Font->Width(EndTime)};  // Width of 'ends at: HH:MM' text
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), m_Font, EndTimeWidth, m_FontHeight);
         left += EndTimeWidth + Spacer;
@@ -590,7 +595,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         //* Draw end time of cutted recording with cutted symbol
         if (Config.PlaybackShowEndTime == 2 && FramesAfterEdit > 0) {
             const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
-            EndTime = *TimeString(CurTime + (RestCutted / FramesPerSecond));  // HH:MM
+            EndTime = *TimeString(now + (RestCutted / FramesPerSecond));  // HH:MM
             if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
                 img = ImgLoader.LoadIcon("recording_cutted_extra", kIconMaxSize, GlyphSize);
                 if (img) {
@@ -606,8 +611,8 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // Config.PlaybackShowEndTime
 
     //* Draw Banner/Poster (Update only every 5 seconds)
-    if (m_LastPosterBannerUpdate + 5 < CurTime) {
-        m_LastPosterBannerUpdate = CurTime;
+    if (m_LastPosterBannerUpdate + 5 < now) {
+        m_LastPosterBannerUpdate = now;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
         if (Config.TVScraperReplayInfoShowPoster) {

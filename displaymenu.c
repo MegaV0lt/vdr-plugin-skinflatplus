@@ -3887,13 +3887,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     while ((entry = d.Next()) != nullptr) {
         FileName = entry->d_name;
         found = FileName.find('_');
-        if (found != std::string_view::npos) {                  // File name contains '_'
-            std::unique_ptr<char[]> temp(new char[found + 1]);  // +1 for '\0' termination
-            std::memcpy(temp.get(), FileName.data(), found);
-            temp[found] = '\0';                       // Terminate the string
-            num = cString(temp.get());                // String is now null-terminated
-            if (atoi(*num) > 0)                       // Number is greater than zero
-                files.emplace_back(FileName.data());  // Store the file name
+        if (found != std::string_view::npos) {               // File name contains '_'
+            num = cString(FileName.data()).Truncate(found);  // Truncate the string to the number part
+            if (atoi(*num) > 0)                              // Number is greater than zero
+                files.emplace_back(FileName.data());         // Store the file name
         }
     }
 
