@@ -126,8 +126,8 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
     FontCache[m_InsertIndex].size = Size;
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
 
-    if (++m_InsertIndex >= MaxFontCache) {
-        isyslog("flatPlus: cFontCache::InsertFont() Cache overflow, increase MaxFontCache (%zu)", MaxFontCache);
+    if (++m_InsertIndex >= kMaxFontCache) {
+        isyslog("flatPlus: cFontCache::InsertFont() Cache overflow, increase kMaxFontCache (%zu)", kMaxFontCache);
         m_InsertIndex = 0;
     }
 }

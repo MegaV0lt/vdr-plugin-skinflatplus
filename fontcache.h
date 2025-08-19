@@ -19,14 +19,14 @@ class cFontCache {
         cFont *font {nullptr};
         cString name {""};  // Name of the font as used in cFont::CreateFont()
         cString FontFileName {""};  // Name of the font file
-        int size {0};               // Size of the font
-        int height {0};             // Height of the font
+        int size {0};               // Size of the font (% of osd height)
+        int height {0};             // Height of the font in pixels
         int ascender;  // Ascender for the font, used for vertical alignment
         mutable std::map<std::string, int> StringWidthCache;  // Cache for string widths
     };
 
-    static constexpr std::size_t MaxFontCache {32};
-    std::array<FontData, MaxFontCache> FontCache {};  // Zero-initialized
+    static constexpr std::size_t kMaxFontCache {32};
+    std::array<FontData, kMaxFontCache> FontCache {};  // Zero-initialized
     std::size_t m_InsertIndex {0};
 
  public:

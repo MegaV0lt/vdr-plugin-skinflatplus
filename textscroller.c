@@ -107,7 +107,7 @@ void cTextScroll::DoStep() {
         m_CachedMaxX = -(Pixmap->DrawPort().Width() - Pixmap->ViewPort().Width());
         m_CacheValid = true;
     }
-    int MaxX = m_CachedMaxX;
+    const int MaxX = m_CachedMaxX;
 
     if (m_ScrollType == 0) {
         if (DrawPortX <= MaxX) {
