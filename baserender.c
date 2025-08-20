@@ -405,9 +405,10 @@ void cFlatBaseRender::TopBarUpdate() {
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString WeekDay {*WeekDayNameFull(Now)};
-        const cString DateStr {*ShortDateString(Now)};
-        const int MaxDateWidth {std::max(m_TopBarFontSml->Width(*WeekDay), m_TopBarFontSml->Width(*DateStr))};
+        const cString WeekDay {*WeekDayNameFull(Now)};  // Translated week day (Monday, Tuesday, ...)
+        const cString DateStr {*ShortDateString(Now)};  // Short date (01.01.00)
+        const int MaxDateWidth {std::max(FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *WeekDay),
+                                         FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *DateStr))};
 
         Right = TopBarWidth - TimeWidth - MaxDateWidth - m_MarginItem;
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *WeekDay, Theme.Color(clrTopBarDateFont),
@@ -432,7 +433,8 @@ void cFlatBaseRender::TopBarUpdate() {
                 if (ImgCon) {
                     ImgConWidth = ImgCon->Width();
                     NumConflictsStr = itoa(NumConflicts);  // Convert number of conflicts to string
-                    NumConflictsWidth = m_TopBarFontSml->Width(*NumConflictsStr);  // Width of number of conflicts
+                    NumConflictsWidth = FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, "0");
+                    if (NumConflicts > 9) NumConflictsWidth *= strlen(*NumConflictsStr);
                     Right -= ImgConWidth + NumConflictsWidth + m_MarginItem;
                     MiddleWidth += ImgConWidth + NumConflictsWidth + m_MarginItem;
                 }
@@ -464,7 +466,8 @@ void cFlatBaseRender::TopBarUpdate() {
                 if (ImgRec) {  // Load recording icon
                     ImgRecWidth = ImgRec->Width();
                     NumRecStr = itoa(NumRec);  // Convert number of recordings to string
-                    NumRecWidth = m_TopBarFontSml->Width(*NumRecStr);
+                    NumRecWidth = FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, "0");
+                    if (NumRec > 9) NumRecWidth *= strlen(*NumRecStr);
                     Right -= ImgRecWidth + NumRecWidth + m_MarginItem;
                     MiddleWidth += ImgRecWidth + NumRecWidth + m_MarginItem;
                 }

@@ -530,12 +530,13 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (IsGroup) {
         DrawProgress = false;
     } else {
-        Buffer = itoa(Channel->Number());
-        Width = m_Font->Width(*Buffer);
+        const int ChannelNumber {Channel->Number()};
+        Buffer = itoa(ChannelNumber);
+        if (ChannelNumber > 9999)
+            Width = m_Font->Width(*Buffer);
+        else  //* At least four digits width in channel list because of different sort modes
+            Width = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
     }
-
-    //* At least four digits width in channel list because of different sort modes
-    Width = std::max(FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000"), Width);
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -910,9 +911,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += ImageHeight + m_MarginItem2;
 
     const cChannel *Channel {Timer->Channel()};
-    cString Buffer = itoa(Channel->Number());
-    const int Width {std::max(FontCache.GetStringWidth(m_FontName, m_FontHeight, "000"),
-                              m_Font->Width(*Buffer))};  // Minimal width for channel number
+    const int ChannelNumber {Channel->Number()};
+    cString Buffer = itoa(ChannelNumber);
+    const int Width {(ChannelNumber < 1000) ? FontCache.GetStringWidth(m_FontName, m_FontHeight, "000")
+                                            : m_Font->Width(*Buffer)};  // Minimal width for channel number
 
     MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     Left += Width + m_MarginItem;
@@ -1122,8 +1124,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         w = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {
-            Buffer = itoa(Channel->Number());
-            w = std::max(w, m_Font->Width(*Buffer));  // Minimal width for channel number in Event (epgSearch)
+            const int ChannelNumber {Channel->Number()};
+            Buffer = itoa(ChannelNumber);
+            if (ChannelNumber > 9999)
+                w = m_Font->Width(*Buffer);  // Width for channel number in Event (epgSearch)
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1700,11 +1704,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                            m_MarginItem * 5};  // For folder with recordings
 
             if (Config.MenuItemRecordingShowFolderDate > 0) {
-                LeftWidth +=
-                    FontCache.GetStringWidth(m_FontName, m_FontHeight, "00.00.00") + m_FontHeight + m_MarginItem2;
+                const int ShortDateWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "00.00.00")};
+                LeftWidth += ShortDateWidth + m_FontHeight + m_MarginItem2;
                 Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
-                Left += m_Font->Width(*Buffer) + m_MarginItem;
+                Left += ShortDateWidth + m_MarginItem;
                 if (IsRecordingOld(Recording, Level)) {
                     DrawRecordingIcon("recording_old", Left, Top, Current);
                     Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
@@ -1815,7 +1819,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_FontSml);
                 if (IsRecordingOld(Recording, Level)) {
-                    Left += m_FontSml->Width(*Buffer);
+                    Left += FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00.00.00");
                     DrawRecordingIcon("recording_old", Left, Top, Current);
                 }
             }
@@ -2982,39 +2986,40 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
                                 "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
     // Check for standard menu entries
-    std::string_view ElementView {*element}, s;
-    for (std::size_t i {0}; i < 16; ++i) {  // 16 menu entry's in vdr
-        s = trVDR(items[i]);
-        if (ElementView == s) { return cString::sprintf("menuIcons/%s", items[i]); }
+    std::string_view ElementView {*element}, sv;
+    for (const auto &item : items) {
+        sv = trVDR(item);  // Translate item to current language
+        if (ElementView == sv) { return cString::sprintf("menuIcons/%s", item); }
     }
 
     // Static cache to store the names of plugins
     static std::unordered_map<std::string, cString> cache;
 
-    // Fill the cache with plugin menu names
-    if (cache.empty()) {  // Only fill cache once
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   Filling plugin name cache");
-#endif
+    // Check if the element matches any plugin name in the cache
+    auto it = cache.find(ElementView.data());
+    if (it != cache.end()) {
+        return cString::sprintf("pluginIcons/%s", *it->second);
+    } else {  // Look for plugin menu name
         // Iterate through all plugins and check for main menu entries
         const char *MainMenuEntry {""};
-        cache.reserve(20);  // Reserve space for 20 entries to avoid rehashing
+        cache.reserve(16);  // Reserve space for 16 entries to avoid rehashing
         for (std::size_t i {0};; ++i) {
             cPlugin *p {cPluginManager::GetPlugin(i)};
 #ifdef DEBUGFUNCSCALL
             dsyslog("   Plugin %ld: %p", i, p);
-            if (p != nullptr) {
-                dsyslog("     Plugin name: %s", p->Name());
-                dsyslog("     Plugin main menu entry: %s", p->MainMenuEntry());
-            }
+            if (p != nullptr)
+                dsyslog("     Plugin name '%s', menu entry '%s'", p->Name(), p->MainMenuEntry());
 #endif
             if (p != nullptr) {  // Plugin found
                 MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
                 if (!isempty(MainMenuEntry)) {  // Plugin has a main menu entry
+                    if (ElementView == MainMenuEntry) {
 #ifdef DEBUGFUNCSCALL
-                    dsyslog("     Adding plugin '%s' to cache", p->Name());
+                        dsyslog("     Adding plugin '%s' to cache (%ld)", p->Name(), cache.size() + 1);
 #endif
-                    cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
+                        cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
+                        return cString::sprintf("pluginIcons/%s", p->Name());  // Return icon name
+                    }
                 }
             } else {
                 break;  // Plugin not found
@@ -3022,17 +3027,11 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         }
     }
 
-    // Check if the element matches any plugin name in the cache
-    auto it = cache.find(ElementView.data());
-    if (it != cache.end()) {
-        return cString::sprintf("pluginIcons/%s", *it->second);
-    }
-
     // Check for special main menu entries "stop recording", "stop replay"
-    std::string_view StopRecording {skipspace(trVDR(" Stop recording "))};
-    if (ElementView == StopRecording) return "menuIcons/StopRecording";
-    std::string_view StopReplay {skipspace(trVDR(" Stop replaying"))};
-    if (ElementView == StopReplay) return "menuIcons/StopReplay";
+    sv = skipspace(trVDR(" Stop recording "));
+    if (ElementView == sv) return "menuIcons/StopRecording";
+    sv = skipspace(trVDR(" Stop replaying"));
+    if (ElementView == sv) return "menuIcons/StopReplay";
 
     // Nothing found, try to return a generic icon
     return cString::sprintf("extraIcons/%s", *element);
@@ -3815,9 +3814,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     }
     // Sort by RecStart and add entrys to ContentWidget
     // Use 'partial_sort()' to limit the number of entries to Config.MainMenuWidgetLastRecMaxCount
-    std::partial_sort(Recs.begin(), Recs.begin() + Config.MainMenuWidgetLastRecMaxCount, Recs.end(),
-                      PairCompareTimeString);
-    for (size_t i {0}; i < static_cast<size_t>(Config.MainMenuWidgetLastRecMaxCount) && i < Recs.size(); ++i) {
+    const std::size_t LastRecMaxCount = Config.MainMenuWidgetLastRecMaxCount;
+    std::partial_sort(Recs.begin(), Recs.begin() + LastRecMaxCount, Recs.end(), PairCompareTimeString);
+    for (std::size_t i {0}; i < LastRecMaxCount && i < Recs.size(); ++i) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
@@ -3866,10 +3865,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
+    static const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
-    const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
+    static const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
     cReadDir d(*ConfigsPath);
     if (d.Ok() == false) {
@@ -3983,16 +3982,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
     const int SecurityUpdates {(Content[0] == '\0') ? -1 : atoi(*Content)};
 
-    if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero) {
+    if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero)
         return -1;  // Nothing to display
-    } else if (updates == -1 || SecurityUpdates == -1) {
-        ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
+
+    ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
+    if (updates == -1 || SecurityUpdates == -1) {
         ContentWidget.AddText(tr("Updatestatus not available please check the widget"), false,
                               cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     } else {
-        ContentTop = AddWidgetHeader("widgets/system_updates", tr("System Updates"), ContentTop, wWidth);
         cString str = cString::sprintf("%s: %d", tr("Updates"), updates);
         ContentWidget.AddText(*str, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4016,7 +4015,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
 
-    const cString ExecFile =
+    static const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
@@ -4080,7 +4079,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
+    static const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
     [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
 
     cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
@@ -4090,7 +4089,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     std::string Output {""};
     Output.reserve(32);
-    const cString ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
+    static const cString ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
     std::ifstream file(*ItemFilename);
     if (file.is_open()) {
         for (; std::getline(file, Output);) {

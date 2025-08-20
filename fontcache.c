@@ -79,7 +79,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
  */
 cString cFontCache::GetFontName(const char *FontFileName) {
     for (const auto &data : FontCache) {
-        if (std::string_view {*data.FontFileName} == std::string_view {FontFileName}) {
+        if (std::string_view {*data.FontFileName} == FontFileName) {
             return data.FontFileName;
         }
     }

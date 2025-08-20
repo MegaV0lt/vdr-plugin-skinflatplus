@@ -178,7 +178,7 @@ class cFlatBaseRender {
     cPixmap *TopBarPixmap {nullptr};
     cPixmap *TopBarIconPixmap {nullptr};
     cPixmap *TopBarIconBgPixmap {nullptr};
-    cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};
+    cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};  // Based on Setup.FontOsd
     int m_TopBarFontHeight {0}, m_TopBarFontSmlHeight {0}, m_TopBarFontClockHeight {0};
 
     cString m_TopBarTitle {""};

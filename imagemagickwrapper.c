@@ -182,8 +182,7 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
         return false;
 
     // Check if file exists
-    struct stat st;
-    if (stat(fullpath, &st) != 0)
+    if (LastModifiedTime(fullpath) == 0)
         return false;
 
     try {
