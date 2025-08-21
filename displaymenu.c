@@ -745,11 +745,15 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     bool IsEmpty {false};
     cString Text {""};
     if (Event) {
-        // Description
-        if (!isempty(Event->Description())) Text.Append(Event->Description());
+        // Description or ShortText if Description is empty
+        if (isempty(Event->Description())) {
+            if (!isempty(Event->ShortText())) Text.Append(Event->ShortText());
+        } else {
+            Text.Append(Event->Description());
+        }
 
         if (Config.EpgAdditionalInfoShow) {
-            Text.Append("\n");
+            if (Text[0] != '\0') Text.Append("\n");
             // Genre
             InsertGenreInfo(Event, Text);  // Add genre info
 
@@ -1990,11 +1994,15 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
-    // Description
-    if (!isempty(Event->Description())) Text.Append(Event->Description());
+    // Description or ShortText if Description is empty
+    if (isempty(Event->Description())) {
+        if (!isempty(Event->ShortText())) Text.Append(Event->ShortText());
+    } else {
+        Text.Append(Event->Description());
+    }
 
     if (Config.EpgAdditionalInfoShow) {
-        Text.Append("\n");
+        if (Text[0] != '\0') Text.Append("\n");
         // Genre
         InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
@@ -2271,10 +2279,16 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     if (Recording) {
         const cRecordingInfo *RecInfo {Recording->Info()};
 
-        if (!isempty(RecInfo->Description())) Text.Append(cString::sprintf("%s\n\n", RecInfo->Description()));
+        // Description or ShortText if Description is empty
+        if (isempty(RecInfo->Description())) {
+            if (!isempty(RecInfo->ShortText())) Text.Append(RecInfo->ShortText());
+        } else {
+            Text.Append(RecInfo->Description());
+        }
 
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
+            if (Text[0] != '\0') Text.Append("\n\n");
             {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                 const cChannel *channel {Channels->GetByChannelID(RecInfo->ChannelID())};
@@ -2534,11 +2548,17 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     std::vector<std::string> GenreIcons;
     GenreIcons.reserve(8);
 
-    if (!isempty(RecInfo->Description())) Text.Append(cString::sprintf("%s\n", RecInfo->Description()));
+    // Description or ShortText if Description is empty
+    if (isempty(RecInfo->Description())) {
+        if (!isempty(RecInfo->ShortText())) Text.Append(RecInfo->ShortText());
+    } else {
+        Text.Append(RecInfo->Description());
+    }
 
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
+        if (Text[0] != '\0') Text.Append("\n");
         const cEvent *Event {RecInfo->GetEvent()};
         if (Event) {
             // Genre
