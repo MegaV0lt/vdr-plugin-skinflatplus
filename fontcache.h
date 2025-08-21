@@ -18,10 +18,10 @@ class cFontCache {
     struct FontData {
         cFont *font {nullptr};
         cString name {""};  // Name of the font as used in cFont::CreateFont()
-        cString FontFileName {""};  // Name of the font file
+        cString FileName {""};  // Name of the font file
         int size {0};               // Size of the font (% of osd height)
         int height {0};             // Height of the font in pixels
-        int ascender;  // Ascender for the font, used for vertical alignment
+        int ascender {0};  // Ascender for the font, used for vertical alignment
         mutable std::map<std::string, int> StringWidthCache;  // Cache for string widths
     };
 
@@ -36,7 +36,7 @@ class cFontCache {
     void Create();
     void Clear();
     cFont* GetFont(const cString &Name, int Size);
-    cString GetFontName(const char *FontFileName);
+    cString GetFontName(const char *FileName);
     int GetFontHeight(const cString &Name, int Size) const;
     void InsertFont(const cString &Name, int Size);
     int GetCacheCount() const;

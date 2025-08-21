@@ -37,7 +37,7 @@ void cFontCache::Clear() {
             data.font = nullptr;
         }
         data.name = "";
-        data.FontFileName = "";
+        data.FileName = "";
         data.size = 0;
         data.height = 0;
         data.ascender = 0;
@@ -74,21 +74,29 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
 
 /**
  * @brief Get the font name for a given font file name from the cache
- * @param FontFileName The file name of the font
+ * @param FileName The file name of the font
  * @return The font name if found in the cache, otherwise an empty string
  */
-cString cFontCache::GetFontName(const char *FontFileName) {
+cString cFontCache::GetFontName(const char *FileName) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFontCache::GetFontName() '%s'", FileName);
+#endif
+
     for (const auto &data : FontCache) {
-        if (std::string_view {*data.FontFileName} == FontFileName) {
-            return data.FontFileName;
+        if (std::string_view {*data.FileName} == FileName) {
+            return data.name;  // Return the font name
         }
     }
-    esyslog("flatPlus: cFontCache::GetFontName() Font name not found in cache: %s", FontFileName);
+    esyslog("flatPlus: cFontCache::GetFontName() Font name not found for file: %s", FileName);
     // If the font name is not found in the cache, return an empty string
     return "";  // Font name not found in cache
 }
 
 int cFontCache::GetFontHeight(const cString &Name, int Size) const {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFontCache::GetFontHeight() Name=%s, Size=%d", *Name, Size);
+#endif
+
     std::string_view NameView {*Name};
     for (const auto &data : FontCache) {
         if (std::string_view {*data.name} == NameView && data.size == Size) {
@@ -110,7 +118,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
         FontCache[m_InsertIndex].name = "";
-        FontCache[m_InsertIndex].FontFileName = "";
+        FontCache[m_InsertIndex].FileName = "";
         FontCache[m_InsertIndex].size = 0;
         FontCache[m_InsertIndex].height = 0;
         FontCache[m_InsertIndex].StringWidthCache.clear();
@@ -118,13 +126,14 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
     // CreateFont() retuns a dummy font on failure
     FontCache[m_InsertIndex].font = cFont::CreateFont(*Name, Size);
     FontCache[m_InsertIndex].name = Name;
-    FontCache[m_InsertIndex].FontFileName = FontCache[m_InsertIndex].font->FontName();
-#ifdef DEBUGFUNCSCALL
-    dsyslog("   Font (%s) inserted at index %zu", *FontCache[m_InsertIndex].FontFileName, m_InsertIndex);
-#endif
-
+    FontCache[m_InsertIndex].FileName = FontCache[m_InsertIndex].font->FontName();
     FontCache[m_InsertIndex].size = Size;
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
+    #ifdef DEBUGFUNCSCALL
+        dsyslog("   Font '%s' inserted at index %zu", *FontCache[m_InsertIndex].name, m_InsertIndex);
+        dsyslog("   Font file name: '%s'", *FontCache[m_InsertIndex].FileName);
+        dsyslog("   Font size: %d, height: %d", FontCache[m_InsertIndex].size, FontCache[m_InsertIndex].height);
+    #endif
 
     if (++m_InsertIndex >= kMaxFontCache) {
         isyslog("flatPlus: cFontCache::InsertFont() Cache overflow, increase kMaxFontCache (%zu)", kMaxFontCache);
