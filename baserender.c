@@ -219,7 +219,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
 #endif
-    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
+    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::Flush()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
@@ -339,6 +339,7 @@ void cFlatBaseRender::TopBarUpdate() {
     if (m_TopBarUpdateTitle || (Now > m_TopBarLastDate + 60)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
+        cTimeMs Timer;  // Start Timer
 #endif
 
         m_TopBarUpdateTitle = false;
@@ -393,14 +394,17 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }  // Config.TopBarMenuIconShow
 
-        const cString time {*TimeString(Now)};  // Reuse 'Now'
+        const cString time {*TimeString(Now)};  // HH:MM
         cString Buffer {""};
-        if (Config.TopBarHideClockText)
+        int TimeWidth {FontCache.GetStringWidth(m_FontName, m_TopBarFontClockHeight, "00:00") + m_MarginItem2};
+        if (Config.TopBarHideClockText) {
             Buffer = *time;
-        else
+        } else {
             Buffer = cString::sprintf("%s %s", *time, tr("clock"));
+            TimeWidth +=
+                FontCache.GetStringWidth(m_FontName, m_TopBarFontClockHeight, cString::sprintf(" %s", tr("clock")));
+        }
 
-        const int TimeWidth {m_TopBarFontClock->Width(*Buffer) + m_MarginItem2};
         int Right {TopBarWidth - TimeWidth};
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
@@ -575,6 +579,9 @@ void cFlatBaseRender::TopBarUpdate() {
                                Config.decorBorderTopBarBg};
         DecorBorderDraw(ib);
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   TopBarUpdate took %ld ms", Timer.Elapsed());
+#endif
 }
 
 void cFlatBaseRender::ButtonsCreate() {
