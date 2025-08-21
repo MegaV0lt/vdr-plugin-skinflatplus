@@ -3005,55 +3005,64 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
                                 "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                 "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
-    // Check for standard menu entries
-    std::string_view ElementView {*element}, sv;
-    for (const auto &item : items) {
-        sv = trVDR(item);  // Translate item to current language
-        if (ElementView == sv) { return cString::sprintf("menuIcons/%s", item); }
-    }
-
-    // Static cache to store the names of plugins
+    // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
 
-    // Check if the element matches any plugin name in the cache
+    std::string_view ElementView {*element}, sv;
+
+    // Check if the element matches any name in the cache
     auto it = cache.find(ElementView.data());
-    if (it != cache.end()) {
-        return cString::sprintf("pluginIcons/%s", *it->second);
-    } else {  // Look for plugin menu name
-        // Iterate through all plugins and check for main menu entries
-        const char *MainMenuEntry {""};
-        cache.reserve(16);  // Reserve space for 16 entries to avoid rehashing
-        for (std::size_t i {0};; ++i) {
-            cPlugin *p {cPluginManager::GetPlugin(i)};
-#ifdef DEBUGFUNCSCALL
-            dsyslog("   Plugin %ld: %p", i, p);
-            if (p != nullptr)
-                dsyslog("     Plugin name '%s', menu entry '%s'", p->Name(), p->MainMenuEntry());
-#endif
-            if (p != nullptr) {  // Plugin found
-                MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
-                if (!isempty(MainMenuEntry)) {  // Plugin has a main menu entry
-                    if (ElementView == MainMenuEntry) {
-#ifdef DEBUGFUNCSCALL
-                        dsyslog("     Adding plugin '%s' to cache (%ld)", p->Name(), cache.size() + 1);
-#endif
-                        cache.emplace(MainMenuEntry, cString(p->Name()));  // Store plugin menu name in cache
-                        return cString::sprintf("pluginIcons/%s", p->Name());  // Return icon name
-                    }
-                }
-            } else {
-                break;  // Plugin not found
-            }
+    if (it != cache.end())
+        return *it->second;  // Return cached icon name including path
+
+    cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
+    //* Check for standard menu entries
+    for (const auto &item : items) {
+        sv = trVDR(item);  // Translate item to current language
+        if (ElementView == sv) {
+            cache.emplace(ElementView, cString::sprintf("menuIcons/%s", item));  // Store menu name in cache
+            return cString::sprintf("menuIcons/%s", item);
         }
     }
 
-    // Check for special main menu entries "stop recording", "stop replay"
-    sv = skipspace(trVDR(" Stop recording "));
-    if (ElementView == sv) return "menuIcons/StopRecording";
-    sv = skipspace(trVDR(" Stop replaying"));
-    if (ElementView == sv) return "menuIcons/StopReplay";
+    //* Iterate through all plugins and check for main menu entries
+    const char *MainMenuEntry {""};
+    for (std::size_t i {0};; ++i) {
+        cPlugin *p {cPluginManager::GetPlugin(i)};
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   Plugin %ld: %p", i, p);
+        if (p != nullptr) dsyslog("     Plugin name '%s', menu entry '%s'", p->Name(), p->MainMenuEntry());
+#endif
+        if (p != nullptr) {                      // Plugin found
+            MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
+            if (!isempty(MainMenuEntry)) {       // Plugin has a main menu entry
+                if (ElementView == MainMenuEntry) {
+#ifdef DEBUGFUNCSCALL
+                    dsyslog("     Adding plugin '%s' to cache (#%ld)", p->Name(), cache.size() + 1);
+#endif
+                    cache.emplace(MainMenuEntry, cString::sprintf("pluginIcons/%s", p->Name()));  // Store in cache
+                    return cString::sprintf("pluginIcons/%s", p->Name());                         // Return icon name
+                }
+            }
+        } else {
+            break;  // Plugin not found
+        }
+    }  // for plugins
 
-    // Nothing found, try to return a generic icon
+    //* Check for special main menu entries "stop recording", "stop replay"
+    sv = skipspace(trVDR(" Stop recording "));
+    if (ElementView == sv) {
+        cache.emplace(ElementView, "menuIcons/StopRecording");  // Store in cache
+        return "menuIcons/StopRecording";
+    }
+    sv = skipspace(trVDR(" Stop replaying"));
+    if (ElementView == sv) {
+        cache.emplace(ElementView, "menuIcons/StopReplay");  // Store in cache
+        return "menuIcons/StopReplay";
+    }
+
+    //* Nothing found, return a generic icon
+    cache.emplace(ElementView, cString::sprintf("extraIcons/%s", *element));  // Store in cache
     return cString::sprintf("extraIcons/%s", *element);
 }
 
