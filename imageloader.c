@@ -32,7 +32,7 @@ cImageLoader::~cImageLoader() {}
  * @param height The desired height of the logo.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
-cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
+cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
     if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -92,7 +92,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     return nullptr;  // No image; so return nullptr
 }
 
-cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
+cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
     if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
 
     cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
@@ -162,7 +162,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     return img;
 }
 
-cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
+cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
     if (width < 0 || height < 0 || isempty(cFile)) return nullptr;
 
     const cString File = cFile;

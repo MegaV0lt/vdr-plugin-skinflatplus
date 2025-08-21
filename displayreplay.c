@@ -94,7 +94,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     int left {m_MarginItem};  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
-        img = ImgLoader.LoadIcon("timerRecording", kIconMaxSize, m_FontSmlHeight);  // Small image
+        img = ImgLoader.GetIcon("timerRecording", kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
             // const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
@@ -126,7 +126,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
 #endif
 
-    img = ImgLoader.LoadIcon("1920x1080", kIconMaxSize, m_FontSmlHeight);
+    img = ImgLoader.GetIcon("1920x1080", kIconMaxSize, m_FontSmlHeight);
     if (img)
         MaxWidth -= img->Width() * 3;  //* Substract guessed max. used space of aspect and format icons
 
@@ -158,7 +158,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
         const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
-        img = ImgLoader.LoadIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
+        img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
             // const int ImageTop {SmallTop};
@@ -248,16 +248,16 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                                       Theme.Color(clrReplayFontSpeed), Theme.Color(clrReplayBg), m_Font);
             }
         }
-        cImage *img {ImgLoader.LoadIcon(*rewind, m_FontHeight, m_FontHeight)};
+        cImage *img {ImgLoader.GetIcon(*rewind, m_FontHeight, m_FontHeight)};
         if (img) IconsPixmap->DrawImage(cPoint(left, 0), *img);
 
-        img = ImgLoader.LoadIcon(*pause, m_FontHeight, m_FontHeight);
+        img = ImgLoader.GetIcon(*pause, m_FontHeight, m_FontHeight);
         if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight + m_MarginItem, 0), *img);
 
-        img = ImgLoader.LoadIcon(*play, m_FontHeight, m_FontHeight);
+        img = ImgLoader.GetIcon(*play, m_FontHeight, m_FontHeight);
         if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight2 + m_MarginItem2, 0), *img);
 
-        img = ImgLoader.LoadIcon(*forward, m_FontHeight, m_FontHeight);
+        img = ImgLoader.GetIcon(*forward, m_FontHeight, m_FontHeight);
         if (img) IconsPixmap->DrawImage(cPoint(left + m_FontHeight * 3 + m_MarginItem3, 0), *img);
     }
 
@@ -359,7 +359,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img {ImgLoader.LoadIcon("recording_pos", kIconMaxSize, GlyphSize)};
+    cImage *img {ImgLoader.GetIcon("recording_pos", kIconMaxSize, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -436,12 +436,12 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int BorderSize {Config.decorBorderReplaySize * 2};  // Border size
     const int TotalWidth {m_Font->Width(m_Total)};         // Width of total length
     const int Spacer {FontCache.GetStringWidth(m_FontName, m_FontHeight, "0")};  // Space between total and cutt length
-    img = ImgLoader.LoadIcon("recording_total", kIconMaxSize, GlyphSize);
+    img = ImgLoader.GetIcon("recording_total", kIconMaxSize, GlyphSize);
     const int ImgWidth {(img) ? img->Width() : 0};
     if (FramesAfterEdit > 0) {
         const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
         const int CuttedWidth {m_Font->Width(cutted)};  // Width of cutted length
-        cImage *ImgCutted {ImgLoader.LoadIcon("recording_cutted_extra", kIconMaxSize, GlyphSize)};
+        cImage *ImgCutted {ImgLoader.GetIcon("recording_cutted_extra", kIconMaxSize, GlyphSize)};
         const int ImgCuttedWidth {(ImgCutted) ? ImgCutted->Width() : 0};
 
         int right {m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - TotalWidth - Spacer - ImgCuttedWidth -
@@ -578,7 +578,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         m_LastCurrent = m_Current;
         left = m_MarginItem;
         //* Image instead of 'ends at:' text
-        /* img = ImgLoader.LoadIcon("recording_finish", m_FontHeight, m_FontHeight);
+        /* img = ImgLoader.GetIcon("recording_finish", m_FontHeight, m_FontHeight);
         if (img) {
             IconsPixmap->DrawImage(cPoint(left, m_FontHeight), *img);
             left += img->Width() + m_MarginItem;
@@ -597,7 +597,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             const int RestCutted {FramesAfterEdit - CurrentFramesAfterEdit};
             EndTime = *TimeString(now + (RestCutted / FramesPerSecond));  // HH:MM
             if (strcmp(TimeStr, EndTime) != 0) {  // Only if not equal
-                img = ImgLoader.LoadIcon("recording_cutted_extra", kIconMaxSize, GlyphSize);
+                img = ImgLoader.GetIcon("recording_cutted_extra", kIconMaxSize, GlyphSize);
                 if (img) {
                     IconsPixmap->DrawImage(cPoint(left, m_FontHeight + TopOffset), *img);
                     left += img->Width() + m_MarginItem;
@@ -620,7 +620,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
-                    img = ImgLoader.LoadFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
+                    img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
                     if (img)
                         MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
                     else
@@ -636,7 +636,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             SetMediaSize(m_TVSRect.Size(), MediaSize);  // Set MediaSize to default size
             MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
             MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
-            img = ImgLoader.LoadFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
+            img = ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
@@ -699,7 +699,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
     cString IconName {""};
     if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
         IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-        img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
+        img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -707,7 +707,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         }
 
         IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-        img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
+        img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -717,7 +717,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
 
     if (Config.RecordingFormatShow && !Config.RecordingSimpleAspectFormat) {
         IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-        img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
+        img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -727,7 +727,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
 
     if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
         IconName = *GetCurrentAudioIcon();  // Show audio icon (Dolby, Stereo)
-        img = ImgLoader.LoadIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
+        img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
@@ -757,20 +757,20 @@ void cFlatDisplayReplay::PreLoadImages() {
     static const cString icons[] {"rewind",     "pause",     "play",     "forward",
                                   "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
     for (const auto &icon : icons) {
-        ImgLoader.LoadIcon(icon, m_FontHeight, m_FontHeight);
+        ImgLoader.GetIcon(icon, m_FontHeight, m_FontHeight);
     }
 
     static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     static const cString icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
     for (const auto &icon : icons1) {
-        ImgLoader.LoadIcon(icon, kIconMaxSize, GlyphSize);
+        ImgLoader.GetIcon(icon, kIconMaxSize, GlyphSize);
     }
 
     static const cString icons2[] {"recording_untested_replay", "recording_ok_replay", "recording_warning_replay",
                                    "recording_error_replay",    "timerRecording"};
     for (const auto &icon : icons2) {
-        ImgLoader.LoadIcon(icon, kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon(icon, kIconMaxSize, m_FontSmlHeight);
     }
 
     static const cString icons3[] {"43",        "169",       "169w",         "221",        "7680x4320",   "3840x2160",
@@ -778,6 +778,6 @@ void cFlatDisplayReplay::PreLoadImages() {
                                    "544x576",   "528x576",   "480x576",      "352x576",    "unknown_res", "uhd",
                                    "hd",        "sd",        "audio_stereo", "audio_dolby"};
     for (const auto &icon : icons3) {
-        ImgLoader.LoadIcon(icon, kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon(icon, kIconMaxSize, m_FontSmlHeight);
     }
 }

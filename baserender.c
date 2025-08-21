@@ -368,7 +368,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 int ImageBGHeight {TopBarLogoHeight};
                 int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
-                img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
+                img = ImgLoader.GetIcon("logo_background", ImageBGWidth, ImageBGHeight);
                 if (img) {
                     ImageBGHeight = img->Height();
                     ImageBGWidth = img->Width();
@@ -376,7 +376,7 @@ void cFlatBaseRender::TopBarUpdate() {
                     TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
                 }
 
-                img = ImgLoader.LoadLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
+                img = ImgLoader.GetLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
                 if (img) {
                     IconTop += (ImageBGHeight - img->Height()) / 2;
                     IconLeft += (ImageBGWidth - img->Width()) / 2;
@@ -384,7 +384,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 }
                 MenuIconWidth = ImageBGWidth + m_MarginItem2;
             } else if (m_TopBarMenuIconSet) {  // Show menu icon
-                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, kIconMaxSize, TopBarLogoHeight);
+                img = ImgLoader.GetIcon(*m_TopBarMenuIcon, kIconMaxSize, TopBarLogoHeight);
                 if (img) {
                     IconTop = (m_TopBarHeight - img->Height()) / 2;
                     TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
@@ -426,9 +426,9 @@ void cFlatBaseRender::TopBarUpdate() {
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
+                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
                 else
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
+                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
 
                 if (ImgCon) {
                     ImgConWidth = ImgCon->Width();
@@ -462,7 +462,7 @@ void cFlatBaseRender::TopBarUpdate() {
 #endif
 
             if (NumRec) {
-                ImgRec = ImgLoader.LoadIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
+                ImgRec = ImgLoader.GetIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
                 if (ImgRec) {  // Load recording icon
                     ImgRecWidth = ImgRec->Width();
                     NumRecStr = itoa(NumRec);  // Convert number of recordings to string
@@ -477,7 +477,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int ImgExtraWidth {0};
         cImage *ImgExtra {nullptr};
         if (m_TopBarExtraIconSet) {  // Load extra icon (Disk usage) with full height of TopBar
-            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, kIconMaxSize, m_TopBarHeight);
+            ImgExtra = ImgLoader.GetIcon(*m_TopBarExtraIcon, kIconMaxSize, m_TopBarHeight);
             if (ImgExtra) {
                 ImgExtraWidth = ImgExtra->Width();
                 Right -= ImgExtraWidth + m_MarginItem;
@@ -489,7 +489,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {  // Load sort icon
-            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, kIconMaxSize, TopBarLogoHeight);
+            ImgIconRight = ImgLoader.GetIcon(*m_TopBarMenuIconRight, kIconMaxSize, TopBarLogoHeight);
             if (ImgIconRight) {
                 TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
@@ -686,7 +686,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img {ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight)};
+    cImage *img {ImgLoader.GetIcon(*Icon, m_FontHeight, m_FontHeight)};
     if (img) MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
 
     if (Config.MessageColorPosition == 0) {  // Vertical
@@ -1912,7 +1912,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon
     cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
-    cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *img {ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
@@ -1928,7 +1928,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
-    cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
     if (ImgUmbrella) {
         WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight - m_MarginItem2;
@@ -1945,7 +1945,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon tomorrow
     WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[1].Icon);
-    img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
+    img = ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;

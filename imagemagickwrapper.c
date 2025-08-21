@@ -50,11 +50,10 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image data");
         return nullptr;
     }
-
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1ULL << 16;
-    const uint64_t QuantumScaleInt = (255ULL * kScale16) / QuantumRange;
+    static const uint64_t QuantumScaleInt = (255ULL * kScale16) / QuantumRange;
     const Quantum *px = buffer.getConstPixels(0, 0, w, h);
     if (!px) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
@@ -103,6 +102,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return image.release();
     }
 #else
+    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     // ImageMagick <=6: use PixelPacket
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
     if (!pixels) {
@@ -111,7 +111,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
     const Magick::PixelPacket *src = pixels;
     static constexpr uint64_t kScaleFactor = 1ULL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
+    static const uint64_t RGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
 
     if (w != width || h != height) {
         ImageScaler scaler;
@@ -147,7 +147,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1UL << 16;
-    const uint64_t QuantumScaleInt = (255UL * kScale16) / QuantumRange;
+    static const uint64_t QuantumScaleInt = (255UL * kScale16) / QuantumRange;
     const Quantum *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     const int quantum_channels = buffer.channels();
@@ -162,10 +162,11 @@ cImage cImageMagickWrapper::CreateImageCopy() {
         *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
     }
 #else
+    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     static constexpr uint64_t kScaleFactor = 1UL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
+    static const uint64_t RGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
             ((~static_cast<int>((src->opacity * kScaleFactor) / RGBScaleInt) << 24) |
@@ -210,7 +211,9 @@ Color cImageMagickWrapper::Argb2Color(tColor col) {
     Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
                 QuantumRange * alpha / 255);
 #else
-    Color color(MaxRGB * red / 255, MaxRGB * green / 255, MaxRGB * blue / 255, MaxRGB * (0xFF - alpha) / 255);
+    static constexpr uint64_t kMaxRGB = 65535;  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
+    Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
+                kMaxRGB * (0xFF - alpha) / 255);
 #endif
     return color;
 }

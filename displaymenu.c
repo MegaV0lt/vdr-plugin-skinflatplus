@@ -381,29 +381,29 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                 switch (s[0]) {
                 case '>':
                     if (Current) {
-                        img = ImgLoader.LoadIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_timer_full_cur", m_FontHeight, m_FontHeight);
                     } else if (Selectable) {
-                        img = ImgLoader.LoadIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_timer_full_sel", m_FontHeight, m_FontHeight);
                     } else {
-                        img = ImgLoader.LoadIcon("text_timer_full", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_timer_full", m_FontHeight, m_FontHeight);
                     }
                     break;
                 case '#':
                     if (Current) {
-                        img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
                     } else if (Selectable) {
-                        img = ImgLoader.LoadIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("timerRecording_sel", m_FontHeight, m_FontHeight);
                     } else {
-                        img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("timerRecording", m_FontHeight, m_FontHeight);
                     }
                     break;
                 case '!':
                     if (Current) {
-                        img = ImgLoader.LoadIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_arrowturn_cur", m_FontHeight, m_FontHeight);
                     } else if (Selectable) {
-                        img = ImgLoader.LoadIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_arrowturn_sel", m_FontHeight, m_FontHeight);
                     } else {
-                        img = ImgLoader.LoadIcon("text_arrowturn", m_FontHeight, m_FontHeight);
+                        img = ImgLoader.GetIcon("text_arrowturn", m_FontHeight, m_FontHeight);
                     }
                     break;
                 // case ' ':
@@ -418,11 +418,11 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     cImage *img {nullptr};
                     if (Current) {
                         const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-                        img = ImgLoader.LoadIcon(*IconNameCur, IconSize, IconSize);
+                        img = ImgLoader.GetIcon(*IconNameCur, IconSize, IconSize);
                     }
-                    if (!img) img = ImgLoader.LoadIcon(*IconName, IconSize, IconSize);
+                    if (!img) img = ImgLoader.GetIcon(*IconName, IconSize, IconSize);
 
-                    if (!img) { img = ImgLoader.LoadIcon("menuIcons/blank", IconSize, IconSize); }
+                    if (!img) { img = ImgLoader.GetIcon("menuIcons/blank", IconSize, IconSize); }
                     // Draw the icon
                     if (img) {
                         MenuIconsPixmap->DrawImage(
@@ -549,7 +549,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     cImage *img {nullptr};
     if (!IsGroup) {
-        img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
+        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -557,19 +557,19 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         }
         // Load named logo only for channels
-        img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+        img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     }
 
     if (!img) {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
-            if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
         } else if (IsGroup) {
-            img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+            img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
         } else {
-            if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
         }
     }
     if (img) {  // Draw the logo
@@ -783,7 +783,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
     ComplexContent.SetBGColor(Theme.Color(clrMenuEventBg));
 
     if (IsEmpty) {
-        cImage *img {ImgLoader.LoadIcon("timerInactiveBig", 256, 256)};
+        cImage *img {ImgLoader.GetIcon("timerInactiveBig", 256, 256)};
         if (img) {
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
             ComplexContent.AddText(
@@ -805,7 +805,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
         }  // TVScraperEPGInfoShowPoster
 
         if (MediaPath[0] != '\0') {
-            cImage *img {ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight)};
+            cImage *img {ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight)};
             if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
@@ -898,7 +898,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         IconName = "timerActive";
     }
 
-    cImage *img {ImgLoader.LoadIcon(*IconName, ImageHeight, ImageHeight)};
+    cImage *img {ImgLoader.GetIcon(*IconName, ImageHeight, ImageHeight)};
     if (img) {
         ImageTop = Top + (m_FontHeight - img->Height()) / 2;
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
@@ -906,7 +906,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     //? Make overlay configurable? (disable)
     if (Timer->Remote()) {  // Remote timer
-        img = ImgLoader.LoadIcon("timerRemote", ImageHeight, ImageHeight);
+        img = ImgLoader.GetIcon("timerRemote", ImageHeight, ImageHeight);
         if (img) {
             ImageTop = Top + (m_FontHeight - img->Height()) / 2;
             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
@@ -926,7 +926,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     ImageLeft = Left;
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
-    img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
+    img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
     if (img) {
         ImageBgWidth = img->Width();
         ImageBgHeight = img->Height();
@@ -934,15 +934,15 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
-    img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+    img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
     if (!img) {
         const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
         if (IsRadioChannel) {
-            if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
         } else {
-            if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
         }
     }
     if (img) {  // Draw the logo
@@ -1141,7 +1141,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
         int ImageBgHeight {m_FontHeight};
         if (!IsGroup) {
-            img = ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight);
+            img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
             if (img) {
                 ImageBgWidth = img->Width();
                 ImageBgHeight = img->Height();
@@ -1149,19 +1149,19 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
             // Load named logo only for channels
-            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
         }
 
         if (!img) {
             const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
             if (IsRadioChannel) {
-                if (Current) img = ImgLoader.LoadIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
             } else if (IsGroup) {
-                img = ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+                img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
             } else {
-                if (Current) img = ImgLoader.LoadIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
             }
         }
         if (img) {  // Draw the logo
@@ -1286,11 +1286,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (TimerActive) {  // Show timer icon only if timer is active
         img = nullptr;
         if (TimerMatch == tmFull) {
-            if (Current) img = ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
-            if (!img) img = ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.GetIcon("timer_full_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.GetIcon("timer_full", ImageHeight, ImageHeight);
         } else if (TimerMatch == tmPartial) {
-            if (Current) img = ImgLoader.LoadIcon("timer_partial_cur", ImageHeight, ImageHeight);
-            if (!img) img = ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.GetIcon("timer_partial_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.GetIcon("timer_partial", ImageHeight, ImageHeight);
         }
         if (img) {  // Draw timer icon
             ImageTop = Top;
@@ -1303,8 +1303,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString Buffer {""};
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = nullptr;
-            if (Current) img = ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
-            if (!img) img = ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
+            if (Current) img = ImgLoader.GetIcon("vps_cur", ImageHeight, ImageHeight);
+            if (!img) img = ImgLoader.GetIcon("vps", ImageHeight, ImageHeight);
             if (img) {
                 ImageTop = Top;
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *img);
@@ -1481,22 +1481,22 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
     cImage *img {nullptr};
     const int RecordingIsInUse {Recording->IsInUse()};
     if ((RecordingIsInUse & ruTimer) != 0) {  // The recording is currently written to by a timer
-        if (Current) img = ImgLoader.LoadIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
-        if (!img) img = ImgLoader.LoadIcon("timerRecording", m_FontHeight, m_FontHeight);
+        if (Current) img = ImgLoader.GetIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.GetIcon("timerRecording", m_FontHeight, m_FontHeight);
     } else if ((RecordingIsInUse & ruReplay) != 0) {  // The recording is being replayed
-        if (Current) img = ImgLoader.LoadIcon("play", m_FontHeight, m_FontHeight);
-        if (!img) img = ImgLoader.LoadIcon("play_sel", m_FontHeight, m_FontHeight);
-        // img = ImgLoader.LoadIcon("recording_replay", m_FontHeight, m_FontHeight);
+        if (Current) img = ImgLoader.GetIcon("play", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.GetIcon("play_sel", m_FontHeight, m_FontHeight);
+        // img = ImgLoader.GetIcon("recording_replay", m_FontHeight, m_FontHeight);
     } else if (Recording->IsNew()) {
-        if (Current) img = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
-        if (!img) img = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
+        if (Current) img = ImgLoader.GetIcon("recording_new_cur", m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.GetIcon("recording_new", m_FontHeight, m_FontHeight);
     } else {
         const cString IconName = *GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume());
         if (Current) {
             const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-            img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
+            img = ImgLoader.GetIcon(*IconNameCur, m_FontHeight, m_FontHeight);
         }
-        if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
+        if (!img) img = ImgLoader.GetIcon(*IconName, m_FontHeight, m_FontHeight);
     }
     // Draw the icon for recording state
     if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
@@ -1515,7 +1515,7 @@ void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int 
     static constexpr float kIconFormatHeightRatio {1.0 / 3.0};
     const cString IconName = *GetRecordingFormatIcon(Recording);    // Show (SD), HD or UHD Logo
     const int ImageHeight = m_FontHeight * kIconFormatHeightRatio;  // 1/3 height. Narrowing conversion
-    const cImage *img {ImgLoader.LoadIcon(*IconName, kIconMaxSize, ImageHeight)};
+    const cImage *img {ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight)};
     if (img) {
         const int ImageTop {Top + m_FontHeight - m_FontAscender};
         const int ImageLeft {Left + m_FontHeight - img->Width()};
@@ -1540,9 +1540,9 @@ void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int L
     cImage *img {nullptr};
     if (Current) {
         const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
-        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
+        img = ImgLoader.GetIcon(*IconNameCur, m_FontHeight, m_FontHeight);
     }
-    if (!img) img = ImgLoader.LoadIcon(*IconName, m_FontHeight, m_FontHeight);
+    if (!img) img = ImgLoader.GetIcon(*IconName, m_FontHeight, m_FontHeight);
     if (img) MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
 }
 
@@ -1563,9 +1563,9 @@ void cFlatDisplayMenu::DrawRecordingIcon(const char *IconName, int &Left, int To
     cImage *img {nullptr};
     if (Current) {
         const cString IconNameCur = cString::sprintf("%s_cur", IconName);
-        img = ImgLoader.LoadIcon(*IconNameCur, m_FontHeight, m_FontHeight);
+        img = ImgLoader.GetIcon(*IconNameCur, m_FontHeight, m_FontHeight);
     }
-    if (!img) img = ImgLoader.LoadIcon(IconName, m_FontHeight, m_FontHeight);
+    if (!img) img = ImgLoader.GetIcon(IconName, m_FontHeight, m_FontHeight);
     if (img) {
         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
         Left += m_FontHeight + m_MarginItem;
@@ -1622,14 +1622,14 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     //* Preload for calculation of position
     cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
     if (Current) {
-        ImgRecNew = ImgLoader.LoadIcon("recording_new_cur", m_FontHeight, m_FontHeight);
-        ImgRecNewSml = ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
+        ImgRecNew = ImgLoader.GetIcon("recording_new_cur", m_FontHeight, m_FontHeight);
+        ImgRecNewSml = ImgLoader.GetIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
+        ImgRecCut = ImgLoader.GetIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
     }
-    if (!ImgRecNew) ImgRecNew = ImgLoader.LoadIcon("recording_new", m_FontHeight, m_FontHeight);
-    if (!ImgRecNewSml) ImgRecNewSml = ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
+    if (!ImgRecNew) ImgRecNew = ImgLoader.GetIcon("recording_new", m_FontHeight, m_FontHeight);
+    if (!ImgRecNewSml) ImgRecNewSml = ImgLoader.GetIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
     if (!ImgRecCut)
-        ImgRecCut = ImgLoader.LoadIcon("recording_cutted", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
+        ImgRecCut = ImgLoader.GetIcon("recording_cutted", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
 
     const int ImgRecNewWidth {(ImgRecNew) ? ImgRecNew->Width() : 0};
     const int ImgRecNewSmlWidth {(ImgRecNewSml) ? ImgRecNewSml->Width() : 0};
@@ -1895,8 +1895,8 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     cImage *img {nullptr};
     if (strlen(*Fsk) > 0) {
         IconName = cString::sprintf("EPGInfo/FSK/%s", *Fsk);
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
-        if (!img) img = ImgLoader.LoadIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
+        img = ImgLoader.GetIcon(*IconName, IconHeight, IconHeight);
+        if (!img) img = ImgLoader.GetIcon("EPGInfo/FSK/unknown", IconHeight, IconHeight);
 
         if (img) {  // Draw the FSK icon
             ContentHeadIconsPixmap->DrawImage(cPoint(HeadIconLeft, HeadIconTop), *img);
@@ -1910,9 +1910,9 @@ void cFlatDisplayMenu::DrawContentHeadFskGenre(int IconHeight, int &HeadIconLeft
     bool IsUnknownDrawn {false};
     for (auto &GenreIcon : GenreIcons) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcon.c_str());
-        img = ImgLoader.LoadIcon(*IconName, IconHeight, IconHeight);
+        img = ImgLoader.GetIcon(*IconName, IconHeight, IconHeight);
         if (!img && !IsUnknownDrawn) {
-            img = ImgLoader.LoadIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
+            img = ImgLoader.GetIcon("EPGInfo/Genre/unknown", IconHeight, IconHeight);
             IsUnknownDrawn = true;
         }
         if (img) {  // Draw the genre icon
@@ -2126,7 +2126,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         // Handle media content
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         if (MediaPath[0] != '\0') {
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text,
@@ -2349,7 +2349,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
             const cString RecPath = Recording->FileName();
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
-                img = ImgLoader.LoadFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
+                img = ImgLoader.GetFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
                 if (img) {
                     const uint16_t Aspect = img->Width() / img->Height();  // Narrowing conversion
                     if (Aspect < 1) {                                      //* Poster (For example 680x1000 = 0.68)
@@ -2365,7 +2365,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     }  // TVScraperRecInfoShowPoster
 
     if (MediaPath[0] != '\0') {
-        img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+        img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
                 img, CIP_Right, *Text,
@@ -2457,7 +2457,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     for (std::size_t row {0}; row < PicLines; ++row) {
         for (std::size_t col {0}; col < ActorsPerLine; ++col) {
             if (Actor == NumActors) break;
-            img = ImgLoader.LoadFile(*ActorsPath[Actor], ActorWidth, kIconMaxSize);
+            img = ImgLoader.GetFile(*ActorsPath[Actor], ActorWidth, kIconMaxSize);
             if (img) {
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 ImgHeight = img->Height();
@@ -2666,7 +2666,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
         // Handle media content
         if (MediaPath[0] != '\0') {
-            img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);
+            img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
                 const uint16_t Aspect = img->Width() / img->Height();  // Narrowing conversion
@@ -2674,7 +2674,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
                     // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
                     MediaHeight *= (2.0 / 3.0);                                     // Size * 0,666 = 2/3
-                    img = ImgLoader.LoadFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
+                    img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
                 }
             }
             if (img) {  // Insert image with floating text
@@ -2788,7 +2788,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
         const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
 
-        img = ImgLoader.LoadIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
+        img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
             const int ImageTop {m_MarginItem + m_FontSmlHeight + m_FontHeight};
@@ -3477,7 +3477,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
  * @return The new top position of the content.
  */
 int cFlatDisplayMenu::AddWidgetHeader(const char *Icon, const char *Title, int ContentTop, int wWidth) {
-    cImage *img {ImgLoader.LoadIcon(Icon, m_FontHeight, m_FontHeight - m_MarginItem2)};
+    cImage *img {ImgLoader.GetIcon(Icon, m_FontHeight, m_FontHeight - m_MarginItem2)};
     if (img) ContentWidget.AddImage(img, cRect(m_MarginItem, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
 
     ContentWidget.AddText(Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
@@ -3687,7 +3687,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.LoadIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
+                    img = ImgLoader.GetIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
@@ -3721,7 +3721,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.LoadIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
+                    img = ImgLoader.GetIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
@@ -3751,7 +3751,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount) break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
+                img = ImgLoader.GetIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -3782,7 +3782,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount) break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.LoadIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
+                img = ImgLoader.GetIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
@@ -4170,7 +4170,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 
     int left {m_MarginItem};
     cString WeatherIcon {""};
-    cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2)};
+    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2)};
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
     const int TempSmlWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "-00,0°C")};  // Width
@@ -4194,7 +4194,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             }
 
             WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[i].Icon);
-            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
+            img = ImgLoader.GetIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
@@ -4241,7 +4241,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
             left += DayStringWidth + m_MarginItem;
 
             WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[i].Icon);
-            img = ImgLoader.LoadIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
+            img = ImgLoader.GetIcon(*WeatherIcon, m_FontHeight, m_FontHeight - m_MarginItem2);
             if (img) {
                 ContentWidget.AddImage(img, cRect(left, ContentTop + m_MarginItem, m_FontHeight, m_FontHeight));
                 left += m_FontHeight + m_MarginItem;
@@ -4299,18 +4299,18 @@ void cFlatDisplayMenu::PreLoadImages() {
         if (File.find("vdrlogo") == 0)  // Skip vdrlogo* files
             continue;
         FileName = cString::sprintf("menuIcons/%s", File.substr(0, File.find_last_of(".")).c_str());
-        ImgLoader.LoadIcon(*FileName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon(*FileName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
     }
 
     if (Config.TopBarMenuIconShow)
-        ImgLoader.LoadIcon(cString::sprintf("menuIcons/%s", VDRLOGO), kIconMaxSize, m_TopBarHeight - m_MarginItem2);
+        ImgLoader.GetIcon(cString::sprintf("menuIcons/%s", VDRLOGO), kIconMaxSize, m_TopBarHeight - m_MarginItem2);
 
-    ImgLoader.LoadIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+    ImgLoader.GetIcon("menuIcons/blank", ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
 
     // Channel icons
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
-    cImage *img {ImgLoader.LoadIcon("logo_background", ImageBgWidth, ImageBgHeight)};
+    cImage *img {ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight)};
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
@@ -4321,14 +4321,14 @@ void cFlatDisplayMenu::PreLoadImages() {
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel {Channels->First()}; Channel && i < LogoPreCache; Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
-            img = ImgLoader.LoadLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img) ++i;
         }
     }  // for channel
 
-    ImgLoader.LoadIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-    ImgLoader.LoadIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-    ImgLoader.LoadIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+    ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
     // Plugin icons
     for (std::size_t i {0};; ++i) {
@@ -4337,7 +4337,7 @@ void cFlatDisplayMenu::PreLoadImages() {
         if (p) {
             if (!isempty(p->MainMenuEntry())) {  // Plugin has a main menu entry
                 PluginName = cString::sprintf("pluginIcons/%s", p->Name());
-                ImgLoader.LoadIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
+                ImgLoader.GetIcon(*PluginName, ImageHeight - m_MarginItem2, ImageHeight - m_MarginItem2);
             }
         } else {
             break;
@@ -4345,67 +4345,67 @@ void cFlatDisplayMenu::PreLoadImages() {
     }
 
     // Top bar icons
-    ImgLoader.LoadIcon("radio", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
-    ImgLoader.LoadIcon("changroup", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
-    ImgLoader.LoadIcon("tv", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.GetIcon("radio", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.GetIcon("changroup", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
+    ImgLoader.GetIcon("tv", kIconMaxSize, m_TopBarHeight - m_MarginItem2);
 
-    ImgLoader.LoadIcon("timerInactive", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timerRecording", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timerActive", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timerInactive", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timerRecording", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timerActive", ImageHeight, ImageHeight);
 
-    ImgLoader.LoadIcon("timer_full", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timer_full_cur", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("timer_partial", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("vps", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("vps_cur", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timer_full", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timer_full_cur", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timer_partial", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("vps", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("vps_cur", ImageHeight, ImageHeight);
 
-    ImgLoader.LoadIcon("sd", ImageHeight, ImageHeight / 3);
-    ImgLoader.LoadIcon("hd", ImageHeight, ImageHeight / 3);
-    ImgLoader.LoadIcon("uhd", ImageHeight, ImageHeight / 3);
+    ImgLoader.GetIcon("sd", ImageHeight, ImageHeight / 3);
+    ImgLoader.GetIcon("hd", ImageHeight, ImageHeight / 3);
+    ImgLoader.GetIcon("uhd", ImageHeight, ImageHeight / 3);
 
-    ImgLoader.LoadIcon("folder", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
-    ImgLoader.LoadIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
-    ImgLoader.LoadIcon("recording_new", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_new_cur", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_old", ImageHeight, ImageHeight);
-    ImgLoader.LoadIcon("recording_old_cur", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("folder", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("recording", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("recording_cutted", ImageHeight, ImageHeight * (2.0 / 3.0));
+    ImgLoader.GetIcon("recording_cutted_cur", ImageHeight, ImageHeight * (2.0 / 3.0));
+    ImgLoader.GetIcon("recording_new", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("recording_new_cur", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("recording_old", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("recording_old_cur", ImageHeight, ImageHeight);
 
-    ImgLoader.LoadIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
-    ImgLoader.LoadIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.GetIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.GetIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.GetIcon("recording_old", m_FontSmlHeight, m_FontSmlHeight);
+    ImgLoader.GetIcon("recording_old_cur", m_FontSmlHeight, m_FontSmlHeight);
 
     // Widget icons
     if (Config.MainMenuWidgetDVBDevicesShow) {
-        ImgLoader.LoadIcon("widgets/dvb_devices", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/dvb_devices", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetActiveTimerShow) {
-        ImgLoader.LoadIcon("widgets/active_timers", ImageHeight, ImageHeight - m_MarginItem2);
-        ImgLoader.LoadIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
-        ImgLoader.LoadIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
+        ImgLoader.GetIcon("widgets/active_timers", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
+        ImgLoader.GetIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
     }
     if (Config.MainMenuWidgetLastRecShow) {
-        ImgLoader.LoadIcon("widgets/last_recordings", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/last_recordings", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetTimerConflictsShow) {
-        ImgLoader.LoadIcon("widgets/timer_conflicts", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/timer_conflicts", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetSystemInfoShow) {
-        ImgLoader.LoadIcon("widgets/system_information", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/system_information", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetSystemUpdatesShow) {
-        ImgLoader.LoadIcon("widgets/system_updates", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/system_updates", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetTemperaturesShow) {
-        ImgLoader.LoadIcon("widgets/temperatures", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/temperatures", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetCommandShow) {
-        ImgLoader.LoadIcon("widgets/command_output", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/command_output", ImageHeight, ImageHeight - m_MarginItem2);
     }
     if (Config.MainMenuWidgetWeatherShow) {
-        ImgLoader.LoadIcon("widgets/weather", ImageHeight, ImageHeight - m_MarginItem2);
-        ImgLoader.LoadIcon("widgets/umbrella", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/weather", ImageHeight, ImageHeight - m_MarginItem2);
+        ImgLoader.GetIcon("widgets/umbrella", ImageHeight, ImageHeight - m_MarginItem2);
     }
 }

@@ -1,3 +1,4 @@
+// -*- c++ -*-
 /*
  * Skin flatPlus: A plugin for the Video Disk Recorder
  *
@@ -12,7 +13,9 @@
 #include <Magick++.h>
 #include <vdr/osd.h>
 
-using namespace Magick;
+// using namespace Magick;
+using Magick::Image;
+using Magick::Color;
 
 class cImageMagickWrapper {
  public:
