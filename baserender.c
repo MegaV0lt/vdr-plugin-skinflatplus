@@ -79,6 +79,11 @@ cFlatBaseRender::cFlatBaseRender() {
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
+    // Set margins relative to the OSD size
+    m_MarginItem = cOsd::OsdWidth() / 200;  // 3 pixel @ 720 pixels, 9 pixel @ 1920 pixels
+    m_MarginItem2 = m_MarginItem * 2;
+    m_MarginItem3 = m_MarginItem * 3;
+
     Borders.reserve(64);
 
     Config.ThemeCheckAndInit();

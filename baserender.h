@@ -146,7 +146,7 @@ class cFlatBaseRender {
     cOsd *m_Osd {nullptr};
 
     int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
-    const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
+    int m_MarginItem {0}, m_MarginItem2 {0}, m_MarginItem3 {0};  // Margins for items in the OSD
 
     static constexpr int kIconMaxSize {999};   // Max icon width or height (999)
 
