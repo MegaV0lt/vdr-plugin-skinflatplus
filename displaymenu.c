@@ -45,6 +45,7 @@ static int CompareTimers(const void *a, const void *b) { return (*(const cTimer 
 cFlatDisplayMenu::cFlatDisplayMenu() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::cFlatDisplayMenu()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     CreateFullOsd();
@@ -98,6 +99,9 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
 
     static constexpr std::size_t kDefaultItemBorderSize {64};
     ItemsBorder.reserve(kDefaultItemBorderSize);
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 cFlatDisplayMenu::~cFlatDisplayMenu() {
@@ -1658,8 +1662,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                                  m_MenuItemWidth - Left - m_MarginItem);
-
-            Left += m_Font->Width(*Buffer);
+            Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00.00.00  00:00   00:00") + m_MarginItem;
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             DrawRecordingStateIcon(Recording, Left, Top, Current);

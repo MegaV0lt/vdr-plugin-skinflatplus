@@ -227,6 +227,7 @@ void cFlatBaseRender::TopBarSetMenuLogo(const cString &icon) {
 void cFlatBaseRender::TopBarEnableDiskUsage() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
+    cTimeMs Timer;  // Start Timer
 #endif
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::Flush()
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
@@ -340,6 +341,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
     TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 //* Should be called with every "Flush"!
@@ -588,7 +592,7 @@ void cFlatBaseRender::TopBarUpdate() {
                                Config.decorBorderTopBarBg};
         DecorBorderDraw(ib);
 #ifdef DEBUGFUNCSCALL
-        if (Timer.Elapsed() > 0) dsyslog("   TopBarUpdate took %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
     }
 }
