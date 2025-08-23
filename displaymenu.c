@@ -1277,7 +1277,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             Top += m_FontHeight;
             ImageHeight = m_FontSmlHeight;
             MenuPixmap->DrawText(cPoint(Left, Top), *EventTimeString, ColorFg, ColorBg, m_FontSml);
-            Left += m_FontSml->Width(*EventTimeString) + m_MarginItem;
+            Left += FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00") + m_MarginItem;
             /* } else if (MenuEventViewShort && Event && Selectable) {
                     MenuPixmap->DrawText(cPoint(Left, Top), *EventTimeString, ColorFg, ColorBg, m_Font);
                     Left += m_Font->Width(*EventTimeString) + m_MarginItem; */

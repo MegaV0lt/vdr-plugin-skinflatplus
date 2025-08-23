@@ -329,7 +329,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         if (Event) {
             StartTime = *Event->GetTimeString();  // Start time (left side)
             StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (right side)
-            StrTimeWidth = m_FontSml->Width(*StrTime) + SmlSpaceWidth2;
+            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00 - 00:00") + SmlSpaceWidth2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
