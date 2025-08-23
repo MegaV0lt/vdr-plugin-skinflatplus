@@ -79,11 +79,6 @@ cFlatBaseRender::cFlatBaseRender() {
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
-    // Set margins relative to the OSD size
-    m_MarginItem = cOsd::OsdWidth() / 200;  // 3 pixel @ 720 pixels, 9 pixel @ 1920 pixels
-    m_MarginItem2 = m_MarginItem * 2;
-    m_MarginItem3 = m_MarginItem * 3;
-
     Borders.reserve(64);
 
     Config.ThemeCheckAndInit();
@@ -115,7 +110,7 @@ void cFlatBaseRender::CreateFullOsd() {
 
 void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
+    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size %dx%d", Left, Top, Width, Height);
 #endif
 
     m_OsdLeft = Left;
@@ -124,6 +119,16 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_OsdHeight = Height;
 
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
+
+    // Set margins relative to the OSD size with an minimum/maximum of 3/19 pixels
+    // Example: 720 pixels OSD width -> 3 pixels margin, 1920 pixels OSD width -> 9 pixels margin
+    m_MarginItem = std::max(3, std::min(19, Width / 200));
+    m_MarginItem2 = m_MarginItem * 2;
+    m_MarginItem3 = m_MarginItem * 3;
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   Osd width: %d, m_MarginItem: %d (%d,%d)", Width, m_MarginItem, m_MarginItem2, m_MarginItem3);
+#endif
+
     tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) { return; }
 
@@ -151,8 +156,7 @@ void cFlatBaseRender::TopBarCreate() {
 
 void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
-    if (Clear) dsyslog("   With clear");
+    dsyslog("flatPlus: TopBarSetTitle() '%s'%s", *Title, Clear ? " With clear" : "");
 #endif
 
     if (Clear) {  // Clear is default
@@ -583,10 +587,10 @@ void cFlatBaseRender::TopBarUpdate() {
                                Config.decorBorderTopBarFg,
                                Config.decorBorderTopBarBg};
         DecorBorderDraw(ib);
-    }
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   TopBarUpdate took %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   TopBarUpdate took %ld ms", Timer.Elapsed());
 #endif
+    }
 }
 
 void cFlatBaseRender::ButtonsCreate() {
