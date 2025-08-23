@@ -348,8 +348,17 @@ void cFlatDisplayReplay::UpdateInfo() {
                                              ? FontCache.GetFontAscender(Setup.FontOsd, FontSecsSize)
                                              : 0)};                                   // Top position for seconds
     const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, FontSecsSize)};  // Height of seconds font
-    static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
-    const int GlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
+    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
+    // Cached glyph size
+    static int CachedGlyphSize = -1;
+    static cString CachedFontOsd {""};
+    static int CachedFontOsdSize = -1;
+    if (strcmp(Setup.FontOsd, CachedFontOsd) != 0 || Setup.FontOsdSize != CachedFontOsdSize) {
+        CachedFontOsd = Setup.FontOsd;
+        CachedFontOsdSize = Setup.FontOsdSize;
+        CachedGlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);
+    }
+    const int GlyphSize {CachedGlyphSize};
     const int TopOffset {m_FontAscender - GlyphSize};
 
 #ifdef DEBUGFUNCSCALL
