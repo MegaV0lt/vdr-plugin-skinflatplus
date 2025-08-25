@@ -120,9 +120,9 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
 
-    // Set margins relative to the OSD size with an minimum/maximum of 3/19 pixels
-    // Example: 720 pixels OSD width -> 3 pixels margin, 1920 pixels OSD width -> 9 pixels margin
-    m_MarginItem = std::max(3, std::min(19, Width / 200));
+    // Set margins relative to the OSD size with an minimum of 3 pixels
+    // Example: 720 pixels OSD width -> 3 pixels margin, 1920 -> 7 pixels, 3840 -> 14 pixels, 7680 -> 27 pixels
+    m_MarginItem = std::min(3, Width / 275);
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
 #ifdef DEBUGFUNCSCALL
@@ -1776,7 +1776,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
 
-            const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
+            static const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location)) out.Location = tr("Unknown");
         }  // End of day 0 specific data reading
