@@ -566,7 +566,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (CachedProgressBarHeight != ProgressBarHeight) {
         CachedProgressBarHeight = ProgressBarHeight;
         CachedFontAscender = FontCache.GetFontAscender(Setup.FontOsd, ProgressBarHeight);
-        CachedGlyphSize = GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
+        CachedGlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
     }
 
     const int TopOffset {(CachedFontAscender - CachedGlyphSize) / 2};  // Center vertically

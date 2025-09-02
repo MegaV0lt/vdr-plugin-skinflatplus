@@ -11,6 +11,7 @@
 #include <vdr/font.h>
 #include <vdr/tools.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -205,7 +206,6 @@ class cComplexContent {
     cOsd *m_Osd {nullptr};
     cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
     cRect m_Position {0, 0, 0, 0};
-
     tColor m_ColorBg {0};
     bool m_FullFillBackground {false};
     int m_DrawPortHeight {0};

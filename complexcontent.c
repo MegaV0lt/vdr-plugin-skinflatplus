@@ -26,6 +26,10 @@ cComplexContent::~cComplexContent() {
 }
 
 void cComplexContent::Clear() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cComplexContent::Clear() Contents size: %ld", Contents.size());
+#endif
+
     m_IsShown = false;
     Contents.clear();
     if (m_Osd) {  //! Check because Clear() is called before SetOsd()
@@ -66,7 +70,7 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
         }
     } else {  // Log values and return
         esyslog(
-            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
+            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d size: %dx%d",
             m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
@@ -74,11 +78,21 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 }
 
 void cComplexContent::CalculateDrawPortHeight() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cComplexContent::CalculateDrawPortHeight() DrawPortHeight: %d", m_DrawPortHeight);
+#endif
+
     m_DrawPortHeight = BottomContent();
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   BottomContent: %d", m_DrawPortHeight);
+#endif
 
     // m_DrawPortHeight has to be set for 'ScrollTotal()' to work
     if (m_IsScrollingActive && m_ScrollSize > 0) {
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
+#ifdef DEBUGFUNCSCALL
+        dsyslog("   ScrollTotal: %d", m_DrawPortHeight);
+#endif
     }
 }
 int cComplexContent::BottomContent() const {

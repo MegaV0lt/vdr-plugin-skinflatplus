@@ -33,7 +33,6 @@
 #include "./displaytracks.h"
 #include "./displayvolume.h"
 #include "./fontcache.h"
-#include "./glyphmetricscache.h"
 
 #include "./services/epgsearch.h"
 
@@ -430,7 +429,7 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize) {  // NOLINT
 
     //* Set to default size
     const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
-    //* Aspect of image is preserved in cImageLoader::LoadFile()
+    //* Aspect of image is preserved in cImageLoader::GetFile()
     if (Aspect < kPosterAspectThreshold) {  //* Poster (For example 680x1000 = 0.68)
         MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio));
     } else if (Aspect < kBannerAspectThreshold) {  //* Portrait (For example 1920x1080 = 1.77)
@@ -475,6 +474,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
+        case sc_audio_AC4:
         case sc_audio_HEAAC:
             if (ossAudio.tellp() > 0) ossAudio << ", ";
             if (p->description) {
@@ -486,6 +486,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
                     AudioType = (p->type == 5) ? "AC3" : "MP2";
                     break;
                 case sc_audio_AC3: AudioType = "AC3"; break;
+                case sc_audio_AC4: AudioType = "AC4"; break;
                 case sc_audio_HEAAC: AudioType = "HEAAC"; break;
                 }  // switch p->stream
                 ossAudio << p->language << " (" << *AudioType << ')';
@@ -720,7 +721,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         oss << '\n'
             << tr("format") << ": " << (IsPesRecording ? "PES" : "TS") << ", " << RecInfo->FrameWidth() << "x"
-            << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(2) << RecInfo->FramesPerSecond();
+            << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(0) << RecInfo->FramesPerSecond();
         if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
             oss << RecInfo->ScanTypeChar();
         if (RecInfo->AspectRatio() != arUnknown) oss << ' ' << RecInfo->AspectRatioText();
@@ -751,39 +752,6 @@ std::string XmlSubstring(const std::string &source, const char *StrStart, const 
     if (EndPos == std::string::npos) return {};
 
     return source.substr(StartPos, EndPos - StartPos);
-}
-
-// Optimized GetGlyphSize with caching
-GlyphMetricsCache &glyphMetricsCache() {
-    static GlyphMetricsCache s_cache;
-    return s_cache;
-}
-/**
- * @brief Get the size of a glyph in a given font and font height.
- * @param[in] Name The name of the font to use.
- * @param[in] CharCode The character code of the glyph to query.
- * @param[in] FontHeight The height of the font in pixels.
- * @return The size of the glyph in pixels, rounded up to the nearest integer.
- * @note This function returns 0 if any error occurs during the execution of the function.
- */
-uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight) {
-    GlyphMetricsCache &cache = glyphMetricsCache();
-
-    FT_Face face = cache.GetFace(*cFont::GetFontFileName(Name));
-    if (face == nullptr) {
-        esyslog("flatPlus: GetGlyphSize() Error: Can't find face (Font = %s)", *cFont::GetFontFileName(Name));
-        return 0;
-    }
-    if (FT_Set_Char_Size(face, FontHeight * 64, FontHeight * 64, 0, 0) != 0) {
-        esyslog("flatPlus: GetGlyphSize() Error: Can't set char size (Font = %s)", *cFont::GetFontFileName(Name));
-        return 0;
-    }
-    FT_GlyphSlot slot = face->glyph;
-    if (FT_Load_Glyph(face, FT_Get_Char_Index(face, CharCode), FT_LOAD_DEFAULT) != 0) {
-        esyslog("flatPlus: GetGlyphSize() Error: Can't load glyph (Font = %s)", *cFont::GetFontFileName(Name));
-        return 0;
-    }
-    return (slot->metrics.height + 63) / 64;
 }
 
 /**

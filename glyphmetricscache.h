@@ -48,4 +48,4 @@ class GlyphMetricsCache {
 };  // class GlyphMetricsCache
 
 // Accessor:
-GlyphMetricsCache &glyphMetricsCache();
+// GlyphMetricsCache &glyphMetricsCache();

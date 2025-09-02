@@ -3,15 +3,20 @@ VDR Plugin 'skin flatPlus' Revision History
 2025-xx-xx: Version 1.2.1
 - [fix] Fix display of disk usage for menu category 0 (mcUndefined)
 - [add] Clear font cache on plugin stop
-- [add] Plugin name cache to prevent repeated calls to GetPluginName()
+- [add] Refactor GetIconName() function to cache all menu names and plugins,
+        improving performance and reducing memory usage
 - [add] Move GetFontAscender() to font cache
 - [update] Optimize justification of text
 - [update] Use a minimum of 15 ms for scroll delay
 - [update] Reduce number of calls to GetRecCounts() and UpdateTimerCounts()
-- [update] Remove any number of '%' from cutted recordings
+- [update] Remove any number of '%' from cutted recordings in menu
 - [update] Refactor display menu to improve event and recording info handling 
            with dedicated draw functions
 - [update] Cache the value MaxX in TextScroller class to avoid repeated calculations
+- [update] Move GetFontName() to font cache
+- [update] Use ShortText if Description is empty for event and recording information.
+- [update] Use a brighter 'Red' color for error marks
+- [update] Set margins relative to the OSD size
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0

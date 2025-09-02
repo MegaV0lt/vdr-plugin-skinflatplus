@@ -122,7 +122,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 
     // Set margins relative to the OSD size with an minimum of 3 pixels
     // Example: 720 pixels OSD width -> 3 pixels margin, 1920 -> 7 pixels, 3840 -> 14 pixels, 7680 -> 27 pixels
-    m_MarginItem = std::min(3, Width / 275);
+    m_MarginItem = std::max(3, static_cast<int>((Width / 275) + 0.5));  // 275 is an empirical value
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
 #ifdef DEBUGFUNCSCALL
@@ -2029,7 +2029,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
-        Alpha = std::min(i * AlphaStep, MaxAlpha);  // Ensure it does not exceed 1.0
+        Alpha = std::min((ShadowSize - i) * AlphaStep, MaxAlpha);  // Calculate alpha from 0.0 (outer) to 1.0 (inner)
         CurrentShadowColor = SetAlpha(ShadowColor, Alpha);
         ShadowX = BaseX + (xOffset * i);
         ShadowY = BaseY + (yOffset * i);
