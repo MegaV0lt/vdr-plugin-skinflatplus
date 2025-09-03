@@ -1892,7 +1892,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     int left {m_MarginItem};
     const int WeatherFontHeight {wd.FontHeight};
+    const int WeatherFontHeightMinusMargin {WeatherFontHeight - m_MarginItem2};
     const int WeatherFontSmlHeight {wd.FontSmlHeight};
+    const int WeatherFontHeightDiff {(WeatherFontHeight - WeatherFontSmlHeight) / 2};
 
     const int TempTodaySignWidth {wd.TempTodaySignWidth};
 
@@ -1906,9 +1908,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
-                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
+                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeightMinusMargin +
                       PrecTodayWidth + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow +
-                      m_MarginItem + WeatherFontHeight - m_MarginItem2 + PrecTomorrowWidth + m_MarginItem2};
+                      m_MarginItem + WeatherFontHeightMinusMargin + PrecTomorrowWidth + m_MarginItem2};
     const int wLeft {m_OsdWidth - wWidth - 20};
 
     // Setup widget
@@ -1932,7 +1934,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon
     cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
-    cImage *img {ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *img {ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
@@ -1948,15 +1950,14 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
-    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeightMinusMargin)};
     if (ImgUmbrella) {
         WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight - m_MarginItem2;
+        left += WeatherFontHeightMinusMargin;
     }
 
     // Add precipitation
-    WeatherWidget.AddText(wd.Days[0].Precipitation, false,
-                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+    WeatherWidget.AddText(wd.Days[0].Precipitation, false, cRect(left, 0 + WeatherFontHeightDiff, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
 
@@ -1965,7 +1966,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon tomorrow
     WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[1].Icon);
-    img = ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
+    img = ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
@@ -1983,12 +1984,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation icon
     if (ImgUmbrella) {
         WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight - m_MarginItem2;
+        left += WeatherFontHeightMinusMargin;
     }
 
     // Add precipitation tomorrow
-    WeatherWidget.AddText(wd.Days[1].Precipitation, false,
-                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+    WeatherWidget.AddText(wd.Days[1].Precipitation, false, cRect(left, 0 + WeatherFontHeightDiff, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), wd.WeatherFontSml);
 
     // left += PrecTomorrowWidth;
