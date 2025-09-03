@@ -137,12 +137,12 @@ void cComplexContent::AddImage(cImage *image, const cRect &Position) {
     Contents.back().SetImage(image, Position);
 }
 
-void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
-                                              tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
-                                              int TextHeight, int TextAlignment) {
+void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, int Margin,
+                                              const cRect &TextPos, tColor ColorFg, tColor ColorBg, cFont *Font,
+                                              int TextWidth, int TextHeight, int TextAlignment) {
     const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
-    // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
-    const int TextWidthLeft {TextWidthFull - image->Width() - 10};
+    // const int TextWidthLeft = m_Position.Width() - image->Width() - Margin * 2 - TextPos.Left();
+    const int TextWidthLeft {TextWidthFull - image->Width() - Margin * 2};
     if (m_ScrollSize == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
         return;
@@ -171,7 +171,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
     }
 
-    const cRect ImagePos {TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height()};
+    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, TextPos.Top(), image->Width(), image->Height()};
     AddImage(image, ImagePos);
 }
 

@@ -809,7 +809,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
             cImage *img {ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight)};
             if (img && MediaType == 2) {  // Movie
                 ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
+                    img, CIP_Right, *Text, m_MarginItem,
                     cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             } else if (img && MediaType == 1) {  // Series
@@ -2117,7 +2117,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
             img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
+                    img, CIP_Right, *Text, m_MarginItem,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             } else if (Text[0] != '\0') {  // No image; insert text
@@ -2354,7 +2354,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
         if (img && MediaType == 2) {  // Movie
             ComplexContent.AddImageWithFloatedText(
-                img, CIP_Right, *Text,
+                img, CIP_Right, *Text, m_MarginItem,
                 cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         } else if (img && MediaType == 1) {  // Series
@@ -2661,7 +2661,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             }
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
-                    img, CIP_Right, *Text,
+                    img, CIP_Right, *Text, m_MarginItem,
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             } else if (Text[0] != '\0') {  // No image; insert text

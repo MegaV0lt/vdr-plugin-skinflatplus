@@ -178,7 +178,7 @@ class cComplexContent {
     void AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
     void AddImage(cImage *image, const cRect &Position);
-    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
+    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, int Margin, const cRect &TextPos,
                                  tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
                                  int TextAlignment = taDefault);
     void AddRect(const cRect &Position, tColor ColorBg);
