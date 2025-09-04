@@ -159,7 +159,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     }  // if (Channel)
 
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
-    const int left {m_MarginItem * 10};  // 50 Pixel
+    const int left {m_MarginItem * 10};
 
     if (Config.ChannelShowNameWithShadow) {
         PixmapClear(ChanInfoTopPixmap);

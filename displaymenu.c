@@ -1925,7 +1925,7 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
  */
 void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
                                     int &ContentTop, bool IsEvent) {
-    const int16_t kTitleLeftMargin = m_MarginItem * 10;  // 50 Pixel
+    const int16_t kTitleLeftMargin = m_MarginItem * 10;
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
     const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
@@ -2099,7 +2099,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
 #endif
-        const int kTitleLeftMargin {m_MarginItem * 10};  // 50 pixel margin
+        const int kTitleLeftMargin {m_MarginItem * 10};
         ContentTop = m_MarginItem;
 
         // Add description header if needed
@@ -2633,7 +2633,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawRecordingInfo() TVSscraper time @ %ld ms", Timer.Elapsed());
 #endif
-        const int kTitleLeftMargin {m_MarginItem * 10};  // 50 pixel margin
+        const int kTitleLeftMargin {m_MarginItem * 10};
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         ContentTop = m_MarginItem;
 
