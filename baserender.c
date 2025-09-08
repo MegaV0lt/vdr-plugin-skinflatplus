@@ -125,8 +125,12 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_MarginItem = std::max(3, static_cast<int>((Width / 275) + 0.5));  // 275 is an empirical value
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
+    // Example: 576 pixels OSD hight -> 3 pixels line width, 1080 -> 4 pixels, 2160 -> 8 pixels, 4320 -> 16 pixels
+    m_LineWidth = std::max(3, static_cast<int>((Height / 275) + 0.5));  // 275 is an empirical value
+    m_LineMargin = m_LineWidth * 2;
 #ifdef DEBUGFUNCSCALL
-    dsyslog("   Osd width: %d, m_MarginItem: %d (%d,%d)", Width, m_MarginItem, m_MarginItem2, m_MarginItem3);
+    dsyslog("   Osd width: %d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin %d)", Width, m_MarginItem,
+            m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin);
 #endif
 
     tArea Area {0, 0, Width, Height, 32};

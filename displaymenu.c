@@ -1934,8 +1934,8 @@ void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cCom
     ComplexContent.AddText(Title, false, cRect(kTitleLeftMargin, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
                            m_Font);
     ContentTop += m_FontHeight;
-    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), ColorTitleLine);
-    ContentTop += 6;
+    ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), ColorTitleLine);
+    ContentTop += m_LineMargin;
     if (Text[0] != '\0')
         ComplexContent.AddText(*Text, true,
                                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
@@ -2077,7 +2077,8 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
     int ContentTop {0};
-    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
+    int MediaWidth {0};
+    int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
     bool FirstRun {true};
     bool Scrollable {false};
 
@@ -2107,8 +2108,8 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
             ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
             ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuEventTitleLine));
-            ContentTop += 6;
+            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), Theme.Color(clrMenuEventTitleLine));
+            ContentTop += m_LineMargin;
         }
 
         // Handle media content
@@ -2607,7 +2608,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
     int ContentTop {0};
-    int MediaWidth {0}, MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - 6};
+    int MediaWidth {0};
+    int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
     bool FirstRun {true};
     bool Scrollable {false};
 
@@ -2642,8 +2644,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
             ContentTop += m_FontHeight;
-            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, 3), Theme.Color(clrMenuRecTitleLine));
-            ContentTop += 6;
+            ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), Theme.Color(clrMenuRecTitleLine));
+            ContentTop += m_LineMargin;
         }
 
         // Handle media content
@@ -3464,8 +3466,8 @@ int cFlatDisplayMenu::AddWidgetHeader(const char *Icon, const char *Title, int C
     ContentWidget.AddText(Title, false, cRect(m_MarginItem2 + m_FontHeight, ContentTop, 0, 0),
                           Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
     ContentTop += m_FontHeight;
-    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, 3), Theme.Color(clrMenuEventTitleLine));
-    ContentTop += 6;
+    ContentWidget.AddRect(cRect(0, ContentTop, wWidth, m_LineWidth), Theme.Color(clrMenuEventTitleLine));
+    ContentTop += m_LineMargin;
 
     return ContentTop;
 }
@@ -3476,7 +3478,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 #endif
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     ContentTop = AddWidgetHeader("widgets/dvb_devices", tr("DVB Devices"), ContentTop, wWidth);
@@ -3592,7 +3594,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
 #endif
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     ContentTop = AddWidgetHeader("widgets/active_timers", tr("Timer"), ContentTop, wWidth);
@@ -3800,7 +3802,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
 #endif
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     ContentTop = AddWidgetHeader("widgets/last_recordings", tr("Last Recordings"), ContentTop, wWidth);
@@ -3845,7 +3847,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     dsyslog("DrawMainMenuWidgetTimerConflicts(%d, %d, %d)", wLeft, wWidth, ContentTop);
 #endif
 
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin+ m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
     const int NumConflicts {GetEpgsearchConflicts()};  // Get conflicts from plugin Epgsearch
@@ -3872,7 +3874,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 #endif
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     static const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
@@ -3983,7 +3985,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates()");
 #endif
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
@@ -4020,7 +4022,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures()");
 #endif
 
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
         return -1;  // Not enough space to display anything meaningful
 
     ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
@@ -4086,7 +4088,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
 int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop) {
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     static const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
@@ -4125,7 +4127,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
 #endif
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    if (ContentTop + m_FontHeight + 6 + m_FontSmlHeight > MenuPixmapViewPortHeight)
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     time_t NewestFiletime {0};  // Last read time

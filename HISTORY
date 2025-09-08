@@ -10,13 +10,25 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Use a minimum of 15 ms for scroll delay
 - [update] Reduce number of calls to GetRecCounts() and UpdateTimerCounts()
 - [update] Remove any number of '%' from cutted recordings in menu
-- [update] Refactor display menu to improve event and recording info handling 
+- [update] Refactor display menu to improve event and recording info handling
            with dedicated draw functions
 - [update] Cache the value MaxX in TextScroller class to avoid repeated calculations
 - [update] Move GetFontName() to font cache
 - [update] Use ShortText if Description is empty for event and recording information.
 - [update] Use a brighter 'Red' color for error marks
 - [update] Set margins relative to the OSD size
+- [update] Use Fontchache for more strings witch seldom change
+- [update] Calculate channel number width only when nessesary
+- [update] Use Description or ShortText if Description is empty for event and recording information
+- [update] Refactor GetIconName() function to cache all menu names and plugins,
+           improving performance and reducing memory usage
+- [update] Use a brighter 'Red' color for error marks
+- [update] Set margins relative to the OSD size
+- [update] Set line width and line margin (Header) relative to the OSD size
+- [update] Use a brighter color for TopBarDateFont
+- [update] Use a brighter color for format symbols like 4k or 1920x1080
+- [update] Update script update_weather.sh to use '$LANG' if '$_LANG' is not set in *.conf
+- [update] Remove obsolete 'pluginelper.h'
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0
