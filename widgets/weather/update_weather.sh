@@ -13,7 +13,7 @@
 #
 # Einstellungen zum Skript in der dazugehörigen *.conf vornehmen!
 #
-#VERSION=240908
+#VERSION=250908
 
 ### Variablen ###
 SELF="$(readlink /proc/$$/fd/255)" || SELF="$0"  # Eigener Pfad (besseres $0)
@@ -100,10 +100,11 @@ for var in API_KEY FORECAST_DAYS _LANG LOCATION UNITS ; do
 done
 [[ -n "$RC" ]] && exit 1
 
-L="${_LANG%%_*}"  # Sprache für den Abruf via Openweathermap-API (de)
+: "${_LANG:=$LANG}"  # Falls _LANG nicht gesetzt ist, wird die Umgebungsvariable LANG verwendet
+L="${_LANG%%_*}"     # Sprache für den Abruf via Openweathermap-API (de)
 
 # Temperatureinheit (Standard [°K], Metric [°C], Imperial [°F])
-case "$UNITS" in
+case "${UNITS,,}" in
   metric)  DEGREE_SIGN='°C' ; DEC=',' ;;
   imperal) DEGREE_SIGN='°F' ;;
   *)       DEGREE_SIGN='°K' ;;
