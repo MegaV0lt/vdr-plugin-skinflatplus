@@ -320,7 +320,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "  ")};
 
     if (Config.ChannelShowStartTime)
-        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00  ");
+        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + SmlSpaceWidth2;
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
@@ -480,11 +480,6 @@ void cFlatDisplayChannel::SignalQualityDraw() {
     m_LastSignalQuality = SignalQuality;
 
     m_SignalFont = FontCache.GetFont(Setup.FontOsd, Config.decorProgressSignalSize);
-    if (!m_SignalFont) {  // Add null check
-        esyslog("flatPlus: Failed to get font for signal quality display");
-        return;
-    }
-
     const int SignalFontHeight {FontCache.GetFontHeight(Setup.FontOsd, Config.decorProgressSignalSize)};
     const int left {m_MarginItem2};
     int top {m_HeightBottom -
@@ -574,10 +569,6 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         TopOffset};  // One margin for progress bar to bottom
 
     m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, ProgressBarHeight);
-    if (!m_DvbapiInfoFont) {  // Add null check
-        esyslog("flatPlus: Failed to get font for dvbapi info display");
-        return;
-    }
     const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight)};
 
     cString DvbapiInfoText {"DVBAPI: "};

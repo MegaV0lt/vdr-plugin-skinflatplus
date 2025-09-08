@@ -105,7 +105,7 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
     return nullptr;
 }
 
-void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, std::size_t MaxSize,
+void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize,
                                   std::size_t BaseIndex, cImage *Image, const cString &Name, int Width, int Height) {
     // std::unique_ptr will automatically delete the old image if one exists when a new one is assigned
     Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);  // Store image in cache

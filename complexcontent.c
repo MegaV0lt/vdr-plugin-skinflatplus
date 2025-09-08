@@ -172,7 +172,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     }
 
     const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, TextPos.Top(), image->Width(), image->Height()};
-    AddImage(image, ImagePos);
+    AddImage(image, ImagePos);  // Add the image (Currently always on the right side)
 }
 
 void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
