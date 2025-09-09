@@ -1124,11 +1124,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     cImage *img {nullptr};
     if (Channel) {
         cString Buffer {""};
-        if (Current) m_ItemEventLastChannelName = Channel->Name();
-
         w = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
         const bool IsGroup {Channel->GroupSep()};
-        if (!IsGroup) {
+        if (!IsGroup) {  // Show channel number for channels only
             const int ChannelNumber {Channel->Number()};
             Buffer = itoa(ChannelNumber);
             if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (epgSearch)
@@ -1136,6 +1134,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
         Left += w + m_MarginItem;
+
+        cString ChannelName {Channel->Name()};
+        if (Current) m_ItemEventLastChannelName = ChannelName;
 
         int ImageLeft {Left};
         int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
@@ -1149,7 +1150,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 MenuIconsBgPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
             }
             // Load named logo only for channels
-            img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            img = ImgLoader.GetLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
         }
 
         if (!img) {
@@ -1175,15 +1176,13 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         // m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
-        cString ChannelName {""};
         if (MenuEventViewShort) {  // flatPlus short, flatPlus short + EPG
-            ChannelName = Channel->Name();
             w = m_Font->Width(*ChannelName);
         } else {
             ChannelName = Channel->ShortName(true);
         }
 
-        if (IsGroup) {
+        if (IsGroup) {  // Draw group name or channel name
             const int LineTop {Top + (m_FontHeight - 3) / 2};
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
             Left += w / 2;
@@ -2882,8 +2881,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
-    static const char *SortIcons[] {"SortNumber", "SortName", "SortDate", "SortProvider"};
-    if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) TopBarSetMenuIconRight(SortIcons[MenuSortMode - 1]);
+    static const char *SortIcons[] {"", "SortNumber", "SortName", "SortDate", "SortProvider"};
+    if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) TopBarSetMenuIconRight(SortIcons[MenuSortMode]);
 }
 
 void cFlatDisplayMenu::Flush() {
@@ -3591,7 +3590,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
             left += FontSmlWidthDigit * 3;
         }
-        str = *(device->DeviceType());  // Sometihng like 'DVB-S2'. Longest in dvbdevice.c is 'ATSCMH'
+        str = *(device->DeviceType());  // Something like 'DVB-S2'. Longest in dvbdevice.c is 'ATSCMH'
         const int FontSmlWidthDevice {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "ATSCMH")};
         ContentWidget.AddText(*str, false, cRect(left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
