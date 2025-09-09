@@ -169,15 +169,15 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     int DrawContentHeadFskGenre(const cString &Fsk, std::vector<std::string> &GenreIcons);  // NOLINT
 
     void DrawMainMenuWidgets();
-    int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop);
-    int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop);
+    int DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
+    int DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight);
 
     // Helper functions
     // Add Text to ComplexContent in SetText()

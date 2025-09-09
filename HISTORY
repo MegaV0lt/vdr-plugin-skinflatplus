@@ -29,6 +29,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Use a brighter color for format symbols like 4k or 1920x1080
 - [update] Update script update_weather.sh to use '$LANG' if '$_LANG' is not set in *.conf
 - [update] Remove obsolete 'pluginelper.h'
+- [update] Calculate 'MenuPixmapViewPortHeight' only in DrawMainMenuWidgets() function
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0

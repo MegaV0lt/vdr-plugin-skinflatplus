@@ -3351,13 +3351,14 @@ void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &re
 void cFlatDisplayMenu::DrawMainMenuWidgets() {
     if (!MenuPixmap) return;
 
+    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     const int wLeft = (m_OsdWidth * Config.MainMenuItemScale) + m_MarginItem + Config.decorBorderMenuContentSize +
                       Config.decorBorderMenuItemSize;  // Narrowing conversion
     const int wTop {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 +
                     Config.decorBorderMenuContentSize};
 
     const int wWidth {m_OsdWidth - wLeft - Config.decorBorderMenuContentSize};
-    const int wHeight {MenuPixmap->ViewPort().Height() - m_MarginItem2};
+    const int wHeight {MenuPixmapViewPortHeight - m_MarginItem2};
 
     ContentWidget.Clear();
     ContentWidget.SetOsd(m_Osd);
@@ -3393,28 +3394,46 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     }
 
     // Define a type for the widget drawing functions
-    using WidgetDrawFunction = std::function<int(int, int, int)>;
+    using WidgetDrawFunction = std::function<int(int, int, int, int)>;
 
     // Create a map that associates widget names with their drawing functions
     // Works as long all strings are different. Else we must use std::string
     std::unordered_map<const char *, WidgetDrawFunction> WidgetDrawers = {
         {"dvb_devices",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetDVBDevices(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetDVBDevices(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"active_timer",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetActiveTimers(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetActiveTimers(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"last_recordings",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetLastRecordings(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetLastRecordings(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"system_information",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetSystemInformation(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetSystemInformation(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"system_updates",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetSystemUpdates(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetSystemUpdates(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"temperatures",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetTemperatures(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetTemperatures(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"timer_conflicts",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetTimerConflicts(left, width, top); }},
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetTimerConflicts(left, width, top, MenuPixmapViewPortHeight);
+         }},
         {"custom_command",
-         [this](int left, int width, int top) { return DrawMainMenuWidgetCommand(left, width, top); }},
-        {"weather", [this](int left, int width, int top) { return DrawMainMenuWidgetWeather(left, width, top); }}};
+         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetCommand(left, width, top, MenuPixmapViewPortHeight);
+         }},
+        {"weather", [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
+             return DrawMainMenuWidgetWeather(left, width, top, MenuPixmapViewPortHeight);
+         }}};
 
     // Sort the widgets based on their positions
     std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
@@ -3428,7 +3447,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
         auto drawerIt = WidgetDrawers.find(widget.data());
         if (drawerIt != WidgetDrawers.end()) {
             // Call the drawer function and update ContentTop
-            AddHeight = drawerIt->second(wLeft, wWidth, ContentTop);
+            AddHeight = drawerIt->second(wLeft, wWidth, ContentTop, MenuPixmapViewPortHeight);
             if (AddHeight > 0) ContentTop = AddHeight + m_MarginItem;
         } else {
             // Handle unknown widget type
@@ -3472,12 +3491,12 @@ int cFlatDisplayMenu::AddWidgetHeader(const char *Icon, const char *Title, int C
     return ContentTop;
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int ContentTop,
+                                                   int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices()");
 #endif
 
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -3588,12 +3607,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int ContentTop,
+                                                     int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DrawMainMenuWidgetActiveTimers()");
 #endif
 
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -3794,14 +3813,15 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
  * @param wLeft Left position of the widget
  * @param wWidth Width of the widget
  * @param ContentTop Top position for the content
+ * @param MenuPixmapViewPortHeight Height of the menu pixmap view port
  * @return The content height if successful, -1 if there's not enough space to display
  */
-int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, int ContentTop,
+                                                       int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("DrawMainMenuWidgetLastRecordings(%d, %d, %d)", wLeft, wWidth, ContentTop);
 #endif
 
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -3842,12 +3862,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, int ContentTop,
+                                                       int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("DrawMainMenuWidgetTimerConflicts(%d, %d, %d)", wLeft, wWidth, ContentTop);
 #endif
 
-    if (ContentTop + m_FontHeight + m_LineMargin+ m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin+ m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     const int NumConflicts {GetEpgsearchConflicts()};  // Get conflicts from plugin Epgsearch
@@ -3868,12 +3889,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth, int ContentTop,
+                                                          int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() ContentTop: %d", ContentTop);
 #endif
 
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -3981,11 +4002,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int ContentTop,
+                                                      int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates()");
 #endif
-    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
@@ -4017,12 +4039,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int ContentTop,
+                                                     int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures()");
 #endif
 
-    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmap->ViewPort().Height())
+    if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
     ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
@@ -4086,8 +4109,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop) {
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
+int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight) {
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -4121,12 +4143,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     return ContentWidget.ContentHeight(false);
 }
 
-int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop) {
+int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::DrawMainMenuWidgetWeather()");
 #endif
 
-    const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
