@@ -30,6 +30,8 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Update script update_weather.sh to use '$LANG' if '$_LANG' is not set in *.conf
 - [update] Remove obsolete 'pluginelper.h'
 - [update] Calculate 'MenuPixmapViewPortHeight' only in DrawMainMenuWidgets() function
+- [update] Smaller VPS icon to save a little space
+- [update] Reduce margin between actor images
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0

@@ -960,12 +960,11 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         day = itoa(Timer->GetMDay(Timer->Day()));
         name = WeekDayName(Timer->Day());
     } else {
-        struct tm tm_r;
         const time_t Day {Timer->Day()};
-        localtime_r(&Day, &tm_r);
-        char Buffer[16];
-        strftime(Buffer, sizeof(Buffer), "%Y%m%d", &tm_r);
-        day = Buffer;
+        struct tm *tm_r = gmtime(&Day);  // NOLINT gmtime() is not thread-safe
+        char buf[12];
+        strftime(buf, sizeof(buf), "%Y%m%d", tm_r);
+        day = buf;
     }
     const char *File {(Setup.FoldersInTimerMenu) ? nullptr : strrchr(Timer->File(), FOLDERDELIMCHAR)};
     if (File && strcmp(File + 1, TIMERMACRO_TITLE) && strcmp(File + 1, TIMERMACRO_EPISODE))
@@ -1247,11 +1246,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     if (Event && Selectable) {
         cString Buffer {""};
         if (WithDate) {  // Draw day and date (Mon 01.)
-            struct tm tm_r;
             const time_t Day {Event->StartTime()};
-            localtime_r(&Day, &tm_r);
-            char buf[8];
-            strftime(buf, sizeof(buf), "%2d", &tm_r);
+            struct tm *tm_r = gmtime(&Day);  // NOLINT gmtime() is not thread-safe
+            char buf[3];
+            snprintf(buf, sizeof(buf), "%2d", tm_r->tm_mday);
 
             Buffer = cString::sprintf("%s %s. ", *WeekDayName(Day), buf);
             if (MenuEventViewShort && Channel) {  // flatPlus short, flatPlus short + EPG
@@ -1293,15 +1291,14 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
             if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
         }  // TimerActive
-        Left += ImageHeight + m_MarginItem;
 
-        // Draw VPS icon
+        // Draw VPS icon (Overlay)
         if (Event->Vps() && (Event->Vps() - Event->StartTime())) {
             img = nullptr;
             if (Current) img = ImgLoader.GetIcon("vps_cur", ImageHeight, ImageHeight);
             if (!img) img = ImgLoader.GetIcon("vps", ImageHeight, ImageHeight);
-            if (img) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
-        }
+            if (img) MenuIconsOvlPixmap->DrawImage(cPoint(Left, Top), *img);
+        }  // VPS
         Left += ImageHeight + m_MarginItem;
 
         // Draw title and short text
@@ -1579,7 +1576,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   RecordingLevel changed from %d to %d", m_LastItemRecordingLevel, Level);
+        dsyslog("   Level changed from %d to %d", m_LastItemRecordingLevel, Level);
 #endif
         m_LastItemRecordingLevel = Level;
         m_RecCounts = *GetRecCounts();
@@ -2427,7 +2424,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     cString Role {""};  // Actor role
     int Actor {0};
     const uint16_t ActorsPerLine {6};                                    // TODO: Config option?
-    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem * 4;  // Narrowing conversion
+    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem2;  // Narrowing conversion
     const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
     const uint16_t PicLines = NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0);  // Number of lines needed
     int ImgHeight {0}, MaxImgHeight {0};
@@ -2729,7 +2726,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
     const cString ShortText = (RecInfo->ShortText() ? RecInfo->ShortText() : " - ");  // No short text. Show ' - '
     const int ShortTextWidth {m_FontSml->Width(*ShortText)};
-    int MaxWidth {HeadIconLeft - m_MarginItem};  // Reduce redundant calculations
+    int MaxWidth {HeadIconLeft - m_MarginItem};
     int left {m_MarginItem};
 
 #if APIVERSNUM >= 20505
@@ -3049,10 +3046,11 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 }
 
 cString cFlatDisplayMenu::GetMenuIconName() const {
+    static constexpr const char *VDRLogoIcon {"menuIcons/" VDRLOGO};
     static const struct {
         eMenuCategory category;
         const cString icon;
-    } MenuIcons[] = {{mcMain, cString::sprintf("menuIcons/%s", VDRLOGO)},
+    } MenuIcons[] = {{mcMain, VDRLogoIcon},
                      {mcSchedule, "menuIcons/Schedule"},
                      {mcScheduleNow, "menuIcons/Schedule"},
                      {mcScheduleNext, "menuIcons/Schedule"},

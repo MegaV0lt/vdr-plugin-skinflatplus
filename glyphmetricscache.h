@@ -47,5 +47,3 @@ class GlyphMetricsCache {
     std::mutex mutex_;
 };  // class GlyphMetricsCache
 
-// Accessor:
-// GlyphMetricsCache &glyphMetricsCache();
