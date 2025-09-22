@@ -7,6 +7,7 @@
  */
 #include "./displaytracks.h"
 #include "./flat.h"
+#include "./fontcache.h"
 
 cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const char * const *Tracks) {
     CreateFullOsd();
@@ -20,7 +21,7 @@ cFlatDisplayTracks::cFlatDisplayTracks(const char *Title, int NumTracks, const c
 
     m_ItemHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderTrackSize * 2;
     m_CurrentIndex = -1;
-    const int TitleWidth {m_Font->Width(Title)};
+    const int TitleWidth {m_Font->Width(Title) + FontCache.GetStringWidth(m_FontName, m_FontHeight, " ")};
     m_MaxItemWidth = TitleWidth + m_MarginItem * 4;
     for (int16_t i {0}; i < NumTracks; ++i)
         m_MaxItemWidth = std::max(m_MaxItemWidth, m_Font->Width(Tracks[i]) + m_MarginItem2);
@@ -61,11 +62,12 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
         : Index >= 0 ? std::make_pair(Theme.Color(clrTrackItemSelableFont), Theme.Color(clrTrackItemSelableBg))
                      : std::make_pair(Theme.Color(clrTrackItemFont), Theme.Color(clrTrackItemBg));
 
+    cString TextWithSpace = cString::sprintf(" %s", Text);
     if (Index == -1)
-        TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
+        TracksPixmap->DrawText(cPoint(0, y), TextWithSpace, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
                                m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
     else
-        TracksPixmap->DrawText(cPoint(0, y), Text, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
+        TracksPixmap->DrawText(cPoint(0, y), TextWithSpace, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
                                m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
 
     const int left {(m_OsdWidth - m_MaxItemWidth) / 2};

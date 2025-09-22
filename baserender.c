@@ -52,7 +52,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontFixedHeight = FontCache.GetFontHeight(Setup.FontFix, Setup.FontFixSize);
 
     // Extra fonts for flatPlus
-    m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
+    m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     if (Config.MainMenuWidgetWeatherShow) {
         m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize / 2);
@@ -63,7 +63,7 @@ cFlatBaseRender::cFlatBaseRender() {
         m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
         m_FontTinyHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize * 0.8);
     }
-    m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * 1.5);
+    m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
     // Unused: m_FontMediumHeight = FontCache.GetFontHeight(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
 
     // Top bar fonts
@@ -118,25 +118,36 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_OsdWidth = Width;
     m_OsdHeight = Height;
 
-    m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
+    SetMargins(Width, Height);  // Set margins relative to the OSD size
 
-    // Set margins relative to the OSD size with an minimum of 3 pixels
-    // Example: 720 pixels OSD width -> 3 pixels margin, 1920 -> 7 pixels, 3840 -> 14 pixels, 7680 -> 27 pixels
-    m_MarginItem = std::max(3, static_cast<int>((Width / 275) + 0.5));  // 275 is an empirical value
-    m_MarginItem2 = m_MarginItem * 2;
-    m_MarginItem3 = m_MarginItem * 3;
-    // Example: 576 pixels OSD hight -> 3 pixels line width, 1080 -> 4 pixels, 2160 -> 8 pixels, 4320 -> 16 pixels
-    m_LineWidth = std::max(3, static_cast<int>((Height / 275) + 0.5));  // 275 is an empirical value
-    m_LineMargin = m_LineWidth * 2;
-#ifdef DEBUGFUNCSCALL
-    dsyslog("   Osd width: %d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin %d)", Width, m_MarginItem,
-            m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin);
-#endif
+    m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
 
     tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) { return; }
 
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
+}
+void cFlatBaseRender::SetMargins(int Width, int Height) {
+    // Set margins relative to the OSD size with an minimum of 3 pixels
+    static constexpr int kMinSize {3};  // Minimum margin size
+    int SizeIncrease {static_cast<int>((Width / 720) + 0.5)};  // (1920: 3 pixels, 3840: 5 pixels, 7680: 11 pixels)
+    // Example: 720 pixels OSD width -> 4 pixels margin, 1920 -> 6 pixels, 3840 -> 8 pixels, 7680 -> 14 pixels
+    m_MarginItem = kMinSize + SizeIncrease;
+    m_MarginItem2 = m_MarginItem * 2;
+    m_MarginItem3 = m_MarginItem * 3;
+    // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
+    SizeIncrease = static_cast<int>((Height / 576) + 0.5);  // (1080: 2 pixels, 2160: 4 pixels, 4320: 8 pixels)
+    m_LineWidth = kMinSize + SizeIncrease;  // Increase line width for larger OSD heights
+    m_LineMargin = m_LineWidth * 2;
+    // Margin for color buttons and messages
+    m_MarginButtonColor += SizeIncrease;  // Increase margin for larger OSD heights
+    m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
+            "%d), m_ButtonColorHeight: %d (Margin %d)",
+            Width, Height, m_MarginItem, m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin, m_ButtonColorHeight,
+            m_MarginButtonColor);
+#endif
 }
 
 void cFlatBaseRender::TopBarCreate() {
@@ -234,6 +245,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     cTimeMs Timer;  // Start Timer
 #endif
     // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::Flush()
+    if (m_VideoDiskUsageState == -1) return;  // No useful data before cVideoDiskUsage::HasChanged was called
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
@@ -274,6 +286,9 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
     const double GBScale {100.0 / DiskFreePercent};
     const double AllGB {FreeGB * GBScale};  // All disk space in GB
+    // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
+    constexpr double kChartSegmentPercent {31.0 / 100.0};  // 32 Segments in Chart (0..31)
+    const int IconIndex {static_cast<int>(DiskFreePercent * kChartSegmentPercent)};  // 0..31
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
@@ -292,8 +307,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
-        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex {(DiskFreePercent * 31) / 100};
+
         IconName = cString::sprintf("chart%db", IconIndex);  // chart0b - chart31b
 #ifdef DEBUGFUNCSCALL
         dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
@@ -338,8 +352,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             }
         }
 
-        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex {(DiskUsagePercent * 31) / 100};
         IconName = cString::sprintf("chart%d", IconIndex + 1);  // chart1 - chart32
     }
 
@@ -352,15 +364,15 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
-    const time_t Now {time(0)};
-    if (m_TopBarUpdateTitle || (Now > m_TopBarLastDate + 60)) {
+    const time_t now {time(0)};
+    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 60)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
         cTimeMs Timer;  // Start Timer
 #endif
 
         m_TopBarUpdateTitle = false;
-        m_TopBarLastDate = Now;
+        m_TopBarLastDate = now;
         if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
             return;
 
@@ -411,7 +423,7 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }  // Config.TopBarMenuIconShow
 
-        const cString time {*TimeString(Now)};  // HH:MM
+        const cString time {*TimeString(now)};  // HH:MM
         cString Buffer {""};
         int TimeWidth {FontCache.GetStringWidth(m_FontName, m_TopBarFontClockHeight, "00:00") + m_MarginItem2};
         if (Config.TopBarHideClockText) {
@@ -426,8 +438,8 @@ void cFlatBaseRender::TopBarUpdate() {
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString WeekDay {*WeekDayNameFull(Now)};  // Translated week day (Monday, Tuesday, ...)
-        const cString DateStr {*ShortDateString(Now)};  // Short date (01.01.00)
+        const cString WeekDay {*WeekDayNameFull(now)};  // Translated week day (Monday, Tuesday, ...)
+        const cString DateStr {*ShortDateString(now)};  // Short date (01.01.00)
         const int MaxDateWidth {std::max(FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *WeekDay),
                                          FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *DateStr))};
 
@@ -477,7 +489,6 @@ void cFlatBaseRender::TopBarUpdate() {
             RecCountCache.UpdateIfNeeded();
             NumRec = s_NumRecordings.load(std::memory_order_relaxed);
             //* END FAST RECORD COUNT
-
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0) dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
@@ -668,7 +679,7 @@ bool cFlatBaseRender::ButtonsDrawn() const { return m_ButtonsDrawn; }
 
 void cFlatBaseRender::MessageCreate() {
     m_MessageHeight = m_FontHeight + m_MarginItem2;
-    if (Config.MessageColorPosition == 1) m_MessageHeight += 8;
+    if (Config.MessageColorPosition == 1) m_MessageHeight += m_ButtonColorHeight;
 
     const int top {m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize};
     const cRect MessagePixmapViewPort {Config.decorBorderMessageSize, top,
@@ -711,23 +722,26 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     MessageScroller.Clear();
 
     cImage *img {ImgLoader.GetIcon(*Icon, m_FontHeight, m_FontHeight)};
-    if (img) MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
+    if (img) MessageIconPixmap->DrawImage(cPoint(m_MarginItem + m_MarginButtonColor, m_MarginItem), *img);
 
     if (Config.MessageColorPosition == 0) {  // Vertical
-        MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
-        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight),
+        MessagePixmap->DrawRectangle(cRect(0, 0, m_ButtonColorHeight, m_MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - m_ButtonColorHeight - Config.decorBorderMessageSize * 2, 0,
+                                           m_ButtonColorHeight, m_MessageHeight),
                                      Col);
     } else {  // Horizontal
-        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
+        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - m_ButtonColorHeight, m_OsdWidth, m_ButtonColorHeight),
+                                     Col);
     }
 
     const int TextWidth {m_Font->Width(Text)};
-    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 - 10};
+    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 -
+                        m_MarginButtonColor};
 
     if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
         MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + m_MarginButtonColor,
                   m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));

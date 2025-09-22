@@ -82,7 +82,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
  * @param FileName The file name of the font
  * @return The font name if found in the cache, otherwise an empty string
  */
-cString cFontCache::GetFontName(const char *FileName) {
+cString cFontCache::GetFontName(const char *FileName) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFontCache::GetFontName() '%s'", FileName);
 #endif
@@ -203,7 +203,7 @@ int cFontCache::GetFontAscender(const cString &FontName, int FontSize) {
 }
 
 int cFontCache::CalculateFontAscender(const cString &FontName, int FontSize) const {
-    GlyphMetricsCache& cache = glyphMetricsCache();
+    GlyphMetricsCache &cache = glyphMetricsCache();
     auto face = cache.GetFace(*cFont::GetFontFileName(FontName));
     if (!face) {
         esyslog("flatPlus: cFontCache::GetFontAscender() FreeType error: Can't find face (Font = %s)",
@@ -211,7 +211,7 @@ int cFontCache::CalculateFontAscender(const cString &FontName, int FontSize) con
         return FontSize;
     }
 
-    int ascender = FontSize;
+    int ascender {FontSize};  // Default fallback value
     if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
         ascender = face->available_sizes->height;
     } else if (FT_Set_Char_Size(face, FontSize * 64, FontSize * 64, 0, 0) == 0) {

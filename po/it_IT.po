@@ -144,6 +144,9 @@ msgstr "informazione sulla registrazione"
 msgid "DVB Devices"
 msgstr "DVB Devices"
 
+msgid "No DVB devices found"
+msgstr "Nessun DVB device trovato"
+
 msgid "LiveTV"
 msgstr ""
 
@@ -164,6 +167,9 @@ msgstr "non attivo/attivo Timer"
 
 msgid "Last Recordings"
 msgstr "Ultime registrazioni"
+
+msgid "no recordings found"
+msgstr "nessuna registrazione trovata"
 
 msgid "Timer Conflicts"
 msgstr "Conflitti del Timer"
@@ -549,7 +555,10 @@ msgstr "Ingressi Iconcache"
 msgid "Fontcache entries"
 msgstr ""
 
-msgid "Show channel name and number with shadow"
+msgid "Channel name/number font size"
+msgstr ""
+
+msgid "Show channel name/number with shadow"
 msgstr ""
 
 msgid "Show Channelinfo icons"
@@ -569,6 +578,9 @@ msgstr "Dimensione font widget previsioni"
 
 msgid "Colors for signal quality"
 msgstr "Colori per qualità del segnale"
+
+msgid "Show audio format"
+msgstr "Mostra formato audio"
 
 msgid "Show resolution & aspect"
 msgstr "Mostra risoluzione & aspetto"
@@ -649,6 +661,9 @@ msgid "Recording menu show recording count in title"
 msgstr "Menù registrazioni mostra la lunghezza nel titolo"
 
 msgid "Recording menu recording seen threshold"
+msgstr ""
+
+msgid "Recording menu use file for old folder"
 msgstr ""
 
 msgid "Recording menu default value - old folder in days"

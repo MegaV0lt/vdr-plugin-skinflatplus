@@ -1572,7 +1572,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     if (Config.MenuRecordingView == 0) return false;
 
-    m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1, true) : "";
+    if (Index == 0)  //? Only update when Index = 0 (First item on the page)
+        m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1, true) : "";
 
     if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
 #ifdef DEBUGFUNCSCALL
@@ -1642,12 +1643,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
             const cString Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
-            Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
+            Buffer = cString::sprintf("%s  %s  Σ%s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                                  m_MenuItemWidth - Left - m_MarginItem);
-            Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00.00.00  00:00   00:00") + m_MarginItem;
+            Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00.00.00  00:00  Σ00:00") + m_MarginItem;
 
             // Show if recording is still in progress (ruTimer), or played (ruReplay)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
@@ -1752,7 +1753,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
             const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
             const cString Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
-            Buffer = cString::sprintf("%s  %s   %s ", *ShortDateString(Recording->Start()),
+            Buffer = cString::sprintf("%s  %s  Σ%s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
 
             Top += m_FontHeight;
@@ -3149,7 +3150,6 @@ cString cFlatDisplayMenu::GetRecCounts() {
     } else {
         RecCounts = cString::sprintf("(%d*/%d)", RecNewCount, RecCount);  // (35*/56)
     }  // Config.ShortRecordingCount */
-
 #ifdef DEBUGFUNCSCALL
     dsyslog("   RecCounts '%s', time: %ld ms", *RecCounts, Timer.Elapsed());
 #endif
@@ -3176,14 +3176,17 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
-    const cString RecFolder {*GetRecordingName(Recording, Level, true)};
-    int16_t value = Config.GetRecordingOldValue(*RecFolder);
+    int16_t value {-1};
+    if (Config.MenuItemRecordingUseOldFile) {
+        const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+        value = Config.GetRecordingOldValue(*RecFolder);
+    }
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
     if (value < 0) return false;
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
-    const double days = difftime(now, LastRecTimeFromFolder) / SECSINDAY;
+    const double days = (now - LastRecTimeFromFolder) * (1.0 / SECSINDAY);
     return days > value;
 }
 
@@ -3287,7 +3290,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     cTimeMs Timer;  // Set Timer
 #endif
 
-    time_t RecStart {Recording->Start()};
+    const time_t RecStart {Recording->Start()};
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
     const cString RecFolder {*GetRecordingName(Recording, Level, true)};
@@ -3499,6 +3502,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     ContentTop = AddWidgetHeader("widgets/dvb_devices", tr("DVB Devices"), ContentTop, wWidth);
 
+    // Get number of devices
+    const int NumDevices {cDevice::NumDevices()};
+
     // Check device which currently displays live tv
     int DeviceLiveTV {-1};
     cDevice *PrimaryDevice {cDevice::PrimaryDevice()};
@@ -3509,10 +3515,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             DeviceLiveTV = PrimaryDevice->DeviceNumber();
     }
 
-    // Check currently recording devices
-    const int NumDevices {cDevice::NumDevices()};
+    // Find all recording devices and set RecDevices[] to true for these devices
     bool RecDevices[NumDevices] {false};  // Array initialised to false
-
     {
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
@@ -3530,6 +3534,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             }
         }  // for cTimer
     }
+
+    // Now display all devices
+    bool FoundTuner {false};
     int ActualNumDevices {0};
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int16_t i {0}; i < NumDevices; ++i) {
@@ -3537,7 +3544,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
             break;  // Not enough space to display anything meaningful
 
         const cDevice *device {cDevice::GetDevice(i)};
-        if (!device || !device->NumProvidedSystems()) continue;
+        if (device && device->NumProvidedSystems())
+            FoundTuner = true;
+        else
+            continue;  // No tuner
 
         ++ActualNumDevices;
         StrDevice = "";  // Reset string
@@ -3601,6 +3611,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         ContentTop += m_FontSmlHeight;
     }  // for NumDevices
 
+    if (FoundTuner == false) {
+        dsyslog("flatPlus: DrawMainMenuWidgetDVBDevices() No DVB devices found");
+        ContentWidget.AddText(tr("No DVB devices found"), false,
+                              cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+                              Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
+        // ContentTop += m_FontSmlHeight;
+    }
+
     return ContentWidget.ContentHeight(false);
 }
 
@@ -3613,15 +3631,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    ContentTop = AddWidgetHeader("widgets/active_timers", tr("Timer"), ContentTop, wWidth);
-
     // Look for timers
     cVector<const cTimer *> TimerRec;
     cVector<const cTimer *> TimerActive;
     cVector<const cTimer *> TimerRemoteRec;
     cVector<const cTimer *> TimerRemoteActive;
 
-    int AllTimers {0};  // All timers and remote timers
+    int AllTimers {0};  // All local and remote timers
 
     {
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
@@ -3657,12 +3673,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
         }
     }
 
-    if (AllTimers == 0 && Config.MainMenuWidgetActiveTimerHideEmpty) return 0;
+    if (AllTimers == 0 && Config.MainMenuWidgetActiveTimerHideEmpty) return -1;
 
     TimerRec.Sort(CompareTimers);
     TimerActive.Sort(CompareTimers);
     TimerRemoteRec.Sort(CompareTimers);
     TimerRemoteActive.Sort(CompareTimers);
+
+    ContentTop = AddWidgetHeader("widgets/active_timers", tr("Timer"), ContentTop, wWidth);
 
     int Left {m_MarginItem};
     int Width {wWidth - m_MarginItem2};
@@ -3686,12 +3704,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.GetIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
+                    img = ImgLoader.GetIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
                         Width -= m_FontSmlHeight - m_MarginItem;
-                    }  //? Fallback? // else StrTimer.Append("L: ");
+                    } else {
+                        StrTimer = "L: ";  // Local (Fallback)
+                    }
                 }
 
                 const cChannel *Channel {(TimerRec[i])->Channel()};
@@ -3720,12 +3740,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if ((Config.MainMenuWidgetActiveTimerShowRemoteActive ||
                      Config.MainMenuWidgetActiveTimerShowRemoteRecording) &&
                     (TimerRemoteRec.Size() > 0 || TimerRemoteActive.Size() > 0)) {
-                    img = ImgLoader.GetIcon("widgets/home", kIconMaxSize, m_FontSmlHeight);
+                    img = ImgLoader.GetIcon("widgets/home", m_FontSmlHeight, m_FontSmlHeight);
                     if (img) {
                         ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                         Left += m_FontSmlHeight + m_MarginItem;
                         Width -= m_FontSmlHeight - m_MarginItem;
-                    }  // StrTimer.Append("L: ");
+                    } else {
+                        StrTimer = "L: ";  // Local (Fallback)
+                    }
                 }
 
                 const cChannel *Channel {(TimerActive[i])->Channel()};
@@ -3750,12 +3772,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount) break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.GetIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
+                img = ImgLoader.GetIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
                     Width -= m_FontSmlHeight - m_MarginItem;
-                }  // StrTimer = cString::sprintf("R: ");
+                } else {
+                    StrTimer = "R: ";  // Remote (Fallback)
+                }
 
                 const cChannel *Channel {(TimerRemoteRec[i])->Channel()};
                 // const cEvent *Event {Timer->Event()};
@@ -3781,12 +3805,14 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                 if (count + RemoteCount >= Config.MainMenuWidgetActiveTimerMaxCount) break;
 
                 StrTimer = "";  // Reset string
-                img = ImgLoader.GetIcon("widgets/remotetimer", kIconMaxSize, m_FontSmlHeight);
+                img = ImgLoader.GetIcon("widgets/remotetimer", m_FontSmlHeight, m_FontSmlHeight);
                 if (img) {
                     ContentWidget.AddImage(img, cRect(Left, ContentTop, Width, m_FontSmlHeight));
                     Left += m_FontSmlHeight + m_MarginItem;
                     Width -= m_FontSmlHeight - m_MarginItem;
-                }  // StrTimer = cString::sprintf("R: ");
+                } else {
+                    StrTimer = "R: ";  // Remote (Fallback)
+                }
 
                 const cChannel *Channel {(TimerRemoteActive[i])->Channel()};
                 StrTimer.Append(cString::sprintf("%s - ", Channel ? Channel->Name() : tr("Unknown")));
@@ -3822,8 +3848,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    ContentTop = AddWidgetHeader("widgets/last_recordings", tr("Last Recordings"), ContentTop, wWidth);
-
     // Get all Recordings including start time and build string for displaying
     std::vector<std::pair<time_t, cString>> Recs;
     Recs.reserve(512);  // Set to at least 512 entry's
@@ -3836,11 +3860,21 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
             RecStart = Rec->Start();
             TimeHM = std::div((Rec->LengthInSeconds() + 30) / 60, 60);
             Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
-            DateTime = cString::sprintf("%s  %s  %s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
+            DateTime = cString::sprintf("%s %s Σ%s", *ShortDateString(RecStart), *TimeString(RecStart), *Length);
             StrRec = cString::sprintf("%s - %s", *DateTime, Rec->Name());
             Recs.emplace_back(std::make_pair(RecStart, StrRec));
         }
     }
+
+    ContentTop = AddWidgetHeader("widgets/last_recordings", tr("Last Recordings"), ContentTop, wWidth);
+    if (Recs.size() == 0) {
+        ContentWidget.AddText(
+            tr("no recordings found"), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+            Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
+        ContentTop += m_FontSmlHeight;
+        return ContentWidget.ContentHeight(false);
+    }
+
     // Sort by RecStart and add entrys to ContentWidget
     // Use 'partial_sort()' to limit the number of entries to Config.MainMenuWidgetLastRecMaxCount
     const std::size_t LastRecMaxCount = Config.MainMenuWidgetLastRecMaxCount;

@@ -85,6 +85,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)                ChannelDvbapiInfoShow = atoi(Value);
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     ChannelIconsShow = atoi(Value);
+    else if (strcmp(Name, "ChannelNameFontSize") == 0)                  ChannelNameFontSize = atod(Value);
+    else if (strcmp(Name, "ChannelAudioFormatShow") == 0)               ChannelAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          ChannelResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            ChannelShowNameWithShadow = atoi(Value);
     else if (strcmp(Name, "ChannelShowStartTime") == 0)                 ChannelShowStartTime = atoi(Value);
@@ -146,6 +148,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingUseOldFile") == 0)          MenuItemRecordingUseOldFile = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        MenuEventRecordingViewJustify = atoi(Value);
@@ -168,6 +171,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            RecordingDimmOnPauseDelay = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           RecordingDimmOnPauseOpaque = atoi(Value);
     else if (strcmp(Name, "RecordingFormatShow") == 0)                  RecordingFormatShow = atoi(Value);
+    else if (strcmp(Name, "RecordingAudioFormatShow") == 0)             RecordingAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "RecordingResolutionAspectShow") == 0)        RecordingResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "RecordingSimpleAspectFormat") == 0)          RecordingSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ScrollerDelay") == 0)                        ScrollerDelay = atoi(Value);

@@ -1,37 +1,42 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-xx-xx: Version 1.2.1
+2025-10-xx: Version 1.2.1
 - [fix] Fix display of disk usage for menu category 0 (mcUndefined)
 - [add] Clear font cache on plugin stop
 - [add] Refactor GetIconName() function to cache all menu names and plugins,
         improving performance and reducing memory usage
 - [add] Move GetFontAscender() to font cache
+- [add] Setting for channel name and number font size in channel info
+- [add] Setting to enable recording old file for old folder icon in recordings menu
+- [add] Setting to enable audio format icon in channel info and recording info
 - [update] Optimize justification of text
 - [update] Use a minimum of 15 ms for scroll delay
 - [update] Reduce number of calls to GetRecCounts() and UpdateTimerCounts()
-- [update] Remove any number of '%' from cutted recordings in menu
+- [update] Reduce number of calls to GetRecordingName() in SetItemRecording()
+- [update] Remove any number of leading '%' from cutted recordings in menu
 - [update] Refactor display menu to improve event and recording info handling
            with dedicated draw functions
 - [update] Cache the value MaxX in TextScroller class to avoid repeated calculations
-- [update] Move GetFontName() to font cache
 - [update] Use ShortText if Description is empty for event and recording information.
-- [update] Use a brighter 'Red' color for error marks
-- [update] Set margins relative to the OSD size
-- [update] Use Fontchache for more strings witch seldom change
+- [update] Use font cache for strings that seldom change
 - [update] Calculate channel number width only when nessesary
-- [update] Use Description or ShortText if Description is empty for event and recording information
-- [update] Refactor GetIconName() function to cache all menu names and plugins,
-           improving performance and reducing memory usage
-- [update] Use a brighter 'Red' color for error marks
 - [update] Set margins relative to the OSD size
-- [update] Set line width and line margin (Header) relative to the OSD size
+- [update] Set line width and line margin (Widgets, recording and event info) 
+           relative to the OSD size
+- [update] Set margin for color buttons and message relative to the OSD size
+- [update] Use a brighter 'Red' color for error marks
 - [update] Use a brighter color for TopBarDateFont
 - [update] Use a brighter color for format symbols like 4k or 1920x1080
 - [update] Update script update_weather.sh to use '$LANG' if '$_LANG' is not set in *.conf
 - [update] Remove obsolete 'pluginelper.h'
-- [update] Calculate 'MenuPixmapViewPortHeight' only in DrawMainMenuWidgets() function
+- [update] Calculate 'MenuPixmapViewPortHeight' only once in DrawMainMenuWidgets() function
 - [update] Smaller VPS icon to save a little space
 - [update] Reduce margin between actor images
+- [update] Use signum 'Σ' prefix for length of recordings
+- [update] In widget dvb devices show 'No DVB devices found' if no device is present
+- [update] In widget last recordings show 'No recordings found' if no recording is present
+- [update] Prefix timer with 'L:' for local and 'R:' for remote timers if no icon is
+           available in timer widget
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0

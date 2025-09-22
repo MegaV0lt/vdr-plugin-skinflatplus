@@ -213,22 +213,25 @@ class cFlatConfig {
         double TopBarFontSize {5.0 / 100};
         double TopBarFontClockScale {1.0 / 100};
 
-        int ChannelResolutionAspectShow {true};
+        double ChannelNameFontSize {1.5 / 100};  // Font size for channel name in channel status bar
+        int ChannelAudioFormatShow {true};       // Show Format icon for audio (stereo, dolby)
+        int ChannelDvbapiInfoShow {1};
         int ChannelFormatShow {true};
+        int ChannelResolutionAspectShow {true};
+        int ChannelShowNameWithShadow {false};   // Show channel name and number with shadow instead of background
+        int ChannelShowStartTime {true};
         int ChannelSimpleAspectFormat {true};
         int ChannelTimeLeft {0};
-        int ChannelDvbapiInfoShow {1};
-        int ChannelShowNameWithShadow {false};  // Show channel name and number with shadow instead of background
-        int ChannelShowStartTime {true};
 
+        double WeatherFontSize {5.0 / 100};  // Font size for weather (% of OSD height)
         int ChannelWeatherShow {1};
         int PlaybackWeatherShow {1};
-        double WeatherFontSize {5.0 / 100};
 
-        int RecordingResolutionAspectShow {true};
-        int RecordingFormatShow {true};
-        int RecordingSimpleAspectFormat {true};
         int RecordingAdditionalInfoShow {true};
+        int RecordingAudioFormatShow {true};  // Show Format icon for audio (stereo, dolby)
+        int RecordingFormatShow {true};
+        int RecordingResolutionAspectShow {true};
+        int RecordingSimpleAspectFormat {true};
         double TimeSecsScale {1.0};
 
         int RecordingDimmOnPause {true};
@@ -260,6 +263,7 @@ class cFlatConfig {
         int MenuChannelShowCount {1};    // Show number of channels in menu channels
 
         double MenuItemRecordingSeenThreshold {0.98 / 100.0};
+        int MenuItemRecordingUseOldFile {false};  // Use recording old file
         int MenuItemRecordingDefaultOldDays {-1};
 
         int MessageColorPosition {1};  // 0 = vertical, 1 = horizontal

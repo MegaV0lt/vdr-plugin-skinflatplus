@@ -582,7 +582,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         const int Rest {NumFrames - m_CurrentFrame};
         const cString TimeStr = (Rest >= 0) ? *TimeString(now + (Rest / FramesPerSecond)) : "??:??";  // HH:MM
         cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
-        const int EndTimeWidth {m_Font->Width(EndTime)};  // Width of 'ends at: HH:MM' text
+        // const int EndTimeWidth {m_Font->Width(EndTime)};
+        const int EndTimeWidth {
+            FontCache.GetStringWidth(m_FontName, m_FontHeight, *EndTime)};  // Width of 'ends at: HH:MM' text
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), m_Font, EndTimeWidth, m_FontHeight);
         left += EndTimeWidth + Spacer;
@@ -720,7 +722,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         }
     }
 
-    if (Config.RecordingResolutionAspectShow) {  //? Add separate config option
+    if (Config.RecordingAudioFormatShow) {
         IconName = *GetCurrentAudioIcon();       // Show audio icon (Dolby, Stereo)
         img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {

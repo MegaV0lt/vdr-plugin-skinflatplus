@@ -41,7 +41,7 @@ class cFontCache {
     void Create();
     void Clear();
     cFont* GetFont(const cString &Name, int Size);
-    cString GetFontName(const char *FileName);
+    cString GetFontName(const char *FileName) const;
     int GetFontHeight(const cString &Name, int Size) const;
     void InsertFont(const cString &Name, int Size);
     int GetStringWidth(const cString &Name, int Height, const cString &Text) const;

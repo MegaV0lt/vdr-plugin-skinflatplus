@@ -348,7 +348,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     if (FrameWidth > 0) return "sd";  // 720 and below is considered sd
 #endif
     // Find radio and H.264/H.265 streams.
-    //! Detection FAILED for RTL, SAT1 etc. They do not send a video component :-(
+    //! RTL, SAT1 etc. do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
         for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // Not iterable
             switch (Components->Component(i)->stream) {
@@ -704,7 +704,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         oss << tr("Size") << ": " << (FsErr ? "!" : "") << std::fixed << std::setprecision(0)
             << static_cast<float>(RecSize) / MEGABYTE(1) << " MB";
 
-    if (HasMarks && (RecSizeCut)) {  // Do not show zero value
+    if (HasMarks && RecSizeCut > 0) {  // Do not show zero value
         if (RecSizeCut > MEGABYTE(1023))
             oss << " (" << tr("cutted") << ": " << std::fixed << std::setprecision(2)
                 << static_cast<float>(RecSizeCut) / MEGABYTE(1024) << " GB)";
@@ -721,14 +721,14 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         oss << '\n'
             << tr("format") << ": " << (IsPesRecording ? "PES" : "TS") << ", " << RecInfo->FrameWidth() << "x"
-            << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(0) << RecInfo->FramesPerSecond();
+            << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(0) << FramesPerSecond;
         if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
             oss << RecInfo->ScanTypeChar();
         if (RecInfo->AspectRatio() != arUnknown) oss << ' ' << RecInfo->AspectRatioText();
 
         if (LastIndex)  //* Bitrate in new line
             oss << '\n' << tr("bit rate") << ": Ø " << std::fixed << std::setprecision(2)
-                << static_cast<float>(RecSize) / LastIndex * RecInfo->FramesPerSecond() * 8 / MEGABYTE(1)
+                << static_cast<float>(RecSize) / LastIndex * FramesPerSecond * 8 / MEGABYTE(1)
                 << " MBit/s (Video + Audio)";
     } else  // NOLINT
 #endif
@@ -903,6 +903,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 }
 
+/* Unused functions for trimming whitespace from strings
+   From https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
 std::string_view ltrim(std::string_view str) {
     const auto pos(str.find_first_not_of(" \t\n\r\f\v"));
     if (pos == std::string_view::npos) {
@@ -928,6 +930,7 @@ std::string_view trim(std::string_view str) {
     str = rtrim(str);
     return str;
 }
+*/
 
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
@@ -979,8 +982,8 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     uint32_t sym {0};
     stripspace(m_Text);  // Strips trailing newlines
     for (char *p {m_Text}; *p;) {
-        /* int */ sl = Utf8CharLen(p);
-        /* uint32_t */ sym = Utf8CharGet(p, sl);
+        sl = Utf8CharLen(p);
+        sym = Utf8CharGet(p, sl);
         if (sym == '\n') {
             if (++m_Lines > UpperLines) Width = WidthLower;
             w = 0;
@@ -990,7 +993,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         } else if (sl == 1 && isspace(sym)) {
             Blank = p;
         }
-        /* int */ cw = Font->Width(sym);
+        cw = Font->Width(sym);
         if (w + cw > Width) {
             if (Blank) {
                 *Blank = '\n';

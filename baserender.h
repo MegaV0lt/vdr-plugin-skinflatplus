@@ -216,7 +216,7 @@ class cFlatBaseRender {
     // Buttons red, green, yellow, blue
     cPixmap *ButtonsPixmap {nullptr};
     int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
-    const int m_MarginButtonColor {10}, m_ButtonColorHeight {8};
+    int m_MarginButtonColor {10}, m_ButtonColorHeight {8};  // Margin and height for button color bar
     bool m_ButtonsDrawn {false};
 
     // Message
@@ -252,6 +252,7 @@ class cFlatBaseRender {
     void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                 int type);
 
+    void SetMargins(int Width, int Height);
     void TopBarEnableDiskUsage();
     // tColor Multiply(tColor Color, uint8_t Alpha);
     tColor SetAlpha(tColor Color, double am);

@@ -274,8 +274,8 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
                 left -= m_MarginItem2;
             }
         }
-        // Show audio icon (Dolby, Stereo)
-        if (Config.ChannelResolutionAspectShow) {  //? Add separate config option (Config.ChannelAudioIconShow)
+
+        if (Config.ChannelAudioFormatShow) {  // Show audio icon (Dolby, Stereo)
             IconName = *GetCurrentAudioIcon();
             img = ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight);
             if (img) {
@@ -618,11 +618,9 @@ void cFlatDisplayChannel::Flush() {
         }
     }
 
-    if (Config.SignalQualityShow)
-        SignalQualityDraw();
+    if (Config.SignalQualityShow) SignalQualityDraw();
 
-    if (Config.ChannelDvbapiInfoShow)
-        DvbapiInfoDraw();
+    if (Config.ChannelDvbapiInfoShow) DvbapiInfoDraw();
 
     TopBarUpdate();
     m_Osd->Flush();

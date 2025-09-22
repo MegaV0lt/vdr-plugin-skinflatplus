@@ -188,10 +188,7 @@ void cComplexContent::Draw() {
     }
 
     for (auto &content : Contents) {
-        if (content.GetContentType() == CT_Image)
-            content.Draw(PixmapImage);
-        else
-            content.Draw(Pixmap);
+        content.Draw((content.GetContentType() == CT_Image) ? PixmapImage : Pixmap);
     }
 }
 
