@@ -288,7 +288,6 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     const double AllGB {FreeGB * GBScale};  // All disk space in GB
     // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
     constexpr double kChartSegmentPercent {31.0 / 100.0};  // 32 Segments in Chart (0..31)
-    const int IconIndex {static_cast<int>(DiskFreePercent * kChartSegmentPercent)};  // 0..31
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
@@ -308,6 +307,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
 
+        const int IconIndex {static_cast<int>(DiskFreePercent * kChartSegmentPercent)};  // 0..31
         IconName = cString::sprintf("chart%db", IconIndex);  // chart0b - chart31b
 #ifdef DEBUGFUNCSCALL
         dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
@@ -352,6 +352,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             }
         }
 
+        const int IconIndex {static_cast<int>(DiskUsagePercent * kChartSegmentPercent)};  // 0..31
         IconName = cString::sprintf("chart%d", IconIndex + 1);  // chart1 - chart32
     }
 
