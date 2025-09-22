@@ -78,21 +78,11 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
 }
 
 void cComplexContent::CalculateDrawPortHeight() {
-#ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cComplexContent::CalculateDrawPortHeight() DrawPortHeight: %d", m_DrawPortHeight);
-#endif
-
     m_DrawPortHeight = BottomContent();
-#ifdef DEBUGFUNCSCALL
-    dsyslog("   BottomContent: %d", m_DrawPortHeight);
-#endif
 
     // m_DrawPortHeight has to be set for 'ScrollTotal()' to work
     if (m_IsScrollingActive && m_ScrollSize > 0) {
         m_DrawPortHeight = ScrollTotal() * m_ScrollSize;
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   ScrollTotal: %d", m_DrawPortHeight);
-#endif
     }
 }
 int cComplexContent::BottomContent() const {

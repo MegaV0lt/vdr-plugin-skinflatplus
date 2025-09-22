@@ -524,21 +524,18 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
 
-    int Width {0};
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
-    const bool IsGroup {Channel->GroupSep()};  // Also used later
-
+    //* At least four digits because of different sort modes
+    int Width = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
+    const bool IsGroup {Channel->GroupSep()};
     cString Buffer {""};
-    const int ChannelNumber {Channel->Number()};
-    Buffer = itoa(ChannelNumber);
-    if (ChannelNumber > 9999)
-        Width = m_Font->Width(*Buffer);
-    else  //* At least four digits width in channel list because of different sort modes
-        Width = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
-
-    if (!IsGroup)  // Show channel number for channels only
+    if (!IsGroup) {  // Show channel number for channels only
+        const int ChannelNumber {Channel->Number()};
+        if (ChannelNumber > 9999) Width = m_Font->Width(*Buffer);
+        Buffer = itoa(ChannelNumber);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
+    }
 
     Left += Width + m_MarginItem;
 
