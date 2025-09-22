@@ -1124,9 +1124,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {  // Show channel number for channels only
             const int ChannelNumber {Channel->Number()};
-            Buffer = itoa(ChannelNumber);
             if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (epgSearch)
-
+            Buffer = itoa(ChannelNumber);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
         Left += w + m_MarginItem;

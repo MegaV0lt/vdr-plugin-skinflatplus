@@ -271,7 +271,7 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     if (Series.firstAired.length() > 0) oss << tr("firstAired: ") << Series.firstAired << '\n';
     if (Series.network.length() > 0) oss << tr("network: ") << Series.network << '\n';
     if (Series.genre.length() > 0) oss << tr("genre: ") << Series.genre << '\n';
-    if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << '\n';
+    if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << "/10\n";
     if (Series.status.length() > 0) oss << tr("status: ") << Series.status << '\n';
     if (Series.episode.season > 0) oss << tr("season number: ") << Series.episode.season << '\n';
     if (Series.episode.number > 0) oss << tr("episode number: ") << Series.episode.number << '\n';
@@ -294,7 +294,7 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     if (Movie.releaseDate.length() > 0) oss << tr("release date: ") << Movie.releaseDate << '\n';
     if (Movie.popularity > 0)
         oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
-    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << '\n';  // 10 Points = 100%
+    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << "%\n";  // 10 Points = 100%
     MovieInfo.Append(oss.str().c_str());
 }
 
