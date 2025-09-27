@@ -1605,19 +1605,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     MenuPixmap->DrawRectangle(cRect(Config.decorBorderMenuItemSize, y, m_MenuItemWidth, Height), ColorBg);
     static constexpr float kIconCutHeightRatio {2.0 / 3.0};
+    const int ImgRecNewHeight {Config.MenuRecordingView == 1 ? m_FontHeight : m_FontSmlHeight};
     //* Preload for calculation of position
-    cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr}, *ImgRecNewSml {nullptr};
+    cImage *ImgRecCut {nullptr}, *ImgRecNew {nullptr};
     if (Current) {
-        ImgRecNew = ImgLoader.GetIcon("recording_new_cur", m_FontHeight, m_FontHeight);
-        ImgRecNewSml = ImgLoader.GetIcon("recording_new_cur", m_FontSmlHeight, m_FontSmlHeight);
+        ImgRecNew = ImgLoader.GetIcon("recording_new_cur", ImgRecNewHeight, ImgRecNewHeight);
         ImgRecCut = ImgLoader.GetIcon("recording_cutted_cur", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
     }
-    if (!ImgRecNew) ImgRecNew = ImgLoader.GetIcon("recording_new", m_FontHeight, m_FontHeight);
-    if (!ImgRecNewSml) ImgRecNewSml = ImgLoader.GetIcon("recording_new", m_FontSmlHeight, m_FontSmlHeight);
+    if (!ImgRecNew) ImgRecNew = ImgLoader.GetIcon("recording_new", ImgRecNewHeight, ImgRecNewHeight);
     if (!ImgRecCut) ImgRecCut = ImgLoader.GetIcon("recording_cutted", m_FontHeight, m_FontHeight * kIconCutHeightRatio);
 
     const int ImgRecNewWidth {(ImgRecNew) ? ImgRecNew->Width() : 0};
-    const int ImgRecNewSmlWidth {(ImgRecNewSml) ? ImgRecNewSml->Width() : 0};
     const int ImgRecCutWidth {(ImgRecCut) ? ImgRecCut->Width() : 0};
     const int ImgRecCutHeight {(ImgRecCut) ? ImgRecCut->Height() : 0};
 
@@ -1795,9 +1793,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                  m_FontSmlHeight, taRight);
             Left += DigitsMaxWidth;
 
-            if (ImgRecNewSml) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNewSml);
+            if (ImgRecNew) MenuIconsPixmap->DrawImage(cPoint(Left, Top), *ImgRecNew);
 
-            Left += ImgRecNewSmlWidth + m_MarginItem;
+            Left += ImgRecNewWidth + m_MarginItem;
             Buffer = itoa(New);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
                                  m_FontSmlHeight);
