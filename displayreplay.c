@@ -566,7 +566,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // HasMarks
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
-    const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' current changed
+    const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' changed
     if (Config.PlaybackShowEndTime > 0 &&  // 1 = End time, 2 = End time and cutted end time
         (m_LastEndTimeUpdate + 60 < now || strcmp(*m_Current, *m_LastCurrent) != 0)) {
         m_LastEndTimeUpdate = now;
@@ -582,9 +582,8 @@ void cFlatDisplayReplay::UpdateInfo() {
         const int Rest {NumFrames - m_CurrentFrame};
         const cString TimeStr = (Rest >= 0) ? *TimeString(now + (Rest / FramesPerSecond)) : "??:??";  // HH:MM
         cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
-        // const int EndTimeWidth {m_Font->Width(EndTime)};
-        const int EndTimeWidth {
-            FontCache.GetStringWidth(m_FontName, m_FontHeight, *EndTime)};  // Width of 'ends at: HH:MM' text
+        const int EndTimeWidth {FontCache.GetStringWidth(
+            m_FontName, m_FontHeight, cString::sprintf("%s: 00:00", tr("ends at")))};  // Width of 'ends at: HH:MM' text
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
                               Theme.Color(clrReplayBg), m_Font, EndTimeWidth, m_FontHeight);
         left += EndTimeWidth + Spacer;
