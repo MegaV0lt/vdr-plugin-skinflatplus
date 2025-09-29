@@ -1861,7 +1861,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
  * by the provided `Fsk` string, followed by genre icons listed in the `GenreIcons` vector.
  * If the specified FSK or genre icon cannot be found, a default 'unknown' icon is used instead.
  *
- * @param HeadIconLeft  The x-coordinate where the FSK and genre icons will be drawn.
  * @param Fsk           A string specifying the FSK icon to be loaded and drawn.
  * @param GenreIcons    A vector of genre icon names to be loaded and drawn. The vector is sorted
  *                      and duplicates are removed before drawing.
