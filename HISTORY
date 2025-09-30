@@ -21,7 +21,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Use font cache for strings that seldom change
 - [update] Calculate channel number width only when nessesary
 - [update] Set margins relative to the OSD size
-- [update] Set line width and line margin (Widgets, recording and event info) 
+- [update] Set line width and line margin (Widgets, recording and event info)
            relative to the OSD size
 - [update] Set margin for color buttons and message relative to the OSD size
 - [update] Use a brighter 'Red' color for error marks
@@ -37,6 +37,9 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] In widget last recordings show 'No recordings found' if no recording is present
 - [update] Prefix timer with 'L:' for local and 'R:' for remote timers if no icon is
            available in timer widget
+- [update] Same height for format icons hd.png, sd.png, crypted.png and uncrypted.png
+- [update] Adjust color of unknown_res.png and unknown_format.png
+- [update] Reduce size of shadow for vps.png
 - [update] Some internal optimizations
 
 2025-08-01: Version 1.2.0
