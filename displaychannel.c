@@ -231,11 +231,10 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
     const int top {m_HeightBottom - m_FontSmlHeight - m_MarginItem};
     int left {m_ChannelWidth - m_MarginItem2};
-    const int ImageHeight {std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem)};
 
     cImage *img {nullptr};
     if (Channel) {
-        img = ImgLoader.GetIcon((Channel->Ca()) ? "crypted" : "uncrypted", kIconMaxSize, ImageHeight);
+        img = ImgLoader.GetIcon((Channel->Ca()) ? "crypted" : "uncrypted", kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
             ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -249,7 +248,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             // If Config.ChannelSimpleAspectFormat is enabled, the aspect ratio is only shown for
             // sd program, else format (HD/UHD) is shown
             IconName = *GetAspectIcon(m_ScreenWidth, m_ScreenAspect);
-            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight);
+            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -257,7 +256,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
 
             IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
-            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight);
+            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -267,7 +266,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelFormatShow && !Config.ChannelSimpleAspectFormat) {
             IconName = *GetFormatIcon(m_ScreenWidth);  // Show Format (HD)
-            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight);
+            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
@@ -277,7 +276,7 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
 
         if (Config.ChannelAudioFormatShow) {  // Show audio icon (Dolby, Stereo)
             IconName = *GetCurrentAudioIcon();
-            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight);
+            img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
             if (img) {
                 left -= img->Width();
                 ChanIconsPixmap->DrawImage(cPoint(left, top), *img);
