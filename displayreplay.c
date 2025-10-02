@@ -629,9 +629,8 @@ void cFlatDisplayReplay::UpdateInfo() {
         PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (MediaPath[0] != '\0') {
-            SetMediaSize(m_TVSRect.Size(), MediaSize);  // Set MediaSize to default size
-            MediaSize.SetWidth(MediaSize.Width() * Config.TVScraperReplayInfoPosterSize * 100);
-            MediaSize.SetHeight(MediaSize.Height() * Config.TVScraperReplayInfoPosterSize * 100);
+            SetMediaSize(m_TVSRect.Size(), MediaSize,
+                         Config.TVScraperReplayInfoPosterSize * 100);  // Set size and apply user setting
             img = ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);

@@ -309,7 +309,7 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
             return ScreenAspectNames[i];
     }
 
-    dsyslog("flatPlus: Unknown screen aspect (%.5f)", ScreenAspect);
+    dsyslog("flatPlus: Unknown screen aspect: %.5f (Screen width: %d)", ScreenAspect, ScreenWidth);
     return "unknown_asp";
 }
 
@@ -397,23 +397,23 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
 }
 
 /**
- * Adjusts the size of a media object based on its aspect ratio and the
- * constraints provided by the content size. This function ensures that
- * the media's aspect ratio is preserved while fitting within the
- * specified dimensions. It categorizes media as poster, portrait, or
- * banner based on its aspect ratio and adjusts its size accordingly.
+ * @brief Set the media size for the TV scraper poster/banner.
  *
- * @param ContentSize The size constraints within which the media should fit.
- * @param MediaSize A reference to the size of the media to be adjusted.
+ * @details Set the media size based on the aspect ratio of the image.
+ * The aspect ratio is used to determine whether the image is a poster, portrait or banner.
+ * For a poster, the height is set to a fraction of the content size height.
+ * For a portrait, the width is set to a fraction of the content size width.
+ * For a banner, the width is set to a target ratio of the content size width.
+ * The user setting is applied to the media size.
  *
- * - Posters are adjusted to a maximum height of 70% of the content height.
- * - Portraits are adjusted to a maximum width of 1/3 of the content width.
- * - Banners are adjusted to maintain a target ratio of 758 width at 1920.
+ * @param[in]  ContentSize  The size of the content.
+ * @param[in,out] MediaSize  The size of the media.
+ * @param[in]  MediaSizeUser  The user setting for the media size.
  */
-void SetMediaSize(const cSize &ContentSize, cSize &MediaSize) {  // NOLINT
+void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUser) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d", MediaSize.Width(), MediaSize.Height(),
-            ContentSize.Width(), ContentSize.Height());
+    dsyslog("flatPlus: SetMediaSize() MediaSize %dx%d, ContentSize %dx%d, MediaSizeUser %.1f", MediaSize.Width(),
+            MediaSize.Height(), ContentSize.Width(), ContentSize.Height(), MediaSizeUser);
 #endif
 
     if (MediaSize.Height() == 0) {  // Avoid DIV/0
@@ -427,15 +427,15 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize) {  // NOLINT
     static constexpr double kPortraitWidthRatio {1.0 / 3.0};      // Max 1/3 of pixmap width
     static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
-    //* Set to default size
     const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
+    //* Set to default size and apply user settings
     //* Aspect of image is preserved in cImageLoader::GetFile()
     if (Aspect < kPosterAspectThreshold) {  //* Poster (For example 680x1000 = 0.68)
-        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio));
+        MediaSize.SetHeight(static_cast<int>(ContentSize.Height() * kPosterHeightRatio * MediaSizeUser));
     } else if (Aspect < kBannerAspectThreshold) {  //* Portrait (For example 1920x1080 = 1.77)
-        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kPortraitWidthRatio));
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kPortraitWidthRatio * MediaSizeUser));
     } else {  //* Banner (Usually 758x140 = 5.41)
-        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kBannerTargetRatio));
+        MediaSize.SetWidth(static_cast<int>(ContentSize.Width() * kBannerTargetRatio * MediaSizeUser));
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   New MediaSize max. %dx%d", MediaSize.Width(), MediaSize.Height());
