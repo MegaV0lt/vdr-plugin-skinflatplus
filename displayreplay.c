@@ -21,10 +21,11 @@ cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay")
     MessageCreate();
 
     const int EffectiveOsdWidth {m_OsdWidth - Config.decorBorderReplaySize * 2};
-    m_TVSRect.Set(20 + Config.decorBorderChannelEPGSize,
-                  m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize,
-                  EffectiveOsdWidth - 40,
-                  m_OsdHeight - m_TopBarHeight - m_LabelHeight - 40 - Config.decorBorderChannelEPGSize * 2);
+    m_TVSRect.Set(
+        m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+        m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+        EffectiveOsdWidth - m_MarginEPGImage * 2,
+        m_OsdHeight - m_TopBarHeight - m_LabelHeight - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2);
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
     const cRect LabelPixmapViewPort {Config.decorBorderReplaySize,
@@ -635,8 +636,8 @@ void cFlatDisplayReplay::UpdateInfo() {
             if (img) {
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-                const sDecorBorder ib {20 + Config.decorBorderChannelEPGSize,
-                                       m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 +
+                const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+                                       m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
                                            Config.decorBorderChannelEPGSize,
                                        img->Width(),
                                        img->Height(),

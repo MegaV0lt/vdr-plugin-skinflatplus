@@ -135,6 +135,8 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarginItem = kMinSize + SizeIncrease;
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
+    // Margin for EPG image in EPG info and recording info
+    m_MarginEPGImage += SizeIncrease;  // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
     // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
     SizeIncrease = static_cast<int>((Height / 576) + 0.5);  // (1080: 2 pixels, 2160: 4 pixels, 4320: 8 pixels)
     m_LineWidth = kMinSize + SizeIncrease;  // Increase line width for larger OSD heights
@@ -144,9 +146,9 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
-            "%d), m_ButtonColorHeight: %d (Margin %d)",
+            "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
             Width, Height, m_MarginItem, m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin, m_ButtonColorHeight,
-            m_MarginButtonColor);
+            m_MarginButtonColor, m_MarginEPGImage);
 #endif
 }
 
@@ -1925,12 +1927,15 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const int WidthTempTomorrow = std::max(wd.WeatherFontSml->Width(wd.Days[1].TempMax),
                                            wd.WeatherFontSml->Width(wd.Days[1].TempMin));  // Max width temp tomorrow
 
-    const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
+
+    // For weather widget use the same margin as for the EPG images
+    const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                    Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
-                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeightMinusMargin +
-                      PrecTodayWidth + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow +
-                      m_MarginItem + WeatherFontHeightMinusMargin + PrecTomorrowWidth + m_MarginItem2};
-    const int wLeft {m_OsdWidth - wWidth - 20};
+                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeightMinusMargin + PrecTodayWidth +
+                      m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow + m_MarginItem +
+                      WeatherFontHeightMinusMargin + PrecTomorrowWidth + m_MarginItem2};
+    const int wLeft {m_OsdWidth - wWidth - m_MarginEPGImage};
 
     // Setup widget
     WeatherWidget.Clear();
