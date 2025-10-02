@@ -282,9 +282,9 @@ cString GetCurrentAudioIcon();
 cString GetRecordingErrorIcon(int RecInfoErrors);
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
 
-std::string_view ltrim(std::string_view str);
+/* std::string_view ltrim(std::string_view str);
 std::string_view rtrim(std::string_view str);
-std::string_view trim(std::string_view str);
+std::string_view trim(std::string_view str); */
 
 void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUser);  // NOLINT in/out
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
