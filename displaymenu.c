@@ -604,8 +604,11 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     if (Config.MenuChannelView == 1) {  // flatPlus long
         Width = m_MenuItemWidth - LeftName;
         if (IsGroup) {
-            const int LineTop {Top + (m_FontHeight - 3) / 2};
-            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
+            // const int LineTop {Top + (m_FontHeight - 3) / 2};  //? Better calculation
+            const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
+            // dsyslog("flatPlus: SetItemChannel() LineTop: %d, m_LineWidth: %d, m_FontHeight: %d", LineTop,
+            //        m_LineWidth, m_FontHeight);
+            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, m_LineWidth), ColorFg);
             const cString GroupName = cString::sprintf(" %s ", *Buffer);
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
@@ -625,8 +628,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             Width = m_MenuItemWidth - LeftName;
 
         if (IsGroup) {
-            const int LineTop {Top + (m_FontHeight - 3) / 2};
-            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
+            const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
+            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, m_LineWidth), ColorFg);
             const cString GroupName = cString::sprintf(" %s ", *Buffer);
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
@@ -1178,8 +1181,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         }
 
         if (IsGroup) {  // Draw group name or channel name
-            const int LineTop {Top + (m_FontHeight - 3) / 2};
-            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, 3), ColorFg);
+            const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
+            MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, m_LineWidth), ColorFg);
             Left += w / 2;
             Buffer = cString::sprintf(" %s ", *ChannelName);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, 0, 0, taCenter);
@@ -1405,8 +1408,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 if (found != std::string_view::npos && found >= 14) {
                     // dsyslog("   Date string found at %ld", found);
                     const std::string date {sep.substr(found - 14, 14)};
-                    const int LineTop {Top + (m_FontHeight - 3) / 2};
-                    MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, 3), ColorFg);
+                    const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
+                    MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, m_LineWidth), ColorFg);
                     const cString DateSpace = cString::sprintf(" %s ", date.c_str());
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
