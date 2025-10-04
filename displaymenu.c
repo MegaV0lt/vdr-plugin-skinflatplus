@@ -643,34 +643,32 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
             Left += Width + m_MarginItem;
 
-            if (!IsGroup) {
-                int PBTop {y + (m_ItemChannelHeight - Config.MenuItemPadding) / 2 -
-                           Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize};
-                int PBLeft {Left};
-                int PBWidth {m_MenuItemWidth / 10};
-                if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
-                    PBTop = Top + m_FontHeight + m_FontSmlHeight;
-                    PBLeft = Left - Width - m_MarginItem;
-                    //? m_WidthScrollBar is already substarcted
-                    PBWidth =
-                        m_MenuItemWidth - LeftName - m_MarginItem2 - Config.decorBorderMenuItemSize - m_WidthScrollBar;
-
-                    if (m_IsScrolling) PBWidth += m_WidthScrollBar;
-                }
-
+            int PBTop {y + (m_ItemChannelHeight - Config.MenuItemPadding) / 2 -
+                        Config.decorProgressMenuItemSize / 2 - Config.decorBorderMenuItemSize};
+            int PBLeft {Left};
+            int PBWidth {m_MenuItemWidth / 10};
+            if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
+                PBTop = Top + m_FontHeight + m_FontSmlHeight;
+                PBLeft = Left - Width - m_MarginItem;
                 //? m_WidthScrollBar is already substarcted
-                Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
-                const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize};
-                if (Current)
-                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                       Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
-                                       Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false);
-                else
-                    ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                       Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
-                                       Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
-                Left += Width + m_MarginItem;
+                PBWidth =
+                    m_MenuItemWidth - LeftName - m_MarginItem2 - Config.decorBorderMenuItemSize - m_WidthScrollBar;
+
+                if (m_IsScrolling) PBWidth += m_WidthScrollBar;
             }
+
+            //? m_WidthScrollBar is already substarcted
+            Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
+            const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize};
+            if (Current)
+                ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
+                                    Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
+                                    Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false);
+            else
+                ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
+                                    Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
+                                    Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
+            Left += Width + m_MarginItem;
 
             if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
                 Left = LeftName;
