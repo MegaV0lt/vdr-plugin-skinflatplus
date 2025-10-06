@@ -64,7 +64,6 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ProgressBarDrawBgColor();
 
     // Pixmap for channel number and name
-    // TODO: Different position for channel number and name when without background
     // Top of ChanInfoTopViewPort depending on setting ChannelShowNameWithShadow
     const int HeightTop {m_FontBigHeight +
                          (Config.ChannelShowNameWithShadow ? m_FontBigHeight / 10 + Config.decorBorderChannelSize : 0)};
@@ -163,9 +162,9 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         PixmapClear(ChanInfoTopPixmap);
         const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
         // Ensure shadow size is reasonable
-        static constexpr int kMinShadowSize {3};   // Shadow should have at least 3 pixel
-        static constexpr int kMaxShadowSize {10};  // Shadow should not be too large
-        const int BoundedShadowSize {std::clamp(ShadowSize, kMinShadowSize, kMaxShadowSize)};
+        const int MinShadowSize {m_MarginItem / 2 + 1};  // Minimum shadow size
+        const int MaxShadowSize {m_MarginItem * 2};      // Shadow should not be too large
+        const int BoundedShadowSize {std::clamp(ShadowSize, MinShadowSize, MaxShadowSize)};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
 #ifdef DBUGFUNCSCALL
@@ -323,8 +322,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         const bool IsPresent {(i) ? false : true};
         const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
-            StartTime = *Event->GetTimeString();                                            // Start time (left side)
-            StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (right side)
+            StartTime = *Event->GetTimeString();  // Start time (Left side)
+            StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (Right side)
             StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00 - 00:00") + SmlSpaceWidth2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
@@ -555,7 +554,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), m_DvbapiInfoFont);
 
-    left += m_DvbapiInfoFont->Width(*DvbapiInfoText) + m_MarginItem;
+    left += FontCache.GetStringWidth(Setup.FontOsd, DvbapiInfoFontHeight, DvbapiInfoText) + m_MarginItem;
 
     cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
     cImage *img {ImgLoader.GetIcon(*IconName, kIconMaxSize, DvbapiInfoFontHeight)};
@@ -571,20 +570,18 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     DvbapiInfoText = cString::sprintf(" %s (%d ms)", *ecmInfo.reader, ecmInfo.ecmtime);
     if (ecmInfo.hops > 1) DvbapiInfoText.Append(cString::sprintf(" (%d hops)", ecmInfo.hops));
 
-    // Store the width of the drawn dvbapi info text for the next draw call,
-    // so that we can ensure that the text is drawn at the correct position
-    // even if the text changes (e.g. when the channel is changed).
+    // Store the width of the drawn dvbapi info text for the next draw call, so that we can ensure that the text
+    // is drawn at the correct position even if the text changes (e.g. when the channel is changed).
     // This is done by storing the maximum width of the text seen so far.
     m_LastDvbapiInfoTextWidth = std::max(m_DvbapiInfoFont->Width(*DvbapiInfoText), m_LastDvbapiInfoTextWidth);
-
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), m_DvbapiInfoFont, m_LastDvbapiInfoTextWidth);
 }
 
 void cFlatDisplayChannel::Flush() {
     if (m_Present) {
-        const time_t t {time(0)};
-        const int Current = (t > m_Present->StartTime()) ? t - m_Present->StartTime() : 0;  // Narrowing conversion
+        const time_t now {time(0)};
+        const int Current = (now > m_Present->StartTime()) ? now - m_Present->StartTime() : 0;  // Narrowing conversion
         const int Total {m_Present->Duration()};
         ProgressBarDraw(Current, Total);
     }
@@ -620,8 +617,8 @@ void cFlatDisplayChannel::PreLoadImages() {
 
     uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel {Channels->First()}; Channel && i < LogoPreCache; Channel = Channels->Next(Channel)) {
-        if (!Channel->GroupSep()) {  // Don't cache named channel group logo
+    for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {
+        if (!Channel->GroupSep()) {  // Don'now cache named channel group logo
             img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img) ++i;
         }
@@ -629,36 +626,31 @@ void cFlatDisplayChannel::PreLoadImages() {
 
     // Preload channel icons
     if (Config.ChannelIconsShow) {
-        if (Config.SignalQualityShow || Config.ChannelDvbapiInfoShow)
-            height = std::max(m_FontSmlHeight, Config.decorProgressSignalSize * 2 + m_MarginItem);
-        else
-            height = m_FontSmlHeight;
-
-        ImgLoader.GetIcon("crypted", kIconMaxSize, height);
-        ImgLoader.GetIcon("uncrypted", kIconMaxSize, height);
-        ImgLoader.GetIcon("unknown_asp", kIconMaxSize, height);
-        ImgLoader.GetIcon("43", kIconMaxSize, height);
-        ImgLoader.GetIcon("169", kIconMaxSize, height);
-        ImgLoader.GetIcon("169w", kIconMaxSize, height);
-        ImgLoader.GetIcon("221", kIconMaxSize, height);
-        ImgLoader.GetIcon("7680x4320", kIconMaxSize, height);
-        ImgLoader.GetIcon("3840x2160", kIconMaxSize, height);
-        ImgLoader.GetIcon("1920x1080", kIconMaxSize, height);
-        ImgLoader.GetIcon("1440x1080", kIconMaxSize, height);
-        ImgLoader.GetIcon("1280x720", kIconMaxSize, height);
-        ImgLoader.GetIcon("960x720", kIconMaxSize, height);
-        ImgLoader.GetIcon("704x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("720x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("544x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("528x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("480x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("352x576", kIconMaxSize, height);
-        ImgLoader.GetIcon("unknown_res", kIconMaxSize, height);
-        ImgLoader.GetIcon("uhd", kIconMaxSize, height);
-        ImgLoader.GetIcon("hd", kIconMaxSize, height);
-        ImgLoader.GetIcon("sd", kIconMaxSize, height);
-        ImgLoader.GetIcon("audio_dolby", kIconMaxSize, height);
-        ImgLoader.GetIcon("audio_stereo", kIconMaxSize, height);
+        ImgLoader.GetIcon("crypted", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("uncrypted", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("unknown_asp", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("43", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("169", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("169w", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("221", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("7680x4320", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("3840x2160", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("1920x1080", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("1440x1080", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("1280x720", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("960x720", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("704x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("720x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("544x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("528x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("480x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("352x576", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("unknown_res", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("uhd", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("hd", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("sd", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("audio_dolby", kIconMaxSize, m_FontSmlHeight);
+        ImgLoader.GetIcon("audio_stereo", kIconMaxSize, m_FontSmlHeight);
 
         // Audio tracks (displaytracks.c)
         ImgLoader.GetIcon("tracks_ac3", kIconMaxSize, m_FontHeight);

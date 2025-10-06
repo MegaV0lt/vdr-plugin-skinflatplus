@@ -289,7 +289,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     const double GBScale {100.0 / DiskFreePercent};
     const double AllGB {FreeGB * GBScale};  // All disk space in GB
     // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-    constexpr double kChartSegmentPercent {31.0 / 100.0};  // 32 Segments in Chart (0..31)
+    static constexpr double kChartSegmentPercent {31.0 / 100.0};  // 32 Segments in Chart (0..31)
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
@@ -2044,7 +2044,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
                                          int yOffset) {
     double Alpha {0.0};
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
-    static constexpr double MaxAlpha {1.0};     // Maximum alpha value
+    static constexpr double kMaxAlpha {1.0};    // Maximum alpha value
     int ShadowX {0}, ShadowY {0};               // Shadow position variables
     const int BaseX {pos.X()};                  // Cache position for faster access
     const int BaseY {pos.Y()};
@@ -2053,7 +2053,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
-        Alpha = std::min((ShadowSize - i) * AlphaStep, MaxAlpha);  // Calculate alpha from 0.0 (outer) to 1.0 (inner)
+        Alpha = std::min((ShadowSize - i) * AlphaStep, kMaxAlpha);  // Calculate alpha from 0.0 (outer) to 1.0 (inner)
         CurrentShadowColor = SetAlpha(ShadowColor, Alpha);
         ShadowX = BaseX + (xOffset * i);
         ShadowY = BaseY + (yOffset * i);

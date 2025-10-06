@@ -16,8 +16,8 @@
 #include "./displayvolume.h"
 
 cImageCache::cImageCache() :
-    ImageCache(MaxImageCache),  // Initialize vector with fixed size
-    IconCache(MaxIconCache) {}
+    ImageCache(kMaxImageCache),  // Initialize vector with fixed size
+    IconCache(kMaxIconCache) {}
 
 cImageCache::~cImageCache() {}  // std::unique_ptr handles memory deallocation automatically
 
@@ -123,10 +123,11 @@ void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, co
 void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
     // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
     if (IsIcon) {  // Insert into icon cache
-        InsertIntoCache(IconCache.data(), m_InsertIconIndex, MaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
+        InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
                         Height);
     } else {  // Insert into image cache
-        InsertIntoCache(ImageCache.data(), m_InsertIndex, MaxImageCache, m_InsertIndexBase, Image, Name, Width, Height);
+        InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
+                        Height);
     }
 }
 

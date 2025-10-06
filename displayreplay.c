@@ -750,29 +750,29 @@ void cFlatDisplayReplay::Flush() {
 }
 
 void cFlatDisplayReplay::PreLoadImages() {
-    constexpr const char *icons[] {"rewind",     "pause",     "play",     "forward",
-                                   "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
+    static constexpr const char *icons[] {"rewind",     "pause",     "play",     "forward",
+                                          "rewind_sel", "pause_sel", "play_sel", "forward_sel"};
     for (const auto &icon : icons) {
         ImgLoader.GetIcon(icon, m_FontHeight, m_FontHeight);
     }
 
-    constexpr uint32_t kCharCode {0x0030};                                                      // U+0030 DIGIT ZERO
+    static constexpr uint32_t kCharCode {0x0030};                                               // U+0030 DIGIT ZERO
     const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
-    constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
+    static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
     for (const auto &icon : icons1) {
         ImgLoader.GetIcon(icon, kIconMaxSize, GlyphSize);
     }
 
-    constexpr const char *icons2[] {"recording_untested_replay", "recording_ok_replay", "recording_warning_replay",
-                                    "recording_error_replay", "timerRecording"};
+    static constexpr const char *icons2[] {"recording_untested_replay", "recording_ok_replay",
+                                           "recording_warning_replay", "recording_error_replay", "timerRecording"};
     for (const auto &icon : icons2) {
         ImgLoader.GetIcon(icon, kIconMaxSize, m_FontSmlHeight);
     }
 
-    constexpr const char *icons3[] {"43",        "169",       "169w",         "221",        "7680x4320",   "3840x2160",
-                                    "1920x1080", "1440x1080", "1280x720",     "960x720",    "704x576",     "720x576",
-                                    "544x576",   "528x576",   "480x576",      "352x576",    "unknown_res", "uhd",
-                                    "hd",        "sd",        "audio_stereo", "audio_dolby"};
+    static constexpr const char *icons3[] {
+        "43",          "169",     "169w",    "221",     "7680x4320",    "3840x2160",  "1920x1080", "1440x1080",
+        "1280x720",    "960x720", "704x576", "720x576", "544x576",      "528x576",    "480x576",   "352x576",
+        "unknown_res", "uhd",     "hd",      "sd",      "audio_stereo", "audio_dolby"};
     for (const auto &icon : icons3) {
         ImgLoader.GetIcon(icon, kIconMaxSize, m_FontSmlHeight);
     }

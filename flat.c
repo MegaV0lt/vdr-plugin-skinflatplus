@@ -377,23 +377,18 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    static const cString SeenIconNames[] {"recording_seen_0", "recording_seen_1", "recording_seen_2",
-                                          "recording_seen_3", "recording_seen_4", "recording_seen_5",
-                                          "recording_seen_6", "recording_seen_7", "recording_seen_8",
-                                          "recording_seen_9", "recording_seen_10"};
-
     if (FrameTotal == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
-        return SeenIconNames[0];  // 0 = 0%
+        return "recording_seen_0";  // 0%
     }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f", SeenThreshold);
-    if (FrameSeen >= SeenThreshold) return SeenIconNames[10];  // 10 = 100%
+    if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100%
 
     const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0..10 rounded
-    return SeenIconNames[idx];
+    return cString::sprintf("recording_seen_%d", idx);
 }
 
 /**
@@ -820,9 +815,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    static constexpr float kLineWidthThreshold {0.8f};       // Line width threshold for justifying
-    static const char *kPunctuationChars {".,?!;"};          // Punctuation characters for justifying
-    if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) {  // Lines shorter than 80% looking bad when justified
+    static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
+    static constexpr const char *kPunctuationChars {".,?!;"};  // Punctuation characters for justifying
+    if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) {    // Lines shorter than 80% looking bad when justified
         const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
         const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
         std::string FillChars {""};
@@ -974,7 +969,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     m_Text[TextLen] = '\0';
 
     m_Lines = 1;
-    static const char *const kDelimiterChars {"-.,:;!?_~"};
+    static constexpr const char *const kDelimiterChars {"-.,:;!?_~"};
     std::size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};

@@ -2474,7 +2474,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
  * the method adds a line to the text with the number of TS errors.
  * The line is formatted as "TS errors: <number>".
  */
-void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) {  // NOLINT
+void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) const {  // NOLINT
     // From SkinNopacity
     if (RecInfo && RecInfo->Errors() > 0) {
         std::ostringstream RecErrors {""};
@@ -2873,7 +2873,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
-    static const char *SortIcons[] {"", "SortNumber", "SortName", "SortDate", "SortProvider"};
+    static constexpr const char *SortIcons[] {"", "SortNumber", "SortName", "SortDate", "SortProvider"};
     if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) TopBarSetMenuIconRight(SortIcons[MenuSortMode]);
 }
 
@@ -2976,9 +2976,9 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
 #endif
 
-    constexpr const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                   "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                   "Replay",   "Miscellaneous", "Plugins", "Restart"};
+    static constexpr const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
+                                          "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
+                                          "Replay",   "Miscellaneous", "Plugins", "Restart"};
 
     // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
@@ -3041,11 +3041,10 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 }
 
 cString cFlatDisplayMenu::GetMenuIconName() const {
-    static constexpr const char *VDRLogoIcon {"menuIcons/" VDRLOGO};
-    static const struct {
+    static constexpr struct {
         eMenuCategory category;
-        const cString icon;
-    } MenuIcons[] = {{mcMain, VDRLogoIcon},
+        const char *icon;
+    } MenuIcons[] = {{mcMain, "menuIcons/" VDRLOGO},
                      {mcSchedule, "menuIcons/Schedule"},
                      {mcScheduleNow, "menuIcons/Schedule"},
                      {mcScheduleNext, "menuIcons/Schedule"},
@@ -3058,7 +3057,7 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
                      {mcRecordingInfo, "extraIcons/PlayInfo"}};
     // Use structured binding
     for (const auto &[category, icon] : MenuIcons) {
-        if (category == m_MenuCategory) return icon;
+        if (category == m_MenuCategory) return cString(icon);
     }
 
     return "";
@@ -3185,7 +3184,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
-    constexpr const char *icons[][16] {
+    static constexpr const char *icons[][16] {
         // MovieDrama
         {"Movie_Drama", "Detective_Thriller", "Adventure_Western_War", "Science Fiction_Fantasy_Horror", "Comedy",
          "Soap_Melodrama_Folkloric", "Romance", "Serious_Classical_Religious_Historical Movie_Drama",
@@ -3219,7 +3218,7 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
         // Special
         {"Original Language", "Black & White", "Unpublished", "Live Broadcast"}};
 
-    static const uchar BaseGenres[] {
+    static constexpr uchar BaseGenres[] {
         ecgMovieDrama,         ecgNewsCurrentAffairs, ecgShow,        ecgSports,
         ecgChildrenYouth,      ecgMusicBalletDance,   ecgArtsCulture, ecgSocialPoliticalEconomics,
         ecgEducationalScience, ecgLeisureHobbies,     ecgSpecial};
@@ -4347,7 +4346,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
     uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-    for (const cChannel *Channel {Channels->First()}; Channel && i < LogoPreCache; Channel = Channels->Next(Channel)) {
+    for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
             if (img) ++i;
