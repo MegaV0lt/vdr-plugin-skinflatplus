@@ -23,7 +23,8 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Set line width and line margin (Widgets, recording- and event info)
            relative to the OSD size
 - [update] Set margin for color buttons and message relative to the OSD size
-- [update] Set margins for EPG images and weather widget relative to the OSD size
+- [update] Set margin for EPG images and weather widget relative to the OSD size
+- [update] Set minimum and maximum shadow size of channel name and number relativ to the OSD size
 - [update] Use a brighter 'Red' color for error marks for better visability
 - [update] Use a brighter color (#C0C0C0) for TopBarDateFont
 - [update] Use a brighter color (#C0C0C0) for format symbols like 4k or 1920x1080

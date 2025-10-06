@@ -753,11 +753,9 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
 
         if (Config.EpgAdditionalInfoShow) {
             if (Text[0] != '\0') Text.Append("\n");
-            // Genre
             InsertGenreInfo(Event, Text);  // Add genre info
 
-            // FSK
-            if (Event->ParentalRating())
+            if (Event->ParentalRating())  // FSK
                 Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Event->GetParentalRatingString()));
 
             const cComponents *Components {Event->Components()};
@@ -2232,11 +2230,10 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
                                       Config.decorBorderMenuContentBg};
     DecorBorderDraw(ContentBorder);
 
+    m_EventInfoDrawn = true;  // Set flag that event info is drawn
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: DrawEventInfo() Total time: %ld ms", Timer.Elapsed());
 #endif
-
-    m_EventInfoDrawn = true;  // Set flag that event info is drawn
 }
 
 void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText) {
@@ -2276,12 +2273,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             }
             const cEvent *Event {RecInfo->GetEvent()};
             if (Event) {
-                // Genre
                 InsertGenreInfo(Event, Text);  // Add genre info
 
                 if (Event->Contents(0)) Text.Append("\n");
-                // FSK
-                if (Event->ParentalRating())
+
+                if (Event->ParentalRating())  // FSK
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
             }
 
@@ -2429,7 +2425,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     int y2 {ContentTop};  //! y2 is for testing
     dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
 #endif
-    if (NumActors > 50) dsyslog("flatPlus: Found %d actor images! First display will probably be slow.", NumActors);
+    if (NumActors > 48) isyslog("flatPlus: First display of %d actor images will probably be slow!", NumActors);
 
     for (std::size_t row {0}; row < PicLines; ++row) {
         for (std::size_t col {0}; col < ActorsPerLine; ++col) {
@@ -2803,11 +2799,10 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
                                         BorderMenuRecord};
     DecorBorderDraw(RecordingBorder, false);
 
+    m_RecordingInfoDrawn = true;  // Recording info is drawn
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: DrawRecordingInfo() Total time: %ld ms", Timer.Elapsed());
 #endif
-
-    m_RecordingInfoDrawn = true;  // Recording info is drawn
 }
 
 void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
