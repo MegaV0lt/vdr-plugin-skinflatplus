@@ -268,7 +268,7 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
     if (Series.name.length() > 0) oss << tr("name: ") << Series.name << '\n';
-    if (Series.firstAired.length() > 0) oss << tr("firstAired: ") << Series.firstAired << '\n';
+    if (Series.firstAired.length() > 0) oss << tr("first aired: ") << Series.firstAired << '\n';
     if (Series.network.length() > 0) oss << tr("network: ") << Series.network << '\n';
     if (Series.genre.length() > 0) oss << tr("genre: ") << Series.genre << '\n';
     if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << "/10\n";

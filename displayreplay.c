@@ -478,7 +478,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 LabelPixmap->DrawText(cPoint(right, 0), *hm, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                       m_Font, HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs), secs.data(), Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_FontSecs, SecsWidth, FontSecsHeight);
+                                      Theme.Color(clrReplayBg), m_FontSecs, SecsWidth + m_MarginItem, FontSecsHeight);
                 right += HmWidth + SecsWidth + Spacer;
             } else {
                 if (img) {  // Draw preloaded 'recording_total' icon
@@ -518,7 +518,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                                       Theme.Color(clrReplayBg), m_Font, HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs), secs.data(),
                                       Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrReplayBg), m_FontSecs,
-                                      SecsWidth, FontSecsHeight);
+                                      SecsWidth + m_MarginItem, FontSecsHeight);
             } else {
                 LabelPixmap->DrawText(cPoint(right, 0), *cutted, Theme.Color(clrMenuItemExtraTextFont),
                                       Theme.Color(clrReplayBg), m_Font, CuttedWidth, m_FontHeight);
@@ -547,7 +547,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 LabelPixmap->DrawText(cPoint(right, 0), *hm, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                       m_Font, HmWidth, m_FontHeight);
                 LabelPixmap->DrawText(cPoint(right + HmWidth, TopSecs), secs.data(), Theme.Color(clrReplayFont),
-                                      Theme.Color(clrReplayBg), m_FontSecs, SecsWidth, FontSecsHeight);
+                                      Theme.Color(clrReplayBg), m_FontSecs, SecsWidth + m_MarginItem, FontSecsHeight);
             } else {
                 if (img) {  // Draw preloaded 'recording_total' icon
                     IconsPixmap->DrawImage(cPoint(right, TopOffset), *img);
