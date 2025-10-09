@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-10-xx: Version 1.2.1
+2025-10-09: Version 1.2.1
 - [fix] Fix display of disk usage for menu category 0 (mcUndefined)
 - [add] Clear font cache on plugin stop
 - [add] Option to set font size of channel name and number in channel info
