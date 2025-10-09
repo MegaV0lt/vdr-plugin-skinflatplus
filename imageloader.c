@@ -10,7 +10,6 @@
 #include <vdr/tools.h>
 
 #include <algorithm>
-#include <filesystem>
 
 #include "./flat.h"
 
@@ -33,11 +32,11 @@ cImageLoader::~cImageLoader() {}
  * @param height The desired height of the logo.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
-cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
+cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
     if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
-    dsyslog("flatPlus: cImageLoader::LoadLogo() '%s' %dx%d", logo, width, height);
+    dsyslog("flatPlus: cImageLoader::GetLogo() '%s' %dx%d", logo, width, height);
     cTimeMs Timer;  // Start timer
 #endif
 
@@ -69,7 +68,7 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
             if (i == 2)              // Third try and not found
-                isyslog("flatPlus: cImageLoader::LoadLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
             continue;
         }
@@ -93,13 +92,13 @@ cImage* cImageLoader::LoadLogo(const char *logo, int width, int height) {
     return nullptr;  // No image; so return nullptr
 }
 
-cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
+cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
     if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
 
     cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
 
 #ifdef DEBUGIMAGELOADTIME
-    dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
+    dsyslog("flatPlus: cImageLoader::GetIcon() '%s'", *File);
     cTimeMs Timer;  // Start timer
 #endif
 
@@ -122,7 +121,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
         File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
 
 #ifdef DEBUGIMAGELOADTIME
-        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s'", *File);
+        dsyslog("flatPlus: cImageLoader::GetIcon() '%s'", *File);
         Timer.Set();  // Reset timer
 #endif
 
@@ -143,7 +142,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 #endif
 
         if (!success) {
-            isyslog("flatPlus: cImageLoader::LoadIcon() '%s' could not be loaded", *File);
+            isyslog("flatPlus: cImageLoader::GetIcon() '%s' could not be loaded", *File);
             return nullptr;
         }
     }
@@ -155,7 +154,7 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
 #endif
 
     if (!img) {
-        dsyslog("flatPlus: cImageLoader::LoadIcon() '%s' 'CreateImage' failed", *File);
+        dsyslog("flatPlus: cImageLoader::GetIcon() '%s' 'CreateImage' failed", *File);
         return nullptr;
     }
 
@@ -163,13 +162,13 @@ cImage* cImageLoader::LoadIcon(const char *cIcon, int width, int height) {
     return img;
 }
 
-cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
+cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
     if (width < 0 || height < 0 || isempty(cFile)) return nullptr;
 
     const cString File = cFile;
 
 #ifdef DEBUGIMAGELOADTIME
-    dsyslog("flatPlus: cImageLoader::LoadFile() '%s'", *File);
+    dsyslog("flatPlus: cImageLoader::GetFile() '%s'", *File);
     cTimeMs Timer;  // Start timer
 #endif
 
@@ -184,7 +183,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
 
     const bool success {LoadImage(*File)};
     if (!success) {
-        isyslog("flatPlus: cImageLoader::LoadFile() '%s' could not be loaded", *File);
+        isyslog("flatPlus: cImageLoader::GetFile() '%s' could not be loaded", *File);
         return nullptr;
     }
 
@@ -204,7 +203,7 @@ cImage* cImageLoader::LoadFile(const char *cFile, int width, int height) {
         return img;
     }
 
-    dsyslog("flatPlus: cImageLoader::LoadFile() '%s' 'CreateImage' failed", *File);
+    dsyslog("flatPlus: cImageLoader::GetFile() '%s' 'CreateImage' failed", *File);
     return nullptr;
 }
 
@@ -229,14 +228,14 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    static const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
-    for (const cString &Image : RecordingImages) {
+    static constexpr const char *Images[] {"banner.jpg", "poster.jpg", "fanart.jpg", "cover_vdr.jpg"};
+    for (const char* const &Image : Images) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;
         }
     }
 
-    dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
+    dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found for %s", *RecPath);
     return false;
 }
 
@@ -254,17 +253,19 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
  */
 bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
     cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }
+    if (Config.TVScraperSearchLocalPosters == 2) return false;  // Search only in recording folder
+
     ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }
     ManualPoster = cString::sprintf("%s/../../%s", *RecPath, *Image);
-    if (std::filesystem::exists(*ManualPoster)) {
+    if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;
         return true;
     }

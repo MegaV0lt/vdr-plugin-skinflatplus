@@ -50,11 +50,10 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to allocate memory for image data");
         return nullptr;
     }
-
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1ULL << 16;
-    const uint64_t QuantumScaleInt = (255ULL * kScale16) / QuantumRange;
+    static constexpr uint64_t kQuantumScaleInt = (255ULL * kScale16) / QuantumRange;
     const Quantum *px = buffer.getConstPixels(0, 0, w, h);
     if (!px) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
@@ -73,11 +72,11 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
-                r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
-                g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
-                b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+                r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
+                g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
+                b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
                 o = quantum_channels > 3
-                    ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                    ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
                     : 0xff;
                 scaler.PutSourcePixel(b, g, r, o);
                 src += quantum_channels;
@@ -91,11 +90,11 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         const Quantum *src = px;
         unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
         for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel) {
-            r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
-            g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
-            b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+            r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
+            g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
+            b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
             o = quantum_channels > 3
-                ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
                 : 0xff;
             *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
             src += quantum_channels;
@@ -103,6 +102,7 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return image.release();
     }
 #else
+    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     // ImageMagick <=6: use PixelPacket
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
     if (!pixels) {
@@ -111,17 +111,17 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
     const Magick::PixelPacket *src = pixels;
     static constexpr uint64_t kScaleFactor = 1ULL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
+    static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
 
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
         int blue {}, green {}, red {}, alpha {};  // Initialise outside of for loop
         for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-            blue  = (src->blue   * kScaleFactor) / RGBScaleInt;
-            green = (src->green  * kScaleFactor) / RGBScaleInt;
-            red   = (src->red    * kScaleFactor) / RGBScaleInt;
-            alpha = ~(static_cast<unsigned char>((src->opacity * kScaleFactor) / RGBScaleInt));
+            blue  = (src->blue   * kScaleFactor) / kRGBScaleInt;
+            green = (src->green  * kScaleFactor) / kRGBScaleInt;
+            red   = (src->red    * kScaleFactor) / kRGBScaleInt;
+            alpha = ~(static_cast<unsigned char>((src->opacity * kScaleFactor) / kRGBScaleInt));
             scaler.PutSourcePixel(blue, green, red, alpha);
         }
         return image.release();
@@ -130,10 +130,10 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     // Fast path: sizes match, just go
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / RGBScaleInt) << 24) |
-             (static_cast<int>((src->red      * kScaleFactor) / RGBScaleInt) << 16) |
-             (static_cast<int>((src->green    * kScaleFactor) / RGBScaleInt) << 8)  |
-             (static_cast<int>((src->blue     * kScaleFactor) / RGBScaleInt)));
+            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
+             (static_cast<int>((src->red      * kScaleFactor) / kRGBScaleInt) << 16) |
+             (static_cast<int>((src->green    * kScaleFactor) / kRGBScaleInt) << 8)  |
+             (static_cast<int>((src->blue     * kScaleFactor) / kRGBScaleInt)));
     }
     return image.release();
 #endif
@@ -147,31 +147,32 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 #ifdef IMAGEMAGICK7
     using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1UL << 16;
-    const uint64_t QuantumScaleInt = (255UL * kScale16) / QuantumRange;
+    static constexpr uint64_t kQuantumScaleInt = (255UL * kScale16) / QuantumRange;
     const Quantum *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     const int quantum_channels = buffer.channels();
     unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, src += quantum_channels) {
-        r = static_cast<unsigned char>((src[0] * QuantumScaleInt) >> 16);
-        g = static_cast<unsigned char>((src[1] * QuantumScaleInt) >> 16);
-        b = static_cast<unsigned char>((src[2] * QuantumScaleInt) >> 16);
+        r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
+        g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
+        b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
         o = quantum_channels > 3
-                ? static_cast<unsigned char>((src[3] * QuantumScaleInt) >> 16)
+                ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
                 : 0xff;
         *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
     }
 #else
+    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     static constexpr uint64_t kScaleFactor = 1UL << 16;
-    const uint64_t RGBScaleInt = ((MaxRGB + 1UL) * kScaleFactor) / 256UL;
+    static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / RGBScaleInt) << 24) |
-            (static_cast<int>((src->red       * kScaleFactor) / RGBScaleInt) << 16) |
-            (static_cast<int>((src->green     * kScaleFactor) / RGBScaleInt) << 8)  |
-            (static_cast<int>((src->blue      * kScaleFactor) / RGBScaleInt)));
+            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
+            (static_cast<int>((src->red       * kScaleFactor) / kRGBScaleInt) << 16) |
+            (static_cast<int>((src->green     * kScaleFactor) / kRGBScaleInt) << 8)  |
+            (static_cast<int>((src->blue      * kScaleFactor) / kRGBScaleInt)));
     }
 #endif
     return image;
@@ -182,8 +183,7 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
         return false;
 
     // Check if file exists
-    struct stat st;
-    if (stat(fullpath, &st) != 0)
+    if (LastModifiedTime(fullpath) == 0)
         return false;
 
     try {
@@ -211,7 +211,9 @@ Color cImageMagickWrapper::Argb2Color(tColor col) {
     Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
                 QuantumRange * alpha / 255);
 #else
-    Color color(MaxRGB * red / 255, MaxRGB * green / 255, MaxRGB * blue / 255, MaxRGB * (0xFF - alpha) / 255);
+    static constexpr uint64_t kMaxRGB = 65535;  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
+    Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
+                kMaxRGB * (0xFF - alpha) / 255);
 #endif
     return color;
 }

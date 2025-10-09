@@ -14,10 +14,11 @@
 #endif
 
 #include "./flat.h"
+#include "./fontcache.h"
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.2.0";
+static const char *VERSION        = "1.2.1";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -108,6 +109,7 @@ bool cPluginFlat::Start() {
 
 void cPluginFlat::Stop() {
     ImgCache.Clear();
+    FontCache.Clear();
 }
 
 void cPluginFlat::Housekeeping() {

@@ -38,7 +38,7 @@ struct sDecorBorder {
 // Font/image caches for session-level reuse (Weather Widget + others)
 class FontImageWeatherCache {
  public:
-    static const int kMaxDays {8};   // Source provides up to 8 days of weather data
+    static constexpr int kMaxDays {8};  // Source provides up to 8 days of weather data
     struct WeatherDayData {
         cString Icon {""};           // Weather icon
         cString TempMax {""};        // Max temperature
@@ -134,8 +134,6 @@ class cFlatBaseRender {
     void DecorBorderRedrawAll();
     void DecorBorderClearByFrom(int From);
 
-    static int GetFontAscender(const char *Name, int CharHeight, int CharWidth = 0);
-
     cString ReadAndExtractData(const cString &FilePath) const;  // Read file and return its content as cString
     bool BatchReadWeatherData(FontImageWeatherCache &out, time_t &out_latest_time);  // Read weather data  // NOLINT
 
@@ -146,9 +144,10 @@ class cFlatBaseRender {
 
  protected:
     cOsd *m_Osd {nullptr};
-
     int m_OsdLeft {0}, m_OsdTop {0}, m_OsdWidth {0}, m_OsdHeight {0};
-    const int m_MarginItem {5}, m_MarginItem2 {10}, m_MarginItem3 {15};
+    int m_MarginItem {0}, m_MarginItem2 {0}, m_MarginItem3 {0};  // Margins for items in the OSD
+    int m_MarginEPGImage {20};                                   // Margin for EPG image
+    int m_LineWidth {0}, m_LineMargin {0};                       // Line width and margin for lines in the OSD
 
     static constexpr int kIconMaxSize {999};   // Max icon width or height (999)
 
@@ -180,7 +179,7 @@ class cFlatBaseRender {
     cPixmap *TopBarPixmap {nullptr};
     cPixmap *TopBarIconPixmap {nullptr};
     cPixmap *TopBarIconBgPixmap {nullptr};
-    cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};
+    cFont *m_TopBarFont {nullptr}, *m_TopBarFontSml {nullptr}, *m_TopBarFontClock {nullptr};  // Based on Setup.FontOsd
     int m_TopBarFontHeight {0}, m_TopBarFontSmlHeight {0}, m_TopBarFontClockHeight {0};
 
     cString m_TopBarTitle {""};
@@ -218,7 +217,7 @@ class cFlatBaseRender {
     // Buttons red, green, yellow, blue
     cPixmap *ButtonsPixmap {nullptr};
     int m_ButtonsWidth {0}, m_ButtonsHeight {0}, m_ButtonsTop {0};
-    const int m_MarginButtonColor {10}, m_ButtonColorHeight {8};
+    int m_MarginButtonColor {10}, m_ButtonColorHeight {8};  // Margin and height for button color bar
     bool m_ButtonsDrawn {false};
 
     // Message
@@ -254,6 +253,7 @@ class cFlatBaseRender {
     void DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg,
                                 int type);
 
+    void SetMargins(int Width, int Height);
     void TopBarEnableDiskUsage();
     // tColor Multiply(tColor Color, uint8_t Alpha);
     tColor SetAlpha(tColor Color, double am);
@@ -272,7 +272,7 @@ class RecTimerCounter {
         time_t now {time(0)};
         if (now - LastUpdate.load() >= kUpdateIntervalSec) {
             uint16_t count {0};
-            { LOCK_TIMERS_READ;
+            { LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
                 for (const cTimer* Timer=Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording)) ++count;
                 }

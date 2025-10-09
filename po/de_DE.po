@@ -154,11 +154,26 @@ msgstr "Sammlung"
 msgid "TV show, missing episode"
 msgstr "Fehlende Folge"
 
+msgid "search local posters"
+msgstr "Suche lokale Poster"
+
+msgid "do not search"
+msgstr "Nicht suchen"
+
+msgid "search"
+msgstr "Suchen"
+
+msgid "search only in recording folder"
+msgstr "Nur im Aufnahmeordner suchen"
+
 msgid "Recording information"
 msgstr "Aufnahme Informationen"
 
 msgid "DVB Devices"
 msgstr "DVB Geräte"
+
+msgid "No DVB devices found"
+msgstr "Keine DVB Geräte gefunden"
 
 msgid "LiveTV"
 msgstr ""
@@ -180,6 +195,9 @@ msgstr "Keine aktiven/aufnehmenden Timer"
 
 msgid "Last Recordings"
 msgstr "Letzte Aufnahmen"
+
+msgid "no recordings found"
+msgstr "Keine Aufnahmen gefunden"
 
 msgid "Timer Conflicts"
 msgstr "Timerkonflikte"
@@ -565,8 +583,11 @@ msgstr "Iconcache Einträge"
 msgid "Fontcache entries"
 msgstr "Fontcache Einträge"
 
-msgid "Show channel name and number with shadow"
-msgstr "Kanalname und Nummer mit Schatten"
+msgid "Channel name/number relative font size"
+msgstr "Kanalname/Nummer relative Schriftgröße"
+
+msgid "Show channel name/number with shadow"
+msgstr "Kanalname/Nummer mit Schatten"
 
 msgid "Show Channelinfo icons"
 msgstr "Zeige Kanalinfo Logos"
@@ -585,6 +606,9 @@ msgstr "Wetter Widget Schriftgröße"
 
 msgid "Colors for signal quality"
 msgstr "Farben für Signalqualität"
+
+msgid "Show audio format"
+msgstr "Zeige Audioformat"
 
 msgid "Show resolution & aspect"
 msgstr "Zeige Auflösung & Bildformat"
@@ -666,6 +690,9 @@ msgstr "Aufnahmen: Anzahl der Aufnahmen in Titelleiste"
 
 msgid "Recording menu recording seen threshold"
 msgstr "Aufnahmen: Aufnahme gesehen Schwellwert"
+
+msgid "Recording menu use file for old folder"
+msgstr "Aufnahmen: Verwende Datei für kennzeichnung alte Ordner"
 
 msgid "Recording menu default value - old folder in days"
 msgstr "Aufnahmen: Vorgabewert alter Ordner in Tagen"

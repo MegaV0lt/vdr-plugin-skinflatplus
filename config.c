@@ -21,8 +21,6 @@
 #include "./flat.h"
 
 cFlatConfig::cFlatConfig() {
-    // RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
-    // RecordingOldValue.reserve(64);
 }
 
 cFlatConfig::~cFlatConfig() {
@@ -85,6 +83,8 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)                ChannelDvbapiInfoShow = atoi(Value);
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     ChannelIconsShow = atoi(Value);
+    else if (strcmp(Name, "ChannelNameFontSize") == 0)                  ChannelNameFontSize = atod(Value);
+    else if (strcmp(Name, "ChannelAudioFormatShow") == 0)               ChannelAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          ChannelResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            ChannelShowNameWithShadow = atoi(Value);
     else if (strcmp(Name, "ChannelShowStartTime") == 0)                 ChannelShowStartTime = atoi(Value);
@@ -146,6 +146,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      MenuItemRecordingDefaultOldDays = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingUseOldFile") == 0)          MenuItemRecordingUseOldFile = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        MenuEventRecordingViewJustify = atoi(Value);
@@ -168,6 +169,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            RecordingDimmOnPauseDelay = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           RecordingDimmOnPauseOpaque = atoi(Value);
     else if (strcmp(Name, "RecordingFormatShow") == 0)                  RecordingFormatShow = atoi(Value);
+    else if (strcmp(Name, "RecordingAudioFormatShow") == 0)             RecordingAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "RecordingResolutionAspectShow") == 0)        RecordingResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "RecordingSimpleAspectFormat") == 0)          RecordingSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ScrollerDelay") == 0)                        ScrollerDelay = atoi(Value);
@@ -195,6 +197,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               TVScraperPosterOpacity = atod(Value);
+    else if (strcmp(Name, "TVScraperSearchLocalPosters") == 0)          TVScraperSearchLocalPosters = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      WeatherFontSize = atod(Value);
     else
         return false;
@@ -459,7 +462,7 @@ bool CompareNumStrings(const cString &a, const cString &b) {
     std::string_view sa = *a;
     std::string_view sb = *b;
     auto get_num = [](std::string_view s) {
-        size_t pos = s.find('_');
+        std::size_t pos = s.find('_');
         if (pos != std::string_view::npos)
             return atoi(std::string(s.substr(0, pos)).c_str());
         return 0;
@@ -713,42 +716,6 @@ void cFlatConfig::DecorLoadFile(cString File) {
     }
 }
 
-/* void cFlatConfig::RecordingOldLoadConfig() {
-    dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
-    RecordingOldFolder.clear();
-    RecordingOldValue.clear();
-
-    FILE *f = fopen(RecordingOldConfigFile, "r");
-    if (!f) {
-        dsyslog("flatPlus: Recording old config file not found: %s", *RecordingOldConfigFile);
-        return;
-    } else {
-        int line {0}, value {0};
-        char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
-        cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != nullptr) {
-            ++line;
-            p = strchr(s, '#');
-            if (p) *p = 0;
-            s = stripspace(skipspace(s));
-            if (!isempty(s)) {
-                n = s;
-                v = strchr(s, '=');
-                if (v) {
-                    *v++ = 0;
-                    n = stripspace(skipspace(n));
-                    v = stripspace(skipspace(v));
-                    value = atoi(v);
-                    dsyslog("flatPlus: Recording old config - folder: %s value: %d", n, value);
-                    RecordingOldFolder.emplace_back(n);
-                    RecordingOldValue.emplace_back(value);
-                }
-            }
-        }  // while
-        fclose(f);
-    }
-} */
-
 int cFlatConfig::GetRecordingOldValue(const std::string &folder) const {
     auto it = RecordingOldFolderMap.find(folder);
     return it != RecordingOldFolderMap.end() ? it->second : -1;
@@ -805,7 +772,7 @@ cString cFlatConfig::CheckSlashAtEnd(std::string path) {
 }
 
 void cFlatConfig::Store(const char *Name, int Value, const char *Filename) {
-    Store(Name, cString::sprintf("%d", Value), Filename);
+    Store(Name, itoa(Value), Filename);
 }
 
 void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
@@ -816,7 +783,7 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
     FILE *f = fopen(Filename, "a");
     if (!f) {
         esyslog("flatPlus: Error storing config: %s = %s", Name, Value);
-        return;  // throw std::runtime_error("Failed to open file");
+        return;
     }
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);

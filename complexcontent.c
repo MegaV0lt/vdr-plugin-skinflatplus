@@ -26,6 +26,10 @@ cComplexContent::~cComplexContent() {
 }
 
 void cComplexContent::Clear() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cComplexContent::Clear() Contents size: %ld", Contents.size());
+#endif
+
     m_IsShown = false;
     Contents.clear();
     if (m_Osd) {  //! Check because Clear() is called before SetOsd()
@@ -58,11 +62,15 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
         if (FullFillBackground) {
             PixmapFill(Pixmap, m_ColorBg);
         } else {
-            Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), ContentHeight(false)), m_ColorBg);
+            const int HeightContent {ContentHeight(false)};
+            if (HeightContent > 0)  // Only draw background if content height is > 0
+                Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg);
+            else
+                PixmapClear(Pixmap);
         }
     } else {  // Log values and return
         esyslog(
-            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d width: %d height: %d",
+            "flatPlus: cComplexContent::CreatePixmaps() Failed to create pixmap left: %d top: %d size: %dx%d",
             m_Position.Left(), m_Position.Top(), m_Position.Width(), m_Position.Height());
         return;
     }
@@ -80,7 +88,7 @@ void cComplexContent::CalculateDrawPortHeight() {
 int cComplexContent::BottomContent() const {
     // Using std::accumulate algorithm instead of manual loop
     return std::accumulate(Contents.begin(), Contents.end(), 0,
-    [](int max, const auto& content) {
+    [](int max, const auto &content) {
         return std::max(max, content.GetBottom());
     });
 }
@@ -119,12 +127,12 @@ void cComplexContent::AddImage(cImage *image, const cRect &Position) {
     Contents.back().SetImage(image, Position);
 }
 
-void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
-                                              tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth,
-                                              int TextHeight, int TextAlignment) {
+void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, int Margin,
+                                              const cRect &TextPos, tColor ColorFg, tColor ColorBg, cFont *Font,
+                                              int TextWidth, int TextHeight, int TextAlignment) {
     const int TextWidthFull {(TextWidth > 0) ? TextWidth : m_Position.Width() - TextPos.Left()};
-    // const int TextWidthLeft = m_Position.Width() - image->Width() - 10 - TextPos.Left();
-    const int TextWidthLeft {TextWidthFull - image->Width() - 10};
+    // const int TextWidthLeft = m_Position.Width() - image->Width() - Margin * 2 - TextPos.Left();
+    const int TextWidthLeft {TextWidthFull - image->Width() - Margin * 2};
     if (m_ScrollSize == 0) {  // Avoid DIV/0
         esyslog("flatPlus: Error in cComplexContent::AddImageWithFloatedText() m_ScrollSize is 0!");
         return;
@@ -153,8 +161,8 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
     }
 
-    const cRect ImagePos {TextPos.Left() + TextWidthLeft + 5, TextPos.Top(), image->Width(), image->Height()};
-    AddImage(image, ImagePos);
+    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, TextPos.Top(), image->Width(), image->Height()};
+    AddImage(image, ImagePos);  // Add the image (Currently always on the right side)
 }
 
 void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
@@ -164,11 +172,13 @@ void cComplexContent::AddRect(const cRect &Position, tColor ColorBg) {
 
 void cComplexContent::Draw() {
     m_IsShown = true;
-    for (auto& content : Contents) {
-        if (content.GetContentType() == CT_Image)
-            content.Draw(PixmapImage);
-        else
-            content.Draw(Pixmap);
+    if (Contents.empty()) {
+        esyslog("flatPlus: Error in cComplexContent::Draw() Contents is empty!");
+        return;
+    }
+
+    for (auto &content : Contents) {
+        content.Draw((content.GetContentType() == CT_Image) ? PixmapImage : Pixmap);
     }
 }
 

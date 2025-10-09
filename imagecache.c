@@ -16,8 +16,8 @@
 #include "./displayvolume.h"
 
 cImageCache::cImageCache() :
-    ImageCache(MaxImageCache),  // Initialize vector with fixed size
-    IconCache(MaxIconCache) {}
+    ImageCache(kMaxImageCache),  // Initialize vector with fixed size
+    IconCache(kMaxIconCache) {}
 
 cImageCache::~cImageCache() {}  // std::unique_ptr handles memory deallocation automatically
 
@@ -68,7 +68,7 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         }
 
         // Find the last '/' and extract the base filename
-        size_t LastSlashPos = DataNameView.find_last_of('/');
+        std::size_t LastSlashPos = DataNameView.find_last_of('/');
         if (LastSlashPos != std::string_view::npos) {
             BaseFileName = DataNameView.substr(LastSlashPos + 1);
         } else {
@@ -98,7 +98,6 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
         if (data.Image == nullptr && DataNameView.empty()) {
             break;  // No more valid images in cache
         }
-        DataNameView = *data.Name;
         if (DataNameView == NameView && data.Width == Width && data.Height == Height) {
             return data.Image.get();  // Return the cached image if found
         }
@@ -106,8 +105,8 @@ cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
     return nullptr;
 }
 
-void cImageCache::InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t MaxSize, size_t BaseIndex,
-                                  cImage *Image, const cString &Name, int Width, int Height) {
+void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize,
+                                  std::size_t BaseIndex, cImage *Image, const cString &Name, int Width, int Height) {
     // std::unique_ptr will automatically delete the old image if one exists when a new one is assigned
     Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);  // Store image in cache
     Cache[InsertIndex].Name = Name;
@@ -124,10 +123,11 @@ void cImageCache::InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t 
 void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
     // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
     if (IsIcon) {  // Insert into icon cache
-        InsertIntoCache(IconCache.data(), m_InsertIconIndex, MaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
+        InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
                         Height);
     } else {  // Insert into image cache
-        InsertIntoCache(ImageCache.data(), m_InsertIndex, MaxImageCache, m_InsertIndexBase, Image, Name, Width, Height);
+        InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
+                        Height);
     }
 }
 

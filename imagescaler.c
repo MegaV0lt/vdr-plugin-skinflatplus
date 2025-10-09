@@ -79,8 +79,8 @@ ALWAYS_INLINE static float sincf(float x) {
 static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src_size) {
     const float fc {(dst_size >= src_size) ? 1.0f : (static_cast<float>(dst_size) / src_size)};
 
-    constexpr float PI {3.14159265359f};  // Pi constant
-    constexpr float SCALE_FACTOR {2048.0};
+    static constexpr float kPi {3.14159265359f};  // kPi constant
+    static constexpr float kScaleFactor {2048.0};
     const int d {2 * dst_size};  // Sample position denominator
     int e {0}, offset {0};       // Init outside of loop
     float sub_offset {0.0f}, norm {0.0f}, t {0.0f};
@@ -94,7 +94,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
 
         // Calculate filter coefficients
         for (unsigned int j {0}; j < 4; ++j) {
-            t = PI * (sub_offset + (1 - j));
+            t = kPi * (sub_offset + (1 - j));
             h_arr[j] = sincf(fc * t) * cosf(0.25f * t);  // Sinc-low pass and cos-window
         }
 
@@ -115,7 +115,7 @@ static void CalculateFilters(ImageScaler::Filter *filters, int dst_size, int src
         }
 
         // Coefficients are normalized to sum up to 2048
-        norm = SCALE_FACTOR / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
+        norm = kScaleFactor / (h_arr[0] + h_arr[1] + h_arr[2] + h_arr[3]);
         --offset;  // Offset of fist used pixel
         filters[i].m_offset = offset + 4;  // Store offset of first unused pixel
         for (unsigned int j {0}; j < 4; ++j) {
@@ -166,9 +166,9 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     m_src_height = src_height;
 
     // Narrowing conversion
-    const size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
-    const size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
-    const size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
+    const std::size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
+    const std::size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
+    const std::size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
     // Use a std::unique_ptr to manage memory
     m_memory = std::make_unique<char[]>(hor_filters_size + ver_filters_size + buffer_size);
@@ -187,9 +187,9 @@ ALWAYS_INLINE static unsigned int shift_clamp(int x) {
 // x = (x + 2^21) >> 22;
 // return std::clamp(x, 0, 255);
 // This avoids branches and uses bitwise operations for performance.
-constexpr int SHIFT_AMOUNT = 22;
-constexpr int ROUNDING = 1 << (SHIFT_AMOUNT - 1);  // 2^21
-x = (x + ROUNDING) >> SHIFT_AMOUNT;
+static constexpr int kShiftAmount = 22;
+static constexpr int kRounding = 1 << (kShiftAmount - 1);  // 2^21
+x = (x + kRounding) >> kShiftAmount;
 
 // Branchless [0,255] clamp for signed int (Common C idiom, fast)
 x &= -(x >= 0);              // Clamp <0 to 0 (if x<0, becomes 0)

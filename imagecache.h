@@ -13,10 +13,10 @@
 #include <memory>  // For std::unique_ptr
 #include <vector>  // For std::vector
 
-constexpr std::size_t MaxImageCache {1024};  // Image cache including two times 'LogoPreCache'
-constexpr std::size_t MaxIconCache {1024};   // Icon cache (Skin icons)
-constexpr std::size_t LogoPreCache {192};    // First x channel logos
-//! Note: 'LogoPreCache' is used twice! One for 'displaychannel' and one for 'menu'
+static constexpr std::size_t kMaxImageCache {1024};  // Image cache including two times 'kLogoPreCache'
+static constexpr std::size_t kMaxIconCache {512};    // Icon cache (Skin icons)
+static constexpr std::size_t kLogoPreCache {192};    // First x channel logos
+//! Note: 'kLogoPreCache' is used twice! One for 'displaychannel' and one for 'menu'
 //! You must double the value for the real amount of pre cached logos
 
 struct ImageData {
@@ -58,6 +58,6 @@ class cImageCache {
     std::size_t m_InsertIconIndex {0};      // Iconcache index
     std::size_t m_InsertIconIndexBase {0};  // Icon cache after first fill at start
 
-    void InsertIntoCache(ImageData *Cache, size_t &InsertIndex, size_t MaxSize, size_t BaseIndex, cImage *Image,  // NOLINT
-                         const cString &Name, int Width, int Height);
+    void InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize, std::size_t BaseIndex,  // NOLINT
+                         cImage *Image, const cString &Name, int Width, int Height);
 };

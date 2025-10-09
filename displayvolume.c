@@ -7,6 +7,7 @@
  */
 #include "./displayvolume.h"
 #include "./flat.h"
+#include "./fontcache.h"
 
 cFlatDisplayVolume::cFlatDisplayVolume() {
     m_LabelHeight = m_FontHeight + m_MarginItem2;
@@ -41,9 +42,9 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     PixmapClear(MuteLogoPixmap);
 
     const cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
-    const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 555);
-    const int MaxLabelWidth {m_Font->Width(*MaxLabel) + m_MarginItem};
-    int left {m_OsdWidth / 2 - MaxLabelWidth / 2};
+    const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 000);  // Use 000 to get the max width
+    const int MaxLabelWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, *MaxLabel) + m_MarginItem};
+    int left {(m_OsdWidth - MaxLabelWidth) / 2};
 
     LabelPixmap->DrawRectangle(cRect(left - m_MarginItem, m_MarginItem, m_MarginItem, m_FontHeight),
                                Theme.Color(clrVolumeBg));
@@ -63,7 +64,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     if (Mute) {
         LabelPixmap->DrawText(cPoint(left, m_MarginItem), *label, Theme.Color(clrVolumeFont), Theme.Color(clrVolumeBg),
             m_Font, MaxLabelWidth + m_MarginItem + m_LabelHeight, m_FontHeight, taLeft);
-        cImage *img {ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight)};
+        cImage *img {ImgLoader.GetIcon("mute", m_FontHeight, m_FontHeight)};
         if (img)
             MuteLogoPixmap->DrawImage(cPoint(left + MaxLabelWidth + m_MarginItem, m_MarginItem), *img);
 
@@ -91,5 +92,5 @@ void cFlatDisplayVolume::Flush() {
 }
 
 void cFlatDisplayVolume::PreLoadImages() {
-    ImgLoader.LoadIcon("mute", m_FontHeight, m_FontHeight);
+    ImgLoader.GetIcon("mute", m_FontHeight, m_FontHeight);
 }

@@ -32,21 +32,27 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
-#include "./glyphmetricscache.h"
 
 cFlatBaseRender::cFlatBaseRender() {
-    // Standard fonts
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::cFlatBaseRender()");
+#endif
+
+    // Standard VDR fonts
     m_Font = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize);
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
+
     m_FontName = Setup.FontOsd;
     m_FontSmlName = Setup.FontSml;
+
     m_FontHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize);
     m_FontHeight2 = m_FontHeight * 2;
     m_FontSmlHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixedHeight = FontCache.GetFontHeight(Setup.FontFix, Setup.FontFixSize);
 
-    m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * 1.5);
+    // Extra fonts for flatPlus
+    m_FontBig = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
     m_FontMedium = FontCache.GetFont(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
     if (Config.MainMenuWidgetWeatherShow) {
         m_FontTempSml = FontCache.GetFont(Setup.FontOsd, Setup.FontOsdSize / 2);
@@ -57,7 +63,7 @@ cFlatBaseRender::cFlatBaseRender() {
         m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
         m_FontTinyHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize * 0.8);
     }
-    m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * 1.5);
+    m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
     // Unused: m_FontMediumHeight = FontCache.GetFontHeight(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
 
     // Top bar fonts
@@ -69,7 +75,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_TopBarFontSmlHeight = FontCache.GetFontHeight(Setup.FontOsd, fs / 2);
     m_TopBarFontClockHeight = FontCache.GetFontHeight(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
 
-    m_FontAscender = GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
+    m_FontAscender = FontCache.GetFontAscender(Setup.FontOsd, Setup.FontOsdSize);  // Top of capital letters
 
     m_ScrollBarWidth = Config.decorScrollBarSize;
 
@@ -104,7 +110,7 @@ void cFlatBaseRender::CreateFullOsd() {
 
 void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
+    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size %dx%d", Left, Top, Width, Height);
 #endif
 
     m_OsdLeft = Left;
@@ -112,11 +118,38 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     m_OsdWidth = Width;
     m_OsdHeight = Height;
 
+    SetMargins(Width, Height);  // Set margins relative to the OSD size
+
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
+
     tArea Area {0, 0, Width, Height, 32};
     if (m_Osd->SetAreas(&Area, 1) == oeOk) { return; }
 
     esyslog("flatPlus: Create osd FAILED left: %d top: %d width: %d height: %d", Left, Top, Width, Height);
+}
+void cFlatBaseRender::SetMargins(int Width, int Height) {
+    // Set margins relative to the OSD size with an minimum of 3 pixels
+    static constexpr int kMinSize {3};  // Minimum margin size
+    int SizeIncrease {static_cast<int>((Width / 720) + 0.5)};  // (1920: 3 pixels, 3840: 5 pixels, 7680: 11 pixels)
+    // Example: 720 pixels OSD width -> 4 pixels margin, 1920 -> 6 pixels, 3840 -> 8 pixels, 7680 -> 14 pixels
+    m_MarginItem = kMinSize + SizeIncrease;
+    m_MarginItem2 = m_MarginItem * 2;
+    m_MarginItem3 = m_MarginItem * 3;
+    // Margin for EPG image in EPG info and recording info
+    m_MarginEPGImage += SizeIncrease;  // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
+    // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
+    SizeIncrease = static_cast<int>((Height / 576) + 0.5);  // (1080: 2 pixels, 2160: 4 pixels, 4320: 8 pixels)
+    m_LineWidth = kMinSize + SizeIncrease;  // Increase line width for larger OSD heights
+    m_LineMargin = m_LineWidth * 2;
+    // Margin for color buttons and messages
+    m_MarginButtonColor += SizeIncrease;  // Increase margin for larger OSD heights
+    m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
+            "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
+            Width, Height, m_MarginItem, m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin, m_ButtonColorHeight,
+            m_MarginButtonColor, m_MarginEPGImage);
+#endif
 }
 
 void cFlatBaseRender::TopBarCreate() {
@@ -140,8 +173,7 @@ void cFlatBaseRender::TopBarCreate() {
 
 void cFlatBaseRender::TopBarSetTitle(const cString &Title, bool Clear) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: TopBarSetTitle() '%s'", *Title);
-    if (Clear) dsyslog("   With clear");
+    dsyslog("flatPlus: TopBarSetTitle() '%s'%s", *Title, Clear ? " With clear" : "");
 #endif
 
     if (Clear) {  // Clear is default
@@ -212,8 +244,10 @@ void cFlatBaseRender::TopBarSetMenuLogo(const cString &icon) {
 void cFlatBaseRender::TopBarEnableDiskUsage() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::TopBarEnableDiskUsage()");
+    cTimeMs Timer;  // Start Timer
 #endif
-    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::cFlatDisplayMenu()
+    // cVideoDiskUsage::HasChanged(m_VideoDiskUsageState);        // Moved to cFlatDisplayMenu::Flush()
+    if (m_VideoDiskUsageState == -1) return;  // No useful data before cVideoDiskUsage::HasChanged was called
     const int DiskUsagePercent {cVideoDiskUsage::UsedPercent()};  // Used %
     const int DiskFreePercent {100 - DiskUsagePercent};           // Free %
     // Division is typically twice as slow as addition or multiplication. Rewrite divisions by a constant into a
@@ -253,14 +287,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     }  // DiskFreePercent == 0 (Show something if disk is full)
 
     const double GBScale {100.0 / DiskFreePercent};
-    const double AllGB {FreeGB * GBScale};                                 // All disk space in GB
-    const double AllMinutes {static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
-
+    const double AllGB {FreeGB * GBScale};  // All disk space in GB
+    // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
+    static constexpr double kChartSegmentPercent {31.0 / 100.0};  // 32 Segments in Chart (0..31)
     if (Config.DiskUsageFree == 1) {  // Show in free mode
         const div_t FreeHM {std::div(FreeMinutes, 60)};
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskFreePercent %d, FreeMinutes %d", DiskFreePercent, FreeMinutes);
-        dsyslog("   FreeGB %.2f, AllGB %.2f, AllMinutes %.2f", FreeGB, AllGB, AllMinutes);
+        dsyslog("   FreeGB %.2f, AllGB %.2f", FreeGB, AllGB);
         dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", FreeHM.quot, FreeHM.rem);
 #endif
         if (Config.DiskUsageShort == false) {  // Long format
@@ -274,8 +308,8 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
-        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex {(DiskFreePercent * 31) / 100};
+
+        const int IconIndex {static_cast<int>(DiskFreePercent * kChartSegmentPercent)};  // 0..31
         IconName = cString::sprintf("chart%db", IconIndex);  // chart0b - chart31b
 #ifdef DEBUGFUNCSCALL
         dsyslog("   IconIndex %d, IconName %s", IconIndex, *IconName);
@@ -283,6 +317,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 
     } else {  // Show in occupied mode
         const double OccupiedGB {AllGB - FreeGB};
+        const double AllMinutes {static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
         const int OccupiedMinutes = AllMinutes - FreeMinutes;  // Narrowing conversion
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskUsagePercent %d, OccupiedMinutes %d", DiskUsagePercent, OccupiedMinutes);
@@ -319,25 +354,28 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             }
         }
 
-        // Rewrite switch with a mathematical formula. This is a lot faster than a switch with 32 cases.
-        const int IconIndex {(DiskUsagePercent * 31) / 100};
+        const int IconIndex {static_cast<int>(DiskUsagePercent * kChartSegmentPercent)};  // 0..31
         IconName = cString::sprintf("chart%d", IconIndex + 1);  // chart1 - chart32
     }
 
     TopBarSetTitleExtra(*Extra1, *Extra2);
     TopBarSetExtraIcon(*IconName);
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
-    const time_t Now {time(0)};
-    if (m_TopBarUpdateTitle || (Now > m_TopBarLastDate + 60)) {
+    const time_t now {time(0)};
+    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 60)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
+        cTimeMs Timer;  // Start Timer
 #endif
 
         m_TopBarUpdateTitle = false;
-        m_TopBarLastDate = Now;
+        m_TopBarLastDate = now;
         if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
             return;
 
@@ -363,7 +401,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 int ImageBGHeight {TopBarLogoHeight};
                 int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
-                img = ImgLoader.LoadIcon("logo_background", ImageBGWidth, ImageBGHeight);
+                img = ImgLoader.GetIcon("logo_background", ImageBGWidth, ImageBGHeight);
                 if (img) {
                     ImageBGHeight = img->Height();
                     ImageBGWidth = img->Width();
@@ -371,7 +409,7 @@ void cFlatBaseRender::TopBarUpdate() {
                     TopBarIconBgPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
                 }
 
-                img = ImgLoader.LoadLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
+                img = ImgLoader.GetLogo(*m_TopBarMenuLogo, ImageBGWidth - 4, ImageBGHeight - 4);
                 if (img) {
                     IconTop += (ImageBGHeight - img->Height()) / 2;
                     IconLeft += (ImageBGWidth - img->Width()) / 2;
@@ -379,7 +417,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 }
                 MenuIconWidth = ImageBGWidth + m_MarginItem2;
             } else if (m_TopBarMenuIconSet) {  // Show menu icon
-                img = ImgLoader.LoadIcon(*m_TopBarMenuIcon, kIconMaxSize, TopBarLogoHeight);
+                img = ImgLoader.GetIcon(*m_TopBarMenuIcon, kIconMaxSize, TopBarLogoHeight);
                 if (img) {
                     IconTop = (m_TopBarHeight - img->Height()) / 2;
                     TopBarIconPixmap->DrawImage(cPoint(IconLeft, IconTop), *img);
@@ -388,21 +426,25 @@ void cFlatBaseRender::TopBarUpdate() {
             }
         }  // Config.TopBarMenuIconShow
 
-        const cString time {*TimeString(Now)};  // Reuse 'Now'
+        const cString time {*TimeString(now)};  // HH:MM
         cString Buffer {""};
-        if (Config.TopBarHideClockText)
+        int TimeWidth {FontCache.GetStringWidth(m_FontName, m_TopBarFontClockHeight, "00:00") + m_MarginItem2};
+        if (Config.TopBarHideClockText) {
             Buffer = *time;
-        else
+        } else {
             Buffer = cString::sprintf("%s %s", *time, tr("clock"));
+            TimeWidth +=
+                FontCache.GetStringWidth(m_FontName, m_TopBarFontClockHeight, cString::sprintf(" %s", tr("clock")));
+        }
 
-        const int TimeWidth {m_TopBarFontClock->Width(*Buffer) + m_MarginItem2};
         int Right {TopBarWidth - TimeWidth};
         TopBarPixmap->DrawText(cPoint(Right, FontClockTop), *Buffer, Theme.Color(clrTopBarTimeFont),
                                Theme.Color(clrTopBarBg), m_TopBarFontClock);
 
-        const cString WeekDay {*WeekDayNameFull(Now)};
-        const cString DateStr {*ShortDateString(Now)};
-        const int MaxDateWidth {std::max(m_TopBarFontSml->Width(*WeekDay), m_TopBarFontSml->Width(*DateStr))};
+        const cString WeekDay {*WeekDayNameFull(now)};  // Translated week day (Monday, Tuesday, ...)
+        const cString DateStr {*ShortDateString(now)};  // Short date (01.01.00)
+        const int MaxDateWidth {std::max(FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *WeekDay),
+                                         FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *DateStr))};
 
         Right = TopBarWidth - TimeWidth - MaxDateWidth - m_MarginItem;
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *WeekDay, Theme.Color(clrTopBarDateFont),
@@ -412,27 +454,32 @@ void cFlatBaseRender::TopBarUpdate() {
                                0, taRight);
 
         int MiddleWidth {0}, NumConflicts {0};
+        cString NumConflictsStr {""};  // Number of conflicts
+        int NumConflictsWidth {0};  // Width of number of conflicts
         int ImgConWidth {0};
         cImage *ImgCon {nullptr};
         if (Config.TopBarRecConflictsShow) {         // Load conflict icon
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
                 if (NumConflicts < Config.TopBarRecConflictsHigh)
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
+                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
                 else
-                    ImgCon = ImgLoader.LoadIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
+                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
 
                 if (ImgCon) {
                     ImgConWidth = ImgCon->Width();
-                    Buffer = cString::sprintf("%d", NumConflicts);
-                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of conflicts
-                    Right -= ImgConWidth + BufferWidth + m_MarginItem;
-                    MiddleWidth += ImgConWidth + BufferWidth + m_MarginItem;
+                    NumConflictsStr = itoa(NumConflicts);  // Convert number of conflicts to string
+                    NumConflictsWidth = FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, "0");
+                    if (NumConflicts > 9) NumConflictsWidth *= strlen(*NumConflictsStr);
+                    Right -= ImgConWidth + NumConflictsWidth + m_MarginItem;
+                    MiddleWidth += ImgConWidth + NumConflictsWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecConflictsShow
 
         uint16_t NumRec {0};  // 65535 should be enough for the number of recordings
+        cString NumRecStr {""};
+        int NumRecWidth {0};  // Width of number of recordings
         int ImgRecWidth {0};
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
@@ -441,38 +488,23 @@ void cFlatBaseRender::TopBarUpdate() {
             cTimeMs Timer;  // Start Timer
 #endif
 
-            // The code below is a workaround for a problem with the VDR thread handling.
-            // The VDR is not designed to handle multiple threads, which is why we have
-            // to use a workaround to get the number of current recordings.
-            // The following code creates a new thread that queries the number of
-            // recordings and waits for the result. This is necessary because the
-            // cTimers::GetTimers() function can only be called from the main thread.
-            // The result is then stored in the NumRec variable.
-            /* auto RecCounterFuture = std::async(std::launch::async, [&NumRec]() {
-                LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
-                    if (Timer->HasFlags(tfRecording))
-                        ++NumRec;
-                }
-            });
-            RecCounterFuture.get(); */
             //* FAST RECORD COUNT: Use cached background thread or event value
             RecCountCache.UpdateIfNeeded();
             NumRec = s_NumRecordings.load(std::memory_order_relaxed);
             //* END FAST RECORD COUNT
-
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0) dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
 
             if (NumRec) {
-                ImgRec = ImgLoader.LoadIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
+                ImgRec = ImgLoader.GetIcon("topbar_timer", TopBarIconHeight, TopBarIconHeight);
                 if (ImgRec) {  // Load recording icon
                     ImgRecWidth = ImgRec->Width();
-                    Buffer = cString::sprintf("%d", NumRec);
-                    const int BufferWidth {m_TopBarFontSml->Width(*Buffer)};  // Width of number of recordings
-                    Right -= ImgRecWidth + BufferWidth + m_MarginItem;
-                    MiddleWidth += ImgRecWidth + BufferWidth + m_MarginItem;
+                    NumRecStr = itoa(NumRec);  // Convert number of recordings to string
+                    NumRecWidth = FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, "0");
+                    if (NumRec > 9) NumRecWidth *= strlen(*NumRecStr);
+                    Right -= ImgRecWidth + NumRecWidth + m_MarginItem;
+                    MiddleWidth += ImgRecWidth + NumRecWidth + m_MarginItem;
                 }
             }
         }  // Config.TopBarRecordingShow
@@ -480,7 +512,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int ImgExtraWidth {0};
         cImage *ImgExtra {nullptr};
         if (m_TopBarExtraIconSet) {  // Load extra icon (Disk usage) with full height of TopBar
-            ImgExtra = ImgLoader.LoadIcon(*m_TopBarExtraIcon, kIconMaxSize, m_TopBarHeight);
+            ImgExtra = ImgLoader.GetIcon(*m_TopBarExtraIcon, kIconMaxSize, m_TopBarHeight);
             if (ImgExtra) {
                 ImgExtraWidth = ImgExtra->Width();
                 Right -= ImgExtraWidth + m_MarginItem;
@@ -492,7 +524,7 @@ void cFlatBaseRender::TopBarUpdate() {
         int TitleWidth {m_TopBarFont->Width(*m_TopBarTitle)};
         cImage *ImgIconRight {nullptr};
         if (m_TopBarMenuIconRightSet) {  // Load sort icon
-            ImgIconRight = ImgLoader.LoadIcon(*m_TopBarMenuIconRight, kIconMaxSize, TopBarLogoHeight);
+            ImgIconRight = ImgLoader.GetIcon(*m_TopBarMenuIconRight, kIconMaxSize, TopBarLogoHeight);
             if (ImgIconRight) {
                 TopBarMenuIconRightWidth = ImgIconRight->Width() + m_MarginItem3;
                 TitleWidth += TopBarMenuIconRightWidth;
@@ -532,10 +564,9 @@ void cFlatBaseRender::TopBarUpdate() {
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgRec);
             Right += ImgRecWidth;
 
-            Buffer = cString::sprintf("%d", NumRec);
-            TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarRecordingActiveFg),
+            TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumRecStr, Theme.Color(clrTopBarRecordingActiveFg),
                                    Theme.Color(clrTopBarRecordingActiveBg), m_TopBarFontSml);
-            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+            Right += NumRecWidth + m_MarginItem;
         }
 
         if (NumConflicts && ImgCon) {  // Draw conflict icon and number of conflicts
@@ -543,14 +574,14 @@ void cFlatBaseRender::TopBarUpdate() {
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgCon);
             Right += ImgConWidth;
 
-            Buffer = cString::sprintf("%d", NumConflicts);
             if (NumConflicts < Config.TopBarRecConflictsHigh)
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictLowFg),
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr, Theme.Color(clrTopBarConflictLowFg),
                                        Theme.Color(clrTopBarConflictLowBg), m_TopBarFontSml);
             else
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *Buffer, Theme.Color(clrTopBarConflictHighFg),
-                                       Theme.Color(clrTopBarConflictHighBg), m_TopBarFontSml);
-            Right += m_TopBarFontSml->Width(*Buffer) + m_MarginItem;
+                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr,
+                                       Theme.Color(clrTopBarConflictHighFg), Theme.Color(clrTopBarConflictHighBg),
+                                       m_TopBarFontSml);
+            Right += NumConflictsWidth + m_MarginItem;
         }
 
         int TopBarMenuIconRightLeft {0};
@@ -578,6 +609,9 @@ void cFlatBaseRender::TopBarUpdate() {
                                Config.decorBorderTopBarFg,
                                Config.decorBorderTopBarBg};
         DecorBorderDraw(ib);
+#ifdef DEBUGFUNCSCALL
+        if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
     }
 }
 
@@ -648,7 +682,7 @@ bool cFlatBaseRender::ButtonsDrawn() const { return m_ButtonsDrawn; }
 
 void cFlatBaseRender::MessageCreate() {
     m_MessageHeight = m_FontHeight + m_MarginItem2;
-    if (Config.MessageColorPosition == 1) m_MessageHeight += 8;
+    if (Config.MessageColorPosition == 1) m_MessageHeight += m_ButtonColorHeight;
 
     const int top {m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize};
     const cRect MessagePixmapViewPort {Config.decorBorderMessageSize, top,
@@ -671,7 +705,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     dsyslog("   Setup.OSDMessageTime: %d, m_OSDMessageTime: %d", Setup.OSDMessageTime, m_OSDMessageTime);
 #endif
 
-    if (!MessagePixmap || !MessageIconPixmap) return;
+    if (!MessagePixmap || !MessageIconPixmap || !Text) return;
 
     static const struct {
         tColor color;
@@ -690,39 +724,42 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
 
-    cImage *img {ImgLoader.LoadIcon(*Icon, m_FontHeight, m_FontHeight)};
-    if (img) MessageIconPixmap->DrawImage(cPoint(m_MarginItem + 10, m_MarginItem), *img);
+    cImage *img {ImgLoader.GetIcon(*Icon, m_FontHeight, m_FontHeight)};
+    if (img) MessageIconPixmap->DrawImage(cPoint(m_MarginItem + m_MarginButtonColor, m_MarginItem), *img);
 
     if (Config.MessageColorPosition == 0) {  // Vertical
-        MessagePixmap->DrawRectangle(cRect(0, 0, 8, m_MessageHeight), Col);
-        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - 8 - Config.decorBorderMessageSize * 2, 0, 8, m_MessageHeight),
+        MessagePixmap->DrawRectangle(cRect(0, 0, m_ButtonColorHeight, m_MessageHeight), Col);
+        MessagePixmap->DrawRectangle(cRect(m_OsdWidth - m_ButtonColorHeight - Config.decorBorderMessageSize * 2, 0,
+                                           m_ButtonColorHeight, m_MessageHeight),
                                      Col);
     } else {  // Horizontal
-        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - 8, m_OsdWidth, 8), Col);
+        MessagePixmap->DrawRectangle(cRect(0, m_MessageHeight - m_ButtonColorHeight, m_OsdWidth, m_ButtonColorHeight),
+                                     Col);
     }
 
     const int TextWidth {m_Font->Width(Text)};
-    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 - 10};
+    const int MaxWidth {m_OsdWidth - Config.decorBorderMessageSize * 2 - m_FontHeight - m_MarginItem3 -
+                        m_MarginButtonColor};
 
     if ((TextWidth > MaxWidth) && Config.ScrollerEnable) {
         MessageScroller.AddScroller(
             Text,
-            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + 10,
+            cRect(Config.decorBorderMessageSize + m_FontHeight + m_MarginItem3 + m_MarginButtonColor,
                   m_OsdHeight - Config.MessageOffset - m_MessageHeight - Config.decorBorderMessageSize + m_MarginItem,
                   MaxWidth, m_FontHeight),
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         const char *TildePos {strchr(Text, '~')};
         if (TildePos) {
-            std::string_view sv1 {Text, static_cast<size_t>(TildePos - Text)};
-            std::string_view sv2 {TildePos + 1};
-            const std::string first {rtrim(sv1)};  // Trim possible space at end
-            std::string_view second {ltrim(sv2)};  // Trim possible space at begin
+            cString first(Text, TildePos);
+            cString second(TildePos + 1);
+            first.CompactChars(' ');   // Remove extra spaces
+            second.CompactChars(' ');  // Remove extra spaces
 
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), first.c_str(),
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), *first,
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
-            const int l {m_Font->Width(first.c_str()) + m_Font->Width('X')};
-            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), second.data(),
+            const int l {m_Font->Width(*first) + FontCache.GetStringWidth(m_FontName, m_FontHeight, "~")};
+            MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2 + l, m_MarginItem), *second,
                                     Theme.Color(clrMenuItemExtraTextFont), Theme.Color(clrMessageBg), m_Font);
         } else {  // ~ not found
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), Text,
@@ -814,9 +851,7 @@ void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
         m_ProgressBarSetBackground, m_ProgressBarIsSignal);
 }
 
-void cFlatBaseRender::ProgressBarDrawBgColor() const {
-    PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg);
-}
+void cFlatBaseRender::ProgressBarDrawBgColor() const { PixmapFill(ProgressBarPixmapBg, m_ProgressBarColorBg); }
 
 void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, const cRect &rect, const cRect &rectBg,
                                          int Current, int Total, tColor ColorFg, tColor ColorBarFg, tColor ColorBg,
@@ -1693,26 +1728,6 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
     }
 }
 
-int cFlatBaseRender::GetFontAscender(const char *Name, int CharHeight, int CharWidth) {
-    GlyphMetricsCache &cache = glyphMetricsCache();  // Use the cache
-    FT_Face face {cache.GetFace(*cFont::GetFontFileName(Name))};
-    if (!face) {
-        esyslog("flatPlus: GetFontAscender() error: can't find face (font = %s)", *cFont::GetFontFileName(Name));
-        return CharHeight;
-    }
-
-    int Ascender {CharHeight};
-    if (face->num_fixed_sizes && face->available_sizes) {  // Fixed size
-        Ascender = face->available_sizes->height;
-    } else if (FT_Set_Char_Size(face, CharWidth * 64, CharHeight * 64, 0, 0) == 0) {
-        Ascender = face->size->metrics.ascender / 64;
-    } else {
-        esyslog("flatPlus: GetFontAscender() FreeType error during FT_Set_Char_Size (font = %s)",
-                *cFont::GetFontFileName(Name));
-    }
-
-    return Ascender;
-}
 cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     if (isempty(*FilePath)) return "";
 
@@ -1734,10 +1749,22 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 #endif
 
     static const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
-    time_t latest {0};
+
+    // First check if temp file exists and get its last modified time
+    static const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
+    const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
+    if (latest == 0) {
+        dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
+        return false;  // If the temp file doesn't exist
+    }
+    // Check if data is already cached
+    if (latest == out.LastReadMTime) {  // If latest mtime matches cached, skip reading files
+        out_latest_time = latest;
+        return true;
+    }
 
     // Moved outside the loop to avoid re-creation in each iteration
-    cString DayPrefix, tempFile, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile, locationFile;
+    cString DayPrefix, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile;
     cString precipitation;
 
     // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
@@ -1754,96 +1781,57 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
         summaryFile = cString::sprintf("%s%s", *DayPrefix, ".summary");
 
         if (day == 0) {  // Only for day 0, read temp and location file
-            tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
-            locationFile = cString::sprintf("%s%s", *prefix, "location");
-
-            // Check file mtime for 'Temp' only as all files are written together
-            struct stat s;
-            if (stat(*tempFile, &s) != 0) {
-                dsyslog("flatPlus: BatchReadWeatherData() Error reading file mtime for %s", *tempFile);
-                return false;
-            }
-
-            latest = s.st_mtime;
-            // Check if data is already cached
-            if (latest == out.LastReadMTime) break;  // If latest mtime matches cached, skip reading files
-
-            // Get data for day 0
             out.Temp = ReadAndExtractData(tempFile);
-            // Check if 'Temp' is valid
-            if (isempty(*out.Temp)) {
+            if (isempty(*out.Temp)) {  // Check if 'Temp' is valid
                 dsyslog("flatPlus: BatchReadWeatherData() 'Temp' for day 0 is empty");
                 return false;
             }
 
-            out.Days[day].Icon = ReadAndExtractData(iconFile);
-            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
-            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
-
-            precipitation = ReadAndExtractData(precFile);
-            if (!isempty(*precipitation)) {
-                istr.str(*precipitation);
-                istr.clear();  // Clear the error state of the stream
-                double p {0.0};
-                if (istr >> p) {  // Check if parsing succeeded
-                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
-                } else {
-                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                    out.Days[day].Precipitation = "0%";  // Default fallback
-                }
-            } else {
-                out.Days[day].Precipitation = "0%";  // Default fallback
-            }
-
-            out.Location = ReadAndExtractData(locationFile);
-            if (isempty(*out.Location))
-                out.Location = tr("Unknown");
-
-            out.Days[day].Summary = ReadAndExtractData(summaryFile);
-
             // Temp sign extraction
             std::string_view tt = *out.Temp;
-            auto deg = tt.find("°");  // Find the degree sign
+            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
-                out.Temp = cString(std::string(tt.substr(0, deg)).c_str());
+                out.Temp = out.Temp.Truncate(deg);                   // Remove the sign from the temp string
             } else {
                 out.TempTodaySign = "";
             }
-        } else {
-            // For days 1-7, only read icon, tempMax, tempMin, precipitation and summary
-            out.Days[day].Icon = ReadAndExtractData(iconFile);
-            // Check if 'Icon' is valid
-            if (isempty(*out.Days[day].Icon)) {
-                // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
-                break;  // No more days to expect (User may configured less than 8 days)
-            }
 
-            out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
-            out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
+            static const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
+            out.Location = ReadAndExtractData(locationFile);
+            if (isempty(*out.Location)) out.Location = tr("Unknown");
+        }  // End of day 0 specific data reading
 
-            precipitation = ReadAndExtractData(precFile);
-            if (!isempty(*precipitation)) {
-                istr.str(*precipitation);
-                istr.clear();  // Clear the error state of the stream
-                double p {0.0};
-                if (istr >> p) {  // Check if parsing succeeded
-                    out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
-                } else {
-                    dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                    out.Days[day].Precipitation = "0%";  // Default fallback
-                }
+        // Read data for icon, tempMax, tempMin, precipitation and summary
+        out.Days[day].Icon = ReadAndExtractData(iconFile);
+        if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
+            // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
+            break;  // No more days to expect (User may configured less than 8 days)
+        }
+
+        out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
+        out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
+
+        precipitation = ReadAndExtractData(precFile);
+        if (!isempty(*precipitation)) {
+            istr.str(*precipitation);
+            istr.clear();  // Clear the error state of the stream
+            double p {0.0};
+            if (istr >> p) {  // Check if parsing succeeded
+                out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             } else {
+                dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
                 out.Days[day].Precipitation = "0%";  // Default fallback
             }
-
-            out.Days[day].Summary = ReadAndExtractData(summaryFile);
+        } else {
+            out.Days[day].Precipitation = "0%";  // Default fallback
         }
+
+        out.Days[day].Summary = ReadAndExtractData(summaryFile);
     }
 
     out.LastReadMTime = latest;
     out_latest_time = latest;
-
     return true;
 }
 
@@ -1865,8 +1853,8 @@ static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  //
     cache.WeatherFontSml = FontCache.GetFont(Setup.FontOsd, fs / 2);
     cache.WeatherFontSign = FontCache.GetFont(Setup.FontOsd, fs / 2.5);
 
-    cache.FontAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs);
-    cache.FontSignAscender = cFlatBaseRender::GetFontAscender(Setup.FontOsd, fs / 2.5);
+    cache.FontAscender = FontCache.GetFontAscender(Setup.FontOsd, fs);
+    cache.FontSignAscender = FontCache.GetFontAscender(Setup.FontOsd, fs / 2.5);
     if (!cache.WeatherFont || !cache.WeatherFontSml || !cache.WeatherFontSign) {
         esyslog("flatPlus: EnsureWeatherWidgetFonts() Font pointer is null!");
         return;
@@ -1925,7 +1913,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     int left {m_MarginItem};
     const int WeatherFontHeight {wd.FontHeight};
+    const int WeatherFontHeightMinusMargin {WeatherFontHeight - m_MarginItem2};
     const int WeatherFontSmlHeight {wd.FontSmlHeight};
+    const int WeatherFontHeightDiff {(WeatherFontHeight - WeatherFontSmlHeight) / 2};
 
     const int TempTodaySignWidth {wd.TempTodaySignWidth};
 
@@ -1937,12 +1927,15 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const int WidthTempTomorrow = std::max(wd.WeatherFontSml->Width(wd.Days[1].TempMax),
                                            wd.WeatherFontSml->Width(wd.Days[1].TempMin));  // Max width temp tomorrow
 
-    const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + 20 + Config.decorBorderChannelEPGSize};
+
+    // For weather widget use the same margin as for the EPG images
+    const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                    Config.decorBorderChannelEPGSize};
     const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
-                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeight - m_MarginItem2 +
-                      PrecTodayWidth + m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow +
-                      m_MarginItem + WeatherFontHeight - m_MarginItem2 + PrecTomorrowWidth + m_MarginItem2};
-    const int wLeft {m_OsdWidth - wWidth - 20};
+                      m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeightMinusMargin + PrecTodayWidth +
+                      m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow + m_MarginItem +
+                      WeatherFontHeightMinusMargin + PrecTomorrowWidth + m_MarginItem2};
+    const int wLeft {m_OsdWidth - wWidth - m_MarginEPGImage};
 
     // Setup widget
     WeatherWidget.Clear();
@@ -1956,8 +1949,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           Theme.Color(clrItemCurrentBg), wd.WeatherFont);
     left += TempTodayWidth;
 
-    const int t {(WeatherFontHeight - WeatherCache.FontAscender) -
-                 (WeatherCache.FontSignHeight - WeatherCache.FontSignAscender)};
+    const int t {(WeatherFontHeight - wd.FontAscender) - (wd.FontSignHeight - wd.FontSignAscender)};
 
     // Add temperature sign
     WeatherWidget.AddText(wd.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
@@ -1966,7 +1958,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon
     cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
-    cImage *img {ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *img {ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
@@ -1982,15 +1974,14 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
-    cImage *ImgUmbrella {ImgLoader.LoadIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeight - m_MarginItem2)};
+    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeightMinusMargin)};
     if (ImgUmbrella) {
         WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight - m_MarginItem2;
+        left += WeatherFontHeightMinusMargin;
     }
 
     // Add precipitation
-    WeatherWidget.AddText(wd.Days[0].Precipitation, false,
-                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+    WeatherWidget.AddText(wd.Days[0].Precipitation, false, cRect(left, 0 + WeatherFontHeightDiff, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
 
@@ -1999,7 +1990,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     // Add weather icon tomorrow
     WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[1].Icon);
-    img = ImgLoader.LoadIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeight - m_MarginItem2);
+    img = ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin);
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
         left += WeatherFontHeight + m_MarginItem;
@@ -2017,12 +2008,11 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add precipitation icon
     if (ImgUmbrella) {
         WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight - m_MarginItem2;
+        left += WeatherFontHeightMinusMargin;
     }
 
     // Add precipitation tomorrow
-    WeatherWidget.AddText(wd.Days[1].Precipitation, false,
-                          cRect(left, 0 + (WeatherFontHeight / 2 - WeatherFontSmlHeight / 2), 0, 0),
+    WeatherWidget.AddText(wd.Days[1].Precipitation, false, cRect(left, 0 + WeatherFontHeightDiff, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), wd.WeatherFontSml);
 
     // left += PrecTomorrowWidth;
@@ -2054,7 +2044,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
                                          int yOffset) {
     double Alpha {0.0};
     const double AlphaStep {1.0 / ShadowSize};  // Normalized step (0.0-1.0)
-    static constexpr double MaxAlpha {1.0};     // Maximum alpha value
+    static constexpr double kMaxAlpha {1.0};    // Maximum alpha value
     int ShadowX {0}, ShadowY {0};               // Shadow position variables
     const int BaseX {pos.X()};                  // Cache position for faster access
     const int BaseY {pos.Y()};
@@ -2063,7 +2053,7 @@ void cFlatBaseRender::DrawTextWithShadow(cPixmap *pixmap, const cPoint &pos, con
     // Loop through the shadow from outer to inner size to create the shadow effect
     // Adjust the xOffset and yOffset for the shadow direction
     for (int i {ShadowSize}; i >= 1; --i) {
-        Alpha = std::min(i * AlphaStep, MaxAlpha);  // Ensure it does not exceed 1.0
+        Alpha = std::min((ShadowSize - i) * AlphaStep, kMaxAlpha);  // Calculate alpha from 0.0 (outer) to 1.0 (inner)
         CurrentShadowColor = SetAlpha(ShadowColor, Alpha);
         ShadowX = BaseX + (xOffset * i);
         ShadowY = BaseY + (yOffset * i);

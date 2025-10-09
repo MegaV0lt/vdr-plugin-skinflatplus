@@ -263,7 +263,6 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 }
 
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
-uint32_t GetGlyphSize(const char *Name, const FT_ULong CharCode, const int FontHeight = 8);
 
 void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
     std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
@@ -283,11 +282,11 @@ cString GetCurrentAudioIcon();
 cString GetRecordingErrorIcon(int RecInfoErrors);
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
 
-std::string_view ltrim(std::string_view str);
+/* std::string_view ltrim(std::string_view str);
 std::string_view rtrim(std::string_view str);
-std::string_view trim(std::string_view str);
+std::string_view trim(std::string_view str); */
 
-void SetMediaSize(cSize &MediaSize, const cSize &ContentSize);  // NOLINT
+void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUser);  // NOLINT in/out
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
                       cString &Subtitle, bool NewLine = false);                            // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT

@@ -11,6 +11,7 @@
 #include <vdr/font.h>
 #include <vdr/tools.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -121,24 +122,24 @@ class cSimpleContent {
     int GetContentType() const { return m_ContentType; }
     int GetBottom() const {
         switch (m_ContentType) {
-            case CT_Text:
+        case CT_Text:
+                // FontCache is returning different values for the same font
+                // const int FontHeight {FontCache.GetFontHeight(Setup.FontOsd, m_Font->Size())};
                 return m_Position.Top() + m_Font->Height();
 
-            case CT_TextMultiline: {
+        case CT_TextMultiline:
+            {
                 cTextFloatingWrapper Wrapper;
                 Wrapper.Set(*m_Text, m_Font, m_Position.Width());
                 return m_Position.Top() + (Wrapper.Lines() * m_Font->Height());
             }
 
-            case CT_Image:
-                return m_Position.Top() + m_Image->Height();
+        case CT_Image: return m_Position.Top() + m_Image->Height();
 
-            case CT_Rect:
-                return m_Position.Top() + m_Position.Height();
+        case CT_Rect: return m_Position.Top() + m_Position.Height();
 
-            case CT_None:
-            default:
-                return 0;
+        case CT_None:
+        default: return 0;
         }
     }
     void Draw(cPixmap *Pixmap) const {
@@ -146,22 +147,16 @@ class cSimpleContent {
         // if (!m_Font || !m_Text) return;
 
         switch (m_ContentType) {
-            case CT_Text:
-                Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font,
-                               m_TextWidth, m_TextHeight, m_TextAlignment);
-                return;
+        case CT_Text:
+            Pixmap->DrawText(m_Position.Point(), *m_Text, m_ColorFg, m_ColorBg, m_Font, m_TextWidth, m_TextHeight,
+                             m_TextAlignment);
+            return;
 
-            case CT_TextMultiline:
-                DrawMultilineText(Pixmap);
-                return;
+        case CT_TextMultiline: DrawMultilineText(Pixmap); return;
 
-            case CT_Rect:
-                Pixmap->DrawRectangle(m_Position, m_ColorBg);
-                return;
+        case CT_Rect: Pixmap->DrawRectangle(m_Position, m_ColorBg); return;
 
-            case CT_Image:
-                Pixmap->DrawImage(m_Position.Point(), *m_Image);
-                return;
+        case CT_Image: Pixmap->DrawImage(m_Position.Point(), *m_Image); return;
         }
     }
 };
@@ -183,7 +178,7 @@ class cComplexContent {
     void AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
     void AddImage(cImage *image, const cRect &Position);
-    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, const cRect &TextPos,
+    void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, int Margin, const cRect &TextPos,
                                  tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
                                  int TextAlignment = taDefault);
     void AddRect(const cRect &Position, tColor ColorBg);
@@ -211,7 +206,6 @@ class cComplexContent {
     cOsd *m_Osd {nullptr};
     cPixmap *Pixmap {nullptr}, *PixmapImage {nullptr};
     cRect m_Position {0, 0, 0, 0};
-
     tColor m_ColorBg {0};
     bool m_FullFillBackground {false};
     int m_DrawPortHeight {0};

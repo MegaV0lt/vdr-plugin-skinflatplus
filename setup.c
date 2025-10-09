@@ -39,6 +39,7 @@ cStringList ChannelTimeLefts;
 cStringList WeatherTypes;
 cStringList ShowEndTime;     // For replay show end time of recording
 cStringList ShowErrorMarks;  // Show error mark in progressbar at replay
+cStringList SearchLocalPosters;  // For tvscraper search local posters
 
 int ConfigFileSelection;
 
@@ -152,6 +153,11 @@ void cFlatSetup::Setup() {
     ShowErrorMarks.Append(strdup(tr("small +")));
     ShowErrorMarks.Append(strdup(tr("big +")));
 
+    SearchLocalPosters.Clear();
+    SearchLocalPosters.Append(strdup(tr("do not search")));
+    SearchLocalPosters.Append(strdup(tr("search")));
+    SearchLocalPosters.Append(strdup(tr("search only in recording folder")));
+
     Add(new cOsdItem(tr("General settings"), osUnknown, true));
     Add(new cOsdItem(tr("Channelinfo settings"), osUnknown, true));
     Add(new cOsdItem(tr("Menu settings"), osUnknown, true));
@@ -262,6 +268,8 @@ void cFlatSetup::Store() {
     SetupStore("ChannelDvbapiInfoShow", Config.ChannelDvbapiInfoShow);
     SetupStore("ChannelFormatShow", Config.ChannelFormatShow);
     SetupStore("ChannelIconsShow", Config.ChannelIconsShow);
+    SetupStore("ChannelNameFontSize", dtoa(Config.ChannelNameFontSize));
+    SetupStore("ChannelAudioFormatShow", Config.ChannelAudioFormatShow);
     SetupStore("ChannelResolutionAspectShow", Config.ChannelResolutionAspectShow);
     SetupStore("ChannelShowNameWithShadow", Config.ChannelShowNameWithShadow);
     SetupStore("ChannelShowStartTime", Config.ChannelShowStartTime);
@@ -324,6 +332,7 @@ void cFlatSetup::Store() {
     SetupStore("MenuItemParseTilde", Config.MenuItemParseTilde);
     SetupStore("MenuItemRecordingClearPercent", Config.MenuItemRecordingClearPercent);
     SetupStore("MenuItemRecordingDefaultOldDays", Config.MenuItemRecordingDefaultOldDays);
+    SetupStore("MenuItemRecordingUseOldFile", Config.MenuItemRecordingUseOldFile);
     SetupStore("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold));
     SetupStore("MenuItemRecordingShowFolderDate", Config.MenuItemRecordingShowFolderDate);
     SetupStore("MenuItemRecordingShowRecordingErrors", Config.MenuItemRecordingShowRecordingErrors);
@@ -345,6 +354,7 @@ void cFlatSetup::Store() {
     SetupStore("RecordingDimmOnPauseDelay", Config.RecordingDimmOnPauseDelay);
     SetupStore("RecordingDimmOnPauseOpaque", Config.RecordingDimmOnPauseOpaque);
     SetupStore("RecordingFormatShow", Config.RecordingFormatShow);
+    SetupStore("RecordingAudioFormatShow", Config.RecordingAudioFormatShow);
     SetupStore("RecordingResolutionAspectShow", Config.RecordingResolutionAspectShow);
     SetupStore("RecordingSimpleAspectFormat", Config.RecordingSimpleAspectFormat);
     SetupStore("ScrollerDelay", Config.ScrollerDelay);
@@ -372,6 +382,7 @@ void cFlatSetup::Store() {
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("TVScraperReplayInfoShowPoster", Config.TVScraperReplayInfoShowPoster);
     SetupStore("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity));
+    SetupStore("TVScraperSearchLocalPosters", Config.TVScraperSearchLocalPosters);
     SetupStore("WeatherFontSize", dtoa(Config.WeatherFontSize));
 
     Config.Init();
@@ -470,6 +481,8 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)                SetupConfig->ChannelDvbapiInfoShow = atoi(Value);
     else if (strcmp(Name, "ChannelFormatShow") == 0)                    SetupConfig->ChannelFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelIconsShow") == 0)                     SetupConfig->ChannelIconsShow = atoi(Value);
+    else if (strcmp(Name, "ChannelNameFontSize") == 0)                  SetupConfig->ChannelNameFontSize = atod(Value);
+    else if (strcmp(Name, "ChannelAudioFormatShow") == 0)               SetupConfig->ChannelAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          SetupConfig->ChannelResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            SetupConfig->ChannelShowNameWithShadow = atoi(Value);
     else if (strcmp(Name, "ChannelShowStartTime") == 0)                 SetupConfig->ChannelShowStartTime = atoi(Value);
@@ -532,6 +545,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
+    else if (strcmp(Name, "MenuItemRecordingUseOldFile") == 0)          SetupConfig->MenuItemRecordingUseOldFile = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
     else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
@@ -553,6 +567,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            SetupConfig->RecordingDimmOnPauseDelay = atoi(Value);
     else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           SetupConfig->RecordingDimmOnPauseOpaque = atoi(Value);
     else if (strcmp(Name, "RecordingFormatShow") == 0)                  SetupConfig->RecordingFormatShow = atoi(Value);
+    else if (strcmp(Name, "RecordingAudioFormatShow") == 0)             SetupConfig->RecordingAudioFormatShow = atoi(Value);
     else if (strcmp(Name, "RecordingResolutionAspectShow") == 0)        SetupConfig->RecordingResolutionAspectShow = atoi(Value);
     else if (strcmp(Name, "RecordingSimpleAspectFormat") == 0)          SetupConfig->RecordingSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ScrollerDelay") == 0)                        SetupConfig->ScrollerDelay = atoi(Value);
@@ -580,6 +595,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               SetupConfig->TVScraperPosterOpacity = atod(Value);
+    else if (strcmp(Name, "TVScraperSearchLocalPosters") == 0)          SetupConfig->TVScraperSearchLocalPosters = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
     else
         return false;
@@ -656,6 +672,8 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("ChannelDvbapiInfoShow", SetupConfig->ChannelDvbapiInfoShow, *Filename);
     Config.Store("ChannelFormatShow", SetupConfig->ChannelFormatShow, *Filename);
     Config.Store("ChannelIconsShow", SetupConfig->ChannelIconsShow, *Filename);
+    Config.Store("ChannelNameFontSize", dtoa(Config.ChannelNameFontSize), *Filename);
+    Config.Store("ChannelAudioFormatShow", SetupConfig->ChannelAudioFormatShow, *Filename);
     Config.Store("ChannelResolutionAspectShow", SetupConfig->ChannelResolutionAspectShow, *Filename);
     Config.Store("ChannelShowNameWithShadow", SetupConfig->ChannelShowNameWithShadow, *Filename);
     Config.Store("ChannelShowStartTime", SetupConfig->ChannelShowStartTime, *Filename);
@@ -718,6 +736,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("MenuItemParseTilde", SetupConfig->MenuItemParseTilde, *Filename);
     Config.Store("MenuItemRecordingClearPercent", SetupConfig->MenuItemRecordingClearPercent, *Filename);
     Config.Store("MenuItemRecordingDefaultOldDays", SetupConfig->MenuItemRecordingDefaultOldDays, *Filename);
+    Config.Store("MenuItemRecordingUseOldFile", SetupConfig->MenuItemRecordingUseOldFile, *Filename);
     Config.Store("MenuItemRecordingSeenThreshold", dtoa(Config.MenuItemRecordingSeenThreshold), *Filename);
     Config.Store("MenuItemRecordingShowFolderDate", SetupConfig->MenuItemRecordingShowFolderDate, *Filename);
     Config.Store("MenuItemRecordingShowRecordingErrors", SetupConfig->MenuItemRecordingShowRecordingErrors, *Filename);
@@ -739,6 +758,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("RecordingDimmOnPauseOpaque", SetupConfig->RecordingDimmOnPauseOpaque, *Filename);
     Config.Store("RecordingDimmOnPause", SetupConfig->RecordingDimmOnPause, *Filename);
     Config.Store("RecordingFormatShow", SetupConfig->RecordingFormatShow, *Filename);
+    Config.Store("RecordingAudioFormatShow", SetupConfig->RecordingAudioFormatShow, *Filename);
     Config.Store("RecordingResolutionAspectShow", SetupConfig->RecordingResolutionAspectShow, *Filename);
     Config.Store("RecordingSimpleAspectFormat", SetupConfig->RecordingSimpleAspectFormat, *Filename);
     Config.Store("ScrollerDelay", SetupConfig->ScrollerDelay, *Filename);
@@ -766,6 +786,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("TVScraperReplayInfoShowPoster", SetupConfig->TVScraperReplayInfoShowPoster, *Filename);
     Config.Store("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity), *Filename);
+    Config.Store("TVScraperSearchLocalPosters", SetupConfig->TVScraperSearchLocalPosters, *Filename);
     Config.Store("WeatherFontSize", dtoa(Config.WeatherFontSize), *Filename);
 
     cString msg = cString::sprintf("%s %s", tr("saved settings in file:"), *File);
@@ -841,7 +862,7 @@ void cFlatSetupGeneral::Setup() {
     Add(new cMenuEditBoolItem(tr("Use Textscroller?"), &SetupConfig->ScrollerEnable));
     if (SetupConfig->ScrollerEnable) {
         Add(new cMenuEditIntItem(tr("Scroller step (in pixel)"), &SetupConfig->ScrollerStep, 1));
-        Add(new cMenuEditIntItem(tr("Scroller delay (in ms)"), &SetupConfig->ScrollerDelay, 1, 100));  // 1 ms ... 100 ms
+        Add(new cMenuEditIntItem(tr("Scroller delay (in ms)"), &SetupConfig->ScrollerDelay, 15, 100));  // 15 ms ... 100 ms
         Add(new cMenuEditStraItem(tr("Scroller type"), &SetupConfig->ScrollerType, ScrollerTypes.Size(), &ScrollerTypes[0]));
     } else {
         cString step = cString::sprintf("%s:\t%d", tr("Scroller step (in pixel)"), SetupConfig->ScrollerStep);
@@ -885,12 +906,13 @@ void cFlatSetupGeneral::Setup() {
         Add(new cMenuEditIntItem(tr("Button border size"), &SetupConfig->decorBorderButtonSizeUser));
     }
 
-    cString ImageCache = cString::sprintf("%s:\t%d / %ld", tr("Imagecache entries"), ImgCache.GetCacheCount(), MaxImageCache);
+    cString ImageCache = cString::sprintf("%s:\t%d / %ld", tr("Imagecache entries"), ImgCache.GetCacheCount(), kMaxImageCache);
     Add(new cOsdItem(ImageCache, osUnknown, true));
-    cString IconCache = cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), MaxIconCache);
+    cString IconCache = cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), kMaxIconCache);
     Add(new cOsdItem(IconCache, osUnknown, true));
 
-    cString FontCacheNum = cString::sprintf("%s:\t%d", tr("Fontcache entries"), FontCache.GetCacheCount());
+    cString FontCacheNum =
+        cString::sprintf("%s:\t%d / %d", tr("Fontcache entries"), FontCache.GetCacheCount(), FontCache.GetSize());
     Add(new cOsdItem(FontCacheNum, osUnknown, true));
 
     if (ItemLastSel >= 0) {
@@ -943,7 +965,8 @@ cFlatSetupChannelInfo::cFlatSetupChannelInfo(cFlatConfig* data) : cMenuSetupSubM
 void cFlatSetupChannelInfo::Setup() {
     Clear();
 
-    Add(new cMenuEditBoolItem(tr("Show channel name and number with shadow"), &SetupConfig->ChannelShowNameWithShadow));
+    Add(new cMenuEditPrcItem(tr("Channel name/number relative font size"), &SetupConfig->ChannelNameFontSize, 0.01, 0.05, 1));
+    Add(new cMenuEditBoolItem(tr("Show channel name/number with shadow"), &SetupConfig->ChannelShowNameWithShadow));
     Add(new cMenuEditBoolItem(tr("Show Channelinfo icons"), &SetupConfig->ChannelIconsShow));
     Add(new cMenuEditBoolItem(tr("Show event start time left"), &SetupConfig->ChannelShowStartTime));
     Add(new cMenuEditBoolItem(tr("Show signal quality"), &SetupConfig->SignalQualityShow));
@@ -951,6 +974,7 @@ void cFlatSetupChannelInfo::Setup() {
     Add(new cMenuEditPrcItem(tr("Weather widget font size"), &SetupConfig->WeatherFontSize, 0.01, 0.2, 1));
     Add(new cMenuEditBoolItem(tr("Colors for signal quality"), &SetupConfig->SignalQualityUseColors));
     Add(new cMenuEditBoolItem(tr("Show resolution & aspect"), &SetupConfig->ChannelResolutionAspectShow));
+    Add(new cMenuEditBoolItem(tr("Show audio format"), &SetupConfig->ChannelAudioFormatShow));
     Add(new cMenuEditBoolItem(tr("Show format (hd/sd)"), &SetupConfig->ChannelFormatShow));
     Add(new cMenuEditBoolItem(tr("Simple aspect & format"), &SetupConfig->ChannelSimpleAspectFormat));
     static cPlugin *pDVBApi = cPluginManager::GetPlugin("dvbapi");
@@ -1054,6 +1078,7 @@ void cFlatSetupMenu::Setup() {
 
     Add(new cMenuEditBoolItem(tr("Recording menu show recording count in title"), &SetupConfig->MenuRecordingShowCount));
     Add(new cMenuEditPrcItem(tr("Recording menu recording seen threshold"), &SetupConfig->MenuItemRecordingSeenThreshold, 0.008, 0.01, 2));
+    Add(new cMenuEditBoolItem(tr("Recording menu use file for old folder"), &SetupConfig->MenuItemRecordingUseOldFile));
     Add(new cMenuEditIntItem(tr("Recording menu default value - old folder in days"), &SetupConfig->MenuItemRecordingDefaultOldDays, -1));
     Add(new cMenuEditBoolItem(tr("Recording menu show recerrors icon"), &SetupConfig->MenuItemRecordingShowRecordingErrors));
     Add(new cMenuEditIntItem(tr("Recording recerrors icon threshold"), &SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold, 1, 999999));
@@ -1165,6 +1190,7 @@ void cFlatSetupReplay::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Show resolution & aspect"), &SetupConfig->RecordingResolutionAspectShow));
+    Add(new cMenuEditBoolItem(tr("Show audio format"), &SetupConfig->RecordingAudioFormatShow));
     Add(new cMenuEditBoolItem(tr("Show format (hd/sd)"), &SetupConfig->RecordingFormatShow));
     Add(new cMenuEditBoolItem(tr("Simple aspect & format"), &SetupConfig->RecordingSimpleAspectFormat));
     Add(new cMenuEditPrcItem(tr("Time seconds font scale"), &SetupConfig->TimeSecsScale, 0.003, 0.01, 1));
@@ -1352,15 +1378,38 @@ void cFlatSetupTVScraper::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Channelinfo show poster?"), &SetupConfig->TVScraperChanInfoShowPoster));
-    Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015, 2));
+    Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015,
+                             2));
     Add(new cMenuEditBoolItem(tr("Replayinfo show poster?"), &SetupConfig->TVScraperReplayInfoShowPoster));
-    Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015, 2));
-    Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001, 0.01, 2));
+    Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015,
+                             2));
+    if (SetupConfig->TVScraperChanInfoShowPoster || SetupConfig->TVScraperReplayInfoShowPoster) {
+        Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001,
+                                 0.01, 2));
+    } else {
+        cString opacity =
+            cString::sprintf("%s:\t%.2f", tr("Replay/channelinfo poster opacity"), SetupConfig->TVScraperPosterOpacity);
+        Add(new cOsdItem(opacity, osUnknown, false));
+    }
     Add(new cMenuEditBoolItem(tr("EPG info show poster?"), &SetupConfig->TVScraperEPGInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
+    if (SetupConfig->TVScraperReplayInfoShowPoster || SetupConfig->TVScraperRecInfoShowPoster) {
+        Add(new cMenuEditStraItem(tr("search local posters"), &SetupConfig->TVScraperSearchLocalPosters,
+                                  SearchLocalPosters.Size(), &SearchLocalPosters[0]));
+    } else {
+        cString search = cString::sprintf("%s:\t%s", tr("search local posters"),
+                                          SearchLocalPosters[SetupConfig->TVScraperSearchLocalPosters]);
+        Add(new cOsdItem(search, osUnknown, false));
+    }
     Add(new cMenuEditBoolItem(tr("recording info show actors?"), &SetupConfig->TVScraperRecInfoShowActors));
-    Add(new cMenuEditIntItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors, -1, 999, trVDR("no")));
+    if (SetupConfig->TVScraperEPGInfoShowActors || SetupConfig->TVScraperRecInfoShowActors) {
+        Add(new cMenuEditIntItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors, -1, 999,
+                                 trVDR("no")));
+    } else {
+        cString max = cString::sprintf("%s:\t%d", tr("Max. actors to show?"), SetupConfig->TVScraperShowMaxActors);
+        Add(new cOsdItem(max, osUnknown, false));
+    }
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));

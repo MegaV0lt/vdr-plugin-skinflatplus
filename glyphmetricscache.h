@@ -26,18 +26,18 @@ class GlyphMetricsCache {
         }
         FT_Done_FreeType(library_);
     }
-    // FontName ist the full path to the font
-    FT_Face GetFace(const std::string &FontName) {
+
+    FT_Face GetFace(const std::string &FontFileName) {
         std::unique_lock lock(mutex_);
-        auto it = faces_.find(FontName);
+        auto it = faces_.find(FontFileName);
         if (it != faces_.end())
             return it->second;
         FT_Face face {nullptr};
-        if (FT_New_Face(library_, FontName.c_str(), 0, &face)) {
-            esyslog("flatPlus: GlyphMetricsCache: FT_New_Face failed for '%s'", FontName.c_str());
+        if (FT_New_Face(library_, FontFileName.c_str(), 0, &face)) {
+            esyslog("flatPlus: GlyphMetricsCache: FT_New_Face failed for '%s'", FontFileName.c_str());
             return nullptr;
         }
-        faces_[FontName] = face;
+        faces_[FontFileName] = face;
         return face;
     }
 
@@ -47,5 +47,3 @@ class GlyphMetricsCache {
     std::mutex mutex_;
 };  // class GlyphMetricsCache
 
-// Accessor:
-GlyphMetricsCache &glyphMetricsCache();
