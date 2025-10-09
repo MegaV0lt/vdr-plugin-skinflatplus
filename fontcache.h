@@ -46,6 +46,7 @@ class cFontCache {
     void InsertFont(const cString &Name, int Size);
     int GetStringWidth(const cString &Name, int Height, const cString &Text) const;
     int GetCacheCount() const;
+    int GetSize() const;
     int GetFontAscender(const cString& FontName, int FontSize);
     uint32_t GetGlyphSize(const cString &Name, const FT_ULong CharCode, const int FontHeight);
 };

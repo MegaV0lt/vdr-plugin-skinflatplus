@@ -51,8 +51,6 @@ class cFlatConfig {
         cString IconPath {""};
         cString RecordingOldConfigFile {""};
 
-        // std::vector<std::string> RecordingOldFolder;
-        // std::vector<int> RecordingOldValue;
         std::map<std::string, int> RecordingOldFolderMap;
 
         // BORDER TYPES
@@ -342,6 +340,8 @@ class cFlatConfig {
         int TVScraperReplayInfoShowPoster {1};
         double TVScraperReplayInfoPosterSize {1.0 / 100};
         double TVScraperPosterOpacity {0.8 / 100};  // Opacitiy of poster in replay info and channel info (80%)
+
+        int TVScraperSearchLocalPosters {1};  // 0 = do not search, 1 = search, 2 = search only in recording folder
 
         int TVScraperEPGInfoShowPoster {1};
         int TVScraperRecInfoShowPoster {1};

@@ -21,8 +21,6 @@
 #include "./flat.h"
 
 cFlatConfig::cFlatConfig() {
-    // RecordingOldFolder.reserve(64);  // Set to at least 64 entry's
-    // RecordingOldValue.reserve(64);
 }
 
 cFlatConfig::~cFlatConfig() {
@@ -199,6 +197,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               TVScraperPosterOpacity = atod(Value);
+    else if (strcmp(Name, "TVScraperSearchLocalPosters") == 0)          TVScraperSearchLocalPosters = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      WeatherFontSize = atod(Value);
     else
         return false;
@@ -784,7 +783,7 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
     FILE *f = fopen(Filename, "a");
     if (!f) {
         esyslog("flatPlus: Error storing config: %s = %s", Name, Value);
-        return;  // throw std::runtime_error("Failed to open file");
+        return;
     }
     fprintf(f, "%s = %s\n", Name, Value);
     fclose(f);

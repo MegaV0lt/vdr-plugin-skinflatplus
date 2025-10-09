@@ -429,6 +429,18 @@ msgstr "Impostazioni TVScraper / scraper2vdr"
 msgid "TVScraper / scraper2vdr not installed"
 msgstr "TVScraper / scraper2vdr non istallati"
 
+msgid "search local posters"
+msgstr "cerca poster locali"
+
+msgid "do not search"
+msgstr "non cercare"
+
+msgid "search"
+msgstr "cerca"
+
+msgid "search only in recording folder"
+msgstr "cerca solo nella cartella delle registrazioni"
+
 msgid "Main menu widgets settings"
 msgstr "Impostazioni menù widget"
 

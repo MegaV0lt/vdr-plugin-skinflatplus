@@ -13,6 +13,7 @@
 
 #include "./fontcache.h"
 #include "./glyphmetricscache.h"
+#include "fontcache.h"
 
 static GlyphMetricsCache &glyphMetricsCache() {
     static GlyphMetricsCache s_cache;
@@ -177,6 +178,8 @@ int cFontCache::GetCacheCount() const {
     }
     return count;
 }
+
+int cFontCache::GetSize() const { return FontCache.size(); }
 
 int cFontCache::GetFontAscender(const cString &FontName, int FontSize) {
     std::string_view FontNameView {*FontName};

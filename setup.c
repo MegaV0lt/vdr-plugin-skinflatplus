@@ -39,6 +39,7 @@ cStringList ChannelTimeLefts;
 cStringList WeatherTypes;
 cStringList ShowEndTime;     // For replay show end time of recording
 cStringList ShowErrorMarks;  // Show error mark in progressbar at replay
+cStringList SearchLocalPosters;  // For tvscraper search local posters
 
 int ConfigFileSelection;
 
@@ -151,6 +152,11 @@ void cFlatSetup::Setup() {
     ShowErrorMarks.Append(strdup(tr("big textcursor")));
     ShowErrorMarks.Append(strdup(tr("small +")));
     ShowErrorMarks.Append(strdup(tr("big +")));
+
+    SearchLocalPosters.Clear();
+    SearchLocalPosters.Append(strdup(tr("do not search")));
+    SearchLocalPosters.Append(strdup(tr("search")));
+    SearchLocalPosters.Append(strdup(tr("search only in recording folder")));
 
     Add(new cOsdItem(tr("General settings"), osUnknown, true));
     Add(new cOsdItem(tr("Channelinfo settings"), osUnknown, true));
@@ -376,6 +382,7 @@ void cFlatSetup::Store() {
     SetupStore("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize));
     SetupStore("TVScraperReplayInfoShowPoster", Config.TVScraperReplayInfoShowPoster);
     SetupStore("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity));
+    SetupStore("TVScraperSearchLocalPosters", Config.TVScraperSearchLocalPosters);
     SetupStore("WeatherFontSize", dtoa(Config.WeatherFontSize));
 
     Config.Init();
@@ -588,6 +595,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
     else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
     else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               SetupConfig->TVScraperPosterOpacity = atod(Value);
+    else if (strcmp(Name, "TVScraperSearchLocalPosters") == 0)          SetupConfig->TVScraperSearchLocalPosters = atoi(Value);
     else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
     else
         return false;
@@ -778,6 +786,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("TVScraperReplayInfoPosterSize", dtoa(Config.TVScraperReplayInfoPosterSize), *Filename);
     Config.Store("TVScraperReplayInfoShowPoster", SetupConfig->TVScraperReplayInfoShowPoster, *Filename);
     Config.Store("TVScraperPosterOpacity", dtoa(Config.TVScraperPosterOpacity), *Filename);
+    Config.Store("TVScraperSearchLocalPosters", SetupConfig->TVScraperSearchLocalPosters, *Filename);
     Config.Store("WeatherFontSize", dtoa(Config.WeatherFontSize), *Filename);
 
     cString msg = cString::sprintf("%s %s", tr("saved settings in file:"), *File);
@@ -902,7 +911,8 @@ void cFlatSetupGeneral::Setup() {
     cString IconCache = cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), kMaxIconCache);
     Add(new cOsdItem(IconCache, osUnknown, true));
 
-    cString FontCacheNum = cString::sprintf("%s:\t%d", tr("Fontcache entries"), FontCache.GetCacheCount());
+    cString FontCacheNum =
+        cString::sprintf("%s:\t%d / %d", tr("Fontcache entries"), FontCache.GetCacheCount(), FontCache.GetSize());
     Add(new cOsdItem(FontCacheNum, osUnknown, true));
 
     if (ItemLastSel >= 0) {
@@ -1368,15 +1378,38 @@ void cFlatSetupTVScraper::Setup() {
     Clear();
 
     Add(new cMenuEditBoolItem(tr("Channelinfo show poster?"), &SetupConfig->TVScraperChanInfoShowPoster));
-    Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015, 2));
+    Add(new cMenuEditPrcItem(tr("Channelinfo poster size"), &SetupConfig->TVScraperChanInfoPosterSize, 0.004, 0.015,
+                             2));
     Add(new cMenuEditBoolItem(tr("Replayinfo show poster?"), &SetupConfig->TVScraperReplayInfoShowPoster));
-    Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015, 2));
-    Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001, 0.01, 2));
+    Add(new cMenuEditPrcItem(tr("Replayinfo poster size"), &SetupConfig->TVScraperReplayInfoPosterSize, 0.004, 0.015,
+                             2));
+    if (SetupConfig->TVScraperChanInfoShowPoster || SetupConfig->TVScraperReplayInfoShowPoster) {
+        Add(new cMenuEditPrcItem(tr("Replay/channelinfo poster opacity"), &SetupConfig->TVScraperPosterOpacity, 0.001,
+                                 0.01, 2));
+    } else {
+        cString opacity =
+            cString::sprintf("%s:\t%.2f", tr("Replay/channelinfo poster opacity"), SetupConfig->TVScraperPosterOpacity);
+        Add(new cOsdItem(opacity, osUnknown, false));
+    }
     Add(new cMenuEditBoolItem(tr("EPG info show poster?"), &SetupConfig->TVScraperEPGInfoShowPoster));
     Add(new cMenuEditBoolItem(tr("EPG info show actors?"), &SetupConfig->TVScraperEPGInfoShowActors));
     Add(new cMenuEditBoolItem(tr("recording info show poster?"), &SetupConfig->TVScraperRecInfoShowPoster));
+    if (SetupConfig->TVScraperReplayInfoShowPoster || SetupConfig->TVScraperRecInfoShowPoster) {
+        Add(new cMenuEditStraItem(tr("search local posters"), &SetupConfig->TVScraperSearchLocalPosters,
+                                  SearchLocalPosters.Size(), &SearchLocalPosters[0]));
+    } else {
+        cString search = cString::sprintf("%s:\t%s", tr("search local posters"),
+                                          SearchLocalPosters[SetupConfig->TVScraperSearchLocalPosters]);
+        Add(new cOsdItem(search, osUnknown, false));
+    }
     Add(new cMenuEditBoolItem(tr("recording info show actors?"), &SetupConfig->TVScraperRecInfoShowActors));
-    Add(new cMenuEditIntItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors, -1, 999, trVDR("no")));
+    if (SetupConfig->TVScraperEPGInfoShowActors || SetupConfig->TVScraperRecInfoShowActors) {
+        Add(new cMenuEditIntItem(tr("Max. actors to show?"), &SetupConfig->TVScraperShowMaxActors, -1, 999,
+                                 trVDR("no")));
+    } else {
+        cString max = cString::sprintf("%s:\t%d", tr("Max. actors to show?"), SetupConfig->TVScraperShowMaxActors);
+        Add(new cOsdItem(max, osUnknown, false));
+    }
 
     if (ItemLastSel >= 0) {
         SetCurrent(Get(ItemLastSel));

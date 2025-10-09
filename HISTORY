@@ -6,6 +6,12 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] Option to set font size of channel name and number in channel info
 - [add] Option to enable/disable usage of recording old file for old folder icon in recordings menu
 - [add] Option to enable/disable display of audio format icon in channel- and recording info
+- [add] Option for searching local recording poster or banner if poster is not available
+        (disable, search, search only in recording folder)
+- [update] Rework menu 'TVScraper settings':
+           - Show 'Replay/channelinfo poster opacity' setting only if show poster is enabled
+           - Show 'search local poster' setting only if show poster is enabled
+           - Show 'Max. actors to show?' setting only if show actors is enabled
 - [update] Move GetFontAscender() to font cache
 - [update] Refactor GetIconName() to cache all menu- and plugin names, improving performance
            and reducing memory usage

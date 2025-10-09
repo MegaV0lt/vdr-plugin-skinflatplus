@@ -228,14 +228,14 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    static const cString RecordingImages[4] {"cover_vdr.jpg", "poster.jpg", "banner.jpg", "fanart.jpg"};
-    for (const cString &Image : RecordingImages) {
+    static constexpr const char *Images[] {"banner.jpg", "poster.jpg", "fanart.jpg", "cover_vdr.jpg"};
+    for (const char* const &Image : Images) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;
         }
     }
 
-    dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found in %s or above.", *RecPath);
+    dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found for %s", *RecPath);
     return false;
 }
 
@@ -257,6 +257,8 @@ bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Im
         found = ManualPoster;
         return true;
     }
+    if (Config.TVScraperSearchLocalPosters == 2) return false;  // Search only in recording folder
+
     ManualPoster = cString::sprintf("%s/../../../%s", *RecPath, *Image);
     if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;

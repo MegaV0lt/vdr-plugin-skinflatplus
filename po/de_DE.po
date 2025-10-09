@@ -154,6 +154,18 @@ msgstr "Sammlung"
 msgid "TV show, missing episode"
 msgstr "Fehlende Folge"
 
+msgid "search local posters"
+msgstr "Suche lokale Poster"
+
+msgid "do not search"
+msgstr "Nicht suchen"
+
+msgid "search"
+msgstr "Suchen"
+
+msgid "search only in recording folder"
+msgstr "Nur im Aufnahmeordner suchen"
+
 msgid "Recording information"
 msgstr "Aufnahme Informationen"
 

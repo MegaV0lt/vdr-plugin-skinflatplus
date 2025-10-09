@@ -2320,7 +2320,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         else if (MediaType == 2)
             MediaWidth = m_cWidth / 2 - m_MarginItem3;
 
-        if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
             const cString RecPath = Recording->FileName();
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
@@ -2614,7 +2614,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         // Call scraper plugin only at first run and reuse data at second run
         if (FirstRun && (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors)) {
             GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName, ActorsRole, nullptr, Recording);
-            if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
+            if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
                 ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
             }

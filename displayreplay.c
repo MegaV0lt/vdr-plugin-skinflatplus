@@ -614,7 +614,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         cSize MediaSize {0, 0};
         if (Config.TVScraperReplayInfoShowPoster) {
             GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-            if (MediaPath[0] == '\0') {  // Prio for tvscraper poster
+            if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
                 const cString RecPath = m_Recording->FileName();
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                     img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
