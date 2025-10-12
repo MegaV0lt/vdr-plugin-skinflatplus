@@ -302,11 +302,11 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720) return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
     static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
-    static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
+    static constexpr const char *ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint16_t ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (std::size_t i {0}; i < ScreenAspectNums; ++i) {
         if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
-            return ScreenAspectNames[i];
+            return cString(ScreenAspectNames[i]);
     }
 
     dsyslog("flatPlus: Unknown screen aspect: %.5f (Screen width: %d)", ScreenAspect, ScreenWidth);
