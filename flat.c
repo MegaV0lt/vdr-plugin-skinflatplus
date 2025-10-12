@@ -323,13 +323,13 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     544x576 (PAL)                 528x576 (PAL)
     480x576 (PAL SVCD)            352x576 (PAL CVD) */
 
-    static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
-                                     "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
-                                     "528x576",   "480x576",   "352x576"};
+    static constexpr const char *ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
+                                             "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
+                                             "528x576",   "480x576",   "352x576"};
     static constexpr int16_t ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
     const uint16_t ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
     for (std::size_t i {0}; i < ResNums; ++i) {
-        if (ScreenWidth == ResWidths[i]) return ResNames[i];
+        if (ScreenWidth == ResWidths[i]) return cString(ResNames[i]);
     }
 
     dsyslog("flatPlus: Unknown screen resolution: %dx%d", ScreenWidth, ScreenHeight);

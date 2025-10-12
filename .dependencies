@@ -13,10 +13,10 @@ imageloader.o: imageloader.c imageloader.h imagemagickwrapper.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
 baserender.o: baserender.c baserender.h imageloader.h \
  imagemagickwrapper.h flat.h services/scraper2vdr.h config.h imagecache.h \
- textscroller.h complexcontent.h fontcache.h glyphmetricscache.h
+ textscroller.h complexcontent.h fontcache.h
 complexcontent.o: complexcontent.c complexcontent.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
-textscroller.o: textscroller.c textscroller.h flat.h \
+textscroller.o: textscroller.c fontcache.h textscroller.h flat.h \
  services/scraper2vdr.h config.h imagecache.h
 displaychannel.o: displaychannel.c displaychannel.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
@@ -35,15 +35,15 @@ displayreplay.o: displayreplay.c displayreplay.h baserender.h \
  services/scraper2vdr.h fontcache.h
 displaytracks.o: displaytracks.c displaytracks.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
- config.h imagecache.h textscroller.h complexcontent.h
+ config.h imagecache.h textscroller.h complexcontent.h fontcache.h
 displayvolume.o: displayvolume.c displayvolume.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
- config.h imagecache.h textscroller.h complexcontent.h
-fontcache.o: fontcache.c fontcache.h
+ config.h imagecache.h textscroller.h complexcontent.h fontcache.h
+fontcache.o: fontcache.c fontcache.h glyphmetricscache.h
 flat.o: flat.c flat.h services/scraper2vdr.h config.h imagecache.h \
  displaychannel.h baserender.h imageloader.h imagemagickwrapper.h \
  textscroller.h complexcontent.h displaymenu.h displaymessage.h \
- displayreplay.h displaytracks.h displayvolume.h glyphmetricscache.h \
+ displayreplay.h displaytracks.h displayvolume.h fontcache.h \
  services/epgsearch.h
 skinflatplus.o: skinflatplus.c flat.h services/scraper2vdr.h config.h \
- imagecache.h setup.h imageloader.h imagemagickwrapper.h
+ imagecache.h fontcache.h setup.h imageloader.h imagemagickwrapper.h
