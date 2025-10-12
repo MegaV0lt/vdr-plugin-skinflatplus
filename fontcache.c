@@ -13,7 +13,6 @@
 
 #include "./fontcache.h"
 #include "./glyphmetricscache.h"
-#include "fontcache.h"
 
 static GlyphMetricsCache &glyphMetricsCache() {
     static GlyphMetricsCache s_cache;
