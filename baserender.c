@@ -1764,11 +1764,11 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     }
 
     // Moved outside the loop to avoid re-creation in each iteration
-    cString DayPrefix, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile;
-    cString precipitation;
+    cString DayPrefix {""}, iconFile {""}, tempMaxFile {""}, tempMinFile {""}, precFile {""}, summaryFile {""};
+    cString precipitation {""};
 
     // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
-    std::istringstream istr;
+    std::istringstream istr {""};
     istr.imbue(std::locale("C"));
 
     // Read all files and cache data
