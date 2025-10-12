@@ -563,7 +563,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 }
 
 int GetEpgsearchConflicts() {
-    cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
+    static cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
     if (pEpgSearchPlugin) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearchPlugin->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);
