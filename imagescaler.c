@@ -183,18 +183,18 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
 
 // Branchless shift and clamp [0,255] (for up to 31-bit signed input)
 ALWAYS_INLINE static unsigned int shift_clamp(int x) {
-// This is a branchless version of:
-// x = (x + 2^21) >> 22;
-// return std::clamp(x, 0, 255);
-// This avoids branches and uses bitwise operations for performance.
-static constexpr int kShiftAmount = 22;
-static constexpr int kRounding = 1 << (kShiftAmount - 1);  // 2^21
-x = (x + kRounding) >> kShiftAmount;
+    // This is a branchless version of:
+    // x = (x + 2^21) >> 22;
+    // return std::clamp(x, 0, 255);
+    // This avoids branches and uses bitwise operations for performance.
+    static constexpr int kShiftAmount = 22;
+    static constexpr int kRounding = 1 << (kShiftAmount - 1);  // 2^21
+    x = (x + kRounding) >> kShiftAmount;
 
-// Branchless [0,255] clamp for signed int (Common C idiom, fast)
-x &= -(x >= 0);              // Clamp <0 to 0 (if x<0, becomes 0)
-x -= (x > 255) * (x - 255);  // Oversaturate above 255 down to 255
-return static_cast<unsigned int>(x);
+    // Branchless [0,255] clamp for signed int (Common C idiom, fast)
+    x &= -(x >= 0);              // Clamp <0 to 0 (if x<0, becomes 0)
+    x -= (x > 255) * (x - 255);  // Oversaturate above 255 down to 255
+    return static_cast<unsigned int>(x);
 }
 
 /**
