@@ -144,6 +144,10 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     // Margin for color buttons and messages
     m_MarginButtonColor += SizeIncrease;  // Increase margin for larger OSD heights
     m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
+    // Size for error marks
+    m_MarkerWidth = (Width > 720) ? 2 : 1;  // One pixel for sd and two for hd
+    m_MarkerHorWidth = (Width > 720) ? 6 : 3;
+    m_MarkerHorOffset = (Width > 720) ? 2 : 1;
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
             "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
@@ -1101,12 +1105,13 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
 #if APIVERSNUM >= 30004
     if (Config.PlaybackShowErrorMarks > 0 && Errors) {  // Draw error marks
+        const tColor Color {Theme.Color(clrReplayErrorMark)};
         int LastPos {-1}, Pos {0};
         const int ErrorsSize {Errors->Size()};
         for (int i {0}; i < ErrorsSize; ++i) {
             Pos = static_cast<int>(Errors->At(i) * PosScaleFactor);  // Position on progressbar in pixel
             if (Pos != LastPos) {                                    // Draw mark if pos is not the same as the last one
-                ProgressBarDrawError(Pos, sml, Pos == PosCurrent);
+                ProgressBarDrawError(Pos, sml, Color, Pos == PosCurrent);
                 LastPos = Pos;
             }
         }
@@ -1185,47 +1190,30 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
 }
 
 #if APIVERSNUM >= 30004
-void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, bool IsCurrent) {
+void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color, bool IsCurrent) {
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks()'
 
-    const tColor ColorError {Theme.Color(clrReplayErrorMark)};
     const int Middle {m_ProgressBarHeight / 2};
     if (IsCurrent) {  //* Draw current position marker in color of error mark
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), Color);
     } else {
-        static constexpr int kMarkerWidth {1}, kMarkerWidth3 {3};
         const int Type {Config.PlaybackShowErrorMarks};
-        switch (Type) {  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
-        case 1:
-        case 2:
-            {
-                const int Top = Middle - (SmallLine * (Type == 1 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 1 ? 1.5 : 1)),
-                                                 ColorError);
-            }
-            break;
-        case 3:
-        case 4:
-            {
-                const int Top = Middle - (SmallLine * (Type == 3 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 3 ? 1.5 : 1)),
-                                                 ColorError);
-                ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Top, kMarkerWidth3, 1), ColorError);
-                ProgressBarPixmap->DrawRectangle(
-                    cRect(Pos - 1, Middle + (SmallLine * (Type == 3 ? 0.75 : 0.5)), kMarkerWidth3, 1), ColorError);
-            }
-            break;
-        case 5:
-        case 6:
-            {
-                const int Top = Middle - (SmallLine * (Type == 5 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 5 ? 1.5 : 1)),
-                                                 ColorError);
-                ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, kMarkerWidth3, 2), ColorError);
-            }
-            break;
-        default: esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type); break;
+        const int Top = Middle - (SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 0.5 : 0.75));
+        const int Height = SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 1 : 1.5);
+        // Draw the '|'
+        ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, m_MarkerWidth, Height), Color);
+        if (Type == 3 || Type == 4) {  // Draw the two '-' for the 'I'
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Top, m_MarkerHorWidth, m_MarkerWidth),
+                                             Color);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset,
+                                                   Middle + (SmallLine * (Type == 3 ? 0.5 : 0.75)) - m_MarkerWidth,
+                                                   m_MarkerHorWidth, m_MarkerWidth),
+                                             Color);
+        } else if (Type == 5 || Type == 6) {  // Draw the '-' for the '+'
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Middle - 1, m_MarkerHorWidth, 2), Color);
+        } else {
+            esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type);
         }
     }
 }

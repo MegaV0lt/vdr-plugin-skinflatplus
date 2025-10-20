@@ -2,6 +2,7 @@ VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2025-xx-xx: Version 1.2.2
 - [fix] Fix menu 'TVScraper settings' to update when itmes should be active or inactive
+- [update] Bigger error marks for osd in hd mode
 - [update] Some internal optimizations
 
 2025-10-09: Version 1.2.1
