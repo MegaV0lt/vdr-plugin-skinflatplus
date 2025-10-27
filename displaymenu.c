@@ -462,7 +462,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                                              m_Font, m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
                     }
                 }
-            }  // Not EPGsearch searchtimer
+            }  // Not EPGSearch searchtimer
         }  // if (s)
         if (!Tab(i + 1)) break;
     }  // for
@@ -1123,7 +1123,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {  // Show channel number for channels only
             const int ChannelNumber {Channel->Number()};
-            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (epgSearch)
+            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (EPGSearch)
             Buffer = itoa(ChannelNumber);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1397,7 +1397,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
             // dsyslog("   Channel is group separator!");
         } else {  // Extract date from separator
-            // epgsearch program '--------------------         Fr. 21.02.2025 --------------------'
+            // EPGSearch program '--------------------         Fr. 21.02.2025 --------------------'
             std::string_view sep {Event->Title()};  // Event->Title should always set to something
             if (sep.length() > 16) {                // Date with day and search string ' -'
                 const std::size_t found {sep.find(" -")};

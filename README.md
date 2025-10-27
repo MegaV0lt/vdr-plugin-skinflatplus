@@ -75,7 +75,7 @@ Versteckte Einstellungen sind Einstellungen die in der VDR setup.conf konfigurie
 
 * MenuItemRecordingClearPercent - Wenn die Einstellung auf 1 gesetzt ist, wird vom Aufnahmetext das Prozentzeichen am Anfang des Strings entfernt.
 * MenuItemRecordingShowFolderDate - Wenn die Einstellung auf 1 gesetzt ist, wird bei einem Ordner von der neuesten Aufzeichnung das Datum angezeigt, Wenn die Einstellung auf 2 gesetzt ist, wird bei einem Ordner von der ältesten Aufzeichnung das Datum angezeigt.
-* MenuItemParseTilde - Wenn die Einstellung auf 1 gesetzt ist, wird beim Menü-Item-Text auf den Buchstaben Tilde '~' geprüft und wenn eine Tilde gefunden wurde, wird die Tilde entfernt und alles was nach der Tilde steht in einer anderen Farbe dargestellt. Dies ist z.B. interessant wenn man epgsearch hat.
+* MenuItemParseTilde - Wenn die Einstellung auf 1 gesetzt ist, wird beim Menü-Item-Text auf den Buchstaben Tilde '~' geprüft und wenn eine Tilde gefunden wurde, wird die Tilde entfernt und alles was nach der Tilde steht in einer anderen Farbe dargestellt. Dies ist z.B. interessant wenn man EPGSearch hat.
 
 Widgets
 _______________________________

@@ -110,7 +110,7 @@ void cFlatBaseRender::CreateFullOsd() {
 
 void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size %dx%d", Left, Top, Width, Height);
+    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size: %dx%d", Left, Top, Width, Height);
 #endif
 
     m_OsdLeft = Left;
@@ -380,8 +380,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = now;
-        if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
-            return;
+        if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap) return;
 
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
@@ -679,7 +678,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             m_ButtonsDrawn = true;
         }
         x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;  // Add button width and margin
-    }  // for (int8_t i = 0; i < 4; i++)
+    }  // for
 }
 
 bool cFlatBaseRender::ButtonsDrawn() const { return m_ButtonsDrawn; }

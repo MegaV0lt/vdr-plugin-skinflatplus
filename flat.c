@@ -118,7 +118,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
-// Optimized EpgSearch Plugin Lookup
+// Optimized EPGSearch Plugin Lookup
 bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
 cPlugin *cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
 // Optimized Scraper Plugin Lookup
@@ -539,8 +539,8 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
             oss << "\n\n" << tr("additional information") << ':';  // Show info line
     }
 
-    if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
-        oss << "\nEPGsearch: " << tr("channel") << ": " << Channel << ", " << tr("search pattern") << ": "
+    if (!Channel.empty() && !Searchtimer.empty()) {  // EPGSearch
+        oss << "\nEPGSearch: " << tr("channel") << ": " << Channel << ", " << tr("search pattern") << ": "
             << Searchtimer;
     }
 
