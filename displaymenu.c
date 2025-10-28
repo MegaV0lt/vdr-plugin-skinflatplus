@@ -1886,7 +1886,7 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
         GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     }
     bool IsUnknownDrawn {false};
-    for (auto &GenreIcon : GenreIcons) {
+    for (const auto &GenreIcon : GenreIcons) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcon.c_str());
         img = ImgLoader.GetIcon(*IconName, IconHeight, IconHeight);
         if (!img && !IsUnknownDrawn) {
