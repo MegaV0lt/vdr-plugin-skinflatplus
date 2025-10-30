@@ -3101,7 +3101,7 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     return cString(std::string(RecNamePart).c_str());
 }
 
-cString cFlatDisplayMenu::GetRecCounts() {
+cString cFlatDisplayMenu::GetRecCounts() const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d", *m_RecFolder,
             m_LastItemRecordingLevel);
