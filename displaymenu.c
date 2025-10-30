@@ -1568,7 +1568,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     if (Config.MenuRecordingView == 0) return false;
 
-    if (Index == 0)  //? Only update when Index = 0 (First item on the page)
+    if (Index == 0)  // Only update when Index = 0 (First item on the page)
         m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1, true) : "";
 
     if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
@@ -3109,7 +3109,6 @@ cString cFlatDisplayMenu::GetRecCounts() {
 #endif
 
     uint16_t RecCount {0}, RecNewCount {0};
-    m_LastRecFolder = m_RecFolder;
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
         const int RecordingLevel {m_LastItemRecordingLevel - 1};  // Folder where the recording is stored in
         cString RecFolder2 {""};

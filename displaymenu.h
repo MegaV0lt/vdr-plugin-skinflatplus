@@ -116,7 +116,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     cString m_ItemEventLastChannelName {""};
 
-    cString m_RecFolder {""}, m_LastRecFolder {""};
+    cString m_RecFolder {""};
     int m_LastItemRecordingLevel {-1};
 
     void ItemBorderInsertUnique(const sDecorBorder &ib);
