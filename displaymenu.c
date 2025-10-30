@@ -1620,8 +1620,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
-    cString RecName = *GetRecordingName(Recording, Level, Total == 0);
-    if (Config.MenuItemRecordingClearPercent && Total == 0) {  // Remove leading percent sign(s) from RecName
+    const bool IsRecording {Total == 0};  // Recording or a folder
+    cString RecName = *GetRecordingName(Recording, Level, IsRecording);
+    if (Config.MenuItemRecordingClearPercent && IsRecording) {  // Remove leading percent sign(s) from RecName
         while (RecName[0] != '\0' && RecName[0] == '%')
             RecName = cString(*RecName + 1);
     }
@@ -1631,7 +1632,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     cString Buffer {""};
     if (Config.MenuRecordingView == 1) {  // flatPlus long
-        if (Total == 0) {                 // Recording
+        if (IsRecording) {                 // Recording
             DrawRecordingIcon("recording", Left, Top, Current);
 
             const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
@@ -1726,8 +1727,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
         }
-    } else {               // flatPlus short
-        if (Total == 0) {  // Recording
+    } else {                // flatPlus short
+        if (IsRecording) {  // Recording
             DrawRecordingIcon("recording", Left, Top, Current);
 
             int ImagesWidth {ImgRecNewWidth + ImgRecCutWidth + m_MarginItem2 + m_WidthScrollBar};
