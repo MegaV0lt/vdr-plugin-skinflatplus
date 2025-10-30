@@ -3109,11 +3109,12 @@ cString cFlatDisplayMenu::GetRecCounts() {
     uint16_t RecCount {0}, RecNewCount {0};
     m_LastRecFolder = m_RecFolder;
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
+        const int RecordingLevel {m_LastItemRecordingLevel - 1};  // Folder where the recording is stored in
         cString RecFolder2 {""};
         std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
         LOCK_RECORDINGS_READ;                      // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-            RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
+            RecFolder2 = *GetRecordingName(Rec, RecordingLevel, true);
             sv2 = *RecFolder2;
             if (sv1 == sv2) {  // Compare recording folder with current folder
                 ++RecCount;
