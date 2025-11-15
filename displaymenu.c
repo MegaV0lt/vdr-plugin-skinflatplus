@@ -1569,7 +1569,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Config.MenuRecordingView == 0) return false;
 
     if (Index == 0)  // Only update when Index = 0 (First item on the page)
-        m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1, true) : "";
+        m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
     if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
 #ifdef DEBUGFUNCSCALL
@@ -1622,7 +1622,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
     const bool IsRecording {Total == 0};  // Recording or a folder
-    cString RecName = *GetRecordingName(Recording, Level, IsRecording);
+    cString RecName = *GetRecordingName(Recording, Level);
     if (Config.MenuItemRecordingClearPercent && IsRecording) {  // Remove leading percent sign(s) from RecName
         while (RecName[0] != '\0' && RecName[0] == '%')
             RecName = cString(*RecName + 1);
@@ -3069,10 +3069,9 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
  *
  * @param Recording A pointer to the cRecording object whose name is to be retrieved.
  * @param Level The folder level at which to retrieve the name segment.
- * @param IsFolder A boolean indicating if the recording is a folder.
  * @return The name segment of the recording as a cString.
  */
-cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const {
+cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecordingName() Level %d", Level);
 #endif
@@ -3115,7 +3114,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
         std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
         LOCK_RECORDINGS_READ;                      // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-            RecFolder2 = *GetRecordingName(Rec, RecordingLevel, true);
+            RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
             sv2 = *RecFolder2;
             if (sv1 == sv2) {  // Compare recording folder with current folder
                 ++RecCount;
@@ -3168,7 +3167,7 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
     int16_t value {-1};
     if (Config.MenuItemRecordingUseOldFile) {
-        const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+        const cString RecFolder {*GetRecordingName(Recording, Level)};
         value = Config.GetRecordingOldValue(*RecFolder);
     }
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
@@ -3283,7 +3282,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     const time_t RecStart {Recording->Start()};
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
-    const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+    const cString RecFolder {*GetRecordingName(Recording, Level)};
     if (isempty(*RecFolder)) return RecStart;  // No folder
 
     std::string_view sv1 {*RecFolder}, sv2;
@@ -3292,7 +3291,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     time_t RecNewest {0}, RecOldest {now};
     LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-        RecFolder2 = *GetRecordingName(Rec, Level, true);
+        RecFolder2 = *GetRecordingName(Rec, Level);
         sv2 = *RecFolder2;
         if (sv1 == sv2) {  // Recordings must be in the same folder
             RecNewest = std::max(RecNewest, Rec->Start());

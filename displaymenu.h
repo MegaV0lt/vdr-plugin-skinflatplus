@@ -81,11 +81,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     cString m_RecCounts {""};  // Number of recordings and new recordings (35*/53)
 
-    int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
+    int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};  // Content head
     cPixmap *ContentHeadPixmap {nullptr};
     cPixmap *ContentHeadIconsPixmap {nullptr};
 
-    int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
+    int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};  // Content
 
     cPixmap *ScrollbarPixmap {nullptr};
     int m_ScrollBarTop {0}, m_ScrollBarHeight {0};
@@ -128,7 +128,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     cString GetIconName(const cString &element) const;
     cString GetMenuIconName() const;
 
-    cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;
+    cString GetRecordingName(const cRecording *Recording, int Level) const;
     cString GetRecCounts() const;  // Get number of recordings and new recordings (35*/53)
 
     void UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &TimerCount) const;  // NOLINT
