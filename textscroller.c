@@ -60,10 +60,8 @@ void cTextScroll::Draw() const {
 
     const char *TildePos {strchr(m_Text, '~')};
     if (TildePos && ColorExtraTextFg) {
-        cString first(m_Text, TildePos);
-        cString second(TildePos + 1);
-        first.CompactChars(' ');  // Remove extra spaces
-        second.CompactChars(' ');  // Remove extra spaces
+        const cString first(m_Text, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+        const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
         const cString FontName {*FontCache.GetFontName(m_Font->FontName())};
         const int FontHeight {FontCache.GetFontHeight(FontName, m_Font->Size())};

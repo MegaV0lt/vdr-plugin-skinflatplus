@@ -440,10 +440,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     if (Config.MenuItemParseTilde) {
                         const char *TildePos {strchr(s, '~')};
                         if (TildePos) {
-                            cString first(s, TildePos);
-                            cString second(TildePos + 1);
-                            first.CompactChars(' ');   // Remove extra spaces
-                            second.CompactChars(' ');  // Remove extra spaces
+                            const cString first(s, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                            const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space
 
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), *first, ColorFg,
                                                  ColorBg, m_Font,
@@ -989,10 +987,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    cString first(File, TildePos);
-                    cString second(TildePos + 1);
-                    first.CompactChars(' ');   // Remove extra spaces
-                    second.CompactChars(' ');  // Remove extra spaces
+                    const cString first(File, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                    const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
                     MenuPixmap->DrawText(cPoint(Left, Top), *first, ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1024,10 +1020,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    cString first(File, TildePos);
-                    cString second(TildePos + 1);
-                    first.CompactChars(' ');   // Remove extra spaces
-                    second.CompactChars(' ');  // Remove extra spaces
+                    const cString first(File, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                    const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), *first, ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
