@@ -1733,7 +1733,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     dsyslog("flatPlus: cFlatBaseRender::BatchReadWeatherData()");
 #endif
 
-    static const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
+    static constexpr const char *prefix {WIDGETOUTPUTPATH "/weather/weather."};
 
     // First check if temp file exists and get its last modified time
     static const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
@@ -1758,7 +1758,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
     // Read all files and cache data
     for (uint day {0}; day < out.kMaxDays; ++day) {
-        DayPrefix = cString::sprintf("%s%d", *prefix, day);
+        DayPrefix = cString::sprintf("%s%d", prefix, day);  // .../weather.0
         iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
         tempMaxFile = cString::sprintf("%s%s", *DayPrefix, ".tempMax");
         tempMinFile = cString::sprintf("%s%s", *DayPrefix, ".tempMin");
@@ -1782,7 +1782,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
 
-            static const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
+            static const cString locationFile = cString::sprintf("%s%s", prefix, "location");
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location)) out.Location = tr("Unknown");
         }  // End of day 0 specific data reading
@@ -1806,10 +1806,10 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             } else {
                 dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                out.Days[day].Precipitation = "0%";  // Default fallback
+                out.Days[day].Precipitation = "-%";  // Default fallback
             }
         } else {
-            out.Days[day].Precipitation = "0%";  // Default fallback
+            out.Days[day].Precipitation = "-%";  // Default fallback
         }
 
         out.Days[day].Summary = ReadAndExtractData(summaryFile);

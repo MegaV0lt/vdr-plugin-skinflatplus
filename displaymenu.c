@@ -1690,10 +1690,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
                 Left += ShortDateWidth + m_MarginItem;
-                if (IsRecordingOld(Recording, Level)) {
+                if (IsRecordingOld(Recording, Level))
                     DrawRecordingIcon("recording_old", Left, Top, Current);
-                    // Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
-                }
+
                 Left += m_FontHeight + m_MarginItem;  // Increase 'Left' even if no image is drawn
             }
 
