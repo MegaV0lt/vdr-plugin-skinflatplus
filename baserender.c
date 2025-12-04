@@ -1736,7 +1736,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     static constexpr const char *prefix {WIDGETOUTPUTPATH "/weather/weather."};
 
     // First check if temp file exists and get its last modified time
-    static const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
+    static const cString tempFile = cString::sprintf("%s%s", prefix, "0.temp");
     const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
     if (latest == 0) {
         dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);

@@ -96,7 +96,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.GetIcon("timerRecording", kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
-            // const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
             left += img->Width() + m_MarginItem;
         }
@@ -158,7 +157,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            // const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
         }
     }  // PlaybackShowRecordingErrors

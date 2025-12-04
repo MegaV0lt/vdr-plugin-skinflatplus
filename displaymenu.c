@@ -1491,7 +1491,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
  */
 void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
     static constexpr float kIconFormatHeightRatio {1.0 / 3.0};
-    const cString IconName = *GetRecordingFormatIcon(Recording);    // Show (SD), HD or UHD Logo
+    const cString IconName = *GetRecordingFormatIcon(Recording);    // Show video format icon (SD, HD, UHD)
     const int ImageHeight = m_FontHeight * kIconFormatHeightRatio;  // 1/3 height. Narrowing conversion
     const cImage *img {ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight)};
     if (img) {

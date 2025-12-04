@@ -377,9 +377,9 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    if (FrameTotal == 0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
-        return "recording_seen_0";  // 0%
+    if (FrameTotal <= 0 || FrameResume < 0) {  // Avoid DIV/0 and negative values
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal: %d, FrameResume: %d", FrameTotal, FrameResume);
+        return "recording_untested_replay";  // Error case. Alternative icon 'message_warning' or individual icon
     }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
