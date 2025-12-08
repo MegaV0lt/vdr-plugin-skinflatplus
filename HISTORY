@@ -2,7 +2,7 @@ VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2025-xx-xx: Version 1.2.2
 - [fix] Fix menu 'TVScraper settings' to update when itmes should be active or inactive
-- [fix] Return 'recording_untested_replay' icon when for negative values in GetRecordingSeenIcon()
+- [fix] Return 'recording_untested_replay' for negative values in GetRecordingSeenIcon()
 - [update] Bigger error marks for osd in hd mode
 - [update] Remove unused parameter from GetRecordingName()
 - [update] Some internal optimizations

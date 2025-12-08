@@ -625,13 +625,13 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
 
         PixmapClear(ChanEpgImagesPixmap);
-        PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (MediaPath[0] != '\0') {
             SetMediaSize(m_TVSRect.Size(), MediaSize,
-                         Config.TVScraperReplayInfoPosterSize * 100);  // Set size and apply user setting
+            Config.TVScraperReplayInfoPosterSize * 100);  // Set size and apply user setting
             img = ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
+                PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
                 const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
@@ -719,8 +719,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         }
     }
 
-    if (Config.RecordingAudioFormatShow) {
-        IconName = *GetCurrentAudioIcon();       // Show audio icon (Dolby, Stereo)
+    if (Config.RecordingAudioFormatShow) {  // Show audio icon (Dolby, Stereo)
+        IconName = *GetCurrentAudioIcon();
         img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
@@ -754,7 +754,7 @@ void cFlatDisplayReplay::PreLoadImages() {
         ImgLoader.GetIcon(icon, m_FontHeight, m_FontHeight);
     }
 
-    static constexpr uint32_t kCharCode {0x0030};                                               // U+0030 DIGIT ZERO
+    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
     static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
     for (const auto &icon : icons1) {
