@@ -599,7 +599,8 @@ void cFlatDisplayReplay::UpdateInfo() {
                 }
 
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
+                                      Theme.Color(clrReplayBg), m_Font,
+                                      FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00"), m_FontHeight);
                 // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
             }
         }
