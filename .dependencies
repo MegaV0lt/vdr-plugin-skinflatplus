@@ -39,7 +39,7 @@ displaytracks.o: displaytracks.c displaytracks.h baserender.h \
 displayvolume.o: displayvolume.c displayvolume.h baserender.h \
  imageloader.h imagemagickwrapper.h flat.h services/scraper2vdr.h \
  config.h imagecache.h textscroller.h complexcontent.h fontcache.h
-fontcache.o: fontcache.c fontcache.h glyphmetricscache.h
+fontcache.o: fontcache.c fontcache.h
 flat.o: flat.c flat.h services/scraper2vdr.h config.h imagecache.h \
  displaychannel.h baserender.h imageloader.h imagemagickwrapper.h \
  textscroller.h complexcontent.h displaymenu.h displaymessage.h \
