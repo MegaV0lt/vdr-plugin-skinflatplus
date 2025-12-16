@@ -15,7 +15,7 @@ See the file COPYING for more information.
 
 Anforderungen
 -------------------------------
-- VDR ab Version 1.7.34
+- VDR ab Version 2.3.8 für Plugin-Version ab 1.0.0 (Plugin-Version bis 0.8.4 VDR ab 1.7.34)
 - GraphicsMagick oder ImageMagick zur Anzeige von png/jpg Icons, Kanal-Logos and EPG Bilder
 
 
@@ -44,9 +44,9 @@ Installation wie bei allen VDR Plugins.
     make install
 
 Für die Kanallogos empfehle ich Logos aus einem der Repositories:
-- https://github.com/MegaV0lt/Picon.cz2VDR
-- https://github.com/MegaV0lt/MP_Logos
 - https://github.com/MegaV0lt/Picons2VDR
+- https://github.com/MegaV0lt/Picon.cz2VDR
+- https://github.com/MegaV0lt/MP_Logos (Veraltet)
 
 Die Logos sollten im folgenden Ordner zur Verfügung gestellt werden:
     `<vdrconfigdir>/plugins/skinflatplus/logos`
@@ -184,9 +184,8 @@ Es sollte darauf geachtet werden das nicht zu viele Zeilen ausgeben werden da im
 
 TVScraper & scraper2vdr
 -------------------------------
-Since version 0.3.0 the skin support TVScraper & scraper2vdr.
-With both plugins you'll get poster, banner and actor images for recordings and epg info.
-If You use scraper2vdr, which I recommend, you'll also get movie and series information.
+Seit Version 0.3.0 unterstützt der Skin TVScraper & scraper2vdr.
+Mit beiden Plugins erhält man Poster-, Banner- und Schauspielerbilder für Aufnahmen und EPG-Informationen.
 
 
 epgd & doppelte Informationen in EPG-Text

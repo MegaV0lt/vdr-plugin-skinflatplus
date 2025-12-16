@@ -90,7 +90,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     // First line for current, total and cutted length, second for end time
     const int SmallTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};  // Top for bottom line
 
-    // Show if still recording
+    // Show if still recording and check if it is an instant recording (@)
     int left {m_MarginItem};  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
@@ -98,6 +98,12 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         if (img) {
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
             left += img->Width() + m_MarginItem;
+        }
+        // Check for instant recording
+        const char *RecordingName {Recording->Name()};
+        if (RecordingName && *RecordingName == '@') {
+            m_TimeShiftMode = true;
+            return;
         }
     }
 
@@ -361,7 +367,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img {ImgLoader.GetIcon("recording_pos", kIconMaxSize, GlyphSize)};
+    cImage *img {
+        ImgLoader.GetIcon((m_TimeShiftMode) ? "recording_timeshift" : "recording_pos", kIconMaxSize, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -383,7 +390,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             left += HmWidth;
             LabelPixmap->DrawText(cPoint(left, TopSecs), secs.data(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_FontSecs, FontSecsWidth, FontSecsHeight);
-            // left += FontSecsWidth;
+            left += FontSecsWidth + m_MarginItem;
         } else {
             // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
             const int CurrentWidth {std::max(m_Font->Width(*m_Current) + m_MarginItem, m_LastCurrentWidth)};
@@ -391,7 +398,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
             LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   m_Font, CurrentWidth, m_FontHeight);
-            // left += CurrentWidth;
+            left += CurrentWidth + m_MarginItem;
         }
     } else {
         // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
@@ -400,7 +407,17 @@ void cFlatDisplayReplay::UpdateInfo() {
 
         LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
                               CurrentWidth, m_FontHeight);
-        // left += CurrentWidth;
+        left += CurrentWidth + m_MarginItem;
+    }
+
+    // Show TimeShift Text with blue backgroud (Message Status)
+    if (m_TimeShiftMode) {
+        const int TimeShiftTop {m_FontAscender -
+                                FontCache.GetFontAscender(m_FontName, (Setup.FontOsdSize + Setup.FontSmlSize) / 2)};
+        const int TimeShiftWidth {FontCache.GetStringWidth(m_FontName, m_FontMediumHeight, tr("TimeShift"))};
+        LabelPixmap->DrawText(cPoint(left, TimeShiftTop), tr("TimeShift"), Theme.Color(clrReplayFont),
+                              Theme.Color(clrButtonBlue), m_FontMedium, TimeShiftWidth, m_FontMediumHeight);
+        // left += TimeShiftWidth + m_MarginItem;
     }
 
     // Check if m_Recording is null and return if so
@@ -757,7 +774,8 @@ void cFlatDisplayReplay::PreLoadImages() {
 
     static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
-    static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
+    static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra",
+                                           "recording_timeshift"};
     for (const auto &icon : icons1) {
         ImgLoader.GetIcon(icon, kIconMaxSize, GlyphSize);
     }

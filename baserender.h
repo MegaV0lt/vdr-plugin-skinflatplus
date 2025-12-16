@@ -176,6 +176,7 @@ class cFlatBaseRender {
     cString m_FontTempSmlName {""};
 
     int m_FontBigHeight {0};
+    int m_FontMediumHeight {0};
     int m_FontTempSmlHeight {0};
     int m_FontTinyHeight {0};
 

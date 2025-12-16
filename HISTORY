@@ -1,9 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2025-xx-xx: Version 1.2.2
+2025-12-16: Version 1.2.2
 - [fix] Fix menu 'TVScraper settings' to update when itmes should be active or inactive
 - [fix] Return 'recording_untested_replay' for negative values in GetRecordingSeenIcon()
+- [fix] Add more links to default theme icons
 - [add] Store glyph size in global font cache and integrate 'GlyphMetricsCache'
+- [add] Indicate time shift mode via dedicated icon and info text in replay
 - [update] Bigger error marks for osd in hd mode
 - [update] Remove unused parameter from GetRecordingName()
 - [update] Some internal optimizations
