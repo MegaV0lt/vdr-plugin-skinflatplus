@@ -530,8 +530,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     cString Buffer {""};
     if (!IsGroup) {  // Show channel number for channels only
         const int ChannelNumber {Channel->Number()};
-        if (ChannelNumber > 9999) Width = m_Font->Width(*Buffer);
         Buffer = itoa(ChannelNumber);
+        if (ChannelNumber > 9999) Width = m_Font->Width(*Buffer);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, Width, m_FontHeight, taRight);
     }
 
@@ -975,7 +975,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     const div_t TimerStart {std::div(Timer->Start(), 100)};
     const div_t TimerStop {std::div(Timer->Stop(), 100)};
     if (Config.MenuTimerView == 1) {  // flatPlus long
-        Buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);
+        Buffer = cString::sprintf("%s%s%s.", *name, *name && **name ? " " : "", *day);  // Di. 16.
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
         Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "MMM 00.  ");
@@ -1123,8 +1123,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {  // Show channel number for channels only
             const int ChannelNumber {Channel->Number()};
-            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (EPGSearch)
             Buffer = itoa(ChannelNumber);
+            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (EPGSearch)
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
         Left += w + m_MarginItem;
