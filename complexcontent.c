@@ -177,7 +177,7 @@ void cComplexContent::Draw() {
         return;
     }
 
-    for (auto &content : Contents) {
+    for (const auto &content : Contents) {
         content.Draw((content.GetContentType() == CT_Image) ? PixmapImage : Pixmap);
     }
 }

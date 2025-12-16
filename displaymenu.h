@@ -81,11 +81,11 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     cString m_RecCounts {""};  // Number of recordings and new recordings (35*/53)
 
-    int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};
+    int m_chLeft {0}, m_chTop {0}, m_chWidth {0}, m_chHeight {0};  // Content head
     cPixmap *ContentHeadPixmap {nullptr};
     cPixmap *ContentHeadIconsPixmap {nullptr};
 
-    int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};
+    int m_cLeft {0}, m_cTop {0}, m_cWidth {0}, m_cHeight {0};  // Content
 
     cPixmap *ScrollbarPixmap {nullptr};
     int m_ScrollBarTop {0}, m_ScrollBarHeight {0};
@@ -116,7 +116,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     cString m_ItemEventLastChannelName {""};
 
-    cString m_RecFolder {""}, m_LastRecFolder {""};
+    cString m_RecFolder {""};
     int m_LastItemRecordingLevel {-1};
 
     void ItemBorderInsertUnique(const sDecorBorder &ib);
@@ -128,8 +128,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     cString GetIconName(const cString &element) const;
     cString GetMenuIconName() const;
 
-    cString GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const;
-    cString GetRecCounts();  // Get number of recordings and new recordings (35*/53)
+    cString GetRecordingName(const cRecording *Recording, int Level) const;
+    cString GetRecCounts() const;  // Get number of recordings and new recordings (35*/53)
 
     void UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &TimerCount) const;  // NOLINT
 
@@ -165,7 +165,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current);
     void DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top);
     void DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current);
-    void DrawRecordingIcon(const char *IconName, int &Left, int Top, bool Current);         // NOLINT
+    int DrawRecordingIcon(const char *IconName, int Left, int Top, bool Current);           // NOLINT
     int DrawContentHeadFskGenre(const cString &Fsk, std::vector<std::string> &GenreIcons);  // NOLINT
 
     void DrawMainMenuWidgets();

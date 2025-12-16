@@ -1429,6 +1429,19 @@ eOSState cFlatSetupTVScraper::ProcessKey(eKeys Key) {
                 break;
         }
     }
+    if (Key == kLeft || Key == kRight) {
+        const char* ItemText = Get(Current())->Text();
+        if (strstr(ItemText, tr("Channelinfo show poster?")) != nullptr ||
+            strstr(ItemText, tr("Replayinfo show poster?")) != nullptr ||
+            strstr(ItemText, tr("EPG info show poster?")) != nullptr ||
+            strstr(ItemText, tr("recording info show poster?")) != nullptr ||
+            strstr(ItemText, tr("search local posters")) != nullptr ||
+            strstr(ItemText, tr("EPG info show actors?")) != nullptr ||
+            strstr(ItemText, tr("recording info show actors?")) != nullptr) {
+            ItemLastSel = Current();
+            Setup();
+        }
+    }
     return state;
 }
 

@@ -90,15 +90,20 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     // First line for current, total and cutted length, second for end time
     const int SmallTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};  // Top for bottom line
 
-    // Show if still recording
+    // Show if still recording and check if it is an instant recording (@)
     int left {m_MarginItem};  // Position for recording symbol/short text/date
     cImage *img {nullptr};
     if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         img = ImgLoader.GetIcon("timerRecording", kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
-            // const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
             left += img->Width() + m_MarginItem;
+        }
+        // Check for instant recording
+        const char *RecordingName {Recording->Name()};
+        if (RecordingName && *RecordingName == '@') {
+            m_TimeShiftMode = true;
+            return;
         }
     }
 
@@ -158,7 +163,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
             left += m_MarginItem;
-            // const int ImageTop {SmallTop};
             IconsPixmap->DrawImage(cPoint(left, SmallTop), *img);
         }
     }  // PlaybackShowRecordingErrors
@@ -363,7 +367,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     //* Draw current position with symbol (1. line)
     int left {m_MarginItem};
-    cImage *img {ImgLoader.GetIcon("recording_pos", kIconMaxSize, GlyphSize)};
+    cImage *img {
+        ImgLoader.GetIcon((m_TimeShiftMode) ? "recording_timeshift" : "recording_pos", kIconMaxSize, GlyphSize)};
     if (img) {
         IconsPixmap->DrawImage(cPoint(left, TopOffset), *img);
         left += img->Width() + m_MarginItem;
@@ -385,7 +390,7 @@ void cFlatDisplayReplay::UpdateInfo() {
             left += HmWidth;
             LabelPixmap->DrawText(cPoint(left, TopSecs), secs.data(), Theme.Color(clrReplayFont),
                                   Theme.Color(clrReplayBg), m_FontSecs, FontSecsWidth, FontSecsHeight);
-            // left += FontSecsWidth;
+            left += FontSecsWidth + m_MarginItem;
         } else {
             // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
             const int CurrentWidth {std::max(m_Font->Width(*m_Current) + m_MarginItem, m_LastCurrentWidth)};
@@ -393,7 +398,7 @@ void cFlatDisplayReplay::UpdateInfo() {
 
             LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg),
                                   m_Font, CurrentWidth, m_FontHeight);
-            // left += CurrentWidth;
+            left += CurrentWidth + m_MarginItem;
         }
     } else {
         // Fix for leftover .00 when in edit mode. Add margin to fix extra pixel glitch
@@ -402,7 +407,17 @@ void cFlatDisplayReplay::UpdateInfo() {
 
         LabelPixmap->DrawText(cPoint(left, 0), *m_Current, Theme.Color(clrReplayFont), Theme.Color(clrReplayBg), m_Font,
                               CurrentWidth, m_FontHeight);
-        // left += CurrentWidth;
+        left += CurrentWidth + m_MarginItem;
+    }
+
+    // Show TimeShift Text with blue backgroud (Message Status)
+    if (m_TimeShiftMode) {
+        const int TimeShiftTop {m_FontAscender -
+                                FontCache.GetFontAscender(m_FontName, (Setup.FontOsdSize + Setup.FontSmlSize) / 2)};
+        const int TimeShiftWidth {FontCache.GetStringWidth(m_FontName, m_FontMediumHeight, tr("TimeShift"))};
+        LabelPixmap->DrawText(cPoint(left, TimeShiftTop), tr("TimeShift"), Theme.Color(clrReplayFont),
+                              Theme.Color(clrButtonBlue), m_FontMedium, TimeShiftWidth, m_FontMediumHeight);
+        // left += TimeShiftWidth + m_MarginItem;
     }
 
     // Check if m_Recording is null and return if so
@@ -601,7 +616,8 @@ void cFlatDisplayReplay::UpdateInfo() {
                 }
 
                 LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrMenuItemExtraTextFont),
-                                      Theme.Color(clrReplayBg), m_Font, m_Font->Width(*EndTime), m_FontHeight);
+                                      Theme.Color(clrReplayBg), m_Font,
+                                      FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00"), m_FontHeight);
                 // left += m_Font->Width(*EndTime) + m_MarginItem;  //* 'left' is not used anymore from here
             }
         }
@@ -627,13 +643,13 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
 
         PixmapClear(ChanEpgImagesPixmap);
-        PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
         DecorBorderClearByFrom(BorderTVSPoster);
         if (MediaPath[0] != '\0') {
             SetMediaSize(m_TVSRect.Size(), MediaSize,
-                         Config.TVScraperReplayInfoPosterSize * 100);  // Set size and apply user setting
+            Config.TVScraperReplayInfoPosterSize * 100);  // Set size and apply user setting
             img = ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height());
             if (img) {
+                PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
                 ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
                 const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
@@ -721,8 +737,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         }
     }
 
-    if (Config.RecordingAudioFormatShow) {
-        IconName = *GetCurrentAudioIcon();       // Show audio icon (Dolby, Stereo)
+    if (Config.RecordingAudioFormatShow) {  // Show audio icon (Dolby, Stereo)
+        IconName = *GetCurrentAudioIcon();
         img = ImgLoader.GetIcon(*IconName, kIconMaxSize, m_FontSmlHeight);
         if (img) {
             left -= img->Width();
@@ -756,9 +772,10 @@ void cFlatDisplayReplay::PreLoadImages() {
         ImgLoader.GetIcon(icon, m_FontHeight, m_FontHeight);
     }
 
-    static constexpr uint32_t kCharCode {0x0030};                                               // U+0030 DIGIT ZERO
+    static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
     const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
-    static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra"};
+    static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra",
+                                           "recording_timeshift"};
     for (const auto &icon : icons1) {
         ImgLoader.GetIcon(icon, kIconMaxSize, GlyphSize);
     }

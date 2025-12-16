@@ -421,13 +421,13 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (Config.TVScraperChanInfoShowPoster) GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
 
     PixmapClear(ChanEpgImagesPixmap);
-    PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
     DecorBorderClearByFrom(BorderTVSPoster);
     if (MediaPath[0] != '\0') {
         SetMediaSize(m_TVSRect.Size(), MediaSize,
-                     Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
+        Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
         cImage *img {ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
         if (img) {
+            PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
             ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
             const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,

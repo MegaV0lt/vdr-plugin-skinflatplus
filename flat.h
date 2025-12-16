@@ -307,7 +307,7 @@ class cPluginSkinFlatPlus : public cPlugin {
         if (!s_bEpgSearchPluginChecked) {
             s_pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
             s_bEpgSearchPluginChecked = true;
-            dsyslog("flatPlus: EpgSearch plugin %s", s_pEpgSearchPlugin ? "found and loaded" : "not found");
+            dsyslog("flatPlus: EPGSearch plugin %s", s_pEpgSearchPlugin ? "found and loaded" : "not found");
         }
         return s_pEpgSearchPlugin;
     }

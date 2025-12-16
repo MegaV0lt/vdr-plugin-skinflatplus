@@ -18,7 +18,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.2.1";
+static const char *VERSION        = "1.2.2";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {

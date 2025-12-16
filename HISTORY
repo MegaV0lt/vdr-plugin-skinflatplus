@@ -1,5 +1,15 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2025-12-16: Version 1.2.2
+- [fix] Fix menu 'TVScraper settings' to update when itmes should be active or inactive
+- [fix] Return 'recording_untested_replay' for negative values in GetRecordingSeenIcon()
+- [fix] Add more links to default theme icons
+- [add] Store glyph size in global font cache and integrate 'GlyphMetricsCache'
+- [add] Indicate time shift mode via dedicated icon and info text in replay
+- [update] Bigger error marks for osd in hd mode
+- [update] Remove unused parameter from GetRecordingName()
+- [update] Some internal optimizations
+
 2025-10-09: Version 1.2.1
 - [fix] Fix display of disk usage for menu category 0 (mcUndefined)
 - [add] Clear font cache on plugin stop
@@ -60,7 +70,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] Implement FontImageWeatherCache for caching weather fonts and data to
         improve performance
 - [update] Optimize scraper plugin lookup for thread safety and performance improvements
-- [update] Optimize epgsearch plugin lookup for performance improvements
+- [update] Optimize EPGSearch plugin lookup for performance improvements
 - [update] Optimize dvbapi plugin lookup for performance improvements
 - [update] Improve text handling and memory management in cTextFloatingWrapper::Set method
 - [update] Add symlinks to default icons in icon theme dirs for faster loading
@@ -250,7 +260,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2023-12-28: Version 0.8.4
 - [fix] Fix dots with long not scrolling text
 - [update] Load named logos only for channels
-- [update] Merge Epgsearch numConflicts
+- [update] Merge EPGSearch numConflicts
 - [update] Merge AddActors
 - [update] Merge InsertAuxInfos
 - [update] Some internal optimizations
@@ -289,7 +299,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Some internal optimizations
 
 2023-10-31: Version 0.7.8
- - [fix] Fix display of channel number in event view (epgSearch)
+ - [fix] Fix display of channel number in event view (EPGSearch)
 
 2023-10-30: Version 0.7.7
 - [update] Log when more then 10 Lines of actor images found
@@ -359,7 +369,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2023-09-12: Version 0.6.9
 - [update] Reformat some code
 - [update] Use CreatePixmap() instead of osd->CreatePixmap()
-- [update] Simplify check for EPGsearch search timer menu
+- [update] Simplify check for EPGSearch search timer menu
 - [update] Add parameter for Get...Icon()
 - [update] Move PlaybackShowRecordingErrors to playback menu
 - [update] Add space between Date and time in status
@@ -378,7 +388,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Update scraper2vdr.h
 
 2023-08-17: Version 0.6.6
-- [fix] mixed icon and text in epgsearch search timer menü
+- [fix] mixed icon and text in EPGSearch search timer menü
 - [fix] increased version to 0.6.5 in code
 - [fix] fix nullptr. after restart of vdr and hitting key menu
           Thanks to MarkusE @ VDR_Portal for reporting
@@ -389,7 +399,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2023-07-31: Version 0.6.5
 - [fix] ‘<unnamed>.cSimpleContent::ContentType’ may be used uninitialized [-Wmaybe-uninitialized]
           Thanks to wirbel @ VDR-Portal and FireFly @ VDR-Portal
-- [fix] Reenable icons in epgSearch's search timer menu
+- [fix] Reenable icons in EPGSearch's search timer menu
 - [add] Add font 'Droid Sans' in /contrib
 - [add] Add 'eventsview-MV.sql' in /contrib
 - [add] Add overlay icon for remote timer
@@ -449,7 +459,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2016-09-05: Version 0.6.0
 - [fix] eMenuSortMode in displaymenu.h for compile with VDR < 2.2.0
 - [fix] position of widgets in main menu (add menu item border size)
-- [fix] wrong epg logo in epgsearch eventsview
+- [fix] wrong epg logo in EPGSearch eventsview
 - [fix] remove show bitrate of audio and video in displaychannel
 - [fix] rename plugin-icon yaepghg to yaepghd
 - [fix] uninitialized pointer in displayrecoding (crash in plex-plugin and others) (thanks chriszero)
@@ -653,7 +663,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] parse tilde in timer menu and draw text after tilde with clrMenuItemExtraTextFont
 
 2014-03-25: Version 0.2.1
-- [fix] epgsearch progessbar in SetItemEvent, if epg start time is after now (2 minutes tolerance)
+- [fix] EPGSearch progessbar in SetItemEvent, if epg start time is after now (2 minutes tolerance)
 - [fix] channel logo in topbar in program menu
 - [fix] reply info background color
 - [fix] display channel progressbar while zapping
@@ -667,7 +677,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] logo background for channel logos (filename: logo_background.png)
 - [add] show cutted length of recording in replay info
 - [add] update script to update MV-Themes (contrib/flatPlus_MV_Update.sh)
-- [add] timer conflicts in TopBar, active epgsearch is needed, configurable via menu settings
+- [add] timer conflicts in TopBar, active EPGSearch is needed, configurable via menu settings
         you can configure a min value at which it will shown in red (otherwise yellow)
 - [add] display audio channel icons in audio tracks menu
 
@@ -693,7 +703,7 @@ VDR Plugin 'skin flatPlus' Revision History
 - [add] imagecache for faster image loading
 - [add] option MenuItemRecordingClearPercent set to 1 to clear the '%' in recording names (you have an cut icon to detect cutted recordings)
 - [add] option MenuItemRecordingShowFolderDate to show the date in the folder item from the newest/oldest recording in that folder (0 = disable, 1 = newest recording date, 2 = oldest recording date)
-- [add] option MenuItemParseTilde for parse the tilde (of epgsearch) and draw the text after the tilde in clrMenuItemExtraTextFont color
+- [add] option MenuItemParseTilde for parse the tilde (of EPGSearch) and draw the text after the tilde in clrMenuItemExtraTextFont color
 - [add] define DEBUGIMAGELOADTIME for debug output of imageloader time (search in cache, load from disk, scale)
 
 

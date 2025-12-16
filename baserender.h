@@ -149,6 +149,10 @@ class cFlatBaseRender {
     int m_MarginEPGImage {20};                                   // Margin for EPG image
     int m_LineWidth {0}, m_LineMargin {0};                       // Line width and margin for lines in the OSD
 
+    int m_MarkerWidth {0};                                       // Size for error markers
+    int m_MarkerHorWidth {0};                                    // Horizontal size for error markers
+    int m_MarkerHorOffset {0};                                   // Horizontal offset for error markers
+
     static constexpr int kIconMaxSize {999};   // Max icon width or height (999)
 
     // Standard fonts
@@ -172,6 +176,7 @@ class cFlatBaseRender {
     cString m_FontTempSmlName {""};
 
     int m_FontBigHeight {0};
+    int m_FontMediumHeight {0};
     int m_FontTempSmlHeight {0};
     int m_FontTinyHeight {0};
 
@@ -233,7 +238,7 @@ class cFlatBaseRender {
 
     void ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosCurrent, bool Start, bool IsCurrent);
 #if APIVERSNUM >= 30004
-    void ProgressBarDrawError(int Pos, int SmallLine, bool IsCurrent);
+    void ProgressBarDrawError(int Pos, int SmallLine, tColor Color, bool IsCurrent);
 #endif
 
     void DecorDrawGlowRectHor(cPixmap *pixmap, int Left, int Top, int Width, int Height, tColor ColorBg);

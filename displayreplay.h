@@ -58,6 +58,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         time_t m_DimmStartTime {0};
 
         int m_CurrentFrame {0};
+        bool m_TimeShiftMode {false};  // Timeshift mode
 
         bool m_ProgressShown {false};
         bool m_ModeOnly {false};

@@ -440,10 +440,8 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                     if (Config.MenuItemParseTilde) {
                         const char *TildePos {strchr(s, '~')};
                         if (TildePos) {
-                            cString first(s, TildePos);
-                            cString second(TildePos + 1);
-                            first.CompactChars(' ');   // Remove extra spaces
-                            second.CompactChars(' ');  // Remove extra spaces
+                            const cString first(s, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                            const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space
 
                             MenuPixmap->DrawText(cPoint(xt + Config.decorBorderMenuItemSize, y), *first, ColorFg,
                                                  ColorBg, m_Font,
@@ -462,7 +460,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                                              m_Font, m_MenuItemWidth - xt - Config.decorBorderMenuItemSize);
                     }
                 }
-            }  // Not EPGsearch searchtimer
+            }  // Not EPGSearch searchtimer
         }  // if (s)
         if (!Tab(i + 1)) break;
     }  // for
@@ -989,10 +987,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    cString first(File, TildePos);
-                    cString second(TildePos + 1);
-                    first.CompactChars(' ');   // Remove extra spaces
-                    second.CompactChars(' ');  // Remove extra spaces
+                    const cString first(File, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                    const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
                     MenuPixmap->DrawText(cPoint(Left, Top), *first, ColorFg, ColorBg, m_Font,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1024,10 +1020,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             if (Config.MenuItemParseTilde) {
                 const char *TildePos {strchr(File, '~')};
                 if (TildePos) {
-                    cString first(File, TildePos);
-                    cString second(TildePos + 1);
-                    first.CompactChars(' ');   // Remove extra spaces
-                    second.CompactChars(' ');  // Remove extra spaces
+                    const cString first(File, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+                    const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
                     MenuPixmap->DrawText(cPoint(Left, Top + m_FontHeight), *first, ColorFg, ColorBg, m_FontSml,
                                          m_MenuItemWidth - Left - m_MarginItem);
@@ -1123,7 +1117,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         const bool IsGroup {Channel->GroupSep()};
         if (!IsGroup) {  // Show channel number for channels only
             const int ChannelNumber {Channel->Number()};
-            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (epgSearch)
+            if (ChannelNumber > 9999) w = m_Font->Width(*Buffer);  // Width for channel number in Event (EPGSearch)
             Buffer = itoa(ChannelNumber);
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font, w, m_FontHeight, taRight);
         }
@@ -1397,7 +1391,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (Channel && Channel->GroupSep()) {  // Exclude epg2vdr group separator '-----#011 Nachrichten -----'
             // dsyslog("   Channel is group separator!");
         } else {  // Extract date from separator
-            // epgsearch program '--------------------         Fr. 21.02.2025 --------------------'
+            // EPGSearch program '--------------------         Fr. 21.02.2025 --------------------'
             std::string_view sep {Event->Title()};  // Event->Title should always set to something
             if (sep.length() > 16) {                // Date with day and search string ' -'
                 const std::size_t found {sep.find(" -")};
@@ -1497,7 +1491,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
  */
 void cFlatDisplayMenu::DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top) {
     static constexpr float kIconFormatHeightRatio {1.0 / 3.0};
-    const cString IconName = *GetRecordingFormatIcon(Recording);    // Show (SD), HD or UHD Logo
+    const cString IconName = *GetRecordingFormatIcon(Recording);    // Show video format icon (SD, HD, UHD)
     const int ImageHeight = m_FontHeight * kIconFormatHeightRatio;  // 1/3 height. Narrowing conversion
     const cImage *img {ImgLoader.GetIcon(*IconName, kIconMaxSize, ImageHeight)};
     if (img) {
@@ -1543,7 +1537,7 @@ void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int L
  * @param Top The y-coordinate where the icon will be drawn.
  * @param Current A boolean indicating whether the icon is the current one.
  */
-void cFlatDisplayMenu::DrawRecordingIcon(const char *IconName, int &Left, int Top, bool Current) {
+int cFlatDisplayMenu::DrawRecordingIcon(const char *IconName, int Left, int Top, bool Current) {
     cImage *img {nullptr};
     if (Current) {
         const cString IconNameCur = cString::sprintf("%s_cur", IconName);
@@ -1554,6 +1548,7 @@ void cFlatDisplayMenu::DrawRecordingIcon(const char *IconName, int &Left, int To
         MenuIconsPixmap->DrawImage(cPoint(Left, Top), *img);
         Left += m_FontHeight + m_MarginItem;
     }
+    return Left;
 }
 
 bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, bool Current, bool Selectable,
@@ -1567,8 +1562,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     if (Config.MenuRecordingView == 0) return false;
 
-    if (Index == 0)  //? Only update when Index = 0 (First item on the page)
-        m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1, true) : "";
+    if (Index == 0)  // Only update when Index = 0 (First item on the page)
+        m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
     if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
 #ifdef DEBUGFUNCSCALL
@@ -1620,8 +1615,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
-    cString RecName = *GetRecordingName(Recording, Level, Total == 0);
-    if (Config.MenuItemRecordingClearPercent && Total == 0) {  // Remove leading percent sign(s) from RecName
+    const bool IsRecording {Total == 0};  // Recording or a folder
+    cString RecName = *GetRecordingName(Recording, Level);
+    if (Config.MenuItemRecordingClearPercent && IsRecording) {  // Remove leading percent sign(s) from RecName
         while (RecName[0] != '\0' && RecName[0] == '%')
             RecName = cString(*RecName + 1);
     }
@@ -1631,8 +1627,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     cString Buffer {""};
     if (Config.MenuRecordingView == 1) {  // flatPlus long
-        if (Total == 0) {                 // Recording
-            DrawRecordingIcon("recording", Left, Top, Current);
+        if (IsRecording) {                // Recording
+            Left = DrawRecordingIcon("recording", Left, Top, Current);
 
             const div_t TimeHM {std::div((Recording->LengthInSeconds() + 30) / 60, 60)};
             const cString Length = cString::sprintf("%02d:%02d", TimeHM.quot, TimeHM.rem);
@@ -1669,7 +1665,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
         } else if (Total > 0) {  // Folder with recordings
-            DrawRecordingIcon("folder", Left, Top, Current);
+            Left = DrawRecordingIcon("folder", Left, Top, Current);
 
             const int DigitsWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000")};
             const int DigitsMaxWidth {DigitsWidth + m_MarginItem};  // Use same width for recs and new recs
@@ -1694,10 +1690,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 Buffer = *ShortDateString(GetLastRecTimeFromFolder(Recording, Level));
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_Font);
                 Left += ShortDateWidth + m_MarginItem;
-                if (IsRecordingOld(Recording, Level)) {
+                if (IsRecordingOld(Recording, Level))
                     DrawRecordingIcon("recording_old", Left, Top, Current);
-                    Left -= m_FontHeight + m_MarginItem;  //* Must be increased always
-                }
+
                 Left += m_FontHeight + m_MarginItem;  // Increase 'Left' even if no image is drawn
             }
 
@@ -1713,7 +1708,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             }
             // LeftWidth += m_Font->Width(*RecName) + m_MarginItem2;  //* Unused from here
         } else if (Total == -1) {  // Folder without recordings
-            DrawRecordingIcon("folder", Left, Top, Current);
+            Left = DrawRecordingIcon("folder", Left, Top, Current);
 
             if (Current && m_Font->Width(Recording->FileName()) > (m_MenuItemWidth - Left - m_MarginItem) &&
                 Config.ScrollerEnable) {
@@ -1726,9 +1721,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                                      m_MenuItemWidth - Left - m_MarginItem);
             }
         }
-    } else {               // flatPlus short
-        if (Total == 0) {  // Recording
-            DrawRecordingIcon("recording", Left, Top, Current);
+    } else {                // flatPlus short
+        if (IsRecording) {  // Recording
+            Left = DrawRecordingIcon("recording", Left, Top, Current);
 
             int ImagesWidth {ImgRecNewWidth + ImgRecCutWidth + m_MarginItem2 + m_WidthScrollBar};
             if (m_IsScrolling) ImagesWidth -= m_WidthScrollBar;
@@ -1773,7 +1768,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Left += ImgRecCutWidth + (ImgRecCutWidth / 2) + m_MarginItem;  // Ensures exact 100% increase
 
         } else if (Total > 0) {  // Folder with recordings
-            DrawRecordingIcon("folder", Left, Top, Current);
+            Left = DrawRecordingIcon("folder", Left, Top, Current);
 
             if (Current && m_Font->Width(*RecName) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
                 MenuItemScroller.AddScroller(
@@ -1805,11 +1800,11 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorExtraTextFg, ColorBg, m_FontSml);
                 if (IsRecordingOld(Recording, Level)) {
                     Left += FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00.00.00");
-                    DrawRecordingIcon("recording_old", Left, Top, Current);
+                    Left = DrawRecordingIcon("recording_old", Left, Top, Current);
                 }
             }
         } else if (Total == -1) {  // Folder without recordings
-            DrawRecordingIcon("folder", Left, Top, Current);
+            Left = DrawRecordingIcon("folder", Left, Top, Current);
 
             if (Current && m_Font->Width(Recording->FileName()) > (m_MenuItemWidth - Left - m_MarginItem) &&
                 Config.ScrollerEnable) {
@@ -1886,7 +1881,7 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
         GenreIcons.erase(unique(GenreIcons.begin(), GenreIcons.end()), GenreIcons.end());
     }
     bool IsUnknownDrawn {false};
-    for (auto &GenreIcon : GenreIcons) {
+    for (const auto &GenreIcon : GenreIcons) {
         IconName = cString::sprintf("EPGInfo/Genre/%s", GenreIcon.c_str());
         img = ImgLoader.GetIcon(*IconName, IconHeight, IconHeight);
         if (!img && !IsUnknownDrawn) {
@@ -3067,10 +3062,9 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
  *
  * @param Recording A pointer to the cRecording object whose name is to be retrieved.
  * @param Level The folder level at which to retrieve the name segment.
- * @param IsFolder A boolean indicating if the recording is a folder.
  * @return The name segment of the recording as a cString.
  */
-cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level, bool IsFolder) const {
+cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Level) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecordingName() Level %d", Level);
 #endif
@@ -3099,7 +3093,7 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     return cString(std::string(RecNamePart).c_str());
 }
 
-cString cFlatDisplayMenu::GetRecCounts() {
+cString cFlatDisplayMenu::GetRecCounts() const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d", *m_RecFolder,
             m_LastItemRecordingLevel);
@@ -3107,13 +3101,13 @@ cString cFlatDisplayMenu::GetRecCounts() {
 #endif
 
     uint16_t RecCount {0}, RecNewCount {0};
-    m_LastRecFolder = m_RecFolder;
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
+        const int RecordingLevel {m_LastItemRecordingLevel - 1};  // Folder where the recording is stored in
         cString RecFolder2 {""};
         std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
         LOCK_RECORDINGS_READ;                      // Creates local const cRecordings *Recordings
         for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-            RecFolder2 = *GetRecordingName(Rec, m_LastItemRecordingLevel - 1, true);
+            RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
             sv2 = *RecFolder2;
             if (sv1 == sv2) {  // Compare recording folder with current folder
                 ++RecCount;
@@ -3166,7 +3160,7 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
     int16_t value {-1};
     if (Config.MenuItemRecordingUseOldFile) {
-        const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+        const cString RecFolder {*GetRecordingName(Recording, Level)};
         value = Config.GetRecordingOldValue(*RecFolder);
     }
     if (value < 0) value = Config.MenuItemRecordingDefaultOldDays;
@@ -3281,7 +3275,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     const time_t RecStart {Recording->Start()};
     if (Config.MenuItemRecordingShowFolderDate == 0) return RecStart;  // None (default)
 
-    const cString RecFolder {*GetRecordingName(Recording, Level, true)};
+    const cString RecFolder {*GetRecordingName(Recording, Level)};
     if (isempty(*RecFolder)) return RecStart;  // No folder
 
     std::string_view sv1 {*RecFolder}, sv2;
@@ -3290,7 +3284,7 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     time_t RecNewest {0}, RecOldest {now};
     LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-        RecFolder2 = *GetRecordingName(Rec, Level, true);
+        RecFolder2 = *GetRecordingName(Rec, Level);
         sv2 = *RecFolder2;
         if (sv1 == sv2) {  // Recordings must be in the same folder
             RecNewest = std::max(RecNewest, Rec->Start());

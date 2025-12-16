@@ -118,7 +118,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     return nullptr;
 }
 
-// Optimized EpgSearch Plugin Lookup
+// Optimized EPGSearch Plugin Lookup
 bool cPluginSkinFlatPlus::s_bEpgSearchPluginChecked = false;
 cPlugin *cPluginSkinFlatPlus::s_pEpgSearchPlugin = nullptr;
 // Optimized Scraper Plugin Lookup
@@ -302,11 +302,11 @@ cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720) return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
     static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
-    static const cString ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
+    static constexpr const char *ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
     const uint16_t ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
     for (std::size_t i {0}; i < ScreenAspectNums; ++i) {
         if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
-            return ScreenAspectNames[i];
+            return cString(ScreenAspectNames[i]);
     }
 
     dsyslog("flatPlus: Unknown screen aspect: %.5f (Screen width: %d)", ScreenAspect, ScreenWidth);
@@ -323,13 +323,13 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     544x576 (PAL)                 528x576 (PAL)
     480x576 (PAL SVCD)            352x576 (PAL CVD) */
 
-    static const cString ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
-                                     "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
-                                     "528x576",   "480x576",   "352x576"};
+    static constexpr const char *ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
+                                             "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
+                                             "528x576",   "480x576",   "352x576"};
     static constexpr int16_t ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
     const uint16_t ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
     for (std::size_t i {0}; i < ResNums; ++i) {
-        if (ScreenWidth == ResWidths[i]) return ResNames[i];
+        if (ScreenWidth == ResWidths[i]) return cString(ResNames[i]);
     }
 
     dsyslog("flatPlus: Unknown screen resolution: %dx%d", ScreenWidth, ScreenHeight);
@@ -377,9 +377,9 @@ cString GetRecordingErrorIcon(int RecInfoErrors) {
 }
 
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
-    if (FrameTotal == 0) {  // Avoid DIV/0
-        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal is 0! FrameResume: %d", FrameResume);
-        return "recording_seen_0";  // 0%
+    if (FrameTotal <= 0 || FrameResume < 0) {  // Avoid DIV/0 and negative values
+        esyslog("flatPlus: Error in GetRecordingSeenIcon() FrameTotal: %d, FrameResume: %d", FrameTotal, FrameResume);
+        return "recording_untested_replay";  // Error case. Alternative icon 'message_warning' or individual icon
     }
 
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
@@ -539,8 +539,8 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
             oss << "\n\n" << tr("additional information") << ':';  // Show info line
     }
 
-    if (!Channel.empty() && !Searchtimer.empty()) {  // EpgSearch
-        oss << "\nEPGsearch: " << tr("channel") << ": " << Channel << ", " << tr("search pattern") << ": "
+    if (!Channel.empty() && !Searchtimer.empty()) {  // EPGSearch
+        oss << "\nEPGSearch: " << tr("channel") << ": " << Channel << ", " << tr("search pattern") << ": "
             << Searchtimer;
     }
 
@@ -563,7 +563,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 }
 
 int GetEpgsearchConflicts() {
-    cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
+    static cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
     if (pEpgSearchPlugin) {
         Epgsearch_lastconflictinfo_v1_0 ServiceData {.nextConflict = 0, .relevantConflicts = 0, .totalConflicts = 0};
         pEpgSearchPlugin->Service("Epgsearch-lastconflictinfo-v1.0", &ServiceData);

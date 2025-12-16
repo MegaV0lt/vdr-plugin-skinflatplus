@@ -43,8 +43,8 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
 
-    m_FontName = Setup.FontOsd;
-    m_FontSmlName = Setup.FontSml;
+    m_FontName = Setup.FontOsd;     // VDR font size
+    m_FontSmlName = Setup.FontSml;  // VDR font small size
 
     m_FontHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize);
     m_FontHeight2 = m_FontHeight * 2;
@@ -64,7 +64,7 @@ cFlatBaseRender::cFlatBaseRender() {
         m_FontTinyHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize * 0.8);
     }
     m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
-    // Unused: m_FontMediumHeight = FontCache.GetFontHeight(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
+    m_FontMediumHeight = FontCache.GetFontHeight(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
 
     // Top bar fonts
     const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
@@ -110,7 +110,7 @@ void cFlatBaseRender::CreateFullOsd() {
 
 void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size %dx%d", Left, Top, Width, Height);
+    dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size: %dx%d", Left, Top, Width, Height);
 #endif
 
     m_OsdLeft = Left;
@@ -144,6 +144,10 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     // Margin for color buttons and messages
     m_MarginButtonColor += SizeIncrease;  // Increase margin for larger OSD heights
     m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
+    // Size for error marks
+    m_MarkerWidth = (Width > 720) ? 2 : 1;  // One pixel for sd and two for hd
+    m_MarkerHorWidth = (Width > 720) ? 6 : 3;
+    m_MarkerHorOffset = (Width > 720) ? 2 : 1;
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
             "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
@@ -376,8 +380,7 @@ void cFlatBaseRender::TopBarUpdate() {
 
         m_TopBarUpdateTitle = false;
         m_TopBarLastDate = now;
-        if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap)  // Check only if we have something to do
-            return;
+        if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap) return;
 
         const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         int MenuIconWidth {0};
@@ -675,7 +678,7 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
             m_ButtonsDrawn = true;
         }
         x += ButtonWidth + m_MarginItem + Config.decorBorderButtonSize * 2;  // Add button width and margin
-    }  // for (int8_t i = 0; i < 4; i++)
+    }  // for
 }
 
 bool cFlatBaseRender::ButtonsDrawn() const { return m_ButtonsDrawn; }
@@ -750,11 +753,9 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         const char *TildePos {strchr(Text, '~')};
-        if (TildePos) {
-            cString first(Text, TildePos);
-            cString second(TildePos + 1);
-            first.CompactChars(' ');   // Remove extra spaces
-            second.CompactChars(' ');  // Remove extra spaces
+        if (TildePos) {  // Text can be 'Title~Subtilte' or 'Title ~ Subtitle'
+            const cString first(Text, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+            const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
             MessagePixmap->DrawText(cPoint((m_OsdWidth - TextWidth) / 2, m_MarginItem), *first,
                                     Theme.Color(clrMessageFont), Theme.Color(clrMessageBg), m_Font);
@@ -1101,12 +1102,13 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
 #if APIVERSNUM >= 30004
     if (Config.PlaybackShowErrorMarks > 0 && Errors) {  // Draw error marks
+        const tColor Color {Theme.Color(clrReplayErrorMark)};
         int LastPos {-1}, Pos {0};
         const int ErrorsSize {Errors->Size()};
         for (int i {0}; i < ErrorsSize; ++i) {
             Pos = static_cast<int>(Errors->At(i) * PosScaleFactor);  // Position on progressbar in pixel
             if (Pos != LastPos) {                                    // Draw mark if pos is not the same as the last one
-                ProgressBarDrawError(Pos, sml, Pos == PosCurrent);
+                ProgressBarDrawError(Pos, sml, Color, Pos == PosCurrent);
                 LastPos = Pos;
             }
         }
@@ -1185,47 +1187,30 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
 }
 
 #if APIVERSNUM >= 30004
-void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, bool IsCurrent) {
+void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color, bool IsCurrent) {
     // if (!ProgressBarPixmap) return;  // Checked in calling function 'ProgressBarDrawMarks()'
 
-    const tColor ColorError {Theme.Color(clrReplayErrorMark)};
     const int Middle {m_ProgressBarHeight / 2};
-    if (IsCurrent) {  //* Draw current position marker in color of error mark
+    if (IsCurrent) {  //* Draw current position marker (square) in color of error mark
         const int Big {m_ProgressBarHeight - (SmallLine * 2) - 2};
-        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), ColorError);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), Color);
     } else {
-        static constexpr int kMarkerWidth {1}, kMarkerWidth3 {3};
-        const int Type {Config.PlaybackShowErrorMarks};
-        switch (Type) {  // Types: '|' (1, 2), 'I' (3, 4) and '+' (5, 6) small/big
-        case 1:
-        case 2:
-            {
-                const int Top = Middle - (SmallLine * (Type == 1 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 1 ? 1.5 : 1)),
-                                                 ColorError);
-            }
-            break;
-        case 3:
-        case 4:
-            {
-                const int Top = Middle - (SmallLine * (Type == 3 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 3 ? 1.5 : 1)),
-                                                 ColorError);
-                ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Top, kMarkerWidth3, 1), ColorError);
-                ProgressBarPixmap->DrawRectangle(
-                    cRect(Pos - 1, Middle + (SmallLine * (Type == 3 ? 0.75 : 0.5)), kMarkerWidth3, 1), ColorError);
-            }
-            break;
-        case 5:
-        case 6:
-            {
-                const int Top = Middle - (SmallLine * (Type == 5 ? 0.75 : 0.5));
-                ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, kMarkerWidth, SmallLine * (Type == 5 ? 1.5 : 1)),
-                                                 ColorError);
-                ProgressBarPixmap->DrawRectangle(cRect(Pos - 1, Middle - 1, kMarkerWidth3, 2), ColorError);
-            }
-            break;
-        default: esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type); break;
+        const int Type {Config.PlaybackShowErrorMarks};  // 1 & 2 = '|', 3 & 4 = 'I', 5 & 6 = '+'
+        const int Top = Middle - (SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 0.5 : 0.75));
+        const int Height = SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 1 : 1.5);
+        // Draw the '|'
+        ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, m_MarkerWidth, Height), Color);
+        if (Type == 3 || Type == 4) {  // Draw the two '-' for the 'I'
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Top, m_MarkerHorWidth, m_MarkerWidth),
+                                             Color);
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset,
+                                                   Middle + (SmallLine * (Type == 3 ? 0.5 : 0.75)) - m_MarkerWidth,
+                                                   m_MarkerHorWidth, m_MarkerWidth),
+                                             Color);
+        } else if (Type == 5 || Type == 6) {  // Draw the '-' for the '+'
+            ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Middle - 1, m_MarkerHorWidth, 2), Color);
+        } else if (Type > 6) {
+            esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type);
         }
     }
 }
@@ -1748,10 +1733,10 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     dsyslog("flatPlus: cFlatBaseRender::BatchReadWeatherData()");
 #endif
 
-    static const cString prefix = cString::sprintf("%s%s", WIDGETOUTPUTPATH, "/weather/weather.");
+    static constexpr const char *prefix {WIDGETOUTPUTPATH "/weather/weather."};
 
     // First check if temp file exists and get its last modified time
-    static const cString tempFile = cString::sprintf("%s%s", *prefix, "0.temp");
+    static const cString tempFile = cString::sprintf("%s%s", prefix, "0.temp");
     const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
     if (latest == 0) {
         dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
@@ -1764,16 +1749,16 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     }
 
     // Moved outside the loop to avoid re-creation in each iteration
-    cString DayPrefix, iconFile, tempMaxFile, tempMinFile, precFile, summaryFile;
-    cString precipitation;
+    cString DayPrefix {""}, iconFile {""}, tempMaxFile {""}, tempMinFile {""}, precFile {""}, summaryFile {""};
+    cString precipitation {""};
 
     // Reuse the istringstream object to avoid repeated construction/destruction in the loop.
-    std::istringstream istr;
+    std::istringstream istr {""};
     istr.imbue(std::locale("C"));
 
     // Read all files and cache data
     for (uint day {0}; day < out.kMaxDays; ++day) {
-        DayPrefix = cString::sprintf("%s%d", *prefix, day);
+        DayPrefix = cString::sprintf("%s%d", prefix, day);  // .../weather.0
         iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
         tempMaxFile = cString::sprintf("%s%s", *DayPrefix, ".tempMax");
         tempMinFile = cString::sprintf("%s%s", *DayPrefix, ".tempMin");
@@ -1797,7 +1782,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
 
-            static const cString locationFile = cString::sprintf("%s%s", *prefix, "location");
+            static const cString locationFile = cString::sprintf("%s%s", prefix, "location");
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location)) out.Location = tr("Unknown");
         }  // End of day 0 specific data reading
@@ -1821,10 +1806,10 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
             } else {
                 dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                out.Days[day].Precipitation = "0%";  // Default fallback
+                out.Days[day].Precipitation = "-%";  // Default fallback
             }
         } else {
-            out.Days[day].Precipitation = "0%";  // Default fallback
+            out.Days[day].Precipitation = "-%";  // Default fallback
         }
 
         out.Days[day].Summary = ReadAndExtractData(summaryFile);
@@ -1912,12 +1897,8 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 #endif
 
     int left {m_MarginItem};
-    const int WeatherFontHeight {wd.FontHeight};
-    const int WeatherFontHeightMinusMargin {WeatherFontHeight - m_MarginItem2};
-    const int WeatherFontSmlHeight {wd.FontSmlHeight};
-    const int WeatherFontHeightDiff {(WeatherFontHeight - WeatherFontSmlHeight) / 2};
-
-    const int TempTodaySignWidth {wd.TempTodaySignWidth};
+    const int WeatherFontHeightMinusMargin {wd.FontHeight - m_MarginItem2};
+    const int WeatherFontHeightDiff {(wd.FontHeight - wd.FontSmlHeight) / 2};
 
     const int TempTodayWidth = wd.WeatherFont->Width(wd.Temp);
     const int PrecTodayWidth = wd.WeatherFontSml->Width(wd.Days[0].Precipitation);
@@ -1931,16 +1912,16 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // For weather widget use the same margin as for the EPG images
     const int wTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
                     Config.decorBorderChannelEPGSize};
-    const int wWidth {m_MarginItem + TempTodayWidth + TempTodaySignWidth + m_MarginItem2 + WeatherFontHeight +
+    const int wWidth {m_MarginItem + TempTodayWidth + wd.TempTodaySignWidth + m_MarginItem2 + wd.FontHeight +
                       m_MarginItem + WidthTempToday + m_MarginItem + WeatherFontHeightMinusMargin + PrecTodayWidth +
-                      m_MarginItem * 4 + WeatherFontHeight + m_MarginItem + WidthTempTomorrow + m_MarginItem +
+                      m_MarginItem * 4 + wd.FontHeight + m_MarginItem + WidthTempTomorrow + m_MarginItem +
                       WeatherFontHeightMinusMargin + PrecTomorrowWidth + m_MarginItem2};
     const int wLeft {m_OsdWidth - wWidth - m_MarginEPGImage};
 
     // Setup widget
     WeatherWidget.Clear();
     WeatherWidget.SetOsd(m_Osd);
-    WeatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, WeatherFontHeight));
+    WeatherWidget.SetPosition(cRect(wLeft, wTop, wWidth, wd.FontHeight));
     WeatherWidget.SetBGColor(Theme.Color(clrItemCurrentBg));
     WeatherWidget.SetScrollingActive(false);
 
@@ -1949,34 +1930,34 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           Theme.Color(clrItemCurrentBg), wd.WeatherFont);
     left += TempTodayWidth;
 
-    const int t {(WeatherFontHeight - wd.FontAscender) - (wd.FontSignHeight - wd.FontSignAscender)};
+    const int t {(wd.FontHeight - wd.FontAscender) - (wd.FontSignHeight - wd.FontSignAscender)};
 
     // Add temperature sign
     WeatherWidget.AddText(wd.TempTodaySign, false, cRect(left, t, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), wd.WeatherFontSign);
-    left += TempTodaySignWidth + m_MarginItem2;
+    left += wd.TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
     cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
-    cImage *img {ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin)};
+    cImage *img {ImgLoader.GetIcon(*WeatherIcon, wd.FontHeight, WeatherFontHeightMinusMargin)};
     if (img) {
-        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight + m_MarginItem;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, wd.FontHeight, wd.FontHeight));
+        left += wd.FontHeight + m_MarginItem;
     }
 
     // Add temperature min/max values
     WeatherWidget.AddText(wd.Days[0].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrItemCurrentBg), wd.WeatherFontSml, WidthTempToday, WeatherFontSmlHeight,
+                          Theme.Color(clrItemCurrentBg), wd.WeatherFontSml, WidthTempToday, wd.FontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(wd.Days[0].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(wd.Days[0].TempMin, false, cRect(left, 0 + wd.FontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml,
-                          WidthTempToday, WeatherFontSmlHeight, taRight);
+                          WidthTempToday, wd.FontSmlHeight, taRight);
     left += WidthTempToday + m_MarginItem;
 
     // Add precipitation icon
-    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", WeatherFontHeight, WeatherFontHeightMinusMargin)};
+    cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", wd.FontHeight, WeatherFontHeightMinusMargin)};
     if (ImgUmbrella) {
-        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, wd.FontHeight, wd.FontHeight));
         left += WeatherFontHeightMinusMargin;
     }
 
@@ -1985,29 +1966,29 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrItemCurrentBg), wd.WeatherFontSml);
     left += PrecTodayWidth + m_MarginItem * 4;
 
-    WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, WeatherFontHeight),
+    WeatherWidget.AddRect(cRect(left - m_MarginItem2, 0, wWidth - left + m_MarginItem2, wd.FontHeight),
                           Theme.Color(clrChannelBg));
 
     // Add weather icon tomorrow
     WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[1].Icon);
-    img = ImgLoader.GetIcon(*WeatherIcon, WeatherFontHeight, WeatherFontHeightMinusMargin);
+    img = ImgLoader.GetIcon(*WeatherIcon, wd.FontHeight, WeatherFontHeightMinusMargin);
     if (img) {
-        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
-        left += WeatherFontHeight + m_MarginItem;
+        WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, wd.FontHeight, wd.FontHeight));
+        left += wd.FontHeight + m_MarginItem;
     }
 
     // Add temperature min/max values tomorrow
     WeatherWidget.AddText(wd.Days[1].TempMax, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
-                          Theme.Color(clrChannelBg), wd.WeatherFontSml, WidthTempTomorrow, WeatherFontSmlHeight,
+                          Theme.Color(clrChannelBg), wd.WeatherFontSml, WidthTempTomorrow, wd.FontSmlHeight,
                           taRight);
-    WeatherWidget.AddText(wd.Days[1].TempMin, false, cRect(left, 0 + WeatherFontSmlHeight, 0, 0),
+    WeatherWidget.AddText(wd.Days[1].TempMin, false, cRect(left, 0 + wd.FontSmlHeight, 0, 0),
                           Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), wd.WeatherFontSml,
-                          WidthTempTomorrow, WeatherFontSmlHeight, taRight);
+                          WidthTempTomorrow, wd.FontSmlHeight, taRight);
     left += WidthTempTomorrow + m_MarginItem;
 
     // Add precipitation icon
     if (ImgUmbrella) {
-        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, WeatherFontHeight, WeatherFontHeight));
+        WeatherWidget.AddImage(ImgUmbrella, cRect(left, 0 + m_MarginItem, wd.FontHeight, wd.FontHeight));
         left += WeatherFontHeightMinusMargin;
     }
 

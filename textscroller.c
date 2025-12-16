@@ -27,14 +27,7 @@ void cTextScroll::SetText(const char *text, const cRect &position, tColor colorF
 
     m_Osd->DestroyPixmap(Pixmap);
     const cRect DrawPort(0, 0, font->Width(text), position.Height());
-    Pixmap = CreatePixmap(m_Osd, "Pixmap", m_Layer, position, DrawPort);
-#ifdef DEBUGFUNCSCALL
-    dsyslog("   Pixmap left %d, top %d, width %d, height %d", m_Position.Left(), m_Position.Top(), m_Position.Width(),
-            m_Position.Height());
-    dsyslog("   DrawPort left %d, top %d, width %d, height %d", DrawPort.Left(), DrawPort.Top(), DrawPort.Width(),
-            DrawPort.Height());
-#endif
-
+    Pixmap = CreatePixmap(m_Osd, "TextScrollPixmap", m_Layer, position, DrawPort);
     PixmapFill(Pixmap, colorBg);
     Draw();
 }
@@ -67,10 +60,8 @@ void cTextScroll::Draw() const {
 
     const char *TildePos {strchr(m_Text, '~')};
     if (TildePos && ColorExtraTextFg) {
-        cString first(m_Text, TildePos);
-        cString second(TildePos + 1);
-        first.CompactChars(' ');  // Remove extra spaces
-        second.CompactChars(' ');  // Remove extra spaces
+        const cString first(m_Text, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
+        const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 
         const cString FontName {*FontCache.GetFontName(m_Font->FontName())};
         const int FontHeight {FontCache.GetFontHeight(FontName, m_Font->Size())};
