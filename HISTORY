@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-xx-xx: Version 1.2.3
+- [update] Remove unused 'Recording_new2' and 'recording_new2_cur' icon
+
 2025-12-16: Version 1.2.2
 - [fix] Fix menu 'TVScraper settings' to update when itmes should be active or inactive
 - [fix] Return 'recording_untested_replay' for negative values in GetRecordingSeenIcon()
