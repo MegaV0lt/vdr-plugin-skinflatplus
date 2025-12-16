@@ -103,7 +103,6 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
         const char *RecordingName {Recording->Name()};
         if (RecordingName && *RecordingName == '@') {
             m_TimeShiftMode = true;
-            return;
         }
     }
 
