@@ -404,7 +404,10 @@ void cFlatBaseRender::TopBarUpdate() {
                 int ImageBGHeight {TopBarLogoHeight};
                 int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
-                img = ImgLoader.GetIcon("logo_background", ImageBGWidth, ImageBGHeight);
+                img = ImgLoader.GetLogo("logo_background", ImageBGWidth, ImageBGHeight);
+                if (!img) {
+                    img = ImgLoader.GetIcon("logo_background", ImageBGWidth, ImageBGHeight);
+                }
                 if (img) {
                     ImageBGHeight = img->Height();
                     ImageBGWidth = img->Width();

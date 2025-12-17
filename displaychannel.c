@@ -198,7 +198,10 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
         int ImageTop {m_MarginItem};
-        cImage *img {ImgLoader.GetIcon("logo_background", ImageHeight * 1.34f, ImageHeight)};
+        cImage *img {ImgLoader.GetLogo("logo_background", ImageHeight * 1.34f, ImageHeight)};
+        if (!img) {
+            img = ImgLoader.GetIcon("logo_background", ImageHeight * 1.34f, ImageHeight);
+        }
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -607,7 +610,10 @@ void cFlatDisplayChannel::PreLoadImages() {
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.GetIcon("logo_background", height, height);
 
-    cImage *img {ImgLoader.GetIcon("logo_background", height * 1.34f, height)};
+    cImage *img {ImgLoader.GetLogo("logo_background", height * 1.34f, height)};
+    if (!img) {
+        img = ImgLoader.GetIcon("logo_background", height * 1.34f, height);
+    }
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
