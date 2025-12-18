@@ -30,9 +30,10 @@ cImageLoader::~cImageLoader() {}
  * @param logo The name of the logo (without path).
  * @param width The desired width of the logo.
  * @param height The desired height of the logo.
+ * @param MissingOk If true, the function returns nullptr if the logo is not found.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
-cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
+cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool MissingOk) {
     if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -67,6 +68,8 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
 
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
+            if (MissingOk) return nullptr;  // Not found, but missing is ok
+
             if (i == 2)              // Third try and not found
                 isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
@@ -92,6 +95,18 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
     return nullptr;  // No image; so return nullptr
 }
 
+/**
+ * @brief Load an icon from a file and scale it to the given width and height.
+ *
+ * This function tries to load the icon from the configured icon path and
+ * scales it to the given width and height. If the icon is not found, the
+ * function logs an error message and returns nullptr.
+ *
+ * @param cIcon The name of the icon (without path).
+ * @param width The desired width of the icon.
+ * @param height The desired height of the icon.
+ * @return The loaded and scaled icon, or nullptr if the icon could not be loaded.
+ */
 cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
     if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
 

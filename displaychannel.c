@@ -163,7 +163,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
         // Ensure shadow size is reasonable
         const int MinShadowSize {m_MarginItem / 2 + 1};  // Minimum shadow size
-        const int MaxShadowSize {m_MarginItem * 2};      // Shadow should not be too large
+        const int MaxShadowSize {m_MarginItem3};         // Shadow should not be too large
         const int BoundedShadowSize {std::clamp(ShadowSize, MinShadowSize, MaxShadowSize)};
         // Set shadow color to the same as background color and remove transparency
         const tColor ShadowColor = 0xFF000000 | Theme.Color(clrChannelBg);
@@ -198,7 +198,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
         int ImageTop {m_MarginItem};
-        cImage *img {ImgLoader.GetLogo("logo_background", ImageHeight * 1.34f, ImageHeight)};
+        cImage *img {ImgLoader.GetLogo("logo_background", ImageHeight * 1.34f, ImageHeight, true)};
         if (!img) {
             img = ImgLoader.GetIcon("logo_background", ImageHeight * 1.34f, ImageHeight);
         }
@@ -606,11 +606,11 @@ void cFlatDisplayChannel::Flush() {
 }
 
 void cFlatDisplayChannel::PreLoadImages() {
-    int height {m_FontHeight2 + (m_FontSmlHeight * 2) + m_MarginItem - m_MarginItem2};
+    const int height {m_HeightImageLogo - m_MarginItem2};
     int ImageBgHeight {height}, ImageBgWidth {height};
     ImgLoader.GetIcon("logo_background", height, height);
 
-    cImage *img {ImgLoader.GetLogo("logo_background", height * 1.34f, height)};
+    cImage *img {ImgLoader.GetLogo("logo_background", height * 1.34f, height, true)};
     if (!img) {
         img = ImgLoader.GetIcon("logo_background", height * 1.34f, height);
     }

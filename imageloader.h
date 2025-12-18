@@ -29,7 +29,7 @@ class cImageLoader : public cImageMagickWrapper {
     cImageLoader();
     ~cImageLoader();
 
-    cImage* GetLogo(const char *logo, int width, int height);
+    cImage* GetLogo(const char *logo, int width, int height, bool MissingOk = false);
     cImage* GetIcon(const char *cIcon, int width, int height);
     cImage* GetFile(const char *cFile, int width, int height);
     bool SearchRecordingPoster(const cString &RecPath, cString &found);  // NOLINT
