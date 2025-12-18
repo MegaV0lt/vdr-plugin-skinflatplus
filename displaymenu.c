@@ -539,9 +539,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     int ImageLeft {Left};
     int ImageTop {Top};
-    int ImageHeight {m_FontHeight};
-    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
-    int ImageBgHeight {ImageHeight};
+    int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
+    int ImageBgHeight {m_FontHeight};
 
     cImage *img {nullptr};
     if (!IsGroup) {

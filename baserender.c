@@ -795,7 +795,6 @@ void cFlatBaseRender::MessageSetExtraTime(const char *Text) {  // For long messa
     static constexpr uint16_t kThreshold {75};  //? Add config option?
     const std::size_t TextLength {strlen(Text)};
     if (TextLength > kThreshold) {  // Message is longer than kThreshold and uses almost the full screen
-        // Narrowing conversion
         const int ExtraTime {std::min(static_cast<int>((TextLength - kThreshold) / (kThreshold / Setup.OSDMessageTime)),
                                       Setup.OSDMessageTime * 3)};  // Max. extra time to add
 #ifdef DEBUGFUNCSCALL
