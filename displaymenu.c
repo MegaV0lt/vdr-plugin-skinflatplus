@@ -545,7 +545,10 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     cImage *img {nullptr};
     if (!IsGroup) {
-        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
+        img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight);
+        if (!img) {
+            img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
+        }
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -921,7 +924,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     ImageLeft = Left;
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
-    img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
+    img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight);
+    if (!img) {
+        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
+    }
     if (img) {
         ImageBgWidth = img->Width();
         ImageBgHeight = img->Height();

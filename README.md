@@ -62,6 +62,9 @@ Man kann dem Skin den Pfad für die Logos beim Start mitgeben:
 oder
   `--logopath=<LOGOPATH>`
 
+Das default Theme Hintergrund des Logos kann ersetzt werden mit "logo_background.png"
+im Logos ordner. Nuetzlich mit transparenten Logos.
+
 Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
 Schriften
