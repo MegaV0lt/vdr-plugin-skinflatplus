@@ -1540,10 +1540,10 @@ void cFlatDisplayMenu::DrawRecordingErrorIcon(const cRecording *Recording, int L
  * with a "_cur" suffix. If the special version is not found, it falls back to the regular icon.
  *
  * @param IconName The name of the icon to be drawn.
- * @param Left The x-coordinate where the icon will be drawn. This value will be updated to the new position after
- * drawing the icon.
+ * @param Left The x-coordinate where the icon will be drawn.
  * @param Top The y-coordinate where the icon will be drawn.
  * @param Current A boolean indicating whether the icon is the current one.
+ * @return Updated x-coordinate value
  */
 int cFlatDisplayMenu::DrawRecordingIcon(const char *IconName, int Left, int Top, bool Current) {
     cImage *img {nullptr};
@@ -2064,7 +2064,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     dsyslog("flatPlus: DrawEventInfo() Reruns time @ %ld ms", Timer.Elapsed());
 #endif
 
-    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
+    std::vector<sActor> Actors;  // Name, role and image path
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
@@ -2087,7 +2087,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 
         // Call scraper plugin only at first run and reuse data at second run
         if (FirstRun && (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors)) {
-            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName, ActorsRole, Event);
+            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, Event);
         }
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
@@ -2134,9 +2134,9 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #endif
 
         // Add actors if available
-        const int NumActors = ActorsPath.size();  // Narrowing conversion
+        const int NumActors = Actors.size();  // Narrowing conversion
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0)
-            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors, true);
+            AddActors(ComplexContent, Actors, NumActors, true);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() Actor time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2389,14 +2389,11 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
  * the actors' names, the actors' roles, and the number of actors as parameters.
  *
  * @param ComplexContent Complex content to add actors to.
- * @param ActorsPath Path of actor images.
- * @param ActorsName Vector of actor names.
- * @param ActorsRole Vector of actor roles.
+ * @param Actors Name, role and image path of actors.
  * @param NumActors Number of actors to add.
  * @param IsEvent Is this for an event or a recording?
  */
-void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,
-                                 std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, int NumActors,
+void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sActor> &Actors, int NumActors,
                                  bool IsEvent) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
@@ -2433,14 +2430,14 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<cS
     for (std::size_t row {0}; row < PicLines; ++row) {
         for (std::size_t col {0}; col < ActorsPerLine; ++col) {
             if (Actor == NumActors) break;
-            img = ImgLoader.GetFile(*ActorsPath[Actor], ActorWidth, kIconMaxSize);
+            img = ImgLoader.GetFile(*Actors[Actor].Path, ActorWidth, kIconMaxSize);
             if (img) {
                 ComplexContent.AddImage(img, cRect(x, y, 0, 0));
                 ImgHeight = img->Height();
-                ComplexContent.AddText(*ActorsName[Actor], false, cRect(x, y + ImgHeight + m_MarginItem, ActorWidth, 0),
-                                       ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight,
-                                       taCenter);
-                Role = cString::sprintf("\"%s\"", *ActorsRole[Actor]);
+                ComplexContent.AddText(*Actors[Actor].Name, false,
+                                       cRect(x, y + ImgHeight + m_MarginItem, ActorWidth, 0), ColorMenuFontInfo,
+                                       ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight, taCenter);
+                Role = cString::sprintf("\"%s\"", *Actors[Actor].Role);
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + ImgHeight + m_MarginItem + m_FontTinyHeight, ActorWidth, 0),
                     ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight, taCenter);
@@ -2593,7 +2590,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     dsyslog("flatPlus: DrawRecordingInfo() Infotext time @ %ld ms", Timer.Elapsed());
 #endif
 
-    std::vector<cString> ActorsPath, ActorsName, ActorsRole;
+    std::vector<sActor> Actors;  // Name, role and image path
     cString MediaPath {""};
     cString MovieInfo {""}, SeriesInfo {""};
     cImage *img {nullptr};
@@ -2616,7 +2613,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
         // Call scraper plugin only at first run and reuse data at second run
         if (FirstRun && (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors)) {
-            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, ActorsPath, ActorsName, ActorsRole, nullptr, Recording);
+            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, nullptr, Recording);
             if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
                 const cString RecPath = Recording->FileName();
                 ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
@@ -2677,9 +2674,9 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #endif
 
         // Add actors if available
-        const int NumActors = ActorsPath.size();  // Narrowing conversion
+        const int NumActors = Actors.size();  // Narrowing conversion
         if (Config.TVScraperRecInfoShowActors && NumActors > 0)
-            AddActors(ComplexContent, ActorsPath, ActorsName, ActorsRole, NumActors);
+            AddActors(ComplexContent, Actors, NumActors);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawRecordingInfo() Actor time @ %ld ms", Timer.Elapsed());
 #endif

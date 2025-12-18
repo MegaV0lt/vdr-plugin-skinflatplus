@@ -26,6 +26,14 @@
 #include "./config.h"
 #include "./imagecache.h"
 
+struct sActor {
+    cString Name {""};  // Actor name
+    cString Role {""};  // Actor role
+    cString Path {""};  // Actor image path
+    // ctor to create the object in place.
+    sActor(cString Name, cString Role, cString Path) : Name(Name), Role(Role), Path(Path) {}
+};
+
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
 
@@ -264,11 +272,11 @@ inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
 
 void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth);  // NOLINT
 
-void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,         // NOLINT
-    std::vector<cString> &ActorsPath, std::vector<cString> &ActorsName,  // NOLINT
-    std::vector<cString> &ActorsRole, const cEvent *Event = nullptr,     // NOLINT
-    const cRecording *Recording = nullptr);                              // NOLINT
-int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event = nullptr, const cRecording *Recording = nullptr);  // NOLINT
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,  // NOLINT
+                     std::vector<sActor> &Actors, const cEvent *Event = nullptr,   // NOLINT
+                     const cRecording *Recording = nullptr);                       // NOLINT
+int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *Event = nullptr,  // NOLINT
+                            const cRecording *Recording = nullptr);
 
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT

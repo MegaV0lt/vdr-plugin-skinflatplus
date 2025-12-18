@@ -126,9 +126,8 @@ bool cPluginSkinFlatPlus::s_bScraperPluginChecked = false;
 cPlugin *cPluginSkinFlatPlus::s_pScraperPlugin = nullptr;
 
 // Get MediaPath, Series/Movie info and add actors if wanted
-void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,                              // NOLINT
-                     std::vector<cString> &ActorsPath,                                                         // NOLINT
-                     std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,  // NOLINT
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,  // NOLINT
+                     std::vector<sActor> &Actors, const cEvent *Event,             // NOLINT
                      const cRecording *Recording) {
     static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (!pScraper) return;
@@ -168,14 +167,10 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         }
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
             const std::size_t ActorsSize {series.actors.size()};
-            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-            ActorsName.reserve(ActorsSize);
-            ActorsRole.reserve(ActorsSize);
+            Actors.reserve(ActorsSize);  // Set capacity to size of actors
             for (const auto &actor : series.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
-                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
-                    ActorsName.emplace_back(actor.name.c_str());
-                    ActorsRole.emplace_back(actor.role.c_str());
+                    Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
                 }
             }
         }
@@ -188,14 +183,10 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         MediaPath = movie.poster.path.c_str();
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
             const std::size_t ActorsSize {movie.actors.size()};
-            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-            ActorsName.reserve(ActorsSize);
-            ActorsRole.reserve(ActorsSize);
+            Actors.reserve(ActorsSize);  // Set capacity to size of actors
             for (const auto &actor : movie.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
-                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
-                    ActorsName.emplace_back(actor.name.c_str());
-                    ActorsRole.emplace_back(actor.role.c_str());
+                    Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
                 }
             }
         }

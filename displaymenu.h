@@ -155,9 +155,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     void DrawItemExtraEvent(const cEvent *Event, const cString EmptyText);
     void DrawItemExtraRecording(const cRecording *Recording, const cString EmptyText);
-    void AddActors(cComplexContent &ComplexContent, std::vector<cString> &ActorsPath,   // NOLINT
-                   std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole,  // NOLINT
-                   int NumActors, bool IsEvent = false);                                // Add Actors to complexcontent
+    void AddActors(cComplexContent &ComplexContent, std::vector<sActor> &Actors, int NumActors,  // NOLINT
+                   bool IsEvent = false);  // Add Actors to complexcontent
 
     void DrawEventInfo(const cEvent *Event);
     void DrawRecordingInfo(const cRecording *Recording);

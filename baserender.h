@@ -30,7 +30,8 @@ enum eBorder {
 };
 
 struct sDecorBorder {
-    int Left {0}, Top {0}, Width {0}, Height {0}, Size {0}, Type {0};
+    int Left {0}, Top {0}, Width {0}, Height {0};
+    int Size {0}, Type {0};
     tColor ColorFg {clrTransparent}, ColorBg {clrTransparent};
     int From {0};
 };
