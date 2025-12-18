@@ -62,8 +62,8 @@ Man kann dem Skin den Pfad für die Logos beim Start mitgeben:
 oder
   `--logopath=<LOGOPATH>`
 
-Das default Theme Hintergrund des Logos kann ersetzt werden mit "logo_background.png"
-im Logos ordner. Nuetzlich mit transparenten Logos.
+Das Hintergrund für Kanallogos (logo_background.png) kann im Kanallogo Ordner bereitg gestellt werden.
+Dies ersetzt dann das Hintergrundlogo des Themas. Nützlich mit transparenten Logos.
 
 Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 
@@ -139,7 +139,7 @@ Das Script (update_weather.sh) wird nicht vom Skin aufgerufen. Dies muss extern 
 @hourly  root  /usr/bin/bash /usr/local/lib/vdr/skinflatplus/widgets/weather/update_weather.sh
 </pre>
 
-Für die Wetterdaten wird openweathermap.org verwendet. Hier sind 1.000 Abfragen am Tag (30.000 im Monat) frei (https://openweathermap.org/full-price#current). Bitte registriere dich kostenlos bei openweathermap.org und erstelle einen eigenen Api-Key. Diesen dann einfach in die update_weather.conf eintragen. Hierfür ist nur eine E-Mail Adresse + Passwort notwendig.
+Für die Wetterdaten wird openweathermap.org verwendet. Hier sind 1.000 Abfragen am Tag (30.000 im Monat) frei (https://openweathermap.org/full-price#current). Die Registriereung ist kostenlos und man kann einen eigenen Api-Key erstellen. Diesen dann einfach in die update_weather.conf eintragen. Hierfür ist nur eine E-Mail Adresse + Passwort notwendig.
 
 Für die Kanalinfo gibt es eine kleine Version des Wetter Widgets. hier wird Heute + Morgen angezeigt.
 
