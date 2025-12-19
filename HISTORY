@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2026-xx-xx: Version 1.2.4
+2025-12-19: Version 1.2.4
 - [fix] Fix calculation of channel number width in SetItemChannel() and SetItemEvent()
 - [fix] Fix wrong links to some skin icons
 - [add] Add polish translation. Thanks to tmn505 @ github
