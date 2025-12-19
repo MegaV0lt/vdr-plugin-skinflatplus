@@ -779,7 +779,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
     const int16_t LineWidth = Font->Width(Line.c_str());       // Width in Pixel
-    if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80% looking bad when justified
+    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80% looking bad when justified
 
     // Count spaces in line
     const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
@@ -796,7 +796,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
-        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
+        // dsyslog("flatPlus: JustifyLine() Line can not be justified. LineSpaces: %d, FillCharWidth: %d", LineSpaces,
         //          FillCharWidth);
         return;
     }
