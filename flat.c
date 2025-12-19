@@ -126,9 +126,8 @@ bool cPluginSkinFlatPlus::s_bScraperPluginChecked = false;
 cPlugin *cPluginSkinFlatPlus::s_pScraperPlugin = nullptr;
 
 // Get MediaPath, Series/Movie info and add actors if wanted
-void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,                              // NOLINT
-                     std::vector<cString> &ActorsPath,                                                         // NOLINT
-                     std::vector<cString> &ActorsName, std::vector<cString> &ActorsRole, const cEvent *Event,  // NOLINT
+void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo,  // NOLINT
+                     std::vector<sActor> &Actors, const cEvent *Event,             // NOLINT
                      const cRecording *Recording) {
     static cPlugin *pScraper {cPluginSkinFlatPlus::GetScraperPlugin()};
     if (!pScraper) return;
@@ -168,14 +167,10 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         }
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
             const std::size_t ActorsSize {series.actors.size()};
-            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-            ActorsName.reserve(ActorsSize);
-            ActorsRole.reserve(ActorsSize);
+            Actors.reserve(ActorsSize);  // Set capacity to size of actors
             for (const auto &actor : series.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
-                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
-                    ActorsName.emplace_back(actor.name.c_str());
-                    ActorsRole.emplace_back(actor.role.c_str());
+                    Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
                 }
             }
         }
@@ -188,14 +183,10 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         MediaPath = movie.poster.path.c_str();
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
             const std::size_t ActorsSize {movie.actors.size()};
-            ActorsPath.reserve(ActorsSize);  // Set capacity to size of actors
-            ActorsName.reserve(ActorsSize);
-            ActorsRole.reserve(ActorsSize);
+            Actors.reserve(ActorsSize);  // Set capacity to size of actors
             for (const auto &actor : movie.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
-                    ActorsPath.emplace_back(actor.actorThumb.path.c_str());
-                    ActorsName.emplace_back(actor.name.c_str());
-                    ActorsRole.emplace_back(actor.role.c_str());
+                    Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
                 }
             }
         }
@@ -262,7 +253,6 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
  *
  * @param Series Reference to data structure containing information about the series.
  * @param SeriesInfo String to append the information to.
- *
  */
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     std::ostringstream oss {""};
@@ -282,7 +272,6 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
  *
  * @param Movie Reference to data structure containing information about the movie.
  * @param MovieInfo String to append the information to.
- *
  */
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     std::ostringstream oss {""};
@@ -382,12 +371,12 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
         return "recording_untested_replay";  // Error case. Alternative icon 'message_warning' or individual icon
     }
 
-    const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};
+    const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};  // 0.0...1.0
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f", SeenThreshold);
     if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100%
 
-    const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0..10 rounded
+    const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0...10 rounded
     return cString::sprintf("recording_seen_%d", idx);
 }
 
@@ -769,6 +758,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     dsyslog("flatPlus: JustifyLine() '%s'", Line.c_str());
     cTimeMs Timer;  // Set Timer
 #endif
+
     if (Line.empty() || LineMaxWidth <= 0)  // Check for empty line or invalid LineMaxWidth
         return;
 
@@ -777,8 +767,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         return;
     }
 
-    // Get the font name (Ubuntu:Regular)
-    const cString FontName {*FontCache.GetFontName(Font->FontName())};
+    const cString FontName {*FontCache.GetFontName(Font->FontName())};  // Font name (Ubuntu:Regular)
     // Use cached font metrics to determine if the font is fixed-width
     const int FontHeight {FontCache.GetFontHeight(FontName, Font->Size())};
     if (FontCache.GetStringWidth(FontName, FontHeight, "M") == FontCache.GetStringWidth(FontName, FontHeight, "i"))
@@ -788,14 +777,16 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
             FontCache.GetStringWidth(FontName, FontHeight, "M"), FontCache.GetStringWidth(FontName, FontHeight, "i"));
 #endif
 
+    static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
+    const int16_t LineWidth = Font->Width(Line.c_str());       // Width in Pixel
+    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80% looking bad when justified
+
     // Count spaces in line
     const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
 
-    // Hair Space is a very small space:
+    //* Detect if font has 'HairSpace'
+    // Hair Space (U+200A) is a very small space:
     // https://de.wikipedia.org/wiki/Leerzeichen#Schriftzeichen_in_ASCII_und_andere_Kodierungen
-    // HairSpace: U+200A, ThinSpace: U+2009
-
-    //* Detect 'HairSpace'
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {FontCache.GetStringWidth(FontName, FontHeight, " ") <
@@ -803,97 +794,88 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                               ? " "
                               : u8"\U0000200A"};  // Use hair space if it is smaller than space
     const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
-    const std::size_t FillCharLength {strlen(FillChar)};                                     // Length in chars
-
-    const int16_t LineWidth = Font->Width(Line.c_str());  // Width in Pixel
-    if ((LineWidth + FillCharWidth) > LineMaxWidth)       // Check if at least one 'FillChar' fits in to the line
-        return;
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
-        // dsyslog("flatPlus: JustifyLine() Zero value found: Spaces: %d, FillCharWidth: %d", LineSpaces,
+        // dsyslog("flatPlus: JustifyLine() Line can not be justified. LineSpaces: %d, FillCharWidth: %d", LineSpaces,
         //          FillCharWidth);
         return;
     }
 
-    static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
-    static constexpr const char *kPunctuationChars {".,?!;"};  // Punctuation characters for justifying
-    if (LineWidth > (LineMaxWidth * kLineWidthThreshold)) {    // Lines shorter than 80% looking bad when justified
-        const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-        const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
-        std::string FillChars {""};
-        FillChars.reserve(FillCharBlock);
-        for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
-            FillChars.append(FillChar);
-        }
+    if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
+        return;
 
-        const std::size_t FillCharsLength {FillChars.length()};
-        std::size_t LineLength {Line.length()};
-        Line.reserve(LineLength + (NeedFillChar * FillCharLength));
-        int16_t InsertedFillChar {0};
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   [Line: spaces %d, width %d, length %ld]\n"
-                "   [FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
-                "   [FillChars: length %ld]",
-                LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, NeedFillChar % LineSpaces,
-                FillCharWidth, FillCharsLength);
-#endif
-        //* Insert blocks at (space)
-        std::size_t pos {0};  // Position also used in following loops
-        for (pos = Line.find(' ');
-             pos != std::string::npos && pos > 0 && (InsertedFillChar + FillCharBlock <= NeedFillChar);
-             pos = Line.find(' ', pos + FillCharsLength + 1)) {
-            if (!isspace(Line[pos - 1])) {
-                // dsyslog("flatPlus:  Insert block at %ld", pos);
-                Line.insert(pos, FillChars);
-                InsertedFillChar += FillCharBlock;
-                LineLength += FillCharsLength;  // Just add the length we inserted
-            }
-        }
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   InsertedFillChar after first loop (space): %d", InsertedFillChar);
-#endif
+    const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
+    const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
+    std::string FillChars {""};
+    FillChars.reserve(FillCharBlock);
+    for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+        FillChars.append(FillChar);
+    }
 
-        //* Insert blocks at (.,?!;)
-        pos = 0;  // Reset pos before the second loop
-        for (pos = Line.find_first_of(kPunctuationChars);
-             pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
-             pos = Line.find_first_of(kPunctuationChars, pos + FillCharsLength + 1)) {
-            if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
-                // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
-                Line.insert(pos + 1, FillChars);
-                InsertedFillChar += FillCharBlock;
-                LineLength += FillCharsLength;  // Just add the length we inserted
-            }
-        }
+    const std::size_t FillCharLength {strlen(FillChar)};  // Length in chars
+    const std::size_t FillCharsLength {FillChars.length()};
+    std::size_t LineLength {Line.length()};
+    Line.reserve(LineLength + (NeedFillChar * FillCharLength));
+    int16_t InsertedFillChar {0};
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
+    dsyslog("   [Line: spaces %d, width %d, length %ld]\n"
+            "   [FillChar: needed %d, blocksize %d, remainder %d, width %d]\n"
+            "   [FillChars: length %ld]",
+            LineSpaces, LineWidth, LineLength, NeedFillChar, FillCharBlock, NeedFillChar % LineSpaces,
+            FillCharWidth, FillCharsLength);
 #endif
-
-        //* Insert the remainder of 'NeedFillChar' from right to left
-        pos = LineLength;  // Reset pos to the end of the string before the third loop
-        std::size_t PrevPos {std::string::npos};
-        while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
-               pos < PrevPos &&                      // Ensure position is decreasing (potential infinite loop)
-               (InsertedFillChar < NeedFillChar) &&  // Check if we still need to insert fill characters
-               pos != LineLength - 1) {              // Do not insert at last position of line
-            PrevPos = pos;
-            if (pos > 0 && !(isspace(Line[pos - 1]))) {
-                // dsyslog("flatPlus:  Insert char at %ld", pos);
-                Line.insert(pos, FillChar);
-                ++InsertedFillChar;
-            }
+    //* Insert blocks at (space)
+    std::size_t pos {0};  // Position also used in following loops
+    for (pos = Line.find(' ');
+         pos != std::string::npos && pos > 0 && (InsertedFillChar + FillCharBlock <= NeedFillChar);
+         pos = Line.find(' ', pos + FillCharsLength + 1)) {
+        if (!isspace(Line[pos - 1])) {
+            // dsyslog("flatPlus:  Insert block at %ld", pos);
+            Line.insert(pos, FillChars);
+            InsertedFillChar += FillCharBlock;
+            LineLength += FillCharsLength;  // Just add the length we inserted
         }
-#ifdef DEBUGFUNCSCALL
-        if (InsertedFillChar < NeedFillChar)
-            dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
-        else
-            dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
-#endif
-    } else {
-        // dsyslog("flatPlus: JustifyLine() Line too short for justifying: LineWidth %d, LineMaxWidth * 0.8: %.0f",
-        //        LineWidth, LineMaxWidth * 0.8);
     }
 #ifdef DEBUGFUNCSCALL
+    dsyslog("   InsertedFillChar after first loop (space): %d", InsertedFillChar);
+#endif
+
+    //* Insert blocks after punctuation (.,?!;)
+    pos = 0;  // Reset pos before the second loop
+    static constexpr const char *kPunctuationChars {".,?!;"};  // Punctuation characters for justifying
+    for (pos = Line.find_first_of(kPunctuationChars);
+         pos != std::string::npos && pos > 0 && ((InsertedFillChar + FillCharBlock) <= NeedFillChar);
+         pos = Line.find_first_of(kPunctuationChars, pos + FillCharsLength + 1)) {
+        if (pos < (LineLength - FillCharBlock - 1) && Line[pos] != Line[pos + 1]) {  // Next char is different
+            // dsyslog("flatPlus:  Insert block at %ld", pos + 1);
+            Line.insert(pos + 1, FillChars);
+            InsertedFillChar += FillCharBlock;
+            LineLength += FillCharsLength;  // Just add the length we inserted
+        }
+    }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   InsertedFillChar after second loop (.,?!;): %d", InsertedFillChar);
+#endif
+
+    //* Insert the remainder of 'NeedFillChar' from right to left
+    pos = LineLength;  // Set pos to the end of the string before the third loop
+    std::size_t PrevPos {std::string::npos};
+    while ((pos = Line.find_last_of(' ', pos - FillCharLength)) != std::string::npos &&
+           pos < PrevPos &&                      // Ensure position is decreasing (potential infinite loop)
+           (InsertedFillChar < NeedFillChar) &&  // Check if we still need to insert fill characters
+           pos != LineLength - 1) {              // Do not insert at last position of line
+        PrevPos = pos;
+        if (pos > 0 && !(isspace(Line[pos - 1]))) {
+            // dsyslog("flatPlus:  Insert char at %ld", pos);
+            Line.insert(pos, FillChar);
+            ++InsertedFillChar;
+        }
+    }
+#ifdef DEBUGFUNCSCALL
+    if (InsertedFillChar < NeedFillChar)
+        dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
+    else
+        dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
     if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
 #endif
 }
