@@ -29,10 +29,12 @@ class cImageLoader : public cImageMagickWrapper {
     cImageLoader();
     ~cImageLoader();
 
-    cImage* GetLogo(const char *logo, int width, int height, bool MissingOk = false);
+    cImage* GetLogo(const char *logo, int width, int height);
     cImage* GetIcon(const char *cIcon, int width, int height);
     cImage* GetFile(const char *cFile, int width, int height);
+    cImage* GetLogoBg(int Width, int Height);  // Load 'logo_background'
     bool SearchRecordingPoster(const cString &RecPath, cString &found);  // NOLINT
+    bool m_LogoOverwrite {false};  // true: use logo from channel logo path instead of themedirectory
 
  private:
     const cString m_LogoExtension {"png"};

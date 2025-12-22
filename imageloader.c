@@ -30,10 +30,9 @@ cImageLoader::~cImageLoader() {}
  * @param logo The name of the logo (without path).
  * @param width The desired width of the logo.
  * @param height The desired height of the logo.
- * @param MissingOk If true, the function returns nullptr if the logo is not found.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
-cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool MissingOk) {
+cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
     if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -68,8 +67,6 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Miss
 
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
-            if (MissingOk) return nullptr;  // Not found, but missing is ok
-
             if (i == 2)              // Third try and not found
                 isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
@@ -220,6 +217,23 @@ cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
 
     dsyslog("flatPlus: cImageLoader::GetFile() '%s' 'CreateImage' failed", *File);
     return nullptr;
+}
+
+/**
+ * @brief Load 'logo_background' from the configured logo path or theme directory.
+ *
+ * If m_LogoOverwrite is true, load the logo from the configured logo path.
+ * Otherwise, load the logo from the theme directory. m_LogoOverwrite ist set 
+ * in cDisplayChannel::PreLoadImages().
+ *
+ * @param Name The name of the logo (without path).
+ * @param Width The desired width of the logo.
+ * @param Height The desired height of the logo.
+ * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
+ */
+cImage* cImageLoader::GetLogoBg(int Width, int Height) {
+    static constexpr const char *LogoBgName {"logo_background"};
+    return (m_LogoOverwrite) ? GetLogo(LogoBgName, Width, Height) : GetIcon(LogoBgName, Width, Height);
 }
 
 /**

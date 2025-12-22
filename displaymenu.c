@@ -544,10 +544,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     cImage *img {nullptr};
     if (!IsGroup) {
-        img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-        if (!img) {
-            img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-        }
+        img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -923,10 +920,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     ImageLeft = Left;
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
-    img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-    if (!img) {
-        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-    }
+    img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgWidth = img->Width();
         ImageBgHeight = img->Height();
@@ -1135,10 +1129,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
         int ImageBgHeight {m_FontHeight};
         if (!IsGroup) {
-            img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-            if (!img) {
-                img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-            }
+            img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
             if (img) {
                 ImageBgWidth = img->Width();
                 ImageBgHeight = img->Height();
@@ -4331,7 +4322,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     // Channel icons
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
-    cImage *img {ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight)};
+    cImage *img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();

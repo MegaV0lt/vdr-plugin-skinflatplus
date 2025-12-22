@@ -138,6 +138,7 @@ void cImageCache::PreLoadImage() {
     cTimeMs Timer;  // Start timer
 
     cFlatDisplayChannel DisplayChannel(false);
+    // Called first. Also used to determine if 'logo_background' should be loaded from logo path or theme path
     DisplayChannel.PreLoadImages();
 
     cFlatDisplayMenu Display_Menu;

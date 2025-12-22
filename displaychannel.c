@@ -198,10 +198,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         int ImageBgWidth {ImageHeight};
         int ImageLeft {m_MarginItem2};
         int ImageTop {m_MarginItem};
-        cImage *img {ImgLoader.GetLogo("logo_background", ImageHeight * 1.34f, ImageHeight, true)};
-        if (!img) {
-            img = ImgLoader.GetIcon("logo_background", ImageHeight * 1.34f, ImageHeight);
-        }
+        cImage *img {ImgLoader.GetLogoBg(ImageHeight * 1.34f, ImageHeight)};  // Load 'logo_background'
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -608,12 +605,20 @@ void cFlatDisplayChannel::Flush() {
 void cFlatDisplayChannel::PreLoadImages() {
     const int height {m_HeightImageLogo - m_MarginItem2};
     int ImageBgHeight {height}, ImageBgWidth {height};
-    ImgLoader.GetIcon("logo_background", height, height);
 
-    cImage *img {ImgLoader.GetLogo("logo_background", height * 1.34f, height, true)};
-    if (!img) {
-        img = ImgLoader.GetIcon("logo_background", height * 1.34f, height);
+    // Set variable 'm_LogoOverwrite' to determine if logo was found in channel logo path
+    cImage *img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight);
+    if (img) {
+        ImgLoader.m_LogoOverwrite = true;  // Used for GetLogoBg()
+    } else {
+        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::PreLoadImages() Using 'logo_background' from %s path",
+            ImgLoader.m_LogoOverwrite ? "logo" : "theme");
+#endif
+
+    img = ImgLoader.GetLogoBg(ImageBgWidth * 1.34f, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
