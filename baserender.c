@@ -1773,7 +1773,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Temp sign extraction
             std::string_view tt = *out.Temp;
-            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
+            const auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
                 out.Temp = out.Temp.Truncate(deg);                   // Remove the sign from the temp string

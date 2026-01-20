@@ -223,7 +223,7 @@ cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
  * @brief Load 'logo_background' from the configured logo path or theme directory.
  *
  * If m_LogoOverwrite is true, load the logo from the configured logo path.
- * Otherwise, load the logo from the theme directory. m_LogoOverwrite ist set 
+ * Otherwise, load the logo from the theme directory. m_LogoOverwrite ist set
  * in cDisplayChannel::PreLoadImages().
  *
  * @param Name The name of the logo (without path).
@@ -280,7 +280,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
  *
  * @return true if the image exists, false otherwise.
  */
-bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) {
+bool cImageLoader::CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) const {
     cString ManualPoster = cString::sprintf("%s/%s", *RecPath, *Image);
     if (LastModifiedTime(*ManualPoster)) {
         found = ManualPoster;

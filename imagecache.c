@@ -68,7 +68,7 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         }
 
         // Find the last '/' and extract the base filename
-        std::size_t LastSlashPos = DataNameView.find_last_of('/');
+        const std::size_t LastSlashPos = DataNameView.find_last_of('/');
         if (LastSlashPos != std::string_view::npos) {
             BaseFileName = DataNameView.substr(LastSlashPos + 1);
         } else {

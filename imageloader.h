@@ -39,5 +39,5 @@ class cImageLoader : public cImageMagickWrapper {
  private:
     const cString m_LogoExtension {"png"};
     void ToLowerCase(std::string &str);  // NOLINT
-    bool CheckImageExistence(const cString &RecPath, const cString &Image, cString &found);  // NOLINT
+    bool CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) const;  // NOLINT
 };

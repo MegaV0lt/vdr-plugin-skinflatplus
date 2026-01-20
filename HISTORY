@@ -1,6 +1,7 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2026-xx-xx: Version 1.2.5
+- [fix] Add missing 'clrReplayErrorMark = FFBB0000' to some themes
 - [update] Merge logic for dynamic loading of 'logo_background'
 
 2025-12-19: Version 1.2.4
