@@ -1077,7 +1077,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         else
             ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - SmlHalf, 0, sml, m_ProgressBarHeight), Color);
 
-        const int big {m_ProgressBarHeight - (sml * 2) - 2};
+        const int big {m_ProgressBarHeight - (sml * 2) - 2};  // Position marker size
         const int BigHalf {big / 2};
         if (Start) {
             // Marker (Position)

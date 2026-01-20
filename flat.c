@@ -987,7 +987,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
                     Capacity = std::max(Capacity * 2, CurLength + 8);
                     NewText = static_cast<char *>(realloc(m_Text, Capacity));
                     if (!NewText) {
-                        esyslog("flatPlus: cTextFloatingWrapper::Set() realloc failed");
+                        esyslog("flatPlus: cTextFloatingWrapper::Set() realloc() failed");
                         return;
                     }
                     m_Text = NewText;
@@ -1025,7 +1025,7 @@ const char *cTextFloatingWrapper::Text() {
     return m_Text;
 }
 
-const char *cTextFloatingWrapper::GetLine(int Line) {
+/* const char *cTextFloatingWrapper::GetLine(int Line) {
     char *s {nullptr};
     if (Line < m_Lines) {
         if (m_EoL) {
@@ -1048,5 +1048,32 @@ const char *cTextFloatingWrapper::GetLine(int Line) {
         }
         m_LastLine = Line;
     }
+    return s;
+} */
+
+const char* cTextFloatingWrapper::GetLine(int Line) {
+    if (Line >= m_Lines)
+        return nullptr;
+
+    const char *s {m_Text};
+    if (m_EoL) {
+        *m_EoL = '\n';
+        m_EoL = nullptr;
+    }
+
+    const char *newline {nullptr};
+    for (int i = 0; i < Line; ++i) {
+        newline = strchr(s, '\n');
+        if (newline) {
+            s = newline + 1;
+        } else {
+            break;
+        }
+    }
+
+    if (s && m_EoL)
+        *m_EoL = '\0';
+
+    m_LastLine = Line;
     return s;
 }
