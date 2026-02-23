@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2026-xx-xx: Version 1.2.5
+2026-02-23: Version 1.2.5
 - [fix] Add missing 'clrReplayErrorMark = FFBB0000' to some themes
 - [fix] Translation of 'Commands' is changed to 'Button$Commands' for VDR 2.7.8 and later
 - [add] New logo 'DeletedRecordings.png' for deleted recordings in main menu
