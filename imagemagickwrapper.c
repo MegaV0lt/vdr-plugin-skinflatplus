@@ -34,8 +34,8 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
 
     if (PreserveAspect) {
         static constexpr uint16_t kScaleFactor {1000};
-        uint32_t scale_w = kScaleFactor * width / w;
-        uint32_t scale_h = kScaleFactor * height / h;
+        const uint32_t scale_w = kScaleFactor * width / w;
+        const uint32_t scale_h = kScaleFactor * height / h;
         if (scale_w > scale_h)
             width = w * height / h;
         else
@@ -203,17 +203,17 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
 }
 
 Color cImageMagickWrapper::Argb2Color(tColor col) {
-    tIndex alpha = (col & 0xFF000000) >> 24;
-    tIndex red   = (col & 0x00FF0000) >> 16;
-    tIndex green = (col & 0x0000FF00) >> 8;
-    tIndex blue  = (col & 0x000000FF);
+    const tIndex alpha = (col & 0xFF000000) >> 24;
+    const tIndex red   = (col & 0x00FF0000) >> 16;
+    const tIndex green = (col & 0x0000FF00) >> 8;
+    const tIndex blue  = (col & 0x000000FF);
 #ifdef IMAGEMAGICK7
-    Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
-                QuantumRange * alpha / 255);
+    const Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
+                      QuantumRange * alpha / 255);
 #else
     static constexpr uint64_t kMaxRGB = 65535;  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
-                kMaxRGB * (0xFF - alpha) / 255);
+    const Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
+                      kMaxRGB * (0xFF - alpha) / 255);
 #endif
     return color;
 }

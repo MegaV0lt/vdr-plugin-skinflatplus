@@ -404,10 +404,7 @@ void cFlatBaseRender::TopBarUpdate() {
                 int ImageBGHeight {TopBarLogoHeight};
                 int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
 
-                img = ImgLoader.GetLogo("logo_background", ImageBGWidth, ImageBGHeight, true);
-                if (!img) {
-                    img = ImgLoader.GetIcon("logo_background", ImageBGWidth, ImageBGHeight);
-                }
+                img = ImgLoader.GetLogoBg(ImageBGWidth, ImageBGHeight);  // Load 'logo_background'
                 if (img) {
                     ImageBGHeight = img->Height();
                     ImageBGWidth = img->Width();
@@ -1080,7 +1077,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         else
             ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - SmlHalf, 0, sml, m_ProgressBarHeight), Color);
 
-        const int big {m_ProgressBarHeight - (sml * 2) - 2};
+        const int big {m_ProgressBarHeight - (sml * 2) - 2};  // Position marker size
         const int BigHalf {big / 2};
         if (Start) {
             // Marker (Position)
@@ -1776,7 +1773,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Temp sign extraction
             std::string_view tt = *out.Temp;
-            auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
+            const auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
                 out.Temp = out.Temp.Truncate(deg);                   // Remove the sign from the temp string

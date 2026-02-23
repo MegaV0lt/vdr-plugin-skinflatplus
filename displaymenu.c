@@ -425,8 +425,20 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         img = ImgLoader.GetIcon(*IconNameCur, IconSize, IconSize);
                     }
                     if (!img) img = ImgLoader.GetIcon(*IconName, IconSize, IconSize);
-
-                    if (!img) { img = ImgLoader.GetIcon("menuIcons/blank", IconSize, IconSize); }
+                    // Show a default generic icon for menu items without an icon instead of no icon at all.
+                    // Depending on setting 'Config.MenuItemIconsShowDefault' a simple square or circle is shown.
+                    // This would make it easier to identify menu items without icons and improve the
+                    // overall look of the menu.
+                    if (!img) {
+                        if (Current)
+                            img = ImgLoader.GetIcon(Config.MenuItemIconsShowDefault ? "menuIcons/Default_cur"
+                                                                                    : "menuIcons/blank",
+                                                    IconSize, IconSize);
+                        if (!img)
+                            img = ImgLoader.GetIcon(Config.MenuItemIconsShowDefault ? "menuIcons/Default"
+                                                                                    : "menuIcons/blank",
+                                                    IconSize, IconSize);
+                    }
                     // Draw the icon
                     if (img) {
                         MenuIconsPixmap->DrawImage(
@@ -544,10 +556,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     cImage *img {nullptr};
     if (!IsGroup) {
-        img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-        if (!img) {
-            img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-        }
+        img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
         if (img) {
             ImageBgHeight = img->Height();
             ImageBgWidth = img->Width();
@@ -923,10 +932,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     ImageLeft = Left;
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
     int ImageBgHeight {ImageHeight};
-    img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-    if (!img) {
-        img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-    }
+    img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgWidth = img->Width();
         ImageBgHeight = img->Height();
@@ -1135,10 +1141,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
         int ImageBgHeight {m_FontHeight};
         if (!IsGroup) {
-            img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true);
-            if (!img) {
-                img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
-            }
+            img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
             if (img) {
                 ImageBgWidth = img->Width();
                 ImageBgHeight = img->Height();
@@ -2970,10 +2973,15 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
 #endif
-
+#if VDRVERSNUM >= 20708
+    static constexpr const char *items[] {
+        "Schedule", "Channels", "Timers", "Recordings", "Setup",  "Button$Commands", "OSD",     "EPG",
+        "DVB",      "LNB",      "CAM",    "Recording",  "Replay", "Miscellaneous",   "Plugins", "Restart"};
+#else
     static constexpr const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
                                           "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
                                           "Replay",   "Miscellaneous", "Plugins", "Restart"};
+#endif
 
     // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
@@ -3018,7 +3026,12 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         }
     }  // for plugins
 
-    //* Check for special main menu entries "stop recording", "stop replay"
+    //* Check for special main menu entries "Deleted recordings", "Stop recording", "Stop replay"
+    sv = skipspace(trVDR(" Deleted recordings"));
+    if (ElementView == sv) {
+        cache.emplace(ElementView, "menuIcons/DeletedRecordings");  // Store in cache
+        return "menuIcons/DeletedRecordings";
+    }
     sv = skipspace(trVDR(" Stop recording "));
     if (ElementView == sv) {
         cache.emplace(ElementView, "menuIcons/StopRecording");  // Store in cache
@@ -4331,7 +4344,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     // Channel icons
     int ImageBgHeight {ImageHeight};
     int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
-    cImage *img {ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight)};
+    cImage *img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();

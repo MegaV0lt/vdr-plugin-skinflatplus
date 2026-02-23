@@ -68,7 +68,7 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         }
 
         // Find the last '/' and extract the base filename
-        std::size_t LastSlashPos = DataNameView.find_last_of('/');
+        const std::size_t LastSlashPos = DataNameView.find_last_of('/');
         if (LastSlashPos != std::string_view::npos) {
             BaseFileName = DataNameView.substr(LastSlashPos + 1);
         } else {
@@ -138,6 +138,7 @@ void cImageCache::PreLoadImage() {
     cTimeMs Timer;  // Start timer
 
     cFlatDisplayChannel DisplayChannel(false);
+    // Called first. Also used to determine if 'logo_background' should be loaded from logo path or theme path
     DisplayChannel.PreLoadImages();
 
     cFlatDisplayMenu Display_Menu;

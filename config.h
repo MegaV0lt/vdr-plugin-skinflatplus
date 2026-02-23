@@ -244,7 +244,8 @@ class cFlatConfig {
         int TopBarRecConflictsShow {true};
         int TopBarRecConflictsHigh {2};
 
-        int MenuItemIconsShow {true};
+        int MenuItemIconsShow {true};  // Show main menu item icons
+        int MenuItemIconsShowDefault {true};  // Show a default menu item icon if icon not found
         int TopBarMenuIconShow {true};
         int TopBarHideClockText {0};
 

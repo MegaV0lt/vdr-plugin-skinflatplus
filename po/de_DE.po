@@ -670,6 +670,9 @@ msgstr "Menüpunkt Abstand"
 msgid "Show mainmenu item icons"
 msgstr "Zeige Symbole für Hauptmenüeinträge"
 
+msgid "Show default for missing main menu icons"
+msgstr "Zeige Symbol für fehlende Hauptmenüeinträge"
+
 msgid "Menu content fullsize background"
 msgstr "Menü: Inhalt voller Hintergrund"
 

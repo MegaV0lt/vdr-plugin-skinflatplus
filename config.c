@@ -142,6 +142,7 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    MenuItemIconsShow = atoi(Value);
+    else if (strcmp(Name, "MenuItemIconsShowDefault") == 0)             MenuItemIconsShowDefault = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      MenuItemPadding = atoi(Value);
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        MenuItemRecordingClearPercent = atoi(Value);
