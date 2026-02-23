@@ -328,6 +328,7 @@ void cFlatSetup::Store() {
     SetupStore("MenuEventRecordingViewJustify", Config.MenuEventRecordingViewJustify);
     SetupStore("MenuFullOsd", Config.MenuFullOsd);
     SetupStore("MenuItemIconsShow", Config.MenuItemIconsShow);
+    SetupStore("MenuItemIconsShowDefault", Config.MenuItemIconsShowDefault);
     SetupStore("MenuItemPadding", Config.MenuItemPadding);
     SetupStore("MenuItemParseTilde", Config.MenuItemParseTilde);
     SetupStore("MenuItemRecordingClearPercent", Config.MenuItemRecordingClearPercent);
@@ -541,6 +542,7 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          SetupConfig->MenuEventViewAlwaysWithDate = atoi(Value);
     else if (strcmp(Name, "MenuFullOsd") == 0)                          SetupConfig->MenuFullOsd = atoi(Value);
     else if (strcmp(Name, "MenuItemIconsShow") == 0)                    SetupConfig->MenuItemIconsShow = atoi(Value);
+    else if (strcmp(Name, "MenuItemIconsShowDefault") == 0)             SetupConfig->MenuItemIconsShowDefault = atoi(Value);
     else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
     else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
     else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
@@ -732,6 +734,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("MenuEventRecordingViewJustify", SetupConfig->MenuEventRecordingViewJustify, *Filename);
     Config.Store("MenuFullOsd", SetupConfig->MenuFullOsd, *Filename);
     Config.Store("MenuItemIconsShow", SetupConfig->MenuItemIconsShow, *Filename);
+    Config.Store("MenuItemIconsShowDefault", SetupConfig->MenuItemIconsShowDefault, *Filename);
     Config.Store("MenuItemPadding", SetupConfig->MenuItemPadding, *Filename);
     Config.Store("MenuItemParseTilde", SetupConfig->MenuItemParseTilde, *Filename);
     Config.Store("MenuItemRecordingClearPercent", SetupConfig->MenuItemRecordingClearPercent, *Filename);
@@ -1070,6 +1073,7 @@ void cFlatSetupMenu::Setup() {
 
     Add(new cMenuEditIntItem(tr("Menuitem padding"), &SetupConfig->MenuItemPadding));
     Add(new cMenuEditBoolItem(tr("Show mainmenu item icons"), &SetupConfig->MenuItemIconsShow));
+    Add(new cMenuEditBoolItem(tr("Show default for missing main menu icons"), &SetupConfig->MenuItemIconsShowDefault));
     Add(new cMenuEditBoolItem(tr("Menu content fullsize background"), &SetupConfig->MenuContentFullSize));
     Add(new cMenuEditBoolItem(tr("Show additional recording info"), &SetupConfig->RecordingAdditionalInfoShow));
     Add(new cMenuEditBoolItem(tr("Show additional EPG info"), &SetupConfig->EpgAdditionalInfoShow));

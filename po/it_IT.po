@@ -654,6 +654,9 @@ msgstr "Riempimento voci del menù"
 msgid "Show mainmenu item icons"
 msgstr "Mostra icone del menù principale"
 
+msgid "Show default for missing main menu icons"
+msgstr "Mostra predefinito per icone mancanti del menù principale"
+
 msgid "Menu content fullsize background"
 msgstr "Menù: contenuto a dimensioni piene in background"
 

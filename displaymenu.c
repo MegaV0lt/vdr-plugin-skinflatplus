@@ -425,8 +425,20 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                         img = ImgLoader.GetIcon(*IconNameCur, IconSize, IconSize);
                     }
                     if (!img) img = ImgLoader.GetIcon(*IconName, IconSize, IconSize);
-
-                    if (!img) { img = ImgLoader.GetIcon("menuIcons/blank", IconSize, IconSize); }
+                    // Show a default generic icon for menu items without an icon instead of no icon at all.
+                    // Depending on setting 'Config.MenuItemIconsShowDefault' a simple square or circle is shown.
+                    // This would make it easier to identify menu items without icons and improve the
+                    // overall look of the menu.
+                    if (!img) {
+                        if (Current)
+                            img = ImgLoader.GetIcon(Config.MenuItemIconsShowDefault ? "menuIcons/Default_cur"
+                                                                                    : "menuIcons/blank",
+                                                    IconSize, IconSize);
+                        if (!img)
+                            img = ImgLoader.GetIcon(Config.MenuItemIconsShowDefault ? "menuIcons/Default"
+                                                                                    : "menuIcons/blank",
+                                                    IconSize, IconSize);
+                    }
                     // Draw the icon
                     if (img) {
                         MenuIconsPixmap->DrawImage(

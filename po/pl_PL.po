@@ -697,6 +697,9 @@ msgstr "Odstęp elementów"
 msgid "Show mainmenu item icons"
 msgstr "Pokaż ikony w menu"
 
+msgid "Show default for missing main menu icons"
+msgstr "Pokaż domyślny dla brakujących ikon menu głównego"
+
 msgid "Menu content fullsize background"
 msgstr "Menu: pełnego rozmiaru tło"
 
