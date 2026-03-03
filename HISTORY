@@ -1,5 +1,9 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-03-03: Version 1.2.6
+- [fix] Fix wrong display of info text of events
+- [update] Refactor getting special menu icons to in GetIconName()
+
 2026-02-23: Version 1.2.5
 - [fix] Add missing 'clrReplayErrorMark = FFBB0000' to some themes
 - [fix] Translation of 'Commands' is changed to 'Button$Commands' for VDR 2.7.8 and later

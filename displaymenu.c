@@ -3026,21 +3026,14 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         }
     }  // for plugins
 
-    //* Check for special main menu entries "Deleted recordings", "Stop recording", "Stop replay"
-    sv = skipspace(trVDR(" Deleted recordings"));
-    if (ElementView == sv) {
-        cache.emplace(ElementView, "menuIcons/DeletedRecordings");  // Store in cache
-        return "menuIcons/DeletedRecordings";
-    }
-    sv = skipspace(trVDR(" Stop recording "));
-    if (ElementView == sv) {
-        cache.emplace(ElementView, "menuIcons/StopRecording");  // Store in cache
-        return "menuIcons/StopRecording";
-    }
-    sv = skipspace(trVDR(" Stop replaying"));
-    if (ElementView == sv) {
-        cache.emplace(ElementView, "menuIcons/StopReplay");  // Store in cache
-        return "menuIcons/StopReplay";
+    //* Check for special main menu entries
+    static constexpr const char *SpecialItems[] {" Deleted recordings", " Stop recording ", " Stop replaying"};
+    for (const auto &item : SpecialItems) {
+        sv = skipspace(trVDR(item));  // Translate and skip leading spaces
+        if (ElementView == sv) {
+            cache.emplace(ElementView, cString::sprintf("menuIcons/%s", item));  // Store in cache
+            return cString::sprintf("menuIcons/%s", item);
+        }
     }
 
     //* Nothing found, return a generic icon
