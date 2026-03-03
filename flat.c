@@ -880,35 +880,6 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 }
 
-/* Unused functions for trimming whitespace from strings
-   From https://stackoverflow.com/questions/216823/whats-the-best-way-to-trim-stdstring
-std::string_view ltrim(std::string_view str) {
-    const auto pos(str.find_first_not_of(" \t\n\r\f\v"));
-    if (pos == std::string_view::npos) {
-        // String contains only whitespace, return empty string_view
-        return std::string_view {};
-    }
-    str.remove_prefix(std::min(pos, str.length()));
-    return str;
-}
-
-std::string_view rtrim(std::string_view str) {
-    const auto pos(str.find_last_not_of(" \t\n\r\f\v"));
-    if (pos == std::string_view::npos) {
-        // String contains only whitespace, return empty string_view
-        return std::string_view {};
-    }
-    str.remove_suffix(std::min(str.length() - pos - 1, str.length()));
-    return str;
-}
-
-std::string_view trim(std::string_view str) {
-    str = ltrim(str);
-    str = rtrim(str);
-    return str;
-}
-*/
-
 // --- cTextFloatingWrapper --- // From skin ElchiHD
 // Based on VDR's cTextWrapper
 cTextFloatingWrapper::cTextFloatingWrapper() {}
@@ -1025,7 +996,7 @@ const char *cTextFloatingWrapper::Text() {
     return m_Text;
 }
 
-/* const char *cTextFloatingWrapper::GetLine(int Line) {
+const char *cTextFloatingWrapper::GetLine(int Line) {
     char *s {nullptr};
     if (Line < m_Lines) {
         if (m_EoL) {
@@ -1048,32 +1019,5 @@ const char *cTextFloatingWrapper::Text() {
         }
         m_LastLine = Line;
     }
-    return s;
-} */
-
-const char* cTextFloatingWrapper::GetLine(int Line) {
-    if (Line >= m_Lines)
-        return nullptr;
-
-    const char *s {m_Text};
-    if (m_EoL) {
-        *m_EoL = '\n';
-        m_EoL = nullptr;
-    }
-
-    const char *newline {nullptr};
-    for (int i = 0; i < Line; ++i) {
-        newline = strchr(s, '\n');
-        if (newline) {
-            s = newline + 1;
-        } else {
-            break;
-        }
-    }
-
-    if (s && m_EoL)
-        *m_EoL = '\0';
-
-    m_LastLine = Line;
     return s;
 }
