@@ -13,6 +13,7 @@
 #error "VDR-2.3.8 API version or greater is required!"
 #endif
 
+#include "./baserender.h"
 #include "./flat.h"
 #include "./fontcache.h"
 #include "./setup.h"
@@ -113,6 +114,7 @@ void cPluginFlat::Stop() {
 }
 
 void cPluginFlat::Housekeeping() {
+    RecCountCache.UpdateIfNeeded();
 }
 
 // void cPluginFlat::MainThreadHook() {}  // Deprecated in VDR 2.7.4

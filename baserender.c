@@ -33,6 +33,9 @@
 #include "./flat.h"
 #include "./fontcache.h"
 
+std::atomic<uint16_t> s_NumRecordings {0};
+RecTimerCounter RecCountCache;
+
 cFlatBaseRender::cFlatBaseRender() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::cFlatBaseRender()");
@@ -491,8 +494,7 @@ void cFlatBaseRender::TopBarUpdate() {
             cTimeMs Timer;  // Start Timer
 #endif
 
-            //* FAST RECORD COUNT: Use cached background thread or event value
-            RecCountCache.UpdateIfNeeded();
+            //* FAST RECORD COUNT: Read value updated by Housekeeping()
             NumRec = s_NumRecordings.load(std::memory_order_relaxed);
             //* END FAST RECORD COUNT
 #ifdef DEBUGFUNCSCALL
