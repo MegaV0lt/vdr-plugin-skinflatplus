@@ -42,7 +42,7 @@ void cFlatDisplayVolume::SetVolume(int Current, int Total, bool Mute) {
     PixmapClear(MuteLogoPixmap);
 
     const cString label = cString::sprintf("%s: %d", tr("Volume"), Current);
-    const cString MaxLabel = cString::sprintf("%s: %d", tr("Volume"), 000);  // Use 000 to get the max width
+    const cString MaxLabel = cString::sprintf("%s: %s", tr("Volume"), "000");  // Use '000' to get the max width
     const int MaxLabelWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, *MaxLabel) + m_MarginItem};
     int left {(m_OsdWidth - MaxLabelWidth) / 2};
 
