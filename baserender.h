@@ -268,8 +268,8 @@ class cFlatBaseRender {
     tColor SetAlpha(tColor Color, double am);
 };  // class cFlatBaseRender
 
-// Recording Timer Count: Cache with event update or periodic refresh
-static std::atomic<uint16_t> s_NumRecordings {0};
+// Recording Timer Count: Updated from Housekeeping()
+extern std::atomic<uint16_t> s_NumRecordings;
 
 class RecTimerCounter {
  public:
@@ -291,4 +291,4 @@ class RecTimerCounter {
         }
     }
 };  // class RecTimerCounter
-static RecTimerCounter RecCountCache;
+extern RecTimerCounter RecCountCache;
