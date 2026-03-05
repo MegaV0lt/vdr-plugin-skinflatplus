@@ -1,5 +1,11 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-03-05: Version 1.2.7
+- [fix] Fix invalid lock sequence: Move LOCK_TIMERS_READ out of rendering path.
+        Thanks to zork @ VDR-Portal for reporting and providing a patch.
+- [fix] Fix truncated volume value display. Thanks to linilinux @ github for reporting.
+- [fix] Fix 'logo_background' not used when in logo directory. Thanks tmn505 @ github for reporting.
+
 2026-03-03: Version 1.2.6
 - [fix] Fix wrong display of info text of events
 - [update] Refactor getting special menu icons to in GetIconName()

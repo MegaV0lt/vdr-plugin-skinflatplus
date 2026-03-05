@@ -32,7 +32,7 @@ void cFontCache::Create() {
 
 void cFontCache::Clear() {
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFontCache::Clear() Clearing cache");
+    dsyslog("flatPlus: cFontCache::Clear()");
 #endif
 
     for (auto &data : FontCache) {
