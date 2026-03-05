@@ -33,6 +33,9 @@
 #include "./flat.h"
 #include "./fontcache.h"
 
+// Global flag to indicate if logo was found in channel logo path
+bool g_LogoBgOverwrite = false;
+
 std::atomic<uint16_t> s_NumRecordings {0};
 RecTimerCounter RecCountCache;
 

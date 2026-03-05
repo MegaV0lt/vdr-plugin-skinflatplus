@@ -16,6 +16,9 @@
 using Magick::Image;
 using Magick::Geometry;
 
+// External declaration of global logo overwrite flag
+extern bool g_LogoBgOverwrite;
+
 cImageLoader::cImageLoader() {}
 
 cImageLoader::~cImageLoader() {}
@@ -222,18 +225,17 @@ cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
 /**
  * @brief Load 'logo_background' from the configured logo path or theme directory.
  *
- * If m_LogoOverwrite is true, load the logo from the configured logo path.
- * Otherwise, load the logo from the theme directory. m_LogoOverwrite ist set
- * in cDisplayChannel::PreLoadImages().
+ * If g_LogoBgOverwrite is true, load the logo from the configured logo path.
+ * Otherwise, load the logo from the theme directory. g_LogoBgOverwrite is set
+ * in cFlatDisplayChannel::PreLoadImages().
  *
- * @param Name The name of the logo (without path).
  * @param Width The desired width of the logo.
  * @param Height The desired height of the logo.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
 cImage* cImageLoader::GetLogoBg(int Width, int Height) {
     static constexpr const char *LogoBgName {"logo_background"};
-    return (m_LogoOverwrite) ? GetLogo(LogoBgName, Width, Height) : GetIcon(LogoBgName, Width, Height);
+    return (g_LogoBgOverwrite) ? GetLogo(LogoBgName, Width, Height) : GetIcon(LogoBgName, Width, Height);
 }
 
 /**
