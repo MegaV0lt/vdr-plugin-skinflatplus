@@ -33,6 +33,9 @@
 #include "./flat.h"
 #include "./fontcache.h"
 
+// Global flag to indicate if logo was found in channel logo path
+bool g_LogoBgOverwrite = false;
+
 cFlatBaseRender::cFlatBaseRender() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::cFlatBaseRender()");

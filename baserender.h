@@ -17,6 +17,9 @@
 #include "./textscroller.h"
 #include "./complexcontent.h"
 
+// Global flag to indicate if logo was found in channel logo path
+extern bool g_LogoBgOverwrite;
+
 enum eBorder {
     BorderMenuItem,
     BorderRecordJump,

@@ -604,21 +604,19 @@ void cFlatDisplayChannel::Flush() {
 
 void cFlatDisplayChannel::PreLoadImages() {
     const int height {m_HeightImageLogo - m_MarginItem2};
-    int ImageBgHeight {height}, ImageBgWidth {height};
+    int ImageBgWidth = height * 1.34f;
+    int ImageBgHeight {height};
 
-    // Set variable 'm_LogoOverwrite' to determine if logo was found in channel logo path
+    // Load 'logo_background' and determine if logo was found in channel logo path
     cImage *img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight);
     if (img) {
-        ImgLoader.m_LogoOverwrite = true;  // Used for GetLogoBg()
+        g_LogoBgOverwrite = true;  // Used for GetLogoBg()
     } else {
         img = ImgLoader.GetIcon("logo_background", ImageBgWidth, ImageBgHeight);
     }
-#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayChannel::PreLoadImages() Using 'logo_background' from %s path",
-            ImgLoader.m_LogoOverwrite ? "logo" : "theme");
-#endif
+            g_LogoBgOverwrite ? "logo" : "theme");
 
-    img = ImgLoader.GetLogoBg(ImageBgWidth * 1.34f, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgHeight = img->Height();
         ImageBgWidth = img->Width();
@@ -626,6 +624,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
     ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
 
+    // Preload channel icons
     uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {
@@ -635,7 +634,6 @@ void cFlatDisplayChannel::PreLoadImages() {
         }
     }  // for cChannel
 
-    // Preload channel icons
     if (Config.ChannelIconsShow) {
         ImgLoader.GetIcon("crypted", kIconMaxSize, m_FontSmlHeight);
         ImgLoader.GetIcon("uncrypted", kIconMaxSize, m_FontSmlHeight);
