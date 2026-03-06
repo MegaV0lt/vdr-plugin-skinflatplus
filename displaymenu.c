@@ -2986,24 +2986,24 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
 
-    std::string_view ElementView {*element}, sv;
+    std::string_view svElement {*element}, sv;
 
     // Check if the element matches any name in the cache
-    auto it = cache.find(ElementView.data());
+    auto it = cache.find(svElement.data());
     if (it != cache.end()) return *it->second;  // Return cached icon name including path
 
     cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
     //* Check for standard menu entries
     for (const auto &item : items) {
         sv = trVDR(item);  // Translate item to current language
-        if (ElementView == sv) {
-            cache.emplace(ElementView, cString::sprintf("menuIcons/%s", item));  // Store menu name in cache
+        if (svElement == sv) {
+            cache.emplace(svElement, cString::sprintf("menuIcons/%s", item));  // Store menu name in cache
             return cString::sprintf("menuIcons/%s", item);
         }
     }
 
     //* Iterate through all plugins and check for main menu entries
-    const char *MainMenuEntry {""};
+    const char *MainMenuEntry {nullptr};
     for (std::size_t i {0};; ++i) {
         cPlugin *p {cPluginManager::GetPlugin(i)};
 #ifdef DEBUGFUNCSCALL
@@ -3013,7 +3013,7 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         if (p != nullptr) {                      // Plugin found
             MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
             if (!isempty(MainMenuEntry)) {       // Plugin has a main menu entry
-                if (ElementView == MainMenuEntry) {
+                if (svElement == MainMenuEntry) {
 #ifdef DEBUGFUNCSCALL
                     dsyslog("     Adding plugin '%s' to cache (#%ld)", p->Name(), cache.size() + 1);
 #endif
@@ -3027,17 +3027,24 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     }  // for plugins
 
     //* Check for special main menu entries
-    static constexpr const char *SpecialItems[] {" Deleted recordings", " Stop recording ", " Stop replaying"};
-    for (const auto &item : SpecialItems) {
-        sv = skipspace(trVDR(item));  // Translate and skip leading spaces
-        if (ElementView == sv) {
-            cache.emplace(ElementView, cString::sprintf("menuIcons/%s", item));  // Store in cache
-            return cString::sprintf("menuIcons/%s", item);
-        }
+    sv = skipspace(trVDR(" Deleted recordings"));
+    if (svElement == sv) {
+        cache.emplace(svElement, "menuIcons/DeletedRecordings");  // Store in cache
+        return "menuIcons/DeletedRecordings";
+    }
+    sv = skipspace(trVDR(" Stop recording "));
+    if (svElement == sv) {
+        cache.emplace(svElement, "menuIcons/StopRecording");  // Store in cache
+        return "menuIcons/StopRecording";
+    }
+    sv = skipspace(trVDR(" Stop replaying"));
+    if (svElement == sv) {
+        cache.emplace(svElement, "menuIcons/StopReplay");  // Store in cache
+        return "menuIcons/StopReplay";
     }
 
     //* Nothing found, return a generic icon
-    cache.emplace(ElementView, cString::sprintf("extraIcons/%s", *element));  // Store in cache
+    cache.emplace(svElement, cString::sprintf("extraIcons/%s", *element));  // Store in cache
     return cString::sprintf("extraIcons/%s", *element);
 }
 
