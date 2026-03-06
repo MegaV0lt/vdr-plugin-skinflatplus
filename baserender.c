@@ -863,6 +863,8 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
                                          int Type, bool SetBackground, bool IsSignal) {
     if (!Pixmap) return;
 
+    if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
+
     if (PixmapBg && SetBackground) PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
@@ -876,8 +878,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
         esyslog("flatPlus: Error in cFlatBaseRender::ProgressBarDrawRaw() Total is 0!");
         return;
     }
-
-    if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
 
     if (Current > Total) Current = Total;  // Clamp Current to Total to avoid drawing outside bounds
 
