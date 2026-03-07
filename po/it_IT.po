@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-skinflatplus 1.0.1\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2017-05-06 16:13+0200\n"
+"POT-Creation-Date: 2026-03-06 09:03+0100\n"
 "PO-Revision-Date: 2015-02-09 20:09+0100\n"
 "Last-Translator: fiveten_59\n"
 "Language-Team: Italian\n"
@@ -24,20 +24,14 @@ msgstr "libero"
 msgid "occupied"
 msgstr "occupato"
 
-msgid "occupied special mode"
-msgstr ""
-
 msgid "clock"
 msgstr "orario"
 
-msgid "Genre"
-msgstr "Genere"
+msgid "Unknown"
+msgstr "Sconosciuto"
 
 msgid "FSK"
 msgstr ""
-
-msgid "Video"
-msgstr "Video"
 
 msgid "Audio"
 msgstr "Audio"
@@ -51,48 +45,6 @@ msgstr "Timer non attivo"
 msgid "no recording info"
 msgstr "nessuna informazione sulla registrazione"
 
-msgid "name: "
-msgstr "Nome: "
-
-msgid "first aired: "
-msgstr "Uscito la prima volta: "
-
-msgid "network: "
-msgstr "network: "
-
-msgid "genre: "
-msgstr "Genere: "
-
-msgid "rating: "
-msgstr "rating: "
-
-msgid "status: "
-msgstr "Status: "
-
-msgid "season number: "
-msgstr "Numero di stagione: "
-
-msgid "episode number: "
-msgstr "Episodio numero: "
-
-msgid "title: "
-msgstr "Titolo: "
-
-msgid "original title: "
-msgstr "Titolo originale: "
-
-msgid "collection name: "
-msgstr "nome collezione:"
-
-msgid "release date: "
-msgstr "Data uscita: "
-
-msgid "popularity: "
-msgstr "popolarità: "
-
-msgid "vote average: "
-msgstr "voto medio: "
-
 msgid "Description"
 msgstr "Descrizione"
 
@@ -102,62 +54,38 @@ msgstr "Informazioni sul Film"
 msgid "Series information"
 msgstr "Informazioni sulla Serie"
 
-msgid "Actors"
-msgstr "Attori"
-
 msgid "Reruns"
 msgstr "Riavvii"
 
 msgid "Video information"
 msgstr "Informazioni Video"
 
-msgid "Length"
-msgstr "Lunghezza"
-
-msgid "cutted"
-msgstr "tagliato"
-
-msgid "Size"
-msgstr "Dimensione"
-
-msgid "format"
-msgstr "Formato"
-
-msgid "bit rate"
-msgstr "Bitrate"
+msgid "Actors"
+msgstr "Attori"
 
 msgid "TS errors"
 msgstr ""
 
-msgid "additional information"
-msgstr "Informazioni addizionali"
-
-msgid "channel"
-msgstr "canale"
-
-msgid "search pattern"
-msgstr "cerca modello"
-
 msgid "Recording information"
 msgstr "informazione sulla registrazione"
+
+msgid "Genre"
+msgstr "Genere"
 
 msgid "DVB Devices"
 msgstr "DVB Devices"
 
-msgid "No DVB devices found"
-msgstr "Nessun DVB device trovato"
-
 msgid "LiveTV"
 msgstr ""
-
-msgid "Unknown"
-msgstr "Sconosciuto"
 
 msgid "recording"
 msgstr "registrazione in corso"
 
 msgid "not used"
 msgstr "non usato"
+
+msgid "No DVB devices found"
+msgstr "Nessun DVB device trovato"
 
 msgid "Timer"
 msgstr "Timer"
@@ -270,8 +198,99 @@ msgstr "Nessun output disponibile"
 msgid "Weather"
 msgstr "Tempo"
 
+# Playback time shift
+msgid "TimeShift"
+msgstr ""
+
+msgid "ends at"
+msgstr ""
+
 msgid "Volume"
 msgstr "Volume"
+
+msgid "name: "
+msgstr "Nome: "
+
+msgid "first aired: "
+msgstr "Uscito la prima volta: "
+
+msgid "network: "
+msgstr "network: "
+
+msgid "genre: "
+msgstr "Genere: "
+
+msgid "rating: "
+msgstr "rating: "
+
+msgid "status: "
+msgstr "Status: "
+
+msgid "season number: "
+msgstr "Numero di stagione: "
+
+msgid "episode number: "
+msgstr "Episodio numero: "
+
+msgid "title: "
+msgstr "Titolo: "
+
+msgid "original title: "
+msgstr "Titolo originale: "
+
+msgid "collection name: "
+msgstr "nome collezione:"
+
+msgid "release date: "
+msgstr "Data uscita: "
+
+msgid "popularity: "
+msgstr "popolarità: "
+
+msgid "vote average: "
+msgstr "voto medio: "
+
+msgid "Video"
+msgstr "Video"
+
+msgid "additional information"
+msgstr "Informazioni addizionali"
+
+msgid "channel"
+msgstr "canale"
+
+msgid "search pattern"
+msgstr "cerca modello"
+
+msgid "caused by"
+msgstr ""
+
+msgid "reason"
+msgstr ""
+
+msgid "improve"
+msgstr ""
+
+msgid "collection"
+msgstr ""
+
+msgid "TV show, missing episode"
+msgstr ""
+
+msgid "Length"
+msgstr "Lunghezza"
+
+msgid "cutted"
+msgstr "tagliato"
+
+msgid "Size"
+msgstr "Dimensione"
+
+msgid "format"
+msgstr "Formato"
+
+msgid "bit rate"
+msgstr "Bitrate"
 
 msgid "none"
 msgstr "nessuno"
@@ -335,6 +354,9 @@ msgstr "sempre in Menù"
 
 msgid "always show"
 msgstr "mostra sempre"
+
+msgid "occupied special mode"
+msgstr ""
 
 msgid "VDR default"
 msgstr "VDR default"
@@ -405,6 +427,39 @@ msgstr "corto"
 msgid "long"
 msgstr "lungo"
 
+msgid "end of recording"
+msgstr ""
+
+msgid "end of edited recording"
+msgstr ""
+
+msgid "small | line"
+msgstr ""
+
+msgid "big | line"
+msgstr ""
+
+msgid "small textcursor"
+msgstr ""
+
+msgid "big textcursor"
+msgstr ""
+
+msgid "small +"
+msgstr ""
+
+msgid "big +"
+msgstr ""
+
+msgid "do not search"
+msgstr "non cercare"
+
+msgid "search"
+msgstr "cerca"
+
+msgid "search only in recording folder"
+msgstr "cerca solo nella cartella delle registrazioni"
+
 msgid "General settings"
 msgstr "Impostazioni generali"
 
@@ -428,18 +483,6 @@ msgstr "Impostazioni TVScraper / scraper2vdr"
 
 msgid "TVScraper / scraper2vdr not installed"
 msgstr "TVScraper / scraper2vdr non istallati"
-
-msgid "search local posters"
-msgstr "cerca poster locali"
-
-msgid "do not search"
-msgstr "non cercare"
-
-msgid "search"
-msgstr "cerca"
-
-msgid "search only in recording folder"
-msgstr "cerca solo nella cartella delle registrazioni"
 
 msgid "Main menu widgets settings"
 msgstr "Impostazioni menù widget"
@@ -567,7 +610,7 @@ msgstr "Ingressi Iconcache"
 msgid "Fontcache entries"
 msgstr ""
 
-msgid "Channel name/number font size"
+msgid "Channel name/number relative font size"
 msgstr ""
 
 msgid "Show channel name/number with shadow"
@@ -591,11 +634,11 @@ msgstr "Dimensione font widget previsioni"
 msgid "Colors for signal quality"
 msgstr "Colori per qualità del segnale"
 
-msgid "Show audio format"
-msgstr "Mostra formato audio"
-
 msgid "Show resolution & aspect"
 msgstr "Mostra risoluzione & aspetto"
+
+msgid "Show audio format"
+msgstr "Mostra formato audio"
 
 msgid "Show format (hd/sd)"
 msgstr "Mostra formato (HD/SD)"
@@ -687,56 +730,10 @@ msgstr ""
 msgid "Recording menu show recerrors icon"
 msgstr ""
 
-msgid "Recording menu show format icon"
-msgstr ""
-
-msgid "Show recerrors icon in playback"
-msgstr ""
-
-# Playback show error marks
-msgid "Show error marks in playback"
-msgstr ""
-
-msgid "small | line"
-msgstr ""
-
-msgid "big | line"
-msgstr ""
-
-msgid "small textcursor"
-msgstr ""
-
-msgid "big textcorsor"
-msgstr ""
-
-msgid "small +"
-msgstr ""
-
-msgid "big +"
-msgstr ""
-
-msgid "Show shorttext with date in playback"
-msgstr ""
-
-# Playback time shift
-msgid "TimeShift"
-msgstr ""
-
-# Playback show end time
-msgid "Show end time of recording"
-msgstr ""
-
-msgid "end of recording"
-msgstr ""
-
-msgid "end of edited recording"
-msgstr ""
-
-msgid "ends at"
-msgstr ""
-
-
 msgid "Recording recerrors icon threshold"
+msgstr ""
+
+msgid "Recording menu show format icon"
 msgstr ""
 
 msgid "Timer menu show timer count in title"
@@ -811,6 +808,20 @@ msgstr "Voci del menù: dimensione progresso in corso"
 msgid "Time seconds font scale"
 msgstr "Scala i font dei secondi"
 
+msgid "Show recerrors icon in playback"
+msgstr ""
+
+# Playback show error marks
+msgid "Show error marks in playback"
+msgstr ""
+
+msgid "Show shorttext with date in playback"
+msgstr ""
+
+# Playback show end time
+msgid "Show end time of recording"
+msgstr ""
+
 msgid "Dimm on pause?"
 msgstr "Mettere in pausa?"
 
@@ -883,11 +894,14 @@ msgstr ""
 msgid "EPG info show poster?"
 msgstr "EPG-Info: mostrare Poster?"
 
+msgid "EPG info show actors?"
+msgstr "Mostrare attori nelle EPG-Info?"
+
 msgid "recording info show poster?"
 msgstr "EPG-Info: mostrare Poster?"
 
-msgid "EPG info show actors?"
-msgstr "Mostrare attori nelle EPG-Info?"
+msgid "search local posters"
+msgstr "cerca poster locali"
 
 msgid "recording info show actors?"
 msgstr "Mostrare attori nelle info delle registrazioni?"
@@ -930,6 +944,9 @@ msgstr "Widget DVB devices: non mostrare sconosciuto"
 
 msgid "Widget DVB devices: don't show not used"
 msgstr "Widget DVB devices: non mostrare non usato"
+
+msgid "Widget DVB devices: native numbering (0..)"
+msgstr ""
 
 msgid "Widget timer"
 msgstr "Widget del Timer"

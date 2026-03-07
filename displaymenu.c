@@ -3537,7 +3537,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
 
     // Now display all devices
     bool FoundTuner {false};
-    int ActualNumDevices {0};
     cString ChannelName {""}, str {""}, StrDevice {""};
     for (int16_t i {0}; i < NumDevices; ++i) {
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
@@ -3549,7 +3548,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         else
             continue;  // No tuner
 
-        ++ActualNumDevices;
         StrDevice = "";  // Reset string
 
         const cChannel *channel {device->GetCurrentlyTunedTransponder()};

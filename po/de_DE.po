@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-skinflatplus 1.1.8\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2017-05-06 16:13+0200\n"
+"POT-Creation-Date: 2026-03-06 09:03+0100\n"
 "PO-Revision-Date: 2025-02-27 10:09+0100\n"
 "Last-Translator: Martin Schirrmacher\n"
 "Language-Team: Martin Schirrmacher\n"
@@ -24,20 +24,14 @@ msgstr "frei"
 msgid "occupied"
 msgstr "belegt"
 
-msgid "occupied special mode"
-msgstr "belegt und freie Zeit"
-
 msgid "clock"
 msgstr "Uhr"
 
-msgid "Genre"
-msgstr "Kategorie"
+msgid "Unknown"
+msgstr "Unbekannt"
 
 msgid "FSK"
 msgstr ""
-
-msgid "Video"
-msgstr "Video"
 
 msgid "Audio"
 msgstr "Audio"
@@ -51,48 +45,6 @@ msgstr "Timer nicht aktiv"
 msgid "no recording info"
 msgstr "Keine Aufnahme Informationen"
 
-msgid "name: "
-msgstr "Name: "
-
-msgid "first aired: "
-msgstr "Erstausstrahlung: "
-
-msgid "network: "
-msgstr "Sender: "
-
-msgid "genre: "
-msgstr "Genre: "
-
-msgid "rating: "
-msgstr "Wertung: "
-
-msgid "status: "
-msgstr "Status: "
-
-msgid "season number: "
-msgstr "Staffel: "
-
-msgid "episode number: "
-msgstr "Folge: "
-
-msgid "title: "
-msgstr "Titel: "
-
-msgid "original title: "
-msgstr "Originaltitel: "
-
-msgid "collection name: "
-msgstr "Sammlung Name: "
-
-msgid "release date: "
-msgstr "Erscheinungsdatum: "
-
-msgid "popularity: "
-msgstr "Beliebtheit: "
-
-msgid "vote average: "
-msgstr "Wertung: Ø "
-
 msgid "Description"
 msgstr "Beschreibung"
 
@@ -102,90 +54,38 @@ msgstr "Film Informationen"
 msgid "Series information"
 msgstr "Serien Informationen"
 
-msgid "Actors"
-msgstr "Darsteller"
-
 msgid "Reruns"
 msgstr "Wiederholungen"
 
 msgid "Video information"
 msgstr "Video Informationen"
 
-msgid "Length"
-msgstr "Länge"
-
-msgid "cutted"
-msgstr "Geschnitten"
-
-msgid "Size"
-msgstr "Größe"
-
-msgid "format"
-msgstr "Format"
-
-msgid "bit rate"
-msgstr "Bitrate"
+msgid "Actors"
+msgstr "Darsteller"
 
 msgid "TS errors"
 msgstr "Aufnahmefehler"
 
-msgid "additional information"
-msgstr "Zusatzinformationen"
-
-msgid "channel"
-msgstr "Kanal"
-
-msgid "search pattern"
-msgstr "Suchmuster"
-
-# TVScraper
-msgid "caused by"
-msgstr "Ausgelöst durch"
-
-msgid "reason"
-msgstr "Grund"
-
-msgid "improve"
-msgstr "Verbessern"
-
-msgid "collection"
-msgstr "Sammlung"
-
-msgid "TV show, missing episode"
-msgstr "Fehlende Folge"
-
-msgid "search local posters"
-msgstr "Suche lokale Poster"
-
-msgid "do not search"
-msgstr "Nicht suchen"
-
-msgid "search"
-msgstr "Suchen"
-
-msgid "search only in recording folder"
-msgstr "Nur im Aufnahmeordner suchen"
-
 msgid "Recording information"
 msgstr "Aufnahme Informationen"
+
+msgid "Genre"
+msgstr "Kategorie"
 
 msgid "DVB Devices"
 msgstr "DVB Geräte"
 
-msgid "No DVB devices found"
-msgstr "Keine DVB Geräte gefunden"
-
 msgid "LiveTV"
 msgstr ""
-
-msgid "Unknown"
-msgstr "Unbekannt"
 
 msgid "recording"
 msgstr "Nimmt auf"
 
 msgid "not used"
 msgstr "Nicht verwendet"
+
+msgid "No DVB devices found"
+msgstr "Keine DVB Geräte gefunden"
 
 msgid "Timer"
 msgstr "Timer"
@@ -298,8 +198,100 @@ msgstr "Keine Ausgabe vorhanden"
 msgid "Weather"
 msgstr "Wetter"
 
+# Playback time shift
+msgid "TimeShift"
+msgstr " Zeitversetzt "
+
+msgid "ends at"
+msgstr "Endet um"
+
 msgid "Volume"
 msgstr "Lautstärke"
+
+msgid "name: "
+msgstr "Name: "
+
+msgid "first aired: "
+msgstr "Erstausstrahlung: "
+
+msgid "network: "
+msgstr "Sender: "
+
+msgid "genre: "
+msgstr "Genre: "
+
+msgid "rating: "
+msgstr "Wertung: "
+
+msgid "status: "
+msgstr "Status: "
+
+msgid "season number: "
+msgstr "Staffel: "
+
+msgid "episode number: "
+msgstr "Folge: "
+
+msgid "title: "
+msgstr "Titel: "
+
+msgid "original title: "
+msgstr "Originaltitel: "
+
+msgid "collection name: "
+msgstr "Sammlung Name: "
+
+msgid "release date: "
+msgstr "Erscheinungsdatum: "
+
+msgid "popularity: "
+msgstr "Beliebtheit: "
+
+msgid "vote average: "
+msgstr "Wertung: Ø "
+
+msgid "Video"
+msgstr "Video"
+
+msgid "additional information"
+msgstr "Zusatzinformationen"
+
+msgid "channel"
+msgstr "Kanal"
+
+msgid "search pattern"
+msgstr "Suchmuster"
+
+# TVScraper
+msgid "caused by"
+msgstr "Ausgelöst durch"
+
+msgid "reason"
+msgstr "Grund"
+
+msgid "improve"
+msgstr "Verbessern"
+
+msgid "collection"
+msgstr "Sammlung"
+
+msgid "TV show, missing episode"
+msgstr "Fehlende Folge"
+
+msgid "Length"
+msgstr "Länge"
+
+msgid "cutted"
+msgstr "Geschnitten"
+
+msgid "Size"
+msgstr "Größe"
+
+msgid "format"
+msgstr "Format"
+
+msgid "bit rate"
+msgstr "Bitrate"
 
 msgid "none"
 msgstr "keine"
@@ -363,6 +355,9 @@ msgstr "Immer im Menü"
 
 msgid "always show"
 msgstr "Immer anzeigen"
+
+msgid "occupied special mode"
+msgstr "belegt und freie Zeit"
 
 msgid "VDR default"
 msgstr "VDR Standard"
@@ -432,6 +427,39 @@ msgstr "Kurz"
 
 msgid "long"
 msgstr "Lang"
+
+msgid "end of recording"
+msgstr "Gesamte Aufnahme"
+
+msgid "end of edited recording"
+msgstr "Gesamte und geschnittene Aufnahme"
+
+msgid "small | line"
+msgstr "Kurze | Linie"
+
+msgid "big | line"
+msgstr "Lange | Linie"
+
+msgid "small textcursor"
+msgstr "Kleiner Textcursor"
+
+msgid "big textcursor"
+msgstr "Großer Textcursor"
+
+msgid "small +"
+msgstr "Kleines +"
+
+msgid "big +"
+msgstr "Großes +"
+
+msgid "do not search"
+msgstr "Nicht suchen"
+
+msgid "search"
+msgstr "Suchen"
+
+msgid "search only in recording folder"
+msgstr "Nur im Aufnahmeordner suchen"
 
 msgid "General settings"
 msgstr "Allgemeine Einstellungen"
@@ -607,11 +635,11 @@ msgstr "Wetter Widget Schriftgröße"
 msgid "Colors for signal quality"
 msgstr "Farben für Signalqualität"
 
-msgid "Show audio format"
-msgstr "Zeige Audioformat"
-
 msgid "Show resolution & aspect"
 msgstr "Zeige Auflösung & Bildformat"
+
+msgid "Show audio format"
+msgstr "Zeige Audioformat"
 
 msgid "Show format (hd/sd)"
 msgstr "Zeige Format (HD/SD)"
@@ -703,56 +731,11 @@ msgstr "Aufnahmen: Vorgabewert alter Ordner in Tagen"
 msgid "Recording menu show recerrors icon"
 msgstr "Aufnahmen: Zeige Aufnahmefehler Symbole"
 
-msgid "Recording menu show format icon"
-msgstr "Aufnahmen: Zeige Formatsymbole (sd/hd/uhd)"
-
-msgid "Show recerrors icon in playback"
-msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
-
-# Playback show error marks
-msgid "Show error marks in playback"
-msgstr "Wiedergabe: Zeige Fehler in Fortschrittsleiste"
-
-msgid "small | line"
-msgstr "Kurze | Linie"
-
-msgid "big | line"
-msgstr "Lange | Linie"
-
-msgid "small textcursor"
-msgstr "Kleiner Textcursor"
-
-msgid "big textcursor"
-msgstr "Großer Textcursor"
-
-msgid "small +"
-msgstr "Kleines +"
-
-msgid "big +"
-msgstr "Großes +"
-
-msgid "Show shorttext with date in playback"
-msgstr "Aufnahmen: Kurztext mit Datum/Zeit anzeigen"
-
-# Playback time shift
-msgid "TimeShift"
-msgstr " Zeitversetzt "
-
-# Playback show end time
-msgid "Show end time of recording"
-msgstr "Wiedergabe: Endzeit der Aufnahme:"
-
-msgid "end of recording"
-msgstr "Gesamte Aufnahme"
-
-msgid "end of edited recording"
-msgstr "Gesamte und geschnittene Aufnahme"
-
-msgid "ends at"
-msgstr "Endet um"
-
 msgid "Recording recerrors icon threshold"
 msgstr "Aufnahmen: Aufnahmefehler Symbole Schwellenwert"
+
+msgid "Recording menu show format icon"
+msgstr "Aufnahmen: Zeige Formatsymbole (sd/hd/uhd)"
 
 msgid "Timer menu show timer count in title"
 msgstr "Timer: Anzahl der Timer in Titelleiste"
@@ -826,6 +809,20 @@ msgstr "Menüitem: Fortschritt Größe"
 msgid "Time seconds font scale"
 msgstr "Uhrzeit: Sekunden Skalierung"
 
+msgid "Show recerrors icon in playback"
+msgstr "Aufnahmen: Fehler Symbole bei Wiedergabe"
+
+# Playback show error marks
+msgid "Show error marks in playback"
+msgstr "Wiedergabe: Zeige Fehler in Fortschrittsleiste"
+
+msgid "Show shorttext with date in playback"
+msgstr "Aufnahmen: Kurztext mit Datum/Zeit anzeigen"
+
+# Playback show end time
+msgid "Show end time of recording"
+msgstr "Wiedergabe: Endzeit der Aufnahme:"
+
 msgid "Dimm on pause?"
 msgstr "Dimmen bei Pause?"
 
@@ -898,11 +895,14 @@ msgstr "Wiedergabe/Kanalinfo: Poster Transparenz"
 msgid "EPG info show poster?"
 msgstr "EPG-Info: Zeige Poster?"
 
+msgid "EPG info show actors?"
+msgstr "EPG-Info: Zeige Darsteller?"
+
 msgid "recording info show poster?"
 msgstr "Aufnahmeinfo: Zeige Poster?"
 
-msgid "EPG info show actors?"
-msgstr "EPG-Info: Zeige Darsteller?"
+msgid "search local posters"
+msgstr "Suche lokale Poster"
 
 msgid "recording info show actors?"
 msgstr "Aufnahmeinfo: Zeige Darsteller?"

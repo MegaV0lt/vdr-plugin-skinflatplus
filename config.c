@@ -561,12 +561,10 @@ cString cFlatConfig::DecorDescription(cString File) {
         return description;
     }
 
-    int line {0};
     char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
     cReadLine ReadLine;
 
     while ((s = ReadLine.Read(f)) != nullptr) {
-        ++line;
         p = strchr(s, '#');
         if (p) *p = 0;
         s = stripspace(skipspace(s));
@@ -625,11 +623,10 @@ void cFlatConfig::DecorLoadFile(cString File) {
         esyslog("flatPlus: Load decor file: %s failed", *File);
         return;
     } else {
-        int line {0}, value {0};
+        int value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != nullptr) {
-            ++line;
             p = strchr(s, '#');
             if (p)
                 *p = 0;
@@ -734,11 +731,10 @@ void cFlatConfig::RecordingOldLoadConfig() {
 #endif
         return;
     } else {
-        int line {0}, value {0};
+        int value {0};
         char *s {nullptr}, *p {nullptr}, *n {nullptr}, *v {nullptr};
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != nullptr) {
-            ++line;
             p = strchr(s, '#');
             if (p) *p = 0;
             s = stripspace(skipspace(s));
