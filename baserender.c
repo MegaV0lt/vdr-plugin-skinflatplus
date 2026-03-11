@@ -36,8 +36,7 @@
 // Global flag to indicate if logo was found in channel logo path
 bool g_LogoBgOverwrite = false;
 
-std::atomic<uint16_t> s_NumRecordings {0};
-RecTimerCounter RecCountCache;
+cRecCountThread RecCountThread;
 
 cFlatBaseRender::cFlatBaseRender() {
 #ifdef DEBUGFUNCSCALL
@@ -497,8 +496,8 @@ void cFlatBaseRender::TopBarUpdate() {
             cTimeMs Timer;  // Start Timer
 #endif
 
-            //* FAST RECORD COUNT: Read value updated by Housekeeping()
-            NumRec = s_NumRecordings.load(std::memory_order_relaxed);
+            //* FAST RECORD COUNT: Read from background thread (no locking here)
+            NumRec = RecCountThread.Count();
             //* END FAST RECORD COUNT
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0) dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
