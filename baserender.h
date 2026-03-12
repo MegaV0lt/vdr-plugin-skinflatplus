@@ -268,27 +268,35 @@ class cFlatBaseRender {
     tColor SetAlpha(tColor Color, double am);
 };  // class cFlatBaseRender
 
-// Recording Timer Count: Updated from Housekeeping()
-extern std::atomic<uint16_t> s_NumRecordings;
-
-class RecTimerCounter {
+// Background thread that periodically counts active recording timers.
+// Runs in its own thread so LOCK_TIMERS_READ is acquired without any
+// other VDR state lock held — avoiding the invalid lock sequence that
+// occurs when the render path (which may already hold Channels lock)
+// tries to acquire the Timers lock.
+class cRecCountThread : public cThread {
  public:
-    std::atomic<time_t> LastUpdate;  // Last time the count was updated
-    static constexpr int kUpdateIntervalSec {2};
-    RecTimerCounter() : LastUpdate(0) {}  // Constructor
+    cRecCountThread() : cThread("RecCount") {}
+    uint16_t Count() const { return m_NumRecordings.load(std::memory_order_relaxed); }
+    void Stop() { Cancel(3); }
 
-    void UpdateIfNeeded() {
-        time_t now {time(0)};
-        if (now - LastUpdate.load() >= kUpdateIntervalSec) {
+ protected:
+    void Action() override {
+        while (Running()) {
             uint16_t count {0};
-            { LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
-                for (const cTimer* Timer=Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+            { LOCK_TIMERS_READ;
+                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording)) ++count;
                 }
             }
-            s_NumRecordings.store(count, std::memory_order_relaxed);
-            LastUpdate = now;
+            m_NumRecordings.store(count, std::memory_order_relaxed);
+            // Sleep in small increments so Cancel() is responsive
+            for (int i {0}; i < 20 && Running(); ++i)
+                cCondWait::SleepMs(100);  // Total ~2 s between updates
         }
     }
-};  // class RecTimerCounter
-extern RecTimerCounter RecCountCache;
+
+ private:
+    std::atomic<uint16_t> m_NumRecordings {0};
+};  // class cRecCountThread
+
+extern cRecCountThread RecCountThread;

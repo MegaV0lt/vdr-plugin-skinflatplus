@@ -105,16 +105,17 @@ bool cPluginFlat::Start() {
     ImgCache.PreLoadImage();
 
     flat = new cFlat;
+    RecCountThread.Start();
     return flat;
 }
 
 void cPluginFlat::Stop() {
+    RecCountThread.Stop();
     ImgCache.Clear();
     FontCache.Clear();
 }
 
 void cPluginFlat::Housekeeping() {
-    RecCountCache.UpdateIfNeeded();
 }
 
 // void cPluginFlat::MainThreadHook() {}  // Deprecated in VDR 2.7.4
