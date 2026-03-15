@@ -156,7 +156,6 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     }  // if (Channel)
 
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
-    const int left {m_MarginItem * 10};
 
     if (Config.ChannelShowNameWithShadow) {
         PixmapClear(ChanInfoTopPixmap);
@@ -171,12 +170,12 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         dsyslog("   m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
 #endif
         // Draw text with shadow
-        DrawTextWithShadow(ChanInfoTopPixmap, cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
-                           ShadowColor, m_FontBig, BoundedShadowSize);
+        DrawTextWithShadow(ChanInfoTopPixmap, cPoint(m_MarginItem10, 0), *ChannelString,
+                           Theme.Color(clrChannelFontTitle), ShadowColor, m_FontBig, BoundedShadowSize);
     } else {
         // Channel name on background
         PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
-        ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
+        ChanInfoTopPixmap->DrawText(cPoint(m_MarginItem10, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                     Theme.Color(clrChannelBg), m_FontBig);
     }
 #ifdef SHOW_TRANSPONDERINFO

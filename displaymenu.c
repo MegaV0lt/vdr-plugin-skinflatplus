@@ -1943,13 +1943,12 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
  */
 void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
                                     int &ContentTop, bool IsEvent) {
-    const int kTitleLeftMargin {m_MarginItem * 10};
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
     const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
     ContentTop = ComplexContent.BottomContent() + m_FontHeight;
-    ComplexContent.AddText(Title, false, cRect(kTitleLeftMargin, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
+    ComplexContent.AddText(Title, false, cRect(m_MarginItem10, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
                            m_Font);
     ContentTop += m_FontHeight;
     ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), ColorTitleLine);
@@ -2118,12 +2117,11 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
 #endif
-        const int kTitleLeftMargin {m_MarginItem * 10};
         ContentTop = m_MarginItem;
 
         // Add description header if needed
         if ((Text[0] != '\0') || (MediaPath[0] != '\0')) {  // Insert description line
-            ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
+            ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuEventFontTitle), Theme.Color(clrMenuEventBg), m_Font);
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), Theme.Color(clrMenuEventTitleLine));
@@ -2648,13 +2646,12 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawRecordingInfo() TVSscraper time @ %ld ms", Timer.Elapsed());
 #endif
-        const int kTitleLeftMargin {m_MarginItem * 10};
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         ContentTop = m_MarginItem;
 
         // Add description header if needed
         if ((Text[0] != '\0') || (MediaPath[0] != '\0')) {  // Insert description line
-            ComplexContent.AddText(tr("Description"), false, cRect(kTitleLeftMargin, ContentTop, 0, 0),
+            ComplexContent.AddText(tr("Description"), false, cRect(m_MarginItem10, ContentTop, 0, 0),
                                    Theme.Color(clrMenuRecFontTitle), Theme.Color(clrMenuRecBg), m_Font);
             ContentTop += m_FontHeight;
             ComplexContent.AddRect(cRect(0, ContentTop, m_cWidth, m_LineWidth), Theme.Color(clrMenuRecTitleLine));

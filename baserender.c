@@ -140,6 +140,7 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarginItem = kMinSize + SizeIncrease;
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
+    m_MarginItem10 = m_MarginItem * 10;
     // Margin for EPG image in EPG info and recording info
     m_MarginEPGImage += SizeIncrease;  // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
     // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
@@ -154,10 +155,10 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarkerHorWidth = (Width > 720) ? 6 : 3;
     m_MarkerHorOffset = (Width > 720) ? 2 : 1;
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
+    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d, m_LineWidth: %d (Margin "
             "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
-            Width, Height, m_MarginItem, m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin, m_ButtonColorHeight,
-            m_MarginButtonColor, m_MarginEPGImage);
+            Width, Height, m_MarginItem, m_LineWidth, m_LineMargin, m_ButtonColorHeight, m_MarginButtonColor,
+            m_MarginEPGImage);
 #endif
 }
 
