@@ -183,6 +183,8 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 
     if (!MenuPixmap) return;
 
+    const int DecorBorderMenuSize {(IsContent) ? Config.decorBorderMenuContentSize : Config.decorBorderMenuItemSize};
+
     if (Total > 0 && Total > Shown) {
         if (!m_IsScrolling && !(m_ShowEvent || m_ShowRecording || m_ShowText)) {
             m_IsScrolling = true;
@@ -192,27 +194,16 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 
             MenuItemScroller.UpdateViewPortWidth(m_WidthScrollBar);
 
-            if (IsContent)
-                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuContentSize,
-                                                0, m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
-                                          clrTransparent);
-            else
-                MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuItemSize, 0,
-                                                m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
-                                          clrTransparent);
+            MenuPixmap->DrawRectangle(cRect(m_MenuItemWidth - m_WidthScrollBar + DecorBorderMenuSize, 0,
+                                            m_WidthScrollBar + m_MarginItem, m_ScrollBarHeight),
+                                      clrTransparent);
         }
     } else if (!(m_ShowEvent || m_ShowRecording || m_ShowText)) {
         m_IsScrolling = false;
     }
 
-    if (IsContent)
-        ScrollbarDraw(ScrollbarPixmap,
-                      m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuContentSize * 2 + m_MarginItem, Top,
-                      Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
-    else
-        ScrollbarDraw(ScrollbarPixmap,
-                      m_MenuItemWidth - m_WidthScrollBar + Config.decorBorderMenuItemSize * 2 + m_MarginItem, Top,
-                      Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
+    ScrollbarDraw(ScrollbarPixmap, m_MenuItemWidth - m_WidthScrollBar + DecorBorderMenuSize * 2 + m_MarginItem, Top,
+                  Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
 }
 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
