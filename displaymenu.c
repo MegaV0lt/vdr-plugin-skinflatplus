@@ -153,6 +153,9 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
                                 Config.decorBorderMenuItemSize * 2 + Config.decorProgressMenuItemSize / 2;
         break;
     case mcRecording:
+#if APIVERSNUM >= 30012
+    case mcRecordingDel:
+#endif
         if (Config.MenuRecordingView <= 1)  // 0 = VDR default, 1 = flatPlus long
             m_ItemRecordingHeight = m_FontHeight + Config.MenuItemPadding + Config.decorBorderMenuItemSize * 2;
         else  // 2 = flatPlus short, 3 = flatPlus short + EPG
@@ -238,7 +241,11 @@ int cFlatDisplayMenu::MaxItems() {
     case mcSchedule:
     case mcScheduleNow:
     case mcScheduleNext: ItemHeight = m_ItemEventHeight; break;
-    case mcRecording: ItemHeight = m_ItemRecordingHeight; break;
+    case mcRecording:
+#if APIVERSNUM >= 30012
+    case mcRecordingDel:
+#endif
+        ItemHeight = m_ItemRecordingHeight; break;
     default: break;
     }
     return m_ScrollBarHeight / ItemHeight;  // Truncation is wanted here to get only full items displayed
@@ -251,7 +258,11 @@ int cFlatDisplayMenu::ItemsHeight() {
     case mcSchedule:
     case mcScheduleNow:
     case mcScheduleNext: return MaxItems() * m_ItemEventHeight - Config.MenuItemPadding;
-    case mcRecording: return MaxItems() * m_ItemRecordingHeight - Config.MenuItemPadding;
+    case mcRecording:
+#if APIVERSNUM >= 30012
+    case mcRecordingDel:
+#endif
+        return MaxItems() * m_ItemRecordingHeight - Config.MenuItemPadding;
     default: return MaxItems() * m_ItemHeight - Config.MenuItemPadding;
     }
 }
@@ -313,6 +324,9 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
         }
         break;
     case mcRecording:
+#if APIVERSNUM >= 30012
+    case mcRecordingDel:
+#endif
         if (Config.MenuRecordingShowCount) {
             //* GetRecCounts() is called in SetItemRecording()
             NewTitle = cString::sprintf("%s %s", Title, *m_RecCounts);
@@ -329,7 +343,11 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
     // - in Recording or Timer menu and Config.DiskUsageShow > 0
     // - in any menu and Config.DiskUsageShow > 1
     // - always when Config.DiskUsageShow == 3 (Handled in TopBarCreate() and TopBarSetTitle())
-    if (((m_MenuCategory == mcRecording || m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
+    if (((m_MenuCategory == mcRecording ||
+#if APIVERSNUM >= 30012
+          m_MenuCategory == mcRecordingDel ||
+#endif
+        m_MenuCategory == mcTimer) && (Config.DiskUsageShow > 0)) ||
         ((m_MenuCategory > mcUndefined && (Config.DiskUsageShow > 1))))
         TopBarEnableDiskUsage();
 }
@@ -1576,11 +1594,16 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Index == 0)  // Only update when Index = 0 (First item on the page)
         m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
-    if (Config.MenuRecordingShowCount && m_LastItemRecordingLevel != Level) {  // Only update when Level changes
+    // Only update 'm_RecCounts' when Level or LastMenuCategory changes
+    static eMenuCategory LastMenuCategory {mcUnknown};
+    if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
+        m_MenuCategory != LastMenuCategory)) {
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   Level changed from %d to %d", m_LastItemRecordingLevel, Level);
+        dsyslog("   Level (Old): %d, new: %d", m_LastItemRecordingLevel, Level);
+        dsyslog("   MenuCategory (Old): %d, new: %d", LastMenuCategory, m_MenuCategory);
 #endif
         m_LastItemRecordingLevel = Level;
+        LastMenuCategory = m_MenuCategory;
         m_RecCounts = *GetRecCounts();
         const cString NewTitle = cString::sprintf("%s %s", *m_LastTitle, *m_RecCounts);
         TopBarSetTitle(*NewTitle, false);  // Do not clear
@@ -3059,6 +3082,9 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
                      {mcChannel, "menuIcons/Channels"},
                      {mcTimer, "menuIcons/Timers"},
                      {mcRecording, "menuIcons/Recordings"},
+#if APIVERSNUM >= 30012
+                     {mcRecordingDel, "menuIcons/DeletedRecordings"},
+#endif
                      {mcSetup, "menuIcons/Setup"},
                      {mcCommand, "menuIcons/Commands"},
                      {mcEvent, "extraIcons/Info"},
@@ -3111,6 +3137,17 @@ cString cFlatDisplayMenu::GetRecordingName(const cRecording *Recording, int Leve
     return cString(std::string(RecNamePart).c_str());
 }
 
+/**
+ * Retrieves the count of recordings in the current folder.
+ *
+ * This function retrieves the count of recordings in the current folder and returns it as a string.
+ * The count is displayed in the form "(X/Y)" where X is the number of new recordings and Y is the total number of recordings.
+ * If the Config.ShortRecordingCount option is set to true, and there are no new recordings, the count is displayed as "(Y)".
+ * If there are only new recordings, the count is displayed as "(X*)".
+ * If Config.ShortRecordingCount is set to false, the count is always displayed as "(X/Y)".
+ *
+ * @return The count of recordings in the current folder as a cString.
+ */
 cString cFlatDisplayMenu::GetRecCounts() const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetRecCounts() m_RecFolder, m_LastItemRecordingLevel: '%s', %d", *m_RecFolder,
@@ -3123,21 +3160,47 @@ cString cFlatDisplayMenu::GetRecCounts() const {
         const int RecordingLevel {m_LastItemRecordingLevel - 1};  // Folder where the recording is stored in
         cString RecFolder2 {""};
         std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
-        LOCK_RECORDINGS_READ;                      // Creates local const cRecordings *Recordings
-        for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-            RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
-            sv2 = *RecFolder2;
-            if (sv1 == sv2) {  // Compare recording folder with current folder
+        if (m_MenuCategory == mcRecording) {
+            LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
+            for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
+                RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
+                sv2 = *RecFolder2;
+                if (sv1 == sv2) {  // Compare recording folder with current folder
+                    ++RecCount;
+                    if (Rec->IsNew()) ++RecNewCount;
+                }
+            }  // for
+        }
+#if APIVERSNUM >= 30012
+        else if (m_MenuCategory == mcRecordingDel) {  // NOLINT
+            LOCK_DELETEDRECORDINGS_READ;  // Creates local const cRecordings *DeletedRecordings
+            for (const cRecording *Rec {DeletedRecordings->First()}; Rec; Rec = DeletedRecordings->Next(Rec)) {
+                RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
+                sv2 = *RecFolder2;
+                if (sv1 == sv2) {  // Compare recording folder with current folder
+                    ++RecCount;
+                    if (Rec->IsNew()) ++RecNewCount;
+                }
+            }  // for
+        }
+#endif
+    } else {  // All recordings
+        if (m_MenuCategory == mcRecording) {
+            LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
+            for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
                 ++RecCount;
                 if (Rec->IsNew()) ++RecNewCount;
             }
-        }  // for
-    } else {                   // All recordings
-        LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
-        for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
-            ++RecCount;
-            if (Rec->IsNew()) ++RecNewCount;
         }
+#if APIVERSNUM >= 30012
+        else if (m_MenuCategory == mcRecordingDel) {  // NOLINT
+            LOCK_DELETEDRECORDINGS_READ;  // Creates local const cRecordings *DeletedRecordings
+            for (const cRecording *Rec {DeletedRecordings->First()}; Rec; Rec = DeletedRecordings->Next(Rec)) {
+                ++RecCount;
+                if (Rec->IsNew()) ++RecNewCount;
+            }
+        }
+#endif
     }
     cString RecCounts {""};
     if (Config.ShortRecordingCount) {                            // Hidden option. 0 = disable, 1 = enable
