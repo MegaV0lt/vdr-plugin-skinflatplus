@@ -378,7 +378,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
     const time_t now {time(0)};
-    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 60)) {
+    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 3)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
         cTimeMs Timer;  // Start Timer
