@@ -1227,14 +1227,15 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         const int ScrollTop {std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
                                       Top + Height - ScrollHeight)};
 
-        // PixmapClear(Pixmap);
-        static int lastTotal = -1, lastShown = -1, lastOffset = -1;
-        if (Total != lastTotal || Shown != lastShown || Offset != lastOffset) {
-            // dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Clear scrollbar pixmap");
+        static int LastTotal = -1, LastShown = -1, LastOffset = -1;
+        if (Total != LastTotal || Shown != LastShown || Offset != LastOffset) {
+#ifdef DEBUGFUNCSCALL
+            dsyslog("   Clear scrollbar pixmap");
+#endif
             PixmapClear(Pixmap);
-            lastTotal = Total;
-            lastShown = Shown;
-            lastOffset = Offset;
+            LastTotal = Total;
+            LastShown = Shown;
+            LastOffset = Offset;
         }
 
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
