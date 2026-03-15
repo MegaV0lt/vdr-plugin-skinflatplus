@@ -492,14 +492,8 @@ void cFlatBaseRender::TopBarUpdate() {
         int ImgRecWidth {0};
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
-#ifdef DEBUGFUNCSCALL
-            dsyslog("   Get number of recording timers");
-            cTimeMs Timer;  // Start Timer
-#endif
-
-            //* FAST RECORD COUNT: Read from background thread (no locking here)
+            //* Read number of recording timers from background thread (no locking here)
             NumRec = RecCountThread.Count();
-            //* END FAST RECORD COUNT
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0) dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
