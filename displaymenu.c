@@ -1590,8 +1590,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
         m_MenuCategory != LastMenuCategory)) {
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   Level (Old): %d, new: %d", m_LastItemRecordingLevel, Level);
-        dsyslog("   MenuCategory (Old): %d, new: %d", LastMenuCategory, m_MenuCategory);
+        dsyslog("   Level: %d -> %d", m_LastItemRecordingLevel, Level);
+        dsyslog("   MenuCategory: %d -> %d", LastMenuCategory, m_MenuCategory);
 #endif
         m_LastItemRecordingLevel = Level;
         LastMenuCategory = m_MenuCategory;
@@ -4043,16 +4043,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                    {"security_updates", trNOOP("Security Updates")}};
 
         cString item {""}, ItemContent {""}, ItemFilename {""};
-        std::string_view FileNameView {""};  // Use std::string_view for better performance
+        std::string_view svFileName {""};  // Use std::string_view for better performance
         int Column {1};
         int ContentLeft {m_MarginItem};
         for (const cString &FileName : files) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
 
-            FileNameView = *FileName;  // Convert cString to std::string_view
-            found = FileNameView.find('_');
-            item = FileNameView.substr(found + 1).data();  // Extract the item name
-            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, FileNameView.data());
+            svFileName = *FileName;  // Convert cString to std::string_view
+            found = svFileName.find('_');
+            item = svFileName.substr(found + 1).data();  // Extract the item name
+            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, svFileName.data());
 
             ItemContent = ReadAndExtractData(ItemFilename);
             if (isempty(*ItemContent)) continue;

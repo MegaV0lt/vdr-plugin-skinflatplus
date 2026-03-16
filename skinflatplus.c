@@ -97,9 +97,9 @@ bool cPluginFlat::Start() {
     if (!cOsdProvider::SupportsTrueColor()) {
         esyslog("flatPlus: No TrueColor OSD found! Aborting!");
         return false;
-    } else {
-        dsyslog("flatPlus: TrueColor OSD found");
     }
+
+    dsyslog("flatPlus: TrueColor OSD found");
 
     ImgCache.Create();
     ImgCache.PreLoadImage();

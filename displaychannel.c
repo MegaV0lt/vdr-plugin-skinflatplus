@@ -218,6 +218,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayChannel::ChannelIconsDraw()");
+    cTimeMs Timer;  // Start Timer
 #endif
     // if (!ChanIconsPixmap) return;  // Remove redundant check since caller already checks
 
@@ -279,6 +280,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
         }
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
@@ -513,7 +517,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #ifdef DEBUGFUNCSCALL
         const int *caids = m_CurChannel->Caids();
         if (caids != nullptr && caids[0] != 0) {
-            dsyslog("flatPlus: No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
+            dsyslog("   No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
         }
 #endif
         return;
