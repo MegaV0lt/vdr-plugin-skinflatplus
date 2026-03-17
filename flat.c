@@ -460,7 +460,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
         case sc_audio_AC3:
         case sc_audio_AC4:
         case sc_audio_HEAAC:
-            if (ossAudio.tellp() > 0) ossAudio << ", ";
+            if (!ossAudio.str().empty()) ossAudio << ", ";
             if (p->description) {
                 ossAudio << p->description << " (" << p->language << ')';
             } else {
@@ -477,7 +477,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             }  // if description
             break;
         case sc_subtitle:
-            if (ossSubtitle.tellp() > 0) ossSubtitle << ", ";
+            if (!ossSubtitle.str().empty()) ossSubtitle << ", ";
             if (p->description)
                 ossSubtitle << p->description << " (" << p->language << ')';
             else
