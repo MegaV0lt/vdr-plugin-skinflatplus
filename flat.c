@@ -551,7 +551,7 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
 
     Text.Append(oss.str().c_str());
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %d ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -730,7 +730,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
     Text.Append(oss.str().c_str());
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %d ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
