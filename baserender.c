@@ -1723,7 +1723,7 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     const char *s = ReadLine.Read(f);  // ReadLine will read from the file pointer
     fclose(f);
 
-    return (s == nullptr) ? "" : cString(s);
+    return cString(s);
 }
 
 // --- Disk read batching and stat cache for weather widget and main menu widget

@@ -493,6 +493,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlat::InsertAuxInfo()");
+    cTimeMs Timer;  // Start Timer
 #endif
 
     const std::string AuxInfo {RecInfo->Aux()};  // Cache aux info
@@ -549,6 +550,9 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         oss << "\nVDRadmin-AM: " << tr("search pattern") << ": " << Pattern;
 
     Text.Append(oss.str().c_str());
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %d ms", Timer.Elapsed());
+#endif
 }
 
 int GetEpgsearchConflicts() {
@@ -593,6 +597,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
 void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlat::InsertCutLengthSize()");
+    cTimeMs Timer;  // Start Timer
 #endif
 
     cMarks Marks;
@@ -724,6 +729,9 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
                 << " MBit/s (Video + Audio)";
     }
     Text.Append(oss.str().c_str());
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %d ms", Timer.Elapsed());
+#endif
 }
 
 // Returns the string between start and end or an empty string if not found
