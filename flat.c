@@ -257,12 +257,12 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
-    if (Series.name.length() > 0) oss << tr("name: ") << Series.name << '\n';
-    if (Series.firstAired.length() > 0) oss << tr("first aired: ") << Series.firstAired << '\n';
-    if (Series.network.length() > 0) oss << tr("network: ") << Series.network << '\n';
-    if (Series.genre.length() > 0) oss << tr("genre: ") << Series.genre << '\n';
+    if (!Series.name.empty()) oss << tr("name: ") << Series.name << '\n';
+    if (!Series.firstAired.empty()) oss << tr("first aired: ") << Series.firstAired << '\n';
+    if (!Series.network.empty()) oss << tr("network: ") << Series.network << '\n';
+    if (!Series.genre.empty()) oss << tr("genre: ") << Series.genre << '\n';
     if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << "/10\n";
-    if (Series.status.length() > 0) oss << tr("status: ") << Series.status << '\n';
+    if (!Series.status.empty()) oss << tr("status: ") << Series.status << '\n';
     if (Series.episode.season > 0) oss << tr("season number: ") << Series.episode.season << '\n';
     if (Series.episode.number > 0) oss << tr("episode number: ") << Series.episode.number << '\n';
     SeriesInfo.Append(oss.str().c_str());
@@ -276,11 +276,11 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
-    if (Movie.title.length() > 0) oss << tr("title: ") << Movie.title << '\n';
-    if (Movie.originalTitle.length() > 0) oss << tr("original title: ") << Movie.originalTitle << '\n';
-    if (Movie.collectionName.length() > 0) oss << tr("collection name: ") << Movie.collectionName << '\n';
-    if (Movie.genres.length() > 0) oss << tr("genre: ") << Movie.genres << '\n';
-    if (Movie.releaseDate.length() > 0) oss << tr("release date: ") << Movie.releaseDate << '\n';
+    if (!Movie.title.empty()) oss << tr("title: ") << Movie.title << '\n';
+    if (!Movie.originalTitle.empty()) oss << tr("original title: ") << Movie.originalTitle << '\n';
+    if (!Movie.collectionName.empty()) oss << tr("collection name: ") << Movie.collectionName << '\n';
+    if (!Movie.genres.empty()) oss << tr("genre: ") << Movie.genres << '\n';
+    if (!Movie.releaseDate.empty()) oss << tr("release date: ") << Movie.releaseDate << '\n';
     if (Movie.popularity > 0)
         oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
     if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << "%\n";  // 10 Points = 100%
