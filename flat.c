@@ -97,7 +97,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
-        if (Timer.Elapsed() > 0) dsyslog("   CreatePixmap() Time: %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
         return pixmap;
     }  // Everything runs according to the plan
@@ -884,7 +884,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
     else
         dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
-    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -992,7 +992,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 

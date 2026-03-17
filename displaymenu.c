@@ -1643,7 +1643,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     const bool IsRecording {Total == 0};  // Recording or a folder
     cString RecName = *GetRecordingName(Recording, Level);
     if (Config.MenuItemRecordingClearPercent && IsRecording) {  // Remove leading percent sign(s) from RecName
-        while (RecName[0] != '\0' && RecName[0] == '%')
+        while (!isempty(*RecName) && RecName[0] == '%')
             RecName = cString(*RecName + 1);
     }
 #ifdef DEBUGFUNCSCALL
@@ -3979,7 +3979,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         return -1;  // Not enough space to display anything meaningful
 
     static const cString ExecFile = cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER);
-    [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
+    if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation() system() failed!");
+        return -1;
+    }
 
     static const cString ConfigsPath = cString::sprintf("%s/system_information/", WIDGETOUTPUTPATH);
 
@@ -4091,10 +4094,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
         return -1;  // Not enough space to display anything meaningful
 
     cString Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH));
-    const int updates {(Content[0] == '\0') ? -1 : atoi(*Content)};
+    const int updates {(!isempty(*Content)) ? -1 : atoi(*Content)};
 
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
-    const int SecurityUpdates {(Content[0] == '\0') ? -1 : atoi(*Content)};
+    const int SecurityUpdates {(isempty(*Content)) ? -1 : atoi(*Content)};
 
     if (updates == 0 && SecurityUpdates == 0 && Config.MainMenuWidgetSystemUpdatesHideIfZero)
         return -1;  // Nothing to display
@@ -4132,21 +4135,23 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
 
     static const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
-    [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
-
+    if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() system() failed!");
+        return -1;
+    }
     int CountTemps {0};
 
     const cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
-    if (TempCPU[0] != '\0') ++CountTemps;
+    if (!isempty(*TempCPU)) ++CountTemps;
 
     const cString TempCase = *ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH));
-    if (TempCase[0] != '\0') ++CountTemps;
+    if (!isempty(*TempCase)) ++CountTemps;
 
     const cString TempMB = *ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH));
-    if (TempMB[0] != '\0') ++CountTemps;
+    if (!isempty(*TempMB)) ++CountTemps;
 
     const cString TempGPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH));
-    if (TempGPU[0] != '\0') ++CountTemps;
+    if (!isempty(*TempGPU)) ++CountTemps;
 
     if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
@@ -4157,28 +4162,28 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
         const int AddLeft {wWidth / CountTemps};
         int Left {m_MarginItem};
         cString str {""};
-        if (TempCPU[0] != '\0') {
+        if (!isempty(*TempCPU)) {
             str = cString::sprintf("%s: %s", tr("CPU"), *TempCPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (TempCase[0] != '\0') {
+        if (!isempty(*TempCase)) {
             str = cString::sprintf("%s: %s", tr("PC-Case"), *TempCase);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (TempMB[0] != '\0') {
+        if (!isempty(*TempMB)) {
             str = cString::sprintf("%s: %s", tr("MB"), *TempMB);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                                   wWidth - m_MarginItem2);
             Left += AddLeft;
         }
-        if (TempGPU[0] != '\0') {
+        if (!isempty(*TempGPU)) {
             str = cString::sprintf("%s: %s", tr("GPU"), *TempGPU);
             ContentWidget.AddText(*str, false, cRect(Left, ContentTop, wWidth / 3 * 2 - m_MarginItem2, m_FontSmlHeight),
                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4194,10 +4199,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
         return -1;  // Not enough space to display anything meaningful
 
     static const cString ExecFile = cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER);
-    [[maybe_unused]] int r {system(*ExecFile)};  // Prevent warning for unused variable
+    if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetCommand() system() failed!");
+        return -1;
+    }
 
     cString Title = *ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH));
-    if (Title[0] == '\0') Title = tr("no title available");
+    if (!isempty(*Title)) Title = tr("no title available");
 
     ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 
