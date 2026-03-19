@@ -4131,14 +4131,13 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
-    ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
-
     static const cString ExecFile =
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER);
     if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
         dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() system() failed!");
         return -1;
     }
+    ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
     int CountTemps {0};
 
     const cString TempCPU = *ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH));
