@@ -3400,6 +3400,11 @@ void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &re
 
 /* Widgets */
 void cFlatDisplayMenu::DrawMainMenuWidgets() {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgets()");
+    cTimeMs Timer;  // Set Timer
+#endif
+
     if (!MenuPixmap) return;
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
@@ -3519,6 +3524,9 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
                            Config.decorBorderMenuContentBg,
                            BorderMMWidget};
     DecorBorderDraw(ib);
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 1) dsyslog("   DrawMainMenuWidget() done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 /**
