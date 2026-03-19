@@ -99,7 +99,11 @@ bool cPluginFlat::Start() {
         return false;
     }
 
-    dsyslog("flatPlus: TrueColor OSD found");
+#ifdef IMAGEMAGICK
+    dsyslog("flatPlus: Built with ImageMagick");
+#else
+    dsyslog("flatPlus: Built with GraphicsMagick");
+#endif
 
     ImgCache.Create();
     ImgCache.PreLoadImage();
