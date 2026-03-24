@@ -140,6 +140,7 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarginItem = kMinSize + SizeIncrease;
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
+    m_MarginItem10 = m_MarginItem * 10;
     // Margin for EPG image in EPG info and recording info
     m_MarginEPGImage += SizeIncrease;  // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
     // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
@@ -154,10 +155,10 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarkerHorWidth = (Width > 720) ? 6 : 3;
     m_MarkerHorOffset = (Width > 720) ? 2 : 1;
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d (%d, %d), m_LineWidth: %d (Margin "
+    dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d, m_LineWidth: %d (Margin "
             "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
-            Width, Height, m_MarginItem, m_MarginItem2, m_MarginItem3, m_LineWidth, m_LineMargin, m_ButtonColorHeight,
-            m_MarginButtonColor, m_MarginEPGImage);
+            Width, Height, m_MarginItem, m_LineWidth, m_LineMargin, m_ButtonColorHeight, m_MarginButtonColor,
+            m_MarginEPGImage);
 #endif
 }
 
@@ -377,7 +378,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
 //* Should be called with every "Flush"!
 void cFlatBaseRender::TopBarUpdate() {
     const time_t now {time(0)};
-    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 60)) {
+    if (m_TopBarUpdateTitle || (now > m_TopBarLastDate + 3)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: cFlatBaseRender::TopBarUpdate() Updating TopBar");
         cTimeMs Timer;  // Start Timer
@@ -491,14 +492,8 @@ void cFlatBaseRender::TopBarUpdate() {
         int ImgRecWidth {0};
         cImage *ImgRec {nullptr};
         if (Config.TopBarRecordingShow) {  // Load recording icon and number of recording timers
-#ifdef DEBUGFUNCSCALL
-            dsyslog("   Get number of recording timers");
-            cTimeMs Timer;  // Start Timer
-#endif
-
-            //* FAST RECORD COUNT: Read from background thread (no locking here)
+            //* Read number of recording timers from background thread (no locking here)
             NumRec = RecCountThread.Count();
-            //* END FAST RECORD COUNT
 #ifdef DEBUGFUNCSCALL
             if (Timer.Elapsed() > 0) dsyslog("   Got %d recording timers after %ld ms", NumRec, Timer.Elapsed());
 #endif
@@ -1232,14 +1227,15 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         const int ScrollTop {std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
                                       Top + Height - ScrollHeight)};
 
-        // PixmapClear(Pixmap);
-        static int lastTotal = -1, lastShown = -1, lastOffset = -1;
-        if (Total != lastTotal || Shown != lastShown || Offset != lastOffset) {
-            // dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Clear scrollbar pixmap");
+        static int LastTotal = -1, LastShown = -1, LastOffset = -1;
+        if (Total != LastTotal || Shown != LastShown || Offset != LastOffset) {
+#ifdef DEBUGFUNCSCALL
+            dsyslog("   Clear scrollbar pixmap");
+#endif
             PixmapClear(Pixmap);
-            lastTotal = Total;
-            lastShown = Shown;
-            lastOffset = Offset;
+            LastTotal = Total;
+            LastShown = Shown;
+            LastOffset = Offset;
         }
 
         Pixmap->DrawRectangle(cRect(Left, Top, m_ScrollBarWidth, Height), Config.decorScrollBarBg);
@@ -1727,7 +1723,7 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     const char *s = ReadLine.Read(f);  // ReadLine will read from the file pointer
     fclose(f);
 
-    return (s == nullptr) ? "" : cString(s);
+    return cString(s);
 }
 
 // --- Disk read batching and stat cache for weather widget and main menu widget

@@ -156,7 +156,6 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
     }  // if (Channel)
 
     const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
-    const int left {m_MarginItem * 10};
 
     if (Config.ChannelShowNameWithShadow) {
         PixmapClear(ChanInfoTopPixmap);
@@ -171,12 +170,12 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         dsyslog("   m_FontBigHeight %d, ShadowSize %d", m_FontBigHeight, ShadowSize);
 #endif
         // Draw text with shadow
-        DrawTextWithShadow(ChanInfoTopPixmap, cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
-                           ShadowColor, m_FontBig, BoundedShadowSize);
+        DrawTextWithShadow(ChanInfoTopPixmap, cPoint(m_MarginItem10, 0), *ChannelString,
+                           Theme.Color(clrChannelFontTitle), ShadowColor, m_FontBig, BoundedShadowSize);
     } else {
         // Channel name on background
         PixmapFill(ChanInfoTopPixmap, Theme.Color(clrChannelBg));
-        ChanInfoTopPixmap->DrawText(cPoint(left, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
+        ChanInfoTopPixmap->DrawText(cPoint(m_MarginItem10, 0), *ChannelString, Theme.Color(clrChannelFontTitle),
                                     Theme.Color(clrChannelBg), m_FontBig);
     }
 #ifdef SHOW_TRANSPONDERINFO
@@ -219,6 +218,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolution) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayChannel::ChannelIconsDraw()");
+    cTimeMs Timer;  // Start Timer
 #endif
     // if (!ChanIconsPixmap) return;  // Remove redundant check since caller already checks
 
@@ -280,6 +280,9 @@ void cFlatDisplayChannel::ChannelIconsDraw(const cChannel *Channel, bool Resolut
             }
         }
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Following) {
@@ -514,7 +517,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 #ifdef DEBUGFUNCSCALL
         const int *caids = m_CurChannel->Caids();
         if (caids != nullptr && caids[0] != 0) {
-            dsyslog("flatPlus: No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
+            dsyslog("   No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
         }
 #endif
         return;

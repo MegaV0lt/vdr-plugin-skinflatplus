@@ -55,27 +55,27 @@ void cImageCache::Clear() {
 }
 
 bool cImageCache::RemoveFromCache(const cString &Name) {
-    std::string_view BaseFileName {""}, DataNameView {""};
-    std::string_view NameView {*Name};
+    std::string_view svBaseFileName {""}, svDataName{""};
+    std::string_view svName {*Name};
 
     for (auto &data : ImageCache) {
         // Check if the ImageData entry is valid (not marked as empty)
-        DataNameView = *data.Name;  // Get the name from the cache entry
-        if (data.Image == nullptr && DataNameView.empty()) {
+        svDataName = *data.Name;  // Get the name from the cache entry
+        if (data.Image == nullptr && svDataName.empty()) {
             // This assumes that an empty name and null image means the end of valid entries
             // or an explicitly empty slot. If "" is a valid name, this logic needs adjustment.
             break;
         }
 
         // Find the last '/' and extract the base filename
-        const std::size_t LastSlashPos = DataNameView.find_last_of('/');
+        const std::size_t LastSlashPos = svDataName.find_last_of('/');
         if (LastSlashPos != std::string_view::npos) {
-            BaseFileName = DataNameView.substr(LastSlashPos + 1);
+            svBaseFileName = svDataName.substr(LastSlashPos + 1);
         } else {
-            BaseFileName = DataNameView;  // No slash, so the whole name is the base filename
+            svBaseFileName = svDataName;  // No slash, so the whole name is the base filename
         }
 
-        if (BaseFileName == NameView) {
+        if (svBaseFileName == svName) {
             dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
             data.Image.reset();  // This deletes the cImage object and sets Image to nullptr
             data.Name = "-Empty!-";  // Mark as empty because "" is for end of cache
@@ -88,17 +88,17 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
 }
 
 cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
-    std::string_view DataNameView {""};
-    std::string_view NameView {*Name};
+    std::string_view svDataName {""};
+    std::string_view svName {*Name};
     const auto &cache = IsIcon ? IconCache : ImageCache;
 
     for (const auto &data : cache) {
-        DataNameView = *data.Name;  // Get the name from the cache entry
+        svDataName = *data.Name;  // Get the name from the cache entry
         // Check if the ImageData entry is valid (not marked as empty)
-        if (data.Image == nullptr && DataNameView.empty()) {
+        if (data.Image == nullptr && svDataName.empty()) {
             break;  // No more valid images in cache
         }
-        if (DataNameView == NameView && data.Width == Width && data.Height == Height) {
+        if (svDataName == svName && data.Width == Width && data.Height == Height) {
             return data.Image.get();  // Return the cached image if found
         }
     }

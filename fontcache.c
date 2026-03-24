@@ -52,19 +52,19 @@ void cFontCache::Clear() {
 }
 
 cFont* cFontCache::GetFont(const cString &Name, int Size) {
-    std::string_view NameView {*Name};
-    if (NameView.empty() || Size <= 0) {  // Invalid parameters
+    std::string_view svName {*Name};
+    if (svName.empty() || Size <= 0) {  // Invalid parameters
         esyslog("flatPlus: cFontCache::GetFont() Invalid parameters: Name=%s, Size=%d", *Name, Size);
         return cFont::CreateFont("DummyFont", 16);  // Return dummy font
     }
 
-    std::string_view DataNameView {""};
+    std::string_view svDataName {""};
     for (const auto &data : FontCache) {
-        DataNameView = *data.name;
-        if (DataNameView.empty()) break;  // End of cache, insert new font
+        svDataName = *data.name;
+        if (svDataName.empty()) break;  // End of cache, insert new font
 
-        if (DataNameView == NameView && data.size == Size && data.font != nullptr) {
-#ifdef DEBUGFUNCSCALL
+        if (svDataName == svName && data.size == Size && data.font != nullptr) {
+#ifdef DEBUGFONTCACHE
             dsyslog("flatPlus: Found in FontCache: Name=%s, Size=%d", *Name, Size);
 #endif
             return data.font;
@@ -83,7 +83,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
  * @return The font name if found in the cache, otherwise an empty string
  */
 cString cFontCache::GetFontName(const char *FileName) const {
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
     dsyslog("flatPlus: cFontCache::GetFontName() '%s'", FileName);
 #endif
 
@@ -98,13 +98,13 @@ cString cFontCache::GetFontName(const char *FileName) const {
 }
 
 int cFontCache::GetFontHeight(const cString &Name, int Size) const {
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
     dsyslog("flatPlus: cFontCache::GetFontHeight() Name=%s, Size=%d", *Name, Size);
 #endif
 
-    std::string_view NameView {*Name};
+    std::string_view svName {*Name};
     for (const auto &data : FontCache) {
-        if (std::string_view {*data.name} == NameView && data.size == Size) {
+        if (std::string_view {*data.name} == svName && data.size == Size) {
             return data.height;
         }
     }
@@ -113,7 +113,7 @@ int cFontCache::GetFontHeight(const cString &Name, int Size) const {
 }
 
 void cFontCache::InsertFont(const cString& Name, int Size) {
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
     dsyslog("flatPlus: cFontCache::InsertFont() Name=%s, Size=%d", *Name, Size);
 #endif
 
@@ -135,7 +135,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
     FontCache[m_InsertIndex].FileName = FontCache[m_InsertIndex].font->FontName();
     FontCache[m_InsertIndex].size = Size;
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
-    #ifdef DEBUGFUNCSCALL
+    #ifdef DEBUGFONTCACHE
         dsyslog("   Font '%s' inserted at index %zu", *FontCache[m_InsertIndex].name, m_InsertIndex);
         dsyslog("   Font file name: '%s'", *FontCache[m_InsertIndex].FileName);
         dsyslog("   Font size: %d, height: %d", FontCache[m_InsertIndex].size, FontCache[m_InsertIndex].height);
@@ -148,9 +148,9 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 }
 
 int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &Text) const {
-    std::string_view NameView {*Name};
+    std::string_view svName {*Name};
     for (auto &data : FontCache) {
-        if (std::string_view {*data.name} == NameView && data.height == Height) {
+        if (std::string_view {*data.name} == svName && data.height == Height) {
             if (data.font) {
                 const std::string TextStr {*Text};
                 auto it = data.StringWidthCache.find(TextStr);
@@ -182,14 +182,14 @@ int cFontCache::GetCacheCount() const {
 int cFontCache::GetSize() const { return FontCache.size(); }
 
 int cFontCache::GetFontAscender(const cString &FontName, int FontSize) {
-    std::string_view FontNameView {*FontName};
-    if (FontNameView.empty() || FontSize <= 0) {
+    std::string_view svFontName {*FontName};
+    if (svFontName.empty() || FontSize <= 0) {
         esyslog("flatPlus: cFontCache::GetFontAscender() Invalid parameters: FontName=%s, FontSize=%d", *FontName,
                 FontSize);
         return FontSize;
     }
     for (auto& data : FontCache) {
-        if (std::string_view {*data.name} == FontNameView && data.size == FontSize) {
+        if (std::string_view {*data.name} == svFontName && data.size == FontSize) {
             if (data.ascender != 0) {
                 // Return cached ascender value
                 return data.ascender;
@@ -232,16 +232,16 @@ int cFontCache::GetFontAscender(const cString &FontName, int FontSize) {
  * @note This function returns 0 if any error occurs during the execution of the function.
  */
 int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const int FontHeight) {
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
     dsyslog("flatPlus: GetGlyphSize() Name=%s, CharCode=%lu, FontHeight=%d", *Name, CharCode, FontHeight);
 #endif
 
-    std::string_view NameView {*Name};
+    std::string_view svName {*Name};
     for (auto &data : FontCache) {
-        if (std::string_view {*data.name} == NameView && data.size == FontHeight) {
+        if (std::string_view {*data.name} == svName && data.size == FontHeight) {
             const auto it = data.GlyphSizeCache.find({*Name, CharCode, FontHeight});
             if (it != data.GlyphSizeCache.end()) {
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
                 dsyslog("   Cache hit: GlyphSize=%d, Name=%s, CharCode=%lu, FontHeight=%d", it->second, *Name, CharCode,
                         FontHeight);
 #endif
@@ -270,7 +270,7 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
                 return 0;
             }
             const int GlyphSize = (slot->metrics.height + 63) / 64;  // Round up to nearest integer
-#ifdef DEBUGFUNCSCALL
+#ifdef DEBUGFONTCACHE
             dsyslog("   Calculated GlyphSize: %d", GlyphSize);
 #endif
 

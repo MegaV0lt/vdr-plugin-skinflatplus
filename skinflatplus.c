@@ -19,7 +19,7 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.2.8";
+static const char *VERSION        = "1.2.9";
 static const char *DESCRIPTION    = "Skin flatPlus";
 
 class cPluginFlat : public cPlugin {
@@ -97,9 +97,13 @@ bool cPluginFlat::Start() {
     if (!cOsdProvider::SupportsTrueColor()) {
         esyslog("flatPlus: No TrueColor OSD found! Aborting!");
         return false;
-    } else {
-        dsyslog("flatPlus: TrueColor OSD found");
     }
+
+#ifdef IMAGEMAGICK
+    dsyslog("flatPlus: Built with ImageMagick");
+#else
+    dsyslog("flatPlus: Built with GraphicsMagick");
+#endif
 
     ImgCache.Create();
     ImgCache.PreLoadImage();

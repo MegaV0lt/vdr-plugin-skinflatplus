@@ -97,7 +97,7 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
-        if (Timer.Elapsed() > 0) dsyslog("   CreatePixmap() Time: %ld ms", Timer.Elapsed());
+        if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
         return pixmap;
     }  // Everything runs according to the plan
@@ -257,12 +257,12 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
-    if (Series.name.length() > 0) oss << tr("name: ") << Series.name << '\n';
-    if (Series.firstAired.length() > 0) oss << tr("first aired: ") << Series.firstAired << '\n';
-    if (Series.network.length() > 0) oss << tr("network: ") << Series.network << '\n';
-    if (Series.genre.length() > 0) oss << tr("genre: ") << Series.genre << '\n';
+    if (!Series.name.empty()) oss << tr("name: ") << Series.name << '\n';
+    if (!Series.firstAired.empty()) oss << tr("first aired: ") << Series.firstAired << '\n';
+    if (!Series.network.empty()) oss << tr("network: ") << Series.network << '\n';
+    if (!Series.genre.empty()) oss << tr("genre: ") << Series.genre << '\n';
     if (Series.rating > 0) oss << tr("rating: ") << std::fixed << std::setprecision(1) << Series.rating << "/10\n";
-    if (Series.status.length() > 0) oss << tr("status: ") << Series.status << '\n';
+    if (!Series.status.empty()) oss << tr("status: ") << Series.status << '\n';
     if (Series.episode.season > 0) oss << tr("season number: ") << Series.episode.season << '\n';
     if (Series.episode.number > 0) oss << tr("episode number: ") << Series.episode.number << '\n';
     SeriesInfo.Append(oss.str().c_str());
@@ -276,11 +276,11 @@ void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo) {  // NOLINT
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     std::ostringstream oss {""};
     oss.imbue(std::locale {""});  // Set to local locale
-    if (Movie.title.length() > 0) oss << tr("title: ") << Movie.title << '\n';
-    if (Movie.originalTitle.length() > 0) oss << tr("original title: ") << Movie.originalTitle << '\n';
-    if (Movie.collectionName.length() > 0) oss << tr("collection name: ") << Movie.collectionName << '\n';
-    if (Movie.genres.length() > 0) oss << tr("genre: ") << Movie.genres << '\n';
-    if (Movie.releaseDate.length() > 0) oss << tr("release date: ") << Movie.releaseDate << '\n';
+    if (!Movie.title.empty()) oss << tr("title: ") << Movie.title << '\n';
+    if (!Movie.originalTitle.empty()) oss << tr("original title: ") << Movie.originalTitle << '\n';
+    if (!Movie.collectionName.empty()) oss << tr("collection name: ") << Movie.collectionName << '\n';
+    if (!Movie.genres.empty()) oss << tr("genre: ") << Movie.genres << '\n';
+    if (!Movie.releaseDate.empty()) oss << tr("release date: ") << Movie.releaseDate << '\n';
     if (Movie.popularity > 0)
         oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
     if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << "%\n";  // 10 Points = 100%
@@ -460,7 +460,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
         case sc_audio_AC3:
         case sc_audio_AC4:
         case sc_audio_HEAAC:
-            if (ossAudio.tellp() > 0) ossAudio << ", ";
+            if (!ossAudio.str().empty()) ossAudio << ", ";
             if (p->description) {
                 ossAudio << p->description << " (" << p->language << ')';
             } else {
@@ -477,7 +477,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             }  // if description
             break;
         case sc_subtitle:
-            if (ossSubtitle.tellp() > 0) ossSubtitle << ", ";
+            if (!ossSubtitle.str().empty()) ossSubtitle << ", ";
             if (p->description)
                 ossSubtitle << p->description << " (" << p->language << ')';
             else
@@ -493,6 +493,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlat::InsertAuxInfo()");
+    cTimeMs Timer;  // Start Timer
 #endif
 
     const std::string AuxInfo {RecInfo->Aux()};  // Cache aux info
@@ -549,6 +550,9 @@ void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine)
         oss << "\nVDRadmin-AM: " << tr("search pattern") << ": " << Pattern;
 
     Text.Append(oss.str().c_str());
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 int GetEpgsearchConflicts() {
@@ -593,6 +597,7 @@ int GetFrameAfterEdit(const cMarks *marks, int Frame, int LastFrame) {  // From 
 void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLINT
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlat::InsertCutLengthSize()");
+    cTimeMs Timer;  // Start Timer
 #endif
 
     cMarks Marks;
@@ -724,6 +729,9 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
                 << " MBit/s (Video + Audio)";
     }
     Text.Append(oss.str().c_str());
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 // Returns the string between start and end or an empty string if not found
@@ -876,7 +884,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
     else
         dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
-    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -984,7 +992,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Time: %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
