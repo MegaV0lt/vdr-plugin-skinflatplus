@@ -1,6 +1,6 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2026-03-XX: Version 1.2.9
+2026-03-24: Version 1.2.9
 - [fix] Replace Housekeeping()-based rec count with dedicated background thread
         Thanks to zork @ VDR-Portal for providing a patch
 - [add] Count deleted recordings instead of recordings if in menu deleted recordings
