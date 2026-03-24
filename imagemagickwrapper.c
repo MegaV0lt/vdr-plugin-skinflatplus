@@ -13,9 +13,9 @@
 #include "./imagescaler.h"
 
 #ifdef IMAGEMAGICK
-#if MagickLibVersion >= 0x700
-#define IMAGEMAGICK7
-#endif
+  #if MagickLibVersion >= 0x700
+    #define IMAGEMAGICK7
+  #endif
 #endif
 
 cImageMagickWrapper::cImageMagickWrapper() {}
@@ -86,30 +86,27 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 
     // "Fast path": sizes match, just convert directly
-    {
-        const Quantum *src = px;
-        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-        for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel) {
-            r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
-            g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
-            b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
-            o = quantum_channels > 3
-                ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
-                : 0xff;
-            *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
-            src += quantum_channels;
-        }
-        return image.release();
+    const Quantum *src = px;
+    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel) {
+        r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
+        g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
+        b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
+        o = quantum_channels > 3
+            ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
+            : 0xff;
+        *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
+        src += quantum_channels;
     }
+    return image.release();
 #else
     static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     // ImageMagick <=6: use PixelPacket
-    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
-    if (!pixels) {
+    const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
+    if (!src) {
         esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
         return nullptr;
     }
-    const Magick::PixelPacket *src = pixels;
     static constexpr uint64_t kScaleFactor = 1ULL << 16;
     static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
 
