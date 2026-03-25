@@ -127,10 +127,10 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     // Fast path: sizes match, just go
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
+            (((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt)) & 0xFF) << 24) |
              (static_cast<int>((src->red      * kScaleFactor) / kRGBScaleInt) << 16) |
              (static_cast<int>((src->green    * kScaleFactor) / kRGBScaleInt) << 8)  |
-             (static_cast<int>((src->blue     * kScaleFactor) / kRGBScaleInt)));
+             (static_cast<int>((src->blue     * kScaleFactor) / kRGBScaleInt));
     }
     return image.release();
 #endif
@@ -166,10 +166,10 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
+            (((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt)) & 0xFF) << 24) |
             (static_cast<int>((src->red       * kScaleFactor) / kRGBScaleInt) << 16) |
             (static_cast<int>((src->green     * kScaleFactor) / kRGBScaleInt) << 8)  |
-            (static_cast<int>((src->blue      * kScaleFactor) / kRGBScaleInt)));
+            (static_cast<int>((src->blue      * kScaleFactor) / kRGBScaleInt));
     }
 #endif
     return image;
