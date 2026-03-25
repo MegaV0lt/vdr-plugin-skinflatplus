@@ -12,13 +12,6 @@
 #include <array>
 #include <cstdlib>
 #include <cmath>
-// #include <memory>
-
-#if defined(__GNUC__) || defined(__clang__)
-    #define ALWAYS_INLINE inline __attribute__((always_inline))
-#else
-    #define ALWAYS_INLINE inline
-#endif
 
 ImageScaler::ImageScaler() :
     m_memory(nullptr),
@@ -48,7 +41,7 @@ ImageScaler::~ImageScaler() = default;  // No need for manual memory management
  * @param x The input value for which the sinc function is calculated.
  * @return The value of sin(x)/x, or an approximation for small x.
  */
-ALWAYS_INLINE static float sincf(float x) {
+inline static float sincf(float x) {
     // Use Taylor expansion for small x; accurate enough for filter design
     if (fabsf(x) < 0.05f)
         return 1.0f - (1.0f / 6.0f) * x * x;
@@ -166,7 +159,8 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     m_src_height = src_height;
 
     // Narrowing conversion
-    const std::size_t hor_filters_size = (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
+    const std::size_t hor_filters_size =
+        (m_dst_width + 1) * sizeof(Filter);  // Reserve one extra position for end marker
     const std::size_t ver_filters_size = (m_dst_height + 1) * sizeof(Filter);
     const std::size_t buffer_size = 4 * m_dst_width * sizeof(TmpPixel);
 
@@ -181,12 +175,12 @@ void ImageScaler::SetImageParameters(unsigned int *dst_image, unsigned int dst_s
     CalculateFilters(m_ver_filters, m_dst_height, m_src_height);
 }
 
-// Branchless shift and clamp [0,255] (for up to 31-bit signed input)
-ALWAYS_INLINE static unsigned int shift_clamp(int x) {
+// Branchless shift and clamp [0,255] (for up to 31-bit signed input).
+// This uses bitwise operations for performance.
+inline static unsigned int shift_clamp(int x) {
     // This is a branchless version of:
     // x = (x + 2^21) >> 22;
     // return std::clamp(x, 0, 255);
-    // This avoids branches and uses bitwise operations for performance.
     static constexpr int kShiftAmount = 22;
     static constexpr int kRounding = 1 << (kShiftAmount - 1);  // 2^21
     x = (x + kRounding) >> kShiftAmount;
@@ -207,7 +201,7 @@ ALWAYS_INLINE static unsigned int shift_clamp(int x) {
  * @param pixel The TmpPixel to pack.
  * @return A 32-bit unsigned integer representing the packed pixel.
  */
-ALWAYS_INLINE unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
+inline unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
     return shift_clamp(pixel[0]) |
            (shift_clamp(pixel[1]) << 8) |
            (shift_clamp(pixel[2]) << 16) |
