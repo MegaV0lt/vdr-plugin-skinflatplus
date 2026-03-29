@@ -86,27 +86,26 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
     return image.release();
 #else
-    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    // ImageMagick <=6: Use PixelPacket
+    // ImageMagick <=6: Use PixelPacket and 16-bit depth (MaxRGB = 65535)
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
         for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
-            scaler.PutSourcePixel(pixels->blue / ((kMaxRGB + 1) / 256),
-                                  pixels->green / ((kMaxRGB + 1) / 256),
-                                  pixels->red / ((kMaxRGB + 1) / 256),
-                                  ~(static_cast<unsigned char>(pixels->opacity / ((kMaxRGB + 1) / 256))));
+            scaler.PutSourcePixel(pixels->blue / ((MaxRGB + 1) / 256),
+                                  pixels->green / ((MaxRGB + 1) / 256),
+                                  pixels->red / ((MaxRGB + 1) / 256),
+                                  ~(static_cast<unsigned char>(pixels->opacity / ((MaxRGB + 1) / 256))));
 
         return image.release();
     }
 
     // Fast path: Sizes match, just go
     for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
-        *imgData++ = ((~static_cast<int>(pixels->opacity / ((kMaxRGB + 1) / 256)) << 24) |
-                      (static_cast<int>(pixels->green / ((kMaxRGB + 1) / 256)) << 8) |
-                      (static_cast<int>(pixels->red / ((kMaxRGB + 1) / 256)) << 16) |
-                      (static_cast<int>(pixels->blue / ((kMaxRGB + 1) / 256)) ));
+        *imgData++ = ((~static_cast<int>(pixels->opacity / ((MaxRGB + 1) / 256)) << 24) |
+                      (static_cast<int>(pixels->green / ((MaxRGB + 1) / 256)) << 8) |
+                      (static_cast<int>(pixels->red / ((MaxRGB + 1) / 256)) << 16) |
+                      (static_cast<int>(pixels->blue / ((MaxRGB + 1) / 256)) ));
 
     return image.release();
 #endif
@@ -132,11 +131,10 @@ cImage cImageMagickWrapper::CreateImageCopy() {
         }
     }
 #else
-    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
     const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
     if (!src) return image;
     static constexpr uint64_t kScaleFactor {1UL << 16};
-    static constexpr uint64_t kRGBScaleInt {((kMaxRGB + 1UL) * kScaleFactor) / 256UL};
+    static constexpr uint64_t kRGBScaleInt {((MaxRGB + 1UL) * kScaleFactor) / 256UL};
     for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
         *imgData++ =
             (((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt)) & 0xFF) << 24) |
