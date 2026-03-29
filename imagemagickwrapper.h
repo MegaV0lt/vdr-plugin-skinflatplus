@@ -16,6 +16,7 @@
 // using namespace Magick;
 using Magick::Image;
 using Magick::Color;
+using Magick::PixelPacket;
 
 class cImageMagickWrapper {
  public:
