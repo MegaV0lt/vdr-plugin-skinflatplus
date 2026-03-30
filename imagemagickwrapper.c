@@ -21,6 +21,20 @@
 cImageMagickWrapper::cImageMagickWrapper() {}
 cImageMagickWrapper::~cImageMagickWrapper() {}
 
+/**
+ * @brief Create a new image with the given dimensions
+ *
+ * @details This function creates a new image with the given dimensions,
+ * and if the dimensions do not match the internal image buffer, it
+ * will resize the image accordingly. The function will return nullptr if
+ * the target dimensions are invalid (e.g. 0x0, negative width/height).
+ *
+ * @param width The desired width of the output image
+ * @param height The desired height of the output image
+ * @param PreserveAspect Whether to preserve the aspect ratio of the internal image buffer when resizing
+ *
+ * @return A new image with the given dimensions, or nullptr if the target dimensions are invalid
+ */
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {
     const int w = buffer.columns();  // Narrowing conversion
     const int h = buffer.rows();
@@ -181,9 +195,9 @@ Color cImageMagickWrapper::Argb2Color(tColor col) {
     const Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
                       QuantumRange * alpha / 255);
 #else
-    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    const Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
-                      kMaxRGB * (0xFF - alpha) / 255);
+    // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
+    const Color color(MaxRGB * red / 255, MaxRGB * green / 255, MaxRGB * blue / 255,
+                      MaxRGB * (0xFF - alpha) / 255);
 #endif
     return color;
 }
