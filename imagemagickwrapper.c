@@ -13,14 +13,28 @@
 #include "./imagescaler.h"
 
 #ifdef IMAGEMAGICK
-#if MagickLibVersion >= 0x700
-#define IMAGEMAGICK7
-#endif
+  #if MagickLibVersion >= 0x700
+    #define IMAGEMAGICK7
+  #endif
 #endif
 
 cImageMagickWrapper::cImageMagickWrapper() {}
 cImageMagickWrapper::~cImageMagickWrapper() {}
 
+/**
+ * @brief Create a new image with the given dimensions
+ *
+ * @details This function creates a new image with the given dimensions,
+ * and if the dimensions do not match the internal image buffer, it
+ * will resize the image accordingly. The function will return nullptr if
+ * the target dimensions are invalid (e.g. 0x0, negative width/height).
+ *
+ * @param width The desired width of the output image
+ * @param height The desired height of the output image
+ * @param PreserveAspect Whether to preserve the aspect ratio of the internal image buffer when resizing
+ *
+ * @return A new image with the given dimensions, or nullptr if the target dimensions are invalid
+ */
 cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAspect) {
     const int w = buffer.columns();  // Narrowing conversion
     const int h = buffer.rows();
@@ -51,90 +65,61 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return nullptr;
     }
 #ifdef IMAGEMAGICK7
-    using Quantum = Magick::Quantum;
-    static constexpr uint64_t kScale16 = 1ULL << 16;
-    static constexpr uint64_t kQuantumScaleInt = (255ULL * kScale16) / QuantumRange;
-    const Quantum *px = buffer.getConstPixels(0, 0, w, h);
-    if (!px) {
-        esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
-        return nullptr;
-    }
-
-    // MagickCore expects: [r,g,b,a] or [cmyk a] etc--RGB(A) order. Confirm layout!
-    const int quantum_channels = buffer.channels();
+    static constexpr uint64_t kScale16 {1ULL << 16};
+    static constexpr uint64_t kQuantumScaleInt {(255ULL * kScale16) / QuantumRange};
 
     // When scaling/resizing required
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
 
-        const Quantum *src = px;
-        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
         for (int iy {0}; iy < h; ++iy) {
             for (int ix {0}; ix < w; ++ix) {
-                r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
-                g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
-                b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
-                o = quantum_channels > 3
-                    ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
-                    : 0xff;
+                Magick::Color px = buffer.pixelColor(ix, iy);
+                unsigned char r = static_cast<unsigned char>((px.quantumRed()   * kQuantumScaleInt) >> 16);
+                unsigned char g = static_cast<unsigned char>((px.quantumGreen() * kQuantumScaleInt) >> 16);
+                unsigned char b = static_cast<unsigned char>((px.quantumBlue()  * kQuantumScaleInt) >> 16);
+                unsigned char o = static_cast<unsigned char>((px.quantumAlpha() * kQuantumScaleInt) >> 16);
                 scaler.PutSourcePixel(b, g, r, o);
-                src += quantum_channels;
             }
         }
         return image.release();
     }
 
-    // "Fast path": sizes match, just convert directly
-    {
-        const Quantum *src = px;
-        unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-        for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel) {
-            r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
-            g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
-            b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
-            o = quantum_channels > 3
-                ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
-                : 0xff;
+    // "Fast path": Sizes match, just convert directly
+    for (int iy {0}, pixel {0}, pix {w * h}; iy < h; ++iy) {
+        for (int ix {0}; ix < w; ++ix, ++pixel) {
+            Magick::Color px = buffer.pixelColor(ix, iy);
+            unsigned char r = static_cast<unsigned char>((px.quantumRed()   * kQuantumScaleInt) >> 16);
+            unsigned char g = static_cast<unsigned char>((px.quantumGreen() * kQuantumScaleInt) >> 16);
+            unsigned char b = static_cast<unsigned char>((px.quantumBlue()  * kQuantumScaleInt) >> 16);
+            unsigned char o = static_cast<unsigned char>((px.quantumAlpha() * kQuantumScaleInt) >> 16);
             *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
-            src += quantum_channels;
         }
-        return image.release();
     }
+    return image.release();
 #else
-    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    // ImageMagick <=6: use PixelPacket
+    // ImageMagick <=6: Use PixelPacket and 16-bit depth (MaxRGB = 65535)
     const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
-    if (!pixels) {
-        esyslog("flatPlus: cImageMagickWrapper::CreateImage() failed to get pixel data");
-        return nullptr;
-    }
-    const Magick::PixelPacket *src = pixels;
-    static constexpr uint64_t kScaleFactor = 1ULL << 16;
-    static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
-
     if (w != width || h != height) {
         ImageScaler scaler;
         scaler.SetImageParameters(imgData, width, width, height, w, h);
-        int blue {}, green {}, red {}, alpha {};  // Initialise outside of for loop
-        for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-            blue  = (src->blue   * kScaleFactor) / kRGBScaleInt;
-            green = (src->green  * kScaleFactor) / kRGBScaleInt;
-            red   = (src->red    * kScaleFactor) / kRGBScaleInt;
-            alpha = ~(static_cast<unsigned char>((src->opacity * kScaleFactor) / kRGBScaleInt));
-            scaler.PutSourcePixel(blue, green, red, alpha);
-        }
+        for (const void *pixels_end = &pixels[w * h]; pixels < pixels_end; ++pixels)
+            scaler.PutSourcePixel(pixels->blue / ((MaxRGB + 1) / 256),
+                                  pixels->green / ((MaxRGB + 1) / 256),
+                                  pixels->red / ((MaxRGB + 1) / 256),
+                                  ~(static_cast<unsigned char>(pixels->opacity / ((MaxRGB + 1) / 256))));
+
         return image.release();
     }
 
-    // Fast path: sizes match, just go
-    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-        *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
-             (static_cast<int>((src->red      * kScaleFactor) / kRGBScaleInt) << 16) |
-             (static_cast<int>((src->green    * kScaleFactor) / kRGBScaleInt) << 8)  |
-             (static_cast<int>((src->blue     * kScaleFactor) / kRGBScaleInt)));
-    }
+    // Fast path: Sizes match, just go
+    for (const void *pixels_end = &pixels[width * height]; pixels < pixels_end; ++pixels)
+        *imgData++ = ((~static_cast<int>(pixels->opacity / ((MaxRGB + 1) / 256)) << 24) |
+                      (static_cast<int>(pixels->green / ((MaxRGB + 1) / 256)) << 8) |
+                      (static_cast<int>(pixels->red / ((MaxRGB + 1) / 256)) << 16) |
+                      (static_cast<int>(pixels->blue / ((MaxRGB + 1) / 256)) ));
+
     return image.release();
 #endif
 }
@@ -145,35 +130,26 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     cImage image(cSize(w, h));
     tColor *imgData = (tColor *)image.Data();
 #ifdef IMAGEMAGICK7
-    using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1UL << 16;
     static constexpr uint64_t kQuantumScaleInt = (255UL * kScale16) / QuantumRange;
-    const Quantum *src = buffer.getConstPixels(0, 0, w, h);
-    if (!src) return image;
-    const int quantum_channels = buffer.channels();
-    unsigned char r {}, g {}, b {}, o {};  // Initialise outside of for loop
-    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, src += quantum_channels) {
-        r = static_cast<unsigned char>((src[0] * kQuantumScaleInt) >> 16);
-        g = static_cast<unsigned char>((src[1] * kQuantumScaleInt) >> 16);
-        b = static_cast<unsigned char>((src[2] * kQuantumScaleInt) >> 16);
-        o = quantum_channels > 3
-                ? static_cast<unsigned char>((src[3] * kQuantumScaleInt) >> 16)
-                : 0xff;
-        *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
+    for (int iy {0}, pixel {0}, pix {w * h}; iy < h; ++iy) {
+        for (int ix {0}; ix < w; ++ix, ++pixel) {
+            Magick::Color px = buffer.pixelColor(ix, iy);
+            unsigned char r = static_cast<unsigned char>((px.quantumRed()   * kQuantumScaleInt) >> 16);
+            unsigned char g = static_cast<unsigned char>((px.quantumGreen() * kQuantumScaleInt) >> 16);
+            unsigned char b = static_cast<unsigned char>((px.quantumBlue()  * kQuantumScaleInt) >> 16);
+            unsigned char o = static_cast<unsigned char>((px.quantumAlpha() * kQuantumScaleInt) >> 16);
+            *imgData++ = (o << 24) | (r << 16) | (g << 8) | b;
+        }
     }
 #else
-    static constexpr uint64_t kMaxRGB {65535};  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
-    if (!src) return image;
-    static constexpr uint64_t kScaleFactor = 1UL << 16;
-    static constexpr uint64_t kRGBScaleInt = ((kMaxRGB + 1UL) * kScaleFactor) / 256UL;
-    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-        *imgData++ =
-            ((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt) << 24) |
-            (static_cast<int>((src->red       * kScaleFactor) / kRGBScaleInt) << 16) |
-            (static_cast<int>((src->green     * kScaleFactor) / kRGBScaleInt) << 8)  |
-            (static_cast<int>((src->blue      * kScaleFactor) / kRGBScaleInt)));
-    }
+    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+    if (!pixels) return image;
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++pixels)
+        *imgData++ = ((~static_cast<int>(pixels->opacity / ((MaxRGB + 1) / 256)) << 24) |
+                      (static_cast<int>(pixels->green / ((MaxRGB + 1) / 256)) << 8) |
+                      (static_cast<int>(pixels->red / ((MaxRGB + 1) / 256)) << 16) |
+                      (static_cast<int>(pixels->blue / ((MaxRGB + 1) / 256)) ));
 #endif
     return image;
 }
@@ -188,11 +164,13 @@ bool cImageMagickWrapper::LoadImage(const char *fullpath) {
 
     try {
         buffer.read(fullpath);
+    } catch (const Magick::Warning &w) {
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Magick::Warning: %s", w.what());
     } catch (const Magick::Exception &e) {
-        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Magick::Exception: %s\n", e.what());
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() Magick::Exception: %s", e.what());
         return false;  // Signal error
     } catch (const std::exception &e) {
-        esyslog("flatPlus: cImageMagickWrapper::LoadImage() std::exception: %s\n", e.what());
+        esyslog("flatPlus: cImageMagickWrapper::LoadImage() std::exception: %s", e.what());
         return false;  // Signal error
     } catch (...) {
         esyslog("flatPlus: cImageMagickWrapper::LoadImage() Unknown error occurred.");
@@ -211,9 +189,9 @@ Color cImageMagickWrapper::Argb2Color(tColor col) {
     const Color color(QuantumRange * red / 255, QuantumRange * green / 255, QuantumRange * blue / 255,
                       QuantumRange * alpha / 255);
 #else
-    static constexpr uint64_t kMaxRGB = 65535;  // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
-    const Color color(kMaxRGB * red / 255, kMaxRGB * green / 255, kMaxRGB * blue / 255,
-                      kMaxRGB * (0xFF - alpha) / 255);
+    // Magick <=6 uses 16-bit depth (MaxRGB = 65535)
+    const Color color(MaxRGB * red / 255, MaxRGB * green / 255, MaxRGB * blue / 255,
+                      MaxRGB * (0xFF - alpha) / 255);
 #endif
     return color;
 }
