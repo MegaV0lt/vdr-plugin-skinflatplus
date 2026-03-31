@@ -65,7 +65,6 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
         return nullptr;
     }
 #ifdef IMAGEMAGICK7
-    using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 {1ULL << 16};
     static constexpr uint64_t kQuantumScaleInt {(255ULL * kScale16) / QuantumRange};
 
@@ -131,7 +130,6 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     cImage image(cSize(w, h));
     tColor *imgData = (tColor *)image.Data();
 #ifdef IMAGEMAGICK7
-    using Quantum = Magick::Quantum;
     static constexpr uint64_t kScale16 = 1UL << 16;
     static constexpr uint64_t kQuantumScaleInt = (255UL * kScale16) / QuantumRange;
     for (int iy {0}, pixel {0}, pix {w * h}; iy < h; ++iy) {
@@ -145,17 +143,13 @@ cImage cImageMagickWrapper::CreateImageCopy() {
         }
     }
 #else
-    const Magick::PixelPacket *src = buffer.getConstPixels(0, 0, w, h);
-    if (!src) return image;
-    static constexpr uint64_t kScaleFactor {1UL << 16};
-    static constexpr uint64_t kRGBScaleInt {((MaxRGB + 1UL) * kScaleFactor) / 256UL};
-    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++src) {
-        *imgData++ =
-            (((~static_cast<int>((src->opacity * kScaleFactor) / kRGBScaleInt)) & 0xFF) << 24) |
-            (static_cast<int>((src->red       * kScaleFactor) / kRGBScaleInt) << 16) |
-            (static_cast<int>((src->green     * kScaleFactor) / kRGBScaleInt) << 8)  |
-            (static_cast<int>((src->blue      * kScaleFactor) / kRGBScaleInt));
-    }
+    const Magick::PixelPacket *pixels = buffer.getConstPixels(0, 0, w, h);
+    if (!pixels) return image;
+    for (int pixel {0}, pix {w * h}; pixel < pix; ++pixel, ++pixels)
+        *imgData++ = ((~static_cast<int>(pixels->opacity / ((MaxRGB + 1) / 256)) << 24) |
+                      (static_cast<int>(pixels->green / ((MaxRGB + 1) / 256)) << 8) |
+                      (static_cast<int>(pixels->red / ((MaxRGB + 1) / 256)) << 16) |
+                      (static_cast<int>(pixels->blue / ((MaxRGB + 1) / 256)) ));
 #endif
     return image;
 }
