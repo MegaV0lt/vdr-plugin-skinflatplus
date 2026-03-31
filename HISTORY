@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-03-31: Version 1.2.10
+- [fix] Refactor image processing and fix opacity handling. This is a try to fix mld issues
+
 2026-03-24: Version 1.2.9
 - [fix] Replace Housekeeping()-based rec count with dedicated background thread
         Thanks to zork @ VDR-Portal for providing a patch
