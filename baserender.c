@@ -1560,13 +1560,19 @@ tColor cFlatBaseRender::Multiply(tColor Color, uint8_t Alpha) {
   return AG | RB;
 } */
 
+/**
+ * Set the alpha channel of a color.
+ *
+ * @param Color The color to be modified
+ * @param am The alpha multiplier (0.0-1.0)
+ * @return The modified color
+ */
 tColor cFlatBaseRender::SetAlpha(tColor Color, double am) {
-    uint8_t A = (Color & 0xFF000000) >> 24;
-    uint8_t R = (Color & 0x00FF0000) >> 16;
-    uint8_t G = (Color & 0x0000FF00) >> 8;
-    uint8_t B = (Color & 0x000000FF);
+    const uint8_t A = ((Color & 0xFF000000) >> 24) * am;  // Extract alpha and apply multiplier
+    const uint8_t R = (Color & 0x00FF0000) >> 16;
+    const uint8_t G = (Color & 0x0000FF00) >> 8;
+    const uint8_t B = (Color & 0x000000FF);
 
-    A = static_cast<uint8_t>(A * am);  // Explicitly cast the result to uint8_t
     return ArgbToColor(A, R, G, B);
 }
 
