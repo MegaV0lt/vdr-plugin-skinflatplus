@@ -1,5 +1,8 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-XX-XX: Version 1.2.11
+- [update] Add spacing before percent and degree symbols
+
 2026-03-31: Version 1.2.10
 - [fix] Refactor image processing and fix opacity handling. This is a try to fix mld issues
 
@@ -161,7 +164,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2025-01-14: Version 1.1.6
 - [fix] Fix display of weather location in main menu
 - [fix] Fix display of plugin icons in main menu
-- [update] Show usage also if disk is 100%full
+- [update] Show usage also if disk is 100 % full
 - [update] Some internal optimizations
 
 2025-01-07: Version 1.1.5
@@ -256,7 +259,7 @@ VDR Plugin 'skin flatPlus' Revision History
         The script can be found in 'contrib/'
 - [add] Some new fonts added in 'contrib/Fonts'
 - [update] If available use 'HairSpace' for justifying text for best result
-- [update] Only justify lines with minimum of 80% width
+- [update] Only justify lines with minimum of 80 % width
 - [update] Some internal optimizations
 
 2024-02-27: Version 1.0.2
@@ -330,7 +333,7 @@ VDR Plugin 'skin flatPlus' Revision History
 2023-11-08: Version 0.8.0
 - [fix] Better display of channel icons (Resolution, ...)
 - [add] Option to show short text without date in playback
-- [update] Tweak toLowerCase(). Preloading time of images reduced by ~15%
+- [update] Tweak toLowerCase(). Preloading time of images reduced by ~15 %
             Before: Image cache pre load images time: 425 ms
             After: Image cache pre load images time: 361 ms
 - [update] Some internal optimizations

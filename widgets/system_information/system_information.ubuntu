@@ -104,7 +104,7 @@ if [ $SHOW_MEM_USAGE = 1 ]; then
   MEM_USAGE=$((${BUF[2]} * 1000 / ${MEM[1]}))
   [ $MEM_USAGE -lt 10 ] && MEM_USAGE="0${MEM_USAGE}"
   MEM_DEC=${MEM_USAGE: -1}
-  echo "${MEM_USAGE:0: -1},${MEM_DEC}%" > ${OUTPUTFLDR}/${MEM_USAGE_POS}_mem_usage
+  echo "${MEM_USAGE:0: -1},${MEM_DEC} %" > ${OUTPUTFLDR}/${MEM_USAGE_POS}_mem_usage
 fi
 
 if [ $SHOW_SWAP_USAGE = 1 ]; then
@@ -115,9 +115,9 @@ if [ $SHOW_SWAP_USAGE = 1 ]; then
       SWP=$((${SWAP[2]} * 1000 / ${SWAP[1]}))
       [ $SWP -lt 10 ] && SWP="0${SWP}"
       SWP_DEC=${SWP: -1} ; SWP=${SWP:0: -1},${SWP_DEC}
-      echo "${SWP}%" > ${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage
+      echo "${SWP} %" > ${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage
     else
-      echo "0,0%" > ${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage
+      echo "0,0 %" > ${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage
     fi
   fi
 fi
@@ -135,7 +135,7 @@ if [ $SHOW_VDR_CPU_USAGE = 1 ]; then
   if [ $? = 0 ]; then
     mapfile -t < <(ps -p ${vdr_pid} -o %cpu) # Ausgabe von ps in Array (Zwei Zeilen)
     CPU_USAGE=${MAPFILE[1]/./,}              # 24.2 -> 24,2
-    echo "${CPU_USAGE}%" > ${OUTPUTFLDR}/${VDR_CPU_USAGE_POS}_vdr_cpu_usage
+    echo "${CPU_USAGE} %" > ${OUTPUTFLDR}/${VDR_CPU_USAGE_POS}_vdr_cpu_usage
   fi
 fi
 
@@ -144,7 +144,7 @@ if [ $SHOW_VDR_MEM_USAGE = 1 ]; then
   if [ $? = 0 ]; then
     mapfile -t < <(ps -p ${vdr_pid} -o %mem) # Ausgabe von ps in Array (Zwei Zeilen)
     VDR_MEM_USAGE=${MAPFILE[1]/./,}          # 24.2 -> 24,2
-    echo "${VDR_MEM_USAGE}%" > ${OUTPUTFLDR}/${VDR_MEM_USAGE_POS}_vdr_mem_usage
+    echo "${VDR_MEM_USAGE} %" > ${OUTPUTFLDR}/${VDR_MEM_USAGE_POS}_vdr_mem_usage
   fi
 fi
 

@@ -283,7 +283,7 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     if (!Movie.releaseDate.empty()) oss << tr("release date: ") << Movie.releaseDate << '\n';
     if (Movie.popularity > 0)
         oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
-    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << "%\n";  // 10 Points = 100%
+    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << " %\n";  // 10 Points = 100 %
     MovieInfo.Append(oss.str().c_str());
 }
 
@@ -374,7 +374,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};  // 0.0...1.0
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f", SeenThreshold);
-    if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100%
+    if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100 %
 
     const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0...10 rounded
     return cString::sprintf("recording_seen_%d", idx);
@@ -407,7 +407,7 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 
     static constexpr int kPosterAspectThreshold {1};              // Smaller than 1 = Poster
     static constexpr int kBannerAspectThreshold {4};              // Smaller than 4 = Portrait, bigger than 4 = Banner
-    static constexpr double kPosterHeightRatio {0.7};             // Max 70% of pixmap height
+    static constexpr double kPosterHeightRatio {0.7};             // Max 70 % of pixmap height
     static constexpr double kPortraitWidthRatio {1.0 / 3.0};      // Max 1/3 of pixmap width
     static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
@@ -787,7 +787,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 
     static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
     const int16_t LineWidth = Font->Width(Line.c_str());       // Width in Pixel
-    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80% looking bad when justified
+    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80 % looking bad when justified
 
     // Count spaces in line
     const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });

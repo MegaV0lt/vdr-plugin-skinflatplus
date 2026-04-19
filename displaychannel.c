@@ -159,7 +159,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
 
     if (Config.ChannelShowNameWithShadow) {
         PixmapClear(ChanInfoTopPixmap);
-        const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10% of font height
+        const int ShadowSize {m_FontBigHeight / 10};  // Shadow size is 10 % of font height
         // Ensure shadow size is reasonable
         const int MinShadowSize {m_MarginItem / 2 + 1};  // Minimum shadow size
         const int MaxShadowSize {m_MarginItem3};         // Shadow should not be too large

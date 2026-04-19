@@ -121,18 +121,18 @@ if [[ "$SHOW_MEM_USAGE" == "1" ]] ; then
   MU=$((MEMUSED * 1000 / MEMTOTAL[1]))
   [[ $MU -lt 10 ]] && MU="0${MU}"
   MU_DEC="${MU: -1}" ; MEM_USAGE="${MU:0: -1},${MU_DEC}"
-  echo "${MEM_USAGE}%" > "${OUTPUTFLDR}/${MEM_USAGE_POS}_mem_usage"
+  echo "${MEM_USAGE} %" > "${OUTPUTFLDR}/${MEM_USAGE_POS}_mem_usage"
 fi
 
 if [[ "$SHOW_SWAP_USAGE" == "1" ]] ; then
   if [[ ${SWAPTOTAL[1]} -eq ${SWAPFREE[1]} ]] ; then
-    echo "0,0%" > "${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage"
+    echo "0,0 %" > "${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage"
   else
     SWPUSED=$((SWAPTOTAL[1] - SWAPFREE[1]))
     SU=$((SWPUSED * 1000 / SWAPFREE[1]))
     [[ $SU -lt 10 ]] && SU="0${SU}"
     SU_DEC="${SU: -1}" ; SWAP_USAGE="${SU:0: -1},${SU_DEC}"
-    echo "${SWAP_USAGE}%" > "${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage"
+    echo "${SWAP_USAGE} %" > "${OUTPUTFLDR}/${SWAP_USAGE_POS}_swap_usage"
   fi
 fi
 
@@ -140,14 +140,14 @@ if [[ "$SHOW_ROOT_USAGE" == "1" ]] ; then
   mapfile -t < <(df -Ph /)    # Ausgabe von df in Array (Zwei Zeilen)
   IFS=' ' read -r -a ROOTUSAGE <<< "${MAPFILE[1]}"  # 2. Zeile in Array
   # Beispiel 2. Zeile: tmpfs  128M  30M  99M  23%  /root
-  echo "${ROOTUSAGE[4]}" > "${OUTPUTFLDR}/${ROOT_USAGE_POS}_root_usage"
+  echo "${ROOTUSAGE[4]/'%'/' %'}" > "${OUTPUTFLDR}/${ROOT_USAGE_POS}_root_usage"
 fi
 
 if [[ "$SHOW_VIDEO_USAGE" == "1" && -d "$VIDEO_MOUNT" ]] ; then
   mapfile -t < <(df -Ph "$VIDEO_MOUNT")    # Ausgabe von df in Array (Zwei Zeilen)
   IFS=' ' read -r -a VIDEOUSAGE <<< "${MAPFILE[1]}"  # 2. Zeile in Array
   # Beispiel 2. Zeile: tmpfs  128M  30M  99M  23%  /root
-  echo "${VIDEOUSAGE[4]}" > "${OUTPUTFLDR}/${VIDEO_USAGE_POS}_video_usage"
+  echo "${VIDEOUSAGE[4]/'%'/' %'}" > "${OUTPUTFLDR}/${VIDEO_USAGE_POS}_video_usage"
 fi
 
 if [[ "$SHOW_VDR_CPU_USAGE" == "1" || "$SHOW_VDR_MEM_USAGE" == "1" ]] ; then
@@ -157,13 +157,13 @@ fi
 if [[ "$SHOW_VDR_CPU_USAGE" == "1" ]] ; then
   IFS=' ' read -r -a CPUTMP <<< "${MAPFILE[0]}"
   CPU_USAGE=${CPUTMP[0]/./,}  # 24.2 -> 24,2
-  echo "${CPU_USAGE//[[:space:]]/}%" > "${OUTPUTFLDR}/${VDR_CPU_USAGE_POS}_vdr_cpu_usage"
+  echo "${CPU_USAGE//[[:space:]]/} %" > "${OUTPUTFLDR}/${VDR_CPU_USAGE_POS}_vdr_cpu_usage"
 fi
 
 if [[ "$SHOW_VDR_MEM_USAGE" == "1" ]] ; then
   IFS=' ' read -r -a MEMTMP <<< "${MAPFILE[0]}"
   VDR_MEM_USAGE=${MEMTMP[1]/./,}  # 24.2 -> 24,2
-  echo "${VDR_MEM_USAGE//[[:space:]]/}%" > "${OUTPUTFLDR}/${VDR_MEM_USAGE_POS}_vdr_mem_usage"
+  echo "${VDR_MEM_USAGE//[[:space:]]/} %" > "${OUTPUTFLDR}/${VDR_MEM_USAGE_POS}_vdr_mem_usage"
 fi
 
 if [[ "$SHOW_TEMPERATURES" == "1" ]] ; then

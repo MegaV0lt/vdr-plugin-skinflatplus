@@ -35,9 +35,9 @@ f_log(){
 
 f_write_temp(){  # Temperaturwert aufbereiten und schreiben ($1 Temperatur, $2 Ausgabedatei)
   local data="$1" file="$2"
-  printf -v data '%.1f' "$data"                  # Temperatur mit einer Nachkommastelle
-  [[ -n "$DEC" ]] && data="${data/./"$DEC"}"     # . durch , ersetzen
-  printf '%s' "${data}${DEGREE_SIGN}" > "$file"  # Daten schreiben (13,1°C)
+  printf -v data '%.1f' "$data"                   # Temperatur mit einer Nachkommastelle
+  [[ -n "$DEC" ]] && data="${data/./"$DEC"}"      # . durch , ersetzen
+  printf '%s' "${data} ${DEGREE_SIGN}" > "$file"  # Daten schreiben (13,1 °C)
 }
 
 f_get_weather(){
@@ -89,7 +89,9 @@ f_get_weather(){
 
 ### Start ###
 # Datenverzeichnis erstellen
-[[ ! -d "$DATA_DIR" ]] && { mkdir --parents "$DATA_DIR" || exit 1 ;}
+if [[ ! -d "$DATA_DIR" ]] ; then
+  mkdir --parents "$DATA_DIR" || { f_log "Error: Could not create directory $DATA_DIR!" ; exit 1 ;}
+fi
 
 rm "${DATA_DIR}/weather.*" &>/dev/null  # Alte Daten löschen
 

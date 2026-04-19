@@ -4272,7 +4272,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     cImage *ImgUmbrella {ImgLoader.GetIcon("widgets/umbrella", m_FontHeight, m_FontHeight - m_MarginItem2)};
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
-    const int TempSmlWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "-00,0°C")};  // Width
+    const int TempSmlWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "-00,0 °C")};  // Width
     const int16_t MainMenuWidgetWeatherDays =
         std::min(Config.MainMenuWidgetWeatherDays, wd.kMaxDays);                           // Narrowing conversion
     if (Config.MainMenuWidgetWeatherType == 0) {                                           // Short
@@ -4323,7 +4323,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         // Space between temperature and precipitation
         const int TempSmlSpaceWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, " ")};
         // Max. width of precipitation string
-        const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "100%")};
+        const int TempSmlPrecWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "100 %")};
         const int DayStringWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "Mon")};  // Mon, Mo.
         for (int16_t i {0}; i < MainMenuWidgetWeatherDays; ++i) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;

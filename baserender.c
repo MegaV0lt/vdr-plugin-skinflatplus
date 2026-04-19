@@ -65,7 +65,7 @@ cFlatBaseRender::cFlatBaseRender() {
         m_FontTempSmlHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize / 2);
     }
     if (Config.TVScraperEPGInfoShowActors || Config.TVScraperRecInfoShowActors) {
-        m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80% of small font size
+        m_FontTiny = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize * 0.8);  // 80 % of small font size
         m_FontTinyHeight = FontCache.GetFontHeight(Setup.FontSml, Setup.FontSmlSize * 0.8);
     }
     m_FontBigHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize * Config.ChannelNameFontSize * 100.0);
@@ -272,19 +272,19 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         if (Config.DiskUsageFree == 1) {  // Show in free mode
             const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: ~ 0%% %s", tr("Disk"), tr("free"));
+                Extra1 = cString::sprintf("%s: ~ 0 %% %s", tr("Disk"), tr("free"));
                 Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // Short format
-                Extra1 = cString::sprintf("~ 0%% %s", tr("free"));
+                Extra1 = cString::sprintf("~ 0 %% %s", tr("free"));
                 Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
             IconName = "chart31b";
         } else {                                   // Show in occupied mode
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: ~ 100%% %s", tr("Disk"), tr("occupied"));
+                Extra1 = cString::sprintf("%s: ~ 100 %% %s", tr("Disk"), tr("occupied"));
                 Extra2 = "? GB ≈ ??:??";  //* Can not be calculated if disk is full (DIV/0)
             } else {                      // Short format
-                Extra1 = cString::sprintf("~ 100%% %s", tr("occupied"));
+                Extra1 = cString::sprintf("~ 100 %% %s", tr("occupied"));
                 Extra2 = "≈ ??:??";
             }
             IconName = "chart32";
@@ -308,14 +308,14 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         dsyslog("   FreeMinutes/60 %d, FreeMinutes%%60 %d", FreeHM.quot, FreeHM.rem);
 #endif
         if (Config.DiskUsageShort == false) {  // Long format
-            Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskFreePercent, tr("free"));
+            Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
                 Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // 1000 GB+
                 Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
             }
         } else {  // Short format
-            Extra1 = cString::sprintf("%d%% %s", DiskFreePercent, tr("free"));
+            Extra1 = cString::sprintf("%d %% %s", DiskFreePercent, tr("free"));
             Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
         }
 
@@ -337,7 +337,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         if (Config.DiskUsageFree == 2) {  //* Special mixed mode free time instead of used
             const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+                Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
                     Extra2 = cString::sprintf("%.1f GB | %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
                 } else {  // 1000 GB+
@@ -345,13 +345,13 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
                         cString::sprintf("%.2f TB | %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
                 }
             } else {  // Short format
-                Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+                Extra1 = cString::sprintf("%d %% %s", DiskUsagePercent, tr("occupied"));
                 Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
             }
         } else {  // Show in occupied mode
             const div_t OccupiedHM {std::div(OccupiedMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
-                Extra1 = cString::sprintf("%s: %d%% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
+                Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
                     Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedHM.quot, OccupiedHM.rem);
                 } else {  // 1000 GB+
@@ -359,7 +359,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
                                               OccupiedHM.rem);
                 }
             } else {  // Short format
-                Extra1 = cString::sprintf("%d%% %s", DiskUsagePercent, tr("occupied"));
+                Extra1 = cString::sprintf("%d %% %s", DiskUsagePercent, tr("occupied"));
                 Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedHM.quot, OccupiedHM.rem);
             }
         }
@@ -1050,7 +1050,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
     // large collections of marks.
     const double PosScaleFactor {static_cast<double>(m_ProgressBarWidth) / Total};
     const int PosCurrent {static_cast<int>(Current * PosScaleFactor)};  // Not needed to calculate for every mark
-    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  // 20% of progressbar height with an minimum of 4 pixel
+    const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};  // 20 % of progressbar height with an minimum of 4 pixel
     if (!Marks || !Marks->First()) {
         // m_ProgressBarColorFg = m_ProgressBarColorBarFg; m_ProgressBarColorFg = m_ProgressBarColorBarCurFg;
         m_ProgressBarColorBarFg = m_ProgressBarColorBarCurFg;
@@ -1808,13 +1808,13 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             istr.clear();  // Clear the error state of the stream
             double p {0.0};
             if (istr >> p) {  // Check if parsing succeeded
-                out.Days[day].Precipitation = cString::sprintf("%d%%", RoundUp(p * 100.0, 10));
+                out.Days[day].Precipitation = cString::sprintf("%d %%", RoundUp(p * 100.0, 10));
             } else {
                 dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);
-                out.Days[day].Precipitation = "-%";  // Default fallback
+                out.Days[day].Precipitation = "- %";  // Default fallback
             }
         } else {
-            out.Days[day].Precipitation = "-%";  // Default fallback
+            out.Days[day].Precipitation = "- %";  // Default fallback
         }
 
         out.Days[day].Summary = ReadAndExtractData(summaryFile);
