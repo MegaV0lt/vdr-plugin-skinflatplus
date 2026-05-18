@@ -135,11 +135,11 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
     FontCache[m_InsertIndex].FileName = FontCache[m_InsertIndex].font->FontName();
     FontCache[m_InsertIndex].size = Size;
     FontCache[m_InsertIndex].height = FontCache[m_InsertIndex].font->Height();
-    #ifdef DEBUGFONTCACHE
-        dsyslog("   Font '%s' inserted at index %zu", *FontCache[m_InsertIndex].name, m_InsertIndex);
-        dsyslog("   Font file name: '%s'", *FontCache[m_InsertIndex].FileName);
-        dsyslog("   Font size: %d, height: %d", FontCache[m_InsertIndex].size, FontCache[m_InsertIndex].height);
-    #endif
+#ifdef DEBUGFONTCACHE
+    dsyslog("   Font '%s' inserted at index %zu", *FontCache[m_InsertIndex].name, m_InsertIndex);
+    dsyslog("   Font file name: '%s'", *FontCache[m_InsertIndex].FileName);
+    dsyslog("   Font size: %d, height: %d", FontCache[m_InsertIndex].size, FontCache[m_InsertIndex].height);
+#endif
 
     if (++m_InsertIndex >= kMaxFontCache) {
         isyslog("flatPlus: cFontCache::InsertFont() Cache overflow, increase kMaxFontCache (%zu)", kMaxFontCache);
