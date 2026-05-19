@@ -273,19 +273,19 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             const div_t FreeHM {std::div(FreeMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: ~ 0 %% %s", tr("Disk"), tr("free"));
-                Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("%.2f GB ≈ %02d:%02d h", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // Short format
                 Extra1 = cString::sprintf("~ 0 %% %s", tr("free"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d h", FreeHM.quot, FreeHM.rem);
             }
             IconName = "chart31b";
         } else {                                   // Show in occupied mode
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: ~ 100 %% %s", tr("Disk"), tr("occupied"));
-                Extra2 = "? GB ≈ ??:??";  //* Can not be calculated if disk is full (DIV/0)
+                Extra2 = "? GB ≈ ??:?? h";  //* Can not be calculated if disk is full (DIV/0)
             } else {                      // Short format
                 Extra1 = cString::sprintf("~ 100 %% %s", tr("occupied"));
-                Extra2 = "≈ ??:??";
+                Extra2 = "≈ ??:?? h";
             }
             IconName = "chart32";
         }
@@ -310,13 +310,13 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
         if (Config.DiskUsageShort == false) {  // Long format
             Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskFreePercent, tr("free"));
             if (FreeGB < 1000.0) {  // Less than 1000 GB
-                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", FreeGB, FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d h", FreeGB, FreeHM.quot, FreeHM.rem);
             } else {  // 1000 GB+
-                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", FreeGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d h", FreeGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
             }
         } else {  // Short format
             Extra1 = cString::sprintf("%d %% %s", DiskFreePercent, tr("free"));
-            Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
+            Extra2 = cString::sprintf("≈ %02d:%02d h", FreeHM.quot, FreeHM.rem);
         }
 
         const int IconIndex {static_cast<int>(DiskFreePercent * kChartSegmentPercent)};  // 0..31
@@ -339,28 +339,28 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB | %02d:%02d", OccupiedGB, FreeHM.quot, FreeHM.rem);
+                    Extra2 = cString::sprintf("%.1f GB | %02d:%02d h", OccupiedGB, FreeHM.quot, FreeHM.rem);
                 } else {  // 1000 GB+
                     Extra2 =
-                        cString::sprintf("%.2f TB | %02d:%02d", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
+                        cString::sprintf("%.2f TB | %02d:%02d h", OccupiedGB * (1.0 / 1024.0), FreeHM.quot, FreeHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d %% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", FreeHM.quot, FreeHM.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d h", FreeHM.quot, FreeHM.rem);
             }
         } else {  // Show in occupied mode
             const div_t OccupiedHM {std::div(OccupiedMinutes, 60)};
             if (Config.DiskUsageShort == false) {  // Long format
                 Extra1 = cString::sprintf("%s: %d %% %s", tr("Disk"), DiskUsagePercent, tr("occupied"));
                 if (OccupiedGB < 1000.0) {  // Less than 1000 GB
-                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d", OccupiedGB, OccupiedHM.quot, OccupiedHM.rem);
+                    Extra2 = cString::sprintf("%.1f GB ≈ %02d:%02d h", OccupiedGB, OccupiedHM.quot, OccupiedHM.rem);
                 } else {  // 1000 GB+
-                    Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d", OccupiedGB * (1.0 / 1024.0), OccupiedHM.quot,
+                    Extra2 = cString::sprintf("%.2f TB ≈ %02d:%02d h", OccupiedGB * (1.0 / 1024.0), OccupiedHM.quot,
                                               OccupiedHM.rem);
                 }
             } else {  // Short format
                 Extra1 = cString::sprintf("%d %% %s", DiskUsagePercent, tr("occupied"));
-                Extra2 = cString::sprintf("≈ %02d:%02d", OccupiedHM.quot, OccupiedHM.rem);
+                Extra2 = cString::sprintf("≈ %02d:%02d h", OccupiedHM.quot, OccupiedHM.rem);
             }
         }
 

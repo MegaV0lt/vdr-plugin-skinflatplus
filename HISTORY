@@ -2,6 +2,8 @@ VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2026-XX-XX: Version 1.2.11
 - [update] Add spacing before percent and degree symbols
+- [update] Improve image cache by replacing linear search with hash-based lookup
+- [update] Clarify disk usage time units by adding 'h' to hour values in top bar
 
 2026-03-31: Version 1.2.10
 - [fix] Refactor image processing and fix opacity handling. This is a try to fix mld issues
