@@ -994,10 +994,10 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                              m_MenuItemWidth - Left - m_MarginItem);
         Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "MMM 00.  ");
         Buffer =
-            cString::sprintf("%02d:%02d - %02d:%02d", TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
+            cString::sprintf("%02d:%02d–%02d:%02d", TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
-        Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00 - 00:00  ");
+        Left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00–00:00  ");
 
         if (Current && m_Font->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(
@@ -1025,7 +1025,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
             }
         }
     } else if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus short, flatPlus short + EPG
-        Buffer = cString::sprintf("%s%s%s.  %02d:%02d - %02d:%02d", *name, *name && **name ? " " : "", *day,
+        Buffer = cString::sprintf("%s%s%s.  %02d:%02d–%02d:%02d", *name, *name && **name ? " " : "", *day,
                                   TimerStart.quot, TimerStart.rem, TimerStop.quot, TimerStop.rem);
         MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_Font,
                              m_MenuItemWidth - Left - m_MarginItem);
@@ -2183,7 +2183,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
 
     const cString StrTime =
-        cString::sprintf("%s  %s - %s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
+        cString::sprintf("%s  %s–%s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString());
 
     const cString Title = Event->Title();
     const cString ShortText = (Event->ShortText()) ? Event->ShortText() : "";  // No short text. Show empty string

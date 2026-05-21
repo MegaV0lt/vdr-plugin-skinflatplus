@@ -326,9 +326,10 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
             StartTime = *Event->GetTimeString();  // Start time (Left side)
-            //? Use of – (EN DASH, U+2013) instead of - (HYPHEN-MINUS, U+002D) for better readability
-            StrTime = cString::sprintf("%s - %s", *StartTime, *Event->GetEndTimeString());  // Start - End (Right side)
-            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00 - 00:00") + SmlSpaceWidth2;
+            // Use of – (EN DASH, U+2013) instead of - (HYPHEN-MINUS, U+002D) for better readability
+            // https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Time_ranges
+            StrTime = cString::sprintf("%s–%s", *StartTime, *Event->GetEndTimeString());  // Start – End (Right side)
+            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00–00:00") + SmlSpaceWidth2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
