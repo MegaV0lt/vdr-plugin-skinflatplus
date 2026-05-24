@@ -18,7 +18,6 @@
 #include <vdr/videodir.h>
 
 #include <dirent.h>
-#include <fstream>
 #include <functional>  // std::less
 #include <locale>
 #include <sstream>
@@ -4216,19 +4215,19 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 
-    std::string Output {""};
-    Output.reserve(32);
+    const char *s {nullptr};
     static const cString ItemFilename = cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH);
-    std::ifstream file(*ItemFilename);
-    if (file.is_open()) {
-        for (; std::getline(file, Output);) {
+    FILE *f = fopen(*ItemFilename, "r");
+    if (f) {
+        cReadLine ReadLine;
+        while ((s = ReadLine.Read(f)) != nullptr) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
             ContentWidget.AddText(
-                Output.c_str(), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+                s, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
             ContentTop += m_FontSmlHeight;
         }
-        file.close();
+        fclose(f);
     } else {
         ContentWidget.AddText(
             tr("no output available"), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
