@@ -1209,7 +1209,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             const time_t EventStartTime {Event->StartTime()};
             static constexpr int kTwoMinutes {2 * 60};
             if ((now >= (EventStartTime - kTwoMinutes))) {
-                const int total = Event->EndTime() - EventStartTime;  // Narrowing conversion
+                const time_t total {Event->EndTime() - EventStartTime};
                 if (total >= 0) {
                     // Calculate progress bar
                     const double duration = Event->Duration();
