@@ -95,6 +95,11 @@ fi
 
 rm "${DATA_DIR}/weather.*" &>/dev/null  # Alte Daten löschen
 
+# Benötigte Tools prüfen
+for tool in curl jq ; do
+  command -v "$tool" &>/dev/null || { f_log "Error: $tool is not installed!" ; RC=1 ;}
+done
+
 # Konfiguration laden und prüfen
 [[ -e "$CONF" ]] && { source "$CONF" || exit 1 ;}
 for var in API_KEY FORECAST_DAYS _LANG LOCATION UNITS ; do
