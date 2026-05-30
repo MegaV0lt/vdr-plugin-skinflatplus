@@ -2411,6 +2411,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
                                  bool IsEvent) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::AddActors()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     // Setting for TVScraperEPGInfoShowActors and TVScraperRecInfoShowActors
@@ -2435,10 +2436,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
     int y {ContentTop};
-#ifdef DEBUGFUNCSCALL
-    int y2 {ContentTop};  //! y2 is for testing
-    dsyslog("   ActorWidth/ActorMargin: %d/%d", ActorWidth, ActorMargin);
-#endif
     if (NumActors > 48) isyslog("flatPlus: First display of %d actor images will probably be slow!", NumActors);
 
     for (std::size_t row {0}; row < PicLines; ++row) {
@@ -2455,9 +2452,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
                 ComplexContent.AddText(
                     *Role, false, cRect(x, y + ImgHeight + m_MarginItem + m_FontTinyHeight, ActorWidth, 0),
                     ColorMenuFontInfo, ColorMenuBg, m_FontTiny, ActorWidth, m_FontTinyHeight, taCenter);
-#ifdef DEBUGFUNCSCALL
-                if (ImgHeight > MaxImgHeight) { dsyslog("   Column %ld: MaxImgHeight changed to %d", col, ImgHeight); }
-#endif
                 MaxImgHeight = std::max(MaxImgHeight, ImgHeight);  // In case images have different size
             }
             x += ActorWidth + ActorMargin;
@@ -2466,13 +2460,11 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
         x = m_MarginItem;
         // y = ComplexContent.BottomContent() + m_FontHeight;
         y += MaxImgHeight + m_MarginItem + (m_FontTinyHeight * 2) + m_FontHeight;
-#ifdef DEBUGFUNCSCALL
-        // Alternate way to get y
-        y2 += MaxImgHeight + m_MarginItem + (m_FontTinyHeight * 2) + m_FontHeight;
-        dsyslog("   y/y2 BottomContent()/Calculation: %d/%d", ComplexContent.BottomContent() + m_FontHeight, y2);
-#endif
         MaxImgHeight = 0;  // Reset value for next row
     }  // for row
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: AddActors() time: %ld ms", Timer.Elapsed());
+#endif
 }
 
 /**
