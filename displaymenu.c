@@ -3335,15 +3335,13 @@ time_t cFlatDisplayMenu::GetLastRecTimeFromFolder(const cRecording *Recording, i
     const cString RecFolder {*GetRecordingName(Recording, Level)};
     if (isempty(*RecFolder)) return RecStart;  // No folder
 
-    std::string_view sv1 {*RecFolder}, sv2;
     cString RecFolder2 {""};
     const time_t now {time(0)};
     time_t RecNewest {0}, RecOldest {now};
     LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
     for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
         RecFolder2 = *GetRecordingName(Rec, Level);
-        sv2 = *RecFolder2;
-        if (sv1 == sv2) {  // Recordings must be in the same folder
+        if (strcmp(*RecFolder, *RecFolder2) == 0) {  // Recordings must be in the same folder
             RecNewest = std::max(RecNewest, Rec->Start());
             RecOldest = std::min(RecOldest, Rec->Start());
         }
