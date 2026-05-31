@@ -3138,13 +3138,11 @@ cString cFlatDisplayMenu::GetRecCounts() const {
     if (!isempty(*m_RecFolder) && m_LastItemRecordingLevel > 0) {
         const int RecordingLevel {m_LastItemRecordingLevel - 1};  // Folder where the recording is stored in
         cString RecFolder2 {""};
-        std::string_view sv1 {*m_RecFolder}, sv2;  // For efficient comparison
         if (m_MenuCategory == mcRecording) {
             LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
             for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
                 RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
-                sv2 = *RecFolder2;
-                if (sv1 == sv2) {  // Compare recording folder with current folder
+                if (strcmp(*m_RecFolder, *RecFolder2) == 0) {  // Compare recording folder with current folder
                     ++RecCount;
                     if (Rec->IsNew()) ++RecNewCount;
                 }
@@ -3155,8 +3153,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
             LOCK_DELETEDRECORDINGS_READ;  // Creates local const cRecordings *DeletedRecordings
             for (const cRecording *Rec {DeletedRecordings->First()}; Rec; Rec = DeletedRecordings->Next(Rec)) {
                 RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
-                sv2 = *RecFolder2;
-                if (sv1 == sv2) {  // Compare recording folder with current folder
+                if (strcmp(*m_RecFolder, *RecFolder2) == 0) {  // Compare recording folder with current folder
                     ++RecCount;
                     if (Rec->IsNew()) ++RecNewCount;
                 }
