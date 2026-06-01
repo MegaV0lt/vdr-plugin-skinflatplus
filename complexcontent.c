@@ -151,8 +151,9 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     std::string Line {""};
     Line.reserve(128);
     cRect FloatedTextPos {TextPos};
+    const int Top = TextPos.Top();  // Cache TextPos.Top() outside the loop
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
-        FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
+        FloatedTextPos.SetTop(Top + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
         // Last line is not justified
         if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
@@ -161,7 +162,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
     }
 
-    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, TextPos.Top(), image->Width(), image->Height()};
+    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, Top, image->Width(), image->Height()};
     AddImage(image, ImagePos);  // Add the image (Currently always on the right side)
 }
 

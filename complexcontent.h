@@ -41,8 +41,13 @@ class cSimpleContent {
     cFont *m_Font {nullptr};
 
     void DrawMultilineText(cPixmap *Pixmap) const {
+        // Cache TextPos and TextWidthLeft for better performance
+        const int PositionLeft {m_Position.Left()};
+        const int PositionTop {m_Position.Top()};
+        const int PositionWidth {m_Position.Width()};
+
         cTextFloatingWrapper Wrapper;
-        Wrapper.Set(*m_Text, m_Font, m_Position.Width());
+        Wrapper.Set(*m_Text, m_Font, PositionWidth);
         std::string Line;
         Line.reserve(128);
         const int Lines {Wrapper.Lines()};
@@ -51,9 +56,9 @@ class cSimpleContent {
         for (int i {0}; i < Lines; ++i) {
             Line = Wrapper.GetLine(i);
             if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1)) {
-                JustifyLine(Line, m_Font, m_Position.Width());
+                JustifyLine(Line, m_Font, PositionWidth);
             }
-            Pixmap->DrawText(cPoint(m_Position.Left(), m_Position.Top() + (i * FontHeight)),
+            Pixmap->DrawText(cPoint(PositionLeft, PositionTop + (i * FontHeight)),
                             Line.c_str(), m_ColorFg, m_ColorBg, m_Font,
                             m_TextWidth, m_TextHeight, m_TextAlignment);
         }
