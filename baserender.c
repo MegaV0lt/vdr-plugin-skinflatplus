@@ -1778,12 +1778,12 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             }
 
             // Temp sign extraction
-            std::string_view tt = *out.Temp;
-            const auto deg = tt.find("°");  // Find the degree sign (UFT-8 char)
+            std::string_view svTemp = *out.Temp;  // Create a string_view for easier manipulation
+            const auto deg = svTemp.find("°");  // Find the degree sign (UFT-8 char)
             if (deg != std::string_view::npos) {
-                out.TempTodaySign = cString(tt.substr(deg).data());  // Get the sign (°C or °F)
+                out.TempTodaySign = cString(svTemp.substr(deg).data());  // Get the sign (°C or °F)
                 // Check if there's a space before the degree sign and also remove it with the sign
-                out.Temp = out.Temp.Truncate((isspace(deg - 1)) ? deg - 1 : deg);
+                out.Temp = out.Temp.Truncate((isspace(svTemp.at(deg - 1)) ? deg - 1 : deg));
             } else {
                 out.TempTodaySign = "";
             }
@@ -1892,7 +1892,8 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 #ifdef DEBUGFUNCSCALL
     // Log weather cache data for debugging
-    dsyslog("flatPlus: DrawWidgetWeather() Temp: %s, Location: %s", *wd.Temp, *wd.Location);
+    dsyslog("flatPlus: DrawWidgetWeather() Temp: '%s', Sign: '%s', Location: '%s'", *wd.Temp, *wd.TempTodaySign,
+            *wd.Location);
     for (int i = 0; i < 7; i++) {
         if (!isempty(*wd.Days[i].Icon)) {
             dsyslog("   Day %d: Icon: %s, TempMax: %s, TempMin: %s, Precipitation: %s, Summary: %s", i,
