@@ -431,7 +431,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     }
 
     if (marks && m_Recording->HasMarks()) {
-#if (APIVERSNUM >= 20608)
+#if APIVERSNUM >= 20608
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);
         if (FramesAfterEdit >= 0) CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
 #else
