@@ -3511,7 +3511,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
                            BorderMMWidget};
     DecorBorderDraw(ib);
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 1) dsyslog("   DrawMainMenuWidget() done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidget() done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -3540,6 +3540,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                                                    int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -3661,6 +3662,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         // ContentTop += m_FontSmlHeight;
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetDVBDevices() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
@@ -3669,6 +3673,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
                                                      int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DrawMainMenuWidgetActiveTimers()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -3870,6 +3875,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers(int wLeft, int wWidth, int 
             }
         }  // Config.MainMenuWidgetActiveTimerShowRemoteActive
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetActiveTimers() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
@@ -3886,6 +3894,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
                                                        int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("DrawMainMenuWidgetLastRecordings(%d, %d, %d)", wLeft, wWidth, ContentTop);
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -3933,6 +3942,10 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetLastRecordings() done in %ld ms", Timer.Elapsed());
+#endif
+
     return ContentWidget.ContentHeight(false);
 }
 
@@ -3940,6 +3953,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
                                                        int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("DrawMainMenuWidgetTimerConflicts(%d, %d, %d)", wLeft, wWidth, ContentTop);
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin+ m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -3959,6 +3973,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts(int wLeft, int wWidth, in
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
                               wWidth - m_MarginItem2);
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetTimerConflicts() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
@@ -3967,6 +3984,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                                                           int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() ContentTop: %d", ContentTop);
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -4075,6 +4093,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
             }
         }
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetSystemInfomation() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
@@ -4083,7 +4104,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
                                                       int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates()");
+    cTimeMs Timer;  // Set Timer
 #endif
+
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -4112,6 +4135,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
             *str, false, cRect(wWidth / 2 + m_MarginItem, ContentTop, wWidth / 2 - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetSystemUpdates() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
@@ -4120,6 +4146,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                                                      int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -4183,11 +4210,19 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
                                   wWidth - m_MarginItem2);
         }
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetTemperatures() done in %ld ms", Timer.Elapsed());
+#endif
 
     return ContentWidget.ContentHeight(false);
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetCommand()");
+    cTimeMs Timer;  // Set Timer
+#endif
+
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
         return -1;  // Not enough space to display anything meaningful
 
@@ -4221,12 +4256,17 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
     }
 
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetCommand() done in %ld ms", Timer.Elapsed());
+#endif
+
     return ContentWidget.ContentHeight(false);
 }
 
 int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int ContentTop, int MenuPixmapViewPortHeight) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::DrawMainMenuWidgetWeather()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (ContentTop + m_FontHeight + m_LineMargin + m_FontSmlHeight > MenuPixmapViewPortHeight)
@@ -4357,10 +4397,11 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         }  // for Config.MainMenuWidgetWeatherDays
     }
 
-    return ContentWidget.ContentHeight(false);
 #ifdef DEBUGFUNCSCALL
-    dsyslog("DrawMainMenuWidgetWeather() Done");
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetWeather() done in %ld ms", Timer.Elapsed());
 #endif
+
+    return ContentWidget.ContentHeight(false);
 }
 
 void cFlatDisplayMenu::PreLoadImages() {
