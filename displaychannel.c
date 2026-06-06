@@ -346,7 +346,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 TopEpg = 0;
                 TopSeen = m_FontSmlHeight;
                 EpgColor = clrChannelFontEpg;
-                const int s = (time(0) - Event->StartTime()) / 60;  // Narrowing conversion
+                const std::time_t s {(time(0) - Event->StartTime()) / 60};
                 const int sleft {EventDuration - s};
 
                 switch (Config.ChannelTimeLeft) {
