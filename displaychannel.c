@@ -586,9 +586,8 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 void cFlatDisplayChannel::Flush() {
     if (m_Present) {
         const time_t now {time(0)};
-        const int Current = (now > m_Present->StartTime()) ? now - m_Present->StartTime() : 0;  // Narrowing conversion
-        const int Total {m_Present->Duration()};
-        ProgressBarDraw(Current, Total);
+        const time_t Current {(now > m_Present->StartTime()) ? now - m_Present->StartTime() : 0};
+        ProgressBarDraw(Current, m_Present->Duration());
     }
 
     if (Config.ChannelIconsShow) {
