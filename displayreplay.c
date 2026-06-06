@@ -772,7 +772,7 @@ void cFlatDisplayReplay::PreLoadImages() {
     }
 
     static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
-    const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
+    const int GlyphSize {FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize)};
     static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra",
                                            "recording_timeshift"};
     for (const auto &icon : icons1) {

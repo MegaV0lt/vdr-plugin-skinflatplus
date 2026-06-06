@@ -311,7 +311,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     bool IsRec {false};
     const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
 
-    int left = m_HeightImageLogo * 1.34f + m_MarginItem3;  // Narrowing conversion
+    int left {static_cast<int>(m_HeightImageLogo * 1.34f) + m_MarginItem3};
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 

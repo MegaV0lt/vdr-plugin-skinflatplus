@@ -328,7 +328,7 @@ void cFlatBaseRender::TopBarEnableDiskUsage() {
     } else {  // Show in occupied mode
         const double OccupiedGB {AllGB - FreeGB};
         const double AllMinutes {static_cast<double>(FreeMinutes) * GBScale};  // All disk space in minutes
-        const int OccupiedMinutes = AllMinutes - FreeMinutes;  // Narrowing conversion
+        const int OccupiedMinutes {static_cast<int>(AllMinutes) - FreeMinutes};  // Occupied disk space in minutes
 #ifdef DEBUGFUNCSCALL
         dsyslog("   DiskUsagePercent %d, OccupiedMinutes %d", DiskUsagePercent, OccupiedMinutes);
         dsyslog("   OccupiedGB %.2f, AllGB %.2f, OccupiedMinutes %d", OccupiedGB, AllGB, OccupiedMinutes);
@@ -408,7 +408,8 @@ void cFlatBaseRender::TopBarUpdate() {
             int IconTop {0};
             if (m_TopBarMenuLogoSet) {  // Show menu channel logo
                 int ImageBGHeight {TopBarLogoHeight};
-                int ImageBGWidth = ImageBGHeight * 1.34f;  // Narrowing conversion
+                // 4:3 logo format (1.33) + some margin (0.01) for better look
+                int ImageBGWidth {static_cast<int>(ImageBGHeight * 1.34f)};
 
                 img = ImgLoader.GetLogoBg(ImageBGWidth, ImageBGHeight);  // Load 'logo_background'
                 if (img) {

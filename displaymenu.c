@@ -559,7 +559,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     int ImageLeft {Left};
     int ImageTop {Top};
-    int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
+    int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
     int ImageBgHeight {m_FontHeight};
 
     cImage *img {nullptr};
@@ -938,7 +938,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     Left += Width + m_MarginItem;
 
     ImageLeft = Left;
-    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
+    int ImageBgWidth {static_cast<int>(ImageHeight * 1.34f)};
     int ImageBgHeight {ImageHeight};
     img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
@@ -1146,7 +1146,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (Current) m_ItemEventLastChannelName = ChannelName;
 
         int ImageLeft {Left};
-        int ImageBgWidth = m_FontHeight * 1.34f;  // Narrowing conversion
+        int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
         int ImageBgHeight {m_FontHeight};
         if (!IsGroup) {
             img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
@@ -1884,7 +1884,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
  *                      and duplicates are removed before drawing.
  */
 int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<std::string> &GenreIcons) {
-    const int IconHeight = (m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0;  // Narrowing conversion
+    const int IconHeight {static_cast<int>((m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0)};
     const int HeadIconTop {m_chHeight - IconHeight - m_MarginItem};  // Position for fsk/genre image
     int HeadIconLeft {m_chWidth - IconHeight - m_MarginItem};
 
@@ -2148,7 +2148,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #endif
 
         // Add actors if available
-        const int NumActors = Actors.size();  // Narrowing conversion
+        const std::size_t NumActors {Actors.size()};
         if (Config.TVScraperEPGInfoShowActors && NumActors > 0)
             AddActors(ComplexContent, Actors, NumActors, true);
 #ifdef DEBUGEPGTIME
@@ -2342,7 +2342,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
                 if (img) {
-                    const uint16_t Aspect = img->Width() / img->Height();  // Narrowing conversion
+                    const int Aspect {img->Width() / img->Height()};
                     if (Aspect < 1) {                                      //* Poster (For example 680x1000 = 0.68)
                         MediaWidth = m_cWidth / 2 - m_MarginItem3;
                         MediaType = 2;
@@ -2429,10 +2429,10 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     cImage *img {nullptr};
     cString Role {""};  // Actor role
     int Actor {0};
-    const uint16_t ActorsPerLine {6};                                    // TODO: Config option?
-    const int ActorWidth = m_cWidth / ActorsPerLine - m_MarginItem2;  // Narrowing conversion
-    const int ActorMargin = ((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1);
-    const uint16_t PicLines = NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0);  // Number of lines needed
+    const int ActorsPerLine {6};                                    // TODO: Config option?
+    const int ActorWidth {m_cWidth / ActorsPerLine - m_MarginItem2};
+    const int ActorMargin {((m_cWidth - m_MarginItem2) - ActorWidth * ActorsPerLine) / (ActorsPerLine - 1)};
+    const int PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};  // Number of lines needed
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
     int y {ContentTop};
@@ -2645,7 +2645,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
             //* Make portrait smaller than poster or banner to prevent wasting of space
             if (img) {
-                const uint16_t Aspect = img->Width() / img->Height();  // Narrowing conversion
+                const int Aspect {img->Width() / img->Height()};
                 if (Aspect > 1 && Aspect < 4) {                        //* Portrait (For example 1920x1080)
                     // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
                     //         img->Width(), img->Height(), Aspect);
@@ -2679,7 +2679,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #endif
 
         // Add actors if available
-        const int NumActors = Actors.size();  // Narrowing conversion
+        const std::size_t NumActors {Actors.size()};
         if (Config.TVScraperRecInfoShowActors && NumActors > 0)
             AddActors(ComplexContent, Actors, NumActors);
 #ifdef DEBUGEPGTIME
@@ -3394,8 +3394,8 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     if (!MenuPixmap) return;
 
     const int MenuPixmapViewPortHeight {MenuPixmap->ViewPort().Height()};
-    const int wLeft = (m_OsdWidth * Config.MainMenuItemScale) + m_MarginItem + Config.decorBorderMenuContentSize +
-                      Config.decorBorderMenuItemSize;  // Narrowing conversion
+    const int wLeft {static_cast<int>(m_OsdWidth * Config.MainMenuItemScale) + m_MarginItem +
+                     Config.decorBorderMenuContentSize + Config.decorBorderMenuItemSize};
     const int wTop {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 +
                     Config.decorBorderMenuContentSize};
 
@@ -4299,8 +4299,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
     cImage *img {nullptr};
     const int Middle {(m_FontHeight - m_FontTempSmlHeight) / 2};  // Vertical center
     const int TempSmlWidth {FontCache.GetStringWidth(m_FontTempSmlName, m_FontTempSmlHeight, "-00,0 °C")};  // Width
-    const int16_t MainMenuWidgetWeatherDays =
-        std::min(Config.MainMenuWidgetWeatherDays, wd.kMaxDays);                           // Narrowing conversion
+    const int MainMenuWidgetWeatherDays {std::min(Config.MainMenuWidgetWeatherDays, wd.kMaxDays)};
     if (Config.MainMenuWidgetWeatherType == 0) {                                           // Short
         const int TempBarWidth {FontCache.GetStringWidth(m_FontName, m_FontHeight, "|")};  // Width of the char '|'
         // Width to fit the temperature string in
@@ -4434,7 +4433,7 @@ void cFlatDisplayMenu::PreLoadImages() {
 
     // Channel icons
     int ImageBgHeight {ImageHeight};
-    int ImageBgWidth = ImageHeight * 1.34f;  // Narrowing conversion
+    int ImageBgWidth {static_cast<int>(ImageHeight * 1.34f)};
     cImage *img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
     if (img) {
         ImageBgHeight = img->Height();
