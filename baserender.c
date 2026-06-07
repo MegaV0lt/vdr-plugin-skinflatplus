@@ -1195,15 +1195,18 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color,
         ProgressBarMarkerPixmap->DrawRectangle(cRect(Pos - (Big / 2), Middle - (Big / 2), Big, Big), Color);
     } else {
         const int Type {Config.PlaybackShowErrorMarks};  // 1 & 2 = '|', 3 & 4 = 'I', 5 & 6 = '+'
-        const int Top = Middle - (SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 0.5 : 0.75));
-        const int Height = SmallLine * ((Type == 1 || Type == 3 || Type == 5) ? 1 : 1.5);
+        // Small types (1, 3, 5) are smaller and centered on the middle line,
+        // while big types (2, 4, 6) are bigger and start at the top of the progress bar
+        const bool SmallType {Type == 1 || Type == 3 || Type == 5};
+        const int Top = Middle - (SmallLine * (SmallType ? 0.5 : 0.75));
+        const int Height = SmallLine * (SmallType ? 1 : 1.5);
         // Draw the '|'
         ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, m_MarkerWidth, Height), Color);
         if (Type == 3 || Type == 4) {  // Draw the two '-' for the 'I'
             ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Top, m_MarkerHorWidth, m_MarkerWidth),
                                              Color);
             ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset,
-                                                   Middle + (SmallLine * (Type == 3 ? 0.5 : 0.75)) - m_MarkerWidth,
+                                                   Middle + (SmallLine * (SmallType ? 0.5 : 0.75)) - m_MarkerWidth,
                                                    m_MarkerHorWidth, m_MarkerWidth),
                                              Color);
         } else if (Type == 5 || Type == 6) {  // Draw the '-' for the '+'
@@ -1228,7 +1231,7 @@ void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Heig
         const int ScrollTop {std::min(static_cast<int>(static_cast<double>(Top) + Height * Offset / Total + 0.5),
                                       Top + Height - ScrollHeight)};
 
-        static int LastTotal = -1, LastShown = -1, LastOffset = -1;
+        static int LastTotal {-1}, LastShown {-1}, LastOffset {-1};
         if (Total != LastTotal || Shown != LastShown || Offset != LastOffset) {
 #ifdef DEBUGFUNCSCALL
             dsyslog("   Clear scrollbar pixmap");
@@ -1864,7 +1867,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 #endif
 
     static int LastOsdHeight {0};
-    const int fs = cOsd::OsdHeight() * Config.WeatherFontSize + 0.5;
+    const int fs {static_cast<int>(cOsd::OsdHeight() * Config.WeatherFontSize + 0.5)};
 
     // Only reload/calc data/fonts if input files or screen size changed, else use prepared/cached
     time_t NewestFiletime {0};
@@ -1908,13 +1911,13 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     const int WeatherFontHeightMinusMargin {wd.FontHeight - m_MarginItem2};
     const int WeatherFontHeightDiff {(wd.FontHeight - wd.FontSmlHeight) / 2};
 
-    const int TempTodayWidth = wd.WeatherFont->Width(wd.Temp);
-    const int PrecTodayWidth = wd.WeatherFontSml->Width(wd.Days[0].Precipitation);
-    const int PrecTomorrowWidth = wd.WeatherFontSml->Width(wd.Days[1].Precipitation);
-    const int WidthTempToday = std::max(wd.WeatherFontSml->Width(wd.Days[0].TempMax),
-                                        wd.WeatherFontSml->Width(wd.Days[0].TempMin));  // Max width temp today
-    const int WidthTempTomorrow = std::max(wd.WeatherFontSml->Width(wd.Days[1].TempMax),
-                                           wd.WeatherFontSml->Width(wd.Days[1].TempMin));  // Max width temp tomorrow
+    const int TempTodayWidth {wd.WeatherFont->Width(wd.Temp)};
+    const int PrecTodayWidth {wd.WeatherFontSml->Width(wd.Days[0].Precipitation)};
+    const int PrecTomorrowWidth {wd.WeatherFontSml->Width(wd.Days[1].Precipitation)};
+    const int WidthTempToday {std::max(wd.WeatherFontSml->Width(wd.Days[0].TempMax),
+                                       wd.WeatherFontSml->Width(wd.Days[0].TempMin))};  // Max width temp today
+    const int WidthTempTomorrow {std::max(wd.WeatherFontSml->Width(wd.Days[1].TempMax),
+                                          wd.WeatherFontSml->Width(wd.Days[1].TempMin))};  // Max width temp tomorrow
 
 
     // For weather widget use the same margin as for the EPG images
