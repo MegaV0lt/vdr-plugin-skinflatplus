@@ -34,7 +34,7 @@
 #include "./fontcache.h"
 
 // Global flag to indicate if logo was found in channel logo path
-bool g_LogoBgOverwrite = false;
+bool g_LogoBgOverwrite {false};
 
 cRecCountThread RecCountThread;
 
@@ -72,7 +72,7 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontMediumHeight = FontCache.GetFontHeight(Setup.FontOsd, (Setup.FontOsdSize + Setup.FontSmlSize) / 2);
 
     // Top bar fonts
-    const int fs = cOsd::OsdHeight() * Config.TopBarFontSize + 0.5;
+    const int fs {static_cast<int>(cOsd::OsdHeight() * Config.TopBarFontSize + 0.5)};
     m_TopBarFont = FontCache.GetFont(Setup.FontOsd, fs);
     m_TopBarFontClock = FontCache.GetFont(Setup.FontOsd, fs * Config.TopBarFontClockScale * 100.0);
     m_TopBarFontSml = FontCache.GetFont(Setup.FontOsd, fs / 2);
@@ -713,7 +713,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     static const struct {
         tColor color;
         const char *icon;
-    } MessageSettings[] = {
+    } MessageSettings[] {
         {Theme.Color(clrMessageStatus), "message_status"},    // mtStatus = 0
         {Theme.Color(clrMessageInfo), "message_info"},        // mtInfo
         {Theme.Color(clrMessageWarning), "message_warning"},  // mtWarning
@@ -722,7 +722,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 
     const int TypeIndex {static_cast<int>(Type)};
     const tColor Col {MessageSettings[TypeIndex].color};
-    const cString Icon = MessageSettings[TypeIndex].icon;
+    const cString Icon {MessageSettings[TypeIndex].icon};
 
     PixmapFill(MessagePixmap, Theme.Color(clrMessageBg));
     MessageScroller.Clear();
@@ -1198,8 +1198,8 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color,
         // Small types (1, 3, 5) are smaller and centered on the middle line,
         // while big types (2, 4, 6) are bigger and start at the top of the progress bar
         const bool SmallType {Type == 1 || Type == 3 || Type == 5};
-        const int Top = Middle - (SmallLine * (SmallType ? 0.5 : 0.75));
-        const int Height = SmallLine * (SmallType ? 1 : 1.5);
+        const int Top {Middle - static_cast<int>(SmallLine * (SmallType ? 0.5 : 0.75))};
+        const int Height {static_cast<int>(SmallLine * (SmallType ? 1 : 1.5))};
         // Draw the '|'
         ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, m_MarkerWidth, Height), Color);
         if (Type == 3 || Type == 4) {  // Draw the two '-' for the 'I'
@@ -1725,12 +1725,12 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     if (isempty(*FilePath)) return "";
 
-    FILE *f = fopen(*FilePath, "r");
+    FILE *f {fopen(*FilePath, "r")};
     if (f == nullptr) return "";  // File doesn't exist
 
     // Read the first line
     cReadLine ReadLine;
-    const char *s = ReadLine.Read(f);  // ReadLine will read from the file pointer
+    const char *s {ReadLine.Read(f)};  // ReadLine will read from the file pointer
     fclose(f);
 
     return cString(s);
@@ -1745,7 +1745,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
     static constexpr const char *prefix {WIDGETOUTPUTPATH "/weather/weather."};
 
     // First check if temp file exists and get its last modified time
-    static const cString tempFile = cString::sprintf("%s%s", prefix, "0.temp");
+    static const cString tempFile {cString::sprintf("%s%s", prefix, "0.temp")};
     const time_t latest {LastModifiedTime(tempFile)};  // Get the latest modification time of the temp file
     if (latest == 0) {
         dsyslog("flatPlus: BatchReadWeatherData() Failed to get latest modification time for %s", *tempFile);
@@ -1792,7 +1792,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
                 out.TempTodaySign = "";
             }
 
-            static const cString locationFile = cString::sprintf("%s%s", prefix, "location");
+            static const cString locationFile {cString::sprintf("%s%s", prefix, "location")};
             out.Location = ReadAndExtractData(locationFile);
             if (isempty(*out.Location)) out.Location = tr("Unknown");
         }  // End of day 0 specific data reading
@@ -1887,7 +1887,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
         WeatherCache.valid = true;
     }
 
-    const auto &wd = WeatherCache;  // Weather data reference
+    const auto &wd {WeatherCache};  // Weather data reference
 
     // Check if data is valid
     if (isempty(*wd.Temp) || isempty(*wd.Days[1].TempMax)) {
@@ -1949,7 +1949,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     left += wd.TempTodaySignWidth + m_MarginItem2;
 
     // Add weather icon
-    cString WeatherIcon = cString::sprintf("widgets/%s", *wd.Days[0].Icon);
+    cString WeatherIcon {cString::sprintf("widgets/%s", *wd.Days[0].Icon)};
     cImage *img {ImgLoader.GetIcon(*WeatherIcon, wd.FontHeight, WeatherFontHeightMinusMargin)};
     if (img) {
         WeatherWidget.AddImage(img, cRect(left, 0 + m_MarginItem, wd.FontHeight, wd.FontHeight));

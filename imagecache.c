@@ -58,7 +58,7 @@ void cImageCache::Clear() {
 }
 
 static std::string_view BaseNameFromCacheName(std::string_view full) {
-    const std::size_t lastSlash = full.find_last_of('/');
+    const std::size_t lastSlash {full.find_last_of('/')};
     return (lastSlash != std::string_view::npos) ? full.substr(lastSlash + 1) : full;
 }
 
@@ -66,12 +66,12 @@ cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool 
     const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 
     const auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
-    const auto it = idx.find(key);
+    const auto it {idx.find(key)};
     if (it != idx.end()) {
-        const std::size_t slot = it->second;
-        const auto &cache = IsIcon ? IconCache : ImageCache;
+        const std::size_t slot {it->second};
+        const auto &cache {IsIcon ? IconCache : ImageCache};
         if (slot < cache.size()) {
-            const ImageData &data = cache[slot];
+            const ImageData &data {cache[slot]};
             if (data.Image && data.Width == Width && data.Height == Height &&
                 std::strcmp(*data.Name, *Name) == 0) {
                 return data.Image.get();
@@ -80,7 +80,7 @@ cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool 
     }
 
     // Fallback to linear search if not found in index (should not happen if index is maintained correctly)
-    const auto &cache = IsIcon ? IconCache : ImageCache;
+    const auto &cache {IsIcon ? IconCache : ImageCache};
     for (const auto &data : cache) {
         if (!data.Image) continue;
         if (data.Width != Width || data.Height != Height) continue;
@@ -108,8 +108,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
 
     if (IsIcon) {
         // Remove any previous mapping that points to the slot we are about to overwrite.
-        const std::size_t slot = m_InsertIconIndex;
-        for (auto it = m_IconIndex.begin(); it != m_IconIndex.end();) {
+        const std::size_t slot {m_InsertIconIndex};
+        for (auto it {m_IconIndex.begin()}; it != m_IconIndex.end();) {
             if (it->second == slot) it = m_IconIndex.erase(it);
             else
                 ++it;
@@ -121,8 +121,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
         const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
         m_IconIndex[key] = slot;
     } else {
-        const std::size_t slot = m_InsertIndex;
-        for (auto it = m_ImageIndex.begin(); it != m_ImageIndex.end();) {
+        const std::size_t slot {m_InsertIndex};
+        for (auto it {m_ImageIndex.begin()}; it != m_ImageIndex.end();) {
             if (it->second == slot) it = m_ImageIndex.erase(it);
             else
                 ++it;
@@ -158,11 +158,11 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
     bool removedAny {false};
 
     for (std::size_t slot {0}; slot < ImageCache.size(); ++slot) {
-        auto &data = ImageCache[slot];
+        auto &data {ImageCache[slot]};
         if (!data.Image) continue;
 
         std::string_view fullName {*data.Name};
-        const std::string_view baseName = BaseNameFromCacheName(fullName);
+        const std::string_view baseName {BaseNameFromCacheName(fullName)};
         if (baseName != svName) continue;
 
         const ImageKey key {data.Name, data.Width, data.Height};

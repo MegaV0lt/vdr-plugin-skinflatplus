@@ -19,8 +19,8 @@
 #include "./setup.h"
 #include "./imageloader.h"
 
-static const char *VERSION        = "1.2.10";
-static const char *DESCRIPTION    = "Skin flatPlus";
+static const char *VERSION     {"1.2.10"};
+static const char *DESCRIPTION {"Skin flatPlus"};
 
 class cPluginFlat : public cPlugin {
  public:
@@ -61,7 +61,7 @@ const char *cPluginFlat::CommandLineHelp() {
 
 bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
     // Implement command line argument processing here if applicable.
-    static const struct option long_options[] = {
+    static const struct option long_options[] {
         { "logopath", required_argument, NULL, 'l' },
         { NULL }
     };
@@ -149,7 +149,7 @@ bool cPluginFlat::Service(const char *Id, void *Data) {
 }
 
 const char **cPluginFlat::SVDRPHelpPages() {
-    static const char *HelpPages[] = {
+    static const char *HelpPages[] {
         "RLFC\n"
         "    Remove Logo From Cache.\n"
         "    Specify logo filename with extension, but without path",

@@ -293,7 +293,7 @@ void cFlatDisplayMenu::SetTitle(const char *Title) {
 #endif
 
     m_LastTitle = Title;
-    cString NewTitle = Title;
+    cString NewTitle {Title};
 
     switch (m_MenuCategory) {
     case mcMain: NewTitle = ""; break;
@@ -426,10 +426,10 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
             } else {  // Not EPGsearch timer menu
                 if ((m_MenuCategory == mcMain || m_MenuCategory == mcSetup) && Config.MenuItemIconsShow) {
                     const int IconSize {m_FontHeight - m_MarginItem2};
-                    const cString IconName = *GetIconName(*MainMenuText(s));
+                    const cString IconName {GetIconName(*MainMenuText(s))};
                     cImage *img {nullptr};
                     if (Current) {
-                        const cString IconNameCur = cString::sprintf("%s_cur", *IconName);
+                        const cString IconNameCur {cString::sprintf("%s_cur", *IconName)};
                         img = ImgLoader.GetIcon(*IconNameCur, IconSize, IconSize);
                     }
                     if (!img) img = ImgLoader.GetIcon(*IconName, IconSize, IconSize);
@@ -545,7 +545,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
     int Top {y};
     //* At least four digits because of different sort modes
-    int Width = FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000");
+    int Width {FontCache.GetStringWidth(m_FontName, m_FontHeight, "0000")};
     const bool IsGroup {Channel->GroupSep()};
     cString Buffer {""};
     if (!IsGroup) {  // Show channel number for channels only
@@ -606,7 +606,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             if (Event) {
                 // Calculate progress bar
                 const time_t now {time(0)};
-                const double duration = Event->Duration();
+                const double duration {static_cast<double>(Event->Duration())};
                 progress = (duration > 0) ? std::clamp((now - Event->StartTime()) * 100.0 / duration, 0.0, 100.0) : 0.0;
                 EventTitle = Event->Title();
             }
@@ -626,7 +626,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             // dsyslog("flatPlus: SetItemChannel() LineTop: %d, m_LineWidth: %d, m_FontHeight: %d", LineTop,
             //        m_LineWidth, m_FontHeight);
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, m_LineWidth), ColorFg);
-            const cString GroupName = cString::sprintf(" %s ", *Buffer);
+            const cString GroupName {cString::sprintf(" %s ", *Buffer)};
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
         } else {
@@ -647,7 +647,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         if (IsGroup) {
             const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
             MenuPixmap->DrawRectangle(cRect(Left, LineTop, m_MenuItemWidth - Left, m_LineWidth), ColorFg);
-            const cString GroupName = cString::sprintf(" %s ", *Buffer);
+            const cString GroupName {cString::sprintf(" %s ", *Buffer)};
             MenuPixmap->DrawText(cPoint(Left + (m_MenuItemWidth / 10 * 2), Top), *GroupName, ColorFg, ColorBg, m_Font,
                                  0, 0, taCenter);
         } else {
@@ -930,7 +930,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     const cChannel *Channel {Timer->Channel()};
     const int ChannelNumber {Channel->Number()};
-    cString Buffer = itoa(ChannelNumber);
+    cString Buffer {itoa(ChannelNumber)};
     const int Width {(ChannelNumber < 1000) ? FontCache.GetStringWidth(m_FontName, m_FontHeight, "000")
                                             : m_Font->Width(*Buffer)};  // Minimal width for channel number
 
@@ -974,7 +974,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         name = WeekDayName(Timer->Day());
     } else {
         const time_t Day {Timer->Day()};
-        struct tm *tm_r = gmtime(&Day);  // NOLINT gmtime() is not thread-safe
+        struct tm *tm_r {gmtime(&Day)};  // NOLINT gmtime() is not thread-safe
         char buf[12];
         strftime(buf, sizeof(buf), "%Y%m%d", tm_r);
         day = buf;
@@ -1212,9 +1212,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                 const time_t total {Event->EndTime() - EventStartTime};
                 if (total >= 0) {
                     // Calculate progress bar
-                    const double duration = Event->Duration();
-                    const double progress =
-                        (duration > 0) ? std::clamp((now - EventStartTime) * 100.0 / duration, 0.0, 100.0) : 0.0;
+                    const double duration {static_cast<double>(Event->Duration())};
+                    const double progress {
+                        (duration > 0) ? std::clamp((now - EventStartTime) * 100.0 / duration, 0.0, 100.0) : 0.0};
 
                     int PBLeft {Left};
                     int PBTop {y + (m_ItemEventHeight - Config.MenuItemPadding) / 2 -
@@ -1255,7 +1255,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         cString Buffer {""};
         if (WithDate) {  // Draw day and date (Mon 01.)
             const time_t Day {Event->StartTime()};
-            struct tm *tm_r = gmtime(&Day);  // NOLINT gmtime() is not thread-safe
+            struct tm *tm_r {gmtime(&Day)};  // NOLINT gmtime() is not thread-safe
             char buf[3];
             snprintf(buf, sizeof(buf), "%2d", tm_r->tm_mday);
 
@@ -1310,8 +1310,8 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += ImageHeight + m_MarginItem;
 
         // Draw title and short text
-        const cString Title = Event->Title();
-        const cString ShortText = (Event->ShortText()) ? Event->ShortText() : "";
+        const cString Title {Event->Title()};
+        const cString ShortText {Event->ShortText() ? Event->ShortText() : ""};
         if (MenuEventViewShort && Channel) {  // flatPlus short, flatPlus short + EPG
             if (Current) {
                 if (ShortText[0] != '\0') {
@@ -1419,7 +1419,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                     const std::string date {sep.substr(found - 14, 14)};
                     const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
                     MenuPixmap->DrawRectangle(cRect(0, LineTop, m_MenuItemWidth, m_LineWidth), ColorFg);
-                    const cString DateSpace = cString::sprintf(" %s ", date.c_str());
+                    const cString DateSpace {cString::sprintf(" %s ", date.c_str())};
                     MenuPixmap->DrawText(cPoint(LeftSecond + m_MenuWidth / 10 * 2, Top), *DateSpace, ColorFg, ColorBg,
                                          m_Font, 0, 0, taCenter);
                 } else {  // Date string not found
@@ -2439,8 +2439,8 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     int y {ContentTop};
     if (NumActors > 48) isyslog("flatPlus: First display of %d actor images will probably be slow!", NumActors);
 
-    for (std::size_t row {0}; row < PicLines; ++row) {
-        for (std::size_t col {0}; col < ActorsPerLine; ++col) {
+    for (int row {0}; row < PicLines; ++row) {
+        for (int col {0}; col < ActorsPerLine; ++col) {
             if (Actor == NumActors) break;
             img = ImgLoader.GetFile(*Actors[Actor].Path, ActorWidth, kIconMaxSize);
             if (img) {
@@ -2591,7 +2591,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         if (RecInfo->Aux()) InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
-    const int HeadIconLeft = DrawContentHeadFskGenre(Fsk, GenreIcons);
+    const int HeadIconLeft {DrawContentHeadFskGenre(Fsk, GenreIcons)};
 
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: DrawRecordingInfo() Infotext time @ %ld ms", Timer.Elapsed());
@@ -2992,7 +2992,7 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     std::string_view svElement {*element}, sv;
 
     // Check if the element matches any name in the cache
-    auto it = cache.find(svElement.data());
+    auto it {cache.find(svElement.data())};
     if (it != cache.end()) return *it->second;  // Return cached icon name including path
 
     cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
@@ -3055,20 +3055,20 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
     static constexpr struct {
         eMenuCategory category;
         const char *icon;
-    } MenuIcons[] = {{mcMain, "menuIcons/" VDRLOGO},
-                     {mcSchedule, "menuIcons/Schedule"},
-                     {mcScheduleNow, "menuIcons/Schedule"},
-                     {mcScheduleNext, "menuIcons/Schedule"},
-                     {mcChannel, "menuIcons/Channels"},
-                     {mcTimer, "menuIcons/Timers"},
-                     {mcRecording, "menuIcons/Recordings"},
+    } MenuIcons[] {{mcMain, "menuIcons/" VDRLOGO},
+                   {mcSchedule, "menuIcons/Schedule"},
+                   {mcScheduleNow, "menuIcons/Schedule"},
+                   {mcScheduleNext, "menuIcons/Schedule"},
+                   {mcChannel, "menuIcons/Channels"},
+                   {mcTimer, "menuIcons/Timers"},
+                   {mcRecording, "menuIcons/Recordings"},
 #if APIVERSNUM >= 30012
-                     {mcRecordingDel, "menuIcons/DeletedRecordings"},
+                   {mcRecordingDel, "menuIcons/DeletedRecordings"},
 #endif
-                     {mcSetup, "menuIcons/Setup"},
-                     {mcCommand, "menuIcons/Commands"},
-                     {mcEvent, "extraIcons/Info"},
-                     {mcRecordingInfo, "extraIcons/PlayInfo"}};
+                   {mcSetup, "menuIcons/Setup"},
+                   {mcCommand, "menuIcons/Commands"},
+                   {mcEvent, "extraIcons/Info"},
+                   {mcRecordingInfo, "extraIcons/PlayInfo"}};
     // Use structured binding
     for (const auto &[category, icon] : MenuIcons) {
         if (category == m_MenuCategory) return cString(icon);
@@ -3216,7 +3216,7 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
 }
 
 bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) const {
-    int16_t value {-1};
+    int value {-1};
     if (Config.MenuItemRecordingUseOldFile) {
         const cString RecFolder {*GetRecordingName(Recording, Level)};
         value = Config.GetRecordingOldValue(*RecFolder);
@@ -3226,7 +3226,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
-    const double days = (now - LastRecTimeFromFolder) * (1.0 / SECSINDAY);
+    const int days {static_cast<int>((now - LastRecTimeFromFolder) * (1.0 / SECSINDAY))};
     return days > value;
 }
 
@@ -3441,7 +3441,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
 
     // Create a map that associates widget names with their drawing functions
     // Works as long all strings are different. Else we must use std::string
-    std::unordered_map<const char *, WidgetDrawFunction> WidgetDrawers = {
+    std::unordered_map<const char *, WidgetDrawFunction> WidgetDrawers {
         {"dvb_devices",
          [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
              return DrawMainMenuWidgetDVBDevices(left, width, top, MenuPixmapViewPortHeight);
@@ -3484,10 +3484,10 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     int AddHeight {0}, ContentTop {0};
     // Process widgets
     for (const auto &PairWidget : widgets) {
-        std::string_view widget = PairWidget.second;
+        std::string_view widget {PairWidget.second};
 
         // Look up the widget drawer function
-        auto drawerIt = WidgetDrawers.find(widget.data());
+        auto drawerIt {WidgetDrawers.find(widget.data())};
         if (drawerIt != WidgetDrawers.end()) {
             // Call the drawer function and update ContentTop
             AddHeight = drawerIt->second(wLeft, wWidth, ContentTop, MenuPixmapViewPortHeight);
@@ -3568,7 +3568,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
             if (Timer->HasFlags(tfRecording)) {
-                if (cRecordControl *RecordControl = cRecordControls::GetRecordControl(Timer)) {
+                if (cRecordControl *RecordControl {cRecordControls::GetRecordControl(Timer)}) {
                     const cDevice *RecDevice {RecordControl->Device()};
                     // Before setting the RecDevices array element, add bounds check
                     if (RecDevice && RecDevice->DeviceNumber() < NumDevices) {
@@ -3936,7 +3936,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
-        const auto &PairRec = Recs[i];
+        const auto &PairRec {Recs[i]};
 
         ContentWidget.AddText(
             *PairRec.second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -4240,7 +4240,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     const char *s {nullptr};
     static const cString ItemFilename {cString::sprintf("%s/command_output/output", WIDGETOUTPUTPATH)};
-    FILE *f = fopen(*ItemFilename, "r");
+    FILE *f {fopen(*ItemFilename, "r")};
     if (f) {
         cReadLine ReadLine;
         while ((s = ReadLine.Read(f)) != nullptr) {
@@ -4288,7 +4288,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetWeather(int wLeft, int wWidth, int Conte
         WeatherCache.valid = true;
     }
 
-    const auto &wd = WeatherCache;  // Weather data reference
+    const auto &wd {WeatherCache};  // Weather data reference
 
     const cString TempToday {cString::sprintf("%s %s", *wd.Temp, *wd.TempTodaySign)};  // Read temperature
     const cString Title {cString::sprintf("%s - %s %s", tr("Weather"), *wd.Location, *TempToday)};

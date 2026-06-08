@@ -347,11 +347,11 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 TopSeen = m_FontSmlHeight;
                 EpgColor = clrChannelFontEpg;
                 const std::time_t s {(time(0) - Event->StartTime()) / 60};
-                const int sleft {EventDuration - s};
+                const int sleft {static_cast<int>(EventDuration - s)};
 
                 switch (Config.ChannelTimeLeft) {
-                case 0: SeenDur = cString::sprintf("%d-/%d+ %d min", s, sleft, EventDuration); break;
-                case 1: SeenDur = cString::sprintf("%d- %d min", s, EventDuration); break;
+                case 0: SeenDur = cString::sprintf("%ld-/%d+ %d min", s, sleft, EventDuration); break;
+                case 1: SeenDur = cString::sprintf("%ld- %d min", s, EventDuration); break;
                 case 2: SeenDur = cString::sprintf("%d+ %d min", sleft, EventDuration); break;
                 }
             } else {  // Following
@@ -561,7 +561,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     left += FontCache.GetStringWidth(Setup.FontOsd, DvbapiInfoFontHeight, DvbapiInfoText) + m_MarginItem;
 
-    cString IconName = cString::sprintf("crypt_%s", *ecmInfo.cardsystem);
+    cString IconName {cString::sprintf("crypt_%s", *ecmInfo.cardsystem)};
     cImage *img {ImgLoader.GetIcon(*IconName, kIconMaxSize, DvbapiInfoFontHeight)};
     if (!img) {
         img = ImgLoader.GetIcon("crypt_unknown", kIconMaxSize, DvbapiInfoFontHeight);
@@ -608,11 +608,11 @@ void cFlatDisplayChannel::Flush() {
 
 void cFlatDisplayChannel::PreLoadImages() {
     const int height {m_HeightImageLogo - m_MarginItem2};
-    int ImageBgWidth = height * 1.34f;
+    int ImageBgWidth {static_cast<int>(height * 1.34f)};
     int ImageBgHeight {height};
 
     // Load 'logo_background' and determine if logo was found in channel logo path
-    cImage *img = ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight);
+    cImage *img {ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight)};
     if (img) {
         g_LogoBgOverwrite = true;  // Used for GetLogoBg()
     } else {

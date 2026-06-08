@@ -69,7 +69,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
 
     // Font not found in cache, insert it
     InsertFont(Name, Size);
-    auto &lastFont = FontCache[m_InsertIndex > 0 ? m_InsertIndex - 1 : 0];
+    auto &lastFont {FontCache[m_InsertIndex > 0 ? m_InsertIndex - 1 : 0]};
     return lastFont.font;
 }
 
@@ -147,7 +147,7 @@ int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &T
         if ((strcmp(*data.name, *Name) == 0) && data.height == Height) {
             if (data.font) {
                 const std::string TextStr {*Text};
-                auto it = data.StringWidthCache.find(TextStr);
+                auto it {data.StringWidthCache.find(TextStr)};
                 if (it != data.StringWidthCache.end()) {
                     return it->second;  // Return cached width
                 } else {
@@ -190,8 +190,8 @@ int cFontCache::GetFontAscender(const cString &FontName, int FontSize) {
                 return data.ascender;
             } else {
                 // Calculate and cache ascender value
-                GlyphMetricsCache &cache = glyphMetricsCache();
-                const auto face = cache.GetFace(*cFont::GetFontFileName(FontName));
+                GlyphMetricsCache &cache {glyphMetricsCache()};
+                const auto face {cache.GetFace(*cFont::GetFontFileName(FontName))};
                 if (!face) {
                     esyslog("flatPlus: cFontCache::GetFontAscender() FreeType error: Can't find face (Font = %s)",
                             *cFont::GetFontFileName(FontName));
@@ -233,7 +233,7 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
 
     for (auto &data : FontCache) {
         if ((strcmp(*data.name, *Name) == 0) && data.size == FontHeight) {
-            const auto it = data.GlyphSizeCache.find({*Name, CharCode, FontHeight});
+            const auto it {data.GlyphSizeCache.find({*Name, CharCode, FontHeight})};
             if (it != data.GlyphSizeCache.end()) {
 #ifdef DEBUGFONTCACHE
                 dsyslog("   Cache hit: GlyphSize=%d, Name=%s, CharCode=%lu, FontHeight=%d", it->second, *Name, CharCode,
@@ -243,13 +243,13 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
                 return it->second;
             }
 
-            GlyphMetricsCache &cache = glyphMetricsCache();
-            const cString FontFileName = cFont::GetFontFileName(*Name);
+            GlyphMetricsCache &cache {glyphMetricsCache()};
+            const cString FontFileName {cFont::GetFontFileName(*Name)};
             if (isempty(*FontFileName)) {
                 esyslog("flatPlus: GetGlyphSize() Error: Font file name is empty for font %s", *Name);
                 return 0;
             }
-            const auto face = cache.GetFace(*FontFileName);
+            const auto face {cache.GetFace(*FontFileName)};
             if (face == nullptr) {
                 esyslog("flatPlus: GetGlyphSize() Error: Can't find face (Font = %s)", *FontFileName);
                 return 0;
@@ -263,7 +263,7 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
                 esyslog("flatPlus: GetGlyphSize() Error: Can't load glyph (Font = %s)", *FontFileName);
                 return 0;
             }
-            const int GlyphSize = (slot->metrics.height + 63) / 64;  // Round up to nearest integer
+            const int GlyphSize {(slot->metrics.height + 63) / 64};  // Round up to nearest integer
 #ifdef DEBUGFONTCACHE
             dsyslog("   Calculated GlyphSize: %d", GlyphSize);
 #endif

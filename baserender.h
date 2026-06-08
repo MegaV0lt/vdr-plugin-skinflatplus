@@ -285,7 +285,7 @@ class cRecCountThread : public cThread {
         while (Running()) {
             uint16_t count {0};
             { LOCK_TIMERS_READ;
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
+                for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
                     if (Timer->HasFlags(tfRecording)) ++count;
                 }
             }

@@ -151,7 +151,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     std::string Line {""};
     Line.reserve(128);
     cRect FloatedTextPos {TextPos};
-    const int Top = TextPos.Top();  // Cache TextPos.Top() outside the loop
+    const int Top {TextPos.Top()};  // Cache TextPos.Top() outside the loop
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(Top + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);

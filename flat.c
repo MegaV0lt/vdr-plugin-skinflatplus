@@ -786,7 +786,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
     static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
-    const int16_t LineWidth = Font->Width(Line.c_str());       // Width in Pixel
+    const int LineWidth {Font->Width(Line.c_str())};           // Width in Pixel
     if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80 % looking bad when justified
 
     // Count spaces in line
@@ -801,7 +801,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                                   FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
                               ? " "
                               : u8"\U0000200A"};  // Use hair space if it is smaller than space
-    const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
+    const int FillCharWidth {FontCache.GetStringWidth(FontName, FontHeight, FillChar)};  // Width in pixel
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
         // dsyslog("flatPlus: JustifyLine() Line can not be justified. LineSpaces: %d, FillCharWidth: %d", LineSpaces,
@@ -812,11 +812,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
         return;
 
-    const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-    const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
+    const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
+    const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
     std::string FillChars {""};
     FillChars.reserve(FillCharBlock);
-    for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+    for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
         FillChars.append(FillChar);
     }
 
@@ -915,7 +915,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     const std::size_t TextLen {strlen(Text)};
     if (TextLen == 0) return;  // Avoid processing empty text
     // Estimate number of lines. More conservative size estimation
-    const std::size_t EstimatedLines = (TextLen / 10) + UpperLines + 10;  // Add safety margin
+    const std::size_t EstimatedLines {(TextLen / 10) + UpperLines + 10};  // Add safety margin
     std::size_t Capacity {TextLen + EstimatedLines + 2};
 #ifdef DEBUGFUNCSCALL
     dsyslog("   TextLen: %ld, EstimatedLines: %ld, Capacity: %ld", TextLen, EstimatedLines, Capacity);
@@ -934,7 +934,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     std::size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
-    int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;
+    int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint32_t sym {0};
     stripspace(m_Text);  // Strips trailing newlines
     for (char *p {m_Text}; *p;) {
