@@ -535,25 +535,17 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
 
     if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999) return;
 
-    int left {m_SignalStrengthRight + m_MarginItem2};
-    static int CachedProgressBarHeight {-1};
-    static int CachedFontAscender {0};
-    static int CachedGlyphSize {0};
-    const int ProgressBarHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
+    int left {m_SignalStrengthRight + m_MarginItem10};
+    const int SignalBarsHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
     static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
 
-    if (CachedProgressBarHeight != ProgressBarHeight) {
-        CachedProgressBarHeight = ProgressBarHeight;
-        CachedFontAscender = FontCache.GetFontAscender(Setup.FontOsd, ProgressBarHeight);
-        CachedGlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, ProgressBarHeight);
-    }
+    const int FontAscender {FontCache.GetFontAscender(Setup.FontOsd, SignalBarsHeight)};
+    const int GlyphSize {FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, SignalBarsHeight)};
+    const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
+    const int top {m_HeightBottom - SignalBarsHeight - TopOffset - m_MarginItem};
 
-    const int TopOffset {(CachedFontAscender - CachedGlyphSize) / 2};  // Center vertically
-    const int top {m_HeightBottom - ProgressBarHeight - m_MarginItem -
-                   TopOffset};  // One margin for progress bar to bottom
-
-    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, ProgressBarHeight);
-    const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, ProgressBarHeight)};
+    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, SignalBarsHeight);
+    const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, SignalBarsHeight)};
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),

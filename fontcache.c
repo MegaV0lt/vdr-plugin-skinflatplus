@@ -263,7 +263,7 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
                 esyslog("flatPlus: GetGlyphSize() Error: Can't load glyph (Font = %s)", *FontFileName);
                 return 0;
             }
-            const int GlyphSize {(slot->metrics.height + 63) / 64};  // Round up to nearest integer
+            const int GlyphSize {static_cast<int>(slot->metrics.height + 63) / 64};  // Round up to nearest integer
 #ifdef DEBUGFONTCACHE
             dsyslog("   Calculated GlyphSize: %d", GlyphSize);
 #endif
