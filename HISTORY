@@ -4,7 +4,10 @@ VDR Plugin 'skin flatPlus' Revision History
 - [update] Add spacing before percent and degree symbols
 - [update] Improve image cache by replacing linear search with hash-based lookup
 - [update] Clarify disk usage time units by adding 'h' to hour values in top bar
-- [update] Replace hyphens with en dashes in time range formatting
+- [update] Replace hyphens (U+002D) with en dashes (U+2013) in time range formatting
+- [update] Add prerequisite tool validation before execution in 'update_weather.sh'
+- [update] Optimice ReadAndExtractData() for faster access
+- [update] Some internal optimizations
 
 2026-03-31: Version 1.2.10
 - [fix] Refactor image processing and fix opacity handling. This is a try to fix mld issues

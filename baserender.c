@@ -1725,15 +1725,25 @@ void cFlatBaseRender::DecorDrawGlowEllipseBR(cPixmap *pixmap, int Left, int Top,
 cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     if (isempty(*FilePath)) return "";
 
-    FILE *f {fopen(*FilePath, "r")};
-    if (f == nullptr) return "";  // File doesn't exist
+    // Faster first-line read:
+    // - Avoids stdio FILE*/cReadLine overhead
+    // - Reads only a small chunk and stops at '\n'
+    const int fd {open(*FilePath, O_RDONLY)};
+    if (fd < 0) return "";
 
-    // Read the first line
-    cReadLine ReadLine;
-    const char *s {ReadLine.Read(f)};  // ReadLine will read from the file pointer
-    fclose(f);
+    char buf[256];
+    const ssize_t n {read(fd, buf, sizeof(buf) - 1)};
+    close(fd);
+    if (n <= 0) return "";
 
-    return cString(s);
+    buf[n] = '\0';  // Ensure null-termination
+
+    // Cut at line endings
+    char *end {buf};
+    while (*end && *end != '\n' && *end != '\r') ++end;
+    *end = '\0';
+
+    return cString(buf);
 }
 
 // --- Disk read batching and stat cache for weather widget and main menu widget
