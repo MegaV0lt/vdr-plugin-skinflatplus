@@ -103,7 +103,7 @@ int cFontCache::GetFontHeight(const cString &Name, int Size) const {
             return data.height;
         }
     }
-    dsyslog("flatPlus: cFontCache::GetFontHeight() Font not found in cache: Name=%s, Size=%d", *Name, Size);
+    esyslog("flatPlus: cFontCache::GetFontHeight() Font not found in cache: Name=%s, Size=%d", *Name, Size);
     return 0;  // Font not found in cache
 }
 
@@ -147,7 +147,7 @@ int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &T
         if ((strcmp(*data.name, *Name) == 0) && data.height == Height) {
             if (data.font) {
                 const std::string TextStr {*Text};
-                auto it {data.StringWidthCache.find(TextStr)};
+                const auto it {data.StringWidthCache.find(TextStr)};
                 if (it != data.StringWidthCache.end()) {
                     return it->second;  // Return cached width
                 } else {
@@ -159,7 +159,7 @@ int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &T
         }
     }
 
-    dsyslog("flatPlus: cFontCache::GetStringWidth() Font not found or invalid");
+    esyslog("flatPlus: cFontCache::GetStringWidth() Font '%s' with height '%d' not found or invalid", *Name, Height);
     return 0;  // Font not found or invalid
 }
 
