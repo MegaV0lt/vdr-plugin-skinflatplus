@@ -539,13 +539,12 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     const int SignalBarsHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
     static constexpr uint32_t kCharCode {0x0044};  // U+0044 LATIN CAPITAL LETTER D
 
+    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, SignalBarsHeight);
+    const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, SignalBarsHeight)};
     const int FontAscender {FontCache.GetFontAscender(Setup.FontOsd, SignalBarsHeight)};
     const int GlyphSize {FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, SignalBarsHeight)};
     const int TopOffset {(FontAscender - GlyphSize) / 2};  // Center vertically
     const int top {m_HeightBottom - SignalBarsHeight - TopOffset - m_MarginItem};
-
-    m_DvbapiInfoFont = FontCache.GetFont(Setup.FontOsd, SignalBarsHeight);
-    const int DvbapiInfoFontHeight {FontCache.GetFontHeight(Setup.FontOsd, SignalBarsHeight)};
 
     cString DvbapiInfoText {"DVBAPI: "};
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), *DvbapiInfoText, Theme.Color(clrChannelSignalFont),
