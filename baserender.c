@@ -1874,6 +1874,7 @@ static void EnsureWeatherWidgetFonts(FontImageWeatherCache &cache, int fs) {  //
 void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::DrawWidgetWeather()");
+    cTimeMs Timer;  // Start Timer
 #endif
 
     static int LastOsdHeight {0};
@@ -1906,8 +1907,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     }
 #ifdef DEBUGFUNCSCALL
     // Log weather cache data for debugging
-    dsyslog("flatPlus: DrawWidgetWeather() Temp: '%s', Sign: '%s', Location: '%s'", *wd.Temp, *wd.TempTodaySign,
-            *wd.Location);
+    dsyslog("   Temp: '%s', Sign: '%s', Location: '%s'", *wd.Temp, *wd.TempTodaySign, *wd.Location);
     for (int i = 0; i < 7; i++) {
         if (!isempty(*wd.Days[i].Icon)) {
             dsyslog("   Day %d: Icon: %s, TempMax: %s, TempMin: %s, Precipitation: %s, Summary: %s", i,
@@ -1949,7 +1949,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
     // Add temperature
     WeatherWidget.AddText(wd.Temp, false, cRect(left, 0, 0, 0), Theme.Color(clrChannelFontEpg),
                           Theme.Color(clrItemCurrentBg), wd.WeatherFont);
-    left += TempTodayWidth;
+    left += TempTodayWidth + (m_MarginItem / 2);
 
     const int t {(wd.FontHeight - wd.FontAscender) - (wd.FontSignHeight - wd.FontSignAscender)};
 
@@ -2022,6 +2022,9 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 
     WeatherWidget.CreatePixmaps(false);
     WeatherWidget.Draw();
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 0) dsyslog("   DrawMainMenuWidgetWeather() done in %ld ms", Timer.Elapsed());
+#endif
 }
 
 /**
