@@ -151,9 +151,10 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     m_MarginButtonColor += SizeIncrease;  // Increase margin for larger OSD heights
     m_ButtonColorHeight += SizeIncrease;  // Increase color height for larger OSD heights
     // Size for error marks
-    m_MarkerWidth = (Width > 720) ? 2 : 1;  // One pixel for sd and two for hd
-    m_MarkerHorWidth = (Width > 720) ? 6 : 3;
-    m_MarkerHorOffset = (Width > 720) ? 2 : 1;
+    const bool IsHD {Width > 720};      // Determine if the OSD is HD based on its width
+    m_MarkerWidth = (IsHD) ? 2 : 1;     // One pixel for sd and two for hd
+    m_MarkerHorWidth = (IsHD) ? 6 : 3;
+    m_MarkerHorOffset = m_MarkerWidth;  // Horizontal marker offset
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::SetMargins() Osd: %dx%d, m_MarginItem: %d, m_LineWidth: %d (Margin "
             "%d), m_ButtonColorHeight: %d (Margin %d), m_MarginEPGImage: %d",
