@@ -47,10 +47,10 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
 
     ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
 
-    // Pixmap for channel logo and background
+    // Pixmap for channel logo and background (4:3 aspect ratio, scaled to height of m_HeightImageLogo)
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
-                                  Config.decorBorderChannelSize + m_ChannelHeight - height, m_HeightBottom * 2,
-                                  m_HeightBottom * 2};
+                                  Config.decorBorderChannelSize + m_ChannelHeight - height,
+                                  static_cast<int>(m_HeightImageLogo * 1.34f), m_HeightImageLogo};
     ChanLogoBgPixmap = CreatePixmap(m_Osd, "ChanLogoBGPixmap", 2, ChanLogoViewPort);
     ChanLogoPixmap = CreatePixmap(m_Osd, "ChanLogoPixmap", 3, ChanLogoViewPort);
 
@@ -155,7 +155,7 @@ void cFlatDisplayChannel::SetChannel(const cChannel *Channel, int Number) {
         ChannelName = ChannelString(NULL, 0);
     }  // if (Channel)
 
-    const cString ChannelString = cString::sprintf("%s  %s", *ChannelNumber, *ChannelName);
+    const cString ChannelString {cString::sprintf("%s  %s", *ChannelNumber, *ChannelName)};
 
     if (Config.ChannelShowNameWithShadow) {
         PixmapClear(ChanInfoTopPixmap);
