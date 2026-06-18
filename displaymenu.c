@@ -18,7 +18,6 @@
 #include <vdr/videodir.h>
 
 #include <dirent.h>
-#include <functional>  // std::less
 #include <locale>
 #include <sstream>
 #include <string_view>
@@ -3386,6 +3385,17 @@ void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &re
 }
 
 /* Widgets */
+
+// Static widget entry: position, pointer to enable flag, member function pointer
+struct WidgetEntry {
+    int position;
+    int *enableFlag;
+    int (cFlatDisplayMenu::*drawFn)(int, int, int, int);
+};
+
+// Comparator for sorting WidgetEntry by position
+static bool WidgetEntryCompare(const WidgetEntry &a, const WidgetEntry &b) { return a.position < b.position; }
+
 void cFlatDisplayMenu::DrawMainMenuWidgets() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgets()");
@@ -3399,7 +3409,6 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
                      Config.decorBorderMenuContentSize + Config.decorBorderMenuItemSize};
     const int wTop {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 +
                     Config.decorBorderMenuContentSize};
-
     const int wWidth {m_OsdWidth - wLeft - Config.decorBorderMenuContentSize};
     const int wHeight {MenuPixmapViewPortHeight - m_MarginItem2};
 
@@ -3409,94 +3418,37 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
     ContentWidget.SetBGColor(Theme.Color(clrMenuRecBg));
     ContentWidget.SetScrollingActive(false);
 
-    std::vector<std::pair<int, const char *>> widgets;
-    widgets.reserve(10);  // Set to at least 10 entry's
+    // Build a static table of all possible widgets with their draw function pointers.
+    // 'position' is the configured position; we sort by it at runtime.
+    WidgetEntry entries[9] {
+        {Config.MainMenuWidgetDVBDevicesPosition, &Config.MainMenuWidgetDVBDevicesShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices},
+        {Config.MainMenuWidgetActiveTimerPosition, &Config.MainMenuWidgetActiveTimerShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetActiveTimers},
+        {Config.MainMenuWidgetLastRecPosition, &Config.MainMenuWidgetLastRecShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings},
+        {Config.MainMenuWidgetSystemInfoPosition, &Config.MainMenuWidgetSystemInfoShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation},
+        {Config.MainMenuWidgetSystemUpdatesPosition, &Config.MainMenuWidgetSystemUpdatesShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates},
+        {Config.MainMenuWidgetTemperaturesPosition, &Config.MainMenuWidgetTemperaturesShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetTemperatures},
+        {Config.MainMenuWidgetTimerConflictsPosition, &Config.MainMenuWidgetTimerConflictsShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetTimerConflicts},
+        {Config.MainMenuWidgetCommandPosition, &Config.MainMenuWidgetCommandShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetCommand},
+        {Config.MainMenuWidgetWeatherPosition, &Config.MainMenuWidgetWeatherShow,
+         &cFlatDisplayMenu::DrawMainMenuWidgetWeather}};
 
-    struct WidgetConfig {
-        int &ShowFlag;
-        int &position;
-        const char *name;
-    };
-
-    const WidgetConfig WidgetConfigs[] {
-        {Config.MainMenuWidgetDVBDevicesShow, Config.MainMenuWidgetDVBDevicesPosition, "dvb_devices"},
-        {Config.MainMenuWidgetActiveTimerShow, Config.MainMenuWidgetActiveTimerPosition, "active_timer"},
-        {Config.MainMenuWidgetLastRecShow, Config.MainMenuWidgetLastRecPosition, "last_recordings"},
-        {Config.MainMenuWidgetSystemInfoShow, Config.MainMenuWidgetSystemInfoPosition, "system_information"},
-        {Config.MainMenuWidgetSystemUpdatesShow, Config.MainMenuWidgetSystemUpdatesPosition, "system_updates"},
-        {Config.MainMenuWidgetTemperaturesShow, Config.MainMenuWidgetTemperaturesPosition, "temperatures"},
-        {Config.MainMenuWidgetTimerConflictsShow, Config.MainMenuWidgetTimerConflictsPosition, "timer_conflicts"},
-        {Config.MainMenuWidgetCommandShow, Config.MainMenuWidgetCommandPosition, "custom_command"},
-        {Config.MainMenuWidgetWeatherShow, Config.MainMenuWidgetWeatherPosition, "weather"}};
-
-    // Populates the widgets vector with enabled widgets based on configuration
-    // Iterates through predefined widget configurations and adds widgets to the vector
-    // if their corresponding show flag is enabled, preserving their configured position
-    for (const auto &cfg : WidgetConfigs) {
-        if (cfg.ShowFlag) { widgets.emplace_back(std::make_pair(cfg.position, cfg.name)); }
-    }
-
-    // Define a type for the widget drawing functions
-    using WidgetDrawFunction = std::function<int(int, int, int, int)>;
-
-    // Create a map that associates widget names with their drawing functions
-    // Works as long all strings are different. Else we must use std::string
-    std::unordered_map<const char *, WidgetDrawFunction> WidgetDrawers {
-        {"dvb_devices",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetDVBDevices(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"active_timer",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetActiveTimers(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"last_recordings",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetLastRecordings(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"system_information",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetSystemInformation(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"system_updates",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetSystemUpdates(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"temperatures",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetTemperatures(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"timer_conflicts",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetTimerConflicts(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"custom_command",
-         [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetCommand(left, width, top, MenuPixmapViewPortHeight);
-         }},
-        {"weather", [this](int left, int width, int top, int MenuPixmapViewPortHeight) {
-             return DrawMainMenuWidgetWeather(left, width, top, MenuPixmapViewPortHeight);
-         }}};
-
-    // Sort the widgets based on their positions
-    std::sort(widgets.begin(), widgets.end(), PairCompareIntString);
+    // Sort entries by configured 'position'
+    std::sort(std::begin(entries), std::end(entries), WidgetEntryCompare);
 
     int AddHeight {0}, ContentTop {0};
-    // Process widgets
-    for (const auto &PairWidget : widgets) {
-        std::string_view widget {PairWidget.second};
-
-        // Look up the widget drawer function
-        auto drawerIt {WidgetDrawers.find(widget.data())};
-        if (drawerIt != WidgetDrawers.end()) {
-            // Call the drawer function and update ContentTop
-            AddHeight = drawerIt->second(wLeft, wWidth, ContentTop, MenuPixmapViewPortHeight);
-            if (AddHeight > 0) ContentTop = AddHeight + m_MarginItem;
-        } else {
-            // Handle unknown widget type
-            esyslog("flatPlus: DrawMainMenuWidget() Unknown widget type: %s", widget.data());
-        }
-    }  // for widgets
+    for (const auto &e : entries) {
+        if (!*(e.enableFlag)) continue;  // Widget not enabled — skip
+        AddHeight = (this->*(e.drawFn))(wLeft, wWidth, ContentTop, MenuPixmapViewPortHeight);
+        if (AddHeight > 0) ContentTop = AddHeight + m_MarginItem;
+    }
 
     ContentWidget.CreatePixmaps(false);
     ContentWidget.Draw();
