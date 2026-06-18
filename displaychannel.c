@@ -418,8 +418,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
         }  // if (Event)
     }  // for
 
-    PixmapClear(ChanIconsPixmap);
-    if (Config.ChannelIconsShow && m_CurChannel) ChannelIconsDraw(m_CurChannel, false);
+    if (Config.ChannelIconsShow && m_CurChannel) ChannelIconsDraw(m_CurChannel, true);
 
     cString MediaPath {""};
     cSize MediaSize {0, 0};  // Width, Height
@@ -585,7 +584,7 @@ void cFlatDisplayChannel::Flush() {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
         if (m_ScreenWidth != m_LastScreenWidth) {
             m_LastScreenWidth = m_ScreenWidth;
-            ChannelIconsDraw(m_CurChannel, true);  // Redraw and clear ChanInfoTopPixmap
+            ChannelIconsDraw(m_CurChannel, true);  // Full redraw when resolution changes
         }
     }
 
