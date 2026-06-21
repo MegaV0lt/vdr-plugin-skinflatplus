@@ -3945,7 +3945,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
     static const cString ExecFile {cString::sprintf("\"%s/system_information/system_information\"", WIDGETFOLDER)};
     if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
-        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation() system() failed!");
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation() system call failed!");
         return -1;
     }
 
@@ -3962,19 +3962,21 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
 
     struct dirent *entry;
     cString num {""};
-    std::string_view FileName {""};
+    std::string_view svFileName {""};  // Also used later when extracting the item name from the file name
     std::size_t found {std::string_view::npos};
     while ((entry = d.Next()) != nullptr) {
-        FileName = entry->d_name;
-        found = FileName.find('_');
+        svFileName = entry->d_name;
+        found = svFileName.find('_');
         if (found != std::string_view::npos) {               // File name contains '_'
-            num = cString(FileName.data()).Truncate(found);  // Truncate the string to the number part
+            num = cString(svFileName.data()).Truncate(found);  // Truncate the string to the number part
             if (atoi(*num) > 0)                              // Number is greater than zero
-                files.emplace_back(FileName.data());         // Store the file name
+                files.emplace_back(svFileName.data());         // Store the file name
         }
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Found %ld files @ %ld ms", files.size(), Timer.Elapsed());
+#endif
 
-    // dsyslog("flatPlus: DrawMainMenuWidgetSystemInfomation() Found %ld files", files.size());
     std::sort(files.begin(), files.end(), CompareNumStrings);  // Sort the files by number
 
     ContentTop = AddWidgetHeader("widgets/system_information", tr("System Information"), ContentTop, wWidth);
@@ -4011,7 +4013,6 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                    {"security_updates", trNOOP("Security Updates")}};
 
         cString item {""}, ItemContent {""}, ItemFilename {""};
-        std::string_view svFileName {""};  // Use std::string_view for better performance
         int Column {1};
         int ContentLeft {m_MarginItem};
         for (const cString &FileName : files) {
@@ -4108,7 +4109,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     static const cString ExecFile {
         cString::sprintf("cd \"%s/temperatures\"; \"%s/temperatures/temperatures\"", WIDGETFOLDER, WIDGETFOLDER)};
     if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
-        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() system() failed!");
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetTemperatures() system call failed!");
         return -1;
     }
     ContentTop = AddWidgetHeader("widgets/temperatures", tr("Temperatures"), ContentTop, wWidth);
@@ -4181,7 +4182,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
 
     static const cString ExecFile {cString::sprintf("\"%s/command_output/command\"", WIDGETFOLDER)};
     if (system(*ExecFile) != 0) {  // If the system call fails, indicate that the widget cannot be displayed
-        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetCommand() system() failed!");
+        dsyslog("flatPlus: cFlatDisplayMenu::DrawMainMenuWidgetCommand() system call failed!");
         return -1;
     }
 
