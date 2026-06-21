@@ -149,9 +149,8 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         if (!pScraper->Service("GetSeries", &series)) return;  // Check if service call was successful
 
         if (series.banners.size() > 1) {  // Use random banner
-            // Gets 'entropy' from device that generates random numbers itself
-            // to seed a mersenne twister (pseudo) random generator
-            std::mt19937 generator(std::random_device {}());
+            // Reuse RNG for less overhead during UI rendering.
+            static thread_local std::mt19937 generator{std::random_device{}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
@@ -217,9 +216,8 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
         if (!pScraper->Service("GetSeries", &series)) return 0;  // Check if service call was successful
 
         if (series.banners.size() > 1) {  // Use random banner
-            // Gets 'entropy' from device that generates random numbers itself
-            // to seed a mersenne twister (pseudo) random generator
-            std::mt19937 generator(std::random_device {}());
+            // Reuse RNG for less overhead during UI rendering.
+            static thread_local std::mt19937 generator{std::random_device{}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
