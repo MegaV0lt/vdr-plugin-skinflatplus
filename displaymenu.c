@@ -4020,7 +4020,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
             svFileName = *FileName;  // Convert cString to std::string_view
             found = svFileName.find('_');
             item = svFileName.substr(found + 1).data();  // Extract the item name
-            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, svFileName.data());
+            ItemFilename = cString::sprintf("%s/system_information/%s", WIDGETOUTPUTPATH, *FileName);
 
             ItemContent = ReadAndExtractData(ItemFilename);
             if (isempty(*ItemContent)) continue;

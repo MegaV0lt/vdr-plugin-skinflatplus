@@ -619,7 +619,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
         index = std::make_unique<cIndexFile>(RecordingFileName, false, IsPesRecording);  // Assign unique ptr object
         if (index) {
-            off_t dummy;
+            off_t dummy {0};
             LastIndex = index->Last();
             index->Get(LastIndex, &MaxFileNum, &dummy);
         }
