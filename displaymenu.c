@@ -768,7 +768,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
         }
 
         if (Config.EpgAdditionalInfoShow) {
-            if (Text[0] != '\0') Text.Append("\n");
+            if (Text[0] != '\0') Text.Append('\n');
             InsertGenreInfo(Event, Text);  // Add genre info
 
             if (Event->ParentalRating())  // FSK
@@ -1999,7 +1999,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     }
 
     if (Config.EpgAdditionalInfoShow) {
-        if (Text[0] != '\0') Text.Append("\n");
+        if (Text[0] != '\0') Text.Append('\n');
         // Genre
         InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
@@ -2015,11 +2015,11 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
             if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append("\n");
+                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
                 TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
             }
             if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append("\n");
+                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
         }  // if Components
@@ -2068,7 +2068,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
                         Reruns.Append(cString::sprintf(":  %s", r->event->Title()));
                         // if (!isempty(r->event->ShortText()))
                         //    Reruns.Append(cString::sprintf("~%s", r->event->ShortText()));
-                        Reruns.Append("\n");
+                        Reruns.Append('\n');
                     }  // for
                     delete list;
                 }  // if list
@@ -2292,7 +2292,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             if (Event) {
                 InsertGenreInfo(Event, Text);  // Add genre info
 
-                if (Event->Contents(0)) Text.Append("\n");
+                if (Event->Contents(0)) Text.Append('\n');
 
                 if (Event->ParentalRating())  // FSK
                     Text.Append(cString::sprintf("%s: %s\n", tr("FSK"), *Event->GetParentalRatingString()));
@@ -2537,13 +2537,13 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     cString Fsk {""};
     // Lent from skinelchi
     if (Config.RecordingAdditionalInfoShow) {
-        if (Text[0] != '\0') Text.Append("\n");
+        if (Text[0] != '\0') Text.Append('\n');
         const cEvent *Event {RecInfo->GetEvent()};
         if (Event) {
             // Genre
             InsertGenreInfo(Event, Text, GenreIcons);  // Add genre info
 
-            if (Event->Contents(0)) Text.Append("\n");
+            if (Event->Contents(0)) Text.Append('\n');
             // FSK
             if (Event->ParentalRating()) {
                 Fsk = *Event->GetParentalRatingString();
@@ -2579,11 +2579,11 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
 
             if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append("\n");
+                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
                 TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
             }
             if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append("\n");
+                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
                 TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
             }
         }
