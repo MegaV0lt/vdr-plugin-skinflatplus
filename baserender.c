@@ -1909,7 +1909,7 @@ void cFlatBaseRender::DrawWidgetWeather() {  // Weather widget (repay/channel)
 #ifdef DEBUGFUNCSCALL
     // Log weather cache data for debugging
     dsyslog("   Temp: '%s', Sign: '%s', Location: '%s'", *wd.Temp, *wd.TempTodaySign, *wd.Location);
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 7; ++i) {
         if (!isempty(*wd.Days[i].Icon)) {
             dsyslog("   Day %d: Icon: %s, TempMax: %s, TempMin: %s, Precipitation: %s, Summary: %s", i,
                     *wd.Days[i].Icon, *wd.Days[i].TempMax, *wd.Days[i].TempMin, *wd.Days[i].Precipitation,

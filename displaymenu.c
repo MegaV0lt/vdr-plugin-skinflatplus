@@ -3144,7 +3144,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
                 RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
                 if (strcmp(*m_RecFolder, *RecFolder2) == 0) {  // Compare recording folder with current folder
                     ++RecCount;
-                    if (Rec->IsNew()) ++RecNewCount;
+                    RecNewCount += (Rec->IsNew()) ? 1 : 0;  // Increment RecNewCount if recording is new
                 }
             }  // for
         }
@@ -3155,7 +3155,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
                 RecFolder2 = *GetRecordingName(Rec, RecordingLevel);
                 if (strcmp(*m_RecFolder, *RecFolder2) == 0) {  // Compare recording folder with current folder
                     ++RecCount;
-                    if (Rec->IsNew()) ++RecNewCount;
+                    RecNewCount += (Rec->IsNew()) ? 1 : 0;  // Increment RecNewCount if recording is new
                 }
             }  // for
         }
@@ -3165,7 +3165,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
             LOCK_RECORDINGS_READ;  // Creates local const cRecordings *Recordings
             for (const cRecording *Rec {Recordings->First()}; Rec; Rec = Recordings->Next(Rec)) {
                 ++RecCount;
-                if (Rec->IsNew()) ++RecNewCount;
+                RecNewCount += (Rec->IsNew()) ? 1 : 0;  // Increment RecNewCount if recording is new
             }
         }
 #if APIVERSNUM >= 30012
@@ -3173,7 +3173,7 @@ cString cFlatDisplayMenu::GetRecCounts() const {
             LOCK_DELETEDRECORDINGS_READ;  // Creates local const cRecordings *DeletedRecordings
             for (const cRecording *Rec {DeletedRecordings->First()}; Rec; Rec = DeletedRecordings->Next(Rec)) {
                 ++RecCount;
-                if (Rec->IsNew()) ++RecNewCount;
+                RecNewCount += (Rec->IsNew()) ? 1 : 0;  // Increment RecNewCount if recording is new
             }
         }
 #endif
@@ -3207,7 +3207,7 @@ void cFlatDisplayMenu::UpdateTimerCounts(uint16_t &TimerActiveCount, uint16_t &T
     LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
     for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
         ++TimerCount;
-        if (Timer->HasFlags(tfActive)) ++TimerActiveCount;
+        TimerActiveCount += (Timer->HasFlags(tfActive)) ? 1 : 0;  // Increment TimerActiveCount if timer is active
     }
 #ifdef DEBUGFUNCSCALL
     dsyslog("   TimerActiveCount: %d, TimerCount: %d, time: %ld ms", TimerActiveCount, TimerCount, Timer.Elapsed());
@@ -3374,7 +3374,7 @@ void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &re
     const char *p {bar + 1};
     uint16_t now {0}, total {0};
     while (*p != ']') {
-        if (*p == '|') ++now;
+        now += (*p == '|') ? 1 : 0;  // Increment now if character is '|'
         ++total;
         ++p;
     }
@@ -4116,16 +4116,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     int CountTemps {0};
 
     const cString TempCPU {ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH))};
-    if (!isempty(*TempCPU)) ++CountTemps;
+    CountTemps += (!isempty(*TempCPU)) ? 1 : 0;
 
     const cString TempCase {ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH))};
-    if (!isempty(*TempCase)) ++CountTemps;
+    CountTemps += (!isempty(*TempCase)) ? 1 : 0;
 
     const cString TempMB {ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH))};
-    if (!isempty(*TempMB)) ++CountTemps;
+    CountTemps += (!isempty(*TempMB)) ? 1 : 0;
 
     const cString TempGPU {ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH))};
-    if (!isempty(*TempGPU)) ++CountTemps;
+    CountTemps += (!isempty(*TempGPU)) ? 1 : 0;
 
     if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,
@@ -4400,7 +4400,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
             img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-            if (img) ++i;
+            i += (img ? 1 : 0);
         }
     }  // for channel
 
