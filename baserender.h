@@ -286,7 +286,7 @@ class cRecCountThread : public cThread {
             uint16_t count {0};
             { LOCK_TIMERS_READ;
                 for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
-                    count += (Timer->HasFlags(tfActive)) ? 1 : 0;  // Increment count if timer is active
+                    count += (Timer->HasFlags(tfRecording)) ? 1 : 0;  // Increment count if timer is recording
                 }
             }
             m_NumRecordings.store(count, std::memory_order_relaxed);
