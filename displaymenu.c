@@ -207,8 +207,7 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
     // Is the menu scrolling or content?
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
-        const bool IsScrolled {ComplexContent.Scroll(Up, Page)};
-        if (IsScrolled) {
+        if (ComplexContent.Scroll(Up, Page)) {
             const int ScrollOffset {ComplexContent.ScrollOffset()};  // Cache value
             DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
                           ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
@@ -676,14 +675,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             //? m_WidthScrollBar is already substarcted
             Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10;
             const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, Config.decorProgressMenuItemSize};
-            if (Current)
-                ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                    Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
-                                    Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false);
-            else
-                ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                    Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
-                                    Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
+            (Current) ? ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
+                                           Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
+                                           Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false)
+                      : ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
+                                           Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
+                                           Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
             Left += Width + m_MarginItem;
 
             if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
@@ -2991,7 +2988,7 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     std::string_view svElement {*element}, sv;
 
     // Check if the element matches any name in the cache
-    auto it {cache.find(svElement.data())};
+    const auto it {cache.find(svElement.data())};
     if (it != cache.end()) return *it->second;  // Return cached icon name including path
 
     cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
@@ -3287,11 +3284,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text) const
     for (std::size_t i {0}; Event->Contents(i); ++i) {
         ContentString = Event->ContentToString(Event->Contents(i));
         if (ContentString[0] != '\0') {  // Skip empty (user defined) content
-            if (!FirstContent)
-                Text.Append(", ");
-            else
-                Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
-
+            Text.Append((FirstContent) ? cString::sprintf("\n%s: ", tr("Genre")) : ", ");
             Text.Append(ContentString);
             FirstContent = false;
         }
@@ -3304,11 +3297,7 @@ void cFlatDisplayMenu::InsertGenreInfo(const cEvent *Event, cString &Text, std::
     for (std::size_t i {0}; Event->Contents(i); ++i) {
         ContentString = Event->ContentToString(Event->Contents(i));
         if (ContentString[0] != '\0') {  // Skip empty (user defined) content
-            if (!FirstContent)
-                Text.Append(", ");
-            else
-                Text.Append(cString::sprintf("\n%s: ", tr("Genre")));
-
+            Text.Append((FirstContent) ? cString::sprintf("\n%s: ", tr("Genre")) : ", ");
             Text.Append(ContentString);
             FirstContent = false;
             GenreIcons.emplace_back(GetGenreIcon(Event->Contents(i)));
@@ -4116,16 +4105,16 @@ int cFlatDisplayMenu::DrawMainMenuWidgetTemperatures(int wLeft, int wWidth, int 
     int CountTemps {0};
 
     const cString TempCPU {ReadAndExtractData(cString::sprintf("%s/temperatures/cpu", WIDGETOUTPUTPATH))};
-    CountTemps += (!isempty(*TempCPU)) ? 1 : 0;
+    CountTemps += (isempty(*TempCPU)) ? 0 : 1;
 
     const cString TempCase {ReadAndExtractData(cString::sprintf("%s/temperatures/pccase", WIDGETOUTPUTPATH))};
-    CountTemps += (!isempty(*TempCase)) ? 1 : 0;
+    CountTemps += (isempty(*TempCase)) ? 0 : 1;
 
     const cString TempMB {ReadAndExtractData(cString::sprintf("%s/temperatures/motherboard", WIDGETOUTPUTPATH))};
-    CountTemps += (!isempty(*TempMB)) ? 1 : 0;
+    CountTemps += (isempty(*TempMB)) ? 0 : 1;
 
     const cString TempGPU {ReadAndExtractData(cString::sprintf("%s/temperatures/gpu", WIDGETOUTPUTPATH))};
-    CountTemps += (!isempty(*TempGPU)) ? 1 : 0;
+    CountTemps += (isempty(*TempGPU)) ? 0 : 1;
 
     if (CountTemps == 0) {
         ContentWidget.AddText(tr("Temperatures not available please check the widget"), false,

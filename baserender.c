@@ -135,16 +135,17 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 void cFlatBaseRender::SetMargins(int Width, int Height) {
     // Set margins relative to the OSD size with an minimum of 3 pixels
     static constexpr int kMinSize {3};  // Minimum margin size
-    int SizeIncrease {static_cast<int>((Width / 720) + 0.5)};  // (1920: 3 pixels, 3840: 5 pixels, 7680: 11 pixels)
-    // Example: 720 pixels OSD width -> 4 pixels margin, 1920 -> 6 pixels, 3840 -> 8 pixels, 7680 -> 14 pixels
+      // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
+    int SizeIncrease {static_cast<int>((Width * (1.0 / 720.0)) + 0.5)};
     m_MarginItem = kMinSize + SizeIncrease;
     m_MarginItem2 = m_MarginItem * 2;
     m_MarginItem3 = m_MarginItem * 3;
     m_MarginItem10 = m_MarginItem * 10;
     // Margin for EPG image in EPG info and recording info
-    m_MarginEPGImage += SizeIncrease;  // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
-    // Example: 576 pixels OSD hight -> 4 pixels line width, 1080 -> 5 pixels, 2160 -> 7 pixels, 4320 -> 11 pixels
-    SizeIncrease = static_cast<int>((Height / 576) + 0.5);  // (1080: 2 pixels, 2160: 4 pixels, 4320: 8 pixels)
+    m_MarginEPGImage += SizeIncrease;
+
+    // (1080: +2 pixels, 2160: +4 pixels, 4320: +8 pixels)
+    SizeIncrease = static_cast<int>((Height * (1.0 / 576.0)) + 0.5);
     m_LineWidth = kMinSize + SizeIncrease;  // Increase line width for larger OSD heights
     m_LineMargin = m_LineWidth * 2;
     // Margin for color buttons and messages
@@ -637,9 +638,6 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     if (!ButtonsPixmap) return;
 
-    const int WidthMargin {m_ButtonsWidth - m_MarginItem3};
-    int ButtonWidth {WidthMargin / 4 - Config.decorBorderButtonSize * 2};
-
     PixmapClear(ButtonsPixmap);
     DecorBorderClearByFrom(BorderButton);
 
@@ -649,8 +647,8 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
     const tColor ButtonColor[] {clrButtonRed, clrButtonGreen, clrButtonYellow, clrButtonBlue};  // ButtonColor
     const int ColorKey[] {Setup.ColorKey0, Setup.ColorKey1, Setup.ColorKey2, Setup.ColorKey3};  // ColorKey
 
+    int ButtonWidth {(m_ButtonsWidth - m_MarginItem3) / 4 - Config.decorBorderButtonSize * 2};
     int x {0};
-
     for (int i {0}; i < 4; i++) {  // Four buttons
         // If there is enough space for the last button, add its width to the
         // right edge of the buttons area. This is done to align the last button
@@ -885,7 +883,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
     case 0:  // Small line + big line
         {
             const int sml {std::max(big / 10 * 2, 2)};
-
             Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top() + Middle - (sml / 2), rect.Width(), sml), ColorFg);
 
             if (Current > 0) Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), PercentPos, big), ColorBarFg);
@@ -1073,10 +1070,10 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
         }
 
         // Draw last mark vertical line
-        if (PosCurrent == PosMark)
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight), ColorCurrent);
-        else
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - SmlHalf, 0, sml, m_ProgressBarHeight), Color);
+        (PosCurrent == PosMark)
+            ? ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
+                                                     ColorCurrent)
+            : ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - SmlHalf, 0, sml, m_ProgressBarHeight), Color);
 
         const int big {m_ProgressBarHeight - (sml * 2) - 2};  // Position marker size
         const int BigHalf {big / 2};
@@ -1122,12 +1119,11 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
 
     const int sml {std::max(m_ProgressBarHeight / 10 * 2, 4)};
     // Mark vertical line
-    if (PosCurrent == PosMark)
-        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
-                                               m_ProgressBarColorMarkCurrent);
-    else
-        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (sml / 2), 0, sml, m_ProgressBarHeight),
-                                               m_ProgressBarColorMark);
+    (PosCurrent == PosMark)
+        ? ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - sml, 0, sml * 2, m_ProgressBarHeight),
+                                                 m_ProgressBarColorMarkCurrent)
+        : ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (sml / 2), 0, sml, m_ProgressBarHeight),
+                                                 m_ProgressBarColorMark);
 
     const int top {m_ProgressBarHeight / 2};
     const int big {m_ProgressBarHeight - (sml * 2) - 2};
@@ -1145,11 +1141,8 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
                                                  m_ProgressBarColorBarCurFg);
         }
         // Mark top
-        if (IsCurrent)
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), 0, mbig, sml),
-                                                   m_ProgressBarColorMarkCurrent);
-        else
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), 0, mbig, sml), m_ProgressBarColorMark);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), 0, mbig, sml),
+                                               (IsCurrent) ? m_ProgressBarColorMarkCurrent : m_ProgressBarColorMark);
     } else {
         // Big line
         if (PosCurrent > PosMark) {
@@ -1170,12 +1163,8 @@ void cFlatBaseRender::ProgressBarDrawMark(int PosMark, int PosMarkLast, int PosC
             }
         }
         // Mark bottom
-        if (IsCurrent)
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), m_ProgressBarHeight - sml, mbig, sml),
-                                                   m_ProgressBarColorMarkCurrent);
-        else
-            ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), m_ProgressBarHeight - sml, mbig, sml),
-                                                   m_ProgressBarColorMark);
+        ProgressBarMarkerPixmap->DrawRectangle(cRect(PosMark - (mbig / 2), m_ProgressBarHeight - sml, mbig, sml),
+                                               (IsCurrent) ? m_ProgressBarColorMarkCurrent : m_ProgressBarColorMark);
     }
 
     if (PosCurrent == PosMarkLast && PosMarkLast != 0)

@@ -150,7 +150,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 
         if (series.banners.size() > 1) {  // Use random banner
             // Reuse RNG for less overhead during UI rendering.
-            static thread_local std::mt19937 generator{std::random_device{}()};
+            static thread_local std::mt19937 generator {std::random_device {}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
@@ -165,8 +165,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
             MediaPath = series.banners[0].path.c_str();
         }
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-            const std::size_t ActorsSize {series.actors.size()};
-            Actors.reserve(ActorsSize);  // Set capacity to size of actors
+            Actors.reserve(series.actors.size());  // Set capacity to size of actors
             for (const auto &actor : series.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
                     Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
@@ -181,8 +180,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 
         MediaPath = movie.poster.path.c_str();
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-            const std::size_t ActorsSize {movie.actors.size()};
-            Actors.reserve(ActorsSize);  // Set capacity to size of actors
+            Actors.reserve(movie.actors.size());  // Set capacity to size of actors
             for (const auto &actor : movie.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
                     Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
@@ -217,7 +215,7 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
 
         if (series.banners.size() > 1) {  // Use random banner
             // Reuse RNG for less overhead during UI rendering.
-            static thread_local std::mt19937 generator{std::random_device{}()};
+            static thread_local std::mt19937 generator {std::random_device {}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
@@ -409,7 +407,7 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
     static constexpr double kPortraitWidthRatio {1.0 / 3.0};      // Max 1/3 of pixmap width
     static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
-    const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
+    const int Aspect {MediaSize.Width() / MediaSize.Height()};  // Aspect ratio as integer. Narrowing conversion
     //* Set to default size and apply user settings
     //* Aspect of image is preserved in cImageLoader::GetFile()
     if (Aspect < kPosterAspectThreshold) {  //* Poster (For example 680x1000 = 0.68)
@@ -427,32 +425,25 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
     std::ostringstream ossText {""}, ossAudio {""}, ossSubtitle {""};
-    cString AudioType {""};
     const int NumComponents {Components->NumComponents()};
     for (int16_t i {0}; i < NumComponents; ++i) {
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
             if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (MPEG2)";
-            else
-                ossText << tr("Video") << ": MPEG2";
+            (p->description) ? ossText << tr("Video") << ": " << p->description << " (MPEG2)"
+                             : ossText << tr("Video") << ": MPEG2";
             break;
         case sc_video_H264_AVC:
             if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (H.264)";
-            else
-                ossText << tr("Video") << ": H.264";
+            (p->description) ? ossText << tr("Video") << ": " << p->description << " (H.264)"
+                             : ossText << tr("Video") << ": H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
             if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (H.265)";
-            else
-                ossText << tr("Video") << ": H.265";
+            (p->description) ? ossText << tr("Video") << ": " << p->description << " (H.265)"
+                             : ossText << tr("Video") << ": H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
@@ -462,6 +453,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             if (p->description) {
                 ossAudio << p->description << " (" << p->language << ')';
             } else {
+                cString AudioType {""};
                 switch (p->stream) {
                 case sc_audio_MP2:
                     // Workaround for wrongfully used stream type X 02 05 for AC3
@@ -476,10 +468,8 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         case sc_subtitle:
             if (!ossSubtitle.str().empty()) ossSubtitle << ", ";
-            if (p->description)
-                ossSubtitle << p->description << " (" << p->language << ')';
-            else
-                ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
+            (p->description) ? ossSubtitle << p->description << " (" << p->language << ')'
+                             : ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
             break;
         }  // switch
     }  // for

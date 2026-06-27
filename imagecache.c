@@ -110,9 +110,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
         // Remove any previous mapping that points to the slot we are about to overwrite.
         const std::size_t slot {m_InsertIconIndex};
         for (auto it {m_IconIndex.begin()}; it != m_IconIndex.end();) {
-            if (it->second == slot) it = m_IconIndex.erase(it);
-            else
-                ++it;
+            (it->second == slot) ? it = m_IconIndex.erase(it)
+                                 : ++it;
         }
 
         InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name,
@@ -123,9 +122,8 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
     } else {
         const std::size_t slot {m_InsertIndex};
         for (auto it {m_ImageIndex.begin()}; it != m_ImageIndex.end();) {
-            if (it->second == slot) it = m_ImageIndex.erase(it);
-            else
-                ++it;
+            (it->second == slot) ? it = m_ImageIndex.erase(it)
+                                 : ++it;
         }
 
         InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
@@ -202,6 +200,6 @@ void cImageCache::PreLoadImage() {
     m_InsertIndexBase = GetCacheCount();
     m_InsertIconIndexBase = GetIconCacheCount();
 
-    dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
     dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
+    dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
 }

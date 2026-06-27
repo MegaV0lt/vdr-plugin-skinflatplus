@@ -63,12 +63,9 @@ void cFlatDisplayTracks::SetItem(const char *Text, int Index, bool Current) {
                      : std::make_pair(Theme.Color(clrTrackItemFont), Theme.Color(clrTrackItemBg));
 
     const cString TextWithSpace {cString::sprintf(" %s", Text)};
-    if (Index == -1)
-        TracksPixmap->DrawText(cPoint(0, y), TextWithSpace, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
-                               m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taLeft);
-    else
-        TracksPixmap->DrawText(cPoint(0, y), TextWithSpace, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
-                               m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2, taCenter);
+    TracksPixmap->DrawText(cPoint(0, y), TextWithSpace, ColorFg, ColorBg, m_Font, m_MaxItemWidth,
+                           m_ItemHeight - Config.MenuItemPadding - Config.decorBorderTrackSize * 2,
+                           (Index == -1) ? taLeft : taCenter);
 
     const int left {(m_OsdWidth - m_MaxItemWidth) / 2};
     const int top {m_OsdHeight - ItemsHeight - m_MarginItem + y};

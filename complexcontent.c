@@ -63,10 +63,9 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             PixmapFill(Pixmap, m_ColorBg);
         } else {
             const int HeightContent {ContentHeight(false)};
-            if (HeightContent > 0)  // Only draw background if content height is > 0
-                Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg);
-            else
-                PixmapClear(Pixmap);
+            (HeightContent > 0)  // Only draw background if content height is > 0
+                ? Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg)
+                : PixmapClear(Pixmap);
         }
     } else {  // Log values and return
         esyslog(
@@ -218,10 +217,8 @@ int cComplexContent::ScrollOffset() const {
     int y {Pixmap->DrawPort().Point().Y() * -1};
     const int PositionHeight {m_Position.Height()};
     if (y + PositionHeight + m_ScrollSize > m_DrawPortHeight) {
-        if (y == m_DrawPortHeight - PositionHeight)
-            y += m_ScrollSize;
-        else
-            y = m_DrawPortHeight - PositionHeight - 1;
+        (y == m_DrawPortHeight - PositionHeight) ? y += m_ScrollSize
+                                                 : y = m_DrawPortHeight - PositionHeight - 1;
     }
 
     if (m_DrawPortHeight == 0) {  // Avoid DIV/0
