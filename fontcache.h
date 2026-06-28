@@ -34,7 +34,7 @@ class GlyphMetricsCache {
 
     FT_Face GetFace(const std::string &FontFileName) {
         std::unique_lock lock(mutex_);
-        auto it = faces_.find(FontFileName);
+        const auto it = faces_.find(FontFileName);
         if (it != faces_.end())
             return it->second;
         FT_Face face {nullptr};
