@@ -308,13 +308,11 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int SeenDurWidth {0}, SeenDurMaxWidth {0};
     int MaxAvailWidth {0};
 
-    bool IsRec {false};
-    const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
-
     int left {static_cast<int>(m_HeightImageLogo * 1.34f) + m_MarginItem3};
     const int StartTimeLeft {left};
     int TopSeen {0}, TopEpg {0};
 
+    const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
     const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "  ")};
 
     if (Config.ChannelShowStartTime)
@@ -322,6 +320,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
+        bool IsRec {false};
         const bool IsPresent {(i) ? false : true};
         const cEvent *Event {(IsPresent) ? Present : Following};
         if (Event) {
