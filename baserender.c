@@ -118,12 +118,15 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size: %dx%d", Left, Top, Width, Height);
 #endif
 
+    // Set Margins only when the OSD size has changed
+    if (m_OsdWidth != Width || m_OsdHeight != Height) {
+        SetMargins(Width, Height);  // Set margins relative to the OSD size
+    }
+
     m_OsdLeft = Left;
     m_OsdTop = Top;
     m_OsdWidth = Width;
     m_OsdHeight = Height;
-
-    SetMargins(Width, Height);  // Set margins relative to the OSD size
 
     m_Osd = cOsdProvider::NewOsd(Left, Top);  // Is always a valid pointer
 
@@ -135,7 +138,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
 void cFlatBaseRender::SetMargins(int Width, int Height) {
     // Set margins relative to the OSD size with an minimum of 3 pixels
     static constexpr int kMinSize {3};  // Minimum margin size
-      // (1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels)
+    // 1920: +3 pixels, 3840: +5 pixels, 7680: +11 pixels
     int SizeIncrease {static_cast<int>((Width * (1.0 / 720.0)) + 0.5)};
     m_MarginItem = kMinSize + SizeIncrease;
     m_MarginItem2 = m_MarginItem * 2;
@@ -144,7 +147,7 @@ void cFlatBaseRender::SetMargins(int Width, int Height) {
     // Margin for EPG image in EPG info and recording info
     m_MarginEPGImage += SizeIncrease;
 
-    // (1080: +2 pixels, 2160: +4 pixels, 4320: +8 pixels)
+    // 1080: +2 pixels, 2160: +4 pixels, 4320: +8 pixels
     SizeIncrease = static_cast<int>((Height * (1.0 / 576.0)) + 0.5);
     m_LineWidth = kMinSize + SizeIncrease;  // Increase line width for larger OSD heights
     m_LineMargin = m_LineWidth * 2;
