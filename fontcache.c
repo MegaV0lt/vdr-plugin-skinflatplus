@@ -146,11 +146,11 @@ int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &T
     for (auto &data : FontCache) {
         if ((strcmp(*data.name, *Name) == 0) && data.height == Height) {
             if (data.font) {
-                const std::string TextStr {*Text};
                 const auto it {data.StringWidthCache.find(TextStr)};
                 if (it != data.StringWidthCache.end()) {
                     return it->second;  // Return cached width
                 } else {
+                    const std::string TextStr {*Text};
                     const int width {data.font->Width(*Text)};
                     data.StringWidthCache[TextStr] = width;  // Cache the width
                     return width;
