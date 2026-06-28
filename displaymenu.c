@@ -491,12 +491,12 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Current) {
-        ib.ColorFg = Config.decorBorderMenuItemCurFg;
-        ib.ColorBg = Config.decorBorderMenuItemCurBg;
-    } else if (Selectable) {
+    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
         ib.ColorFg = Config.decorBorderMenuItemSelFg;
         ib.ColorBg = Config.decorBorderMenuItemSelBg;
+    } else if (Current) {
+        ib.ColorFg = Config.decorBorderMenuItemCurFg;
+        ib.ColorBg = Config.decorBorderMenuItemCurBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -719,12 +719,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Current) {
-        ib.ColorFg = Config.decorBorderMenuItemCurFg;
-        ib.ColorBg = Config.decorBorderMenuItemCurBg;
-    } else if (Selectable) {
+    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
         ib.ColorFg = Config.decorBorderMenuItemSelFg;
         ib.ColorBg = Config.decorBorderMenuItemSelBg;
+    } else if (Current) {
+        ib.ColorFg = Config.decorBorderMenuItemCurFg;
+        ib.ColorBg = Config.decorBorderMenuItemCurBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1063,12 +1063,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Current) {
-        ib.ColorFg = Config.decorBorderMenuItemCurFg;
-        ib.ColorBg = Config.decorBorderMenuItemCurBg;
-    } else if (Selectable) {
+    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
         ib.ColorFg = Config.decorBorderMenuItemSelFg;
         ib.ColorBg = Config.decorBorderMenuItemSelBg;
+    } else if (Current) {
+        ib.ColorFg = Config.decorBorderMenuItemCurFg;
+        ib.ColorBg = Config.decorBorderMenuItemCurBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1437,12 +1437,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Current) {
-        ib.ColorFg = Config.decorBorderMenuItemCurFg;
-        ib.ColorBg = Config.decorBorderMenuItemCurBg;
-    } else if (Selectable) {
+    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
         ib.ColorFg = Config.decorBorderMenuItemSelFg;
         ib.ColorBg = Config.decorBorderMenuItemSelBg;
+    } else if (Current) {
+        ib.ColorFg = Config.decorBorderMenuItemCurFg;
+        ib.ColorBg = Config.decorBorderMenuItemCurBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1847,12 +1847,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Current) {
-        ib.ColorFg = Config.decorBorderMenuItemCurFg;
-        ib.ColorBg = Config.decorBorderMenuItemCurBg;
-    } else if (Selectable) {
+    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
         ib.ColorFg = Config.decorBorderMenuItemSelFg;
         ib.ColorBg = Config.decorBorderMenuItemSelBg;
+    } else if (Current) {
+        ib.ColorFg = Config.decorBorderMenuItemCurFg;
+        ib.ColorBg = Config.decorBorderMenuItemCurBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;

@@ -32,6 +32,7 @@ enum eBorder {
     BorderMMWidget
 };
 
+// Decorated border (Left, Top, Width, Height, Size, Type, ColorFg, ColorBg, From)
 struct sDecorBorder {
     int Left {0}, Top {0}, Width {0}, Height {0};
     int Size {0}, Type {0};
