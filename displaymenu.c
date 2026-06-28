@@ -2086,6 +2086,14 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     bool FirstRun {true};
     bool Scrollable {false};
 
+    // Get media information from TVScraper if enabled in config
+    if (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) {
+        GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, Event);
+    }
+#ifdef DEBUGEPGTIME
+    dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
+#endif
+
     // First run setup
     m_cWidth -= m_WidthScrollBar;  // Assume that we need scrollbar most of the time
 
@@ -2097,13 +2105,6 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-        // Call scraper plugin only at first run and reuse data at second run
-        if (FirstRun && (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors)) {
-            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, Event);
-        }
-#ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
-#endif
         ContentTop = m_MarginItem;
 
         // Add description header if needed
@@ -2603,6 +2604,18 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     bool FirstRun {true};
     bool Scrollable {false};
 
+    // Get media information from TVScraper if enabled in config
+    if (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) {
+        GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, nullptr, Recording);
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+            const cString RecPath {Recording->FileName()};
+            ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
+        }
+    }
+#ifdef DEBUGEPGTIME
+    dsyslog("flatPlus: DrawRecordingInfo() TVSscraper time @ %ld ms", Timer.Elapsed());
+#endif
+
     // First run setup
     m_cWidth -= m_WidthScrollBar;  // Assume that we need scrollbar most of the time
 
@@ -2614,17 +2627,6 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         ComplexContent.SetScrollSize(m_FontHeight);
         ComplexContent.SetScrollingActive(true);
 
-        // Call scraper plugin only at first run and reuse data at second run
-        if (FirstRun && (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors)) {
-            GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, nullptr, Recording);
-            if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
-                const cString RecPath {Recording->FileName()};
-                ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
-            }
-        }
-#ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: DrawRecordingInfo() TVSscraper time @ %ld ms", Timer.Elapsed());
-#endif
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         ContentTop = m_MarginItem;
 
