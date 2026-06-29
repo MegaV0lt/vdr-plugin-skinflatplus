@@ -48,8 +48,8 @@ cFlatBaseRender::cFlatBaseRender() {
     m_FontSml = FontCache.GetFont(Setup.FontSml, Setup.FontSmlSize);
     m_FontFixed = FontCache.GetFont(Setup.FontFix, Setup.FontFixSize);
 
-    m_FontName = Setup.FontOsd;     // VDR font size
-    m_FontSmlName = Setup.FontSml;  // VDR font small size
+    m_FontName = Setup.FontOsd;     // VDR font name
+    m_FontSmlName = Setup.FontSml;  // VDR font small name
 
     m_FontHeight = FontCache.GetFontHeight(Setup.FontOsd, Setup.FontOsdSize);
     m_FontHeight2 = m_FontHeight * 2;
@@ -118,10 +118,7 @@ void cFlatBaseRender::CreateOsd(int Left, int Top, int Width, int Height) {
     dsyslog("flatPlus: cFlatBaseRender::CreateOsd() left: %d, top: %d, size: %dx%d", Left, Top, Width, Height);
 #endif
 
-    // Set Margins only when the OSD size has changed
-    if (m_OsdWidth != Width || m_OsdHeight != Height) {
-        SetMargins(Width, Height);  // Set margins relative to the OSD size
-    }
+    SetMargins(Width, Height);  // Set margins relative to the OSD size
 
     m_OsdLeft = Left;
     m_OsdTop = Top;
@@ -393,20 +390,19 @@ void cFlatBaseRender::TopBarUpdate() {
         m_TopBarLastDate = now;
         if (!TopBarPixmap || !TopBarIconPixmap || !TopBarIconBgPixmap) return;
 
-        const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
-        int MenuIconWidth {0};
+        PixmapFill(TopBarPixmap, Theme.Color(clrTopBarBg));
+        PixmapClear(TopBarIconPixmap);
+        PixmapClear(TopBarIconBgPixmap);
 
         const int FontTop {(m_TopBarHeight - m_TopBarFontHeight) / 2};
         const int FontSmlTop {(m_TopBarHeight - m_TopBarFontSmlHeight * 2) / 2};
         const int FontClockTop {(m_TopBarHeight - m_TopBarFontClockHeight) / 2};
 
-        PixmapFill(TopBarPixmap, Theme.Color(clrTopBarBg));
-        PixmapClear(TopBarIconPixmap);
-        PixmapClear(TopBarIconBgPixmap);
-
+        const int TopBarWidth {m_OsdWidth - Config.decorBorderTopBarSize * 2};
         const int TopBarLogoHeight {m_TopBarHeight - m_MarginItem2};      // Height of TopBar
         const int TopBarIconHeight {m_TopBarFontHeight - m_MarginItem2};  // Height of font in TopBar
 
+        int MenuIconWidth {0};
         cImage *img {nullptr};
         if (Config.TopBarMenuIconShow) {
             int IconLeft {m_MarginItem};

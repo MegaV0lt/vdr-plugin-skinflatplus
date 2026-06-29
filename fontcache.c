@@ -145,16 +145,20 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 int cFontCache::GetStringWidth(const cString &Name, int Height, const cString &Text) const {
     for (auto &data : FontCache) {
         if ((strcmp(*data.name, *Name) == 0) && data.height == Height) {
+            const std::string TextStr {*Text};
+            const auto it {data.StringWidthCache.find(TextStr)};
+            if (it != data.StringWidthCache.end())
+                return it->second;  // Return cached width
+
             if (data.font) {
-                const auto it {data.StringWidthCache.find(TextStr)};
-                if (it != data.StringWidthCache.end()) {
-                    return it->second;  // Return cached width
-                } else {
-                    const std::string TextStr {*Text};
-                    const int width {data.font->Width(*Text)};
-                    data.StringWidthCache[TextStr] = width;  // Cache the width
-                    return width;
-                }
+                const int width {data.font->Width(*Text)};
+#ifdef DEBUGFONTCACHE
+                dsyslog("flatPlus: cFontCache::GetStringWidth() Storing in cache: width=%d for font '%s', height=%d, "
+                        "text='%s'",
+                        width, *Name, Height, *Text);
+#endif
+                data.StringWidthCache[TextStr] = width;  // Store in cache for future use
+                return width;
             }
         }
     }

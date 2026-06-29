@@ -277,7 +277,7 @@ class cFlatBaseRender {
 // tries to acquire the Timers lock.
 class cRecCountThread : public cThread {
  public:
-    cRecCountThread() : cThread("RecCount") {}
+    cRecCountThread() : cThread("RecCount", true) {}  // Low priority thread
     uint16_t Count() const { return m_NumRecordings.load(std::memory_order_relaxed); }
     void Stop() { Cancel(3); }
 
@@ -285,7 +285,8 @@ class cRecCountThread : public cThread {
     void Action() override {
         while (Running()) {
             uint16_t count {0};
-            { LOCK_TIMERS_READ;
+            {
+                LOCK_TIMERS_READ;
                 for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
                     count += (Timer->HasFlags(tfRecording)) ? 1 : 0;  // Increment count if timer is recording
                 }

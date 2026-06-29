@@ -26,7 +26,7 @@
 #include "./config.h"
 #include "./imagecache.h"
 
-struct sActor {
+struct sActor {  // Actor information structure (Name, Role and Path)
     cString Name {""};  // Actor name
     cString Role {""};  // Actor role
     cString Path {""};  // Actor image path

@@ -491,12 +491,12 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
-        ib.ColorFg = Config.decorBorderMenuItemSelFg;
-        ib.ColorBg = Config.decorBorderMenuItemSelBg;
-    } else if (Current) {
+    if (Current) {  // Must check first for Current, because Selectable ia also true
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -719,12 +719,12 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
-        ib.ColorFg = Config.decorBorderMenuItemSelFg;
-        ib.ColorBg = Config.decorBorderMenuItemSelBg;
-    } else if (Current) {
+    if (Current) {  // Must check first for Current, because Selectable ia also true
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1028,7 +1028,8 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         if (Current && m_FontSml->Width(File) > (m_MenuItemWidth - Left - m_MarginItem) && Config.ScrollerEnable) {
             MenuItemScroller.AddScroller(File,
                                          cRect(Left, Top + m_FontHeight + m_MenuTop,  // TODO: Mismatch when scrolling
-                                               m_MenuItemWidth - Left - m_MarginItem - m_WidthScrollBar,
+                                               // m_MenuItemWidth - Left - m_MarginItem - m_WidthScrollBar,
+                                               m_MenuItemWidth - Left - m_MarginItem,
                                                m_FontSmlHeight),
                                          ColorFg, clrTransparent, m_FontSml, ColorExtraTextFg);
         } else {
@@ -1063,12 +1064,12 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
-        ib.ColorFg = Config.decorBorderMenuItemSelFg;
-        ib.ColorBg = Config.decorBorderMenuItemSelBg;
-    } else if (Current) {
+    if (Current) {  // Must check first for Current, because Selectable ia also true
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1079,7 +1080,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     if (!m_IsScrolling) ItemBorderInsertUnique(ib);
 
-    if (Config.MenuTimerView == 3 && Current) {  // flatPlus short
+    if (Config.MenuTimerView == 3 && Current) {  // flatPlus short + EPG
         const cEvent *Event {Timer->Event()};
         DrawItemExtraEvent(Event, tr("timer not enabled"));
     }
@@ -1437,12 +1438,12 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
-        ib.ColorFg = Config.decorBorderMenuItemSelFg;
-        ib.ColorBg = Config.decorBorderMenuItemSelBg;
-    } else if (Current) {
+    if (Current) {  // Must check first for Current, because Selectable ia also true
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
@@ -1847,12 +1848,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                      .Size = Config.decorBorderMenuItemSize,
                      .Type = Config.decorBorderMenuItemType};
 
-    if (Selectable) {  // Most items are selectable, so check this first to avoid unnecessary checks for Current
-        ib.ColorFg = Config.decorBorderMenuItemSelFg;
-        ib.ColorBg = Config.decorBorderMenuItemSelBg;
-    } else if (Current) {
+    if (Current) {  // Must check first for Current, because Selectable ia also true
         ib.ColorFg = Config.decorBorderMenuItemCurFg;
         ib.ColorBg = Config.decorBorderMenuItemCurBg;
+    } else if (Selectable) {
+        ib.ColorFg = Config.decorBorderMenuItemSelFg;
+        ib.ColorBg = Config.decorBorderMenuItemSelBg;
     } else {
         ib.ColorFg = Config.decorBorderMenuItemFg;
         ib.ColorBg = Config.decorBorderMenuItemBg;
