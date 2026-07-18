@@ -516,7 +516,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     if (!pDVBApi->Service("GetEcmInfo", &ecmInfo)) {
 #ifdef DEBUGFUNCSCALL
         const int *caids = m_CurChannel->Caids();
-        if (caids != nullptr && caids[0] != 0) {
+        if (caids && caids[0] != 0) {
             dsyslog("   No ECM info for channel %s (SID: %d)", m_CurChannel->Name(), m_CurChannel->Sid());
         }
 #endif

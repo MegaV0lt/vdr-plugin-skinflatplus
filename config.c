@@ -618,8 +618,7 @@ void cFlatConfig::DecorLoadFile(cString File) {
     dsyslog("flatPlus: Load decor file: %s", *File);
 
     FILE *f {fopen(File, "r")};
-    if (f == nullptr) {
-        // Handle error
+    if (!f) {  // Handle error
         esyslog("flatPlus: Load decor file: %s failed", *File);
         return;
     } else {

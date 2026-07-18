@@ -3010,9 +3010,9 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
         cPlugin *p {cPluginManager::GetPlugin(i)};
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Plugin %ld: %p", i, p);
-        if (p != nullptr) dsyslog("     Plugin name '%s', menu entry '%s'", p->Name(), p->MainMenuEntry());
+        if (p) dsyslog("     Plugin name '%s', menu entry '%s'", p->Name(), p->MainMenuEntry());
 #endif
-        if (p != nullptr) {                      // Plugin found
+        if (p) {                                 // Plugin found
             MainMenuEntry = p->MainMenuEntry();  // Get main menu entry of plugin
             if (!isempty(MainMenuEntry)) {       // Plugin has a main menu entry
                 if (svElement == MainMenuEntry) {
@@ -3956,7 +3956,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     cString num {""};
     std::string_view svFileName {""};  // Also used later when extracting the item name from the file name
     std::size_t found {std::string_view::npos};
-    while ((entry = d.Next()) != nullptr) {
+    while (entry = d.Next()) {
         svFileName = entry->d_name;
         found = svFileName.find('_');
         if (found != std::string_view::npos) {               // File name contains '_'
@@ -4188,7 +4188,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     FILE *f {fopen(*ItemFilename, "r")};
     if (f) {
         cReadLine ReadLine;
-        while ((s = ReadLine.Read(f)) != nullptr) {
+        while (s = ReadLine.Read(f)) {
             if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight) break;
             ContentWidget.AddText(
                 s, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
@@ -4364,7 +4364,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     }
 
     struct dirent *e;
-    while ((e = d.Next()) != nullptr) {
+    while (e = d.Next()) {
         File = e->d_name;
         if (File.find("vdrlogo") == 0)  // Skip vdrlogo* files
             continue;

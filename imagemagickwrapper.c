@@ -155,7 +155,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
 }
 
 bool cImageMagickWrapper::LoadImage(const char *fullpath) {
-    if ((fullpath == nullptr) || (strlen(fullpath) < 5))
+    if (!fullpath || (strlen(fullpath) < 5))
         return false;
 
     // Check if file exists

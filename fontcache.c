@@ -59,7 +59,7 @@ cFont* cFontCache::GetFont(const cString &Name, int Size) {
     for (const auto &data : FontCache) {
         if (isempty(*data.name)) break;  // End of cache, insert new font
 
-        if ((strcmp(*data.name, *Name) == 0) && data.size == Size && data.font != nullptr) {
+        if ((strcmp(*data.name, *Name) == 0) && data.size == Size && data.font) {
 #ifdef DEBUGFONTCACHE
             dsyslog("flatPlus: Found in FontCache: Name=%s, Size=%d", *Name, Size);
 #endif
@@ -113,7 +113,7 @@ void cFontCache::InsertFont(const cString& Name, int Size) {
 #endif
 
     if (isempty(*Name) || Size <= 0) return;  // Invalid parameters
-    if (FontCache[m_InsertIndex].font != nullptr) {  // If the slot is already used, delete it
+    if (FontCache[m_InsertIndex].font) {  // If the slot is already used, delete it
         dsyslog("flatPlus: cFontCache::InsertFont() Replacing existing font at index %zu", m_InsertIndex);
         delete FontCache[m_InsertIndex].font;
         FontCache[m_InsertIndex].font = nullptr;
@@ -254,7 +254,7 @@ int cFontCache::GetGlyphSize(const cString &Name, const FT_ULong CharCode, const
                 return 0;
             }
             const auto face {cache.GetFace(*FontFileName)};
-            if (face == nullptr) {
+            if (!face) {
                 esyslog("flatPlus: GetGlyphSize() Error: Can't find face (Font = %s)", *FontFileName);
                 return 0;
             }
