@@ -107,11 +107,11 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     }
 
     cString InfoText {""};
-    if (isempty(RecInfo->ShortText())) {  // No short text. Show date and time instead
-        InfoText = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
+    if (isempty(RecInfo->ShortText())) {  // No short text. Show date and time instead (00.00.00 00:00)
+        InfoText = cString::sprintf("%s %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
     } else {
         if (Config.PlaybackShowRecordingDate)  // Date  Time - ShortText
-            InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()),
+            InfoText = cString::sprintf("%s %s - %s", *ShortDateString(Recording->Start()),
                                         *TimeString(Recording->Start()), RecInfo->ShortText());
         else
             InfoText = RecInfo->ShortText();

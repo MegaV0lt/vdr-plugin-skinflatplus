@@ -1755,8 +1755,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(Left, Top), *RecName, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem - ImagesWidth);
             }
-
-            Buffer = cString::sprintf("%s  %s  Σ %s ", *ShortDateString(Recording->Start()),
+            // Draw recording date, time and length (00.00.00 00:00 Σ 00:00)
+            Buffer = cString::sprintf("%s %s Σ %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
             Top += m_FontHeight;
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
@@ -2172,9 +2172,9 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 
     PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
-
+    // Draw event time, title and short text (00.00.0000 00:00–00:00)
     const cString StrTime {
-        cString::sprintf("%s  %s–%s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString())};
+        cString::sprintf("%s %s–%s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString())};
 
     const cString Title {Event->Title()};
     const cString ShortText {(Event->ShortText()) ? Event->ShortText() : ""};  // No short text. Show empty string
@@ -2703,8 +2703,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
     PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
-
-    const cString StrTime {cString::sprintf("%s  %s  %s", *DateString(Recording->Start()),
+    // Date/Time (00.00.0000 00:00  Channel name)
+    const cString StrTime {cString::sprintf("%s %s  %s", *DateString(Recording->Start()),
                                             *TimeString(Recording->Start()),
                                             (RecInfo->ChannelName()) ? RecInfo->ChannelName() : "")};
 
