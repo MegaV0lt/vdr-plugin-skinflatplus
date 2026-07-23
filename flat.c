@@ -335,7 +335,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     // Find radio and H.264/H.265 streams.
     //! RTL, SAT1 etc. do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
-        for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // Not iterable
+        for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {  // Not iterable
             switch (Components->Component(i)->stream) {
             case sc_video_MPEG2: return "sd";
             case sc_video_H264_AVC: return "hd";
@@ -424,26 +424,23 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
-    std::ostringstream ossText {""}, ossAudio {""}, ossSubtitle {""};
+    std::ostringstream ossVideo {""}, ossAudio {""}, ossSubtitle {""};
     const int NumComponents {Components->NumComponents()};
-    for (int16_t i {0}; i < NumComponents; ++i) {
+    for (int i {0}; i < NumComponents; ++i) {
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
-            if (NewLine) ossText << '\n';
-            (p->description) ? ossText << tr("Video") << ": " << p->description << " (MPEG2)"
-                             : ossText << tr("Video") << ": MPEG2";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (MPEG2)"
+                             : ossVideo << tr("Video") << ": MPEG2";
             break;
         case sc_video_H264_AVC:
-            if (NewLine) ossText << '\n';
-            (p->description) ? ossText << tr("Video") << ": " << p->description << " (H.264)"
-                             : ossText << tr("Video") << ": H.264";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.264)"
+                             : ossVideo << tr("Video") << ": H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
-            if (NewLine) ossText << '\n';
-            (p->description) ? ossText << tr("Video") << ": " << p->description << " (H.265)"
-                             : ossText << tr("Video") << ": H.265";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.265)"
+                             : ossVideo << tr("Video") << ": H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
@@ -473,9 +470,16 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         }  // switch
     }  // for
-    Text.Append(ossText.str().c_str());
-    Audio.Append(ossAudio.str().c_str());
-    Subtitle.Append(ossSubtitle.str().c_str());
+
+    if (NewLine) Text.Append('\n');
+    Text.Append(ossVideo.str().c_str());
+
+    if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
+    // Audio.Append(ossAudio.str().c_str());
+
+    if (!ossSubtitle.str().empty())
+        Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), ossSubtitle.str().c_str()));
+    // Subtitle.Append(ossSubtitle.str().c_str());
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
