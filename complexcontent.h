@@ -205,6 +205,13 @@ class cComplexContent {
     bool IsShown() const { return m_IsShown; }
     bool IsScrollingActive() const { return m_IsScrollingActive; }
 
+    // Hide/show the content pixmaps (used by the zapcockpit list views).
+    // The layers correspond to those used in CreatePixmaps()
+    void SetVisible(bool Visible) {
+        if (Pixmap) Pixmap->SetLayer(Visible ? 1 : -1);
+        if (PixmapImage) PixmapImage->SetLayer(Visible ? 2 : -1);
+    }
+
  private:
     std::vector<cSimpleContent> Contents;
 

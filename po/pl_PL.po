@@ -1035,3 +1035,21 @@ msgstr "Aktywny?"
 
 msgid "Widget custom commands: position"
 msgstr "Pozycja"
+
+msgid "No EPG info available."
+msgstr "Brak dostępnych informacji EPG."
+
+msgid "Zapcockpit: Key right opens channellist"
+msgstr "Zapcockpit: klawisz w prawo otwiera listę kanałów"
+
+msgid "Zapcockpit: Relative list width"
+msgstr "Zapcockpit: względna szerokość listy"
+
+msgid "Zapcockpit: Relative list font size"
+msgstr "Zapcockpit: względny rozmiar czcionki listy"
+
+msgid "Zapcockpit: List fade-in time (ms)"
+msgstr "Zapcockpit: czas pojawiania się listy (ms)"
+
+msgid "Zapcockpit: List shift-in time (ms)"
+msgstr "Zapcockpit: czas wsuwania listy (ms)"

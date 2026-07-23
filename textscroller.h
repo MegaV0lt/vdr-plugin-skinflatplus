@@ -34,6 +34,11 @@ class cTextScroll {
     void UpdateViewPortWidth(int w);
     void Reset();
 
+    // Hide/show the scroller pixmap (used by the zapcockpit list views)
+    void SetVisible(bool Visible) {
+        if (Pixmap) Pixmap->SetLayer(Visible ? m_Layer : -1);
+    }
+
     void SetText(const char *text, const cRect &position, tColor colorFg, tColor colorBg,
                  cFont *font, tColor ColorExtraTextFg = 0);
     void DoStep();
@@ -72,6 +77,12 @@ class cTextScrollers : public cThread {
                      cFont *font, tColor ColorExtraTextFg = 0);
     void UpdateViewPortWidth(int w);
     bool isActive() { return Active(); }
+
+    // Hide/show all scroller pixmaps (used by the zapcockpit list views)
+    void SetVisible(bool Visible) {
+        for (cTextScroll *Scroller : Scrollers)
+            Scroller->SetVisible(Visible);
+    }
 
  private:
     std::vector<cTextScroll *> Scrollers;  // NOLINT

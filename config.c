@@ -91,6 +91,11 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      ChannelTimeLeft = atoi(Value);
     else if (strcmp(Name, "ChannelWeatherShow") == 0)                   ChannelWeatherShow = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitKeyRightOpensList") == 0)   ChannelZapcockpitKeyRightOpensList = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitListWidth") == 0)           ChannelZapcockpitListWidth = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFontSize") == 0)            ChannelZapcockpitFontSize = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFadeTime") == 0)            ChannelZapcockpitFadeTime = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitShiftTime") == 0)           ChannelZapcockpitShiftTime = atoi(Value);
     else if (strcmp(Name, "DecorIndex") == 0)                           DecorIndex = atoi(Value);
     else if (strcmp(Name, "DiskUsageFree") == 0)                        DiskUsageFree = atoi(Value);
     else if (strcmp(Name, "DiskUsageShort") == 0)                       DiskUsageShort = atoi(Value);

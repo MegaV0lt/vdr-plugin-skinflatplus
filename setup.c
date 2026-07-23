@@ -276,6 +276,11 @@ void cFlatSetup::Store() {
     SetupStore("ChannelSimpleAspectFormat", Config.ChannelSimpleAspectFormat);
     SetupStore("ChannelTimeLeft", Config.ChannelTimeLeft);
     SetupStore("ChannelWeatherShow", Config.ChannelWeatherShow);
+    SetupStore("ChannelZapcockpitKeyRightOpensList", Config.ChannelZapcockpitKeyRightOpensList);
+    SetupStore("ChannelZapcockpitListWidth", Config.ChannelZapcockpitListWidth);
+    SetupStore("ChannelZapcockpitFontSize", Config.ChannelZapcockpitFontSize);
+    SetupStore("ChannelZapcockpitFadeTime", Config.ChannelZapcockpitFadeTime);
+    SetupStore("ChannelZapcockpitShiftTime", Config.ChannelZapcockpitShiftTime);
     SetupStore("DecorIndex", Config.DecorIndex);
     SetupStore("DiskUsageFree", Config.DiskUsageFree);
     SetupStore("DiskUsageShort", Config.DiskUsageShort);
@@ -488,6 +493,11 @@ bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            SetupConfig->ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      SetupConfig->ChannelTimeLeft = atoi(Value);
     else if (strcmp(Name, "ChannelWeatherShow") == 0)                   SetupConfig->ChannelWeatherShow = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitKeyRightOpensList") == 0)   SetupConfig->ChannelZapcockpitKeyRightOpensList = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitListWidth") == 0)           SetupConfig->ChannelZapcockpitListWidth = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFontSize") == 0)            SetupConfig->ChannelZapcockpitFontSize = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFadeTime") == 0)            SetupConfig->ChannelZapcockpitFadeTime = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitShiftTime") == 0)           SetupConfig->ChannelZapcockpitShiftTime = atoi(Value);
     else if (strcmp(Name, "DecorIndex") == 0)                           SetupConfig->DecorIndex = atoi(Value);
     else if (strcmp(Name, "DiskUsageFree") == 0)                        SetupConfig->DiskUsageFree = atoi(Value);
     else if (strcmp(Name, "DiskUsageShort") == 0)                       SetupConfig->DiskUsageShort = atoi(Value);
@@ -680,6 +690,11 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     Config.Store("ChannelSimpleAspectFormat", SetupConfig->ChannelSimpleAspectFormat, *Filename);
     Config.Store("ChannelTimeLeft", SetupConfig->ChannelTimeLeft, *Filename);
     Config.Store("ChannelWeatherShow", SetupConfig->ChannelWeatherShow, *Filename);
+    Config.Store("ChannelZapcockpitKeyRightOpensList", SetupConfig->ChannelZapcockpitKeyRightOpensList, *Filename);
+    Config.Store("ChannelZapcockpitListWidth", SetupConfig->ChannelZapcockpitListWidth, *Filename);
+    Config.Store("ChannelZapcockpitFontSize", SetupConfig->ChannelZapcockpitFontSize, *Filename);
+    Config.Store("ChannelZapcockpitFadeTime", SetupConfig->ChannelZapcockpitFadeTime, *Filename);
+    Config.Store("ChannelZapcockpitShiftTime", SetupConfig->ChannelZapcockpitShiftTime, *Filename);
     Config.Store("DecorIndex", SetupConfig->DecorIndex, *Filename);
     Config.Store("DiskUsageFree", SetupConfig->DiskUsageFree, *Filename);
     Config.Store("DiskUsageShort", SetupConfig->DiskUsageShort, *Filename);
@@ -971,6 +986,18 @@ void cFlatSetupChannelInfo::Setup() {
     Add(new cMenuEditBoolItem(tr("Show Channelinfo icons"), &SetupConfig->ChannelIconsShow));
     Add(new cMenuEditBoolItem(tr("Show event start time left"), &SetupConfig->ChannelShowStartTime));
     Add(new cMenuEditBoolItem(tr("Show signal quality"), &SetupConfig->SignalQualityShow));
+#ifdef USE_ZAPCOCKPIT
+    Add(new cMenuEditBoolItem(tr("Zapcockpit: Key right opens channellist"),
+                              &SetupConfig->ChannelZapcockpitKeyRightOpensList));
+    Add(new cMenuEditIntItem(tr("Zapcockpit: Relative list width"),
+                             &SetupConfig->ChannelZapcockpitListWidth, 20, 40));
+    Add(new cMenuEditIntItem(tr("Zapcockpit: Relative list font size"),
+                             &SetupConfig->ChannelZapcockpitFontSize, 60, 100));
+    Add(new cMenuEditIntItem(tr("Zapcockpit: List fade-in time (ms)"),
+                             &SetupConfig->ChannelZapcockpitFadeTime, 0, 1000));
+    Add(new cMenuEditIntItem(tr("Zapcockpit: List shift-in time (ms)"),
+                             &SetupConfig->ChannelZapcockpitShiftTime, 0, 1000));
+#endif
     Add(new cMenuEditBoolItem(tr("Show weather widget"), &SetupConfig->ChannelWeatherShow));
     Add(new cMenuEditPrcItem(tr("Weather widget font size"), &SetupConfig->WeatherFontSize, 0.01, 0.2, 1));
     Add(new cMenuEditBoolItem(tr("Colors for signal quality"), &SetupConfig->SignalQualityUseColors));

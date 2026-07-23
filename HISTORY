@@ -1,6 +1,26 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2026-XX-XX: Version 1.2.11
+2026-XX-XX: Version 1.3.0
+- [add] Zapcockpit support (extended channel display) like in skindesigner:
+        channellist, grouplist with separate group channel list, channel hints
+        while entering a channel number and detailed EPG info (2nd 'Ok').
+        Requires a VDR patched with the zapcockpit patch (USE_ZAPCOCKPIT in
+        vdr/skins.h) and 'Zapcockpit: enabled' in the VDR miscellaneous setup.
+        The lists slide in from the side of the pressed key (key 'left'
+        opens its list at the right edge) and while a list is shown all
+        other OSD elements (top bar, channel info) are hidden.
+        The channellist items show the channel logo and three text lines:
+        Remaining time, title of the running event and the following event.
+        The lists use the full OSD height; too long texts are cut off and
+        end with '...' like in skindesigner. The channel logos in the lists
+        are drawn on the 'logo_background' image like in the channel info
+        display at the bottom (alpha blended in software, so semi transparent
+        images do not punch through to the live picture).
+        Builds unchanged against an unpatched VDR.
+        New setup options: 'Zapcockpit: Key right opens channellist',
+        relative list width, relative list font size, list fade-in time and
+        list shift-in time (ms, 0 = off) for animated showing of the lists.
+        Thanks to heifisch @ VDR-Portal
 - [update] Add spacing before percent and degree symbols
 - [update] Improve image cache by replacing linear search with hash-based lookup
 - [update] Clarify disk usage time units by adding 'h' to hour values in top bar

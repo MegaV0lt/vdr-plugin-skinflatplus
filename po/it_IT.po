@@ -1040,3 +1040,21 @@ msgstr "Uso comandi dei widget: posizione"
 
 #~ msgid "dvbapi plugin non installed"
 #~ msgstr "dvbapi plugin non installato"
+
+msgid "No EPG info available."
+msgstr "Nessuna info EPG disponibile."
+
+msgid "Zapcockpit: Key right opens channellist"
+msgstr "Zapcockpit: tasto destro apre la lista canali"
+
+msgid "Zapcockpit: Relative list width"
+msgstr "Zapcockpit: larghezza relativa lista"
+
+msgid "Zapcockpit: Relative list font size"
+msgstr "Zapcockpit: dimensione fonte relativa lista"
+
+msgid "Zapcockpit: List fade-in time (ms)"
+msgstr "Zapcockpit: tempo di dissolvenza lista (ms)"
+
+msgid "Zapcockpit: List shift-in time (ms)"
+msgstr "Zapcockpit: tempo di scorrimento lista (ms)"

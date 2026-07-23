@@ -220,6 +220,11 @@ class cFlatConfig {
         int ChannelShowStartTime {true};
         int ChannelSimpleAspectFormat {true};
         int ChannelTimeLeft {0};
+        int ChannelZapcockpitKeyRightOpensList {true};  // Zapcockpit: Key right opens channellist (else grouplist)
+        int ChannelZapcockpitListWidth {33};   // Zapcockpit: Width of one list column in % of the OSD width (20-40)
+        int ChannelZapcockpitFontSize {100};   // Zapcockpit: Font size of the list items in % of the OSD font (60-100)
+        int ChannelZapcockpitFadeTime {0};     // Zapcockpit: Fade-in time of the lists in ms (0 = off)
+        int ChannelZapcockpitShiftTime {0};    // Zapcockpit: Shift-in time of the lists in ms (0 = off)
 
         double WeatherFontSize {5.0 / 100};  // Font size for weather (% of OSD height)
         int ChannelWeatherShow {1};
