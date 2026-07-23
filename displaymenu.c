@@ -559,9 +559,10 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int ImageTop {Top};
     int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
     int ImageBgHeight {m_FontHeight};
-
     cImage *img {nullptr};
-    if (!IsGroup) {
+    if (IsGroup) {
+        img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+    } else {
         img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
         if (img) {
             ImageBgHeight = img->Height();
@@ -571,20 +572,18 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         }
         // Load named logo only for channels
         img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-    }
-
-    if (!img) {
-        const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-        if (IsRadioChannel) {
-            if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-        } else if (IsGroup) {
-            img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-        } else {
-            if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+        if (!img) {
+            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
+            if (IsRadioChannel) {
+                if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            } else {
+                if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            }
         }
     }
+
     if (img) {  // Draw the logo
         ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -1145,7 +1144,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageLeft {Left};
         int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
         int ImageBgHeight {m_FontHeight};
-        if (!IsGroup) {
+        if (IsGroup) {
+            img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+        } else {
             img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
             if (img) {
                 ImageBgWidth = img->Width();
@@ -1155,20 +1156,18 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
             // Load named logo only for channels
             img = ImgLoader.GetLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
-        }
-
-        if (!img) {
-            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-            if (IsRadioChannel) {
-                if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-            } else if (IsGroup) {
-                img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-            } else {
-                if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) {
+                const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
+                if (IsRadioChannel) {
+                    if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                    if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+                } else {
+                    if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                    if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+                }
             }
         }
+
         if (img) {  // Draw the logo
             ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
             ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1771,7 +1770,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 
-            Left += m_FontSmlHeight + m_MarginItem;
+            Left += m_FontHeight + m_MarginItem;
             if (IsEdited && ImgRecCut) {
                 const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
@@ -1796,11 +1795,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Top += m_FontHeight;
             const int DigitsMaxWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "0000") +
                                       m_MarginItem};  // Use same width for recs and new recs
+            const int TotalPrefixWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "Σ ")};
             // Total recordings in folder preceeded by Σ (Sigma) symbol
             Buffer = cString::sprintf("Σ %d", Total);
-            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
-                                 m_FontSmlHeight, taRight);
-            Left += DigitsMaxWidth + m_MarginItem3;  // Add margin between total and new recordings
+            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
+                                 TotalPrefixWidth + DigitsMaxWidth, m_FontSmlHeight);
+            Left += TotalPrefixWidth + DigitsMaxWidth + m_MarginItem3;  // Add margin between total and new recordings
 
             Left = DrawRecordingIcon("recording_new", Left, Top, Current, true);  // Draw small new icon
 
