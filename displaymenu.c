@@ -2030,7 +2030,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
         cString SearchTerm {Event->Title()};  // Search term
-        if (pEpgSearchPlugin && !isempty(Event->Title())) {
+        if (pEpgSearchPlugin && !isempty(SearchTerm)) {
             Epgsearch_searchresults_v1_0 data {
                 .query = const_cast<char *>(static_cast<const char *>(SearchTerm)),
                 .mode = 0,               // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
