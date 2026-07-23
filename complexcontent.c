@@ -63,10 +63,9 @@ void cComplexContent::CreatePixmaps(bool FullFillBackground) {
             PixmapFill(Pixmap, m_ColorBg);
         } else {
             const int HeightContent {ContentHeight(false)};
-            if (HeightContent > 0)  // Only draw background if content height is > 0
-                Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg);
-            else
-                PixmapClear(Pixmap);
+            (HeightContent > 0)  // Only draw background if content height is > 0
+                ? Pixmap->DrawRectangle(cRect(0, 0, m_Position.Width(), HeightContent), m_ColorBg)
+                : PixmapClear(Pixmap);
         }
     } else {  // Log values and return
         esyslog(
@@ -109,10 +108,9 @@ bool cComplexContent::Scrollable(int height) {
         return false;
     }
 
-    const int total {ScrollTotal()};
     // const int shown = ceil(height * 1.0 / m_ScrollSize);  // Narrowing conversion
     const int shown {(height + m_ScrollSize - 1) / m_ScrollSize};  // Avoid floating-point and use integer division
-    return total > shown;
+    return ScrollTotal() > shown;
 }
 
 void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg,
@@ -151,8 +149,9 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     std::string Line {""};
     Line.reserve(128);
     cRect FloatedTextPos {TextPos};
+    const int Top {TextPos.Top()};  // Cache TextPos.Top() outside the loop
     for (int i {0}; i < Lines; ++i) {  // Add text line by line
-        FloatedTextPos.SetTop(TextPos.Top() + (i * m_ScrollSize));
+        FloatedTextPos.SetTop(Top + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
         // Last line is not justified
         if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
@@ -161,7 +160,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
     }
 
-    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, TextPos.Top(), image->Width(), image->Height()};
+    const cRect ImagePos {TextPos.Left() + TextWidthLeft + Margin, Top, image->Width(), image->Height()};
     AddImage(image, ImagePos);  // Add the image (Currently always on the right side)
 }
 
@@ -217,10 +216,8 @@ int cComplexContent::ScrollOffset() const {
     int y {Pixmap->DrawPort().Point().Y() * -1};
     const int PositionHeight {m_Position.Height()};
     if (y + PositionHeight + m_ScrollSize > m_DrawPortHeight) {
-        if (y == m_DrawPortHeight - PositionHeight)
-            y += m_ScrollSize;
-        else
-            y = m_DrawPortHeight - PositionHeight - 1;
+        (y == m_DrawPortHeight - PositionHeight) ? y += m_ScrollSize
+                                                 : y = m_DrawPortHeight - PositionHeight - 1;
     }
 
     if (m_DrawPortHeight == 0) {  // Avoid DIV/0

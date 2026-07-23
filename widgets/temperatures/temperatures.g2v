@@ -28,22 +28,22 @@ done
 
 # cpu temp
 #CPUTEMP=($(sensors -A | grep "CPU Temperature"))  # no need for grep
-CPUTEMP[2]="${CPUTEMP[2]/+}"                       # +36.0°C -> 36.0°C
-#echo "${CPUTEMP[2]/./,}" > "${OUTPUTFLDR}/cpu"    # 36,0°C
-echo "${CPUTEMP[2]%.*}°C" > "${OUTPUTFLDR}/cpu"    # 36°C
+CPUTEMP[2]="${CPUTEMP[2]/+}"                       # +36.0 °C -> 36.0 °C
+#echo "${CPUTEMP[2]/./,}" > "${OUTPUTFLDR}/cpu"    # 36,0 °C
+echo "${CPUTEMP[2]%.*} °C" > "${OUTPUTFLDR}/cpu"    # 36 °C
 
 # pc case temp
 #sensors -A acpitz-virtual-0 | grep "temp1" | awk '{print $2}' | tr -d "+" > "${OUTPUTFLDR}/pccase"
 
 # motherboard temp
-MBTEMP[2]="${MBTEMP[2]/+}"                              # +36.0°C -> 36.0°C
-#echo "${MBTEMP[2]/./,}" > "${OUTPUTFLDR}/motherboard"  # 36,0°C
-echo "${MBTEMP[2]%.*}°C" > "${OUTPUTFLDR}/motherboard"  # 36°C
+MBTEMP[2]="${MBTEMP[2]/+}"                              # +36.0 °C -> 36.0 °C
+#echo "${MBTEMP[2]/./,}" > "${OUTPUTFLDR}/motherboard"  # 36,0 °C
+echo "${MBTEMP[2]%.*} °C" > "${OUTPUTFLDR}/motherboard"  # 36 °C
 
 # nvidia gpu temp
 # nvidia-settings must be run as the user of the x server
 #GPU=$(nvidia-settings -c :0 -t -query GPUCoreTemp | head -n 1)   # slow
 #GPU=$(nvidia-smi -q -d TEMPERATURE | grep -Pow "[[:digit:]]+(?=\sC)" | head -n1) # faster
 GPU="$(/opt/bin/nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader)"    # fastest
-echo "${GPU}°C" > "${OUTPUTFLDR}/gpu"
+echo "${GPU} °C" > "${OUTPUTFLDR}/gpu"
 

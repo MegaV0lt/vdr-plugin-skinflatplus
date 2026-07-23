@@ -6,7 +6,7 @@ HISTORY
  [...] Erste Version
  [18.11.2013] - Themen ueberarbeitet. Farben angepasst und .decor erstellt
  [24.11.2013] - Widergabestatus: Symbole passend zu den Themen eingefaerbt
-              - Formatsymbole: von 100% Weiss nach 95%
+              - Formatsymbole: von 100 % Weiss nach 95 %
  [25.11.2013] - Wiedergabe-Info: Eigenes Symbol (extraIcons/playing.png)
  [26.11.2013] - Wiedergabe-Info: Symbolname korrigiert (extraIcons/Playing.png)
               - Themen "Blood" und "Rauchglas" nur noch mit geaendertem Hintergrund
@@ -43,7 +43,7 @@ HISTORY
               - 'timer_full.png' verkleinert, 'timer_partial.png' geaendert
  [10.03.2014] - ExtraTextFont in Themenfarbe
               - ExtraTextCurrentFont in Hintergrundfarbe
- [11.03.2014] - 'logo_background.png' fuer Kanallogos mit 30% Deckkraft und in #FFFFFF
+ [11.03.2014] - 'logo_background.png' fuer Kanallogos mit 30 % Deckkraft und in #FFFFFF
  [12.03.2014] - 'logo_background.png' mit runden Ecken und leichtem Verlauf
               - 'vps.png' Schrift vergroessert
  [14.03.2014] - Verlinkung von Themenuebergreifenden Symbolen mit symbolischen Links
@@ -112,7 +112,7 @@ HISTORY
               - Hinweis auf Schriften geaendert
  [09.12.2014] - Diskanzeige - Symbole neu verlinkt (16 statt 8 Abschnitte)
  [08.02.2015] - Symbole fuer "Aufnahme gesehen" ab VDR 2.1.8 in Skinfarbe
- [10.02.2015] - Symbol fuer "Aufnahme komplett (100%) gesehen" hinzugefuegt
+ [10.02.2015] - Symbol fuer "Aufnahme komplett (100 %) gesehen" hinzugefuegt
  [25.04.2015] - Diskanzeige - Symbole neu verlinkt (32 statt 16 Abschnitte)
  [26.04.2015] - Symbol 'timerInactive_cur.png' in Skinfarbe (HG)
  [01.05.2015] - Symbole 'radio_cur.png', 'tv_cur.png' und 'recording_cur.png'

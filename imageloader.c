@@ -44,7 +44,7 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
 #endif
 
     // Plain logo without converting to lower including '/'
-    cString File = cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension);
+    cString File {cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension)};
     std::string LogoLower {""};
     bool success {false};
     cImage *img {nullptr};
@@ -110,7 +110,7 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
 cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
     if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
 
-    cString File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension);
+    cString File {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension)};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::GetIcon() '%s'", *File);
@@ -180,7 +180,7 @@ cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
 cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
     if (width < 0 || height < 0 || isempty(cFile)) return nullptr;
 
-    const cString File = cFile;
+    const cString File {cFile};
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::GetFile() '%s'", *File);

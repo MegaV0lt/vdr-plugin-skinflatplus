@@ -91,6 +91,10 @@
     "C_Cpp.vcFormat.space.beforeInitializerListOpenBrace": true,
     "javascript.inlayHints.enumMemberValues.enabled": true,
     "C_Cpp.default.defines": [
-        "PLUGIN_NAME_I18N=skinflatplus"
+        "PLUGIN_NAME_I18N=skinflatplus",
+        "USE_ZAPCOCKPIT=1"
+    ],
+    "editor.dropIntoEditor.preferences": [
+
     ]
 }

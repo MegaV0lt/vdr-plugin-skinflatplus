@@ -32,6 +32,7 @@ enum eBorder {
     BorderMMWidget
 };
 
+// Decorated border (Left, Top, Width, Height, Size, Type, ColorFg, ColorBg, From)
 struct sDecorBorder {
     int Left {0}, Top {0}, Width {0}, Height {0};
     int Size {0}, Type {0};
@@ -276,7 +277,7 @@ class cFlatBaseRender {
 // tries to acquire the Timers lock.
 class cRecCountThread : public cThread {
  public:
-    cRecCountThread() : cThread("RecCount") {}
+    cRecCountThread() : cThread("RecCount", true) {}  // Low priority thread
     uint16_t Count() const { return m_NumRecordings.load(std::memory_order_relaxed); }
     void Stop() { Cancel(3); }
 
@@ -284,9 +285,10 @@ class cRecCountThread : public cThread {
     void Action() override {
         while (Running()) {
             uint16_t count {0};
-            { LOCK_TIMERS_READ;
-                for (const cTimer *Timer = Timers->First(); Timer; Timer = Timers->Next(Timer)) {
-                    if (Timer->HasFlags(tfRecording)) ++count;
+            {
+                LOCK_TIMERS_READ;
+                for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
+                    count += (Timer->HasFlags(tfRecording)) ? 1 : 0;  // Increment count if timer is recording
                 }
             }
             m_NumRecordings.store(count, std::memory_order_relaxed);

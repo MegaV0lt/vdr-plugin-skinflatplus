@@ -149,9 +149,8 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
         if (!pScraper->Service("GetSeries", &series)) return;  // Check if service call was successful
 
         if (series.banners.size() > 1) {  // Use random banner
-            // Gets 'entropy' from device that generates random numbers itself
-            // to seed a mersenne twister (pseudo) random generator
-            std::mt19937 generator(std::random_device {}());
+            // Reuse RNG for less overhead during UI rendering.
+            static thread_local std::mt19937 generator {std::random_device {}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
@@ -166,8 +165,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
             MediaPath = series.banners[0].path.c_str();
         }
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-            const std::size_t ActorsSize {series.actors.size()};
-            Actors.reserve(ActorsSize);  // Set capacity to size of actors
+            Actors.reserve(series.actors.size());  // Set capacity to size of actors
             for (const auto &actor : series.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
                     Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
@@ -182,8 +180,7 @@ void GetScraperMedia(cString &MediaPath, cString &SeriesInfo, cString &MovieInfo
 
         MediaPath = movie.poster.path.c_str();
         if ((Event && Config.TVScraperEPGInfoShowActors) || (Recording && Config.TVScraperRecInfoShowActors)) {
-            const std::size_t ActorsSize {movie.actors.size()};
-            Actors.reserve(ActorsSize);  // Set capacity to size of actors
+            Actors.reserve(movie.actors.size());  // Set capacity to size of actors
             for (const auto &actor : movie.actors) {
                 if (LastModifiedTime(actor.actorThumb.path.c_str())) {
                     Actors.emplace_back(actor.name.c_str(), actor.role.c_str(), actor.actorThumb.path.c_str());
@@ -217,9 +214,8 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
         if (!pScraper->Service("GetSeries", &series)) return 0;  // Check if service call was successful
 
         if (series.banners.size() > 1) {  // Use random banner
-            // Gets 'entropy' from device that generates random numbers itself
-            // to seed a mersenne twister (pseudo) random generator
-            std::mt19937 generator(std::random_device {}());
+            // Reuse RNG for less overhead during UI rendering.
+            static thread_local std::mt19937 generator {std::random_device {}()};
 
             // Make sure all numbers have an equal chance.
             // Range is inclusive (so we need -1 for vector index)
@@ -283,7 +279,7 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
     if (!Movie.releaseDate.empty()) oss << tr("release date: ") << Movie.releaseDate << '\n';
     if (Movie.popularity > 0)
         oss << tr("popularity: ") << std::fixed << std::setprecision(1) << Movie.popularity << '\n';
-    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << "%\n";  // 10 Points = 100%
+    if (Movie.voteAverage > 0) oss << tr("vote average: ") << Movie.voteAverage * 10 << " %\n";  // 10 Points = 100 %
     MovieInfo.Append(oss.str().c_str());
 }
 
@@ -339,7 +335,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     // Find radio and H.264/H.265 streams.
     //! RTL, SAT1 etc. do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
-        for (int16_t i {0}, n = Components->NumComponents(); i < n; ++i) {  // Not iterable
+        for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {  // Not iterable
             switch (Components->Component(i)->stream) {
             case sc_video_MPEG2: return "sd";
             case sc_video_H264_AVC: return "hd";
@@ -374,7 +370,7 @@ cString GetRecordingSeenIcon(int FrameTotal, int FrameResume) {
     const double FrameSeen {static_cast<double>(FrameResume) / FrameTotal};  // 0.0...1.0
     const double SeenThreshold {Config.MenuItemRecordingSeenThreshold * 100.0};
     // dsyslog("flatPlus: Config.MenuItemRecordingSeenThreshold: %.2f", SeenThreshold);
-    if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100%
+    if (FrameSeen >= SeenThreshold) return "recording_seen_10";  // 100 %
 
     const int idx {std::min(static_cast<int>(FrameSeen * 10.0 + 0.5), 10)};  // 0...10 rounded
     return cString::sprintf("recording_seen_%d", idx);
@@ -407,11 +403,11 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 
     static constexpr int kPosterAspectThreshold {1};              // Smaller than 1 = Poster
     static constexpr int kBannerAspectThreshold {4};              // Smaller than 4 = Portrait, bigger than 4 = Banner
-    static constexpr double kPosterHeightRatio {0.7};             // Max 70% of pixmap height
+    static constexpr double kPosterHeightRatio {0.7};             // Max 70 % of pixmap height
     static constexpr double kPortraitWidthRatio {1.0 / 3.0};      // Max 1/3 of pixmap width
     static constexpr double kBannerTargetRatio {758.0 / 1920.0};  // To get 758 width @ 1920
 
-    const uint16_t Aspect = MediaSize.Width() / MediaSize.Height();  // Aspect ratio as integer. Narrowing conversion
+    const int Aspect {MediaSize.Width() / MediaSize.Height()};  // Aspect ratio as integer. Narrowing conversion
     //* Set to default size and apply user settings
     //* Aspect of image is preserved in cImageLoader::GetFile()
     if (Aspect < kPosterAspectThreshold) {  //* Poster (For example 680x1000 = 0.68)
@@ -428,33 +424,23 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 
 void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
                       bool NewLine) {
-    std::ostringstream ossText {""}, ossAudio {""}, ossSubtitle {""};
-    cString AudioType {""};
+    std::ostringstream ossVideo {""}, ossAudio {""}, ossSubtitle {""};
     const int NumComponents {Components->NumComponents()};
-    for (int16_t i {0}; i < NumComponents; ++i) {
+    for (int i {0}; i < NumComponents; ++i) {
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
-            if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (MPEG2)";
-            else
-                ossText << tr("Video") << ": MPEG2";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (MPEG2)"
+                             : ossVideo << tr("Video") << ": MPEG2";
             break;
         case sc_video_H264_AVC:
-            if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (H.264)";
-            else
-                ossText << tr("Video") << ": H.264";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.264)"
+                             : ossVideo << tr("Video") << ": H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
-            if (NewLine) ossText << '\n';
-            if (p->description)
-                ossText << tr("Video") << ": " << p->description << " (H.265)";
-            else
-                ossText << tr("Video") << ": H.265";
+            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.265)"
+                             : ossVideo << tr("Video") << ": H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
@@ -464,6 +450,7 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             if (p->description) {
                 ossAudio << p->description << " (" << p->language << ')';
             } else {
+                cString AudioType {""};
                 switch (p->stream) {
                 case sc_audio_MP2:
                     // Workaround for wrongfully used stream type X 02 05 for AC3
@@ -478,16 +465,21 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
             break;
         case sc_subtitle:
             if (!ossSubtitle.str().empty()) ossSubtitle << ", ";
-            if (p->description)
-                ossSubtitle << p->description << " (" << p->language << ')';
-            else
-                ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
+            (p->description) ? ossSubtitle << p->description << " (" << p->language << ')'
+                             : ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
             break;
         }  // switch
     }  // for
-    Text.Append(ossText.str().c_str());
-    Audio.Append(ossAudio.str().c_str());
-    Subtitle.Append(ossSubtitle.str().c_str());
+
+    if (NewLine) Text.Append('\n');
+    Text.Append(ossVideo.str().c_str());
+
+    if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
+    // Audio.Append(ossAudio.str().c_str());
+
+    if (!ossSubtitle.str().empty())
+        Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), ossSubtitle.str().c_str()));
+    // Subtitle.Append(ossSubtitle.str().c_str());
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT
@@ -619,7 +611,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
         index = std::make_unique<cIndexFile>(RecordingFileName, false, IsPesRecording);  // Assign unique ptr object
         if (index) {
-            off_t dummy;
+            off_t dummy {0};
             LastIndex = index->Last();
             index->Get(LastIndex, &MaxFileNum, &dummy);
         }
@@ -786,8 +778,8 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
 #endif
 
     static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
-    const int16_t LineWidth = Font->Width(Line.c_str());       // Width in Pixel
-    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80% looking bad when justified
+    const int LineWidth {Font->Width(Line.c_str())};           // Width in Pixel
+    if (LineWidth < (LineMaxWidth * kLineWidthThreshold)) return;  // Lines shorter than 80 % looking bad when justified
 
     // Count spaces in line
     const int LineSpaces = std::count_if(Line.begin(), Line.end(), [](char c) { return c == ' '; });
@@ -801,7 +793,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
                                   FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
                               ? " "
                               : u8"\U0000200A"};  // Use hair space if it is smaller than space
-    const int16_t FillCharWidth = FontCache.GetStringWidth(FontName, FontHeight, FillChar);  // Width in pixel
+    const int FillCharWidth {FontCache.GetStringWidth(FontName, FontHeight, FillChar)};  // Width in pixel
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
         // dsyslog("flatPlus: JustifyLine() Line can not be justified. LineSpaces: %d, FillCharWidth: %d", LineSpaces,
@@ -812,11 +804,11 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     if ((LineWidth + FillCharWidth) > LineMaxWidth)  // Check if at least one 'FillChar' fits in to the line
         return;
 
-    const int16_t NeedFillChar = (LineMaxWidth - LineWidth) / FillCharWidth;  // How many 'FillChar' we need?
-    const int16_t FillCharBlock = std::max(NeedFillChar / LineSpaces, 1);     // For inserting multiple 'FillChar'
+    const int NeedFillChar {(LineMaxWidth - LineWidth) / FillCharWidth};  // How many 'FillChar' we need?
+    const int FillCharBlock {std::max(NeedFillChar / LineSpaces, 1)};  // For inserting multiple 'FillChar'
     std::string FillChars {""};
     FillChars.reserve(FillCharBlock);
-    for (int16_t i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
+    for (int i {0}; i < FillCharBlock; ++i) {  // Create 'FillChars' block for inserting
         FillChars.append(FillChar);
     }
 
@@ -915,7 +907,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     const std::size_t TextLen {strlen(Text)};
     if (TextLen == 0) return;  // Avoid processing empty text
     // Estimate number of lines. More conservative size estimation
-    const std::size_t EstimatedLines = (TextLen / 10) + UpperLines + 10;  // Add safety margin
+    const std::size_t EstimatedLines {(TextLen / 10) + UpperLines + 10};  // Add safety margin
     std::size_t Capacity {TextLen + EstimatedLines + 2};
 #ifdef DEBUGFUNCSCALL
     dsyslog("   TextLen: %ld, EstimatedLines: %ld, Capacity: %ld", TextLen, EstimatedLines, Capacity);
@@ -934,7 +926,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     std::size_t CurLength {TextLen};  // Current length of the text
     char *Blank {nullptr}, *Delim {nullptr}, *NewText {nullptr};
     int16_t cw {0}, l {0}, sl {0}, w {0};
-    int16_t Width = (UpperLines > 0) ? WidthUpper : WidthLower;
+    int Width {(UpperLines > 0) ? WidthUpper : WidthLower};
     uint32_t sym {0};
     stripspace(m_Text);  // Strips trailing newlines
     for (char *p {m_Text}; *p;) {

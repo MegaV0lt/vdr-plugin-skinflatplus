@@ -25,4 +25,4 @@ sensors -A acpitz-virtual-0 | grep "temp1" | awk '{print $2}' | tr -d "+" > ${OU
 # nvidia gpu temp
 # nvidia-settings must be run as the user of the x server
 GPU="$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader)"
-echo "${GPU}°C" > ${OUTPUTFLDR}/gpu
+echo "${GPU} °C" > ${OUTPUTFLDR}/gpu

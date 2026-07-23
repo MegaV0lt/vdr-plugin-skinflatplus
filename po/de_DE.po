@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-skinflatplus 1.1.8\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2026-03-06 09:03+0100\n"
+"POT-Creation-Date: 2026-07-22 18:09+0000\n"
 "PO-Revision-Date: 2025-02-27 10:09+0100\n"
 "Last-Translator: Martin Schirrmacher\n"
 "Language-Team: Martin Schirrmacher\n"
@@ -29,6 +29,9 @@ msgstr "Uhr"
 
 msgid "Unknown"
 msgstr "Unbekannt"
+
+msgid "No EPG info available."
+msgstr "Keine EPG-Info verfügbar."
 
 msgid "FSK"
 msgstr ""
@@ -625,6 +628,21 @@ msgstr "Zeige Event Startzeit links"
 
 msgid "Show signal quality"
 msgstr "Zeige Signalqualität"
+
+msgid "Zapcockpit: Key right opens channellist"
+msgstr "Zapcockpit: Taste rechts öffnet Kanalliste"
+
+msgid "Zapcockpit: Relative list width"
+msgstr "Zapcockpit: Relative Listenbreite"
+
+msgid "Zapcockpit: Relative list font size"
+msgstr "Zapcockpit: Relative Schriftgröße der Listen"
+
+msgid "Zapcockpit: List fade-in time (ms)"
+msgstr "Zapcockpit: Einblendzeit der Listen (ms)"
+
+msgid "Zapcockpit: List shift-in time (ms)"
+msgstr "Zapcockpit: Einschiebezeit der Listen (ms)"
 
 msgid "Show weather widget"
 msgstr "Zeige Wetter Widget"

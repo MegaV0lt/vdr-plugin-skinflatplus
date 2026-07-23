@@ -164,7 +164,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void DrawRecordingStateIcon(const cRecording *Recording, int Left, int Top, bool Current);
     void DrawRecordingFormatIcon(const cRecording *Recording, int Left, int Top);
     void DrawRecordingErrorIcon(const cRecording *Recording, int Left, int Top, bool Current);
-    int DrawRecordingIcon(const char *IconName, int Left, int Top, bool Current);           // NOLINT
+    int DrawRecordingIcon(const char *IconName, int Left, int Top, bool Current, bool Small = false);           // NOLINT
     int DrawContentHeadFskGenre(const cString &Fsk, std::vector<std::string> &GenreIcons);  // NOLINT
 
     void DrawMainMenuWidgets();

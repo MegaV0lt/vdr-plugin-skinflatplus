@@ -348,9 +348,9 @@ void cFlatDisplayReplay::UpdateInfo() {
     const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, FontSecsSize)};  // Height of seconds font
     static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
     // Cached glyph size
-    static int CachedGlyphSize = -1;
+    static int CachedGlyphSize {-1};
     static cString CachedFontOsd {""};
-    static int CachedFontOsdSize = -1;
+    static int CachedFontOsdSize {-1};
     if (strcmp(Setup.FontOsd, CachedFontOsd) != 0 || Setup.FontOsdSize != CachedFontOsdSize) {
         CachedFontOsd = Setup.FontOsd;
         CachedFontOsdSize = Setup.FontOsdSize;
@@ -431,7 +431,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     }
 
     if (marks && m_Recording->HasMarks()) {
-#if (APIVERSNUM >= 20608)
+#if APIVERSNUM >= 20608
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);
         if (FramesAfterEdit >= 0) CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
 #else
@@ -453,7 +453,7 @@ void cFlatDisplayReplay::UpdateInfo() {
     img = ImgLoader.GetIcon("recording_total", kIconMaxSize, GlyphSize);
     const int ImgWidth {(img) ? img->Width() : 0};
     if (FramesAfterEdit > 0) {
-        const cString cutted = *IndexToHMSF(FramesAfterEdit, false, FramesPerSecond);
+        const cString cutted {IndexToHMSF(FramesAfterEdit, false, FramesPerSecond)};
         const int CuttedWidth {m_Font->Width(cutted)};  // Width of cutted length
         cImage *ImgCutted {ImgLoader.GetIcon("recording_cutted_extra", kIconMaxSize, GlyphSize)};
         const int ImgCuttedWidth {(ImgCutted) ? ImgCutted->Width() : 0};
@@ -595,8 +595,8 @@ void cFlatDisplayReplay::UpdateInfo() {
         } */
 
         const int Rest {NumFrames - m_CurrentFrame};
-        const cString TimeStr = (Rest >= 0) ? *TimeString(now + (Rest / FramesPerSecond)) : "??:??";  // HH:MM
-        cString EndTime = cString::sprintf("%s: %s", tr("ends at"), *TimeStr);
+        const cString TimeStr {(Rest >= 0) ? *TimeString(now + (Rest / FramesPerSecond)) : "??:??"};  // HH:MM
+        cString EndTime {cString::sprintf("%s: %s", tr("ends at"), *TimeStr)};
         const int EndTimeWidth {FontCache.GetStringWidth(
             m_FontName, m_FontHeight, cString::sprintf("%s: 00:00", tr("ends at")))};  // Width of 'ends at: HH:MM' text
         LabelPixmap->DrawText(cPoint(left, m_FontHeight), *EndTime, Theme.Color(clrReplayFont),
@@ -630,7 +630,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         if (Config.TVScraperReplayInfoShowPoster) {
             GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
             if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
-                const cString RecPath = m_Recording->FileName();
+                const cString RecPath {m_Recording->FileName()};
                 if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                     img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
                     if (img)
@@ -772,7 +772,7 @@ void cFlatDisplayReplay::PreLoadImages() {
     }
 
     static constexpr uint32_t kCharCode {0x0030};  // U+0030 DIGIT ZERO
-    const int GlyphSize = FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize);  // Narrowing conversion
+    const int GlyphSize {FontCache.GetGlyphSize(Setup.FontOsd, kCharCode, Setup.FontOsdSize)};
     static constexpr const char *icons1[] {"recording_pos", "recording_total", "recording_cutted_extra",
                                            "recording_timeshift"};
     for (const auto &icon : icons1) {

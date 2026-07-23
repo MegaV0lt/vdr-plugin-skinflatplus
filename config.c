@@ -91,6 +91,11 @@ bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
     else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            ChannelSimpleAspectFormat = atoi(Value);
     else if (strcmp(Name, "ChannelTimeLeft") == 0)                      ChannelTimeLeft = atoi(Value);
     else if (strcmp(Name, "ChannelWeatherShow") == 0)                   ChannelWeatherShow = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitKeyRightOpensList") == 0)   ChannelZapcockpitKeyRightOpensList = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitListWidth") == 0)           ChannelZapcockpitListWidth = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFontSize") == 0)            ChannelZapcockpitFontSize = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitFadeTime") == 0)            ChannelZapcockpitFadeTime = atoi(Value);
+    else if (strcmp(Name, "ChannelZapcockpitShiftTime") == 0)           ChannelZapcockpitShiftTime = atoi(Value);
     else if (strcmp(Name, "DecorIndex") == 0)                           DecorIndex = atoi(Value);
     else if (strcmp(Name, "DiskUsageFree") == 0)                        DiskUsageFree = atoi(Value);
     else if (strcmp(Name, "DiskUsageShort") == 0)                       DiskUsageShort = atoi(Value);
@@ -463,7 +468,7 @@ bool CompareNumStrings(const cString &a, const cString &b) {
     std::string_view sa = *a;
     std::string_view sb = *b;
     auto get_num = [](std::string_view s) {
-        std::size_t pos = s.find('_');
+        std::size_t pos {s.find('_')};
         if (pos != std::string_view::npos)
             return atoi(std::string(s.substr(0, pos)).c_str());
         return 0;
@@ -472,8 +477,8 @@ bool CompareNumStrings(const cString &a, const cString &b) {
 }
 
 bool StringCompare(const std::string &left, const std::string &right) {
-    auto len = std::min(left.size(), right.size());
-    auto lit = left.cbegin(), rit = right.cbegin();
+    auto len {std::min(left.size(), right.size())};
+    auto lit {left.cbegin()}, rit {right.cbegin()};
     while (len-- > 0) {
         if (tolower(*lit) != tolower(*rit)) return tolower(*lit) < tolower(*rit);
         ++lit;
@@ -518,7 +523,7 @@ int RoundUp(int NumToRound, int multiple) {
 }
 
 void cFlatConfig::DecorDescriptions(cStringList &Decors) {
-    cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
+    cString DecorPath {cString::sprintf("%s/decors", PLUGINRESOURCEPATH)};
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
     Decors.Clear();
@@ -555,7 +560,7 @@ cString cFlatConfig::DecorDescription(cString File) {
         return description;
     }
 
-    FILE *f = fopen(File, "r");
+    FILE *f {fopen(File, "r")};
     if (!f) {
         esyslog("flatPlus: DecorDescription() Unable to open file: %s", *File);
         return description;
@@ -588,7 +593,7 @@ cString cFlatConfig::DecorDescription(cString File) {
 }
 
 void cFlatConfig::DecorLoadCurrent() {
-    cString DecorPath = cString::sprintf("%s/decors", PLUGINRESOURCEPATH);
+    cString DecorPath {cString::sprintf("%s/decors", PLUGINRESOURCEPATH)};
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
 
@@ -617,9 +622,8 @@ void cFlatConfig::DecorLoadCurrent() {
 void cFlatConfig::DecorLoadFile(cString File) {
     dsyslog("flatPlus: Load decor file: %s", *File);
 
-    FILE *f = fopen(File, "r");
-    if (f == nullptr) {
-        // Handle error
+    FILE *f {fopen(File, "r")};
+    if (!f) {  // Handle error
         esyslog("flatPlus: Load decor file: %s failed", *File);
         return;
     } else {
@@ -715,8 +719,8 @@ void cFlatConfig::DecorLoadFile(cString File) {
 }
 
 int cFlatConfig::GetRecordingOldValue(const std::string &folder) const {
-    auto it = RecordingOldFolderMap.find(folder);
-    return it != RecordingOldFolderMap.end() ? it->second : -1;
+    auto it {RecordingOldFolderMap.find(folder)};
+    return (it != RecordingOldFolderMap.end()) ? it->second : -1;
 }
 
 void cFlatConfig::RecordingOldLoadConfig() {
@@ -724,7 +728,7 @@ void cFlatConfig::RecordingOldLoadConfig() {
     dsyslog("flatPlus: Load recording old config file: %s", *RecordingOldConfigFile);
 #endif
 
-    FILE *f = fopen(RecordingOldConfigFile, "r");
+    FILE *f {fopen(RecordingOldConfigFile, "r")};
     if (!f) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("flatPlus: Recording old config file not found: %s", *RecordingOldConfigFile);
@@ -777,7 +781,7 @@ void cFlatConfig::Store(const char *Name, double &Value, const char *Filename) {
 }
 
 void cFlatConfig::Store(const char *Name, const char *Value, const char *Filename) {
-    FILE *f = fopen(Filename, "a");
+    FILE *f {fopen(Filename, "a")};
     if (!f) {
         esyslog("flatPlus: Error storing config: %s = %s", Name, Value);
         return;
@@ -787,7 +791,7 @@ void cFlatConfig::Store(const char *Name, const char *Value, const char *Filenam
 }
 
 void cFlatConfig::GetConfigFiles(cStringList &Files) {
-    cString ConfigsPath = cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N));
+    cString ConfigsPath {cString::sprintf("%s/configs", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N))};
     std::vector<std::string> files;
     files.reserve(64);  // Set to at least 64 entry's
     Files.Clear();

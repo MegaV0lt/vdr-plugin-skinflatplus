@@ -15,11 +15,11 @@
 #include "./displaytracks.h"
 #include "./displayvolume.h"
 
-cImageCache::cImageCache() :
-    ImageCache(kMaxImageCache),  // Initialize vector with fixed size
-    IconCache(kMaxIconCache) {}
+cImageCache::cImageCache()
+    : ImageCache(kMaxImageCache),  // Initialize vector with fixed size
+      IconCache(kMaxIconCache) {}
 
-cImageCache::~cImageCache() {}  // std::unique_ptr handles memory deallocation automatically
+cImageCache::~cImageCache() = default;
 
 void cImageCache::Create() {
     // Reset Image and Icon caches to default empty state
@@ -50,65 +50,94 @@ void cImageCache::Clear() {
         data.Height = -1;
     }
 
+    m_ImageIndex.clear();
+    m_IconIndex.clear();
+
     m_InsertIndex = 0;
     m_InsertIconIndex = 0;
 }
 
-bool cImageCache::RemoveFromCache(const cString &Name) {
-    std::string_view svBaseFileName {""}, svDataName{""};
-    std::string_view svName {*Name};
-
-    for (auto &data : ImageCache) {
-        // Check if the ImageData entry is valid (not marked as empty)
-        svDataName = *data.Name;  // Get the name from the cache entry
-        if (data.Image == nullptr && svDataName.empty()) {
-            // This assumes that an empty name and null image means the end of valid entries
-            // or an explicitly empty slot. If "" is a valid name, this logic needs adjustment.
-            break;
-        }
-
-        // Find the last '/' and extract the base filename
-        const std::size_t LastSlashPos = svDataName.find_last_of('/');
-        if (LastSlashPos != std::string_view::npos) {
-            svBaseFileName = svDataName.substr(LastSlashPos + 1);
-        } else {
-            svBaseFileName = svDataName;  // No slash, so the whole name is the base filename
-        }
-
-        if (svBaseFileName == svName) {
-            dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
-            data.Image.reset();  // This deletes the cImage object and sets Image to nullptr
-            data.Name = "-Empty!-";  // Mark as empty because "" is for end of cache
-            data.Width = -1;
-            data.Height = -1;
-            return true;
-        }
-    }
-    return false;
+static std::string_view BaseNameFromCacheName(std::string_view full) {
+    const std::size_t lastSlash {full.find_last_of('/')};
+    return (lastSlash != std::string_view::npos) ? full.substr(lastSlash + 1) : full;
 }
 
-cImage* cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
-    std::string_view svDataName {""};
-    std::string_view svName {*Name};
-    const auto &cache = IsIcon ? IconCache : ImageCache;
+cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool IsIcon) const {
+    const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 
-    for (const auto &data : cache) {
-        svDataName = *data.Name;  // Get the name from the cache entry
-        // Check if the ImageData entry is valid (not marked as empty)
-        if (data.Image == nullptr && svDataName.empty()) {
-            break;  // No more valid images in cache
-        }
-        if (svDataName == svName && data.Width == Width && data.Height == Height) {
-            return data.Image.get();  // Return the cached image if found
+    const auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
+    const auto it {idx.find(key)};
+    if (it != idx.end()) {
+        const std::size_t slot {it->second};
+        const auto &cache {IsIcon ? IconCache : ImageCache};
+        if (slot < cache.size()) {
+            const ImageData &data {cache[slot]};
+            if (data.Image && data.Width == Width && data.Height == Height &&
+                std::strcmp(*data.Name, *Name) == 0) {
+                return data.Image.get();
+            }
         }
     }
+
+    // Fallback to linear search if not found in index (should not happen if index is maintained correctly)
+    const auto &cache {IsIcon ? IconCache : ImageCache};
+    for (const auto &data : cache) {
+        if (!data.Image) continue;
+        if (data.Width != Width || data.Height != Height) continue;
+        if (std::strcmp(*data.Name, *Name) != 0) continue;
+        return data.Image.get();
+    }
+
     return nullptr;
 }
 
+cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
+    const cImage *img {FindImage(Name, Width, Height, IsIcon)};
+    if (img) return const_cast<cImage *>(img);
+
+    return nullptr;
+}
+
+void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
+    if (!Image) return;
+
+    if (FindImage(Name, Width, Height, IsIcon)) {  // Image already in cache
+        delete Image;
+        return;
+    }
+
+    if (IsIcon) {
+        // Remove any previous mapping that points to the slot we are about to overwrite.
+        const std::size_t slot {m_InsertIconIndex};
+        for (auto it {m_IconIndex.begin()}; it != m_IconIndex.end();) {
+            (it->second == slot) ? it = m_IconIndex.erase(it)
+                                 : ++it;
+        }
+
+        InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name,
+                         Width, Height);
+
+        const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
+        m_IconIndex[key] = slot;
+    } else {
+        const std::size_t slot {m_InsertIndex};
+        for (auto it {m_ImageIndex.begin()}; it != m_ImageIndex.end();) {
+            (it->second == slot) ? it = m_ImageIndex.erase(it)
+                                 : ++it;
+        }
+
+        InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
+                         Height);
+
+        const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
+        m_ImageIndex[key] = slot;
+    }
+}
+
 void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize,
-                                  std::size_t BaseIndex, cImage *Image, const cString &Name, int Width, int Height) {
-    // std::unique_ptr will automatically delete the old image if one exists when a new one is assigned
-    Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);  // Store image in cache
+                                   std::size_t BaseIndex, cImage *Image, const cString &Name, int Width,
+                                   int Height) {
+    Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);
     Cache[InsertIndex].Name = Name;
     Cache[InsertIndex].Width = Width;
     Cache[InsertIndex].Height = Height;
@@ -120,22 +149,40 @@ void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, co
     }
 }
 
-void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
-    // dsyslog("flatPlus: Imagecache insert image %s Width %d Height %d", Name.c_str(), Width, Height);
-    if (IsIcon) {  // Insert into icon cache
-        InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name, Width,
-                        Height);
-    } else {  // Insert into image cache
-        InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
-                        Height);
+bool cImageCache::RemoveFromCache(const cString &Name) {
+    // Preserve old behavior: remove entries by base filename (ignoring path)
+    const std::string_view svName {*Name};
+
+    bool removedAny {false};
+
+    for (std::size_t slot {0}; slot < ImageCache.size(); ++slot) {
+        auto &data {ImageCache[slot]};
+        if (!data.Image) continue;
+
+        std::string_view fullName {*data.Name};
+        const std::string_view baseName {BaseNameFromCacheName(fullName)};
+        if (baseName != svName) continue;
+
+        const ImageKey key {data.Name, data.Width, data.Height};
+        m_ImageIndex.erase(key);
+
+        dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
+        data.Image.reset();
+        data.Name = "";
+        data.Width = -1;
+        data.Height = -1;
+
+        removedAny = true;
     }
+
+    return removedAny;
 }
 
 // Preload images and icons
 // This function is called at startup to load images and icons into the cache
 // to speed up the display of the menu and other components.
 void cImageCache::PreLoadImage() {
-    cTimeMs Timer;  // Start timer
+    cTimeMs Timer;
 
     cFlatDisplayChannel DisplayChannel(false);
     // Called first. Also used to determine if 'logo_background' should be loaded from logo path or theme path
@@ -152,6 +199,7 @@ void cImageCache::PreLoadImage() {
 
     m_InsertIndexBase = GetCacheCount();
     m_InsertIconIndexBase = GetIconCacheCount();
-    dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
+
     dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
+    dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
 }
