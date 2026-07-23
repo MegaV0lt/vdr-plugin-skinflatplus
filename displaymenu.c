@@ -1918,16 +1918,16 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
  * @param Title The title of the extra information block.
  * @param Text The text to display in the extra information block.
  * @param ComplexContent The ComplexContent to add the extra information to.
- * @param ContentTop The top position of the extra information block.
  * @param IsEvent true if this block is for an event, false if it is for a recording.
+ * @return The height of the extra information block without the text!
  */
-void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
-                                    int &ContentTop, bool IsEvent) {
+int cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
+                                   bool IsEvent) {
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
     const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
-    ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+    int ContentTop {ComplexContent.BottomContent() + m_FontHeight};
     ComplexContent.AddText(Title, false, cRect(m_MarginItem10, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
                            m_Font);
     ContentTop += m_FontHeight;
@@ -1937,6 +1937,8 @@ void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cCom
         ComplexContent.AddText(*Text, true,
                                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                                ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
+
+    return ContentTop;
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
@@ -2131,10 +2133,10 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         }
 
         // Add movie information if available
-        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop, true);
+        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, true);
 
         // Add series information if available
-        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop, true);
+        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, true);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() Epgtext time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2148,11 +2150,11 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #endif
 
         // Add reruns information if available
-        if (Reruns[0] != '\0') AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, ContentTop, true);
+        if (Reruns[0] != '\0') AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, true);
 
         // Add video information if available
         if (TextAdditional[0] != '\0')
-            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop, true);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, true);
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
@@ -2411,9 +2413,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     if (ShowMaxActors == 0) return;  // Do not show actors (-1 = Show all actors)
     if (ShowMaxActors > 0) NumActors = std::min(NumActors, ShowMaxActors);  // Limit to ShowMaxActors
 
-    int ContentTop {0};  // Calculated by 'AddExtraInfo()'
-    AddExtraInfo(tr("Actors"), "", ComplexContent, ContentTop, IsEvent);
-
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
 
@@ -2426,7 +2425,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     const int PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};  // Number of lines needed
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
-    int y {ContentTop};
+    int y {AddExtraInfo(tr("Actors"), "", ComplexContent, IsEvent)};
     if (NumActors > 48) isyslog("flatPlus: First display of %d actor images will probably be slow!", NumActors);
 
     for (int row {0}; row < PicLines; ++row) {
@@ -2661,10 +2660,10 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         }
 
         // Add movie information if available
-        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop);
+        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent);
 
         // Add series information if available
-        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop);
+        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawRecordingInfo() Epgtext time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2679,11 +2678,11 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
         // Add recording information if available
         if (RecAdditional[0] != '\0')
-            AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent, ContentTop);
+            AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent);
 
         // Add video information if available
         if (TextAdditional[0] != '\0')
-            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent);
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
