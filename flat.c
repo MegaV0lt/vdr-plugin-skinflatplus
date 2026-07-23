@@ -422,8 +422,7 @@ void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUse
 #endif
 }
 
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio, cString &Subtitle,  // NOLINT
-                      bool NewLine) {
+void InsertComponents(const cComponents *Components, cString &Text, bool NewLine) {  // NOLINT
     std::ostringstream ossVideo {""}, ossAudio {""}, ossSubtitle {""};
     const int NumComponents {Components->NumComponents()};
     for (int i {0}; i < NumComponents; ++i) {
@@ -475,11 +474,9 @@ void InsertComponents(const cComponents *Components, cString &Text, cString &Aud
     Text.Append(ossVideo.str().c_str());
 
     if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
-    // Audio.Append(ossAudio.str().c_str());
 
     if (!ossSubtitle.str().empty())
         Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), ossSubtitle.str().c_str()));
-    // Subtitle.Append(ossSubtitle.str().c_str());
 }
 
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine) {  // NOLINT

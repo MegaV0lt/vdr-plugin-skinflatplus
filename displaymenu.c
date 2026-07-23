@@ -771,13 +771,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                 Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Event->GetParentalRatingString()));
 
             const cComponents *Components {Event->Components()};
-            if (Components) {
-                cString Audio {""}, Subtitle {""};
-                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
-
-                // if (Audio[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                // if (Subtitle[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            }  // if Components
+            if (Components) InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
         }  // EpgAdditionalInfoShow
     } else {
         Text.Append(*EmptyText);
@@ -2003,19 +1997,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         }
 
         const cComponents *Components {Event->Components()};
-        if (Components) {
-            cString Audio {""}, Subtitle {""};
-            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
-
-            /* if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
-            }
-            if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            } */
-        }  // if Components
+        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
     }  // EpgAdditionalInfoShow
 
     // Draw FSK and genre icons and get the left position for the title
@@ -2299,13 +2281,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 #endif
 
             const cComponents *Components {RecInfo->Components()};
-            if (Components) {
-                cString Audio {""}, Subtitle {""};
-                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
+            if (Components) InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
 
-                // if (Audio[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                // if (Subtitle[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            }
             if (RecInfo->Aux()) InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
     } else {
@@ -2563,19 +2540,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #endif
 
         const cComponents *Components {RecInfo->Components()};
-        if (Components) {
-            cString Audio {""}, Subtitle {""};
-            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
+        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
 
-            /* if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
-            }
-            if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            } */
-        }
         if (RecInfo->Aux()) InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
