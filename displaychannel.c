@@ -708,13 +708,13 @@ void cFlatDisplayChannel::ZapRunShowAnimation() {
     const int TotalTime {std::max(ShiftTime, FadeTime)};
     if (TotalTime <= 0 || (!Pixmaps[0] && !Pixmaps[1])) return;
 
-    static constexpr int FrameTime {10};  // Duration of one animation step in ms
-    for (int t {FrameTime}; t < TotalTime; t += FrameTime) {
+    static constexpr int kFrameTime {10};  // Duration of one animation step in ms
+    for (int t {kFrameTime}; t < TotalTime; t += kFrameTime) {
         for (cPixmap *Pixmap : Pixmaps) {
             if (!Pixmap || Pixmap->Layer() < 0) continue;
             if (ShiftTime > 0) {  // Slide the content in from the anchored edge
                 const double Progress {std::min(1.0, static_cast<double>(t) / ShiftTime)};
-                const int Offset = static_cast<int>((1.0 - Progress) * Pixmap->ViewPort().Width());
+                const int Offset {static_cast<int>((1.0 - Progress) * Pixmap->ViewPort().Width())};
                 const bool LeftAnchored {Pixmap->ViewPort().X() < m_OsdWidth / 2};
                 Pixmap->SetDrawPortPoint(cPoint(LeftAnchored ? -Offset : Offset, 0));
             }
@@ -972,9 +972,9 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
                             Theme.Color(clrChannelFontTitle),
                             Theme.Color(clrChannelBg), m_Font, MaxTextWidth);
     top += m_FontHeight;
-    ZapInfoPixmap->DrawRectangle(cRect(m_MarginItem2, top + m_MarginItem / 2, MaxTextWidth, 3),
+    ZapInfoPixmap->DrawRectangle(cRect(m_MarginItem2, top + m_MarginItem / 2, MaxTextWidth, m_LineHeight),
                                  Theme.Color(clrChannelFontTitle));
-    top += m_MarginItem2 + 3;
+    top += m_MarginItem2 + m_LineMargin;
 
     const cEvent *Present {nullptr}, *Following {nullptr};
     {
@@ -1029,9 +1029,9 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     }
 
     if (Following) {  // Following event in the reserved line at the bottom
-        const cString Next = cString::sprintf("%s  %s%s%s", *Following->GetTimeString(), Following->Title(),
+        const cString Next {cString::sprintf("%s  %s%s%s", *Following->GetTimeString(), Following->Title(),
                                               isempty(Following->ShortText()) ? "" : " - ",
-                                              isempty(Following->ShortText()) ? "" : Following->ShortText());
+                                              isempty(Following->ShortText()) ? "" : Following->ShortText())};
         ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, Height - m_FontSmlHeight),
                                 *ZapShortenText(*Next, m_FontSml, MaxTextWidth),
                                 Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_FontSml,
