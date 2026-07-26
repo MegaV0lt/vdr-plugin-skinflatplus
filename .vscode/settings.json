@@ -92,9 +92,11 @@
     "javascript.inlayHints.enumMemberValues.enabled": true,
     "C_Cpp.default.defines": [
         "PLUGIN_NAME_I18N=skinflatplus",
-        "USE_ZAPCOCKPIT=1"
+        "USE_ZAPCOCKPIT"
     ],
     "editor.dropIntoEditor.preferences": [
 
-    ]
+    ],
+    "C_Cpp.default.enableConfigurationSquiggles": true,
+    "C_Cpp.default.compilerPath": ""
 }
