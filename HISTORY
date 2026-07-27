@@ -1,5 +1,17 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-xx-xx: Version 1.3.1
+- [update] Remove extra space in some date and time strings.
+- [update] Changes in Zapcockpit:
+             - Use Dynamic LineWidth and LineMargin in channel information.
+             - Use medium font for wide display of channel info.
+             - Hide EPG image and weather widget in zapcockpit channel info display.
+             - Justify description in zapcockpit if it is set for event and recording info.
+             - Reuse event data (Present/Following) from SetEvents() in wide channel info.
+             - Use own CTextFloatingWrapper for channel info description wrapping.
+             - Add a outer margin (Same as for EPG image) to wide channel info display.
+- [update] Some internal optimizations.
+
 2026-07-23: Version 1.3.0
 - [add] Zapcockpit support (extended channel display) like in skindesigner:
         channellist, grouplist with separate group channel list, channel hints

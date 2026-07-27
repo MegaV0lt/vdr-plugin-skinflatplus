@@ -29,7 +29,8 @@ enum eBorder {
     BorderContent,
     BorderTVSPoster,
     BorderSetRecording,
-    BorderMMWidget
+    BorderMMWidget,
+    BorderChannelInfo
 };
 
 // Decorated border (Left, Top, Width, Height, Size, Type, ColorFg, ColorBg, From)

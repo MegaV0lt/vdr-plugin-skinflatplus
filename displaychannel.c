@@ -45,15 +45,6 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoViewPort);
     ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoViewPort);
 
-    // Area for TVScraper images
-    m_TVSRect.Set(
-        m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-        m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-        m_OsdWidth - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2,
-        m_OsdHeight - m_TopBarHeight - m_HeightBottom - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2);
-
-    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
-
     // Pixmap for channel logo and background (4:3 aspect ratio, scaled to height of m_HeightImageLogo)
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
                                   Config.decorBorderChannelSize + m_ChannelHeight - height,
@@ -80,6 +71,17 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                                      HeightTop};
     ChanInfoTopPixmap = CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1, ChanInfoTopViewPort);
 
+    // Area for TVScraper images
+    m_TVSRect.Set(m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+                  m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                      Config.decorBorderChannelEPGSize,
+                  m_OsdWidth - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2,
+                  m_ChannelHeight - m_TopBarHeight - Config.decorBorderTopBarSize * 2 - HeightTop - m_HeightBottom -
+                      m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2);
+
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
+
+    // Clear Pixmaps
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     PixmapClear(ChanIconsPixmap);
     PixmapClear(ChanEpgImagesPixmap);
@@ -171,7 +173,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                            Config.decorBorderChannelSize,
                            Config.decorBorderChannelType,
                            Config.decorBorderChannelFg,
-                           Config.decorBorderChannelBg};
+                           Config.decorBorderChannelBg,
+                           BorderChannelInfo};
     DecorBorderDraw(ib);
 #ifdef DEBUGFUNCSCALL
     dsyslog("   cFlatDisplayChannel() done, elapsed time %ld ms", Timer.Elapsed());
@@ -699,6 +702,8 @@ void cFlatDisplayChannel::ZapHideEpgImages() {
     if (ChanEpgImagesPixmap && ChanEpgImagesPixmap->Layer() >= 0) {
         m_ZapHiddenPixmaps.emplace_back(ChanEpgImagesPixmap, ChanEpgImagesPixmap->Layer());
         ChanEpgImagesPixmap->SetLayer(-1);
+        // Remove the border around the poster image, because it would overlap the zapcockpit info pixmap
+        DecorBorderClearByFrom(BorderTVSPoster);
     }
     WeatherWidget.SetVisible(false);
 }
@@ -976,9 +981,10 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
 
     if (!Channel) return;
 
-    const cRect &Rect {(m_ZapViewType == dcChannelInfo)
-                           ? m_ZapInfoWideRect
-                           : (m_ZapViewType == dcGroupsChannelListInfo) ? m_ZapInfoRectGroup : m_ZapInfoRectChan};
+    const bool IsWide {m_ZapViewType == dcChannelInfo};  // Full width info pixmap (2nd 'Ok' on the current channel)
+    const cRect &Rect {(IsWide)                                     ? m_ZapInfoWideRect
+                       : (m_ZapViewType == dcGroupsChannelListInfo) ? m_ZapInfoRectGroup
+                                                                    : m_ZapInfoRectChan};
     ZapCreateInfoPixmap(Rect);
     if (!ZapInfoPixmap) return;
 
@@ -997,23 +1003,24 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
                                  Theme.Color(clrChannelFontTitle));
     top += m_MarginItem2 + m_LineMargin;
 
-    /* const cEvent *Present {nullptr}, *Following {nullptr};
-    {
+    // Use m_FontMedium when m_ZapViewType == dcChannelInfo, because the info pixmap is wider and can show more text
+    // lines. Use m_FontSml for other view types.
+    const cFont *Font {(IsWide) ? m_FontMedium : m_FontSml};  // Medium or small
+    const int FontHeight {(IsWide) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
+
+    const cEvent *Present {nullptr}, *Following {nullptr};
+    if (IsWide) {
+        // Use the events from SetEvents() instead of querying the schedule again
+        Present = m_Present;
+        Following = m_Following;
+    } else {
         LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
         const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
         if (Schedule) {
             Present = Schedule->GetPresentEvent();
             Following = Schedule->GetFollowingEvent();
         }
-    } */
-
-    // Use m_FontMedium when m_ZapViewType == dcChannelInfo, because the info pixmap is wider and can show more text
-    // lines. Use m_FontSml for other view types.
-    const cFont *Font {(m_ZapViewType == dcChannelInfo) ? m_FontMedium : m_FontSml};  // Medium or small
-    const int FontHeight {(m_ZapViewType == dcChannelInfo) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
-
-    // Use the events from SetEvents() instead of querying the schedule again
-    const cEvent *Present {m_Present}, *Following {m_Following};
+    }
 
     if (!Present) {
         ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), tr("No EPG info available."),
@@ -1043,16 +1050,14 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
                                 MaxTextWidth);
         top += FontHeight;
     }
-    top += m_MarginItem;
-
-    // TODO: Show the EPG image of the present event if available, like in VDR's channel info display.
+    top += m_MarginItem2;  // Some space between the short text and the description.
 
     if (!isempty(Present->Description())) {  // Description (wrapped, cut off at the bottom)
         cTextFloatingWrapper Description;  // Wraps the description text into lines of the given width and font
         Description.Set(Present->Description(), Font, MaxTextWidth);
         const int NumLines {Description.Lines()};
         std::string Line {""};
-        Line.reserve(128);
+        Line.reserve(256);  // Avoids repeated memory allocations when appending the lines
 
         for (int i {0}; i < NumLines && (top + FontHeight <= BottomFollowing); ++i) {
             Line = Description.GetLine(i);
