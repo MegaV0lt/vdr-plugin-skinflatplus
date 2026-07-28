@@ -1004,8 +1004,8 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
 
     if (!Channel) return;
 
-    const bool IsWide {m_ZapViewType == dcChannelInfo};  // Full width info pixmap (2nd 'Ok' on the current channel)
-    const cRect &Rect {(IsWide)                                     ? m_ZapInfoWideRect
+    const bool IsWideInfo {m_ZapViewType == dcChannelInfo};  // Full width info pixmap (2nd 'Ok' on the current channel)
+    const cRect &Rect {(IsWideInfo)                                 ? m_ZapInfoWideRect
                        : (m_ZapViewType == dcGroupsChannelListInfo) ? m_ZapInfoRectGroup
                                                                     : m_ZapInfoRectChan};
     ZapCreateInfoPixmap(Rect);
@@ -1028,11 +1028,11 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
 
     // Use m_FontMedium when m_ZapViewType == dcChannelInfo, because the info pixmap is wider and can show more text
     // lines. Use m_FontSml for other view types.
-    const cFont *Font {(IsWide) ? m_FontMedium : m_FontSml};  // Medium or small
-    const int FontHeight {(IsWide) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
+    const cFont *Font {(IsWideInfo) ? m_FontMedium : m_FontSml};  // Medium or small
+    const int FontHeight {(IsWideInfo) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
 
     const cEvent *Present {nullptr}, *Following {nullptr};
-    if (IsWide) {
+    if (IsWideInfo) {
         // Use the events from SetEvents() instead of querying the schedule again
         Present = m_Present;
         Following = m_Following;

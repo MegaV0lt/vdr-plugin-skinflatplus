@@ -138,6 +138,7 @@ class cFlatBaseRender {
     void DecorBorderClear(const cRect &Rect, int Size);
     void DecorBorderClearAll() const;
     void DecorBorderRedrawAll();
+    void DecorBorderRedrawByFrom(int From);  // Redraw first decorated border that have the given "From" value
     void DecorBorderClearByFrom(int From);
 
     cString ReadAndExtractData(const cString &FilePath) const;  // Read file and return its content as cString

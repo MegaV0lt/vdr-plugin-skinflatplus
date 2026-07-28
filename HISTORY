@@ -1,6 +1,7 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 2026-xx-xx: Version 1.3.1
+- [fix] Add missing include in imagecache.h
 - [update] Remove extra space in some date and time strings.
 - [update] Changes in Zapcockpit:
              - Use Dynamic LineWidth and LineMargin in channel information.
@@ -8,8 +9,22 @@ VDR Plugin 'skin flatPlus' Revision History
              - Hide EPG image and weather widget in zapcockpit channel info display.
              - Justify description in zapcockpit if it is set for event and recording info.
              - Reuse event data (Present/Following) from SetEvents() in wide channel info.
-             - Use own CTextFloatingWrapper for channel info description wrapping.
+             - Use own cTextFloatingWrapper for channel info description wrapping.
              - Add a outer margin (Same as for EPG image) to wide channel info display.
+             - ZapAlphaOver now exits earlier for fully opaque or fully transparent cases.
+             - Refactor ZapBlendImage:
+                 Use the underlying pixel buffer via Data() instead of repeated GetPixel/SetPixel.
+                 Compute the visible clip rectangle once before the loops.
+                 Avoid per-pixel bounds checks in the hot loop.
+             - Refactor ZapShortenText:
+                 Added an early guard for MaxWidth <= 0.
+                 If the ellipsis itself does not fit, return an empty string instead of
+                 attempting a meaningless truncation.
+                 For the final result, return a clean ellipsis-only string when the input
+                 becomes empty after trimming.
+             - Improve ZapRunShowAnimation by using 'ViewPort' and PixmapSetAlpha().
+- [update] Refactor imagescaler.c: Changing the hot loop to direct component arithmetic so
+             it avoids the temporary-object style work in the inner path.
 - [update] Some internal optimizations.
 
 2026-07-23: Version 1.3.0
