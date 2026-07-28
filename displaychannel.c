@@ -606,22 +606,32 @@ static void ZapBlendImage(cImage &Composed, const cImage *Image, int Left, int T
 #endif
 }
 
-// Shortens the given text so that it fits into MaxWidth: If the text is too long, it is cut off(UTF - 8 safe) and the
-// end is replaced by '...' - like the truncated texts in the extended channel lists of skindesigner
+// Shortens the given text so that it fits into MaxWidth: If the text is too long, it is cut off (UTF-8 safe) and the
+// end is replaced by '...' - like the truncated texts in the extended channel lists of skindesigner.
 static cString ZapShortenText(const char *Text, const cFont *Font, int MaxWidth) {
-    if (!Text || !*Text || Font->Width(Text) <= MaxWidth) return Text;
+    if (!Text || !*Text || MaxWidth <= 0) return "";
 
     const int EllipsisWidth {Font->Width("...")};
+    if (EllipsisWidth >= MaxWidth) return "";
+
     std::string Shortened {Text};
-    while (!Shortened.empty()) {
-        std::size_t i {Shortened.size()};  // Remove the last UTF-8 character
+    int CurrentWidth {Font->Width(Shortened.c_str())};
+
+    while (!Shortened.empty() && CurrentWidth + EllipsisWidth > MaxWidth) {
+        std::size_t i {Shortened.size()};  // Remove the last UTF-8 character.
         do {
             --i;
-        } while (i > 0 && (Shortened[i] & 0xC0) == 0x80);  // Skip UTF-8 continuation bytes
+        } while (i > 0 && (Shortened[i] & 0xC0) == 0x80);  // Skip UTF-8 continuation bytes.
+
+        if (i == 0) break;
+
+        const std::string Removed {Shortened.substr(i)};
+        const int RemovedWidth {Font->Width(Removed.c_str())};  // Or better: Width of one char
         Shortened.erase(i);
-        if (Font->Width(Shortened.c_str()) + EllipsisWidth <= MaxWidth) break;
+        CurrentWidth -= RemovedWidth;
     }
-    return cString::sprintf("%s...", Shortened.c_str());
+
+    return Shortened.empty() ? cString("...") : cString::sprintf("%s...", Shortened.c_str());
 }
 
 // Creates the list pixmap if not yet existing and shows it. If the pixmap exists but at a different position
