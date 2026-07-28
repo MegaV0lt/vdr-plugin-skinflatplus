@@ -744,7 +744,7 @@ void cFlatDisplayChannel::ZapShowBaseElements() {
 
 // Fade-in/shift-in animation for newly shown list panels, executed in Flush() after the panel content has been drawn
 // (like fadetimezapcockpit/shifttimezapcockpit in skindesigner themes). The lists slide in from the edge they are
-// anchored to. Runs blocking for at most one second
+// anchored to. Runs blocking for at most one second.
 void cFlatDisplayChannel::ZapRunShowAnimation() {
     m_ZapAnimPending = false;
     cPixmap *Pixmaps[2] {m_ZapAnimPixmap1, m_ZapAnimPixmap2};
@@ -759,24 +759,26 @@ void cFlatDisplayChannel::ZapRunShowAnimation() {
     for (int t {kFrameTime}; t < TotalTime; t += kFrameTime) {
         for (cPixmap *Pixmap : Pixmaps) {
             if (!Pixmap || Pixmap->Layer() < 0) continue;
+            const cRect ViewPort {Pixmap->ViewPort()};
             if (ShiftTime > 0) {  // Slide the content in from the anchored edge
                 const double Progress {std::min(1.0, static_cast<double>(t) / ShiftTime)};
-                const int Offset {static_cast<int>((1.0 - Progress) * Pixmap->ViewPort().Width())};
-                const bool LeftAnchored {Pixmap->ViewPort().X() < m_OsdWidth / 2};
+                const int Offset {static_cast<int>((1.0 - Progress) * ViewPort.Width())};
+                const bool LeftAnchored {ViewPort.X() < m_OsdWidth / 2};
                 Pixmap->SetDrawPortPoint(cPoint(LeftAnchored ? -Offset : Offset, 0));
             }
             if (FadeTime > 0) {  // Fade the content in
                 const double Progress {std::min(1.0, static_cast<double>(t) / FadeTime)};
-                Pixmap->SetAlpha(static_cast<int>(ALPHA_OPAQUE * Progress));
+                PixmapSetAlpha(Pixmap, static_cast<int>(ALPHA_OPAQUE * Progress));
             }
         }
         m_Osd->Flush();
         cCondWait::SleepMs(kFrameTime);
     }
+
     for (cPixmap *Pixmap : Pixmaps) {  // Ensure the final state
         if (Pixmap) {
             Pixmap->SetDrawPortPoint(cPoint(0, 0));
-            Pixmap->SetAlpha(ALPHA_OPAQUE);
+            PixmapSetAlpha(Pixmap, ALPHA_OPAQUE);
         }
     }
 }
