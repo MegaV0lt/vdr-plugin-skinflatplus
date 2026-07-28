@@ -32,15 +32,24 @@ class ImageScaler {
      * SetImageParameters() must be called first
      */
     void PutSourcePixel(unsigned char c0, unsigned char c1, unsigned char c2, unsigned char c3) {
-        m_hbuf[ (m_src_x++) & 3 ].Set(c0, c1, c2, c3);
+        TmpPixel &current = m_hbuf[(m_src_x++) & 3];
+        current.Set(c0, c1, c2, c3);
 
-        TmpPixel      *bp = m_buffer + 4 * m_dst_x + (m_src_y & 3);
-        const Filter  *fh;
+        TmpPixel *bp = m_buffer + 4 * m_dst_x + (m_src_y & 3);
+        const Filter *fh;
 
-        while ((fh=m_hor_filters + m_dst_x)->m_offset == m_src_x) {
-            *bp = m_hbuf[0] * fh->m_coeff[0] + m_hbuf[1] * fh->m_coeff[1] + m_hbuf[2] * fh->m_coeff[2]
-                  + m_hbuf[3]*fh->m_coeff[3];
-            m_dst_x++;
+        while ((fh = m_hor_filters + m_dst_x)->m_offset == m_src_x) {
+            const int h0 = fh->m_coeff[0];
+            const int h1 = fh->m_coeff[1];
+            const int h2 = fh->m_coeff[2];
+            const int h3 = fh->m_coeff[3];
+            const int c0v = m_hbuf[0][0] * h0 + m_hbuf[1][0] * h1 + m_hbuf[2][0] * h2 + m_hbuf[3][0] * h3;
+            const int c1v = m_hbuf[0][1] * h0 + m_hbuf[1][1] * h1 + m_hbuf[2][1] * h2 + m_hbuf[3][1] * h3;
+            const int c2v = m_hbuf[0][2] * h0 + m_hbuf[1][2] * h1 + m_hbuf[2][2] * h2 + m_hbuf[3][2] * h3;
+            const int c3v = m_hbuf[0][3] * h0 + m_hbuf[1][3] * h1 + m_hbuf[2][3] * h2 + m_hbuf[3][3] * h3;
+
+            bp->Set(c0v, c1v, c2v, c3v);
+            ++m_dst_x;
             bp += 4;
         }
 
@@ -84,7 +93,7 @@ class ImageScaler {
 
     //! This is called whenever one input line is processed completely
     void NextSourceLine();
-    unsigned int PackPixel(const TmpPixel &pixel);
+    unsigned int PackPixel(int c0, int c1, int c2, int c3);
 
     TmpPixel      m_hbuf[4];      //! Ring buffer for 4 input pixels
     // char      *m_memory;
