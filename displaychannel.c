@@ -558,11 +558,12 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
 // composition of the separate logo pixmap layers)
 static tColor ZapAlphaOver(tColor Fg, tColor Bg) {
     const int Af {static_cast<int>((Fg >> 24) & 0xFF)};
-    if (Af == 255) return Fg;
-    if (Af == 0) return Bg;
+    if (Af >= 255) return Fg;
+    if (Af <= 0) return Bg;
     const int Ab {static_cast<int>((Bg >> 24) & 0xFF)};
+    if (Ab <= 0) return Fg;
     const int A {Af + Ab * (255 - Af) / 255};
-    if (A == 0) return clrTransparent;
+    if (A <= 0) return clrTransparent;
     const auto Channel = [&](int Shift) -> int {
         const int Cf {static_cast<int>((Fg >> Shift) & 0xFF)};
         const int Cb {static_cast<int>((Bg >> Shift) & 0xFF)};
@@ -579,15 +580,25 @@ static void ZapBlendImage(cImage &Composed, const cImage *Image, int Left, int T
 #endif
 
     if (!Image) return;
-    const int Width {Image->Width()}, Height {Image->Height()};
-    for (int y {0}; y < Height; ++y) {
-        const int cy {Top + y};
-        if (cy < 0 || cy >= Composed.Height()) continue;
-        for (int x {0}; x < Width; ++x) {
-            const int cx {Left + x};
-            if (cx < 0 || cx >= Composed.Width()) continue;
-            const cPoint Src {x, y}, Dst {cx, cy};
-            Composed.SetPixel(Dst, ZapAlphaOver(Image->GetPixel(Src), Composed.GetPixel(Dst)));
+    const int ComposedWidth {Composed.Width()};
+    const int ComposedHeight {Composed.Height()};
+    const int ImageWidth {Image->Width()};
+    const int ImageHeight {Image->Height()};
+    const int StartX {std::max(0, -Left)};
+    const int StartY {std::max(0, -Top)};
+    const int EndX {std::min(ImageWidth, ComposedWidth - Left)};
+    const int EndY {std::min(ImageHeight, ComposedHeight - Top)};
+    if (StartX >= EndX || StartY >= EndY) return;
+
+    const tColor *ImageData {Image->Data()};
+    tColor *ComposedData {const_cast<tColor *>(Composed.Data())};
+    for (int y {StartY}; y < EndY; ++y) {
+        const int SrcIndexY {y * ImageWidth};
+        const int DstIndexY {(Top + y) * ComposedWidth};
+        for (int x {StartX}; x < EndX; ++x) {
+            const int SrcIndex {SrcIndexY + x};
+            const int DstIndex {DstIndexY + Left + x};
+            ComposedData[DstIndex] = ZapAlphaOver(ImageData[SrcIndex], ComposedData[DstIndex]);
         }
     }
 #ifdef DEBUGIMAGELOADTIME
