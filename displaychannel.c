@@ -39,11 +39,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_HeightBottom += m_FontSmlHeight + m_MarginItem;
 
     int height {m_HeightBottom};
-    const cRect ChanInfoViewPort {Config.decorBorderChannelSize,
-                                  Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
-                                  m_HeightBottom};
-    ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoViewPort);
-    ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoViewPort);
+    const cRect ChanInfoBottomViewPort {Config.decorBorderChannelSize,
+                                        Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
+                                        m_HeightBottom};
+    ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoBottomViewPort);
+    ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoBottomViewPort);
 
     // Pixmap for channel logo and background (4:3 aspect ratio, scaled to height of m_HeightImageLogo)
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
@@ -158,10 +158,21 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_ZapInfoRectGroup.Set(Lx3, 0, std::max(0, ZapRight - Lx3), ZapFullHeight);
         m_ZapHintsRect.Set(Rx1, ZapTop, m_ZapColWidth, ZapHeight);
     }
+    // The area between top bar and the channel info display at the bottom without the ChanInfoTopPixmap area
     // m_ZapInfoWideRect.Set(ZapLeft, ZapTop, ZapRight - ZapLeft, ZapHeight);
-    // Use m_TVSRect for the EPG info panel, because it is already calculated to fit the area between top bar and
-    // channel info display at the bottom
-    m_ZapInfoWideRect = m_TVSRect;
+    m_ZapInfoWideRect.Set(ZapLeft + m_MarginEPGImage, ZapTop + m_MarginEPGImage,
+                          ZapRight - ZapLeft - m_MarginEPGImage * 2, ZapHeight + HeightTop - m_MarginEPGImage * 2);
+
+    // DecorBorder for the channel info display at the bottom without the ChanInfoTopPixmap area (Channel name)
+    m_ZapChanInfoBottomDecorBorder = {
+        Config.decorBorderChannelSize,
+        ChanInfoTopViewPort.Y() + HeightTop,
+        m_ChannelWidth,
+        m_HeightBottom + Config.decorProgressChannelSize + m_MarginItem2,
+        Config.decorBorderChannelSize,
+        Config.decorBorderChannelType,
+        Config.decorBorderChannelFg,
+        Config.decorBorderChannelBg};
 #endif
 
     // Decor border depending on setting 'ChannelShowNameWithShadow'
@@ -174,7 +185,7 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                            Config.decorBorderChannelType,
                            Config.decorBorderChannelFg,
                            Config.decorBorderChannelBg,
-                           BorderChannelInfo};
+                           BorderChannelInfoBottom};
     DecorBorderDraw(ib);
 #ifdef DEBUGFUNCSCALL
     dsyslog("   cFlatDisplayChannel() done, elapsed time %ld ms", Timer.Elapsed());
@@ -611,12 +622,13 @@ static void ZapBlendImage(cImage &Composed, const cImage *Image, int Left, int T
 static cString ZapShortenText(const char *Text, const cFont *Font, int MaxWidth) {
     if (!Text || !*Text || MaxWidth <= 0) return "";
 
+    int CurrentWidth {Font->Width(Text)};
+    if (CurrentWidth <= MaxWidth) return Text;
+
     const int EllipsisWidth {Font->Width("...")};
     if (EllipsisWidth >= MaxWidth) return "";
 
     std::string Shortened {Text};
-    int CurrentWidth {Font->Width(Shortened.c_str())};
-
     while (!Shortened.empty() && CurrentWidth + EllipsisWidth > MaxWidth) {
         std::size_t i {Shortened.size()};  // Remove the last UTF-8 character.
         do {
@@ -713,19 +725,33 @@ void cFlatDisplayChannel::ZapHideBaseElements() {
     WeatherWidget.SetVisible(false);
 }
 
-// Hide the weather widget and the ChanEpgImagesPixmap when the zapcockipt channel info is shown, because the weather
-// widget and the poster image of the selected channel would overlap the zapcockpit info pixmap. The original pixmap
-// layers are stored for restoring in ZapShowBaseElements()
-void cFlatDisplayChannel::ZapHideEpgImages() {
+// Hide the weather widget, ChanEpgImagesPixmap and the channel name when the zapcockipt channel info is shown, because
+// they would overlap the zapcockpit info pixmap. The original pixmap. Layers are stored for restoring in
+// ZapShowBaseElements()
+void cFlatDisplayChannel::ZapHideInfoElements() {
     if (m_ZapEpgImagesHidden) return;
     m_ZapEpgImagesHidden = true;
 
-    if (ChanEpgImagesPixmap && ChanEpgImagesPixmap->Layer() >= 0) {
-        m_ZapHiddenPixmaps.emplace_back(ChanEpgImagesPixmap, ChanEpgImagesPixmap->Layer());
-        ChanEpgImagesPixmap->SetLayer(-1);
-        // Remove the border around the poster image, because it would overlap the zapcockpit info pixmap
-        DecorBorderClearByFrom(BorderTVSPoster);
+    cPixmap *InfoElementPixmaps[] {ChanEpgImagesPixmap, ChanInfoTopPixmap};
+    m_ZapHiddenPixmaps.clear();
+    m_ZapHiddenPixmaps.reserve(sizeof(InfoElementPixmaps) / sizeof(InfoElementPixmaps[0]));
+    for (cPixmap *Pixmap : InfoElementPixmaps) {
+        if (Pixmap && Pixmap->Layer() >= 0) {
+            m_ZapHiddenPixmaps.emplace_back(Pixmap, Pixmap->Layer());
+            Pixmap->SetLayer(-1);
+        }
     }
+
+    // Remove the border around the poster image, because it would overlap the zapcockpit info pixmap
+    DecorBorderClearByFrom(BorderTVSPoster);
+
+    // If channel name is drawn without shadow, redraw the border for the bottom pixmap
+    if (!Config.ChannelShowNameWithShadow) {
+        DecorBorderClearByFrom(BorderChannelInfoBottom);  // Remove the Border
+        // Draw the border for the remaining bottom pixmap
+        DecorBorderDraw(m_ZapChanInfoBottomDecorBorder, false);
+    }
+
     WeatherWidget.SetVisible(false);
 }
 
@@ -801,8 +827,8 @@ void cFlatDisplayChannel::SetViewType(eDisplaychannelView ViewType) {
     case dcChannelInfo:  // Info pixmap is (re)created in SetChannelInfo()
         ZapHideLists();
         ZapShowBaseElements();
-        ZapHideEpgImages();  // Hide the weather widget and the poster image of the selected channel, because they would
-                             // overlap the info pixmap
+        ZapHideInfoElements();  // Hide the weather widget, the EPG image and the channel name, because they would
+                                // overlap the info pixmap
         break;
     case dcChannelList:
     case dcChannelListInfo: {
@@ -1016,12 +1042,14 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     const int MaxTextWidth {Width - m_MarginItem2 * 2};
     int top {m_MarginItem};
 
-    // Header: Channel number and name
+    // Header: Channel number and name. When view is wide (2nd 'Ok') we use the same size as in normal channel info.
+    const cFont *FontHdr {(IsWideInfo) ? m_FontBig : m_Font};  // Big or normal
+    const int FontHdrHeight {(IsWideInfo) ? m_FontBigHeight : m_FontHeight};  // Big or normal
     const cString Header {cString::sprintf("%d  %s", Channel->Number(), Channel->Name())};
-    ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *ZapShortenText(*Header, m_Font, MaxTextWidth),
+    ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *ZapShortenText(*Header, FontHdr, MaxTextWidth),
                             Theme.Color(clrChannelFontTitle),
-                            Theme.Color(clrChannelBg), m_Font, MaxTextWidth);
-    top += m_FontHeight;
+                            Theme.Color(clrChannelBg), FontHdr, MaxTextWidth);
+    top += FontHdrHeight;
     ZapInfoPixmap->DrawRectangle(cRect(m_MarginItem2, top + m_MarginItem / 2, MaxTextWidth, m_LineWidth),
                                  Theme.Color(clrChannelFontTitle));
     top += m_MarginItem2 + m_LineMargin;

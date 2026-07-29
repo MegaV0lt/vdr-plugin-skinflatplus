@@ -105,6 +105,9 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         cFont *m_ZapFont {nullptr}, *m_ZapFontSml {nullptr};
         int m_ZapFontHeight {0}, m_ZapFontSmlHeight {0};
 
+        // DecorBorder for the channel info display at the bottom without the ChanInfoTopPixmap area
+        sDecorBorder m_ZapChanInfoBottomDecorBorder {0, 0, 0, 0, 0, 0, clrTransparent, clrTransparent, 0};
+
         int m_ZapColWidth {0};                 // Width of one list column
         int m_ZapItemHeightChan {0};           // Height of one channellist item (logo + 3 text lines)
         int m_ZapItemHeightGroup {0};          // Height of one grouplist item (one text line)
@@ -132,7 +135,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void ZapHideInfo();
         void ZapHideBaseElements();  // Hide the base OSD elements (top bar and channel info display at the bottom)
                                      // while a list view is shown
-        void ZapHideEpgImages();     // Hide the weather widget and the EPG image
+        void ZapHideInfoElements();  // Hide the weather widget, EPG image and channel name
         void ZapShowBaseElements();
         void ZapRunShowAnimation();
         void ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Channel, int Index, bool Current);
