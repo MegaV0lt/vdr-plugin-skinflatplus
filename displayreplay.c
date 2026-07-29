@@ -623,21 +623,19 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // Config.PlaybackShowEndTime
 
     //* Draw Banner/Poster (Update only every 5 seconds)
-    if (m_LastPosterBannerUpdate + 5 < now) {
+    if (Config.TVScraperReplayInfoShowPoster && m_LastPosterBannerUpdate + 5 < now) {
         m_LastPosterBannerUpdate = now;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
-        if (Config.TVScraperReplayInfoShowPoster) {
-            GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-            if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
-                const cString RecPath {m_Recording->FileName()};
-                if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
-                    img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
-                    if (img)
-                        MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
-                    else
-                        MediaPath = "";  // Just in case image can not be loaded
-                }
+        GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+            const cString RecPath {m_Recording->FileName()};
+            if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
+                img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
+                if (img)
+                    MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
+                else
+                    MediaPath = "";  // Just in case image can not be loaded
             }
         }
 
@@ -664,7 +662,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 DecorBorderDraw(ib);
             }
         }
-    }  // m_LastPosterBannerUpdate
+    }  // Config.TVScraperReplayInfoShowPoster && m_LastPosterBannerUpdate
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {
