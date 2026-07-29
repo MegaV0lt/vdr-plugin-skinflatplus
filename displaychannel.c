@@ -522,33 +522,35 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     if (Config.ChannelIconsShow && m_CurChannel) ChannelIconsDraw(m_CurChannel, true);
 
-    cString MediaPath {""};
-    cSize MediaSize {0, 0};  // Width, Height
-    if (Config.TVScraperChanInfoShowPoster) GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
+    if (Config.TVScraperChanInfoShowPoster) {
+        cString MediaPath {""};
+        cSize MediaSize {0, 0};  // Width, Height
+        GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
 
-    PixmapClear(ChanEpgImagesPixmap);
-    DecorBorderClearByFrom(BorderTVSPoster);
-    if (MediaPath[0] != '\0') {
-        SetMediaSize(m_TVSRect.Size(), MediaSize,
-        Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
-        cImage *img {ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
-        if (img) {
-            PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
-            ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
+        PixmapClear(ChanEpgImagesPixmap);
+        DecorBorderClearByFrom(BorderTVSPoster);
+        if (MediaPath[0] != '\0') {
+            SetMediaSize(m_TVSRect.Size(), MediaSize,
+            Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
+            cImage *img {ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
+            if (img) {
+                PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
+                ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-            const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-                                   m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
-                                       Config.decorBorderChannelEPGSize,
-                                   img->Width(),
-                                   img->Height(),
-                                   Config.decorBorderChannelEPGSize,
-                                   Config.decorBorderChannelEPGType,
-                                   Config.decorBorderChannelEPGFg,
-                                   Config.decorBorderChannelEPGBg,
-                                   BorderTVSPoster};
-            DecorBorderDraw(ib);
+                const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+                                    m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                                        Config.decorBorderChannelEPGSize,
+                                    img->Width(),
+                                    img->Height(),
+                                    Config.decorBorderChannelEPGSize,
+                                    Config.decorBorderChannelEPGType,
+                                    Config.decorBorderChannelEPGFg,
+                                    Config.decorBorderChannelEPGBg,
+                                    BorderTVSPoster};
+                DecorBorderDraw(ib);
+            }
         }
-    }
+    }  // if (Config.TVScraperChanInfoShowPoster)
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
