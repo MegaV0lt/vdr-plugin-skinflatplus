@@ -147,7 +147,7 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
     //         FloatLines, NumLines, TextWidthLeft, TextWidthFull);
 
     std::string Line {""};
-    Line.reserve(128);
+    Line.reserve(256);
     cRect FloatedTextPos {TextPos};
     const int Top {TextPos.Top()};  // Cache TextPos.Top() outside the loop
     for (int i {0}; i < NumLines; ++i) {  // Add text line by line
