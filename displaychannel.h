@@ -136,7 +136,8 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void ZapHideBaseElements();  // Hide the base OSD elements (top bar and channel info display at the bottom)
                                      // while a list view is shown
         void ZapHideInfoElements();  // Hide the weather widget, EPG image and channel name
-        void ZapShowBaseElements();
+        void ZapShowBaseElements();  // Show the base OSD elements (top bar and channel info display at the bottom)
+                                     // including the weather widget and EPG image
         void ZapRunShowAnimation();
         void ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Channel, int Index, bool Current);
         void ZapDrawGroupItem(cPixmap *Pixmap, const cString &Text, int Index, bool Current);

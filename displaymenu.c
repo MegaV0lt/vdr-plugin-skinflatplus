@@ -98,7 +98,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     static constexpr std::size_t kDefaultItemBorderSize {64};
     ItemsBorder.reserve(kDefaultItemBorderSize);
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   cFlatDisplayMenu() Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -524,7 +524,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize;
+        Height += m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize;
         m_MenuItemWidth /= 2;
     }
 
@@ -609,10 +609,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     }
-    if (WithProvider)
-        Buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
-    else
-        Buffer = Channel->Name();
+    (WithProvider)  // Append provider name
+        ? Buffer = cString::sprintf("%s (%s)", Channel->Name(), Channel->Provider())
+        : Buffer = Channel->Name();
 
     const int LeftName {Left};
     if (Config.MenuChannelView == 1) {  // flatPlus long
@@ -862,7 +861,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus short, flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem;
+        Height += m_FontSmlHeight + m_MarginItem;
         m_MenuItemWidth /= 2;
     }
 
@@ -1096,7 +1095,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (MenuEventViewShort) {  // flatPlus short. flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.decorProgressMenuItemSize / 2;
+        Height += m_FontSmlHeight + m_MarginItem2 + Config.decorProgressMenuItemSize / 2;
         m_MenuItemWidth *= 0.6;
     }
 
@@ -2927,19 +2926,29 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     return found ? skipspace(text.substr(i).data()) : text.data();
 }
 
+
+/**
+ * Returns the icon name for a menu entry.
+ *
+ * The function resolves standard VDR menu entries to their corresponding icon names,
+ * checks plugin-provided main menu entries, and falls back to a generic icon for
+ * unknown entries. The icon names are stored in a static cache for faster access.
+ *
+ * @param element The menu entry name to resolve.
+ * @return The icon name associated with the menu entry.
+ */
 cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
 #endif
+
+    static constexpr const char *items[] {"Schedule", "Channels", "Timers", "Recordings", "Setup",
 #if VDRVERSNUM >= 20708
-    static constexpr const char *items[] {
-        "Schedule", "Channels", "Timers", "Recordings", "Setup",  "Button$Commands", "OSD",     "EPG",
-        "DVB",      "LNB",      "CAM",    "Recording",  "Replay", "Miscellaneous",   "Plugins", "Restart"};
+        "Button$Commands",
 #else
-    static constexpr const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                          "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                          "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        "Commands",
 #endif
+        "OSD", "EPG", "DVB", "LNB", "CAM", "Recording", "Replay", "Miscellaneous", "Plugins", "Restart"};
 
     // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
@@ -3457,10 +3466,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     int DeviceLiveTV {-1};
     cDevice *PrimaryDevice {cDevice::PrimaryDevice()};
     if (PrimaryDevice) {
-        if (!PrimaryDevice->Replaying() || PrimaryDevice->Transferring())
-            DeviceLiveTV = cDevice::ActualDevice()->DeviceNumber();
-        else
-            DeviceLiveTV = PrimaryDevice->DeviceNumber();
+        (!PrimaryDevice->Replaying() || PrimaryDevice->Transferring())
+            ? DeviceLiveTV = cDevice::ActualDevice()->DeviceNumber()
+            : DeviceLiveTV = PrimaryDevice->DeviceNumber();
     }
 
     // Find all recording devices and set RecDevices[] to true for these devices
@@ -3499,10 +3507,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         StrDevice = "";  // Reset string
 
         const cChannel *channel {device->GetCurrentlyTunedTransponder()};
-        if (channel && channel->Number() > 0)
-            ChannelName = channel->Name();
-        else
-            ChannelName = tr("Unknown");
+        (channel && channel->Number() > 0)
+            ? ChannelName = channel->Name()
+            : ChannelName = tr("Unknown");
 
         if (i == DeviceLiveTV) {
             StrDevice.Append(cString::sprintf("%s (%s)", tr("LiveTV"), *ChannelName));

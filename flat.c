@@ -471,7 +471,8 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
     }  // for
 
     if (NewLine) Text.Append('\n');
-    Text.Append(ossVideo.str().c_str());
+
+    if (!ossVideo.str().empty()) Text.Append(ossVideo.str().c_str());
 
     if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
 
