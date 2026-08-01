@@ -1198,6 +1198,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         dsyslog("flatPlus: DVBApi plugin %s", pDVBApi ? "found and loaded" : "not found");
     }
     if (!pDVBApi) return;
+    if (!m_CurChannel) return;  // Not set yet when an OSD size change re-created this object
 
     sDVBAPIEcmInfo ecmInfo {.sid = static_cast<uint16_t>(m_CurChannel->Sid()), .ecmtime = 0, .hops = -1};
 
@@ -1295,7 +1296,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     int ImageBgHeight {height};
 
     // Load 'logo_background' and determine if logo was found in channel logo path
-    cImage *img {ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight)};
+    cImage *img {ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true)};  // Miss is expected
     if (img) {
         g_LogoBgOverwrite = true;  // Used for GetLogoBg()
     } else {

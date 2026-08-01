@@ -184,18 +184,12 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
 void cImageCache::PreLoadImage() {
     cTimeMs Timer;
 
-    cFlatDisplayChannel DisplayChannel(false);
+    // Only one OSD may be open at a time, so scope each object to close its OSD before the next one
     // Called first. Also used to determine if 'logo_background' should be loaded from logo path or theme path
-    DisplayChannel.PreLoadImages();
-
-    cFlatDisplayMenu Display_Menu;
-    Display_Menu.PreLoadImages();
-
-    cFlatDisplayReplay DisplayReplay(false);
-    DisplayReplay.PreLoadImages();
-
-    cFlatDisplayVolume DisplayVolume;
-    DisplayVolume.PreLoadImages();
+    { cFlatDisplayChannel DisplayChannel(false); DisplayChannel.PreLoadImages(); }
+    { cFlatDisplayMenu Display_Menu; Display_Menu.PreLoadImages(); }
+    { cFlatDisplayReplay DisplayReplay(false); DisplayReplay.PreLoadImages(); }
+    { cFlatDisplayVolume DisplayVolume; DisplayVolume.PreLoadImages(); }
 
     m_InsertIndexBase = GetCacheCount();
     m_InsertIconIndexBase = GetIconCacheCount();
