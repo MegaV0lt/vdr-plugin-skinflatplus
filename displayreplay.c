@@ -322,15 +322,15 @@ void cFlatDisplayReplay::SetCurrent(const char *Current) {
 #endif
     if (m_ModeOnly) return;
 
-    m_Current = Current;
+    m_Current = Current ? Current : "";  // Never store a nullptr, it is dereferenced unchecked below
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
     if (m_ModeOnly) return;
 
-    m_Total = Total;
-    if (m_Current[0] != '\0')  // Do not call 'UpdateInfo()' when 'm_Current' is not set
+    m_Total = Total ? Total : "";
+    if (!isempty(*m_Current))  // Do not call 'UpdateInfo()' when 'm_Current' is not set
         UpdateInfo();
 }
 
