@@ -419,18 +419,18 @@ void cFlatDisplayReplay::UpdateInfo() {
         // left += TimeShiftWidth + m_MarginItem;
     }
 
-    // Check if m_Recording is null and return if so
-    if (!m_Recording) return;
+    // Without a recording (media player replay) only the total length can be drawn
+    if (!m_Recording && isempty(*m_Total)) return;
 
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
-    const int NumFrames {m_Recording->NumFrames()};  // Total frames in recording
-    if (NumFrames <= 0) {
+    const int NumFrames {m_Recording ? m_Recording->NumFrames() : 0};  // Total frames in recording
+    if (m_Recording && NumFrames <= 0) {
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid NumFrames: %d", NumFrames);
         return;
     }
 
-    if (marks && m_Recording->HasMarks()) {
+    if (m_Recording && marks && m_Recording->HasMarks()) {
 #if APIVERSNUM >= 20608
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);
         if (FramesAfterEdit >= 0) CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
@@ -440,8 +440,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 #endif
     }
 
-    const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    if (FramesPerSecond <= 0.0) {  // Avoid DIV/0
+    const double FramesPerSecond {m_Recording ? m_Recording->FramesPerSecond() : 0.0};
+    if (m_Recording && FramesPerSecond <= 0.0) {  // Avoid DIV/0
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid FramesPerSecond: %.2f", FramesPerSecond);
         return;
     }
@@ -579,6 +579,8 @@ void cFlatDisplayReplay::UpdateInfo() {
                                   m_Font, TotalWidth, m_FontHeight);
         }
     }  // HasMarks
+
+    if (!m_Recording) return;  // End time and poster need the recording
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
     const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' changed
