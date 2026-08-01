@@ -35,7 +35,7 @@ cImageLoader::~cImageLoader() {}
  * @param height The desired height of the logo.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
-cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
+cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quiet) {
     if (width < 0 || height < 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
@@ -70,7 +70,7 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height) {
 
         success = LoadImage(*File);  // Try to load image from disk
         if (!success) {              // Image not found on disk
-            if (i == 2)              // Third try and not found
+            if (i == 2 && !Quiet)    // Third try and not found
                 isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
                         *m_LogoExtension);
             continue;
