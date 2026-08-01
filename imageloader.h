@@ -29,7 +29,7 @@ class cImageLoader : public cImageMagickWrapper {
     cImageLoader();
     ~cImageLoader();
 
-    cImage* GetLogo(const char *logo, int width, int height);
+    cImage* GetLogo(const char *logo, int width, int height, bool Quiet = false);  // 'Quiet': Do not log a miss
     cImage* GetIcon(const char *cIcon, int width, int height);
     cImage* GetFile(const char *cFile, int width, int height);
     cImage* GetLogoBg(int Width, int Height);  // Load 'logo_background'
