@@ -14,6 +14,7 @@
 #include <memory>  // For std::unique_ptr
 #include <unordered_map>
 #include <vector>  // For std::vector
+#include <string_view>
 
 static constexpr std::size_t kMaxImageCache {1024};  // Image cache including two times 'kLogoPreCache'
 static constexpr std::size_t kMaxIconCache {512};    // Icon cache (Skin icons)

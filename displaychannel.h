@@ -47,6 +47,7 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
 
  private:
         const cEvent *m_Present {nullptr};
+        const cEvent *m_Following {nullptr};
 
         int m_ChannelWidth {0}, m_ChannelHeight {0};
 
@@ -81,32 +82,31 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
 
 #ifdef USE_ZAPCOCKPIT
         // Zapcockpit rendering
-        // The group list and the channellist of the selected group are two
-        // separate panels which are visible side by side, because the VDR
-        // state machine does not redraw the group list when returning from
-        // the group channel list (dcGroupsChannelList -> dcGroupsList).
-        // The lists slide in from the side of the pressed key: The list opened
-        // with 'right' is anchored at the left edge, the list opened with
-        // 'left' at the right edge (mirrored when the setup option
-        // 'Zapcockpit: Key right opens channellist' is disabled).
-        // While a list view is shown, all other OSD elements (top bar and the
-        // channel info display at the bottom) are hidden.
-        cPixmap *ZapListPixmap {nullptr};      // 1st column: Channellist, grouplist, channel hints
-        cPixmap *ZapList2Pixmap {nullptr};     // 2nd column: Channellist of the selected group
-        cPixmap *ZapInfoPixmap {nullptr};      // Detailed EPG info panel (beside the lists or full width)
+        // The group list and the channellist of the selected group are two separate panels which are visible side by
+        // side, because the VDR state machine does not redraw the group list when returning from the group channel list
+        // (dcGroupsChannelList -> dcGroupsList). The lists slide in from the side of the pressed key: The list opened
+        // with 'right' is anchored at the left edge, the list opened with 'left' at the right edge (mirrored when the
+        // setup option 'Zapcockpit: Key right opens channellist' is disabled). While a list view is shown, all other
+        // OSD elements (top bar and the channel info display at the bottom) are hidden.
+        cPixmap *ZapListPixmap {nullptr};   // 1st column: Channellist, grouplist, channel hints
+        cPixmap *ZapList2Pixmap {nullptr};  // 2nd column: Channellist of the selected group
+        cPixmap *ZapInfoPixmap {nullptr};   // Detailed EPG info panel (beside the lists or full width)
 
         eDisplaychannelView m_ZapViewType {dcDefault};
-        cRect m_ZapListRectChan {0, 0, 0, 0};   // Channellist panel
-        cRect m_ZapInfoRectChan {0, 0, 0, 0};   // Info panel beside the channellist
-        cRect m_ZapListRectGroup {0, 0, 0, 0};  // Grouplist panel (opposite side of the channellist)
+        cRect m_ZapListRectChan {0, 0, 0, 0};    // Channellist panel
+        cRect m_ZapInfoRectChan {0, 0, 0, 0};    // Info panel beside the channellist
+        cRect m_ZapListRectGroup {0, 0, 0, 0};   // Grouplist panel (opposite side of the channellist)
         cRect m_ZapList2RectGroup {0, 0, 0, 0};  // Channellist of the selected group (beside the grouplist)
         cRect m_ZapInfoRectGroup {0, 0, 0, 0};   // Info panel beside the group channel list
         cRect m_ZapInfoWideRect {0, 0, 0, 0};    // Info panel over the full width (dcChannelInfo)
         cRect m_ZapHintsRect {0, 0, 0, 0};       // Channel hints panel (base OSD elements stay visible)
-        // Fonts of the list items: The same fonts as in the channel info
-        // display at the bottom, scaled by 'ChannelZapcockpitFontSize'
+        // Fonts of the list items: The same fonts as in the channel info display at the bottom, scaled by
+        // 'ChannelZapcockpitFontSize'
         cFont *m_ZapFont {nullptr}, *m_ZapFontSml {nullptr};
         int m_ZapFontHeight {0}, m_ZapFontSmlHeight {0};
+
+        // DecorBorder for the channel info display at the bottom without the ChanInfoTopPixmap area
+        sDecorBorder m_ZapChanInfoBottomDecorBorder {0, 0, 0, 0, 0, 0, clrTransparent, clrTransparent, 0};
 
         int m_ZapColWidth {0};                 // Width of one list column
         int m_ZapItemHeightChan {0};           // Height of one channellist item (logo + 3 text lines)
@@ -117,10 +117,11 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         int m_ZapNumHints {0};                 // Number of currently displayed channel hints
 
         bool m_ZapBaseHidden {false};          // Base OSD elements currently hidden?
+        bool m_ZapEpgImagesHidden {false};     // EPG image and weather widget currently hidden?
         std::vector<std::pair<cPixmap *, int>> m_ZapHiddenPixmaps;  // Hidden pixmaps with their original layer
 
-        // Show animation (fade-in/shift-in of newly shown list panels),
-        // executed in Flush() after the panel content has been drawn
+        // Show animation (fade-in/shift-in of newly shown list panels), executed in Flush() after the panel content has
+        // been drawn
         bool m_ZapAnimPending {false};
         cPixmap *m_ZapAnimPixmap1 {nullptr}, *m_ZapAnimPixmap2 {nullptr};
 
@@ -132,8 +133,11 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void ZapHideList(cPixmap *Pixmap);
         void ZapHideLists();
         void ZapHideInfo();
-        void ZapHideBaseElements();
-        void ZapShowBaseElements();
+        void ZapHideBaseElements();  // Hide the base OSD elements (top bar and channel info display at the bottom)
+                                     // while a list view is shown
+        void ZapHideInfoElements();  // Hide the weather widget, EPG image and channel name
+        void ZapShowBaseElements();  // Show the base OSD elements (top bar and channel info display at the bottom)
+                                     // including the weather widget and EPG image
         void ZapRunShowAnimation();
         void ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Channel, int Index, bool Current);
         void ZapDrawGroupItem(cPixmap *Pixmap, const cString &Text, int Index, bool Current);

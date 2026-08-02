@@ -201,11 +201,11 @@ inline static unsigned int shift_clamp(int x) {
  * @param pixel The TmpPixel to pack.
  * @return A 32-bit unsigned integer representing the packed pixel.
  */
-inline unsigned int ImageScaler::PackPixel(const TmpPixel &pixel) {
-    return shift_clamp(pixel[0]) |
-           (shift_clamp(pixel[1]) << 8) |
-           (shift_clamp(pixel[2]) << 16) |
-           (shift_clamp(pixel[3]) << 24);
+inline unsigned int ImageScaler::PackPixel(int c0, int c1, int c2, int c3) {
+    return shift_clamp(c0) |
+           (shift_clamp(c1) << 8) |
+           (shift_clamp(c2) << 16) |
+           (shift_clamp(c3) << 24);
 }
 
 /**
@@ -242,21 +242,36 @@ void ImageScaler::NextSourceLine() {
 
         // Unroll 4 pixels at a time for speed
         for (; i + 3 < m_dst_width; i += 4) {
-            // Calculate four pixels at a time
-            const TmpPixel t0(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
-            const TmpPixel t1(src[4] * h0 + src[5] * h1 + src[6] * h2 + src[7] * h3);
-            const TmpPixel t2(src[8] * h0 + src[9] * h1 + src[10] * h2 + src[11] * h3);
-            const TmpPixel t3(src[12] * h0 + src[13] * h1 + src[14] * h2 + src[15] * h3);
-            dst[i] = PackPixel(t0);
-            dst[i+1] = PackPixel(t1);
-            dst[i+2] = PackPixel(t2);
-            dst[i+3] = PackPixel(t3);
+            // Calculate four pixels at a time using direct component math to avoid temporary objects.
+            const int c00 = src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3;
+            const int c01 = src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3;
+            const int c02 = src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3;
+            const int c03 = src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3;
+            const int c10 = src[4][0] * h0 + src[5][0] * h1 + src[6][0] * h2 + src[7][0] * h3;
+            const int c11 = src[4][1] * h0 + src[5][1] * h1 + src[6][1] * h2 + src[7][1] * h3;
+            const int c12 = src[4][2] * h0 + src[5][2] * h1 + src[6][2] * h2 + src[7][2] * h3;
+            const int c13 = src[4][3] * h0 + src[5][3] * h1 + src[6][3] * h2 + src[7][3] * h3;
+            const int c20 = src[8][0] * h0 + src[9][0] * h1 + src[10][0] * h2 + src[11][0] * h3;
+            const int c21 = src[8][1] * h0 + src[9][1] * h1 + src[10][1] * h2 + src[11][1] * h3;
+            const int c22 = src[8][2] * h0 + src[9][2] * h1 + src[10][2] * h2 + src[11][2] * h3;
+            const int c23 = src[8][3] * h0 + src[9][3] * h1 + src[10][3] * h2 + src[11][3] * h3;
+            const int c30 = src[12][0] * h0 + src[13][0] * h1 + src[14][0] * h2 + src[15][0] * h3;
+            const int c31 = src[12][1] * h0 + src[13][1] * h1 + src[14][1] * h2 + src[15][1] * h3;
+            const int c32 = src[12][2] * h0 + src[13][2] * h1 + src[14][2] * h2 + src[15][2] * h3;
+            const int c33 = src[12][3] * h0 + src[13][3] * h1 + src[14][3] * h2 + src[15][3] * h3;
+            dst[i] = PackPixel(c00, c01, c02, c03);
+            dst[i+1] = PackPixel(c10, c11, c12, c13);
+            dst[i+2] = PackPixel(c20, c21, c22, c23);
+            dst[i+3] = PackPixel(c30, c31, c32, c33);
             src += 16;
         }
         // If num pixels is not a multiple of 4, finish the remaining ones
         for (; i < m_dst_width; ++i) {
-            const TmpPixel t(src[0] * h0 + src[1] * h1 + src[2] * h2 + src[3] * h3);
-            dst[i] = PackPixel(t);
+            const int c0 = src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3;
+            const int c1 = src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3;
+            const int c2 = src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3;
+            const int c3 = src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3;
+            dst[i] = PackPixel(c0, c1, c2, c3);
             src += 4;
         }
         ++m_dst_y;

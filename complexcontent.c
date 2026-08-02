@@ -141,20 +141,20 @@ void cComplexContent::AddImageWithFloatedText(cImage *image, int imageAlignment,
 
     cTextFloatingWrapper WrapperFloat;  // Modified cTextWrapper lent from skin ElchiHD
     WrapperFloat.Set(Text, Font, TextWidthFull, FloatLines, TextWidthLeft);  //* Set() strips trailing newlines!
-    const int Lines {WrapperFloat.Lines()};
+    const int NumLines {WrapperFloat.Lines()};
 
     // dsyslog("flatPlus: AddImageWithFloatedText:\nFloatLines %d, Lines %d, TextWithLeft %d, TextWidthFull %d",
-    //         FloatLines, Lines, TextWidthLeft, TextWidthFull);
+    //         FloatLines, NumLines, TextWidthLeft, TextWidthFull);
 
     std::string Line {""};
-    Line.reserve(128);
+    Line.reserve(256);
     cRect FloatedTextPos {TextPos};
     const int Top {TextPos.Top()};  // Cache TextPos.Top() outside the loop
-    for (int i {0}; i < Lines; ++i) {  // Add text line by line
+    for (int i {0}; i < NumLines; ++i) {  // Add text line by line
         FloatedTextPos.SetTop(Top + (i * m_ScrollSize));
         Line = WrapperFloat.GetLine(i);
         // Last line is not justified
-        if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1))
+        if (Config.MenuEventRecordingViewJustify == 1 && i < (NumLines - 1))
             JustifyLine(Line, Font, (i < FloatLines) ? TextWidthLeft : TextWidthFull);
 
         AddText(Line.c_str(), false, FloatedTextPos, ColorFg, ColorBg, Font, TextWidthFull, TextHeight, TextAlignment);
@@ -257,7 +257,7 @@ bool cComplexContent::Scroll(bool Up, bool Page) {
             return false;
         }
     } else {
-        const int MaxScroll = -(TotalHeight - ScreenHeight);
+        const int MaxScroll {-(TotalHeight - ScreenHeight)};  // Maximum scroll position (negative value)
         if (Page) {  // Page down
             NewY = std::max(CurrentHeight - ScreenHeight, MaxScroll);
         } else {  // Line down

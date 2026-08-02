@@ -295,8 +295,7 @@ std::string_view rtrim(std::string_view str);
 std::string_view trim(std::string_view str); */
 
 void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUser);  // NOLINT in/out
-void InsertComponents(const cComponents *Components, cString &Text, cString &Audio,        // NOLINT
-                      cString &Subtitle, bool NewLine = false);                            // NOLINT
+void InsertComponents(const cComponents *Components, cString &Text, bool NewLine = false);  // NOLINT
 void InsertAuxInfos(const cRecordingInfo *RecInfo, cString &Text, bool InfoLine = false);  // NOLINT
 int GetEpgsearchConflicts();
 int GetFrameAfterEdit(const cMarks *marks = nullptr, int Frame = 0, int LastFrame = 0);

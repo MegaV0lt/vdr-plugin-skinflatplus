@@ -107,11 +107,11 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
     }
 
     cString InfoText {""};
-    if (isempty(RecInfo->ShortText())) {  // No short text. Show date and time instead
-        InfoText = cString::sprintf("%s  %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
+    if (isempty(RecInfo->ShortText())) {  // No short text. Show date and time instead (00.00.00 00:00)
+        InfoText = cString::sprintf("%s %s", *ShortDateString(Recording->Start()), *TimeString(Recording->Start()));
     } else {
         if (Config.PlaybackShowRecordingDate)  // Date  Time - ShortText
-            InfoText = cString::sprintf("%s  %s - %s", *ShortDateString(Recording->Start()),
+            InfoText = cString::sprintf("%s %s - %s", *ShortDateString(Recording->Start()),
                                         *TimeString(Recording->Start()), RecInfo->ShortText());
         else
             InfoText = RecInfo->ShortText();
@@ -157,7 +157,7 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
 #if APIVERSNUM >= 20505
     if (Config.PlaybackShowRecordingErrors) {  // Separate config option
-        const cString RecErrIcon = cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()));
+        const cString RecErrIcon {cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()))};
 
         img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
         if (img) {
@@ -219,7 +219,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     }
 
     int left {0};
-    const int FontWidth00 {FontCache.GetStringWidth(m_FontName, m_FontHeight, "00")};  // Width of '00'
+    const int ExtraMargin {FontCache.GetStringWidth(m_FontName, m_FontHeight, "0") * 2};  // Width of two '0'
     const int EffectiveOsdWidth {m_OsdWidth - Config.decorBorderReplaySize * 2};
     if (Setup.ShowReplayMode) {
         left = (EffectiveOsdWidth - (m_FontHeight * 4 + m_MarginItem3)) / 2;
@@ -227,15 +227,15 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         if (m_ModeOnly) PixmapClear(LabelPixmap);
 
         // PixmapClear(IconsPixmap);  //* Moved to SetRecording
-        LabelPixmap->DrawRectangle(cRect(left - FontWidth00 - m_MarginItem, 0,
-                                         m_FontHeight * 4 + m_MarginItem * 6 + FontWidth00 * 2, m_FontHeight),
+        LabelPixmap->DrawRectangle(cRect(left - ExtraMargin - m_MarginItem, 0,
+                                         m_FontHeight * 4 + m_MarginItem * 6 + ExtraMargin * 2, m_FontHeight),
                                    Theme.Color(clrReplayBg));
 
         cString rewind {"rewind"}, pause {"pause"}, play {"play"}, forward {"forward"};
         if (Speed == -1) {  // Replay or pause
             (Play) ? play = "play_sel" : pause = "pause_sel";
         } else {
-            const cString speed = itoa(Speed);
+            const cString speed {itoa(Speed)};
             if (Forward) {
                 forward = "forward_sel";
                 LabelPixmap->DrawText(cPoint(left + m_FontHeight * 4 + m_MarginItem * 4, 0), speed,
@@ -272,9 +272,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
         DecorBorderDraw(ib);
     } else {
         if (m_ModeOnly) {
-            const sDecorBorder ib {left - FontWidth00 - m_MarginItem + Config.decorBorderReplaySize,
+            const sDecorBorder ib {left - ExtraMargin - m_MarginItem + Config.decorBorderReplaySize,
                                    m_OsdHeight - m_LabelHeight - Config.decorBorderReplaySize,
-                                   m_FontHeight * 4 + m_MarginItem * 6 + FontWidth00 * 2,
+                                   m_FontHeight * 4 + m_MarginItem * 6 + ExtraMargin * 2,
                                    m_FontHeight,
                                    Config.decorBorderReplaySize,
                                    Config.decorBorderReplayType,
@@ -322,15 +322,15 @@ void cFlatDisplayReplay::SetCurrent(const char *Current) {
 #endif
     if (m_ModeOnly) return;
 
-    m_Current = Current;
+    m_Current = Current ? Current : "";  // Never store a nullptr, it is dereferenced unchecked below
     UpdateInfo();
 }
 
 void cFlatDisplayReplay::SetTotal(const char *Total) {
     if (m_ModeOnly) return;
 
-    m_Total = Total;
-    if (m_Current[0] != '\0')  // Do not call 'UpdateInfo()' when 'm_Current' is not set
+    m_Total = Total ? Total : "";
+    if (!isempty(*m_Current))  // Do not call 'UpdateInfo()' when 'm_Current' is not set
         UpdateInfo();
 }
 
@@ -419,18 +419,18 @@ void cFlatDisplayReplay::UpdateInfo() {
         // left += TimeShiftWidth + m_MarginItem;
     }
 
-    // Check if m_Recording is null and return if so
-    if (!m_Recording) return;
+    // Without a recording (media player replay) only the total length can be drawn
+    if (!m_Recording && isempty(*m_Total)) return;
 
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
-    const int NumFrames {m_Recording->NumFrames()};  // Total frames in recording
-    if (NumFrames <= 0) {
+    const int NumFrames {m_Recording ? m_Recording->NumFrames() : 0};  // Total frames in recording
+    if (m_Recording && NumFrames <= 0) {
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid NumFrames: %d", NumFrames);
         return;
     }
 
-    if (marks && m_Recording->HasMarks()) {
+    if (m_Recording && marks && m_Recording->HasMarks()) {
 #if APIVERSNUM >= 20608
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);
         if (FramesAfterEdit >= 0) CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
@@ -440,8 +440,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 #endif
     }
 
-    const double FramesPerSecond {m_Recording->FramesPerSecond()};
-    if (FramesPerSecond <= 0.0) {  // Avoid DIV/0
+    const double FramesPerSecond {m_Recording ? m_Recording->FramesPerSecond() : 0.0};
+    if (m_Recording && FramesPerSecond <= 0.0) {  // Avoid DIV/0
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid FramesPerSecond: %.2f", FramesPerSecond);
         return;
     }
@@ -580,6 +580,8 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     }  // HasMarks
 
+    if (!m_Recording) return;  // End time and poster need the recording
+
     //* Draw end time of recording with symbol for cutted end time (2. line)
     const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' changed
     if (Config.PlaybackShowEndTime > 0 &&  // 1 = End time, 2 = End time and cutted end time
@@ -623,21 +625,19 @@ void cFlatDisplayReplay::UpdateInfo() {
     }  // Config.PlaybackShowEndTime
 
     //* Draw Banner/Poster (Update only every 5 seconds)
-    if (m_LastPosterBannerUpdate + 5 < now) {
+    if (Config.TVScraperReplayInfoShowPoster && m_LastPosterBannerUpdate + 5 < now) {
         m_LastPosterBannerUpdate = now;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
-        if (Config.TVScraperReplayInfoShowPoster) {
-            GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-            if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
-                const cString RecPath {m_Recording->FileName()};
-                if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
-                    img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
-                    if (img)
-                        MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
-                    else
-                        MediaPath = "";  // Just in case image can not be loaded
-                }
+        GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+            const cString RecPath {m_Recording->FileName()};
+            if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
+                img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
+                if (img)
+                    MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
+                else
+                    MediaPath = "";  // Just in case image can not be loaded
             }
         }
 
@@ -664,7 +664,7 @@ void cFlatDisplayReplay::UpdateInfo() {
                 DecorBorderDraw(ib);
             }
         }
-    }  // m_LastPosterBannerUpdate
+    }  // Config.TVScraperReplayInfoShowPoster && m_LastPosterBannerUpdate
 }
 
 void cFlatDisplayReplay::SetJump(const char *Jump) {

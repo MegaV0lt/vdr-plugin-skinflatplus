@@ -32,6 +32,7 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
+#include "baserender.h"
 
 // Global flag to indicate if logo was found in channel logo path
 bool g_LogoBgOverwrite {false};
@@ -1408,6 +1409,17 @@ void cFlatBaseRender::DecorBorderClearByFrom(int From) {
 void cFlatBaseRender::DecorBorderRedrawAll() {
     for (const auto &ib : Borders) {
         DecorBorderDraw(ib, false);
+    }
+}
+
+// Draw an specific border by its From value. This is useful when you want to redraw a specific border without redrawing
+// all of them. Only use for unique From values, as this function will only redraw the first matching border it finds.
+void cFlatBaseRender::DecorBorderRedrawByFrom(int From) {
+    for (const auto &ib : Borders) {
+        if (ib.From == From) {
+            DecorBorderDraw(ib, false);
+            break;  // We break after finding the first match.
+        }
     }
 }
 

@@ -18,6 +18,11 @@
 #include "./services/dvbapi.h"
 
 cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::cFlatDisplayChannel()");
+    cTimeMs Timer;  // Start Timer
+#endif
+
     CreateFullOsd();
     TopBarCreate();
     MessageCreate();
@@ -34,20 +39,11 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_HeightBottom += m_FontSmlHeight + m_MarginItem;
 
     int height {m_HeightBottom};
-    const cRect ChanInfoViewPort {Config.decorBorderChannelSize,
-                                  Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
-                                  m_HeightBottom};
-    ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoViewPort);
-    ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoViewPort);
-
-    // Area for TVScraper images
-    m_TVSRect.Set(
-        m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-        m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-        m_OsdWidth - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2,
-        m_OsdHeight - m_TopBarHeight - m_HeightBottom - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2);
-
-    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
+    const cRect ChanInfoBottomViewPort {Config.decorBorderChannelSize,
+                                        Config.decorBorderChannelSize + m_ChannelHeight - height, m_ChannelWidth,
+                                        m_HeightBottom};
+    ChanInfoBottomPixmap = CreatePixmap(m_Osd, "ChanInfoBottomPixmap", 1, ChanInfoBottomViewPort);
+    ChanIconsPixmap = CreatePixmap(m_Osd, "ChanIconsPixmap", 2, ChanInfoBottomViewPort);
 
     // Pixmap for channel logo and background (4:3 aspect ratio, scaled to height of m_HeightImageLogo)
     const cRect ChanLogoViewPort {Config.decorBorderChannelSize,
@@ -75,6 +71,17 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                                      HeightTop};
     ChanInfoTopPixmap = CreatePixmap(m_Osd, "ChanInfoTopPixmap", 1, ChanInfoTopViewPort);
 
+    // Area for TVScraper images
+    m_TVSRect.Set(m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+                  m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                      Config.decorBorderChannelEPGSize,
+                  m_OsdWidth - m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2,
+                  m_ChannelHeight - m_TopBarHeight - Config.decorBorderTopBarSize * 2 - HeightTop - m_HeightBottom -
+                      m_MarginEPGImage * 2 - Config.decorBorderChannelEPGSize * 2);
+
+    ChanEpgImagesPixmap = CreatePixmap(m_Osd, "ChanEpgImagesPixmap", 2, m_TVSRect);
+
+    // Clear Pixmaps
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     PixmapClear(ChanIconsPixmap);
     PixmapClear(ChanEpgImagesPixmap);
@@ -90,22 +97,16 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     if (Config.ChannelWeatherShow) DrawWidgetWeather();
 
 #ifdef USE_ZAPCOCKPIT
-    // Geometry for the zapcockpit panels: The area between top bar and the
-    // channel info display at the bottom is used for the lists and the
-    // detailed EPG info. The lists are anchored at the side of the pressed
-    // key: The list opened with key 'right' at the left edge, the list opened
-    // with key 'left' at the right edge. With the default setup ('Key right
-    // opens channellist') the channellist is therefore shown at the left and
-    // the grouplist at the right edge (mirrored when the option is disabled).
-    // The channellist of the selected group is shown beside the grouplist and
-    // the EPG info of the selected channel in the remaining space.
-    // For dcChannelInfo (2nd 'Ok') the EPG info uses the full width.
-    // Pixmaps are created lazily when one of the extended views is opened.
-    // While a list view is shown all base OSD elements are hidden, so the
-    // lists and the EPG info beside them can use the full OSD height. Only
-    // the channel hints (shown while entering a channel number) and the full
-    // width EPG info (2nd 'Ok') use the area between top bar and the channel
-    // info display, because there the base OSD elements stay visible.
+    // Geometry for the zapcockpit panels: The area between top bar and the channel info display at the bottom is used
+    // for the lists and the detailed EPG info. The lists are anchored at the side of the pressed key: The list opened
+    // with key 'right' at the left edge, the list opened with key 'left' at the right edge. With the default setup
+    // ('Key right opens channellist') the channellist is therefore shown at the left and the grouplist at the right
+    // edge (mirrored when the option is disabled). The channellist of the selected group is shown beside the grouplist
+    // and the EPG info of the selected channel in the remaining space. For dcChannelInfo (2nd 'Ok') the EPG info uses
+    // the full width. Pixmaps are created lazily when one of the extended views is opened. While a list view is shown
+    // all base OSD elements are hidden, so the lists and the EPG info beside them can use the full OSD height. Only the
+    // channel hints (shown while entering a channel number) and the full width EPG info (2nd 'Ok') use the area between
+    // top bar and the channel info display, because there the base OSD elements stay visible.
     const int ZapTop {m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginItem};
     const int ZapBottom {Config.decorBorderChannelSize + m_ChannelHeight - height - m_MarginItem2};
     const int ZapHeight {std::max(0, ZapBottom - ZapTop)};
@@ -123,9 +124,8 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
     const int Rx2 {Rx1 - m_MarginItem2 - m_ZapColWidth};  // 2nd column from right
     const int Rx3 {Rx2 - m_MarginItem2 - m_ZapColWidth};  // 3rd column from right
 
-    // The list items use the same fonts as the channel info display at the
-    // bottom, scaled by the setup option 'Zapcockpit: List font size', so
-    // that more items fit on the screen
+    // The list items use the same fonts as the channel info display at the bottom, scaled by the setup option
+    // 'Zapcockpit: List font size', so that more items fit on the screen
     const int ZapFontPct {std::clamp(Config.ChannelZapcockpitFontSize, 60, 100)};
     const int ZapFontSize {std::max(1, Setup.FontOsdSize * ZapFontPct / 100)};
     const int ZapFontSmlSize {std::max(1, Setup.FontSmlSize * ZapFontPct / 100)};
@@ -158,7 +158,21 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
         m_ZapInfoRectGroup.Set(Lx3, 0, std::max(0, ZapRight - Lx3), ZapFullHeight);
         m_ZapHintsRect.Set(Rx1, ZapTop, m_ZapColWidth, ZapHeight);
     }
-    m_ZapInfoWideRect.Set(ZapLeft, ZapTop, ZapRight - ZapLeft, ZapHeight);
+    // The area between top bar and the channel info display at the bottom without the ChanInfoTopPixmap area
+    // m_ZapInfoWideRect.Set(ZapLeft, ZapTop, ZapRight - ZapLeft, ZapHeight);
+    m_ZapInfoWideRect.Set(ZapLeft + m_MarginEPGImage, ZapTop + m_MarginEPGImage,
+                          ZapRight - ZapLeft - m_MarginEPGImage * 2, ZapHeight + HeightTop - m_MarginEPGImage * 2);
+
+    // DecorBorder for the channel info display at the bottom without the ChanInfoTopPixmap area (Channel name)
+    m_ZapChanInfoBottomDecorBorder = {
+        Config.decorBorderChannelSize,
+        ChanInfoTopViewPort.Y() + HeightTop,
+        m_ChannelWidth,
+        m_HeightBottom + Config.decorProgressChannelSize + m_MarginItem2,
+        Config.decorBorderChannelSize,
+        Config.decorBorderChannelType,
+        Config.decorBorderChannelFg,
+        Config.decorBorderChannelBg};
 #endif
 
     // Decor border depending on setting 'ChannelShowNameWithShadow'
@@ -170,8 +184,12 @@ cFlatDisplayChannel::cFlatDisplayChannel(bool WithInfo) {
                            Config.decorBorderChannelSize,
                            Config.decorBorderChannelType,
                            Config.decorBorderChannelFg,
-                           Config.decorBorderChannelBg};
+                           Config.decorBorderChannelBg,
+                           BorderChannelInfoBottom};
     DecorBorderDraw(ib);
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   cFlatDisplayChannel() done, elapsed time %ld ms", Timer.Elapsed());
+#endif
 }
 
 cFlatDisplayChannel::~cFlatDisplayChannel() {
@@ -376,6 +394,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
     m_Present = Present;
+    m_Following = Following;  // Store the events for later use in Zapcockpit extended channel display
     Scrollers.Clear();
 
     // Epg related variables
@@ -397,7 +416,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int TopSeen {0}, TopEpg {0};
 
     const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
-    const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "  ")};
+    const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, " ") * 2};
 
     if (Config.ChannelShowStartTime)
         left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + SmlSpaceWidth2;
@@ -503,33 +522,35 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 
     if (Config.ChannelIconsShow && m_CurChannel) ChannelIconsDraw(m_CurChannel, true);
 
-    cString MediaPath {""};
-    cSize MediaSize {0, 0};  // Width, Height
-    if (Config.TVScraperChanInfoShowPoster) GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
+    if (Config.TVScraperChanInfoShowPoster) {
+        cString MediaPath {""};
+        cSize MediaSize {0, 0};  // Width, Height
+        GetScraperMediaTypeSize(MediaPath, MediaSize, Present);
 
-    PixmapClear(ChanEpgImagesPixmap);
-    DecorBorderClearByFrom(BorderTVSPoster);
-    if (MediaPath[0] != '\0') {
-        SetMediaSize(m_TVSRect.Size(), MediaSize,
-        Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
-        cImage *img {ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
-        if (img) {
-            PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
-            ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
+        PixmapClear(ChanEpgImagesPixmap);
+        DecorBorderClearByFrom(BorderTVSPoster);
+        if (MediaPath[0] != '\0') {
+            SetMediaSize(m_TVSRect.Size(), MediaSize,
+            Config.TVScraperChanInfoPosterSize * 100);  // Set size and apply user setting
+            cImage *img {ImgLoader.GetFile(*MediaPath, MediaSize.Width(), MediaSize.Height())};
+            if (img) {
+                PixmapSetAlpha(ChanEpgImagesPixmap, 255 * Config.TVScraperPosterOpacity * 100);  // Set transparency
+                ChanEpgImagesPixmap->DrawImage(cPoint(0, 0), *img);
 
-            const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
-                                   m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
-                                       Config.decorBorderChannelEPGSize,
-                                   img->Width(),
-                                   img->Height(),
-                                   Config.decorBorderChannelEPGSize,
-                                   Config.decorBorderChannelEPGType,
-                                   Config.decorBorderChannelEPGFg,
-                                   Config.decorBorderChannelEPGBg,
-                                   BorderTVSPoster};
-            DecorBorderDraw(ib);
+                const sDecorBorder ib {m_MarginEPGImage + Config.decorBorderChannelEPGSize,
+                                    m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_MarginEPGImage +
+                                        Config.decorBorderChannelEPGSize,
+                                    img->Width(),
+                                    img->Height(),
+                                    Config.decorBorderChannelEPGSize,
+                                    Config.decorBorderChannelEPGType,
+                                    Config.decorBorderChannelEPGFg,
+                                    Config.decorBorderChannelEPGBg,
+                                    BorderTVSPoster};
+                DecorBorderDraw(ib);
+            }
         }
-    }
+    }  // if (Config.TVScraperChanInfoShowPoster)
 }
 
 void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
@@ -538,26 +559,24 @@ void cFlatDisplayChannel::SetMessage(eMessageType Type, const char *Text) {
 
 #ifdef USE_ZAPCOCKPIT
 //
-// Zapcockpit (extended channel display)
-// The complete input handling and list logic is implemented in the patched
-// VDR (cDisplayChannelExtended in menu.c). The skin only has to render the
-// channel-/grouplist, the channellist of the selected group, the channel
-// hints and the detailed EPG info of the selected channel.
+//* Zapcockpit (extended channel display)
+// The complete input handling and list logic is implemented in the patched VDR (cDisplayChannelExtended in menu.c). The
+// skin only has to render the channel-/grouplist, the channellist of the selected group, the channel hints and the
+// detailed EPG info of the selected channel.
 //
 
-// Alpha blends Fg over Bg (straight alpha 'over' operator). Used to compose
-// the channel logo on the 'logo_background' image and the list item
-// background in software, because cPixmap::DrawImage() replaces the pixels
-// including their alpha value instead of blending them (in the channel info
-// display at the bottom the blending is done by the OSD composition of the
-// separate logo pixmap layers)
+// Alpha blends Fg over Bg (straight alpha 'over' operator). Used to compose the channel logo on the 'logo_background'
+// image and the list item background in software, because cPixmap::DrawImage() replaces the pixels including their
+// alpha value instead of blending them (in the channel info display at the bottom the blending is done by the OSD
+// composition of the separate logo pixmap layers)
 static tColor ZapAlphaOver(tColor Fg, tColor Bg) {
     const int Af {static_cast<int>((Fg >> 24) & 0xFF)};
-    if (Af == 255) return Fg;
-    if (Af == 0) return Bg;
+    if (Af >= 255) return Fg;
+    if (Af <= 0) return Bg;
     const int Ab {static_cast<int>((Bg >> 24) & 0xFF)};
+    if (Ab <= 0) return Fg;
     const int A {Af + Ab * (255 - Af) / 255};
-    if (A == 0) return clrTransparent;
+    if (A <= 0) return clrTransparent;
     const auto Channel = [&](int Shift) -> int {
         const int Cf {static_cast<int>((Fg >> Shift) & 0xFF)};
         const int Cb {static_cast<int>((Bg >> Shift) & 0xFF)};
@@ -566,45 +585,71 @@ static tColor ZapAlphaOver(tColor Fg, tColor Bg) {
     return (static_cast<tColor>(A) << 24) | (Channel(16) << 16) | (Channel(8) << 8) | Channel(0);
 }
 
-// Blends the given image at the given position over the existing content of
-// the composed image
+// Blends the given image at the given position over the existing content of the composed image
 static void ZapBlendImage(cImage &Composed, const cImage *Image, int Left, int Top) {  // NOLINT
+#ifdef DEBUGIMAGELOADTIME
+    dsyslog("flatPlus: ZapBlendImage(%d, %d)", Left, Top);
+    cTimeMs Timer;  // Start Timer
+#endif
+
     if (!Image) return;
-    const int Width {Image->Width()}, Height {Image->Height()};
-    for (int y {0}; y < Height; ++y) {
-        const int cy {Top + y};
-        if (cy < 0 || cy >= Composed.Height()) continue;
-        for (int x {0}; x < Width; ++x) {
-            const int cx {Left + x};
-            if (cx < 0 || cx >= Composed.Width()) continue;
-            const cPoint Src {x, y}, Dst {cx, cy};
-            Composed.SetPixel(Dst, ZapAlphaOver(Image->GetPixel(Src), Composed.GetPixel(Dst)));
+    const int ComposedWidth {Composed.Width()};
+    const int ComposedHeight {Composed.Height()};
+    const int ImageWidth {Image->Width()};
+    const int ImageHeight {Image->Height()};
+    const int StartX {std::max(0, -Left)};
+    const int StartY {std::max(0, -Top)};
+    const int EndX {std::min(ImageWidth, ComposedWidth - Left)};
+    const int EndY {std::min(ImageHeight, ComposedHeight - Top)};
+    if (StartX >= EndX || StartY >= EndY) return;
+
+    const tColor *ImageData {Image->Data()};
+    tColor *ComposedData {const_cast<tColor *>(Composed.Data())};
+    for (int y {StartY}; y < EndY; ++y) {
+        const int SrcIndexY {y * ImageWidth};
+        const int DstIndexY {(Top + y) * ComposedWidth};
+        for (int x {StartX}; x < EndX; ++x) {
+            const int SrcIndex {SrcIndexY + x};
+            const int DstIndex {DstIndexY + Left + x};
+            ComposedData[DstIndex] = ZapAlphaOver(ImageData[SrcIndex], ComposedData[DstIndex]);
         }
     }
+#ifdef DEBUGIMAGELOADTIME
+    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+#endif
 }
 
-// Shortens the given text so that it fits into MaxWidth: If the text is too
-// long, it is cut off (UTF-8 safe) and the end is replaced by '...' - like
-// the truncated texts in the extended channel lists of skindesigner
+// Shortens the given text so that it fits into MaxWidth: If the text is too long, it is cut off (UTF-8 safe) and the
+// end is replaced by '...' - like the truncated texts in the extended channel lists of skindesigner.
 static cString ZapShortenText(const char *Text, const cFont *Font, int MaxWidth) {
-    if (!Text || !*Text || Font->Width(Text) <= MaxWidth) return Text;
+    if (!Text || !*Text || MaxWidth <= 0) return "";
+
+    int CurrentWidth {Font->Width(Text)};
+    if (CurrentWidth <= MaxWidth) return Text;
 
     const int EllipsisWidth {Font->Width("...")};
+    if (EllipsisWidth >= MaxWidth) return "";
+
     std::string Shortened {Text};
-    while (!Shortened.empty()) {
-        std::size_t i {Shortened.size()};  // Remove the last UTF-8 character
+    while (!Shortened.empty() && CurrentWidth + EllipsisWidth > MaxWidth) {
+        std::size_t i {Shortened.size()};  // Remove the last UTF-8 character.
         do {
             --i;
-        } while (i > 0 && (Shortened[i] & 0xC0) == 0x80);  // Skip UTF-8 continuation bytes
+        } while (i > 0 && (Shortened[i] & 0xC0) == 0x80);  // Skip UTF-8 continuation bytes.
+
+        if (i == 0) break;
+
+        const std::string Removed {Shortened.substr(i)};
+        const int RemovedWidth {Font->Width(Removed.c_str())};  // Or better: Width of one char
         Shortened.erase(i);
-        if (Font->Width(Shortened.c_str()) + EllipsisWidth <= MaxWidth) break;
+        CurrentWidth -= RemovedWidth;
     }
-    return cString::sprintf("%s...", Shortened.c_str());
+
+    return Shortened.empty() ? cString("...") : cString::sprintf("%s...", Shortened.c_str());
 }
 
-// Creates the list pixmap if not yet existing and shows it. If the pixmap
-// exists but at a different position (channellist and grouplist are anchored
-// at opposite edges) it is recreated at the given position
+// Creates the list pixmap if not yet existing and shows it. If the pixmap exists but at a different position
+// (channellist and grouplist are anchored at opposite edges) it is recreated at the given position
 bool cFlatDisplayChannel::ZapEnsureListPixmap(cPixmap *&Pixmap, const char *Name, const cRect &Rect, bool Clear) {
     if (Pixmap && !(Pixmap->ViewPort() == Rect)) {  // Anchored at the other edge: Recreate
         m_Osd->DestroyPixmap(Pixmap);
@@ -658,13 +703,13 @@ void cFlatDisplayChannel::ZapHideInfo() {
     }
 }
 
-// Hides all base OSD elements (top bar, channel info display at the bottom,
-// progress bar, decor borders, weather widget and text scrollers) while one
-// of the zapcockpit list views is shown, so that only the lists are visible.
-// The original pixmap layers are stored for restoring in ZapShowBaseElements()
+// Hides all base OSD elements (Top bar, channel info display at the bottom, progress bar, decor borders, weather widget
+// and text scrollers) while one of the zapcockpit list views is shown, so that only the lists are visible. The original
+// pixmap layers are stored for restoring in ZapShowBaseElements()
 void cFlatDisplayChannel::ZapHideBaseElements() {
     if (m_ZapBaseHidden) return;
     m_ZapBaseHidden = true;
+    m_ZapEpgImagesHidden = true;  // EPG image and weather widget are also hidden when the base elements are hidden
 
     cPixmap *BasePixmaps[] {TopBarPixmap,     TopBarIconBgPixmap,      TopBarIconPixmap,   ChanInfoTopPixmap,
                             ChanInfoBottomPixmap, ChanLogoBgPixmap,    ChanLogoPixmap,     ChanIconsPixmap,
@@ -682,22 +727,52 @@ void cFlatDisplayChannel::ZapHideBaseElements() {
     WeatherWidget.SetVisible(false);
 }
 
+// Hide the weather widget, ChanEpgImagesPixmap and the channel name when the zapcockipt channel info is shown, because
+// they would overlap the zapcockpit info pixmap. The original pixmap. Layers are stored for restoring in
+// ZapShowBaseElements()
+void cFlatDisplayChannel::ZapHideInfoElements() {
+    if (m_ZapEpgImagesHidden) return;
+    m_ZapEpgImagesHidden = true;
+
+    cPixmap *InfoElementPixmaps[] {ChanEpgImagesPixmap, ChanInfoTopPixmap};
+    m_ZapHiddenPixmaps.clear();
+    m_ZapHiddenPixmaps.reserve(sizeof(InfoElementPixmaps) / sizeof(InfoElementPixmaps[0]));
+    for (cPixmap *Pixmap : InfoElementPixmaps) {
+        if (Pixmap && Pixmap->Layer() >= 0) {
+            m_ZapHiddenPixmaps.emplace_back(Pixmap, Pixmap->Layer());
+            Pixmap->SetLayer(-1);
+        }
+    }
+
+    // Remove the border around the poster image, because it would overlap the zapcockpit info pixmap
+    DecorBorderClearByFrom(BorderTVSPoster);
+
+    // If channel name is drawn without shadow, redraw the border for the bottom pixmap
+    if (!Config.ChannelShowNameWithShadow) {
+        DecorBorderClearByFrom(BorderChannelInfoBottom);  // Remove the Border
+        // Draw the border for the remaining bottom pixmap
+        DecorBorderDraw(m_ZapChanInfoBottomDecorBorder, false);
+    }
+
+    WeatherWidget.SetVisible(false);
+}
+
 void cFlatDisplayChannel::ZapShowBaseElements() {
-    if (!m_ZapBaseHidden) return;
+    if (!m_ZapBaseHidden && !m_ZapEpgImagesHidden) return;
     m_ZapBaseHidden = false;
+    m_ZapEpgImagesHidden = false;
 
     for (const auto &Hidden : m_ZapHiddenPixmaps)
         Hidden.first->SetLayer(Hidden.second);
-    m_ZapHiddenPixmaps.clear();
+    m_ZapHiddenPixmaps.clear();  // Clear the list of hidden pixmaps after restoring their layers
 
     Scrollers.SetVisible(true);
     if (Config.ChannelWeatherShow) WeatherWidget.SetVisible(true);
 }
 
-// Fade-in/shift-in animation for newly shown list panels, executed in
-// Flush() after the panel content has been drawn (like fadetimezapcockpit/
-// shifttimezapcockpit in skindesigner themes). The lists slide in from the
-// edge they are anchored to. Runs blocking for at most one second
+// Fade-in/shift-in animation for newly shown list panels, executed in Flush() after the panel content has been drawn
+// (like fadetimezapcockpit/shifttimezapcockpit in skindesigner themes). The lists slide in from the edge they are
+// anchored to. Runs blocking for at most one second.
 void cFlatDisplayChannel::ZapRunShowAnimation() {
     m_ZapAnimPending = false;
     cPixmap *Pixmaps[2] {m_ZapAnimPixmap1, m_ZapAnimPixmap2};
@@ -708,35 +783,37 @@ void cFlatDisplayChannel::ZapRunShowAnimation() {
     const int TotalTime {std::max(ShiftTime, FadeTime)};
     if (TotalTime <= 0 || (!Pixmaps[0] && !Pixmaps[1])) return;
 
-    static constexpr int FrameTime {10};  // Duration of one animation step in ms
-    for (int t {FrameTime}; t < TotalTime; t += FrameTime) {
+    static constexpr int kFrameTime {10};  // Duration of one animation step in ms
+    for (int t {kFrameTime}; t < TotalTime; t += kFrameTime) {
         for (cPixmap *Pixmap : Pixmaps) {
             if (!Pixmap || Pixmap->Layer() < 0) continue;
+            const cRect ViewPort {Pixmap->ViewPort()};
             if (ShiftTime > 0) {  // Slide the content in from the anchored edge
                 const double Progress {std::min(1.0, static_cast<double>(t) / ShiftTime)};
-                const int Offset = static_cast<int>((1.0 - Progress) * Pixmap->ViewPort().Width());
-                const bool LeftAnchored {Pixmap->ViewPort().X() < m_OsdWidth / 2};
+                const int Offset {static_cast<int>((1.0 - Progress) * ViewPort.Width())};
+                const bool LeftAnchored {ViewPort.X() < m_OsdWidth / 2};
                 Pixmap->SetDrawPortPoint(cPoint(LeftAnchored ? -Offset : Offset, 0));
             }
             if (FadeTime > 0) {  // Fade the content in
                 const double Progress {std::min(1.0, static_cast<double>(t) / FadeTime)};
-                Pixmap->SetAlpha(static_cast<int>(ALPHA_OPAQUE * Progress));
+                PixmapSetAlpha(Pixmap, static_cast<int>(ALPHA_OPAQUE * Progress));
             }
         }
         m_Osd->Flush();
-        cCondWait::SleepMs(FrameTime);
+        cCondWait::SleepMs(kFrameTime);
     }
+
     for (cPixmap *Pixmap : Pixmaps) {  // Ensure the final state
-        if (!Pixmap) continue;
-        Pixmap->SetDrawPortPoint(cPoint(0, 0));
-        Pixmap->SetAlpha(ALPHA_OPAQUE);
+        if (Pixmap) {
+            Pixmap->SetDrawPortPoint(cPoint(0, 0));
+            PixmapSetAlpha(Pixmap, ALPHA_OPAQUE);
+        }
     }
 }
 
-// Shows/hides the panels for the given view. The list contents are only
-// cleared when a view of a different kind is entered, because the VDR state
-// machine partially redraws the lists while scrolling and does not repaint
-// the group list when returning from the group channel list.
+// Shows/hides the panels for the given view. The list contents are only cleared when a view of a different kind is
+// entered, because the VDR state machine partially redraws the lists while scrolling and does not repaint the group
+// list when returning from the group channel list.
 void cFlatDisplayChannel::SetViewType(eDisplaychannelView ViewType) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayChannel::SetViewType(%d)", ViewType);
@@ -752,6 +829,8 @@ void cFlatDisplayChannel::SetViewType(eDisplaychannelView ViewType) {
     case dcChannelInfo:  // Info pixmap is (re)created in SetChannelInfo()
         ZapHideLists();
         ZapShowBaseElements();
+        ZapHideInfoElements();  // Hide the weather widget, the EPG image and the channel name, because they would
+                                // overlap the info pixmap
         break;
     case dcChannelList:
     case dcChannelListInfo: {
@@ -801,9 +880,8 @@ void cFlatDisplayChannel::SetViewType(eDisplaychannelView ViewType) {
     }
 }
 
-// The grouplist uses single line items, the channellists use higher items
-// with three text lines. MaxItems() is queried by the VDR state machine after
-// SetViewType(), so the value can depend on the current view
+// The grouplist uses single line items, the channellists use higher items with three text lines. MaxItems() is queried
+// by the VDR state machine after SetViewType(), so the value can depend on the current view
 int cFlatDisplayChannel::MaxItems() {
     return (m_ZapViewType == dcGroupsList) ? m_ZapMaxItemsGroup : m_ZapMaxItemsChan;
 }
@@ -812,11 +890,10 @@ bool cFlatDisplayChannel::KeyRightOpensChannellist() {
     return Config.ChannelZapcockpitKeyRightOpensList;
 }
 
-// Draws one item of a channellist (channellist, group channel list, channel
-// hints): The channel logo at the left (if available) and three text lines
-// right of it: Remaining time of the running event (small font), title of
-// the running event and start-/end time plus title of the following event
-// (small font) - like the extended channel lists of skindesigner
+// Draws one item of a channellist (channellist, group channel list, channel hints): The channel logo at the left (if
+// available) and three text lines right of it: Remaining time of the running event (small font), title of the running
+// event and start-/end time plus title of the following event (small font) - like the extended channel lists of
+// skindesigner
 void cFlatDisplayChannel::ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Channel, int Index, bool Current) {
     if (!Pixmap || !Channel || Index < 0) return;
     // The hints panel is smaller than the full height channellist panels,
@@ -831,13 +908,11 @@ void cFlatDisplayChannel::ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Ch
 
     Pixmap->DrawRectangle(cRect(0, Top, Width, InnerHeight), ColorBg);
 
-    // Channel logo on the 'logo_background' image (like in the channel info
-    // display at the bottom) in a fixed width column at the left, so that
-    // the text lines of all items are aligned. Item background color,
-    // 'logo_background' and the logo are alpha blended in software into one
-    // image, because cPixmap::DrawImage() would replace the pixels including
-    // their alpha value (the semi transparent parts of the images would then
-    // punch through to the live picture instead of showing the layer below)
+    // Channel logo on the 'logo_background' image (like in the channel info display at the bottom) in a fixed width
+    // column at the left, so that the text lines of all items are aligned. Item background color, 'logo_background' and
+    // the logo are alpha blended in software into one image, because cPixmap::DrawImage() would replace the pixels
+    // including their alpha value (the semi transparent parts of the images would then punch through to the live
+    // picture instead of showing the layer below)
     const int LogoHeight {InnerHeight - m_MarginItem2};
     const int LogoWidth {static_cast<int>(LogoHeight * 1.34f)};  // 1.34 = 4:3
     int left {m_MarginItem};
@@ -893,8 +968,8 @@ void cFlatDisplayChannel::ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Ch
         // 3rd line (small font): Start-/end time and title of the following event
         const cString StrFollowing {cString::sprintf("%s–%s: %s", *Following->GetTimeString(),
                                                       *Following->GetEndTimeString(), Following->Title())};
-        Pixmap->DrawText(cPoint(left, top), *ZapShortenText(*StrFollowing, m_ZapFontSml, MaxTextWidth), ColorFg,
-                         ColorBg, m_ZapFontSml, MaxTextWidth);
+        Pixmap->DrawText(cPoint(left, top), *ZapShortenText(*StrFollowing, m_ZapFontSml, MaxTextWidth),
+                         clrChannelFontEpgFollow, ColorBg, m_ZapFontSml, MaxTextWidth);
     }
 }
 
@@ -913,16 +988,15 @@ void cFlatDisplayChannel::ZapDrawGroupItem(cPixmap *Pixmap, const cString &Text,
                      ColorBg, m_ZapFont, Width - m_MarginItem2);
 }
 
-// Also used for the channellist of the selected group: The VDR state machine
-// draws that list via SetChannelList() too, so the target panel is selected
-// by the current view type
+// Also used for the channellist of the selected group: The VDR state machine draws that list via SetChannelList() too,
+// so the target panel is selected by the current view type
 void cFlatDisplayChannel::SetChannelList(const cChannel *Channel, int Index, bool Current) {
     if (!Channel) return;
     ZapDrawChannelItem(ZapIsGroupChannelView() ? ZapList2Pixmap : ZapListPixmap, Channel, Index, Current);
 }
 
 void cFlatDisplayChannel::SetGroupList(const char *Group, int NumChannels, int Index, bool Current) {
-    const cString Text = cString::sprintf("%s (%d)", Group ? Group : "", NumChannels);
+    const cString Text {cString::sprintf("%s (%d)", Group ? Group : "", NumChannels)};
     ZapDrawGroupItem(ZapListPixmap, Text, Index, Current);
 }
 
@@ -936,9 +1010,8 @@ void cFlatDisplayChannel::ClearList() {
 }
 
 void cFlatDisplayChannel::SetNumChannelHints(int Num) {
-    // Hints are shown in a smaller panel between top bar and channel info
-    // display while entering a channel number; the other OSD elements stay
-    // visible there (unlike in the full height list views)
+    // Hints are shown in a smaller panel between top bar and channel info display while entering a channel number; the
+    // other OSD elements stay visible there (unlike in the full height list views)
     ZapEnsureListPixmap(ZapListPixmap, "ZapListPixmap", m_ZapHintsRect, true);
     m_ZapNumHints = Num;
     m_ZapHintIndex = 0;
@@ -946,18 +1019,23 @@ void cFlatDisplayChannel::SetNumChannelHints(int Num) {
 
 void cFlatDisplayChannel::SetChannelHint(const cChannel *Channel) {
     if (!Channel) return;
-    ZapDrawChannelItem(ZapListPixmap, Channel, m_ZapHintIndex++, false);
+    ZapDrawChannelItem(ZapListPixmap, Channel, ++m_ZapHintIndex, false);
 }
 
-// Draws the detailed EPG info for the given channel. Depending on the current
-// view type the full width (dcChannelInfo: 2nd 'Ok' on the current channel) or
-// the area beside the visible list panels is used.
+// Draws the detailed EPG info for the given channel. Depending on the current view type the full width (dcChannelInfo:
+// 2nd 'Ok' on the current channel) or the area beside the visible list panels is used.
 void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cFlatDisplayChannel::SetChannelInfo(%s)", Channel ? Channel->Name() : "nullptr");
+    cTimeMs Timer;  // Set Timer
+#endif
+
     if (!Channel) return;
 
-    const cRect &Rect {(m_ZapViewType == dcChannelInfo)
-                           ? m_ZapInfoWideRect
-                           : (m_ZapViewType == dcGroupsChannelListInfo) ? m_ZapInfoRectGroup : m_ZapInfoRectChan};
+    const bool IsWideInfo {m_ZapViewType == dcChannelInfo};  // Full width info pixmap (2nd 'Ok' on the current channel)
+    const cRect &Rect {(IsWideInfo)                                 ? m_ZapInfoWideRect
+                       : (m_ZapViewType == dcGroupsChannelListInfo) ? m_ZapInfoRectGroup
+                                                                    : m_ZapInfoRectChan};
     ZapCreateInfoPixmap(Rect);
     if (!ZapInfoPixmap) return;
 
@@ -966,18 +1044,29 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     const int MaxTextWidth {Width - m_MarginItem2 * 2};
     int top {m_MarginItem};
 
-    // Header: Channel number and name
+    // Header: Channel number and name. When view is wide (2nd 'Ok') we use the same size as in normal channel info.
+    const cFont *FontHdr {(IsWideInfo) ? m_FontBig : m_Font};  // Big or normal
+    const int FontHdrHeight {(IsWideInfo) ? m_FontBigHeight : m_FontHeight};  // Big or normal
     const cString Header {cString::sprintf("%d  %s", Channel->Number(), Channel->Name())};
-    ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *ZapShortenText(*Header, m_Font, MaxTextWidth),
+    ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *ZapShortenText(*Header, FontHdr, MaxTextWidth),
                             Theme.Color(clrChannelFontTitle),
-                            Theme.Color(clrChannelBg), m_Font, MaxTextWidth);
-    top += m_FontHeight;
-    ZapInfoPixmap->DrawRectangle(cRect(m_MarginItem2, top + m_MarginItem / 2, MaxTextWidth, 3),
+                            Theme.Color(clrChannelBg), FontHdr, MaxTextWidth);
+    top += FontHdrHeight;
+    ZapInfoPixmap->DrawRectangle(cRect(m_MarginItem2, top + m_MarginItem / 2, MaxTextWidth, m_LineWidth),
                                  Theme.Color(clrChannelFontTitle));
-    top += m_MarginItem2 + 3;
+    top += m_MarginItem2 + m_LineMargin;
+
+    // Use m_FontMedium when m_ZapViewType == dcChannelInfo, because the info pixmap is wider and can show more text
+    // lines. Use m_FontSml for other view types.
+    const cFont *Font {(IsWideInfo) ? m_FontMedium : m_FontSml};  // Medium or small
+    const int FontHeight {(IsWideInfo) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
 
     const cEvent *Present {nullptr}, *Following {nullptr};
-    {
+    if (IsWideInfo) {
+        // Use the events from SetEvents() instead of querying the schedule again
+        Present = m_Present;
+        Following = m_Following;
+    } else {
         LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
         const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
         if (Schedule) {
@@ -988,55 +1077,66 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
 
     if (!Present) {
         ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), tr("No EPG info available."),
-                                Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_FontSml, MaxTextWidth);
+                                Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), Font, MaxTextWidth);
         return;
     }
 
     // Reserve one line at the bottom for the following event
-    const int BottomFollowing {(Following) ? Height - m_FontSmlHeight - m_MarginItem : Height};
+    const int BottomFollowing {(Following) ? Height - FontHeight - m_MarginItem : Height};
 
     // Present event: Time, title, short text and description
     const cString StrTime {cString::sprintf("%s–%s  (%d min)", *Present->GetTimeString(),
                                              *Present->GetEndTimeString(), Present->Duration() / 60)};
     ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *StrTime, Theme.Color(clrChannelFontEpg),
-                            Theme.Color(clrChannelBg), m_FontSml, MaxTextWidth);
-    top += m_FontSmlHeight + m_MarginItem;
+                            Theme.Color(clrChannelBg), Font, MaxTextWidth);
+    top += FontHeight + m_MarginItem;
 
-    if (top + m_FontHeight <= BottomFollowing) {
+    if (top + m_FontHeight <= BottomFollowing) {  // Title
         ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), *ZapShortenText(Present->Title(), m_Font, MaxTextWidth),
                                 Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_Font, MaxTextWidth);
         top += m_FontHeight;
     }
-    if (!isempty(Present->ShortText()) && (top + m_FontSmlHeight <= BottomFollowing)) {
+    if (!isempty(Present->ShortText()) && (top + FontHeight <= BottomFollowing)) {  // Short text
         ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top),
-                                *ZapShortenText(Present->ShortText(), m_FontSml, MaxTextWidth),
-                                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_FontSml,
+                                *ZapShortenText(Present->ShortText(), Font, MaxTextWidth),
+                                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), Font,
                                 MaxTextWidth);
-        top += m_FontSmlHeight;
+        top += FontHeight;
     }
-    top += m_MarginItem;
+    top += m_MarginItem2;  // Some space between the short text and the description.
 
     if (!isempty(Present->Description())) {  // Description (wrapped, cut off at the bottom)
-        // cTextWrapper Description(Present->Description(), m_FontSml, MaxTextWidth);
-        cTextFloatingWrapper Description;
-        Description.Set(Present->Description(), m_FontSml, MaxTextWidth);
-        for (int i {0}; i < Description.Lines() && (top + m_FontSmlHeight <= BottomFollowing); ++i) {
-            ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), Description.GetLine(i),
-                                    Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), m_FontSml,
+        cTextFloatingWrapper Description;  // Wraps the description text into lines of the given width and font
+        Description.Set(Present->Description(), Font, MaxTextWidth);
+        const int NumLines {Description.Lines()};
+        std::string Line {""};
+        Line.reserve(256);  // Avoids repeated memory allocations when appending the lines
+
+        for (int i {0}; i < NumLines && (top + FontHeight <= BottomFollowing); ++i) {
+            Line = Description.GetLine(i);
+            // Justify all lines except the last one
+            if (Config.MenuEventRecordingViewJustify == 1 && i < (NumLines - 1))
+                JustifyLine(Line, Font, MaxTextWidth);
+
+            ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, top), Line.c_str(),
+                                    Theme.Color(clrChannelFontEpg), Theme.Color(clrChannelBg), Font,
                                     MaxTextWidth);
-            top += m_FontSmlHeight;
+            top += FontHeight;
         }
     }
 
     if (Following) {  // Following event in the reserved line at the bottom
-        const cString Next = cString::sprintf("%s  %s%s%s", *Following->GetTimeString(), Following->Title(),
+        const cString Next {cString::sprintf("%s  %s%s%s", *Following->GetTimeString(), Following->Title(),
                                               isempty(Following->ShortText()) ? "" : " - ",
-                                              isempty(Following->ShortText()) ? "" : Following->ShortText());
-        ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, Height - m_FontSmlHeight),
-                                *ZapShortenText(*Next, m_FontSml, MaxTextWidth),
-                                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), m_FontSml,
+                                              isempty(Following->ShortText()) ? "" : Following->ShortText())};
+        ZapInfoPixmap->DrawText(cPoint(m_MarginItem2, Height - FontHeight),
+                                *ZapShortenText(*Next, Font, MaxTextWidth),
+                                Theme.Color(clrChannelFontEpgFollow), Theme.Color(clrChannelBg), Font,
                                 MaxTextWidth);
     }
+#ifdef DEBUGFUNCSCALL
+    dsyslog("   SetChannelInfo() done in %ld ms", Timer.Elapsed());
+#endif
 }
 #endif  // USE_ZAPCOCKPIT
 
@@ -1098,6 +1198,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
         dsyslog("flatPlus: DVBApi plugin %s", pDVBApi ? "found and loaded" : "not found");
     }
     if (!pDVBApi) return;
+    if (!m_CurChannel) return;  // Not set yet when an OSD size change re-created this object
 
     sDVBAPIEcmInfo ecmInfo {.sid = static_cast<uint16_t>(m_CurChannel->Sid()), .ecmtime = 0, .hops = -1};
 
@@ -1195,7 +1296,7 @@ void cFlatDisplayChannel::PreLoadImages() {
     int ImageBgHeight {height};
 
     // Load 'logo_background' and determine if logo was found in channel logo path
-    cImage *img {ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight)};
+    cImage *img {ImgLoader.GetLogo("logo_background", ImageBgWidth, ImageBgHeight, true)};  // Miss is expected
     if (img) {
         g_LogoBgOverwrite = true;  // Used for GetLogoBg()
     } else {

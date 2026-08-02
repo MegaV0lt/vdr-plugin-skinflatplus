@@ -98,7 +98,7 @@ cFlatDisplayMenu::cFlatDisplayMenu() {
     static constexpr std::size_t kDefaultItemBorderSize {64};
     ItemsBorder.reserve(kDefaultItemBorderSize);
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   cFlatDisplayMenu() Done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -524,7 +524,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (MenuChannelViewShort) {  // flatPlus short, flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize;
+        Height += m_FontSmlHeight + m_MarginItem + Config.decorProgressMenuItemSize;
         m_MenuItemWidth /= 2;
     }
 
@@ -559,9 +559,10 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     int ImageTop {Top};
     int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
     int ImageBgHeight {m_FontHeight};
-
     cImage *img {nullptr};
-    if (!IsGroup) {
+    if (IsGroup) {
+        img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+    } else {
         img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
         if (img) {
             ImageBgHeight = img->Height();
@@ -571,20 +572,18 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
         }
         // Load named logo only for channels
         img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
-    }
-
-    if (!img) {
-        const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-        if (IsRadioChannel) {
-            if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-        } else if (IsGroup) {
-            img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-        } else {
-            if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-            if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+        if (!img) {
+            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
+            if (IsRadioChannel) {
+                if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+            } else {
+                if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            }
         }
     }
+
     if (img) {  // Draw the logo
         ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
         ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
@@ -610,10 +609,9 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     }
-    if (WithProvider)
-        Buffer = cString::sprintf("%s - %s", Channel->Provider(), Channel->Name());
-    else
-        Buffer = Channel->Name();
+    (WithProvider)  // Append provider name
+        ? Buffer = cString::sprintf("%s (%s)", Channel->Name(), Channel->Provider())
+        : Buffer = Channel->Name();
 
     const int LeftName {Left};
     if (Config.MenuChannelView == 1) {  // flatPlus long
@@ -772,13 +770,7 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                 Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Event->GetParentalRatingString()));
 
             const cComponents *Components {Event->Components()};
-            if (Components) {
-                cString Audio {""}, Subtitle {""};
-                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
-
-                // if (Audio[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                // if (Subtitle[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            }  // if Components
+            if (Components) InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
         }  // EpgAdditionalInfoShow
     } else {
         Text.Append(*EmptyText);
@@ -869,7 +861,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (Config.MenuTimerView == 2 || Config.MenuTimerView == 3) {  // flatPlus short, flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem;
+        Height += m_FontSmlHeight + m_MarginItem;
         m_MenuItemWidth /= 2;
     }
 
@@ -1103,7 +1095,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
     int Height {m_FontHeight};
     m_MenuItemWidth = m_MenuWidth - Config.decorBorderMenuItemSize * 2;
     if (MenuEventViewShort) {  // flatPlus short. flatPlus short + EPG
-        Height = m_FontHeight + m_FontSmlHeight + m_MarginItem2 + Config.decorProgressMenuItemSize / 2;
+        Height += m_FontSmlHeight + m_MarginItem2 + Config.decorProgressMenuItemSize / 2;
         m_MenuItemWidth *= 0.6;
     }
 
@@ -1145,7 +1137,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         int ImageLeft {Left};
         int ImageBgWidth {static_cast<int>(m_FontHeight * 1.34f)};
         int ImageBgHeight {m_FontHeight};
-        if (!IsGroup) {
+        if (IsGroup) {
+            img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
+        } else {
             img = ImgLoader.GetLogoBg(ImageBgWidth, ImageBgHeight);  // Load 'logo_background'
             if (img) {
                 ImageBgWidth = img->Width();
@@ -1155,20 +1149,18 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
             }
             // Load named logo only for channels
             img = ImgLoader.GetLogo(*ChannelName, ImageBgWidth - 4, ImageBgHeight - 4);
-        }
-
-        if (!img) {
-            const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
-            if (IsRadioChannel) {
-                if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
-            } else if (IsGroup) {
-                img = ImgLoader.GetIcon("changroup", ImageBgWidth - 10, ImageBgHeight - 10);
-            } else {
-                if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
-                if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+            if (!img) {
+                const bool IsRadioChannel {((!Channel->Vpid()) && (Channel->Apid(0))) ? true : false};
+                if (IsRadioChannel) {
+                    if (Current) img = ImgLoader.GetIcon("radio_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                    if (!img) img = ImgLoader.GetIcon("radio", ImageBgWidth - 10, ImageBgHeight - 10);
+                } else {
+                    if (Current) img = ImgLoader.GetIcon("tv_cur", ImageBgWidth - 10, ImageBgHeight - 10);
+                    if (!img) img = ImgLoader.GetIcon("tv", ImageBgWidth - 10, ImageBgHeight - 10);
+                }
             }
         }
+
         if (img) {  // Draw the logo
             ImageLeft = Left + (ImageBgWidth - img->Width()) / 2;
             ImageTop = Top + (ImageBgHeight - img->Height()) / 2;
@@ -1755,8 +1747,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
                 MenuPixmap->DrawText(cPoint(Left, Top), *RecName, ColorFg, ColorBg, m_Font,
                                      m_MenuItemWidth - Left - m_MarginItem - ImagesWidth);
             }
-
-            Buffer = cString::sprintf("%s  %s  Σ %s ", *ShortDateString(Recording->Start()),
+            // Draw recording date, time and length (00.00.00 00:00 Σ 00:00)
+            Buffer = cString::sprintf("%s %s Σ %s ", *ShortDateString(Recording->Start()),
                                       *TimeString(Recording->Start()), *Length);
             Top += m_FontHeight;
             MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
@@ -1771,7 +1763,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 
-            Left += m_FontSmlHeight + m_MarginItem;
+            Left += m_FontHeight + m_MarginItem;
             if (IsEdited && ImgRecCut) {
                 const int ImageTop {Top + m_FontHeight - ImgRecCutHeight};  // 2/3 image height
                 MenuIconsPixmap->DrawImage(cPoint(Left, ImageTop), *ImgRecCut);
@@ -1796,11 +1788,12 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             Top += m_FontHeight;
             const int DigitsMaxWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "0000") +
                                       m_MarginItem};  // Use same width for recs and new recs
+            const int TotalPrefixWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "Σ ")};
             // Total recordings in folder preceeded by Σ (Sigma) symbol
             Buffer = cString::sprintf("Σ %d", Total);
-            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml, DigitsMaxWidth,
-                                 m_FontSmlHeight, taRight);
-            Left += DigitsMaxWidth + m_MarginItem3;  // Add margin between total and new recordings
+            MenuPixmap->DrawText(cPoint(Left, Top), *Buffer, ColorFg, ColorBg, m_FontSml,
+                                 TotalPrefixWidth + DigitsMaxWidth, m_FontSmlHeight);
+            Left += TotalPrefixWidth + DigitsMaxWidth + m_MarginItem3;  // Add margin between total and new recordings
 
             Left = DrawRecordingIcon("recording_new", Left, Top, Current, true);  // Draw small new icon
 
@@ -1918,16 +1911,16 @@ int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<st
  * @param Title The title of the extra information block.
  * @param Text The text to display in the extra information block.
  * @param ComplexContent The ComplexContent to add the extra information to.
- * @param ContentTop The top position of the extra information block.
  * @param IsEvent true if this block is for an event, false if it is for a recording.
+ * @return The height of the extra information block without the text!
  */
-void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
-                                    int &ContentTop, bool IsEvent) {
+int cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,
+                                   bool IsEvent) {
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontTitle {Theme.Color(IsEvent ? clrMenuEventFontTitle : clrMenuRecFontTitle)};
     const tColor ColorTitleLine {Theme.Color(IsEvent ? clrMenuEventTitleLine : clrMenuRecTitleLine)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
-    ContentTop = ComplexContent.BottomContent() + m_FontHeight;
+    int ContentTop {ComplexContent.BottomContent() + m_FontHeight};
     ComplexContent.AddText(Title, false, cRect(m_MarginItem10, ContentTop, 0, 0), ColorMenuFontTitle, ColorMenuBg,
                            m_Font);
     ContentTop += m_FontHeight;
@@ -1937,6 +1930,8 @@ void cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cCom
         ComplexContent.AddText(*Text, true,
                                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                                ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
+
+    return ContentTop;
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
@@ -2001,19 +1996,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         }
 
         const cComponents *Components {Event->Components()};
-        if (Components) {
-            cString Audio {""}, Subtitle {""};
-            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
-
-            /* if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
-            }
-            if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            } */
-        }  // if Components
+        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
     }  // EpgAdditionalInfoShow
 
     // Draw FSK and genre icons and get the left position for the title
@@ -2028,7 +2011,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         // Lent from nopacity
         cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
         cString SearchTerm {Event->Title()};  // Search term
-        if (pEpgSearchPlugin && !isempty(Event->Title())) {
+        if (pEpgSearchPlugin && !isempty(SearchTerm)) {
             Epgsearch_searchresults_v1_0 data {
                 .query = const_cast<char *>(static_cast<const char *>(SearchTerm)),
                 .mode = 0,               // Search mode (0=phrase, 1=and, 2=or, 3=regular expression)
@@ -2131,10 +2114,10 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         }
 
         // Add movie information if available
-        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop, true);
+        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, true);
 
         // Add series information if available
-        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop, true);
+        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, true);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawEventInfo() Epgtext time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2148,11 +2131,11 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 #endif
 
         // Add reruns information if available
-        if (Reruns[0] != '\0') AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, ContentTop, true);
+        if (Reruns[0] != '\0') AddExtraInfo(tr("Reruns"), Reruns, ComplexContent, true);
 
         // Add video information if available
         if (TextAdditional[0] != '\0')
-            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop, true);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, true);
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
@@ -2172,9 +2155,9 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 
     PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
-
+    // Draw event time, title and short text (00.00.0000 00:00–00:00)
     const cString StrTime {
-        cString::sprintf("%s  %s–%s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString())};
+        cString::sprintf("%s %s–%s", *Event->GetDateString(), *Event->GetTimeString(), *Event->GetEndTimeString())};
 
     const cString Title {Event->Title()};
     const cString ShortText {(Event->ShortText()) ? Event->ShortText() : ""};  // No short text. Show empty string
@@ -2297,13 +2280,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
 #endif
 
             const cComponents *Components {RecInfo->Components()};
-            if (Components) {
-                cString Audio {""}, Subtitle {""};
-                InsertComponents(Components, Text, Audio, Subtitle, true);  // Get info for audio/video and subtitle
+            if (Components) InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
 
-                // if (Audio[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), *Audio));
-                // if (Subtitle[0] != '\0') Text.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            }
             if (RecInfo->Aux()) InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
     } else {
@@ -2411,9 +2389,6 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     if (ShowMaxActors == 0) return;  // Do not show actors (-1 = Show all actors)
     if (ShowMaxActors > 0) NumActors = std::min(NumActors, ShowMaxActors);  // Limit to ShowMaxActors
 
-    int ContentTop {0};  // Calculated by 'AddExtraInfo()'
-    AddExtraInfo(tr("Actors"), "", ComplexContent, ContentTop, IsEvent);
-
     const tColor ColorMenuBg {Theme.Color(IsEvent ? clrMenuEventBg : clrMenuRecBg)};
     const tColor ColorMenuFontInfo {Theme.Color(IsEvent ? clrMenuEventFontInfo : clrMenuRecFontInfo)};
 
@@ -2426,7 +2401,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
     const int PicLines {NumActors / ActorsPerLine + (NumActors % ActorsPerLine != 0)};  // Number of lines needed
     int ImgHeight {0}, MaxImgHeight {0};
     int x {m_MarginItem};
-    int y {ContentTop};
+    int y {AddExtraInfo(tr("Actors"), "", ComplexContent, IsEvent)};
     if (NumActors > 48) isyslog("flatPlus: First display of %d actor images will probably be slow!", NumActors);
 
     for (int row {0}; row < PicLines; ++row) {
@@ -2564,19 +2539,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 #endif
 
         const cComponents *Components {RecInfo->Components()};
-        if (Components) {
-            cString Audio {""}, Subtitle {""};
-            InsertComponents(Components, TextAdditional, Audio, Subtitle);  // Get info for audio/video and subtitle
+        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
 
-            /* if (Audio[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("%s: %s", tr("Audio"), *Audio));
-            }
-            if (Subtitle[0] != '\0') {
-                if (TextAdditional[0] != '\0') TextAdditional.Append('\n');
-                TextAdditional.Append(cString::sprintf("\n%s: %s", tr("Subtitle"), *Subtitle));
-            } */
-        }
         if (RecInfo->Aux()) InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
 
@@ -2661,10 +2625,10 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         }
 
         // Add movie information if available
-        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent, ContentTop);
+        if (MovieInfo[0] != '\0') AddExtraInfo(tr("Movie information"), MovieInfo, ComplexContent);
 
         // Add series information if available
-        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent, ContentTop);
+        if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent);
 #ifdef DEBUGEPGTIME
         dsyslog("flatPlus: DrawRecordingInfo() Epgtext time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2679,11 +2643,11 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
         // Add recording information if available
         if (RecAdditional[0] != '\0')
-            AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent, ContentTop);
+            AddExtraInfo(tr("Recording information"), RecAdditional, ComplexContent);
 
         // Add video information if available
         if (TextAdditional[0] != '\0')
-            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent, ContentTop);
+            AddExtraInfo(tr("Video information"), TextAdditional, ComplexContent);
 
         Scrollable = ComplexContent.Scrollable(m_cHeight - m_MarginItem2);
 
@@ -2703,8 +2667,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
 
     PixmapClear(ContentHeadPixmap);
     ContentHeadPixmap->DrawRectangle(cRect(0, 0, m_MenuWidth, m_chHeight), Theme.Color(clrScrollbarBg));
-
-    const cString StrTime {cString::sprintf("%s  %s  %s", *DateString(Recording->Start()),
+    // Date/Time (00.00.0000 00:00  Channel name)
+    const cString StrTime {cString::sprintf("%s %s  %s", *DateString(Recording->Start()),
                                             *TimeString(Recording->Start()),
                                             (RecInfo->ChannelName()) ? RecInfo->ChannelName() : "")};
 
@@ -2962,19 +2926,29 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     return found ? skipspace(text.substr(i).data()) : text.data();
 }
 
+
+/**
+ * Returns the icon name for a menu entry.
+ *
+ * The function resolves standard VDR menu entries to their corresponding icon names,
+ * checks plugin-provided main menu entries, and falls back to a generic icon for
+ * unknown entries. The icon names are stored in a static cache for faster access.
+ *
+ * @param element The menu entry name to resolve.
+ * @return The icon name associated with the menu entry.
+ */
 cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
 #endif
+
+    static constexpr const char *items[] {"Schedule", "Channels", "Timers", "Recordings", "Setup",
 #if VDRVERSNUM >= 20708
-    static constexpr const char *items[] {
-        "Schedule", "Channels", "Timers", "Recordings", "Setup",  "Button$Commands", "OSD",     "EPG",
-        "DVB",      "LNB",      "CAM",    "Recording",  "Replay", "Miscellaneous",   "Plugins", "Restart"};
+        "Button$Commands",
 #else
-    static constexpr const char *items[] {"Schedule", "Channels",      "Timers",  "Recordings", "Setup", "Commands",
-                                          "OSD",      "EPG",           "DVB",     "LNB",        "CAM",   "Recording",
-                                          "Replay",   "Miscellaneous", "Plugins", "Restart"};
+        "Commands",
 #endif
+        "OSD", "EPG", "DVB", "LNB", "CAM", "Recording", "Replay", "Miscellaneous", "Plugins", "Restart"};
 
     // Static cache to store the names of main menu entries
     static std::unordered_map<std::string, cString> cache;
@@ -3492,10 +3466,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     int DeviceLiveTV {-1};
     cDevice *PrimaryDevice {cDevice::PrimaryDevice()};
     if (PrimaryDevice) {
-        if (!PrimaryDevice->Replaying() || PrimaryDevice->Transferring())
-            DeviceLiveTV = cDevice::ActualDevice()->DeviceNumber();
-        else
-            DeviceLiveTV = PrimaryDevice->DeviceNumber();
+        (!PrimaryDevice->Replaying() || PrimaryDevice->Transferring())
+            ? DeviceLiveTV = cDevice::ActualDevice()->DeviceNumber()
+            : DeviceLiveTV = PrimaryDevice->DeviceNumber();
     }
 
     // Find all recording devices and set RecDevices[] to true for these devices
@@ -3534,10 +3507,9 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
         StrDevice = "";  // Reset string
 
         const cChannel *channel {device->GetCurrentlyTunedTransponder()};
-        if (channel && channel->Number() > 0)
-            ChannelName = channel->Name();
-        else
-            ChannelName = tr("Unknown");
+        (channel && channel->Number() > 0)
+            ? ChannelName = channel->Name()
+            : ChannelName = tr("Unknown");
 
         if (i == DeviceLiveTV) {
             StrDevice.Append(cString::sprintf("%s (%s)", tr("LiveTV"), *ChannelName));

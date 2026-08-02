@@ -140,9 +140,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     void InsertGenreInfo(const cEvent *Event, cString &Text, std::vector<std::string> &GenreIcons) const;  // NOLINT
     void InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) const;                               // NOLINT
 
-    void AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,             // NOLINT
-                      int &ContentTop,        // NOLINT
-                      bool IsEvent = false);  // NOLINT
+    int AddExtraInfo(const char *Title, const cString &Text, cComplexContent &ComplexContent,             // NOLINT
+                     bool IsEvent = false);  // NOLINT
 
     time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 
