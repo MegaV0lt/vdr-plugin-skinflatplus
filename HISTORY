@@ -1,7 +1,13 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
-2026-xx-xx: Version 1.3.1
+2026-08-02: Version 1.3.1
 - [fix] Add missing include in imagecache.h
+- [fix] Thanks to zork @ VDR-Portal for fixing:
+        - imageloader: Do not report the expected 'logo_background' miss.
+        - displayreplay: Never store a nullptr in 'm_Current' or 'm_Total'.
+                         Show total length when replaying without a cRecording.
+        - imagecache: Open only one OSD at a time while pre-loading.
+        - displaychannel: Guard against null m_CurChannel in DvbapiInfoDraw()
 - [update] Remove extra space in some date and time strings.
 - [update] Changes in Zapcockpit:
            - Use Dynamic LineWidth and LineMargin in channel information.
