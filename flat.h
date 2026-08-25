@@ -312,6 +312,9 @@ class cPluginSkinFlatPlus : public cPlugin {
  public:
     static cPlugin* GetEpgSearchPlugin() {
         if (!s_bEpgSearchPluginChecked) {
+            // Thread safe initialization
+            static std::mutex init_mutex;
+            std::lock_guard<std::mutex> lock(init_mutex);
             s_pEpgSearchPlugin = cPluginManager::GetPlugin("epgsearch");
             s_bEpgSearchPluginChecked = true;
             dsyslog("flatPlus: EPGSearch plugin %s", s_pEpgSearchPlugin ? "found and loaded" : "not found");
