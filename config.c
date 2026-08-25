@@ -769,7 +769,7 @@ cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     if (!path.empty() && path.back() == '/')
         path.pop_back();  // Use pop_back for efficiency
 
-    return path.c_str();
+    return cString(path.c_str());
 }
 
 void cFlatConfig::Store(const char *Name, int Value, const char *Filename) {
