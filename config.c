@@ -27,6 +27,11 @@ cFlatConfig::~cFlatConfig() {
 }
 
 bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
+    // Call a separate function to handle specific config options
+    return ParseSpecificConfigOption(Name, Value);
+}
+
+bool cFlatConfig::ParseSpecificConfigOption(const char *Name, const char *Value) {
     if      (strcmp(Name, "decorBorderChannelByTheme") == 0)            decorBorderChannelByTheme = atoi(Value);
     else if (strcmp(Name, "decorBorderChannelTypeUser") == 0)           decorBorderChannelTypeUser = atoi(Value);
     else if (strcmp(Name, "decorBorderChannelSizeUser") == 0)           decorBorderChannelSizeUser = atoi(Value);

@@ -21,6 +21,7 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
+// #include "./config.h"
 
 cStringList Bordertypes;
 cStringList DiskUsages;
@@ -429,188 +430,8 @@ void cFlatSetupGeneral::LoadConfigFile() {
 }
 
 bool cFlatSetupGeneral::SetupParse(const char *Name, const char *Value) {
-    if      (strcmp(Name, "decorBorderChannelByTheme") == 0)            SetupConfig->decorBorderChannelByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderChannelTypeUser") == 0)           SetupConfig->decorBorderChannelTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderChannelSizeUser") == 0)           SetupConfig->decorBorderChannelSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderChannelEPGByTheme") == 0)         SetupConfig->decorBorderChannelEPGByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderChannelEPGTypeUser") == 0)        SetupConfig->decorBorderChannelEPGTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderChannelEPGSizeUser") == 0)        SetupConfig->decorBorderChannelEPGSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderTopBarByTheme") == 0)             SetupConfig->decorBorderTopBarByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderTopBarTypeUser") == 0)            SetupConfig->decorBorderTopBarTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderTopBarSizeUser") == 0)            SetupConfig->decorBorderTopBarSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMessageByTheme") == 0)            SetupConfig->decorBorderMessageByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderMessageTypeUser") == 0)           SetupConfig->decorBorderMessageTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMessageSizeUser") == 0)           SetupConfig->decorBorderMessageSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderVolumeByTheme") == 0)             SetupConfig->decorBorderVolumeByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderVolumeTypeUser") == 0)            SetupConfig->decorBorderVolumeTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderVolumeSizeUser") == 0)            SetupConfig->decorBorderVolumeSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderTrackByTheme") == 0)              SetupConfig->decorBorderTrackByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderTrackTypeUser") == 0)             SetupConfig->decorBorderTrackTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderTrackSizeUser") == 0)             SetupConfig->decorBorderTrackSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderReplayByTheme") == 0)             SetupConfig->decorBorderReplayByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderReplayTypeUser") == 0)            SetupConfig->decorBorderReplayTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderReplaySizeUser") == 0)            SetupConfig->decorBorderReplaySizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuItemByTheme") == 0)           SetupConfig->decorBorderMenuItemByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuItemTypeUser") == 0)          SetupConfig->decorBorderMenuItemTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuItemSizeUser") == 0)          SetupConfig->decorBorderMenuItemSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentHeadByTheme") == 0)    SetupConfig->decorBorderMenuContentHeadByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentHeadTypeUser") == 0)   SetupConfig->decorBorderMenuContentHeadTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentHeadSizeUser") == 0)   SetupConfig->decorBorderMenuContentHeadSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentByTheme") == 0)        SetupConfig->decorBorderMenuContentByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentTypeUser") == 0)       SetupConfig->decorBorderMenuContentTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderMenuContentSizeUser") == 0)       SetupConfig->decorBorderMenuContentSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderButtonByTheme") == 0)             SetupConfig->decorBorderButtonByTheme = atoi(Value);
-    else if (strcmp(Name, "decorBorderButtonTypeUser") == 0)            SetupConfig->decorBorderButtonTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorBorderButtonSizeUser") == 0)            SetupConfig->decorBorderButtonSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressChannelByTheme") == 0)          SetupConfig->decorProgressChannelByTheme = atoi(Value);
-    else if (strcmp(Name, "decorProgressChannelTypeUser") == 0)         SetupConfig->decorProgressChannelTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressChannelSizeUser") == 0)         SetupConfig->decorProgressChannelSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressVolumeByTheme") == 0)           SetupConfig->decorProgressVolumeByTheme = atoi(Value);
-    else if (strcmp(Name, "decorProgressVolumeTypeUser") == 0)          SetupConfig->decorProgressVolumeTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressVolumeSizeUser") == 0)          SetupConfig->decorProgressVolumeSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressMenuItemByTheme") == 0)         SetupConfig->decorProgressMenuItemByTheme = atoi(Value);
-    else if (strcmp(Name, "decorProgressMenuItemTypeUser") == 0)        SetupConfig->decorProgressMenuItemTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressMenuItemSizeUser") == 0)        SetupConfig->decorProgressMenuItemSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressReplayByTheme") == 0)           SetupConfig->decorProgressReplayByTheme = atoi(Value);
-    else if (strcmp(Name, "decorProgressReplayTypeUser") == 0)          SetupConfig->decorProgressReplayTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressReplaySizeUser") == 0)          SetupConfig->decorProgressReplaySizeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressSignalByTheme") == 0)           SetupConfig->decorProgressSignalByTheme = atoi(Value);
-    else if (strcmp(Name, "decorProgressSignalTypeUser") == 0)          SetupConfig->decorProgressSignalTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorProgressSignalSizeUser") == 0)          SetupConfig->decorProgressSignalSizeUser = atoi(Value);
-    else if (strcmp(Name, "decorScrollBarByTheme") == 0)                SetupConfig->decorScrollBarByTheme = atoi(Value);
-    else if (strcmp(Name, "decorScrollBarTypeUser") == 0)               SetupConfig->decorScrollBarTypeUser = atoi(Value);
-    else if (strcmp(Name, "decorScrollBarSizeUser") == 0)               SetupConfig->decorScrollBarSizeUser = atoi(Value);
-
-    else if (strcmp(Name, "ButtonsShowEmpty") == 0)                     SetupConfig->ButtonsShowEmpty = atoi(Value);
-    else if (strcmp(Name, "ChannelDvbapiInfoShow") == 0)                SetupConfig->ChannelDvbapiInfoShow = atoi(Value);
-    else if (strcmp(Name, "ChannelFormatShow") == 0)                    SetupConfig->ChannelFormatShow = atoi(Value);
-    else if (strcmp(Name, "ChannelIconsShow") == 0)                     SetupConfig->ChannelIconsShow = atoi(Value);
-    else if (strcmp(Name, "ChannelNameFontSize") == 0)                  SetupConfig->ChannelNameFontSize = atod(Value);
-    else if (strcmp(Name, "ChannelAudioFormatShow") == 0)               SetupConfig->ChannelAudioFormatShow = atoi(Value);
-    else if (strcmp(Name, "ChannelResolutionAspectShow") == 0)          SetupConfig->ChannelResolutionAspectShow = atoi(Value);
-    else if (strcmp(Name, "ChannelShowNameWithShadow") == 0)            SetupConfig->ChannelShowNameWithShadow = atoi(Value);
-    else if (strcmp(Name, "ChannelShowStartTime") == 0)                 SetupConfig->ChannelShowStartTime = atoi(Value);
-    else if (strcmp(Name, "ChannelSimpleAspectFormat") == 0)            SetupConfig->ChannelSimpleAspectFormat = atoi(Value);
-    else if (strcmp(Name, "ChannelTimeLeft") == 0)                      SetupConfig->ChannelTimeLeft = atoi(Value);
-    else if (strcmp(Name, "ChannelWeatherShow") == 0)                   SetupConfig->ChannelWeatherShow = atoi(Value);
-    else if (strcmp(Name, "ChannelZapcockpitKeyRightOpensList") == 0)   SetupConfig->ChannelZapcockpitKeyRightOpensList = atoi(Value);
-    else if (strcmp(Name, "ChannelZapcockpitListWidth") == 0)           SetupConfig->ChannelZapcockpitListWidth = atoi(Value);
-    else if (strcmp(Name, "ChannelZapcockpitFontSize") == 0)            SetupConfig->ChannelZapcockpitFontSize = atoi(Value);
-    else if (strcmp(Name, "ChannelZapcockpitFadeTime") == 0)            SetupConfig->ChannelZapcockpitFadeTime = atoi(Value);
-    else if (strcmp(Name, "ChannelZapcockpitShiftTime") == 0)           SetupConfig->ChannelZapcockpitShiftTime = atoi(Value);
-    else if (strcmp(Name, "DecorIndex") == 0)                           SetupConfig->DecorIndex = atoi(Value);
-    else if (strcmp(Name, "DiskUsageFree") == 0)                        SetupConfig->DiskUsageFree = atoi(Value);
-    else if (strcmp(Name, "DiskUsageShort") == 0)                       SetupConfig->DiskUsageShort = atoi(Value);
-    else if (strcmp(Name, "DiskUsageShow") == 0)                        SetupConfig->DiskUsageShow = atoi(Value);
-    else if (strcmp(Name, "EpgAdditionalInfoShow") == 0)                SetupConfig->EpgAdditionalInfoShow = atoi(Value);
-    else if (strcmp(Name, "EpgRerunsShow") == 0)                        SetupConfig->EpgRerunsShow = atoi(Value);
-    else if (strcmp(Name, "EpgFskGenreIconSize") == 0)                  SetupConfig->EpgFskGenreIconSize = atod(Value);
-    else if (strcmp(Name, "MainMenuItemScale") == 0)                    SetupConfig->MainMenuItemScale = atod(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerHideEmpty") == 0)   SetupConfig->MainMenuWidgetActiveTimerHideEmpty = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerMaxCount") == 0)    SetupConfig->MainMenuWidgetActiveTimerMaxCount = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerPosition") == 0)    SetupConfig->MainMenuWidgetActiveTimerPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShow") == 0)        SetupConfig->MainMenuWidgetActiveTimerShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShowActive") == 0)  SetupConfig->MainMenuWidgetActiveTimerShowActive = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShowRecording") == 0) SetupConfig->MainMenuWidgetActiveTimerShowRecording = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShowRemoteActive") == 0)         SetupConfig->MainMenuWidgetActiveTimerShowRemoteActive = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShowRemoteRecording") == 0)         SetupConfig->MainMenuWidgetActiveTimerShowRemoteRecording = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetActiveTimerShowRemoteRefreshTime") == 0)         SetupConfig->MainMenuWidgetActiveTimerShowRemoteRefreshTime = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetCommandPosition") == 0)        SetupConfig->MainMenuWidgetCommandPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetCommandShow") == 0)            SetupConfig->MainMenuWidgetCommandShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardNotUsed") == 0) SetupConfig->MainMenuWidgetDVBDevicesDiscardNotUsed = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetDVBDevicesDiscardUnknown") == 0) SetupConfig->MainMenuWidgetDVBDevicesDiscardUnknown = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetDVBDevicesNativeNumbering") == 0) SetupConfig->MainMenuWidgetDVBDevicesNativeNumbering = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetDVBDevicesPosition") == 0)     SetupConfig->MainMenuWidgetDVBDevicesPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetDVBDevicesShow") == 0)         SetupConfig->MainMenuWidgetDVBDevicesShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetLastRecMaxCount") == 0)        SetupConfig->MainMenuWidgetLastRecMaxCount = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetLastRecPosition") == 0)        SetupConfig->MainMenuWidgetLastRecPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetLastRecShow") == 0)            SetupConfig->MainMenuWidgetLastRecShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetsEnable") == 0)                SetupConfig->MainMenuWidgetsEnable = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetSystemInfoPosition") == 0)     SetupConfig->MainMenuWidgetSystemInfoPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetSystemInfoShow") == 0)         SetupConfig->MainMenuWidgetSystemInfoShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetSystemUpdatesHideIfZero") == 0)SetupConfig->MainMenuWidgetSystemUpdatesHideIfZero = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetSystemUpdatesPosition") == 0)  SetupConfig->MainMenuWidgetSystemUpdatesPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetSystemUpdatesShow") == 0)      SetupConfig->MainMenuWidgetSystemUpdatesShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetTemperaturesPosition") == 0)   SetupConfig->MainMenuWidgetTemperaturesPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetTemperaturesShow") == 0)       SetupConfig->MainMenuWidgetTemperaturesShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetTimerConflictsHideEmpty") == 0)SetupConfig->MainMenuWidgetTimerConflictsHideEmpty = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetTimerConflictsPosition") == 0) SetupConfig->MainMenuWidgetTimerConflictsPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetTimerConflictsShow") == 0)     SetupConfig->MainMenuWidgetTimerConflictsShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetWeatherDays") == 0)            SetupConfig->MainMenuWidgetWeatherDays = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetWeatherPosition") == 0)        SetupConfig->MainMenuWidgetWeatherPosition = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetWeatherShow") == 0)            SetupConfig->MainMenuWidgetWeatherShow = atoi(Value);
-    else if (strcmp(Name, "MainMenuWidgetWeatherType") == 0)            SetupConfig->MainMenuWidgetWeatherType = atoi(Value);
-    else if (strcmp(Name, "marginOsdHor") == 0)                         SetupConfig->marginOsdHor = atoi(Value);
-    else if (strcmp(Name, "marginOsdVer") == 0)                         SetupConfig->marginOsdVer = atoi(Value);
-    else if (strcmp(Name, "MenuChannelShowCount") == 0)                 SetupConfig->MenuChannelShowCount = atoi(Value);
-    else if (strcmp(Name, "MenuChannelView") == 0)                      SetupConfig->MenuChannelView = atoi(Value);
-    else if (strcmp(Name, "MenuContentFullSize") == 0)                  SetupConfig->MenuContentFullSize = atoi(Value);
-    else if (strcmp(Name, "MenuEventView") == 0)                        SetupConfig->MenuEventView = atoi(Value);
-    else if (strcmp(Name, "MenuEventRecordingViewJustify") == 0)        SetupConfig->MenuEventRecordingViewJustify = atoi(Value);
-    else if (strcmp(Name, "MenuEventViewAlwaysWithDate") == 0)          SetupConfig->MenuEventViewAlwaysWithDate = atoi(Value);
-    else if (strcmp(Name, "MenuFullOsd") == 0)                          SetupConfig->MenuFullOsd = atoi(Value);
-    else if (strcmp(Name, "MenuItemIconsShow") == 0)                    SetupConfig->MenuItemIconsShow = atoi(Value);
-    else if (strcmp(Name, "MenuItemIconsShowDefault") == 0)             SetupConfig->MenuItemIconsShowDefault = atoi(Value);
-    else if (strcmp(Name, "MenuItemPadding") == 0)                      SetupConfig->MenuItemPadding = atoi(Value);
-    else if (strcmp(Name, "MenuItemParseTilde") == 0)                   SetupConfig->MenuItemParseTilde = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingClearPercent") == 0)        SetupConfig->MenuItemRecordingClearPercent = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingDefaultOldDays") == 0)      SetupConfig->MenuItemRecordingDefaultOldDays = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingUseOldFile") == 0)          SetupConfig->MenuItemRecordingUseOldFile = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingSeenThreshold") == 0)       SetupConfig->MenuItemRecordingSeenThreshold = atod(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowFolderDate") == 0)      SetupConfig->MenuItemRecordingShowFolderDate = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrors") == 0) SetupConfig->MenuItemRecordingShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowRecordingErrorsThreshold") == 0) SetupConfig->MenuItemRecordingShowRecordingErrorsThreshold = atoi(Value);
-    else if (strcmp(Name, "MenuItemRecordingShowFormatIcons") == 0)     SetupConfig->MenuItemRecordingShowFormatIcons = atoi(Value);
-    else if (strcmp(Name, "MenuRecordingShowCount") == 0)               SetupConfig->MenuRecordingShowCount = atoi(Value);
-    else if (strcmp(Name, "MenuRecordingView") == 0)                    SetupConfig->MenuRecordingView = atoi(Value);
-    else if (strcmp(Name, "MenuTimerShowCount") == 0)                   SetupConfig->MenuTimerShowCount = atoi(Value);
-    else if (strcmp(Name, "MenuTimerView") == 0)                        SetupConfig->MenuTimerView = atoi(Value);
-    else if (strcmp(Name, "MessageColorPosition") == 0)                 SetupConfig->MessageColorPosition = atoi(Value);
-    else if (strcmp(Name, "MessageOffset") == 0)                        SetupConfig->MessageOffset = atoi(Value);
-    else if (strcmp(Name, "PlaybackShowRecordingErrors") == 0)          SetupConfig->PlaybackShowRecordingErrors = atoi(Value);
-    else if (strcmp(Name, "PlaybackShowErrorMarks") == 0)               SetupConfig->PlaybackShowErrorMarks = atoi(Value);
-    else if (strcmp(Name, "PlaybackShowRecordingDate") == 0)            SetupConfig->PlaybackShowRecordingDate = atoi(Value);
-    else if (strcmp(Name, "PlaybackShowEndTime") == 0)                  SetupConfig->PlaybackShowEndTime = atoi(Value);
-    else if (strcmp(Name, "PlaybackWeatherShow") == 0)                  SetupConfig->PlaybackWeatherShow = atoi(Value);
-    else if (strcmp(Name, "RecordingAdditionalInfoShow") == 0)          SetupConfig->RecordingAdditionalInfoShow = atoi(Value);
-    else if (strcmp(Name, "RecordingDimmOnPause") == 0)                 SetupConfig->RecordingDimmOnPause = atoi(Value);
-    else if (strcmp(Name, "RecordingDimmOnPauseDelay") == 0)            SetupConfig->RecordingDimmOnPauseDelay = atoi(Value);
-    else if (strcmp(Name, "RecordingDimmOnPauseOpaque") == 0)           SetupConfig->RecordingDimmOnPauseOpaque = atoi(Value);
-    else if (strcmp(Name, "RecordingFormatShow") == 0)                  SetupConfig->RecordingFormatShow = atoi(Value);
-    else if (strcmp(Name, "RecordingAudioFormatShow") == 0)             SetupConfig->RecordingAudioFormatShow = atoi(Value);
-    else if (strcmp(Name, "RecordingResolutionAspectShow") == 0)        SetupConfig->RecordingResolutionAspectShow = atoi(Value);
-    else if (strcmp(Name, "RecordingSimpleAspectFormat") == 0)          SetupConfig->RecordingSimpleAspectFormat = atoi(Value);
-    else if (strcmp(Name, "ScrollerDelay") == 0)                        SetupConfig->ScrollerDelay = atoi(Value);
-    else if (strcmp(Name, "ScrollerEnable") == 0)                       SetupConfig->ScrollerEnable = atoi(Value);
-    else if (strcmp(Name, "ScrollerStep") == 0)                         SetupConfig->ScrollerStep = atoi(Value);
-    else if (strcmp(Name, "ScrollerType") == 0)                         SetupConfig->ScrollerType = atoi(Value);
-    else if (strcmp(Name, "ShortRecordingCount") == 0)                  SetupConfig->ShortRecordingCount = atoi(Value);
-    else if (strcmp(Name, "SignalQualityShow") == 0)                    SetupConfig->SignalQualityShow = atoi(Value);
-    else if (strcmp(Name, "SignalQualityUseColors") == 0)               SetupConfig->SignalQualityUseColors = atoi(Value);
-    else if (strcmp(Name, "TimeSecsScale") == 0)                        SetupConfig->TimeSecsScale = atod(Value);
-    else if (strcmp(Name, "TopBarFontClockScale") == 0)                 SetupConfig->TopBarFontClockScale = atod(Value);
-    else if (strcmp(Name, "TopBarFontSize") == 0)                       SetupConfig->TopBarFontSize = atod(Value);
-    else if (strcmp(Name, "TopBarHideClockText") == 0)                  SetupConfig->TopBarHideClockText = atoi(Value);
-    else if (strcmp(Name, "TopBarMenuIconShow") == 0)                   SetupConfig->TopBarMenuIconShow = atoi(Value);
-    else if (strcmp(Name, "TopBarRecConflictsHigh") == 0)               SetupConfig->TopBarRecConflictsHigh = atoi(Value);
-    else if (strcmp(Name, "TopBarRecConflictsShow") == 0)               SetupConfig->TopBarRecConflictsShow = atoi(Value);
-    else if (strcmp(Name, "TopBarRecordingShow") == 0)                  SetupConfig->TopBarRecordingShow = atoi(Value);
-    else if (strcmp(Name, "TVScraperChanInfoPosterSize") == 0)          SetupConfig->TVScraperChanInfoPosterSize = atod(Value);
-    else if (strcmp(Name, "TVScraperChanInfoShowPoster") == 0)          SetupConfig->TVScraperChanInfoShowPoster = atoi(Value);
-    else if (strcmp(Name, "TVScraperEPGInfoShowActors") == 0)           SetupConfig->TVScraperEPGInfoShowActors = atoi(Value);
-    else if (strcmp(Name, "TVScraperEPGInfoShowPoster") == 0)           SetupConfig->TVScraperEPGInfoShowPoster = atoi(Value);
-    else if (strcmp(Name, "TVScraperRecInfoShowActors") == 0)           SetupConfig->TVScraperRecInfoShowActors = atoi(Value);
-    else if (strcmp(Name, "TVScraperShowMaxActors") == 0)               SetupConfig->TVScraperShowMaxActors = atoi(Value);
-    else if (strcmp(Name, "TVScraperRecInfoShowPoster") == 0)           SetupConfig->TVScraperRecInfoShowPoster = atoi(Value);
-    else if (strcmp(Name, "TVScraperReplayInfoPosterSize") == 0)        SetupConfig->TVScraperReplayInfoPosterSize = atod(Value);
-    else if (strcmp(Name, "TVScraperReplayInfoShowPoster") == 0)        SetupConfig->TVScraperReplayInfoShowPoster = atoi(Value);
-    else if (strcmp(Name, "TVScraperPosterOpacity") == 0)               SetupConfig->TVScraperPosterOpacity = atod(Value);
-    else if (strcmp(Name, "TVScraperSearchLocalPosters") == 0)          SetupConfig->TVScraperSearchLocalPosters = atoi(Value);
-    else if (strcmp(Name, "WeatherFontSize") == 0)                      SetupConfig->WeatherFontSize = atod(Value);
-    else
-        return false;
-
-    return true;
+    // Call the same function to handle specific config options
+    return Config.ParseSpecificConfigOption(Name, Value);
 }
 
 void cFlatSetupGeneral::SaveCurrentSettings() {
@@ -622,7 +443,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     cString File {time};
     cString Filename {cString::sprintf("%s/configs/%s", PLUGINRESOURCEPATH, *File)};
 
-    // if file exist remove it
+    // If file exist remove it
     if (access(Filename, F_OK) != -1)
         remove(Filename);
 

@@ -32,6 +32,7 @@ class cFlatConfig {
         void Init();
         void SetLogoPath(cString path);
         bool SetupParse(const char *Name, const char *Value);
+        bool ParseSpecificConfigOption(const char *Name, const char *Value);
 
         void ThemeCheckAndInit();
         void ThemeInit();
