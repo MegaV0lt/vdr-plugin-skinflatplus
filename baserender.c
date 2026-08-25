@@ -39,6 +39,8 @@ bool g_LogoBgOverwrite {false};
 
 cRecCountThread RecCountThread;
 
+FontImageWeatherCache WeatherCache;
+
 cFlatBaseRender::cFlatBaseRender() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::cFlatBaseRender()");

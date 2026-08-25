@@ -75,7 +75,7 @@ class FontImageWeatherCache {
     FontImageWeatherCache() = default;  // Constructor
     void Clear() { valid = false; }
 };  // class FontImageWeatherCache
-static FontImageWeatherCache WeatherCache;
+extern FontImageWeatherCache WeatherCache;
 
 // Base class for rendering OSD elements in the flatPlus skin
 // Provides methods for creating and managing OSD elements like top bar, buttons, messages, progress
