@@ -326,6 +326,7 @@ cString GetFormatIcon(int ScreenWidth) {
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
+    if (!Recording || !Recording->Info()) return "";  // No info
 #if APIVERSNUM >= 20605
     const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
     if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
