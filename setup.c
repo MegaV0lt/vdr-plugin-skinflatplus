@@ -21,7 +21,6 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
-// #include "./config.h"
 
 cStringList Bordertypes;
 cStringList DiskUsages;
