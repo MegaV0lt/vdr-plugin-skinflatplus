@@ -609,8 +609,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     }
-    (WithProvider)  // Append provider name
-        ? Buffer = cString::sprintf("%s (%s)", Channel->Name(), Channel->Provider())
+    (WithProvider)  // Prefix provider name
+        ? Buffer = cString::sprintf("[%s] %s", Channel->Provider(), Channel->Name())
         : Buffer = Channel->Name();
 
     const int LeftName {Left};
