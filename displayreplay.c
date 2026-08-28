@@ -119,17 +119,17 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     const int InfoWidth {m_FontSml->Width(*InfoText)};  // Width of infotext
     // TODO: How to get width of aspect and format icons?
-    //  Done: Substract 'left' in case of displayed recording icon
-    //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
-    //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
+    //  Done: Subtract 'left' in case of displayed recording icon
+    //  Done: Subtract 'm_FontSmlHeight' in case of recording error icon is displayed later
+    //* Workaround: Subtract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth {m_OsdWidth - left - Config.decorBorderReplaySize * 2};
 
 #if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
+    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Subtract width of imgRecErr
 #endif
 
     img = ImgLoader.GetIcon("1920x1080", kIconMaxSize, m_FontSmlHeight);
-    if (img) MaxWidth -= img->Width() * 3;  //* Substract guessed max. used space of aspect and format icons
+    if (img) MaxWidth -= img->Width() * 3;  //* Subtract guessed max. used space of aspect and format icons
 
     if (InfoWidth > MaxWidth) {  // Infotext too long
         if (Config.ScrollerEnable) {

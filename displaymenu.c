@@ -634,7 +634,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     } else {  // flatPlus long with epg or flatPlus short (with epg)
-        //? m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+        //? m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10 * 2;
 
         if (MenuChannelViewShort)  // flatPlus short, flatPlus short + EPG
@@ -1169,7 +1169,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
-        // m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+        // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
         if (MenuEventViewShort) {  // flatPlus short, flatPlus short + EPG
@@ -1191,7 +1191,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {  // Draw progress of event
-            // m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+            // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
@@ -2681,7 +2681,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     int left {m_MarginItem};
 
 #if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
+    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Subtract width of imgRecErr
 #endif
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuRecFontInfo),
