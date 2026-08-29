@@ -1581,6 +1581,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
         m_MenuCategory != LastMenuCategory || Total != LastTotal)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Level: %d -> %d", m_LastItemRecordingLevel, Level);
+        dsyslog("   Total: %d -> %d", LastTotal, Total);
         dsyslog("   MenuCategory: %d -> %d", LastMenuCategory, m_MenuCategory);
 #endif
         m_LastItemRecordingLevel = Level;
