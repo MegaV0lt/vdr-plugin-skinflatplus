@@ -1574,15 +1574,17 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Index == 0)  // Only update when Index = 0 (First item on the page)
         m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
-    // Only update 'm_RecCounts' when Level or LastMenuCategory changes
+    // Only update 'm_RecCounts' when Level, Total or LastMenuCategory changes
+    static int LastTotal {0};  // Update when a recording gets removed
     static eMenuCategory LastMenuCategory {mcUnknown};
     if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
-        m_MenuCategory != LastMenuCategory)) {
+        m_MenuCategory != LastMenuCategory || Total != LastTotal)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Level: %d -> %d", m_LastItemRecordingLevel, Level);
         dsyslog("   MenuCategory: %d -> %d", LastMenuCategory, m_MenuCategory);
 #endif
         m_LastItemRecordingLevel = Level;
+        LastTotal = Total;
         LastMenuCategory = m_MenuCategory;
         m_RecCounts = *GetRecCounts();
         const cString NewTitle {cString::sprintf("%s %s", *m_LastTitle, *m_RecCounts)};
