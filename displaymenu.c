@@ -4143,7 +4143,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     }
 
     cString Title {ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH))};
-    if (!isempty(*Title)) Title = tr("no title available");
+    if (isempty(*Title)) Title = tr("no title available");
 
     ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 
