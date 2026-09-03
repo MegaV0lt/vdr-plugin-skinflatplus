@@ -617,7 +617,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
 
     if (MaxFileNum == 0) {
-        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum is 0!");
+        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum of recording '%s' is 0!", RecordingFileName);
         return;
     }
 
