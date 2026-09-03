@@ -789,9 +789,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {FontCache.GetStringWidth(FontName, FontHeight, " ") <
-                                  FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
+                                  FontCache.GetStringWidth(FontName, FontHeight, u8"\u200A")
                               ? " "
-                              : u8"\U0000200A"};  // Use hair space if it is smaller than space
+                              : u8"\u200A"};  // Use hair space if it is smaller than space
     const int FillCharWidth {FontCache.GetStringWidth(FontName, FontHeight, FillChar)};  // Width in pixel
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
@@ -875,7 +875,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
     else
         dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   JustifyLine done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -983,7 +983,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Set done in %ld ms", Timer.Elapsed());
 #endif
 }
 
