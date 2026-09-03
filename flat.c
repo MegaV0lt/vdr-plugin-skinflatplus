@@ -89,11 +89,11 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     }
     cTimeMs Timer;  // Start Timer
 #endif
-    /* if (!osd) {
+    if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap '%s' with size %ix%i", *Name, DrawPort.Width(),
                 DrawPort.Height());
         return nullptr;
-    } */
+    }
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
