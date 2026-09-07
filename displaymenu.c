@@ -2916,17 +2916,14 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     dsyslog("flatPlus: cFlatDisplayMenu::MainMenuText() '%s'", *Text);
 #endif
     std::string_view text {skipspace(*Text)};
-    bool found {false};
     const std::size_t TextLength {text.length()};
     std::size_t i {0};  // 'i' used also after loop
     for (; i < TextLength; ++i) {
-        if (isdigit(text.at(i)) && i < 5)  // Up to 4 digits expected
-            found = true;
-        else
+        if (!(isdigit(text.at(i)) && i < 5))  // Up to 4 digits expected
             break;
     }
 
-    return found ? skipspace(text.substr(i).data()) : text.data();
+    return (i > 0) ? skipspace(text.substr(i).data()) : text.data();
 }
 
 
