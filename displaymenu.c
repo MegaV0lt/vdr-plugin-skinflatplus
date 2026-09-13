@@ -1632,10 +1632,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     cString RecName {GetRecordingName(Recording, Level)};
     if (IsRecording && Config.MenuItemRecordingClearPercent) {  // Remove leading percent sign(s) from RecName
         while (!isempty(*RecName) && RecName[0] == '%')
-        RecName = cString(*RecName + 1);
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   RecName for display '%s'", *RecName);
-#endif
+            RecName = cString(*RecName + 1);
     }
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
@@ -1655,7 +1652,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show recording status: New, still in progress (ruTimer), played (ruReplay) or seen (resume)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            // Show recording errors if enabled in config (Drwan as overlay icon)
+            // Show recording errors if enabled in config (Drawn as overlay icon)
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 
@@ -1762,7 +1759,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show recording status: New, still in progress (ruTimer), played (ruReplay) or seen (resume)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            // Show recording errors if enabled in config (Drwan as overlay icon)
+            // Show recording errors if enabled in config (Drawn as overlay icon)
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 

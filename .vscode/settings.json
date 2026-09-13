@@ -70,15 +70,19 @@
         "variant": "cpp"
     },
     "cSpell.words": [
+        "APIVERSNUM",
+        "DEBUGEPGTIME",
         "Epgsearch",
         "esyslog",
         "ETSI",
+        "FOLDERDELIMCHAR",
         "HEAAC",
         "Pixmap",
         "Pixmaps",
         "Scrollers",
         "SVCD",
-        "SVDRP"
+        "SVDRP",
+        "WIDGETOUTPUTPATH"
     ],
     "C_Cpp.default.cppStandard": "c++17",
     "C_Cpp.default.cStandard": "c17",
