@@ -232,15 +232,15 @@ class cTextFloatingWrapper {
  public:
     cTextFloatingWrapper();
     ~cTextFloatingWrapper();
-    ///< Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
-    ///< Wrapping is done by inserting the necessary number of newline characters into the string.
-    ///< When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
+    // Wraps the Text to make it fit into the area defined by the given Width when displayed with the given Font.
+    // Wrapping is done by inserting the necessary number of newline characters into the string.
+    // When 'UpperLines' and 'WidthUpper' are set the 'UpperLines' are wrapped to fit in 'WidthUpper'.
     void Set(const char *Text, const cFont *Font, int WidthLower, int UpperLines = 0, int WidthUpper = 0);
-    ///< Returns the full wrapped text.
+    // Returns the full wrapped text.
     const char *Text();
-    ///< Returns the actual number of lines needed to display the full wrapped text.
+    // Returns the actual number of lines needed to display the full wrapped text.
     int Lines() const { return m_Lines; }
-    ///< Returns the given Line. The first line is numbered 0.
+    // Returns the given Line. The first line is numbered 0.
     const char *GetLine(int Line);
 
  private:
@@ -250,13 +250,13 @@ class cTextFloatingWrapper {
     int m_LastLine {-1};
 };  // class cTextFloatingWrapper
 
-
-
 cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer = 0, const cRect &ViewPort = cRect::Null,
                       const cRect &DrawPort = cRect::Null);
+
 inline void PixmapFill(cPixmap *Pixmap, tColor Color) {
     if (Pixmap) Pixmap->Fill(Color);
 }
+
 inline void PixmapClear(cPixmap *Pixmap) {
     if (Pixmap) Pixmap->Clear();
 }
@@ -266,6 +266,7 @@ inline void PixmapClear(cPixmap *Pixmap) {
  * @param Pixmap - A pointer to the `cPixmap` object.
  * @param Alpha - The alpha value to be set (0-255, where 0 represents full transparency).
  */
+
 inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
@@ -289,10 +290,6 @@ cString GetRecordingFormatIcon(const cRecording *Recording);
 cString GetCurrentAudioIcon();
 cString GetRecordingErrorIcon(int RecInfoErrors);
 cString GetRecordingSeenIcon(int FrameTotal, int FrameResume);
-
-/* std::string_view ltrim(std::string_view str);
-std::string_view rtrim(std::string_view str);
-std::string_view trim(std::string_view str); */
 
 void SetMediaSize(const cSize &ContentSize, cSize &MediaSize, float MediaSizeUser);  // NOLINT in/out
 void InsertComponents(const cComponents *Components, cString &Text, bool NewLine = false);  // NOLINT

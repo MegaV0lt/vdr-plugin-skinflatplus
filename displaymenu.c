@@ -159,6 +159,9 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
         else  // 2 = flatPlus short, 3 = flatPlus short + EPG
             m_ItemRecordingHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                     Config.decorBorderMenuItemSize * 2;
+        // *When a recording is deleted, the number of recordings and new recordings is not updated in the menu title.
+        // Trigger update of recording counts to fix numbering when a recording gets deleted
+        if (Config.MenuRecordingShowCount > 0) m_UpdateRecCounts = true;
         break;
     case mcMain:
         if (Config.MainMenuWidgetsEnable) DrawMainMenuWidgets();
@@ -1574,19 +1577,20 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Index == 0)  // Only update when Index = 0 (First item on the page)
         m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
-    // Only update 'm_RecCounts' when Level, Total or LastMenuCategory changes
-    static int LastTotal {0};  // Update when a recording gets removed
+    // Update counts when Level, MenuCategory changes or m_UpdateRecCounts is true.
+    // m_UpdateRecCounts is set to true when menu category is set to mcRecording or mcRecordingDel. This is a workaround
+    // to update counts weh a recording got deleted.
     static eMenuCategory LastMenuCategory {mcUnknown};
     if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
-        m_MenuCategory != LastMenuCategory || Total != LastTotal)) {
+        m_MenuCategory != LastMenuCategory || m_UpdateRecCounts)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Level: %d -> %d", m_LastItemRecordingLevel, Level);
-        dsyslog("   Total: %d -> %d", LastTotal, Total);
         dsyslog("   MenuCategory: %d -> %d", LastMenuCategory, m_MenuCategory);
+        dsyslog("   m_UpdateRecCounts: %d", m_UpdateRecCounts);
 #endif
         m_LastItemRecordingLevel = Level;
-        LastTotal = Total;
         LastMenuCategory = m_MenuCategory;
+        m_UpdateRecCounts = false;
         m_RecCounts = *GetRecCounts();
         const cString NewTitle {cString::sprintf("%s %s", *m_LastTitle, *m_RecCounts)};
         TopBarSetTitle(*NewTitle, false);  // Do not clear
@@ -2847,22 +2851,27 @@ void cFlatDisplayMenu::Flush() {
         m_MenuFullOsdIsDrawn = true;
     }
 
-    if (m_MenuCategory == mcEvent && !m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
-
-    if (m_MenuCategory == mcRecordingInfo && !m_RecordingInfoDrawn)
-        DrawRecordingInfo(m_Recording);  // Draw recording info
-
-    if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
-        uint16_t TimerActiveCount {0}, TimerCount {0};
-        UpdateTimerCounts(TimerActiveCount, TimerCount);
-
-        if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
-            m_LastTimerActiveCount = TimerActiveCount;
-            m_LastTimerCount = TimerCount;
-            const cString NewTitle {cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount)};
-            TopBarSetTitle(*NewTitle, false);  // Do not clear
+    switch (m_MenuCategory) {
+    case mcEvent:
+        if (!m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
+        break;
+    case mcRecordingInfo:
+        if (!m_RecordingInfoDrawn) DrawRecordingInfo(m_Recording);  // Draw recording info
+        break;
+    case mcTimer:
+        if (Config.MenuTimerShowCount) {
+            uint16_t TimerActiveCount {0}, TimerCount {0};
+            UpdateTimerCounts(TimerActiveCount, TimerCount);
+            if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
+                m_LastTimerActiveCount = TimerActiveCount;
+                m_LastTimerCount = TimerCount;
+                const cString NewTitle {cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount)};
+                TopBarSetTitle(*NewTitle, false);
+            }
         }
-    }
+        break;
+    default: break;  // Any other categories (like mcChannel, mcMain, etc.) that don't need special flush handling
+    }  // switch
 
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState)) TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
@@ -2873,7 +2882,7 @@ void cFlatDisplayMenu::Flush() {
 // Insert a new sDecorBorder into ItemsBorder, or update the existing one if Left and Top already exist.
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
     for (auto &item : ItemsBorder) {
-        if (item.Left == ib.Left && item.Top == ib.Top) {
+        if (item.Top == ib.Top && item.Left == ib.Left) {
             item = ib;
             return;
         }
@@ -3187,7 +3196,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
-    const int days {static_cast<int>((now - LastRecTimeFromFolder) * (1.0 / SECSINDAY))};
+    const int days {static_cast<int>(now - LastRecTimeFromFolder) / SECSINDAY};
     return days > value;
 }
 

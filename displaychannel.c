@@ -1276,9 +1276,12 @@ void cFlatDisplayChannel::Flush() {
 
     if (Config.ChannelIconsShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
-        if (m_ScreenWidth != m_LastScreenWidth) {
+        // Also check if audio icon changed (e.g., Stereo ↔ Dolby Digital)
+        const cString CurrentAudioIcon {GetCurrentAudioIcon()};
+        if (m_ScreenWidth != m_LastScreenWidth || strcmp(m_LastAudioIcon, CurrentAudioIcon) != 0) {
             m_LastScreenWidth = m_ScreenWidth;
-            ChannelIconsDraw(m_CurChannel, true);  // Full redraw when resolution changes
+            m_LastAudioIcon = CurrentAudioIcon;
+            ChannelIconsDraw(m_CurChannel, true);  // Full redraw when resolution or audio icon changes
         }
     }
 

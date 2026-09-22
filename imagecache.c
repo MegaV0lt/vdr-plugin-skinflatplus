@@ -79,8 +79,10 @@ cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool 
         }
     }
 
-    // Fallback to linear search if not found in index (Should not happen if index is maintained correctly)
+    // Fallback to linear search if not found in index
+#ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: FindImage: Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
+#endif
     const auto &cache {IsIcon ? IconCache : ImageCache};
     for (const auto &data : cache) {
         if (data.Image && data.Width == Width && data.Height == Height &&

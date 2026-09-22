@@ -754,7 +754,7 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
             Theme.Color(clrMessageFont), clrTransparent, m_Font, Theme.Color(clrMenuItemExtraTextFont));
     } else if (Config.MenuItemParseTilde) {
         const char *TildePos {strchr(Text, '~')};
-        if (TildePos) {  // Text can be 'Title~Subtilte' or 'Title ~ Subtitle'
+        if (TildePos) {  // Text can be 'Title~Subtitle' or 'Title ~ Subtitle'
             const cString first(Text, (isspace(*TildePos - 1)) ? TildePos - 1 : TildePos);
             const cString second(skipspace(TildePos + 1));  // Part after ~ and remove leading space if any
 

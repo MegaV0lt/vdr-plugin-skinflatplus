@@ -95,16 +95,16 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
     std::vector<sDecorBorder> ItemsBorder;
-    // sDecorBorder EventBorder, RecordingBorder, TextBorder;
 
     bool m_IsScrolling {false};
-    // bool m_IsGroup {false};
     bool m_ShowEvent {false};
     bool m_ShowRecording {false};
     bool m_ShowText {false};
 
     bool m_RecordingInfoDrawn {false};
     bool m_EventInfoDrawn {false};
+
+    bool m_UpdateRecCounts {false};  // Update number of recordings and new recordings (35*/53)
 
     cComplexContent ComplexContent;
 
