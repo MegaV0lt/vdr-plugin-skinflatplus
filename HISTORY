@@ -1,5 +1,14 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+2026-xx-xx: Version 1.3.2
+- [fix] Trigger recording count update when a recording is deleted.
+- [updare] Prefix provider name in channel list view when sorted by provider.
+- [update] 'check_fonts_for_hairspace.sh' now also checks for almost equal to (≈) U+2248
+           and average to (Ø) (U+00D8).
+- [update] Added audio icon change detection in Flush() method.
+- [update] Do not search for icons with '/' (Convertet to '~') in their name if the do not have one.
+- [update] Some internal optimizations
+
 2026-08-02: Version 1.3.1
 - [fix] Add missing include in imagecache.h
 - [fix] Thanks to zork @ VDR-Portal for fixing:

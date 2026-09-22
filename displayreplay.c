@@ -754,8 +754,10 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
 void cFlatDisplayReplay::Flush() {
     if (Config.RecordingResolutionAspectShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
-        if (m_ScreenWidth != m_LastScreenWidth) {
+        const cString CurrentAudioIcon {GetCurrentAudioIcon()};
+        if (m_ScreenWidth != m_LastScreenWidth || strcmp(m_LastAudioIcon, CurrentAudioIcon) != 0) {
             m_LastScreenWidth = m_ScreenWidth;
+            m_LastAudioIcon = CurrentAudioIcon;
             ResolutionAspectDraw();
         }
     }
