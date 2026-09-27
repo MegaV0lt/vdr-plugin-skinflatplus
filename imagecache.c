@@ -62,7 +62,7 @@ static std::string_view BaseNameFromCacheName(std::string_view full) {
     return (lastSlash != std::string_view::npos) ? full.substr(lastSlash + 1) : full;
 }
 
-cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool IsIcon) const {
+cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
     const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 
     const auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
@@ -81,7 +81,7 @@ cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool 
 
     // Fallback to linear search if not found in index
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: FindImage: Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
+    dsyslog("flatPlus: GetImage: Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
 #endif
     const auto &cache {IsIcon ? IconCache : ImageCache};
     for (const auto &data : cache) {
@@ -90,13 +90,6 @@ cImage *cImageCache::FindImage(const cString &Name, int Width, int Height, bool 
             return data.Image.get();
         }
     }
-
-    return nullptr;
-}
-
-cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
-    const cImage *img {FindImage(Name, Width, Height, IsIcon)};
-    if (img) return const_cast<cImage *>(img);
 
     return nullptr;
 }
