@@ -440,7 +440,7 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     char time[32];
     strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", &tm_r);
     cString File {time};
-    cString Filename {cString::sprintf("%s/configs/%s", PLUGINRESOURCEPATH, *File)};
+    cString Filename {cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), *File)};
 
     // If file exist remove it
     if (access(Filename, F_OK) != -1)
