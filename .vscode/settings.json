@@ -82,6 +82,7 @@
         "Scrollers",
         "SVCD",
         "SVDRP",
+        "VDRLOGO",
         "WIDGETOUTPUTPATH"
     ],
     "C_Cpp.default.cppStandard": "c++17",

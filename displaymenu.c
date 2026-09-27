@@ -384,7 +384,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     for (std::size_t i {0}; i < MaxTabs; ++i) {
         s = GetTabbedText(Text, i);
         if (s) {
-            // From skinelchi
+            // From SkinElchi
             xt = Tab(i);
             XOff = xt + Config.decorBorderMenuItemSize;
 
@@ -2012,7 +2012,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 
     cString Reruns {""};
     if (Config.EpgRerunsShow) {
-        // Lent from nopacity
+        // Lent from NOpacity
         cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
         cString SearchTerm {Event->Title()};  // Search term
         if (pEpgSearchPlugin && !isempty(SearchTerm)) {
@@ -2446,7 +2446,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
  * The line is formatted as "TS errors: <number>".
  */
 void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) const {  // NOLINT
-    // From SkinNopacity
+    // From SkinNOpacity
     if (RecInfo && RecInfo->Errors() > 0) {
         std::ostringstream RecErrors {""};
         RecErrors.imbue(std::locale {""});  // Set to local locale
@@ -2504,7 +2504,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     }
 
     cString Fsk {""};
-    // Lent from skinelchi
+    // Lent from SkinElchi
     if (Config.RecordingAdditionalInfoShow) {
         if (Text[0] != '\0') Text.Append('\n');
         const cEvent *Event {RecInfo->GetEvent()};
@@ -2720,7 +2720,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     }
 
 #if APIVERSNUM >= 20505
-    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
+    if (Config.MenuItemRecordingShowRecordingErrors) {  //? Separate config option?
         const cString RecErrIcon {cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()))};
 
         img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
@@ -2965,7 +2965,8 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     const auto it {cache.find(svElement.data())};
     if (it != cache.end()) return *it->second;  // Return cached icon name including path
 
-    cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
+    if (cache.empty()) cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
+
     //* Check for standard menu entries
     for (const auto &item : items) {
         sv = trVDR(item);  // Translate item to current language
@@ -3941,7 +3942,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     ContentTop = AddWidgetHeader("widgets/system_information", tr("System Information"), ContentTop, wWidth);
 
     cString Buffer {""};
-    if (files.size() == 0) {
+    if (files.empty()) {
         Buffer = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
         ContentWidget.AddText(*Buffer, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,

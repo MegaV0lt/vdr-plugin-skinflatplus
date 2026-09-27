@@ -409,7 +409,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         left += CurrentWidth + m_MarginItem;
     }
 
-    // Show TimeShift Text with blue backgroud (Message Status)
+    // Show TimeShift Text with blue background (Message Status)
     if (m_TimeShiftMode) {
         const int TimeShiftTop {m_FontAscender -
                                 FontCache.GetFontAscender(m_FontName, (Setup.FontOsdSize + Setup.FontSmlSize) / 2)};
@@ -630,7 +630,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         cString MediaPath {""};
         cSize MediaSize {0, 0};
         GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster
             const cString RecPath {m_Recording->FileName()};
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
