@@ -1478,6 +1478,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
     } else if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         if (Current) img = ImgLoader.GetIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
         if (!img) img = ImgLoader.GetIcon("timerRecording", m_FontHeight, m_FontHeight);
+    // TODO: Add icon for recording in cut process (ruCut) if needed
     } else {
         const cString IconName {GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume())};
         if (Current) {
