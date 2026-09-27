@@ -48,8 +48,9 @@ Für die Kanallogos empfehle ich Logos aus einem der Repositories:
 - https://github.com/MegaV0lt/Picon.cz2VDR
 - https://github.com/MegaV0lt/MP_Logos (Veraltet)
 
-Die Logos sollten im folgenden Ordner zur Verfügung gestellt werden:
-    `<vdrconfigdir>/plugins/skinflatplus/logos`
+Die Logos sollten im gemeinsamen, skin-unabhängigen Logo-Ordner des VDR
+zur Verfügung gestellt werden:
+    `<vdrresdir>/logos`
 
 Das Skin sucht Kanallogos im PNG-Format in folgenden Schreibweisen:
 

@@ -49,9 +49,13 @@ LIBDIR = $(call PKGCFG,libdir)
 LOCDIR = $(call PKGCFG,locdir)
 PLGCFG  = $(call PKGCFG,plgcfg)
 VDRCONFDIR = $(call PKGCFG,configdir)
-PLGRESDIR = $(call PKGCFG,resdir)/plugins/$(PLUGIN)
+VDRRESDIR = $(call PKGCFG,resdir)
+PLGRESDIR = $(VDRRESDIR)/plugins/$(PLUGIN)
 TMPDIR ?= /tmp
 SKINFLATPLUS_WIDGETDIR ?= $(LIBDIR)/$(PLUGIN)/widgets
+# Channel logos are skin independent, so they live in VDR's shared resource
+# directory rather than below this plugin's own resource directory.
+SKINFLATPLUS_LOGODIR ?= $(VDRRESDIR)/logos
 
 ### The compiler options:
 export CFLAGS   = $(call PKGCFG,cflags)
@@ -90,6 +94,7 @@ endif
 
 DEFINES += -DPLUGIN_NAME_I18N='"$(PLUGIN)"' -DVDRLOGO=\"$(SKINFLATPLUS_VDRLOGO)\"
 DEFINES += -DWIDGETFOLDER='"$(SKINFLATPLUS_WIDGETDIR)"'
+DEFINES += -DLOGOFOLDER='"$(SKINFLATPLUS_LOGODIR)"'
 
 ### The object files (add further files here):
 
