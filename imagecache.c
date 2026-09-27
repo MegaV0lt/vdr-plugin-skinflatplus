@@ -104,11 +104,6 @@ cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
 void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon) {
     if (!Image) return;
 
-    if (FindImage(Name, Width, Height, IsIcon)) {  // Image already in cache
-        delete Image;
-        return;
-    }
-
     if (IsIcon) {
         // Remove any previous mapping that points to the slot we are about to overwrite.
         const std::size_t slot {m_InsertIconIndex};

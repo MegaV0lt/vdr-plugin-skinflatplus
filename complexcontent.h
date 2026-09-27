@@ -48,7 +48,7 @@ class cSimpleContent {
 
         cTextFloatingWrapper Wrapper;
         Wrapper.Set(*m_Text, m_Font, PositionWidth);
-        std::string Line;
+        std::string Line {""};
         Line.reserve(256);
         const int Lines {Wrapper.Lines()};
         const int FontHeight {m_Font->Height()};
