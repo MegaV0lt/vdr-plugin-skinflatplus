@@ -449,7 +449,7 @@ void cFlatConfig::ThemeInit() {
 
 void cFlatConfig::Init() {
     if (!strcmp(LogoPath, "")) {
-        LogoPath = cString::sprintf("%s/logos", PLUGINRESOURCEPATH);
+        LogoPath = LOGOFOLDER;
         dsyslog("flatPlus: LogoPath: %s", *LogoPath);
     }
     if (!strcmp(IconPath, "")) {
