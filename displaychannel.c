@@ -416,13 +416,9 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int TopSeen {0}, TopEpg {0};
 
     const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
-    // const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, " ") * 2};
-    // Use 'm_MarginItem2' instead of 'SmlSpaceWidth2' for spacing between elements, as it is more consistent
-    // with the overall layout
-    const int SmlSpaceWidth2 {m_MarginItem2};
 
     if (Config.ChannelShowStartTime)
-        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + SmlSpaceWidth2;
+        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + m_MarginItem2;
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
@@ -434,7 +430,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             // Use of – (EN DASH, U+2013) instead of - (HYPHEN-MINUS, U+002D) for better readability
             // https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Time_ranges
             StrTime = cString::sprintf("%s–%s", *StartTime, *Event->GetEndTimeString());  // Start – End (Right side)
-            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00–00:00") + SmlSpaceWidth2;
+            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00–00:00") + m_MarginItem2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
@@ -466,7 +462,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 SeenDur = cString::sprintf("%d min", EventDuration);
             }  // if (IsPresent)
 
-            SeenDurWidth = m_FontSml->Width(*SeenDur) + SmlSpaceWidth2;
+            SeenDurWidth = m_FontSml->Width(*SeenDur) + m_MarginItem2;
             SeenDurMaxWidth = std::max(StrTimeWidth, SeenDurWidth);
             MaxAvailWidth = m_ChannelWidth - left - SeenDurMaxWidth;
 #ifdef DEBUGFUNCSCALL
