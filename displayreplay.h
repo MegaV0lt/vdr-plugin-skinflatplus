@@ -45,6 +45,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         int m_ScreenWidth {-1}, m_LastScreenWidth {-1};
         int m_ScreenHeight {0};
         double m_ScreenAspect {0.0};
+        cString m_LastAudioIcon {""};  // Used to detect changes in audio icon
 
         time_t m_LastEndTimeUpdate {0};
         time_t m_LastPosterBannerUpdate {0};

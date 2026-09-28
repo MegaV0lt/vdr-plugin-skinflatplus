@@ -119,17 +119,17 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     const int InfoWidth {m_FontSml->Width(*InfoText)};  // Width of infotext
     // TODO: How to get width of aspect and format icons?
-    //  Done: Substract 'left' in case of displayed recording icon
-    //  Done: Substract 'm_FontSmlHeight' in case of recording error icon is displayed later
-    //* Workaround: Substract width of aspect and format icons (ResolutionAspectDraw()) ???
+    //  Done: Subtract 'left' in case of displayed recording icon
+    //  Done: Subtract 'm_FontSmlHeight' in case of recording error icon is displayed later
+    //* Workaround: Subtract width of aspect and format icons (ResolutionAspectDraw()) ???
     int MaxWidth {m_OsdWidth - left - Config.decorBorderReplaySize * 2};
 
 #if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
+    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Subtract width of imgRecErr
 #endif
 
     img = ImgLoader.GetIcon("1920x1080", kIconMaxSize, m_FontSmlHeight);
-    if (img) MaxWidth -= img->Width() * 3;  //* Substract guessed max. used space of aspect and format icons
+    if (img) MaxWidth -= img->Width() * 3;  //* Subtract guessed max. used space of aspect and format icons
 
     if (InfoWidth > MaxWidth) {  // Infotext too long
         if (Config.ScrollerEnable) {
@@ -409,7 +409,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         left += CurrentWidth + m_MarginItem;
     }
 
-    // Show TimeShift Text with blue backgroud (Message Status)
+    // Show TimeShift Text with blue background (Message Status)
     if (m_TimeShiftMode) {
         const int TimeShiftTop {m_FontAscender -
                                 FontCache.GetFontAscender(m_FontName, (Setup.FontOsdSize + Setup.FontSmlSize) / 2)};
@@ -630,7 +630,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         cString MediaPath {""};
         cSize MediaSize {0, 0};
         GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
-        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster
             const cString RecPath {m_Recording->FileName()};
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
@@ -754,8 +754,10 @@ void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
 void cFlatDisplayReplay::Flush() {
     if (Config.RecordingResolutionAspectShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
-        if (m_ScreenWidth != m_LastScreenWidth) {
+        const cString CurrentAudioIcon {GetCurrentAudioIcon()};
+        if (m_ScreenWidth != m_LastScreenWidth || strcmp(m_LastAudioIcon, CurrentAudioIcon) != 0) {
             m_LastScreenWidth = m_ScreenWidth;
+            m_LastAudioIcon = CurrentAudioIcon;
             ResolutionAspectDraw();
         }
     }

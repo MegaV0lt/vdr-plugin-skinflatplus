@@ -159,6 +159,9 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
         else  // 2 = flatPlus short, 3 = flatPlus short + EPG
             m_ItemRecordingHeight = m_FontHeight + m_FontSmlHeight + m_MarginItem + Config.MenuItemPadding +
                                     Config.decorBorderMenuItemSize * 2;
+        // *When a recording is deleted, the number of recordings and new recordings is not updated in the menu title.
+        // Trigger update of recording counts to fix numbering when a recording gets deleted
+        if (Config.MenuRecordingShowCount > 0) m_UpdateRecCounts = true;
         break;
     case mcMain:
         if (Config.MainMenuWidgetsEnable) DrawMainMenuWidgets();
@@ -381,7 +384,7 @@ void cFlatDisplayMenu::SetItem(const char *Text, int Index, bool Current, bool S
     for (std::size_t i {0}; i < MaxTabs; ++i) {
         s = GetTabbedText(Text, i);
         if (s) {
-            // From skinelchi
+            // From SkinElchi
             xt = Tab(i);
             XOff = xt + Config.decorBorderMenuItemSize;
 
@@ -609,8 +612,8 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     }
-    (WithProvider)  // Append provider name
-        ? Buffer = cString::sprintf("%s (%s)", Channel->Name(), Channel->Provider())
+    (WithProvider)  // Prefix provider name
+        ? Buffer = cString::sprintf("[%s] %s", Channel->Provider(), Channel->Name())
         : Buffer = Channel->Name();
 
     const int LeftName {Left};
@@ -634,7 +637,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
             }
         }
     } else {  // flatPlus long with epg or flatPlus short (with epg)
-        //? m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+        //? m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         Width = (m_MenuItemWidth + (m_IsScrolling ? m_WidthScrollBar : 0)) / 10 * 2;
 
         if (MenuChannelViewShort)  // flatPlus short, flatPlus short + EPG
@@ -1169,7 +1172,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
         Left += ImageBgWidth + m_MarginItem2;
         LeftSecond = Left;
-        // m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+        // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
         if (MenuEventViewShort) {  // flatPlus short, flatPlus short + EPG
@@ -1191,7 +1194,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         Left += w + m_MarginItem2;
 
         if (Event) {  // Draw progress of event
-            // m_WidthScrollBar is already substracted. If not scrolling, we need to substract it
+            // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
             int PBWidth {(m_IsScrolling) ? m_MenuItemWidth / 20 : (m_MenuItemWidth - m_WidthScrollBar) / 20};
 
             const time_t now {time(0)};
@@ -1475,6 +1478,7 @@ void cFlatDisplayMenu::DrawRecordingStateIcon(const cRecording *Recording, int L
     } else if ((Recording->IsInUse() & ruTimer) != 0) {  // The recording is currently written to by a timer
         if (Current) img = ImgLoader.GetIcon("timerRecording_cur", m_FontHeight, m_FontHeight);
         if (!img) img = ImgLoader.GetIcon("timerRecording", m_FontHeight, m_FontHeight);
+    // TODO: Add icon for recording in cut process (ruCut) if needed
     } else {
         const cString IconName {GetRecordingSeenIcon(Recording->NumFrames(), Recording->GetResume())};
         if (Current) {
@@ -1574,16 +1578,20 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     if (Index == 0)  // Only update when Index = 0 (First item on the page)
         m_RecFolder = (Level > 0) ? *GetRecordingName(Recording, Level - 1) : "";
 
-    // Only update 'm_RecCounts' when Level or LastMenuCategory changes
+    // Update counts when Level, MenuCategory changes or m_UpdateRecCounts is true.
+    // m_UpdateRecCounts is set to true when menu category is set to mcRecording or mcRecordingDel. This is a workaround
+    // to update counts weh a recording got deleted.
     static eMenuCategory LastMenuCategory {mcUnknown};
     if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
-        m_MenuCategory != LastMenuCategory)) {
+        m_MenuCategory != LastMenuCategory || m_UpdateRecCounts)) {
 #ifdef DEBUGFUNCSCALL
         dsyslog("   Level: %d -> %d", m_LastItemRecordingLevel, Level);
         dsyslog("   MenuCategory: %d -> %d", LastMenuCategory, m_MenuCategory);
+        dsyslog("   m_UpdateRecCounts: %d", m_UpdateRecCounts);
 #endif
         m_LastItemRecordingLevel = Level;
         LastMenuCategory = m_MenuCategory;
+        m_UpdateRecCounts = false;
         m_RecCounts = *GetRecCounts();
         const cString NewTitle {cString::sprintf("%s %s", *m_LastTitle, *m_RecCounts)};
         TopBarSetTitle(*NewTitle, false);  // Do not clear
@@ -1629,10 +1637,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     cString RecName {GetRecordingName(Recording, Level)};
     if (IsRecording && Config.MenuItemRecordingClearPercent) {  // Remove leading percent sign(s) from RecName
         while (!isempty(*RecName) && RecName[0] == '%')
-        RecName = cString(*RecName + 1);
-#ifdef DEBUGFUNCSCALL
-        dsyslog("   RecName for display '%s'", *RecName);
-#endif
+            RecName = cString(*RecName + 1);
     }
 
     int Left {Config.decorBorderMenuItemSize + m_MarginItem};
@@ -1652,7 +1657,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show recording status: New, still in progress (ruTimer), played (ruReplay) or seen (resume)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            // Show recording errors if enabled in config (Drwan as overlay icon)
+            // Show recording errors if enabled in config (Drawn as overlay icon)
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 
@@ -1759,7 +1764,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
             // Show recording status: New, still in progress (ruTimer), played (ruReplay) or seen (resume)
             DrawRecordingStateIcon(Recording, Left, Top, Current);
 #if APIVERSNUM >= 20505
-            // Show recording errors if enabled in config (Drwan as overlay icon)
+            // Show recording errors if enabled in config (Drawn as overlay icon)
             if (Config.MenuItemRecordingShowRecordingErrors) DrawRecordingErrorIcon(Recording, Left, Top, Current);
 #endif
 
@@ -2008,7 +2013,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
 
     cString Reruns {""};
     if (Config.EpgRerunsShow) {
-        // Lent from nopacity
+        // Lent from NOpacity
         cPlugin *pEpgSearchPlugin {cPluginSkinFlatPlus::GetEpgSearchPlugin()};
         cString SearchTerm {Event->Title()};  // Search term
         if (pEpgSearchPlugin && !isempty(SearchTerm)) {
@@ -2442,7 +2447,7 @@ void cFlatDisplayMenu::AddActors(cComplexContent &ComplexContent, std::vector<sA
  * The line is formatted as "TS errors: <number>".
  */
 void cFlatDisplayMenu::InsertTSErrors(const cRecordingInfo *RecInfo, cString &Text) const {  // NOLINT
-    // From SkinNopacity
+    // From SkinNOpacity
     if (RecInfo && RecInfo->Errors() > 0) {
         std::ostringstream RecErrors {""};
         RecErrors.imbue(std::locale {""});  // Set to local locale
@@ -2500,7 +2505,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     }
 
     cString Fsk {""};
-    // Lent from skinelchi
+    // Lent from SkinElchi
     if (Config.RecordingAdditionalInfoShow) {
         if (Text[0] != '\0') Text.Append('\n');
         const cEvent *Event {RecInfo->GetEvent()};
@@ -2681,7 +2686,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     int left {m_MarginItem};
 
 #if APIVERSNUM >= 20505
-    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Substract width of imgRecErr
+    if (Config.PlaybackShowRecordingErrors) MaxWidth -= m_FontSmlHeight;  // Subtract width of imgRecErr
 #endif
 
     ContentHeadPixmap->DrawText(cPoint(left, m_MarginItem), *StrTime, Theme.Color(clrMenuRecFontInfo),
@@ -2716,7 +2721,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     }
 
 #if APIVERSNUM >= 20505
-    if (Config.MenuItemRecordingShowRecordingErrors) {  // TODO: Separate config option?
+    if (Config.MenuItemRecordingShowRecordingErrors) {  //? Separate config option?
         const cString RecErrIcon {cString::sprintf("%s_replay", *GetRecordingErrorIcon(RecInfo->Errors()))};
 
         img = ImgLoader.GetIcon(*RecErrIcon, kIconMaxSize, m_FontSmlHeight);  // Small image
@@ -2847,22 +2852,27 @@ void cFlatDisplayMenu::Flush() {
         m_MenuFullOsdIsDrawn = true;
     }
 
-    if (m_MenuCategory == mcEvent && !m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
-
-    if (m_MenuCategory == mcRecordingInfo && !m_RecordingInfoDrawn)
-        DrawRecordingInfo(m_Recording);  // Draw recording info
-
-    if (m_MenuCategory == mcTimer && Config.MenuTimerShowCount) {
-        uint16_t TimerActiveCount {0}, TimerCount {0};
-        UpdateTimerCounts(TimerActiveCount, TimerCount);
-
-        if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
-            m_LastTimerActiveCount = TimerActiveCount;
-            m_LastTimerCount = TimerCount;
-            const cString NewTitle {cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount)};
-            TopBarSetTitle(*NewTitle, false);  // Do not clear
+    switch (m_MenuCategory) {
+    case mcEvent:
+        if (!m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
+        break;
+    case mcRecordingInfo:
+        if (!m_RecordingInfoDrawn) DrawRecordingInfo(m_Recording);  // Draw recording info
+        break;
+    case mcTimer:
+        if (Config.MenuTimerShowCount) {
+            uint16_t TimerActiveCount {0}, TimerCount {0};
+            UpdateTimerCounts(TimerActiveCount, TimerCount);
+            if (m_LastTimerActiveCount != TimerActiveCount || m_LastTimerCount != TimerCount) {
+                m_LastTimerActiveCount = TimerActiveCount;
+                m_LastTimerCount = TimerCount;
+                const cString NewTitle {cString::sprintf("%s (%d/%d)", *m_LastTitle, TimerActiveCount, TimerCount)};
+                TopBarSetTitle(*NewTitle, false);
+            }
         }
-    }
+        break;
+    default: break;  // Any other categories (like mcChannel, mcMain, etc.) that don't need special flush handling
+    }  // switch
 
     if (cVideoDiskUsage::HasChanged(m_VideoDiskUsageState)) TopBarEnableDiskUsage();  // Keep 'DiskUsage' up to date
 
@@ -2873,7 +2883,7 @@ void cFlatDisplayMenu::Flush() {
 // Insert a new sDecorBorder into ItemsBorder, or update the existing one if Left and Top already exist.
 void cFlatDisplayMenu::ItemBorderInsertUnique(const sDecorBorder &ib) {
     for (auto &item : ItemsBorder) {
-        if (item.Left == ib.Left && item.Top == ib.Top) {
+        if (item.Top == ib.Top && item.Left == ib.Left) {
             item = ib;
             return;
         }
@@ -2913,17 +2923,14 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     dsyslog("flatPlus: cFlatDisplayMenu::MainMenuText() '%s'", *Text);
 #endif
     std::string_view text {skipspace(*Text)};
-    bool found {false};
     const std::size_t TextLength {text.length()};
     std::size_t i {0};  // 'i' used also after loop
     for (; i < TextLength; ++i) {
-        if (isdigit(text.at(i)) && i < 5)  // Up to 4 digits expected
-            found = true;
-        else
+        if (!(isdigit(text.at(i)) && i < 5))  // Up to 4 digits expected
             break;
     }
 
-    return found ? skipspace(text.substr(i).data()) : text.data();
+    return (i > 0) ? skipspace(text.substr(i).data()) : text.data();
 }
 
 
@@ -2959,7 +2966,8 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     const auto it {cache.find(svElement.data())};
     if (it != cache.end()) return *it->second;  // Return cached icon name including path
 
-    cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
+    if (cache.empty()) cache.reserve(32);  // Reserve space for 32 entries to avoid rehashing
+
     //* Check for standard menu entries
     for (const auto &item : items) {
         sv = trVDR(item);  // Translate item to current language
@@ -3190,7 +3198,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
 
     const time_t LastRecTimeFromFolder {GetLastRecTimeFromFolder(Recording, Level)};
     const time_t now {time(0)};
-    const int days {static_cast<int>((now - LastRecTimeFromFolder) * (1.0 / SECSINDAY))};
+    const int days {static_cast<int>(now - LastRecTimeFromFolder) / SECSINDAY};
     return days > value;
 }
 
@@ -3935,7 +3943,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
     ContentTop = AddWidgetHeader("widgets/system_information", tr("System Information"), ContentTop, wWidth);
 
     cString Buffer {""};
-    if (files.size() == 0) {
+    if (files.empty()) {
         Buffer = cString::sprintf("%s - %s", tr("no information available please check the script"), *ExecFile);
         ContentWidget.AddText(*Buffer, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
                               Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml,
@@ -4140,7 +4148,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetCommand(int wLeft, int wWidth, int Conte
     }
 
     cString Title {ReadAndExtractData(cString::sprintf("%s/command_output/title", WIDGETOUTPUTPATH))};
-    if (!isempty(*Title)) Title = tr("no title available");
+    if (isempty(*Title)) Title = tr("no title available");
 
     ContentTop = AddWidgetHeader("widgets/command_output", *Title, ContentTop, wWidth);
 

@@ -27,6 +27,11 @@ cFlatConfig::~cFlatConfig() {
 }
 
 bool cFlatConfig::SetupParse(const char *Name, const char *Value) {
+    // Call a separate function to handle specific config options
+    return ParseSpecificConfigOption(Name, Value);
+}
+
+bool cFlatConfig::ParseSpecificConfigOption(const char *Name, const char *Value) {
     if      (strcmp(Name, "decorBorderChannelByTheme") == 0)            decorBorderChannelByTheme = atoi(Value);
     else if (strcmp(Name, "decorBorderChannelTypeUser") == 0)           decorBorderChannelTypeUser = atoi(Value);
     else if (strcmp(Name, "decorBorderChannelSizeUser") == 0)           decorBorderChannelSizeUser = atoi(Value);
@@ -444,7 +449,7 @@ void cFlatConfig::ThemeInit() {
 
 void cFlatConfig::Init() {
     if (!strcmp(LogoPath, "")) {
-        LogoPath = cString::sprintf("%s/logos", PLUGINRESOURCEPATH);
+        LogoPath = LOGOFOLDER;
         dsyslog("flatPlus: LogoPath: %s", *LogoPath);
     }
     if (!strcmp(IconPath, "")) {
@@ -769,7 +774,7 @@ cString cFlatConfig::CheckSlashAtEnd(std::string path) {
     if (!path.empty() && path.back() == '/')
         path.pop_back();  // Use pop_back for efficiency
 
-    return path.c_str();
+    return cString(path.c_str());
 }
 
 void cFlatConfig::Store(const char *Name, int Value, const char *Filename) {

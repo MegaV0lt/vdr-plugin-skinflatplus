@@ -33,6 +33,7 @@ cImageLoader::~cImageLoader() {}
  * @param logo The name of the logo (without path).
  * @param width The desired width of the logo.
  * @param height The desired height of the logo.
+ * @param Quiet If true, do not log an error message if the logo is not found.
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
 cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quiet) {
@@ -55,6 +56,14 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
             ToLowerCase(LogoLower);  // Convert to lowercase (A-Z)
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         } else if (i == 2) {            // Third try. Search for lowercase logo with '~' for path '/'
+            // Only convert '/' to '~' if the logo contains a '/' (e.g. 'logo 1/2.png')
+            // Check if '/' is present in the logo name
+            if (LogoLower.find('/') == std::string::npos) {
+                isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                        *m_LogoExtension);
+                return nullptr;
+            }
+
             std::replace(LogoLower.begin(), LogoLower.end(), '/', '~');
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }

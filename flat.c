@@ -89,11 +89,11 @@ cPixmap *CreatePixmap(cOsd *osd, const cString Name, int Layer, const cRect &Vie
     }
     cTimeMs Timer;  // Start Timer
 #endif
-    /* if (!osd) {
+    if (!osd) {
         esyslog("flatPlus: No osd! Could not create pixmap '%s' with size %ix%i", *Name, DrawPort.Width(),
                 DrawPort.Height());
         return nullptr;
-    } */
+    }
 
     if (cPixmap *pixmap {osd->CreatePixmap(Layer, ViewPort, DrawPort)}) {
 #ifdef DEBUGFUNCSCALL
@@ -326,6 +326,7 @@ cString GetFormatIcon(int ScreenWidth) {
 }
 
 cString GetRecordingFormatIcon(const cRecording *Recording) {
+    if (!Recording || !Recording->Info()) return "";  // No info
 #if APIVERSNUM >= 20605
     const uint16_t FrameWidth {Recording->Info()->FrameWidth()};
     if (FrameWidth > 1920) return "uhd";  // TODO: Separate images
@@ -616,7 +617,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     }
 
     if (MaxFileNum == 0) {
-        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum is 0!");
+        esyslog("flatPlus: Error in InsertCutLengthSize() MaxFileNum of recording '%s' is 0!", RecordingFileName);
         return;
     }
 
@@ -788,9 +789,9 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     // Assume that 'tofu' char (Char not found) is bigger in size than space
     // Space ~ 5 pixel; HairSpace ~ 1 pixel; Tofu ~ 10 pixel
     const char *FillChar {FontCache.GetStringWidth(FontName, FontHeight, " ") <
-                                  FontCache.GetStringWidth(FontName, FontHeight, u8"\U0000200A")
+                                  FontCache.GetStringWidth(FontName, FontHeight, u8"\u200A")
                               ? " "
-                              : u8"\U0000200A"};  // Use hair space if it is smaller than space
+                              : u8"\u200A"};  // Use hair space if it is smaller than space
     const int FillCharWidth {FontCache.GetStringWidth(FontName, FontHeight, FillChar)};  // Width in pixel
 
     if (LineSpaces == 0 || FillCharWidth == 0) {  // Avoid DIV/0 with lines without space
@@ -874,7 +875,7 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
         dsyslog("   FillChar not inserted!: %d", NeedFillChar - InsertedFillChar);
     else
         dsyslog("   InsertedFillChar after third loop (space): %d", InsertedFillChar);
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   JustifyLine done in %ld ms", Timer.Elapsed());
 #endif
 }
 
@@ -982,7 +983,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
         p += sl;
     }  // for char
 #ifdef DEBUGFUNCSCALL
-    if (Timer.Elapsed() > 0) dsyslog("   Done in %ld ms", Timer.Elapsed());
+    if (Timer.Elapsed() > 0) dsyslog("   Set done in %ld ms", Timer.Elapsed());
 #endif
 }
 

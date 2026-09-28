@@ -416,10 +416,9 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     int TopSeen {0}, TopEpg {0};
 
     const int RecWidth {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "REC")};
-    const int SmlSpaceWidth2 {FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, " ") * 2};
 
     if (Config.ChannelShowStartTime)
-        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + SmlSpaceWidth2;
+        left += FontCache.GetStringWidth(m_FontName, m_FontHeight, "00:00") + m_MarginItem2;
 
     PixmapFill(ChanInfoBottomPixmap, Theme.Color(clrChannelBg));
     for (int8_t i {0}; i < 2; i++) {
@@ -431,7 +430,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
             // Use of – (EN DASH, U+2013) instead of - (HYPHEN-MINUS, U+002D) for better readability
             // https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Time_ranges
             StrTime = cString::sprintf("%s–%s", *StartTime, *Event->GetEndTimeString());  // Start – End (Right side)
-            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00–00:00") + SmlSpaceWidth2;
+            StrTimeWidth = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "00:00–00:00") + m_MarginItem2;
             EventDuration = Event->Duration() / 60;  // Duration in minutes
 
             Epg = Event->Title();
@@ -463,7 +462,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
                 SeenDur = cString::sprintf("%d min", EventDuration);
             }  // if (IsPresent)
 
-            SeenDurWidth = m_FontSml->Width(*SeenDur) + SmlSpaceWidth2;
+            SeenDurWidth = m_FontSml->Width(*SeenDur) + m_MarginItem2;
             SeenDurMaxWidth = std::max(StrTimeWidth, SeenDurWidth);
             MaxAvailWidth = m_ChannelWidth - left - SeenDurMaxWidth;
 #ifdef DEBUGFUNCSCALL
@@ -620,7 +619,7 @@ static void ZapBlendImage(cImage &Composed, const cImage *Image, int Left, int T
 }
 
 // Shortens the given text so that it fits into MaxWidth: If the text is too long, it is cut off (UTF-8 safe) and the
-// end is replaced by '...' - like the truncated texts in the extended channel lists of skindesigner.
+// end is replaced by '...' - like the truncated texts in the extended channel lists of SkinDesigner.
 static cString ZapShortenText(const char *Text, const cFont *Font, int MaxWidth) {
     if (!Text || !*Text || MaxWidth <= 0) return "";
 
@@ -727,7 +726,7 @@ void cFlatDisplayChannel::ZapHideBaseElements() {
     WeatherWidget.SetVisible(false);
 }
 
-// Hide the weather widget, ChanEpgImagesPixmap and the channel name when the zapcockipt channel info is shown, because
+// Hide the weather widget, ChanEpgImagesPixmap and the channel name when the zapcockpit channel info is shown, because
 // they would overlap the zapcockpit info pixmap. The original pixmap. Layers are stored for restoring in
 // ZapShowBaseElements()
 void cFlatDisplayChannel::ZapHideInfoElements() {
@@ -771,15 +770,15 @@ void cFlatDisplayChannel::ZapShowBaseElements() {
 }
 
 // Fade-in/shift-in animation for newly shown list panels, executed in Flush() after the panel content has been drawn
-// (like fadetimezapcockpit/shifttimezapcockpit in skindesigner themes). The lists slide in from the edge they are
+// (like fadetimezapcockpit/shifttimezapcockpit in SkinDesigner themes). The lists slide in from the edge they are
 // anchored to. Runs blocking for at most one second.
 void cFlatDisplayChannel::ZapRunShowAnimation() {
     m_ZapAnimPending = false;
     cPixmap *Pixmaps[2] {m_ZapAnimPixmap1, m_ZapAnimPixmap2};
     m_ZapAnimPixmap1 = m_ZapAnimPixmap2 = nullptr;
 
-    const int ShiftTime {std::clamp(Config.ChannelZapcockpitShiftTime, 0, 1000)};
-    const int FadeTime {std::clamp(Config.ChannelZapcockpitFadeTime, 0, 1000)};
+    const int ShiftTime {std::clamp(Config.ChannelZapcockpitShiftTime, 0, 1'000)};
+    const int FadeTime {std::clamp(Config.ChannelZapcockpitFadeTime, 0, 1'000)};
     const int TotalTime {std::max(ShiftTime, FadeTime)};
     if (TotalTime <= 0 || (!Pixmaps[0] && !Pixmaps[1])) return;
 
@@ -1220,7 +1219,7 @@ void cFlatDisplayChannel::DvbapiInfoDraw() {
     dsyslog("   Protocol: %s", *ecmInfo.protocol);
 #endif
 
-    if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9999) return;
+    if (ecmInfo.hops < 0 || ecmInfo.ecmtime == 0 || ecmInfo.ecmtime > 9'999) return;
 
     int left {m_SignalStrengthRight + m_MarginItem10};
     const int SignalBarsHeight {Config.decorProgressSignalSize * 2 + m_MarginItem};
@@ -1276,9 +1275,12 @@ void cFlatDisplayChannel::Flush() {
 
     if (Config.ChannelIconsShow) {
         cDevice::PrimaryDevice()->GetVideoSize(m_ScreenWidth, m_ScreenHeight, m_ScreenAspect);
-        if (m_ScreenWidth != m_LastScreenWidth) {
+        // Also check if audio icon changed (e.g., Stereo ↔ Dolby Digital)
+        const cString CurrentAudioIcon {GetCurrentAudioIcon()};
+        if (m_ScreenWidth != m_LastScreenWidth || strcmp(m_LastAudioIcon, CurrentAudioIcon) != 0) {
             m_LastScreenWidth = m_ScreenWidth;
-            ChannelIconsDraw(m_CurChannel, true);  // Full redraw when resolution changes
+            m_LastAudioIcon = CurrentAudioIcon;
+            ChannelIconsDraw(m_CurChannel, true);  // Full redraw when resolution or audio icon changes
         }
     }
 
