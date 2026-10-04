@@ -2,11 +2,10 @@
 
 This is a "plugin" for the Video Disk Recorder (VDR).
 
-Written by:             Martin Schirrmacher <vdr.skinflatplus@schirrmacher.eu>
-
-Project's homepage:     [projects.vdr-developer.org](http://projects.vdr-developer.org/projects/plg-skinflatplus/)
-
-Project Wiki:           [projects.vdr-developer.org/wiki](http://projects.vdr-developer.org/projects/plg-skinflatplus/wiki)
+- Original written by: Martin Schirrmacher <vdr.skinflatplus@schirrmacher.eu>
+- Current Maintainer:  [MegaV0lt @ github](https://github.com/MegaV0lt)
+- Project's homepage:  [github.com/MegaV0lt/vdr-plugin-skinflatplus](https://github.com/MegaV0lt/vdr-plugin-skinflatplus)
+- Project Wiki:        [github.com/MegaV0lt/vdr-plugin-skinflatplus/wiki](https://github.com/MegaV0lt/vdr-plugin-skinflatplus/wiki)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,7 +15,8 @@ See the file COPYING for more information.
 
 ## Anforderungen
 
-- VDR ab Version 2.3.8 für Plugin-Version ab 1.0.0 (Plugin-Version bis 0.8.4: VDR ab 1.7.34)
+- VDR ab Version 1.7.34 bis Plugin-Version bis 0.8.4
+- VDR ab Version 2.3.8 für Plugin-Version ab 1.0.0
 - GraphicsMagick oder ImageMagick zur Anzeige von PNG/JPG-Icons, Kanal-Logos und EPG-Bildern
 
 ## Beschreibung
@@ -28,17 +28,17 @@ Hauptmenü mit aktivierten 'Widgets':
 
 ## git-Zugriff
 
-Auf das Git kann mittels
-`git clone https://github.com/MegaV0lt/vdr-plugin-skinflatplus.git`
-
-zugegriffen werden.
+Auf das Git kann mittels `git clone https://github.com/MegaV0lt/vdr-plugin-skinflatplus.git` zugegriffen werden.
 Fehler können nicht ausgeschlossen werden ;-) (läuft aber bei mir stabil)
 
 ## Installation
 
 Installation wie bei allen VDR-Plugins.
+
+```pre
     make
     make install
+```
 
 Für die Kanallogos empfehle ich Logos aus einem der Repositories:
 
@@ -72,15 +72,15 @@ Der Skin muss im Menü unter Einstellungen -> OSD ausgewählt werden.
 ## Schriften
 
 Im Ordner `contrib/Fonts` sind verschiedene Schriften abgelegt, die einfach nach `/usr/share/fonts` kopiert werden können.
-Ich empfehle DroidSans für die Anzeige zu verwenden.
+Ich empfehle die Schriftart **DroidSans** für die Anzeige zu verwenden.
 
 ## Versteckte Einstellungen
 
-Versteckte Einstellungen sind Einstellungen, die in der VDR setup.conf konfiguriert werden können, wozu es aber keine Einstellungen im OSD -> Einstellungen -> Plugins -> skinflatplus gibt.
+Einstellungen, die in der VDR setup.conf konfiguriert werden können, wozu es aber keine Einstellungen im OSD -> Einstellungen -> Plugins -> skinflatplus gibt.
 
-* MenuItemRecordingClearPercent - Wenn die Einstellung auf 1 gesetzt ist, wird vom Aufnahmetext das Prozentzeichen am Anfang des Strings entfernt.
-* MenuItemRecordingShowFolderDate - Wenn die Einstellung auf 1 gesetzt ist, wird bei einem Ordner von der neuesten Aufzeichnung das Datum angezeigt. Wenn die Einstellung auf 2 gesetzt ist, wird bei einem Ordner von der ältesten Aufzeichnung das Datum angezeigt.
-* MenuItemParseTilde - Wenn die Einstellung auf 1 gesetzt ist, wird beim Menü-Item-Text auf den Buchstaben Tilde '~' geprüft und wenn eine Tilde gefunden wurde, wird die Tilde entfernt und alles, was nach der Tilde steht, in einer anderen Farbe dargestellt. Dies ist z.B. interessant, wenn man EPGSearch hat.
+- MenuItemRecordingClearPercent - Wenn die Einstellung auf 1 gesetzt ist, wird vom Aufnahmetext das Prozentzeichen am Anfang des Strings entfernt.
+- MenuItemRecordingShowFolderDate - Wenn die Einstellung auf 1 gesetzt ist, wird bei einem Ordner von der neuesten Aufzeichnung das Datum angezeigt. Wenn die Einstellung auf 2 gesetzt ist, wird bei einem Ordner von der ältesten Aufzeichnung das Datum angezeigt.
+- MenuItemParseTilde - Wenn die Einstellung auf 1 gesetzt ist, wird beim Menü-Item-Text auf den Buchstaben Tilde '~' geprüft und wenn eine Tilde gefunden wurde, wird die Tilde entfernt und alles, was nach der Tilde steht, in einer anderen Farbe dargestellt. Dies ist z.B. interessant, wenn man EPGSearch hat.
 
 ## Widgets
 
@@ -121,10 +121,13 @@ Alle Ausgaben der Scripte sind unter `/tmp/skinflatplus/widgets/`
 Zeigt das aktuelle Wetter und eine Vorschau an. Die Ansicht der Vorschau kann konfiguriert werden. Es existiert eine Lang- und eine Kurzansicht. Bei der langen Ansicht gibt es pro Tag eine Zeile; bei der kurzen Ansicht wird alles in einer Zeile dargestellt. Die Anzahl der Tage kann über die Plugineinstellungen konfiguriert werden, wobei max. 7 Tage möglich sind.
 Dieses Widget benötigt jq; unter Ubuntu ist z.B. das Paket jq notwendig.
 Im Ordner existiert eine update_weather.conf.dist; diese muss nach update_weather.conf kopiert werden.
-`cd /usr/local/lib/vdr/skinflatplus/widgets/weather
 
-cp update_weather.conf.dist update_weather.conf`
-Anschließend muss Latitude und Longitude vom Ort ermittelt werden; dafür gibt es z.B. die Seite <https://www.latlong.net>.
+```pre
+cd /usr/local/lib/vdr/skinflatplus/widgets/weather
+cp update_weather.conf.dist update_weather.conf
+```
+
+Anschließend muss Latitude und Longitude vom Ort ermittelt werden; dafür gibt es z.B. die Seite [latlong.net](https://www.latlong.net).
 Die Werte von Latitude und Longitude in die update_weather.conf schreiben und auch den Wert "LOCATION" entsprechend anpassen. "LOCATION" wird später im Skin als Ort angezeigt.
 
 Das Script (update_weather.sh) wird nicht vom Skin aufgerufen. Dies muss extern über cron oder ähnliches erfolgen. Z.B. über folgende Zeile in der /etc/crontab
@@ -134,7 +137,7 @@ Das Script (update_weather.sh) wird nicht vom Skin aufgerufen. Dies muss extern 
 @hourly  root  /usr/bin/bash /usr/local/lib/vdr/skinflatplus/widgets/weather/update_weather.sh
 ```
 
-Für die Wetterdaten wird openweathermap.org verwendet. Hier sind 1.000 Abfragen am Tag (30.000 im Monat) frei (<https://openweathermap.org/full-price#current>). Die Registrierung ist kostenlos, und man kann einen eigenen API-Key erstellen. Diesen dann einfach in die update_weather.conf eintragen. Hierfür ist nur eine E-Mail-Adresse + Passwort notwendig.
+Für die Wetterdaten wird [openweathermap.org](https://openweathermap.org/full-price#current) verwendet. Hier sind 1.000 Abfragen am Tag (30.000 im Monat) frei. Die Registrierung ist kostenlos, und man kann einen eigenen API-Key erstellen. Diesen dann einfach in die update_weather.conf eintragen. Hierfür ist nur eine E-Mail-Adresse + Passwort notwendig.
 
 Für die Kanalinfo gibt es eine kleine Version des Wetter-Widgets. Hier wird Heute + Morgen angezeigt.
 
