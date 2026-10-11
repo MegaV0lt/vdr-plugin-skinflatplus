@@ -767,14 +767,19 @@ void JustifyLine(std::string &Line, const cFont *Font, const int LineMaxWidth) {
     }
 
     const cString FontName {*FontCache.GetFontName(Font->FontName())};  // Font name (Ubuntu:Regular)
-    // Use cached font metrics to determine if the font is fixed-width
     const int FontHeight {FontCache.GetFontHeight(FontName, Font->Size())};
+
+    //* Since only the description is justified we do not need to check for fixed-width fonts anymore. The description
+    //* is always in a proportional font.
+    // Use cached font metrics to determine if the font is fixed-width
+    /*
     if (FontCache.GetStringWidth(FontName, FontHeight, "M") == FontCache.GetStringWidth(FontName, FontHeight, "i"))
         return;  // Font is fixed-width, no justification needed
 #ifdef DEBUGFUNCSCALL
     dsyslog("   FontName '%s', FontHeight %d, Width 'M' %d, Width 'i' %d", *FontName, FontHeight,
             FontCache.GetStringWidth(FontName, FontHeight, "M"), FontCache.GetStringWidth(FontName, FontHeight, "i"));
 #endif
+    */
 
     static constexpr float kLineWidthThreshold {0.8f};         // Line width threshold for justifying
     const int LineWidth {Font->Width(Line.c_str())};           // Width in Pixel
@@ -907,7 +912,7 @@ void cTextFloatingWrapper::Set(const char *Text, const cFont *Font, int WidthLow
     if (TextLen == 0) return;  // Avoid processing empty text
     // Estimate number of lines. More conservative size estimation
     const std::size_t EstimatedLines {(TextLen / 10) + UpperLines + 10};  // Add safety margin
-    std::size_t Capacity {TextLen + EstimatedLines + 2};
+    std::size_t Capacity {TextLen + EstimatedLines};
 #ifdef DEBUGFUNCSCALL
     dsyslog("   TextLen: %ld, EstimatedLines: %ld, Capacity: %ld", TextLen, EstimatedLines, Capacity);
 #endif

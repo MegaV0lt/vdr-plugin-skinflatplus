@@ -117,7 +117,16 @@ void cComplexContent::AddText(const char *Text, bool Multiline, const cRect &Pos
                               cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
     // Use emplace_back to construct a cSimpleContent in-place and then set its properties.
     Contents.emplace_back();
-    Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment);
+    Contents.back().SetText(Text, Multiline, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment,
+                            false);
+}
+
+void cComplexContent::AddTextDescription(const char *Text, const cRect &Position, tColor ColorFg, tColor ColorBg,
+                                         cFont *Font, int TextWidth, int TextHeight, int TextAlignment) {
+    // Use emplace_back to construct a cSimpleContent in-place and then set its properties.
+    Contents.emplace_back();
+    Contents.back().SetText(Text, true, Position, ColorFg, ColorBg, Font, TextWidth, TextHeight, TextAlignment,
+                            true);
 }
 
 void cComplexContent::AddImage(cImage *image, const cRect &Position) {

@@ -818,18 +818,18 @@ void cFlatDisplayMenu::DrawItemExtraEvent(const cEvent *Event, const cString Emp
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             } else if (img && MediaType == 1) {  // Series
                 ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
-                ComplexContent.AddText(*Text, true,
+                ComplexContent.AddTextDescription(*Text,
                                        cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem2,
                                              m_cHeight - m_MarginItem2),
                                        Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             } else {
-                ComplexContent.AddText(
-                    *Text, true, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                ComplexContent.AddTextDescription(
+                    *Text, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
             }
         } else {
-            ComplexContent.AddText(
-                *Text, true, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+            ComplexContent.AddTextDescription(
+                *Text, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml);
         }
     }
@@ -2108,14 +2108,14 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             } else if (Text[0] != '\0') {  // No image; insert text
-                ComplexContent.AddText(
-                    *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                ComplexContent.AddTextDescription(
+                    *Text, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
             }
         } else if (Text[0] != '\0') {  // No image; insert text
-            ComplexContent.AddText(*Text, true,
-                                   cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                                   Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
+            ComplexContent.AddTextDescription(
+                *Text, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_Font);
         }
 
         // Add movie information if available
@@ -2339,19 +2339,19 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         } else if (img && MediaType == 1) {  // Series
             ComplexContent.AddImage(img, cRect(m_MarginItem, m_MarginItem, img->Width(), img->Height()));
-            ComplexContent.AddText(
-                *Text, true,
+            ComplexContent.AddTextDescription(
+                *Text,
                 cRect(m_MarginItem, m_MarginItem + img->Height(), m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         } else {
-            ComplexContent.AddText(
-                *Text, true, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+            ComplexContent.AddTextDescription(
+                *Text, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                 Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
         }
     } else {
-        ComplexContent.AddText(*Text, true,
-                               cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                               Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
+        ComplexContent.AddTextDescription(
+            *Text, cRect(m_MarginItem, m_MarginItem, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+            Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_FontSml);
     }
 
     ComplexContent.CreatePixmaps(Config.MenuContentFullSize);
@@ -2568,7 +2568,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     // Get media information from TVScraper if enabled in config
     if (Config.TVScraperRecInfoShowPoster || Config.TVScraperRecInfoShowActors) {
         GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, nullptr, Recording);
-        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster
             const cString RecPath {Recording->FileName()};
             ImgLoader.SearchRecordingPoster(RecPath, MediaPath);
         }
@@ -2619,14 +2619,14 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
                     cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             } else if (Text[0] != '\0') {  // No image; insert text
-                ComplexContent.AddText(
-                    *Text, true, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                ComplexContent.AddTextDescription(
+                    *Text, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                     Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
             }
         } else if (Text[0] != '\0') {  // No image; insert text
-            ComplexContent.AddText(*Text, true,
-                                   cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
-                                   Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
+            ComplexContent.AddTextDescription(
+                *Text, cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
+                Theme.Color(clrMenuRecFontInfo), Theme.Color(clrMenuRecBg), m_Font);
         }
 
         // Add movie information if available

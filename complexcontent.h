@@ -18,11 +18,12 @@
 #include "./flat.h"
 
 enum eContentType {
+    CT_None,
     CT_Text,
     CT_TextMultiline,
+    CT_TextDescription,
     CT_Image,
-    CT_Rect,
-    CT_None
+    CT_Rect
 };
 
 enum eContentImageAlignment {
@@ -40,7 +41,7 @@ class cSimpleContent {
     cImage *m_Image {nullptr};
     cFont *m_Font {nullptr};
 
-    void DrawMultilineText(cPixmap *Pixmap) const {
+    void DrawMultilineText(cPixmap *Pixmap, bool IsDescription) const {
         // Cache TextPos and TextWidthLeft for better performance
         const int PositionLeft {m_Position.Left()};
         const int PositionTop {m_Position.Top()};
@@ -53,9 +54,15 @@ class cSimpleContent {
         const int Lines {Wrapper.Lines()};
         const int FontHeight {m_Font->Height()};
 
+#ifdef DEBUGFUNCSCALL
+        dsyslog("flatPlus: cSimpleContent::DrawMultilineText() Lines: %d, FontHeight: %d, PositionWidth: %d", Lines,
+                FontHeight, PositionWidth);
+        dsyslog("flatPlus: cSimpleContent::DrawMultilineText() Text: %s", *m_Text);
+#endif
         for (int i {0}; i < Lines; ++i) {
             Line = Wrapper.GetLine(i);
-            if (Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1)) {
+            // Only justify description
+            if (IsDescription && Config.MenuEventRecordingViewJustify == 1 && i < (Lines - 1)) {
                 JustifyLine(Line, m_Font, PositionWidth);
             }
             Pixmap->DrawText(cPoint(PositionLeft, PositionTop + (i * FontHeight)),
@@ -101,8 +108,8 @@ class cSimpleContent {
     }
 
     void SetText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
-                 int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault) {
-        m_ContentType = (Multiline) ? CT_TextMultiline : CT_Text;
+                 int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault, bool IsDescription = false) {
+        m_ContentType = (IsDescription) ? CT_TextDescription : (Multiline) ? CT_TextMultiline : CT_Text;
         m_Position = Position;
         m_Text = Text;
         m_Font = Font;
@@ -125,6 +132,7 @@ class cSimpleContent {
     }
 
     int GetContentType() const { return m_ContentType; }
+
     int GetBottom() const {
         switch (m_ContentType) {
         case CT_Text:
@@ -133,6 +141,7 @@ class cSimpleContent {
                 return m_Position.Top() + m_Font->Height();
 
         case CT_TextMultiline:
+        case CT_TextDescription:
             {
                 cTextFloatingWrapper Wrapper;
                 Wrapper.Set(*m_Text, m_Font, m_Position.Width());
@@ -147,6 +156,7 @@ class cSimpleContent {
         default: return 0;
         }
     }
+
     void Draw(cPixmap *Pixmap) const {
         if (!Pixmap) return;
         // if (!m_Font || !m_Text) return;
@@ -157,7 +167,9 @@ class cSimpleContent {
                              m_TextAlignment);
             return;
 
-        case CT_TextMultiline: DrawMultilineText(Pixmap); return;
+        case CT_TextMultiline: DrawMultilineText(Pixmap, false); return;
+
+        case CT_TextDescription: DrawMultilineText(Pixmap, true); return;
 
         case CT_Rect: Pixmap->DrawRectangle(m_Position, m_ColorBg); return;
 
@@ -182,6 +194,8 @@ class cComplexContent {
 
     void AddText(const char *Text, bool Multiline, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
                  int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
+    void AddTextDescription(const char *Text, const cRect &Position, tColor ColorFg, tColor ColorBg, cFont *Font,
+                            int TextWidth = 0, int TextHeight = 0, int TextAlignment = taDefault);
     void AddImage(cImage *image, const cRect &Position);
     void AddImageWithFloatedText(cImage *image, int imageAlignment, const char *Text, int Margin, const cRect &TextPos,
                                  tColor ColorFg, tColor ColorBg, cFont *Font, int TextWidth = 0, int TextHeight = 0,
