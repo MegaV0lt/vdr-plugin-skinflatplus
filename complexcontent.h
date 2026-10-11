@@ -55,9 +55,8 @@ class cSimpleContent {
         const int FontHeight {m_Font->Height()};
 
 #ifdef DEBUGFUNCSCALL
-        dsyslog("flatPlus: cSimpleContent::DrawMultilineText() Lines: %d, FontHeight: %d, PositionWidth: %d", Lines,
-                FontHeight, PositionWidth);
-        dsyslog("flatPlus: cSimpleContent::DrawMultilineText() Text: %s", *m_Text);
+        dsyslog("flatPlus: cSimpleContent::DrawMultilineText() Lines: %d, FontHeight: %d, PositionWidth: %d "
+                "(%s)", Lines, FontHeight, PositionWidth, (IsDescription) ? "Description" : "Multiline");
 #endif
         for (int i {0}; i < Lines; ++i) {
             Line = Wrapper.GetLine(i);
