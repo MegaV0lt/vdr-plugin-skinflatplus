@@ -46,8 +46,8 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void PreLoadImages();
 
  private:
-        const cEvent *m_Present {nullptr};
-        const cEvent *m_Following {nullptr};
+        time_t m_PresentStart {0};  // Copied in SetEvents(): the cEvent is only valid under the Schedules lock
+        int m_PresentDuration {0};
 
         int m_ChannelWidth {0}, m_ChannelHeight {0};
 

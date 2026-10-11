@@ -393,8 +393,8 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
 #endif
     if (!ChanInfoBottomPixmap || !ChanEpgImagesPixmap) return;
 
-    m_Present = Present;
-    m_Following = Following;  // Store the events for later use in Zapcockpit extended channel display
+    m_PresentStart = (Present) ? Present->StartTime() : 0;
+    m_PresentDuration = (Present) ? Present->Duration() : 0;
     Scrollers.Clear();
 
     // Epg related variables
@@ -1061,17 +1061,11 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     const int FontHeight {(IsWideInfo) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
 
     const cEvent *Present {nullptr}, *Following {nullptr};
-    if (IsWideInfo) {
-        // Use the events from SetEvents() instead of querying the schedule again
-        Present = m_Present;
-        Following = m_Following;
-    } else {
-        LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
-        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
-        if (Schedule) {
-            Present = Schedule->GetPresentEvent();
-            Following = Schedule->GetFollowingEvent();
-        }
+    LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
+    const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
+    if (Schedule) {
+        Present = Schedule->GetPresentEvent();
+        Following = Schedule->GetFollowingEvent();
     }
 
     if (!Present) {
@@ -1267,10 +1261,10 @@ void cFlatDisplayChannel::Flush() {
     if (m_ZapAnimPending) ZapRunShowAnimation();
 #endif
 
-    if (m_Present) {
+    if (m_PresentStart) {
         const time_t now {time(0)};
-        const time_t Current {(now > m_Present->StartTime()) ? now - m_Present->StartTime() : 0};
-        ProgressBarDraw(Current, m_Present->Duration());
+        const time_t Current {(now > m_PresentStart) ? now - m_PresentStart : 0};
+        ProgressBarDraw(Current, m_PresentDuration);
     }
 
     if (Config.ChannelIconsShow) {
