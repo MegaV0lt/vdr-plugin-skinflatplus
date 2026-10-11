@@ -218,6 +218,7 @@ class cFlatBaseRender {
     int m_ProgressBarHeight {0}, m_ProgressBarTop {0}, m_ProgressBarWidth {0};
     int m_ProgressBarMarginHor {0}, m_ProgressBarMarginVer {0};
     int m_ProgressType {0};
+    int m_ProgressBarLastCurrent {-1}, m_ProgressBarLastTotal {-1};  // Last bar drawn by ProgressBarDraw()
     bool m_ProgressBarSetBackground {false};
     bool m_ProgressBarIsSignal {false};
     tColor m_ProgressBarColorFg {0}, m_ProgressBarColorBarFg {0};
