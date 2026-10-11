@@ -861,6 +861,16 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
 
     if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
 
+    // Only draw the progressbar when Total, Current or top of the progressbar has changed
+    static int LastCurrent {-1};
+    static int LastTotal {-1};
+    static int LastTop {-1};
+    if (Current == LastCurrent && Total == LastTotal && rect.Top() == LastTop) return;
+
+    LastCurrent = Current;
+    LastTotal = Total;
+    LastTop = rect.Top();
+
     if (PixmapBg && SetBackground) PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
