@@ -37,7 +37,7 @@ cImageLoader::~cImageLoader() {}
  * @return The loaded and scaled logo, or nullptr if the logo could not be loaded.
  */
 cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quiet) {
-    if (width < 0 || height < 0 || isempty(logo)) return nullptr;
+    if (width <= 0 || height <= 0 || isempty(logo)) return nullptr;
 
 #ifdef DEBUGIMAGELOADTIME
     dsyslog("flatPlus: cImageLoader::GetLogo() '%s' %dx%d", logo, width, height);
@@ -117,7 +117,7 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
  * @return The loaded and scaled icon, or nullptr if the icon could not be loaded.
  */
 cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
-    if (width < 0 || height < 0 || isempty(cIcon)) return nullptr;
+    if (width <= 0 || height <= 0 || isempty(cIcon)) return nullptr;
 
     cString File {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension)};
 
@@ -187,7 +187,7 @@ cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
 }
 
 cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
-    if (width < 0 || height < 0 || isempty(cFile)) return nullptr;
+    if (width <= 0 || height <= 0 || isempty(cFile)) return nullptr;
 
     const cString File {cFile};
 
