@@ -135,7 +135,7 @@ void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, co
 
     if (++InsertIndex >= MaxSize) {
         isyslog("flatPlus: Cache overflow, increase Cachesize (%ld)", MaxSize);
-        isyslog("flatPlus: Refilling cache keeping %ld pre loaded icons", BaseIndex);
+        isyslog("flatPlus: Refilling cache keeping %ld pre loaded images", BaseIndex);
         InsertIndex = BaseIndex;  // Keep images loaded at start
     }
 }
