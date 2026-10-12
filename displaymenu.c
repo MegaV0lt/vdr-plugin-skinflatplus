@@ -1944,9 +1944,10 @@ void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
     dsyslog("flatPlus: cFlatDisplayMenu::SetEvent()");
 #endif
 
-    // All work is done in DrawEventInfo() to avoid 'invalid lock sequence' in VDR.
-    // Here we just save the cEvent object for later use.
-    m_Event = Event;
+    // All work is done in DrawEventInfo() to avoid 'invalid lock sequence' in VDR. The event is
+    // only valid under the Schedules lock VDR holds now, so keep its id, not the pointer.
+    m_EventChannelID = Event ? Event->ChannelID() : tChannelID();
+    m_EventID = Event ? Event->EventID() : 0;
     m_ShowEvent = true;
     m_ShowRecording = false;
     m_ShowText = false;
@@ -2461,9 +2462,9 @@ void cFlatDisplayMenu::SetRecording(const cRecording *Recording) {
     dsyslog("flatPlus: cFlatDisplayMenu::SetRecording()");
 #endif
 
-    // All the work is done in DrawRecordingInfo() to prevent 'invalid lock sequence' in VDR.
-    // Here we only save the recording object for later use.
-    m_Recording = Recording;
+    // All the work is done in DrawRecordingInfo() to prevent 'invalid lock sequence' in VDR. The
+    // recording is only valid under the Recordings lock VDR holds now, so keep its file name.
+    m_RecordingFileName = Recording ? Recording->FileName() : nullptr;
     m_ShowEvent = false;
     m_ShowRecording = true;
     m_ShowText = false;
@@ -2854,10 +2855,30 @@ void cFlatDisplayMenu::Flush() {
 
     switch (m_MenuCategory) {
     case mcEvent:
-        if (!m_EventInfoDrawn) DrawEventInfo(m_Event);  // Draw event info
+        if (!m_EventInfoDrawn) {
+            // The draw functions lock the channels themselves; VDR's lock order is timers, channels,
+            // recordings, schedules, so take the read locks in that order before looking the event up.
+            LOCK_TIMERS_READ;
+            LOCK_CHANNELS_READ;
+            LOCK_RECORDINGS_READ;
+            LOCK_SCHEDULES_READ;
+            const cSchedule *Schedule {Schedules->GetSchedule(m_EventChannelID)};
+            if (const cEvent *Event = Schedule ? Schedule->GetEventById(m_EventID) : nullptr)
+                DrawEventInfo(Event);
+            else
+                m_EventInfoDrawn = true;  // Gone meanwhile; nothing to draw
+        }
         break;
     case mcRecordingInfo:
-        if (!m_RecordingInfoDrawn) DrawRecordingInfo(m_Recording);  // Draw recording info
+        if (!m_RecordingInfoDrawn) {
+            LOCK_TIMERS_READ;
+            LOCK_CHANNELS_READ;
+            LOCK_RECORDINGS_READ;
+            if (const cRecording *Recording = Recordings->GetByName(*m_RecordingFileName))
+                DrawRecordingInfo(Recording);
+            else
+                m_RecordingInfoDrawn = true;
+        }
         break;
     case mcTimer:
         if (Config.MenuTimerShowCount) {

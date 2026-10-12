@@ -7,7 +7,6 @@
  */
 #pragma once
 
-#include <vdr/status.h>
 
 #include <utility>
 #include <vector>
@@ -15,9 +14,9 @@
 #include "./baserender.h"
 
 #ifdef USE_ZAPCOCKPIT
-class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannelExtended, public cStatus {
+class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannelExtended {
 #else
-class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, public cStatus {
+class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel {
 #endif
  public:
         explicit cFlatDisplayChannel(bool WithInfo);
@@ -46,8 +45,8 @@ class cFlatDisplayChannel : public cFlatBaseRender, public cSkinDisplayChannel, 
         void PreLoadImages();
 
  private:
-        const cEvent *m_Present {nullptr};
-        const cEvent *m_Following {nullptr};
+        time_t m_PresentStart {0};  // Copied in SetEvents(): the cEvent is only valid under the Schedules lock
+        int m_PresentDuration {0};
 
         int m_ChannelWidth {0}, m_ChannelHeight {0};
 
