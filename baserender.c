@@ -842,9 +842,15 @@ void cFlatBaseRender::ProgressBarCreate(const cRect &Rect, int MarginHor, int Ma
     PixmapClear(ProgressBarMarkerPixmap);
     PixmapClear(ProgressBarPixmap);
     PixmapClear(ProgressBarPixmapBg);
+    m_ProgressBarLastCurrent = -1;  // New pixmaps, nothing drawn yet
 }
 
 void cFlatBaseRender::ProgressBarDraw(int Current, int Total) {
+    // Only this display draws on its progress bar pixmaps, so an unchanged bar is still there
+    if (Current == m_ProgressBarLastCurrent && Total == m_ProgressBarLastTotal) return;
+
+    m_ProgressBarLastCurrent = Current;
+    m_ProgressBarLastTotal = Total;
     ProgressBarDrawRaw(
         ProgressBarPixmap, ProgressBarPixmapBg, cRect(0, 0, m_ProgressBarWidth, m_ProgressBarHeight),
         cRect(0, 0, m_ProgressBarWidth + m_ProgressBarMarginVer * 2, m_ProgressBarHeight + m_ProgressBarMarginHor * 2),
@@ -860,16 +866,6 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
     if (!Pixmap) return;
 
     if (rect.Width() == 0 || rect.Height() == 0) return;  // Check for zero values
-
-    // Only draw the progressbar when Total, Current or top of the progressbar has changed
-    static int LastCurrent {-1};
-    static int LastTotal {-1};
-    static int LastTop {-1};
-    if (Current == LastCurrent && Total == LastTotal && rect.Top() == LastTop) return;
-
-    LastCurrent = Current;
-    LastTotal = Total;
-    LastTop = rect.Top();
 
     if (PixmapBg && SetBackground) PixmapBg->DrawRectangle(rectBg, ColorBg);
 
@@ -1056,6 +1052,7 @@ void cFlatBaseRender::ProgressBarDrawMarks(int Current, int Total, const cMarks 
 
     PixmapFill(ProgressBarPixmap, m_ProgressBarColorBg);
     PixmapClear(ProgressBarMarkerPixmap);
+    m_ProgressBarLastCurrent = -1;  // The fill erased the bar
 
     // Eliminate the division operation in each iteration and potentially reduce the computational cost, especially for
     // large collections of marks.
