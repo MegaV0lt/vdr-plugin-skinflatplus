@@ -4360,7 +4360,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {
         if (!Channel->GroupSep()) {  // Don't cache named channel group logo
-            img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4);
+            img = ImgLoader.GetLogo(Channel->Name(), ImageBgWidth - 4, ImageBgHeight - 4, true);
             i += (img ? 1 : 0);
         }
     }  // for channel
