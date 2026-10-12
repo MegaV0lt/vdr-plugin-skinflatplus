@@ -81,12 +81,21 @@ cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
 
     // Fallback to linear search if not found in index
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: GetImage: Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
+    dsyslog("flatPlus: GetImage() Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
 #endif
     const auto &cache {IsIcon ? IconCache : ImageCache};
-    for (const auto &data : cache) {
+    for (std::size_t slot {0}; slot < cache.size(); ++slot) {
+        const ImageData &data {cache[slot]};
         if (data.Image && data.Width == Width && data.Height == Height &&
             std::strcmp(*data.Name, *Name) == 0) {
+            // Cache the result in the index for future O(1) lookups
+            const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
+#ifdef DEBUGFUNCSCALL
+            dsyslog("flatPlus: GetImage() Found in linear search, caching index for %s (%dx%d) at slot %ld", *Name,
+                    Width, Height, slot);
+#endif
+            // (IsIcon) ? m_IconIndex[key] = slot : m_ImageIndex[key] = slot;
+            idx[key] = slot;
             return data.Image.get();
         }
     }
@@ -136,14 +145,14 @@ void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, co
     if (++InsertIndex >= MaxSize) {
         isyslog("flatPlus: Cache overflow, increase Cachesize (%ld)", MaxSize);
         isyslog("flatPlus: Refilling cache keeping %ld pre loaded images", BaseIndex);
-        InsertIndex = BaseIndex;  // Keep images loaded at start
+        InsertIndex = BaseIndex;  // Keep pre-loaded images. Keep old images until they are overwritten by new ones.
     }
 }
 
+// Remove an image from the imagecache by its base filename (ignoring path). Used for removing a channel logo.
 bool cImageCache::RemoveFromCache(const cString &Name) {
     // Preserve old behavior: remove entries by base filename (ignoring path)
     const std::string_view svName {*Name};
-
     bool removedAny {false};
 
     for (std::size_t slot {0}; slot < ImageCache.size(); ++slot) {

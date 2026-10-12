@@ -76,8 +76,8 @@ class cImageCache {
     std::vector<ImageData> IconCache;
 
     // O(1) lookup indexes for (Name, Width, Height)->slot
-    std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
-    std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
+    mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
+    mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
 
     std::size_t m_InsertIndex {0};      // Imagecache index
     std::size_t m_InsertIndexBase {0};  // Imagecache after first fill at start
