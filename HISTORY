@@ -1,5 +1,16 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+
+2026-xx-xx: Version 1.3.3
+- [fix] Improve image cache lookup and replacement, allow zero-sized image requests, and
+        suppress expected missing channel-logo messages during preloading.
+- [fix] Justify event and recording descriptions without justifying additional information.
+- [fix] Thanks to dnehring7 @ github for providing the following fixes:
+        - Protect channel and menu list access with locks and avoid keeping cEvent pointers
+          beyond SetEvents().
+        - Track progress bar state per display and redraw it only when it changes.
+- [update] Improve image cache logging and fix version extraction in the Makefile.
+
 2026-09-28: Version 1.3.2
 - [fix] Trigger recording count update when a recording is deleted.
 - [update] Prefix provider name in channel list view when sorted by provider.
