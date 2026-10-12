@@ -65,7 +65,7 @@ static std::string_view BaseNameFromCacheName(std::string_view full) {
 cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
     const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 
-    const auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
+    auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
     const auto it {idx.find(key)};
     if (it != idx.end()) {
         const std::size_t slot {it->second};

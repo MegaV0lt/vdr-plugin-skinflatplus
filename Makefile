@@ -38,8 +38,7 @@ SKINFLATPLUS_VDRLOGO = vdrlogo_default
 IMAGELIB ?= graphicsmagick
 
 ### The version number of this plugin (taken from the main source file):
-
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).c | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION = $(shell grep 'static const char \*VERSION' $(PLUGIN).c | sed -E 's/.*"([^"]+)".*/\1/')
 
 ### The directory environment:
 
