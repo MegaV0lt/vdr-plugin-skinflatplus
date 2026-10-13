@@ -4047,7 +4047,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemUpdates(int wLeft, int wWidth, int
         return -1;  // Not enough space to display anything meaningful
 
     cString Content {ReadAndExtractData(cString::sprintf("%s/system_updatestatus/updates", WIDGETOUTPUTPATH))};
-    const int updates {(!isempty(*Content)) ? -1 : atoi(*Content)};
+    const int updates {(isempty(*Content)) ? -1 : atoi(*Content)};
 
     Content = *ReadAndExtractData(cString::sprintf("%s/system_updatestatus/security_updates", WIDGETOUTPUTPATH));
     const int SecurityUpdates {(isempty(*Content)) ? -1 : atoi(*Content)};

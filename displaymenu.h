@@ -73,8 +73,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    cString m_RecordingFileName;              // Current recording: looked up again under the Recordings lock when drawing
-    tChannelID m_EventChannelID;              // Current event: looked up again under the Schedules lock when drawing
+    cString m_RecordingFileName;  // Recording file name: Looked up in SetRecording() under the Recordings lock
+    tChannelID m_EventChannelID;  // Channel ID: Looked up in SetEvent() under the Schedules lock
     tEventID m_EventID {0};
 
     uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};

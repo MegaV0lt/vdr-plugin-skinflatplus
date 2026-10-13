@@ -40,7 +40,11 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         cPixmap *DimmPixmap {nullptr};
 
         cFont *m_FontSecs {nullptr};
-        const cRecording *m_Recording {nullptr};
+
+        // Looked up in SetRecording() and used in UpdateInfo()
+        cString m_RecordingFileName {""};         // Recording file name
+        double m_RecordingFramesPerSecond {0.0};  // Recording frame rate
+        bool m_HasRecording {false};              // Is there a recording currently being played?
 
         int m_ScreenWidth {-1}, m_LastScreenWidth {-1};
         int m_ScreenHeight {0};

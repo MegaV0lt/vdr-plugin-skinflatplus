@@ -9,6 +9,8 @@
 #include "./flat.h"
 #include "./fontcache.h"
 
+#include <vdr/recording.h>
+
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
     if (Config.PlaybackShowEndTime > 0)  // 1 = End time, 2 = End time and cutted end time
@@ -81,7 +83,13 @@ void cFlatDisplayReplay::SetRecording(const cRecording *Recording) {
 
     if (!Recording || !Recording->Info()) return;
     const cRecordingInfo *RecInfo {Recording->Info()};
-    m_Recording = Recording;
+
+    // The recording is only valid under the Recordings lock VDR holds now,
+    // so keep its file name and info in our own members for later use
+    m_RecordingFileName = Recording->FileName();
+    m_RecordingNumFrames = Recording->NumFrames();
+    m_RecordingFramesPerSecond = Recording->FramesPerSecond();
+    m_HasRecording = true;
 
     PixmapClear(IconsPixmap);
 
@@ -420,17 +428,17 @@ void cFlatDisplayReplay::UpdateInfo() {
     }
 
     // Without a recording (media player replay) only the total length can be drawn
-    if (!m_Recording && isempty(*m_Total)) return;
+    if (!m_HasRecording && isempty(*m_Total)) return;
 
     int FramesAfterEdit {-1};
     int CurrentFramesAfterEdit {-1};
-    const int NumFrames {m_Recording ? m_Recording->NumFrames() : 0};  // Total frames in recording
-    if (m_Recording && NumFrames <= 0) {
+    const int NumFrames {m_RecordingNumFrames};  // Total frames in recording
+    if (m_HasRecording && NumFrames <= 0) {
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid NumFrames: %d", NumFrames);
         return;
     }
 
-    if (m_Recording && marks && m_Recording->HasMarks()) {
+    if (m_HasRecording && marks) {
 #if APIVERSNUM >= 20608
         FramesAfterEdit = marks->GetFrameAfterEdit(NumFrames, NumFrames);
         if (FramesAfterEdit >= 0) CurrentFramesAfterEdit = marks->GetFrameAfterEdit(m_CurrentFrame, NumFrames);
@@ -440,8 +448,8 @@ void cFlatDisplayReplay::UpdateInfo() {
 #endif
     }
 
-    const double FramesPerSecond {m_Recording ? m_Recording->FramesPerSecond() : 0.0};
-    if (m_Recording && FramesPerSecond <= 0.0) {  // Avoid DIV/0
+    const double FramesPerSecond {m_RecordingFramesPerSecond};
+    if (m_HasRecording && FramesPerSecond <= 0.0) {  // Avoid DIV/0
         esyslog("flatPlus: cFlatDisplayReplay::UpdateInfo() Invalid FramesPerSecond: %.2f", FramesPerSecond);
         return;
     }
@@ -580,7 +588,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     }  // HasMarks
 
-    if (!m_Recording) return;  // End time and poster need the recording
+    if (!m_HasRecording) return;  // End time and poster need the recording
 
     //* Draw end time of recording with symbol for cutted end time (2. line)
     const time_t now {time(0)};  // Fix 'jumping' end times - Update once per minute or 'm_Current' changed
@@ -629,10 +637,13 @@ void cFlatDisplayReplay::UpdateInfo() {
         m_LastPosterBannerUpdate = now;
         cString MediaPath {""};
         cSize MediaSize {0, 0};
-        GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, m_Recording);
+        {
+            LOCK_RECORDINGS_READ;
+            if (const cRecording *Recording = Recordings->GetByName(*m_RecordingFileName))
+                GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, Recording);
+        }
         if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster
-            const cString RecPath {m_Recording->FileName()};
-            if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
+            if (ImgLoader.SearchRecordingPoster(*m_RecordingFileName, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_TVSRect.Width(), m_TVSRect.Height());
                 if (img)
                     MediaSize.Set(img->Width(), img->Height());  // Get values for SetMediaSize()
