@@ -211,10 +211,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
     if (!LabelPixmap || !IconsPixmap) return;
 
     if (Config.RecordingDimmOnPause) {
-        if (Play == false) {
-            time(&m_DimmStartTime);  // Set start time for dimming
-            if (!Start()) esyslog("flatPlus: cFlatDisplayReplay::SetMode() Could not start thread in DisplayReplay");
-        } else {
+        if (Play) {
             Cancel(-1);
             while (Active())
                 cCondWait::SleepMs(10);
@@ -223,6 +220,9 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
                 PixmapClear(DimmPixmap);
                 Flush();
             }
+        } else {
+            time(&m_DimmStartTime);  // Set start time for dimming
+            if (!Start()) esyslog("flatPlus: cFlatDisplayReplay::SetMode() Could not start thread in DisplayReplay");
         }
     }
 
