@@ -44,6 +44,7 @@ class cFlatDisplayReplay : public cFlatBaseRender, public cSkinDisplayReplay, pu
         // Looked up in SetRecording() and used in UpdateInfo()
         cString m_RecordingFileName {""};         // Recording file name
         double m_RecordingFramesPerSecond {0.0};  // Recording frame rate
+        int m_RecordingNumFrames {0};             // Number of frames in recording
         bool m_HasRecording {false};              // Is there a recording currently being played?
 
         int m_ScreenWidth {-1}, m_LastScreenWidth {-1};
