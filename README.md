@@ -15,7 +15,7 @@ See the file COPYING for more information.
 
 ## Anforderungen
 
-- VDR ab Version 1.7.34 bis Plugin-Version bis 0.8.4
+- VDR ab Version 1.7.34 Plugin-Version bis 0.8.4
 - VDR ab Version 2.3.8 für Plugin-Version ab 1.0.0
 - GraphicsMagick oder ImageMagick zur Anzeige von PNG/JPG-Icons, Kanal-Logos und EPG-Bildern
 

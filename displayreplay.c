@@ -186,7 +186,7 @@ void cFlatDisplayReplay::Action() {
 
     // Start dimming thread
     while (Running()) {
-        time_t now {time(0)};
+        const time_t now {time(0)};
         if ((now - m_DimmStartTime) > Config.RecordingDimmOnPauseDelay && Running()) {
             m_DimmActive = true;
             // Use batch: fade in, then go back to sleep
