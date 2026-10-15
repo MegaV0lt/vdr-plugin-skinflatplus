@@ -1201,18 +1201,27 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color,
         const int Height {static_cast<int>(SmallLine * (SmallType ? 1 : 1.5))};
         // Draw the '|'
         ProgressBarPixmap->DrawRectangle(cRect(Pos, Top, m_MarkerWidth, Height), Color);
-        if (Type == 3 || Type == 4) {  // Draw the two '-' for the 'I'
+        switch (Type) {
+        case 1:  // Only draw the '|'
+        case 2:
+            break;
+        case 3:  // Draw the two '-' for the 'I'
+        case 4:
             ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Top, m_MarkerHorWidth, m_MarkerWidth),
                                              Color);
             ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset,
                                                    Middle + (SmallLine * (SmallType ? 0.5 : 0.75)) - m_MarkerWidth,
                                                    m_MarkerHorWidth, m_MarkerWidth),
                                              Color);
-        } else if (Type == 5 || Type == 6) {  // Draw the '-' for the '+'
+            break;
+        case 5:  // Draw the '-' for the '+'
+        case 6:
             ProgressBarPixmap->DrawRectangle(cRect(Pos - m_MarkerHorOffset, Middle - 1, m_MarkerHorWidth, 2), Color);
-        } else if (Type > 6) {
+            break;
+        default:
             esyslog("flatPlus: cFlatBaseRender::ProgressBarDrawError() Type %d not implemented.", Type);
-        }
+            break;
+        }  // switch (Type)
     }
 }
 #endif
