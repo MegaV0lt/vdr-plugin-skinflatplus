@@ -36,7 +36,7 @@
 
 #include "./services/epgsearch.h"
 
-/* Possible values of the stream content descriptor according to ETSI EN 300 468 */
+/* VDR combines stream_content and stream_content_ext as stream_content | (stream_content_ext << 4). */
 enum stream_content {
     sc_reserved = 0x00,
     sc_video_MPEG2 = 0x01,  // MPEG2 video
@@ -45,8 +45,11 @@ enum stream_content {
     sc_audio_AC3 = 0x04,
     sc_video_H264_AVC = 0x05,
     sc_audio_HEAAC = 0x06,
-    sc_video_H265_HEVC = 0x09,  // Stream content 0x09, extension 0x00
-    sc_audio_AC4 = 0x19,        // Stream content 0x09, extension 0x10
+    sc_audio_DTS = 0x07,           // DTS/DTS-HD audio
+    sc_content_protection = 0x08,  // DVB content protection data
+    sc_video_H265_HEVC = 0x09,     // Stream content 0x09, extension 0x00
+    sc_audio_ext1 = 0x19,          // Stream content 0x09, extension 0x01: AC-4, MPEG-H, DTS-UHD, or AVS3-P3
+    sc_subtitle_TTML = 0x29,       // Stream content 0x09, extension 0x02
 };
 
 class cFlatConfig Config;
@@ -430,22 +433,23 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
         const tComponent *p {Components->Component(i)};
         switch (p->stream) {
         case sc_video_MPEG2:
-            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (MPEG2)"
-                             : ossVideo << tr("Video") << ": MPEG2";
+            (p->description) ? ossVideo << p->description << " (MPEG2)"
+                             : ossVideo << ": MPEG2";
             break;
         case sc_video_H264_AVC:
-            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.264)"
-                             : ossVideo << tr("Video") << ": H.264";
+            (p->description) ? ossVideo << p->description << " (H.264)"
+                             : ossVideo << ": H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
-            (p->description) ? ossVideo << tr("Video") << ": " << p->description << " (H.265)"
-                             : ossVideo << tr("Video") << ": H.265";
+            (p->description) ? ossVideo << p->description << " (H.265)"
+                             : ossVideo << ": H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
-        case sc_audio_AC4:
         case sc_audio_HEAAC:
+        case sc_audio_DTS:
+        case sc_audio_ext1:
             if (!ossAudio.str().empty()) ossAudio << ", ";
             if (p->description) {
                 ossAudio << p->description << " (" << p->language << ')';
@@ -457,13 +461,21 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
                     AudioType = (p->type == 5) ? "AC3" : "MP2";
                     break;
                 case sc_audio_AC3: AudioType = "AC3"; break;
-                case sc_audio_AC4: AudioType = "AC4"; break;
                 case sc_audio_HEAAC: AudioType = "HEAAC"; break;
+                case sc_audio_DTS: AudioType = "DTS"; break;
+                case sc_audio_ext1:
+                    AudioType = (p->type <= 0x0E)   ? "AC4"
+                                : (p->type == 0x0F) ? "MPEG-H"
+                                : (p->type <= 0x1E) ? "DTS-UHD"
+                                : (p->type <= 0x22) ? "AVS3-P3"
+                                                    : "Audio";
+                    break;
                 }  // switch p->stream
                 ossAudio << p->language << " (" << *AudioType << ')';
             }  // if description
             break;
         case sc_subtitle:
+        case sc_subtitle_TTML:
             if (!ossSubtitle.str().empty()) ossSubtitle << ", ";
             (p->description) ? ossSubtitle << p->description << " (" << p->language << ')'
                              : ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
@@ -473,7 +485,7 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
 
     if (NewLine) Text.Append('\n');
 
-    if (!ossVideo.str().empty()) Text.Append(ossVideo.str().c_str());
+    if (!ossVideo.str().empty()) Text.Append(cString::sprintf("%s: %s", tr("Video"), ossVideo.str().c_str()));
 
     if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
 
