@@ -744,7 +744,7 @@ void cFlatSetupGeneral::Setup() {
 
     cString ImageCache {cString::sprintf("%s:\t%d / %ld", tr("Imagecache entries"), ImgCache.GetCacheCount(), kMaxImageCache)};
     Add(new cOsdItem(ImageCache, osUnknown, true));
-    cString IconCache {cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetIconCacheCount(), kMaxIconCache)};
+    cString IconCache {cString::sprintf("%s:\t%d / %ld", tr("Iconcache entries"), ImgCache.GetCacheCount(true), kMaxIconCache)};
     Add(new cOsdItem(IconCache, osUnknown, true));
 
     cString FontCacheNum {

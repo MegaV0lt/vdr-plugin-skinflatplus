@@ -38,12 +38,8 @@ class cImageCache {
     void Clear();
     bool RemoveFromCache(const cString &Name);
 
-    int GetCacheCount() const {
-      return m_InsertIndex;
-    }
-
-    int GetIconCacheCount() const {
-      return m_InsertIconIndex;
+    int GetCacheCount(bool IconCache = false) const {
+      return IconCache ? m_InsertIconIndex : m_InsertIndex;
     }
 
     cImage *GetImage(const cString &Name, int Width, int Height, bool IsIcon = false) const;

@@ -192,7 +192,7 @@ void cImageCache::PreLoadImage() {
     { cFlatDisplayVolume DisplayVolume; DisplayVolume.PreLoadImages(); }
 
     m_InsertIndexBase = GetCacheCount();
-    m_InsertIconIndexBase = GetIconCacheCount();
+    m_InsertIconIndexBase = GetCacheCount(true);
 
     dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
     dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
