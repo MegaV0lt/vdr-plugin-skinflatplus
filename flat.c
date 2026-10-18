@@ -57,7 +57,6 @@ class cImageCache ImgCache;
 
 cTheme Theme;
 static bool m_MenuActive {false};
-// time_t m_RemoteTimersLastRefresh {0};
 
 cFlat::cFlat() : cSkin("flatPlus", &::Theme) { Display_Menu = nullptr; }
 
@@ -485,7 +484,8 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
 
     if (NewLine) Text.Append('\n');
 
-    if (!ossVideo.str().empty()) Text.Append(cString::sprintf("%s: %s", tr("Video"), ossVideo.str().c_str()));
+    Text.Append(
+        cString::sprintf("%s: %s", tr("Video"), (ossVideo.str().empty()) ? tr("Unknown") : ossVideo.str().c_str()));
 
     if (!ossAudio.str().empty()) Text.Append(cString::sprintf("\n%s: %s", tr("Audio"), ossAudio.str().c_str()));
 
