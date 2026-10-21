@@ -266,7 +266,6 @@ inline void PixmapClear(cPixmap *Pixmap) {
  * @param Pixmap - A pointer to the `cPixmap` object.
  * @param Alpha - The alpha value to be set (0-255, where 0 represents full transparency).
  */
-
 inline void PixmapSetAlpha(cPixmap *Pixmap, int Alpha) {
     if (Pixmap) Pixmap->SetAlpha(Alpha);  // 0-255 (0 = Full transparent)
 }
@@ -281,7 +280,6 @@ int GetScraperMediaTypeSize(cString &MediaPath, cSize &MediaSize, const cEvent *
 
 void InsertSeriesInfos(const cSeries &Series, cString &SeriesInfo);  // NOLINT
 void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo);      // NOLINT
-
 
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect);
 cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight);

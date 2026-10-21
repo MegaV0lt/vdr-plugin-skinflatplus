@@ -1061,11 +1061,13 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     const int FontHeight {(IsWideInfo) ? m_FontMediumHeight : m_FontSmlHeight};  // Medium or small
 
     const cEvent *Present {nullptr}, *Following {nullptr};
-    LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
-    const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
-    if (Schedule) {
-        Present = Schedule->GetPresentEvent();
-        Following = Schedule->GetFollowingEvent();
+    {
+        LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
+        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
+        if (Schedule) {
+            Present = Schedule->GetPresentEvent();
+            Following = Schedule->GetFollowingEvent();
+        }
     }
 
     if (!Present) {
