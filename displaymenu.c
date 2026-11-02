@@ -3053,15 +3053,32 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
                    {mcScheduleNow, "menuIcons/Schedule"},
                    {mcScheduleNext, "menuIcons/Schedule"},
                    {mcChannel, "menuIcons/Channels"},
+                   {mcChannelEdit, "menuIcons/Channels"},  //? New icon?
                    {mcTimer, "menuIcons/Timers"},
+                   {mcTimerEdit, "menuIcons/Timers"},      //? New icon?
                    {mcRecording, "menuIcons/Recordings"},
 #if APIVERSNUM >= 30012
                    {mcRecordingDel, "menuIcons/DeletedRecordings"},
 #endif
+                   {mcRecordingEdit, "menuIcons/Recordings"},  //? New icon?
+                   {mcRecordingInfo, "extraIcons/PlayInfo"},
+                   {mcPlugin, "menuIcons/Plugins"},
+                   {mcPluginSetup, "menuIcons/Plugins"},
                    {mcSetup, "menuIcons/Setup"},
+                   {mcSetupOsd, "menuIcons/Setup"},       //? New icon?
+                   {mcSetupEpg, "menuIcons/Setup"},       //? New icon?
+                   {mcSetupDvb, "menuIcons/Setup"},       //? New icon?
+                   {mcSetupLnb, "menuIcons/Setup"},       //? New icon?
+                   {mcSetupCam, "menuIcons/Setup"},       //? New icon?
+                   {mcSetupRecord, "menuIcons/Setup"},    //? New icon?
+                   {mcSetupReplay, "menuIcons/Setup"},    //? New icon?
+                   {mcSetupMisc, "menuIcons/Setup"},      //? New icon?
+                   {mcSetupPlugins, "menuIcons/Setup"},   //? New icon?
                    {mcCommand, "menuIcons/Commands"},
                    {mcEvent, "extraIcons/Info"},
-                   {mcRecordingInfo, "extraIcons/PlayInfo"}};
+                   // {mcText, "menuIcons/Text"},         // New icon needed
+                   {mcFolder, "folder"},
+                   {mcCam, "menuIcons/Cam"}};             //? New icon?
     // Use structured binding
     for (const auto &[category, icon] : MenuIcons) {
         if (category == m_MenuCategory) return cString(icon);
