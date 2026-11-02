@@ -335,8 +335,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
     if (FrameWidth > 720) return "hd";
     if (FrameWidth > 0) return "sd";  // 720 and below is considered sd
 #endif
-    // Find radio and H.264/H.265 streams.
-    //! RTL, SAT1 etc. do not send a video component :-(
+    // Find radio and H.264/H.265 streams. //! RTL, SAT1 etc. do not send a video component :-(
     if (const auto *Components {Recording->Info()->Components()}) {
         for (int i {0}, n {Components->NumComponents()}; i < n; ++i) {  // Not iterable
             switch (Components->Component(i)->stream) {
@@ -347,7 +346,8 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
             }
         }
     }
-    return "";
+    // Check for old PES recordings (VDR < 2.6.5)
+    return (Recording->IsPesRecording()) ? "pes" : "";
 }
 
 cString GetCurrentAudioIcon() {
