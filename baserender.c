@@ -458,7 +458,7 @@ void cFlatBaseRender::TopBarUpdate() {
         const cString WeekDay {*WeekDayNameFull(now)};  // Translated week day (Monday, Tuesday, ...)
         const cString DateStr {*ShortDateString(now)};  // Short date (01.01.00)
         const int MaxDateWidth {std::max(FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *WeekDay),
-                                         FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, *DateStr))};
+                                         FontCache.GetStringWidth(m_FontName, m_TopBarFontSmlHeight, "00.00.00"))};
 
         Right = TopBarWidth - TimeWidth - MaxDateWidth - m_MarginItem;
         TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *WeekDay, Theme.Color(clrTopBarDateFont),
