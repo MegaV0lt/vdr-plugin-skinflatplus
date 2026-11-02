@@ -3076,7 +3076,7 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
                    {mcSetupPlugins, "menuIcons/Setup"},   //? New icon?
                    {mcCommand, "menuIcons/Commands"},
                    {mcEvent, "extraIcons/Info"},
-                   // {mcText, "menuIcons/Text"},         // New icon needed
+                   {mcText, "Text"},
                    {mcFolder, "folder"},
                    {mcCam, "menuIcons/Cam"}};             //? New icon?
     // Use structured binding
