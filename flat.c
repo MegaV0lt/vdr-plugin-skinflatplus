@@ -479,6 +479,10 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
             (p->description) ? ossSubtitle << p->description << " (" << p->language << ')'
                              : ossSubtitle << p->language << " (" << tr("Subtitle") << ')';
             break;
+        default:
+            dsyslog("flatPlus: Unknown stream type %02X (type %02X) for language '%s' and description '%s'", p->stream,
+                    p->type, (p->language) ? p->language : "", (p->description) ? p->description : "");
+            break;
         }  // switch
     }  // for
 
