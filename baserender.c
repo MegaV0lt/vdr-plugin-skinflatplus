@@ -1795,13 +1795,6 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
     // Read all files and cache data
     for (uint day {0}; day < out.kMaxDays; ++day) {
-        DayPrefix = cString::sprintf("%s%d", prefix, day);  // .../weather.0
-        iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
-        tempMaxFile = cString::sprintf("%s%s", *DayPrefix, ".tempMax");
-        tempMinFile = cString::sprintf("%s%s", *DayPrefix, ".tempMin");
-        precFile = cString::sprintf("%s%s", *DayPrefix, ".precipitation");
-        summaryFile = cString::sprintf("%s%s", *DayPrefix, ".summary");
-
         if (day == 0) {  // Only for day 0, read temp and location file
             out.Temp = ReadAndExtractData(tempFile);
             if (isempty(*out.Temp)) {  // Check if 'Temp' is valid
@@ -1811,7 +1804,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
             // Temp sign extraction
             std::string_view svTemp = *out.Temp;  // Create a string_view for easier manipulation
-            const auto deg = svTemp.find("°");  // Find the degree sign (UFT-8 char)
+            const auto deg = svTemp.find("°");  // Find the degree sign (UFT-8 code point U+00B0)
             if (deg != std::string_view::npos) {
                 out.TempTodaySign = cString(svTemp.substr(deg).data());  // Get the sign (°C or °F)
                 // Check if there's a space before the degree sign and also remove it with the sign
@@ -1826,15 +1819,20 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
         }  // End of day 0 specific data reading
 
         // Read data for icon, tempMax, tempMin, precipitation and summary
+        DayPrefix = cString::sprintf("%s%d", prefix, day);  // .../weather.0
+        iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
         out.Days[day].Icon = ReadAndExtractData(iconFile);
         if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
             // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
             break;  // No more days to expect (User may configured less than 8 days)
         }
 
+        tempMaxFile = cString::sprintf("%s%s", *DayPrefix, ".tempMax");
+        tempMinFile = cString::sprintf("%s%s", *DayPrefix, ".tempMin");
         out.Days[day].TempMax = ReadAndExtractData(tempMaxFile);
         out.Days[day].TempMin = ReadAndExtractData(tempMinFile);
 
+        precFile = cString::sprintf("%s%s", *DayPrefix, ".precipitation");
         precipitation = ReadAndExtractData(precFile);
         if (!isempty(*precipitation)) {
             istr.str(*precipitation);
@@ -1850,6 +1848,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
             out.Days[day].Precipitation = "- %";  // Default fallback
         }
 
+        summaryFile = cString::sprintf("%s%s", *DayPrefix, ".summary");
         out.Days[day].Summary = ReadAndExtractData(summaryFile);
     }
 
