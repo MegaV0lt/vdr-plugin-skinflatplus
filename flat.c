@@ -716,7 +716,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
     const cRecordingInfo *RecInfo {Recording->Info()};  // From skin ElchiHD
     if (RecInfo->FrameWidth() > 0 && RecInfo->FrameHeight() > 0) {
         oss << '\n'
-            << tr("format") << ": " << (IsPesRecording ? "PES" : "TS") << ", " << RecInfo->FrameWidth() << "x"
+            << tr("format") << ": " << (IsPesRecording ? "PES" : "TS") << ", " << RecInfo->FrameWidth() << 'x'
             << RecInfo->FrameHeight() << '@' << std::fixed << std::setprecision(0) << FramesPerSecond;
         if (RecInfo->ScanTypeChar() != '-')  // Do not show the '-' for unknown scan type
             oss << RecInfo->ScanTypeChar();
