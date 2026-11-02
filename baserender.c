@@ -475,10 +475,9 @@ void cFlatBaseRender::TopBarUpdate() {
         if (Config.TopBarRecConflictsShow) {         // Load conflict icon
             NumConflicts = GetEpgsearchConflicts();  // Get conflicts from plugin Epgsearch
             if (NumConflicts) {
-                if (NumConflicts < Config.TopBarRecConflictsHigh)
-                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight);
-                else
-                    ImgCon = ImgLoader.GetIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
+                (NumConflicts < Config.TopBarRecConflictsHigh)
+                    ? ImgCon = ImgLoader.GetIcon("topbar_timerconflict_low", TopBarIconHeight, TopBarIconHeight)
+                    : ImgCon = ImgLoader.GetIcon("topbar_timerconflict_high", TopBarIconHeight, TopBarIconHeight);
 
                 if (ImgCon) {
                     ImgConWidth = ImgCon->Width();
@@ -581,13 +580,14 @@ void cFlatBaseRender::TopBarUpdate() {
             TopBarIconPixmap->DrawImage(cPoint(Right, IconTop), *ImgCon);
             Right += ImgConWidth;
 
-            if (NumConflicts < Config.TopBarRecConflictsHigh)
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr, Theme.Color(clrTopBarConflictLowFg),
-                                       Theme.Color(clrTopBarConflictLowBg), m_TopBarFontSml);
-            else
-                TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr,
+            (NumConflicts < Config.TopBarRecConflictsHigh)
+                ? TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr,
+                                         Theme.Color(clrTopBarConflictLowFg), Theme.Color(clrTopBarConflictLowBg),
+                                         m_TopBarFontSml)
+                : TopBarPixmap->DrawText(cPoint(Right, FontSmlTop), *NumConflictsStr,
                                        Theme.Color(clrTopBarConflictHighFg), Theme.Color(clrTopBarConflictHighBg),
                                        m_TopBarFontSml);
+
             Right += NumConflictsWidth + m_MarginItem;
         }
 
@@ -870,10 +870,9 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
     if (PixmapBg && SetBackground) PixmapBg->DrawRectangle(rectBg, ColorBg);
 
     if (SetBackground) {
-        if (PixmapBg == Pixmap)
-            Pixmap->DrawRectangle(rect, ColorBg);
-        else
-            Pixmap->DrawRectangle(rect, clrTransparent);
+        (PixmapBg == Pixmap)
+            ? Pixmap->DrawRectangle(rect, ColorBg)
+            : Pixmap->DrawRectangle(rect, clrTransparent);
     }
 
     if (Total == 0) {  // Avoid DIV/0
