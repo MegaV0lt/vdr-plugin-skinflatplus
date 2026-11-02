@@ -347,7 +347,7 @@ cString GetRecordingFormatIcon(const cRecording *Recording) {
         }
     }
     // Check for old PES recordings (VDR < 2.6.5)
-    return (Recording->IsPesRecording()) ? "pes" : "";
+    return (Recording->IsPesRecording()) ? "PES" : "";
 }
 
 cString GetCurrentAudioIcon() {

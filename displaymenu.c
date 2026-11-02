@@ -4439,6 +4439,7 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.GetIcon("sd", ImageHeight, ImageHeight / 3);
     ImgLoader.GetIcon("hd", ImageHeight, ImageHeight / 3);
     ImgLoader.GetIcon("uhd", ImageHeight, ImageHeight / 3);
+    ImgLoader.GetIcon("PES", ImageHeight, ImageHeight / 3);
 
     ImgLoader.GetIcon("folder", ImageHeight, ImageHeight);
     ImgLoader.GetIcon("recording", ImageHeight, ImageHeight);
