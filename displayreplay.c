@@ -301,7 +301,7 @@ void cFlatDisplayReplay::SetMode(bool Play, bool Forward, int Speed) {
             DecorBorderDraw(ib);
         }
     }
-    ResolutionAspectDraw();
+    // ResolutionAspectDraw();
 }
 
 void cFlatDisplayReplay::SetProgress(int Current, int Total) {
@@ -726,6 +726,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
+            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
         }
 
         IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
@@ -734,6 +735,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
+            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
         }
     }
 
@@ -744,6 +746,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
+            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
         }
     }
 
@@ -753,7 +756,8 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
         if (img) {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
-            // left -= m_MarginItem2;
+            left -= m_MarginItem2;
+            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
         }
     }
 }
