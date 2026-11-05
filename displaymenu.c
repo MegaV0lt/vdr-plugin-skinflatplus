@@ -909,14 +909,24 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
         MenuIconsPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
     }
 
-    //? Make overlay configurable? (disable)
-    if (Timer->Remote()) {  // Remote timer
-        img = ImgLoader.GetIcon("timerRemote", ImageHeight, ImageHeight);
+    // Show overlay icons for remote and VPS timers
+    const char *OverlayIconName {nullptr};
+    if (Timer->Remote() && Timer->HasFlags(tfVps)) {
+        OverlayIconName = "timerRemoteVps";
+    } else if (Timer->Remote()) {
+        OverlayIconName = "timerRemote";
+    } else if (Timer->HasFlags(tfVps)) {
+        OverlayIconName = "vps";
+    }
+
+    if (OverlayIconName) {
+        img = ImgLoader.GetIcon(OverlayIconName, ImageHeight, ImageHeight);
         if (img) {
             ImageTop = Top + (m_FontHeight - img->Height()) / 2;
             MenuIconsOvlPixmap->DrawImage(cPoint(ImageLeft, ImageTop), *img);
         }
     }
+
     Left += ImageHeight + m_MarginItem2;
 
     const cChannel *Channel {Timer->Channel()};
@@ -1175,11 +1185,9 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
-        if (MenuEventViewShort) {  // flatPlus short, flatPlus short + EPG
-            w = m_Font->Width(*ChannelName);
-        } else {
-            ChannelName = Channel->ShortName(true);
-        }
+        (MenuEventViewShort)  // flatPlus short, flatPlus short + EPG
+            ? w = m_Font->Width(*ChannelName)
+            : ChannelName = Channel->ShortName(true);
 
         if (IsGroup) {  // Draw group name or channel name
             const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
@@ -1224,15 +1232,15 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
                     if (!IsGroup) {  // Exclude epg2vdr group separator
                         const cRect ProgressBarSize {PBLeft, PBTop, PBWidth, PBHeight};
-                        if (Current)
-                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                               Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
-                                               Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType,
-                                               false);
-                        else
-                            ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
-                                               Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
-                                               Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType, false);
+                        (Current)
+                            ? ProgressBarDrawRaw(
+                                  MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress, 100,
+                                  Config.decorProgressMenuItemCurFg, Config.decorProgressMenuItemCurBarFg,
+                                  Config.decorProgressMenuItemCurBg, Config.decorProgressMenuItemType, false)
+                            : ProgressBarDrawRaw(MenuPixmap, MenuPixmap, ProgressBarSize, ProgressBarSize, progress,
+                                                 100, Config.decorProgressMenuItemFg, Config.decorProgressMenuItemBarFg,
+                                                 Config.decorProgressMenuItemBg, Config.decorProgressMenuItemType,
+                                                 false);
                     }
                 }
             }
@@ -2070,9 +2078,9 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     bool Scrollable {false};
 
     // Get media information from TVScraper if enabled in config
-    if (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors) {
+    if (Config.TVScraperEPGInfoShowPoster || Config.TVScraperEPGInfoShowActors)
         GetScraperMedia(MediaPath, SeriesInfo, MovieInfo, Actors, Event);
-    }
+
 #ifdef DEBUGEPGTIME
     dsyslog("flatPlus: DrawEventInfo() TVScraper time @ %ld ms", Timer.Elapsed());
 #endif
@@ -2313,7 +2321,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         else if (MediaType == 2)
             MediaWidth = m_cWidth / 2 - m_MarginItem3;
 
-        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for tvscraper poster
+        if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster
             const cString RecPath {Recording->FileName()};
             if (ImgLoader.SearchRecordingPoster(RecPath, MediaPath)) {
                 img = ImgLoader.GetFile(*MediaPath, m_cWidth - m_MarginItem2, MediaHeight);
@@ -3871,7 +3879,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
     }
 
     ContentTop = AddWidgetHeader("widgets/last_recordings", tr("Last Recordings"), ContentTop, wWidth);
-    if (Recs.size() == 0) {
+    if (Recs.empty()) {
         ContentWidget.AddText(
             tr("no recordings found"), false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
@@ -3887,10 +3895,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetLastRecordings(int wLeft, int wWidth, in
         if (ContentTop + m_MarginItem > MenuPixmapViewPortHeight)
             break;  // Exit the loop if we've run out of display space
 
-        const auto &PairRec {Recs[i]};
-
         ContentWidget.AddText(
-            *PairRec.second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
+            *Recs[i].second, false, cRect(m_MarginItem, ContentTop, wWidth - m_MarginItem2, m_FontSmlHeight),
             Theme.Color(clrMenuEventFontInfo), Theme.Color(clrMenuEventBg), m_FontSml, wWidth - m_MarginItem2);
         ContentTop += m_FontSmlHeight;
     }
@@ -4429,6 +4435,8 @@ void cFlatDisplayMenu::PreLoadImages() {
     ImgLoader.GetIcon("timerInactive", ImageHeight, ImageHeight);
     ImgLoader.GetIcon("timerRecording", ImageHeight, ImageHeight);
     ImgLoader.GetIcon("timerActive", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timerRemote", ImageHeight, ImageHeight);
+    ImgLoader.GetIcon("timerRemoteVps", ImageHeight, ImageHeight);
 
     ImgLoader.GetIcon("timer_full", ImageHeight, ImageHeight);
     ImgLoader.GetIcon("timer_full_cur", ImageHeight, ImageHeight);
