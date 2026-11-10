@@ -38,7 +38,7 @@ SKINFLATPLUS_VDRLOGO = vdrlogo_default
 IMAGELIB ?= graphicsmagick
 
 ### The version number of this plugin (taken from the main source file):
-VERSION = $(shell grep 'static const char \*VERSION' $(PLUGIN).c | sed -E 's/.*"([^"]+)".*/\1/')
+VERSION = $(shell grep 'static const char \*VERSION' $(PLUGIN).cpp | sed -E 's/.*"([^"]+)".*/\1/')
 
 ### The directory environment:
 
@@ -106,7 +106,7 @@ all: $(SOFILE) i18n
 
 ### Implicit rules:
 
-%.o: %.c
+%.o: %.cpp
 	$(CXX) -Wall $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) -o $@ $<
 
 ### Dependencies:
@@ -114,7 +114,7 @@ all: $(SOFILE) i18n
 MAKEDEP = $(CXX) -MM -MG
 DEPFILE = .dependencies
 $(DEPFILE): Makefile
-	@$(MAKEDEP) $(CXXFLAGS) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.c) > $@
+	@$(MAKEDEP) $(CXXFLAGS) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.cpp) > $@
 
 -include $(DEPFILE)
 
@@ -130,7 +130,7 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 	@echo MO $@
 	$(Q)msgfmt -c -o $@ $<
 
-$(I18Npot): $(wildcard *.c)
+$(I18Npot): $(wildcard *.cpp)
 	@echo GT $@
 	$(Q)xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ `ls $^`
 

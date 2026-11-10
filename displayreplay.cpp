@@ -6,10 +6,11 @@
  * $Id$
  */
 #include "./displayreplay.h"
-#include "./flat.h"
-#include "./fontcache.h"
 
 #include <vdr/recording.h>
+
+#include "./flat.h"
+#include "./fontcache.h"
 
 cFlatDisplayReplay::cFlatDisplayReplay(bool ModeOnly) : cThread("DisplayReplay") {
     m_LabelHeight = m_FontHeight + m_FontSmlHeight;
@@ -325,10 +326,11 @@ void cFlatDisplayReplay::SetProgress(int Current, int Total) {
 }
 
 void cFlatDisplayReplay::SetCurrent(const char *Current) {
+    if (m_ModeOnly) return;
+
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayReplay::SetCurrent() '%s'", Current);
 #endif
-    if (m_ModeOnly) return;
 
     m_Current = Current ? Current : "";  // Never store a nullptr, it is dereferenced unchecked below
     UpdateInfo();
@@ -349,10 +351,10 @@ void cFlatDisplayReplay::UpdateInfo() {
 
     if (m_ModeOnly || !ChanEpgImagesPixmap || !IconsPixmap || !LabelPixmap) return;
 
+    const bool TimeSecsScaled {Config.TimeSecsScale < 1.0};
     const int FontSecsSize {static_cast<int>(Setup.FontOsdSize * Config.TimeSecsScale * 100.0)};  // Size for seconds
-    const int TopSecs {m_FontAscender - ((Config.TimeSecsScale < 1.0)
-                                             ? FontCache.GetFontAscender(Setup.FontOsd, FontSecsSize)
-                                             : 0)};                                   // Top position for seconds
+    const int TopSecs {m_FontAscender - ((TimeSecsScaled) ? FontCache.GetFontAscender(Setup.FontOsd, FontSecsSize)
+                                                          : 0)};                      // Top position for seconds
     const int FontSecsHeight {FontCache.GetFontHeight(Setup.FontOsd, FontSecsSize)};  // Height of seconds font
     static constexpr uint32_t kCharCode {0x0030};                                     // U+0030 DIGIT ZERO
     // Cached glyph size
@@ -381,10 +383,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         left += img->Width() + m_MarginItem;
     }
 
-    if (Config.TimeSecsScale < 1.0) {
+    if (TimeSecsScaled) {
         std::string_view cur {*m_Current};
-        const std::size_t found {cur.find_last_of(':')};
-        if (found != std::string_view::npos) {
+        if (const std::size_t found {cur.find_last_of(':')}; found != std::string_view::npos) {
             cString hm {*m_Current};
             hm.Truncate(found);  // Hours and minutes
             std::string_view secs {cur.substr(found, cur.length() - found)};  // Seconds (:00 or :00.00)
@@ -469,10 +470,9 @@ void cFlatDisplayReplay::UpdateInfo() {
         int right {m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - TotalWidth - Spacer - ImgCuttedWidth -
                    m_MarginItem - CuttedWidth};
 
-        if (Config.TimeSecsScale < 1.0) {
+        if (TimeSecsScaled) {
             std::string_view tot {*m_Total};  // Total length
-            const std::size_t found {tot.find_last_of(':')};
-            if (found != std::string_view::npos) {
+            if (const std::size_t found {tot.find_last_of(':')}; found != std::string_view::npos) {
                 cString hm {*m_Total};
                 hm.Truncate(found);  // Hours and minutes
                 std::string_view secs {tot.substr(found, tot.length() - found)};
@@ -526,10 +526,9 @@ void cFlatDisplayReplay::UpdateInfo() {
             right += ImgCuttedWidth + m_MarginItem;  // 'ImgCuttedWidth' is already set
         }
 
-        if (Config.TimeSecsScale < 1.0) {
+        if (TimeSecsScaled) {
             std::string_view cutt {*cutted};
-            const std::size_t found {cutt.find_last_of(':')};
-            if (found != std::string_view::npos) {
+            if (const std::size_t found {cutt.find_last_of(':')}; found != std::string_view::npos) {
                 cString hm {*cutted};
                 hm.Truncate(found);  // Hours and minutes
                 std::string_view secs {cutt.substr(found, cutt.length() - found)};
@@ -551,7 +550,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         }
     } else {  // Not cutted
         int right {m_OsdWidth - BorderSize - ImgWidth - m_MarginItem - TotalWidth};
-        if (Config.TimeSecsScale < 1.0) {
+        if (TimeSecsScaled) {
             std::string_view tot {*m_Total};
             const std::size_t found {tot.find_last_of(':')};
             if (found != std::string_view::npos) {
@@ -639,7 +638,7 @@ void cFlatDisplayReplay::UpdateInfo() {
         cSize MediaSize {0, 0};
         {
             LOCK_RECORDINGS_READ;
-            if (const cRecording *Recording = Recordings->GetByName(*m_RecordingFileName))
+            if (const cRecording *Recording {Recordings->GetByName(*m_RecordingFileName)})
                 GetScraperMediaTypeSize(MediaPath, MediaSize, nullptr, Recording);
         }
         if (MediaPath[0] == '\0' && Config.TVScraperSearchLocalPosters) {  // Prio for TVScraper poster

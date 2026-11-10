@@ -32,7 +32,6 @@
 
 #include "./flat.h"
 #include "./fontcache.h"
-#include "baserender.h"
 
 // Global flag to indicate if logo was found in channel logo path
 bool g_LogoBgOverwrite {false};
@@ -895,12 +894,12 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
             if (Current > 0) Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), PercentPos, big), ColorBarFg);
             break;
         }
-    case 1:  // big line
+    case 1:  // Big line
         {
             if (Current > 0) Pixmap->DrawRectangle(cRect(rect.Left(), rect.Top(), PercentPos, big), ColorBarFg);
             break;
         }
-    case 2:  // big line + outline
+    case 2:  // Big line + outline
         {
             const int out {big > 10 ? 2 : 1};
             // Outline
@@ -912,29 +911,28 @@ void cFlatBaseRender::ProgressBarDrawRaw(cPixmap *Pixmap, cPixmap *PixmapBg, con
 
             if (Current > 0) {
                 const int out2 {out * 2};
+                const int OutHeight {big - out2};
+                const cPoint LeftTop {rect.Left() + out, rect.Top() + out};
                 if (IsSignal) {
                     const int GreenWidth {static_cast<int>(rect.Width() * 0.666) - out2};
                     const int YellowWidth {static_cast<int>(rect.Width() * 0.333) - out2};
 
                     if (Percent > 0.666f) {
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, PercentPos - out2, big - out2),
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(PercentPos - out2, OutHeight)),
                                               Theme.Color(clrButtonGreen));
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, GreenWidth, big - out2),
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(GreenWidth, OutHeight)),
                                               Theme.Color(clrButtonYellow));
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, YellowWidth, big - out2),
-                                              Theme.Color(clrButtonRed));
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(YellowWidth, OutHeight)), Theme.Color(clrButtonRed));
                     } else if (Percent > 0.333f) {
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, PercentPos - out2, big - out2),
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(PercentPos - out2, OutHeight)),
                                               Theme.Color(clrButtonYellow));
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, YellowWidth, big - out2),
-                                              Theme.Color(clrButtonRed));
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(YellowWidth, OutHeight)), Theme.Color(clrButtonRed));
                     } else {
-                        Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, PercentPos - out2, big - out2),
+                        Pixmap->DrawRectangle(cRect(LeftTop, cSize(PercentPos - out2, OutHeight)),
                                               Theme.Color(clrButtonRed));
                     }
                 } else {
-                    Pixmap->DrawRectangle(cRect(rect.Left() + out, rect.Top() + out, PercentPos - out2, big - out2),
-                                          ColorBarFg);
+                    Pixmap->DrawRectangle(cRect(LeftTop, cSize(PercentPos - out2, OutHeight)), ColorBarFg);
                 }
             }
             break;
@@ -1225,8 +1223,7 @@ void cFlatBaseRender::ProgressBarDrawError(int Pos, int SmallLine, tColor Color,
 }
 #endif
 
-void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown,
-                                    bool CanScrollUp, bool CanScrollDown) {
+void cFlatBaseRender::ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatBaseRender::ScrollBarDraw() Total %d, Shown %d, Offset %d", Total, Shown, Offset);
 #endif
@@ -1820,7 +1817,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
 
         // Read data for icon, tempMax, tempMin, precipitation and summary
         DayPrefix = cString::sprintf("%s%d", prefix, day);  // .../weather.0
-        iconFile = cString::sprintf("%s%s", *DayPrefix, day == 0 ? ".icon-act" : ".icon");
+        iconFile = cString::sprintf("%s%s", *DayPrefix, (day == 0) ? ".icon-act" : ".icon");
         out.Days[day].Icon = ReadAndExtractData(iconFile);
         if (isempty(*out.Days[day].Icon)) {  // Check if 'Icon' is valid
             // isyslog("flatPlus: BatchReadWeatherData() Missing data for day %d", day);
@@ -1837,8 +1834,7 @@ bool cFlatBaseRender::BatchReadWeatherData(FontImageWeatherCache &out, time_t &o
         if (!isempty(*precipitation)) {
             istr.str(*precipitation);
             istr.clear();  // Clear the error state of the stream
-            double p {0.0};
-            if (istr >> p) {  // Check if parsing succeeded
+            if (double p {0.0}; istr >> p) {  // Check if parsing succeeded
                 out.Days[day].Precipitation = cString::sprintf("%d %%", RoundUp(p * 100.0, 10));
             } else {
                 dsyslog("flatPlus: BatchReadWeatherData() Failed to parse precipitation value: %s", *precipitation);

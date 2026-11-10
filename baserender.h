@@ -130,8 +130,7 @@ class cFlatBaseRender {
      */
     void ProgressBarDrawMarks(int Current, int Total, const cMarks *Marks, tColor Color, tColor ColorCurrent);
 #endif
-    void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset,
-                        int Shown, bool CanScrollUp, bool CanScrollDown);
+    void ScrollbarDraw(cPixmap *Pixmap, int Left, int Top, int Height, int Total, int Offset, int Shown);
     int ScrollBarWidth() const;
 
     void DecorBorderDraw(const sDecorBorder &ib, bool Store = true);
@@ -176,7 +175,7 @@ class cFlatBaseRender {
     int m_FontFixedHeight {0};
     int m_FontAscender {0};  // Ascender for font
 
-    cFont *m_FontBig {nullptr};      // Big font for channel name in displaychannel.c
+    cFont *m_FontBig {nullptr};      // Big font for channel name in displaychannel.cpp
     cFont *m_FontMedium {nullptr};   // Font in Size between m_Font and m_FontSml
     cFont *m_FontTempSml {nullptr};  // Font for main menu weather widget
     cFont *m_FontTiny {nullptr};     // Very small font for actor name and role

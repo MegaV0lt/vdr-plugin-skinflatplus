@@ -18,6 +18,7 @@
 #include <vdr/videodir.h>
 
 #include <dirent.h>
+#include <iterator>  // std::begin, std::end
 #include <locale>
 #include <sstream>
 #include <string_view>
@@ -25,6 +26,7 @@
 #include <utility>
 
 #include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <cstring>
 
@@ -171,12 +173,10 @@ void cFlatDisplayMenu::SetMenuCategory(eMenuCategory MenuCategory) {
 }
 
 void cFlatDisplayMenu::SetScrollbar(int Total, int Offset) {
-    const int ItemsMax {MaxItems()};  // Cache value
-    DrawScrollbar(Total, Offset, ItemsMax, 0, ItemsHeight(), Offset > 0, Offset + ItemsMax < Total);
+    DrawScrollbar(Total, Offset, MaxItems(), 0, ItemsHeight());
 }
 
-void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp,
-                                     bool CanScrollDown, bool IsContent) {
+void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool IsContent) {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayMenu::DrawScrollbar()");
     dsyslog("   Total: %d, Offset: %d, Shown: %d, Top: %d, Height: %d", Total, Offset, Shown, Top, Height);
@@ -204,17 +204,15 @@ void cFlatDisplayMenu::DrawScrollbar(int Total, int Offset, int Shown, int Top, 
     }
 
     ScrollbarDraw(ScrollbarPixmap, m_MenuItemWidth - m_WidthScrollBar + DecorBorderMenuSize * 2 + m_MarginItem, Top,
-                  Height, Total, Offset, Shown, CanScrollUp, CanScrollDown);
+                  Height, Total, Offset, Shown);
 }
 
 void cFlatDisplayMenu::Scroll(bool Up, bool Page) {
     // Is the menu scrolling or content?
     if (ComplexContent.IsShown() && ComplexContent.IsScrollingActive() && ComplexContent.Scrollable()) {
         if (ComplexContent.Scroll(Up, Page)) {
-            const int ScrollOffset {ComplexContent.ScrollOffset()};  // Cache value
-            DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
-                          ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
-                          ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+            DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
+                          ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), true);
         }
     } else {
         cSkinDisplayMenu::Scroll(Up, Page);
@@ -600,8 +598,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
     double progress {0.0};
     {
         LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
-        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
-        if (Schedule) {
+        if (const cSchedule *Schedule {Schedules->GetSchedule(Channel)}) {
             Event = Schedule->GetPresentEvent();
             if (Event) {
                 // Calculate progress bar
@@ -1185,9 +1182,11 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         // m_WidthScrollBar is already subtracted. If not scrolling, we need to subtract it
         w = m_IsScrolling ? m_MenuItemWidth / 10 * 2 : (m_MenuItemWidth - m_WidthScrollBar) / 10 * 2;
 
-        (MenuEventViewShort)  // flatPlus short, flatPlus short + EPG
-            ? w = m_Font->Width(*ChannelName)
-            : ChannelName = Channel->ShortName(true);
+        if (MenuEventViewShort) {  // flatPlus short, flatPlus short + EPG
+            w = m_Font->Width(*ChannelName);
+        } else {
+            ChannelName = Channel->ShortName(true);
+        }
 
         if (IsGroup) {  // Draw group name or channel name
             const int LineTop {Top + (m_FontHeight - m_LineWidth / 2) / 2};
@@ -1637,7 +1636,6 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
     cImage *ImgRecCut {nullptr};
     if (IsRecording && Recording->IsEdited()) {  // Preload icon only when needed
         IsEdited = true;
-
         if (Current) { ImgRecCut = ImgLoader.GetIcon("recording_cutted_cur", ImgRecCutWidth, ImgRecCutHeight); }
         if (!ImgRecCut) { ImgRecCut = ImgLoader.GetIcon("recording_cutted", ImgRecCutWidth, ImgRecCutHeight); }
     }
@@ -1863,7 +1861,9 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     if (!m_IsScrolling) ItemBorderInsertUnique(ib);
 
-    if (Config.MenuRecordingView == 3 && Current) DrawItemExtraRecording(Recording, tr("no recording info"));
+    // Draw extra recording info if enabled in config and this is the current item
+    if (Current && Config.MenuRecordingView == 3)
+        DrawItemExtraRecording(Recording, tr("no recording info"));
 
     return true;
 }
@@ -2048,10 +2048,10 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
                         Reruns.Append(*DayDateTime(r->event->StartTime()));
                         {
                             LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-                            const cChannel *channel {Channels->GetByChannelID(r->event->ChannelID(), true, true)};
-                            if (channel)
+                            if (const cChannel *channel {Channels->GetByChannelID(r->event->ChannelID(), true, true)}) {
                                 Reruns.Append(
                                     cString::sprintf(", %d - %s", channel->Number(), channel->ShortName(true)));
+                            }
                         }
                         Reruns.Append(cString::sprintf(":  %s", r->event->Title()));
                         // if (!isempty(r->event->ShortText()))
@@ -2073,7 +2073,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     cImage *img {nullptr};
     int ContentTop {0};
     int MediaWidth {0};
-    int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
+    const int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
     bool FirstRun {true};
     bool Scrollable {false};
 
@@ -2219,10 +2219,8 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     DecorBorderDraw(ib);
 
     if (Scrollable) {
-        const int ScrollOffset {ComplexContent.ScrollOffset()};
-        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
-                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), true);
     }
 
     const sDecorBorder ContentBorder {m_cLeft,
@@ -2270,13 +2268,17 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
         // Lent from skinelchi
         if (Config.RecordingAdditionalInfoShow) {
             if (Text[0] != '\0') Text.Append("\n\n");
-            {
+            /* {
                 LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
                 const cChannel *channel {Channels->GetByChannelID(RecInfo->ChannelID())};
                 if (channel)
                     Text.Append(
                         cString::sprintf("%s: %d - %s\n", trVDR("Channel"), channel->Number(), channel->Name()));
-            }
+            } */
+            //* Omit channel number to avoid 'invalid lock sequence' in VDR
+            // The recording object is locked in the calling function, so we can safely access the channel name here
+            Text.Append(cString::sprintf("%s: %s\n", trVDR("Channel"), RecInfo->ChannelName()));
+
             const cEvent *Event {RecInfo->GetEvent()};
             if (Event) {
                 InsertGenreInfo(Event, Text);  // Add genre info
@@ -2530,19 +2532,18 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             }
         }
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() @ %ld ms", Timer.Elapsed());
+        dsyslog("   DrawRecordingInfo() GetByChannelID() @ %ld ms", Timer.Elapsed());
 #endif
 
         {
             LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
-            const cChannel *Channel {Channels->GetByChannelID(RecInfo->ChannelID())};
-            if (Channel)
+            if (const cChannel *Channel {Channels->GetByChannelID(RecInfo->ChannelID())})
                 RecAdditional.Append(
                     cString::sprintf("%s: %d - %s\n", trVDR("Channel"), Channel->Number(), Channel->Name()));
         }
 
 #ifdef DEBUGFUNCSCALL
-        dsyslog("   RecordingAdditionalInfoShow() GetByChannelID() done @ %ld ms", Timer.Elapsed());
+        dsyslog("   DrawRecordingInfo() GetByChannelID() done @ %ld ms", Timer.Elapsed());
 #endif
 
         InsertCutLengthSize(Recording, RecAdditional);  // Process marks and insert text
@@ -2583,7 +2584,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         }
     }
 #ifdef DEBUGEPGTIME
-    dsyslog("flatPlus: DrawRecordingInfo() TVSscraper time @ %ld ms", Timer.Elapsed());
+    dsyslog("flatPlus: DrawRecordingInfo() TVSScraper time @ %ld ms", Timer.Elapsed());
 #endif
 
     // First run setup
@@ -2686,9 +2687,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
                                             *TimeString(Recording->Start()),
                                             (RecInfo->ChannelName()) ? RecInfo->ChannelName() : "")};
 
-    cString Title {RecInfo->Title()};
-    if (isempty(*Title)) Title = Recording->Name();
-
+    const cString Title {RecInfo->Title() ? RecInfo->Title() : Recording->Name()};
     const cString ShortText {RecInfo->ShortText() ? RecInfo->ShortText() : " - "};  // No short text. Show ' - '
     const int ShortTextWidth {m_FontSml->Width(*ShortText)};
     int MaxWidth {HeadIconLeft - m_MarginItem};
@@ -2754,10 +2753,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     DecorBorderDraw(ib, false);
 
     if (Scrollable) {
-        const int ScrollOffset {ComplexContent.ScrollOffset()};
-        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
-                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), true);
     }
 
     const sDecorBorder RecordingBorder {m_cLeft,
@@ -2795,7 +2792,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
     const int Left {Config.decorBorderMenuContentSize};  // Config.decorBorderMenuContentSize
     const int Top {m_TopBarHeight + m_MarginItem + Config.decorBorderTopBarSize * 2 + Left};
-    int Width {m_MenuWidth - Left * 2};
+    const int Width {m_MenuWidth - Left * 2};
     int Height {m_OsdHeight - (m_TopBarHeight + Config.decorBorderTopBarSize * 2 + m_ButtonsHeight +
                                Config.decorBorderButtonSize * 2 + Left * 2 + m_MarginItem)};
 
@@ -2822,10 +2819,8 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     ComplexContent.Draw();
 
     if (Scrollable) {
-        const int ScrollOffset {ComplexContent.ScrollOffset()};
-        DrawScrollbar(ComplexContent.ScrollTotal(), ScrollOffset, ComplexContent.ScrollShown(),
-                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), ScrollOffset > 0,
-                      ScrollOffset + ComplexContent.ScrollShown() < ComplexContent.ScrollTotal(), true);
+        DrawScrollbar(ComplexContent.ScrollTotal(), ComplexContent.ScrollOffset(), ComplexContent.ScrollShown(),
+                      ComplexContent.Top() - m_ScrollBarTop, ComplexContent.Height(), true);
     }
 
     const sDecorBorder ib {.Left = Left,
@@ -2871,7 +2866,7 @@ void cFlatDisplayMenu::Flush() {
             LOCK_RECORDINGS_READ;
             LOCK_SCHEDULES_READ;
             const cSchedule *Schedule {Schedules->GetSchedule(m_EventChannelID)};
-            if (const cEvent *Event = Schedule ? Schedule->GetEventById(m_EventID) : nullptr)
+            if (const cEvent *Event {Schedule ? Schedule->GetEventById(m_EventID) : nullptr})
                 DrawEventInfo(Event);
             else
                 m_EventInfoDrawn = true;  // Gone meanwhile; nothing to draw
@@ -2882,7 +2877,7 @@ void cFlatDisplayMenu::Flush() {
             LOCK_TIMERS_READ;
             LOCK_CHANNELS_READ;
             LOCK_RECORDINGS_READ;
-            if (const cRecording *Recording = Recordings->GetByName(*m_RecordingFileName))
+            if (const cRecording *Recording {Recordings->GetByName(*m_RecordingFileName)})
                 DrawRecordingInfo(Recording);
             else
                 m_RecordingInfoDrawn = true;
@@ -3526,7 +3521,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices(int wLeft, int wWidth, int Co
     }
 
     // Find all recording devices and set RecDevices[] to true for these devices
-    bool RecDevices[NumDevices] {false};  // Array initialised to false
+    std::array<bool, MAXDEVICES> RecDevices {false};
     {
         LOCK_TIMERS_READ;  // Creates local const cTimers *Timers
         for (const cTimer *Timer {Timers->First()}; Timer; Timer = Timers->Next(Timer)) {
@@ -4399,7 +4394,7 @@ void cFlatDisplayMenu::PreLoadImages() {
         ImageBgWidth = img->Width();
     }
 
-    //* Same as in 'displaychannel.c' 'PreLoadImages()', but different logo size!
+    //* Same as in 'displaychannel.cpp' 'PreLoadImages()', but different logo size!
     uint16_t i {0};
     LOCK_CHANNELS_READ;  // Creates local const cChannels *Channels
     for (const cChannel *Channel {Channels->First()}; Channel && i < kLogoPreCache; Channel = Channels->Next(Channel)) {

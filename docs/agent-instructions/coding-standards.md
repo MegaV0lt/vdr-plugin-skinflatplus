@@ -1,6 +1,8 @@
 # Coding Standards
 
-Conventions for the skinflatplus C++ codebase. Code formatting (braces, indentation, line width, pointer alignment) is handled by `.clang-format`, so it is not repeated here. This file covers naming, comments, and error handling only.
+- Conventions for the skinflatplus C++ codebase. Code formatting (braces, indentation, line width, pointer lignment) is  handled by `.clang-format`, so it is not repeated here. This file covers naming, comments, and error handling only.
+- Prefer c++-style code over c-style code (e.g. use STL array or vector over C-Style array)
+- Consider style guide at https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines
 
 ## Naming Conventions
 

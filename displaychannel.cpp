@@ -424,8 +424,7 @@ void cFlatDisplayChannel::SetEvents(const cEvent *Present, const cEvent *Followi
     for (int8_t i {0}; i < 2; i++) {
         bool IsRec {false};
         const bool IsPresent {(i) ? false : true};
-        const cEvent *Event {(IsPresent) ? Present : Following};
-        if (Event) {
+        if (const cEvent *Event {(IsPresent) ? Present : Following}; Event) {
             StartTime = *Event->GetTimeString();  // Start time (Left side)
             // Use of – (EN DASH, U+2013) instead of - (HYPHEN-MINUS, U+002D) for better readability
             // https://en.wikipedia.org/wiki/Wikipedia:Manual_of_Style/Dates_and_numbers#Time_ranges
@@ -936,8 +935,7 @@ void cFlatDisplayChannel::ZapDrawChannelItem(cPixmap *Pixmap, const cChannel *Ch
     const cEvent *Present {nullptr}, *Following {nullptr};
     {
         LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
-        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
-        if (Schedule) {
+        if (const cSchedule *Schedule {Schedules->GetSchedule(Channel)}) {
             Present = Schedule->GetPresentEvent();
             Following = Schedule->GetFollowingEvent();
         }
@@ -1063,8 +1061,7 @@ void cFlatDisplayChannel::SetChannelInfo(const cChannel *Channel) {
     const cEvent *Present {nullptr}, *Following {nullptr};
     {
         LOCK_SCHEDULES_READ;  // Creates local const cSchedules *Schedules
-        const cSchedule *Schedule {Schedules->GetSchedule(Channel)};
-        if (Schedule) {
+        if (const cSchedule *Schedule {Schedules->GetSchedule(Channel)}) {
             Present = Schedule->GetPresentEvent();
             Following = Schedule->GetFollowingEvent();
         }
@@ -1142,8 +1139,8 @@ void cFlatDisplayChannel::SignalQualityDraw() {
 
     if (!ChanInfoBottomPixmap) return;
 
-    const int SignalStrength {cDevice::ActualDevice()->SignalStrength()};
-    const int SignalQuality {cDevice::ActualDevice()->SignalQuality()};
+    const int SignalStrength {cDevice::ActualDevice()->SignalStrength()};  // 0..100 (-1 = Error)
+    const int SignalQuality {cDevice::ActualDevice()->SignalQuality()};    // 0..100 (-1 = Error)
     if (m_LastSignalStrength == SignalStrength && m_LastSignalQuality == SignalQuality) return;
 
     m_LastSignalStrength = SignalStrength;
@@ -1163,16 +1160,19 @@ void cFlatDisplayChannel::SignalQualityDraw() {
                             m_MarginItem};
     const int ProgressWidth {m_ChannelWidth / 4 - ProgressLeft - m_MarginItem};
     cRect ProgressBar {ProgressLeft, top, ProgressWidth, Config.decorProgressSignalSize};
-    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalStrength, 100,
-                       Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
-                       Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
+    // Draw the progress bars with the configured colors and style (solid, gradient, etc.)
+    // Note: A value of -1 (Error) is drawn as empty bar
+    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar,
+                       std::max(SignalStrength, 0), 100, Config.decorProgressSignalFg, Config.decorProgressSignalBarFg,
+                       Config.decorProgressSignalBg, Config.decorProgressSignalType, false,
+                       Config.SignalQualityUseColors);
 
     top += Config.decorProgressSignalSize + m_MarginItem;
     ChanInfoBottomPixmap->DrawText(cPoint(left, top), "SNR", Theme.Color(clrChannelSignalFont),
                                    Theme.Color(clrChannelBg), m_SignalFont);
     ProgressBar.SetY(top);
-    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, SignalQuality, 100,
-                       Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
+    ProgressBarDrawRaw(ChanInfoBottomPixmap, ChanInfoBottomPixmap, ProgressBar, ProgressBar, std::max(SignalQuality, 0),
+                       100, Config.decorProgressSignalFg, Config.decorProgressSignalBarFg, Config.decorProgressSignalBg,
                        Config.decorProgressSignalType, false, Config.SignalQualityUseColors);
 
     m_SignalStrengthRight = ProgressLeft + ProgressWidth;
@@ -1347,7 +1347,7 @@ void cFlatDisplayChannel::PreLoadImages() {
         ImgLoader.GetIcon("audio_dolby", kIconMaxSize, m_FontSmlHeight);
         ImgLoader.GetIcon("audio_stereo", kIconMaxSize, m_FontSmlHeight);
 
-        // Audio tracks (displaytracks.c)
+        // Audio tracks (displaytracks.cpp)
         ImgLoader.GetIcon("tracks_ac3", kIconMaxSize, m_FontHeight);
         ImgLoader.GetIcon("tracks_stereo", kIconMaxSize, m_FontHeight);
     }
