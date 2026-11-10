@@ -14,8 +14,9 @@
 
 #include <unistd.h>
 
+#include <array>
 #include <cstdio>
-#include <cstdlib>
+// #include <cstdlib>
 #include <cstring>
 #include <ctime>
 
@@ -437,9 +438,9 @@ void cFlatSetupGeneral::SaveCurrentSettings() {
     time_t t {time(0)};
     struct tm tm_r;
     localtime_r(&t, &tm_r);
-    char time[32];
-    strftime(time, sizeof(time)-1, "%d.%m.%Y_%H:%M", &tm_r);
-    cString File {time};
+    std::array<char, 32> time {};
+    strftime(time.data(), time.size() - 1, "%d.%m.%Y_%H:%M", &tm_r);
+    cString File {time.data()};
     cString Filename {cString::sprintf("%s/configs/%s", cPlugin::ConfigDirectory(PLUGIN_NAME_I18N), *File)};
 
     // If file exist remove it

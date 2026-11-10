@@ -10,6 +10,7 @@
 #include <vdr/tools.h>
 
 #include <algorithm>
+#include <array>
 
 #include "./flat.h"
 
@@ -267,7 +268,7 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
-    static constexpr const char *Images[] {"banner.jpg", "poster.jpg", "fanart.jpg", "cover_vdr.jpg"};
+    static constexpr std::array<const char *, 4> Images {"banner.jpg", "poster.jpg", "fanart.jpg", "cover_vdr.jpg"};
     for (const char* const &Image : Images) {
         if (CheckImageExistence(RecPath, Image, found)) {
             return true;

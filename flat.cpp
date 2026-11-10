@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cerrno>
 #include <cmath>
@@ -288,10 +289,9 @@ void InsertMovieInfos(const cMovie &Movie, cString &MovieInfo) {  // NOLINT
 cString GetAspectIcon(int ScreenWidth, double ScreenAspect) {
     if (Config.ChannelSimpleAspectFormat && ScreenWidth > 720) return (ScreenWidth > 1920) ? "uhd" : "hd";  // UHD or HD
 
-    static constexpr double ScreenAspects[] {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
-    static constexpr const char *ScreenAspectNames[] {"169", "169w", "169w", "43", "221"};
-    const uint16_t ScreenAspectNums {sizeof(ScreenAspects) / sizeof(ScreenAspects[0])};
-    for (std::size_t i {0}; i < ScreenAspectNums; ++i) {
+    static constexpr std::array<double, 5> ScreenAspects {16.0 / 9.0, 20.0 / 11.0, 15.0 / 11.0, 4.0 / 3.0, 2.21};
+    static constexpr std::array<const char *, 5> ScreenAspectNames {"169", "169w", "169w", "43", "221"};
+    for (std::size_t i {0}; i < ScreenAspects.size(); ++i) {
         if (std::abs(ScreenAspect - ScreenAspects[i]) < 0.0001)  // Compare double with epsilon tolerance
             return cString(ScreenAspectNames[i]);
     }
@@ -310,12 +310,12 @@ cString GetScreenResolutionIcon(int ScreenWidth, int ScreenHeight) {
     544x576 (PAL)                 528x576 (PAL)
     480x576 (PAL SVCD)            352x576 (PAL CVD) */
 
-    static constexpr const char *ResNames[] {"7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080",
-                                             "1280x720",  "960x720",   "720x576",   "704x576",   "544x576",
-                                             "528x576",   "480x576",   "352x576"};
-    static constexpr int16_t ResWidths[] {7680, 3840, 2560, 1920, 1440, 1280, 960, 720, 704, 544, 528, 480, 352};
-    const uint16_t ResNums {sizeof(ResNames) / sizeof(ResNames[0])};
-    for (std::size_t i {0}; i < ResNums; ++i) {
+    static constexpr std::array<const char *, 13> ResNames {
+        "7680x4320", "3840x2160", "2560x1440", "1920x1080", "1440x1080", "1280x720", "960x720",
+        "720x576",   "704x576",   "544x576",   "528x576",   "480x576",   "352x576"};
+    static constexpr std::array<int16_t, 13> ResWidths {7680, 3840, 2560, 1920, 1440, 1280, 960,
+                                                        720,  704,  544,  528,  480,  352};
+    for (std::size_t i {0}; i < ResNames.size(); ++i) {
         if (ScreenWidth == ResWidths[i]) return cString(ResNames[i]);
     }
 

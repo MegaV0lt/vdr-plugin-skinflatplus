@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <memory>
 
@@ -17,8 +18,8 @@
 class ImageScaler {
  public:
     struct Filter {
-        unsigned int  m_offset;
-        int16_t       m_coeff[4];
+        unsigned int m_offset;
+        std::array<int16_t, 4> m_coeff;
     };
 
     ImageScaler();
@@ -88,15 +89,14 @@ class ImageScaler {
         }
 
      private:
-        int m_comp[4];
+       std::array<int, 4> m_comp;
     };
 
     //! This is called whenever one input line is processed completely
     void NextSourceLine();
     unsigned int PackPixel(int c0, int c1, int c2, int c3);
 
-    TmpPixel      m_hbuf[4];      //! Ring buffer for 4 input pixels
-    // char      *m_memory;
+    std::array<TmpPixel, 4> m_hbuf;  //! Ring buffer for 4 input pixels
     std::unique_ptr<char[]> m_memory;  //! Buffer container - use std::unique_ptr to manage memory
     Filter       *m_hor_filters;  //! Buffer for horizontal filters (one for each output image column)
     Filter       *m_ver_filters;  //! Buffer for vertical   filters (one for each output image row)

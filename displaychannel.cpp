@@ -9,8 +9,9 @@
 
 #include <vdr/device.h>
 
-#include <algorithm>
 #include <cstddef>
+#include <algorithm>
+#include <array>
 #include <string>
 
 #include "./flat.h"
@@ -709,12 +710,12 @@ void cFlatDisplayChannel::ZapHideBaseElements() {
     m_ZapBaseHidden = true;
     m_ZapEpgImagesHidden = true;  // EPG image and weather widget are also hidden when the base elements are hidden
 
-    cPixmap *BasePixmaps[] {TopBarPixmap,     TopBarIconBgPixmap,      TopBarIconPixmap,   ChanInfoTopPixmap,
-                            ChanInfoBottomPixmap, ChanLogoBgPixmap,    ChanLogoPixmap,     ChanIconsPixmap,
-                            ChanEpgImagesPixmap,  ProgressBarPixmapBg, ProgressBarPixmap,  ProgressBarMarkerPixmap,
-                            DecorPixmap};
+    const std::array<cPixmap *, 13> BasePixmaps {
+        TopBarPixmap,      TopBarIconBgPixmap,      TopBarIconPixmap, ChanInfoTopPixmap,   ChanInfoBottomPixmap,
+        ChanLogoBgPixmap,  ChanLogoPixmap,          ChanIconsPixmap,  ChanEpgImagesPixmap, ProgressBarPixmapBg,
+        ProgressBarPixmap, ProgressBarMarkerPixmap, DecorPixmap};
     m_ZapHiddenPixmaps.clear();
-    m_ZapHiddenPixmaps.reserve(sizeof(BasePixmaps) / sizeof(BasePixmaps[0]));
+    m_ZapHiddenPixmaps.reserve(BasePixmaps.size());
     for (cPixmap *Pixmap : BasePixmaps) {
         if (Pixmap && Pixmap->Layer() >= 0) {
             m_ZapHiddenPixmaps.emplace_back(Pixmap, Pixmap->Layer());
@@ -732,9 +733,9 @@ void cFlatDisplayChannel::ZapHideInfoElements() {
     if (m_ZapEpgImagesHidden) return;
     m_ZapEpgImagesHidden = true;
 
-    cPixmap *InfoElementPixmaps[] {ChanEpgImagesPixmap, ChanInfoTopPixmap};
+    const std::array<cPixmap *, 2> InfoElementPixmaps {ChanEpgImagesPixmap, ChanInfoTopPixmap};
     m_ZapHiddenPixmaps.clear();
-    m_ZapHiddenPixmaps.reserve(sizeof(InfoElementPixmaps) / sizeof(InfoElementPixmaps[0]));
+    m_ZapHiddenPixmaps.reserve(InfoElementPixmaps.size());
     for (cPixmap *Pixmap : InfoElementPixmaps) {
         if (Pixmap && Pixmap->Layer() >= 0) {
             m_ZapHiddenPixmaps.emplace_back(Pixmap, Pixmap->Layer());
@@ -773,7 +774,7 @@ void cFlatDisplayChannel::ZapShowBaseElements() {
 // anchored to. Runs blocking for at most one second.
 void cFlatDisplayChannel::ZapRunShowAnimation() {
     m_ZapAnimPending = false;
-    cPixmap *Pixmaps[2] {m_ZapAnimPixmap1, m_ZapAnimPixmap2};
+    const std::array<cPixmap *, 2> Pixmaps {m_ZapAnimPixmap1, m_ZapAnimPixmap2};
     m_ZapAnimPixmap1 = m_ZapAnimPixmap2 = nullptr;
 
     const int ShiftTime {std::clamp(Config.ChannelZapcockpitShiftTime, 0, 1'000)};

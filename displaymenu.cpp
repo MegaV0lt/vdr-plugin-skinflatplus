@@ -973,9 +973,9 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
     } else {
         const time_t Day {Timer->Day()};
         struct tm *tm_r {gmtime(&Day)};  // NOLINT gmtime() is not thread-safe
-        char buf[12];
-        strftime(buf, sizeof(buf), "%Y%m%d", tm_r);
-        day = buf;
+        std::array<char, 12> buf {};
+        strftime(buf.data(), buf.size(), "%Y%m%d", tm_r);
+        day = buf.data();
     }
     const char *File {(Setup.FoldersInTimerMenu) ? nullptr : strrchr(Timer->File(), FOLDERDELIMCHAR)};
     if (File && strcmp(File + 1, TIMERMACRO_TITLE) && strcmp(File + 1, TIMERMACRO_EPISODE))
@@ -1255,10 +1255,10 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
         if (WithDate) {  // Draw day and date (Mon 01.)
             const time_t Day {Event->StartTime()};
             struct tm *tm_r {gmtime(&Day)};  // NOLINT gmtime() is not thread-safe
-            char buf[3];
-            snprintf(buf, sizeof(buf), "%2d", tm_r->tm_mday);
+            std::array<char, 3> buf {};
+            snprintf(buf.data(), buf.size(), "%2d", tm_r->tm_mday);
 
-            Buffer = cString::sprintf("%s %s. ", *WeekDayName(Day), buf);
+            Buffer = cString::sprintf("%s %s. ", *WeekDayName(Day), buf.data());
             if (MenuEventViewShort && Channel) {  // flatPlus short, flatPlus short + EPG
                 w = FontCache.GetStringWidth(m_FontSmlName, m_FontSmlHeight, "Mon 00. ");
                 MenuPixmap->DrawText(cPoint(LeftSecond, Top + m_FontHeight), *Buffer, ColorFg, ColorBg, m_FontSml,
@@ -2837,7 +2837,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
 
 void cFlatDisplayMenu::SetMenuSortMode(eMenuSortMode MenuSortMode) {
     // Do not set sort icon if mode is unknown
-    static constexpr const char *SortIcons[] {"", "SortNumber", "SortName", "SortDate", "SortProvider"};
+    static constexpr std::array<const char *, 5> SortIcons {"", "SortNumber", "SortName", "SortDate", "SortProvider"};
     if (MenuSortMode > msmUnknown && MenuSortMode <= msmProvider) TopBarSetMenuIconRight(SortIcons[MenuSortMode]);
 }
 
@@ -2973,7 +2973,7 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
     dsyslog("flatPlus: cFlatDisplayMenu::GetIconName() '%s'", *element);
 #endif
 
-    static constexpr const char *items[] {"Schedule", "Channels", "Timers", "Recordings", "Setup",
+    static constexpr std::array<const char *, 16> items {"Schedule", "Channels", "Timers", "Recordings", "Setup",
 #if VDRVERSNUM >= 20708
         "Button$Commands",
 #else
@@ -3048,10 +3048,12 @@ cString cFlatDisplayMenu::GetIconName(const cString &element) const {
 }
 
 cString cFlatDisplayMenu::GetMenuIconName() const {
-    static constexpr struct {
+    struct MenuIconEntry {
         eMenuCategory category;
         const char *icon;
-    } MenuIcons[] {{mcMain, "menuIcons/" VDRLOGO},
+    };
+    static constexpr std::array<MenuIconEntry, 28 + (APIVERSNUM >= 30012 ? 1 : 0)> MenuIcons {{
+                   {mcMain, "menuIcons/" VDRLOGO},
                    {mcSchedule, "menuIcons/Schedule"},
                    {mcScheduleNow, "menuIcons/Schedule"},
                    {mcScheduleNext, "menuIcons/Schedule"},
@@ -3081,7 +3083,7 @@ cString cFlatDisplayMenu::GetMenuIconName() const {
                    {mcEvent, "extraIcons/Info"},
                    {mcText, "Text"},
                    {mcFolder, "folder"},
-                   {mcCam, "menuIcons/Cam"}};             //? New icon?
+                   {mcCam, "menuIcons/Cam"}}};            //? New icon?
     // Use structured binding
     for (const auto &[category, icon] : MenuIcons) {
         if (category == m_MenuCategory) return cString(icon);
@@ -3244,7 +3246,7 @@ bool cFlatDisplayMenu::IsRecordingOld(const cRecording *Recording, int Level) co
 }
 
 const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
-    static constexpr const char *icons[][16] {
+    static constexpr std::array<std::array<const char *, 16>, 11> icons {{
         // MovieDrama
         {"Movie_Drama", "Detective_Thriller", "Adventure_Western_War", "Science Fiction_Fantasy_Horror", "Comedy",
          "Soap_Melodrama_Folkloric", "Romance", "Serious_Classical_Religious_Historical Movie_Drama",
@@ -3276,15 +3278,14 @@ const char *cFlatDisplayMenu::GetGenreIcon(uchar genre) const {
         {"Leisure_Hobbies", "Tourism_Travel", "Handicraft", "Motoring", "Fitness_Health", "Cooking",
          "Advertisement_Shopping", "Gardening"},
         // Special
-        {"Original Language", "Black & White", "Unpublished", "Live Broadcast"}};
+        {"Original Language", "Black & White", "Unpublished", "Live Broadcast"}}};
 
-    static constexpr uchar BaseGenres[] {
+    static constexpr std::array<uchar, 11> BaseGenres {{
         ecgMovieDrama,         ecgNewsCurrentAffairs, ecgShow,        ecgSports,
         ecgChildrenYouth,      ecgMusicBalletDance,   ecgArtsCulture, ecgSocialPoliticalEconomics,
-        ecgEducationalScience, ecgLeisureHobbies,     ecgSpecial};
+        ecgEducationalScience, ecgLeisureHobbies,     ecgSpecial}};
 
-    const std::size_t GenreNums {sizeof(BaseGenres) / sizeof(BaseGenres[0])};
-    for (std::size_t i {0}; i < GenreNums; ++i) {
+    for (std::size_t i {0}; i < BaseGenres.size(); ++i) {
         if ((genre & 0xF0) == BaseGenres[i]) {
             // Return the first icon for the genre if field is empty
             return (isempty(icons[i][genre & 0x0F])) ? icons[i][0] : icons[i][genre & 0x0F];
@@ -3426,7 +3427,7 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
 
     // Build a static table of all possible widgets with their draw function pointers.
     // 'position' is the configured position; we sort by it at runtime.
-    WidgetEntry entries[9] {
+    std::array<WidgetEntry, 9> entries {{
         {Config.MainMenuWidgetDVBDevicesPosition, &Config.MainMenuWidgetDVBDevicesShow,
          &cFlatDisplayMenu::DrawMainMenuWidgetDVBDevices},
         {Config.MainMenuWidgetActiveTimerPosition, &Config.MainMenuWidgetActiveTimerShow,
@@ -3444,10 +3445,10 @@ void cFlatDisplayMenu::DrawMainMenuWidgets() {
         {Config.MainMenuWidgetCommandPosition, &Config.MainMenuWidgetCommandShow,
          &cFlatDisplayMenu::DrawMainMenuWidgetCommand},
         {Config.MainMenuWidgetWeatherPosition, &Config.MainMenuWidgetWeatherShow,
-         &cFlatDisplayMenu::DrawMainMenuWidgetWeather}};
+         &cFlatDisplayMenu::DrawMainMenuWidgetWeather}}};
 
     // Sort entries by configured 'position'
-    std::sort(std::begin(entries), std::end(entries), WidgetEntryCompare);
+    std::sort(entries.begin(), entries.end(), WidgetEntryCompare);
 
     int AddHeight {0}, ContentTop {0};
     for (const auto &e : entries) {
@@ -3991,10 +3992,12 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         // Items are stored in an array, in which case they need to be marked differently
         // Using the trNOOP() macro, the actual translation is then done when such a text is used
         // https://github.com/vdr-projects/vdr/wiki/The-VDR-Plugin-System#internationalization
-        const struct ItemData {
+        struct ItemData {
             const char *key;
             const char *label;
-        } items[] {{"sys_version", trNOOP("System Version")},
+        };
+        const std::array<ItemData, 17> items {{
+                   {"sys_version", trNOOP("System Version")},
                    {"kernel_version", trNOOP("Kernel Version")},
                    {"uptime", trNOOP("Uptime")},
                    {"load", trNOOP("Load")},
@@ -4010,7 +4013,7 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
                    {"pccase", trNOOP("Temp PC-Case")},
                    {"motherboard", trNOOP("Temp MB")},
                    {"updates", trNOOP("Updates")},
-                   {"security_updates", trNOOP("Security Updates")}};
+                   {"security_updates", trNOOP("Security Updates")}}};
 
         cString item {""}, ItemContent {""}, ItemFilename {""};
         int Column {1};

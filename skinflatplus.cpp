@@ -9,6 +9,8 @@
 #include <vdr/plugin.h>
 #include <Magick++.h>
 
+#include <array>
+
 #if defined(APIVERSNUM) && APIVERSNUM < 20308
 #error "VDR-2.3.8 API version or greater is required!"
 #endif
@@ -61,13 +63,11 @@ const char *cPluginFlat::CommandLineHelp() {
 
 bool cPluginFlat::ProcessArgs(int argc, char *argv[]) {
     // Implement command line argument processing here if applicable.
-    static const struct option long_options[] {
-        { "logopath", required_argument, NULL, 'l' },
-        { NULL }
-    };
+    static const std::array<struct option, 2> long_options {
+        {{"logopath", required_argument, nullptr, 'l'}, {nullptr, 0, nullptr, 0}}};
 
     int c {0};
-    while ((c = getopt_long(argc, argv, "l:", long_options, NULL)) != -1) {
+    while ((c = getopt_long(argc, argv, "l:", long_options.data(), nullptr)) != -1) {
         switch (c) {
             case 'l':
                 Config.SetLogoPath(cString(optarg));
@@ -149,13 +149,11 @@ bool cPluginFlat::Service(const char *Id, void *Data) {
 }
 
 const char **cPluginFlat::SVDRPHelpPages() {
-    static const char *HelpPages[] {
-        "RLFC\n"
-        "    Remove Logo From Cache.\n"
-        "    Specify logo filename with extension, but without path",
-        NULL
-    };
-    return HelpPages;
+    static std::array<const char *, 2> HelpPages {"RLFC\n"
+                                                  "    Remove Logo From Cache.\n"
+                                                  "    Specify logo filename with extension, but without path",
+                                                  nullptr};
+    return HelpPages.data();
 }
 
 cString cPluginFlat::SVDRPCommand(const char *Command, const char *Option, int &ReplyCode) {

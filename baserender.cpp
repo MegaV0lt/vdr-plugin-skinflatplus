@@ -18,6 +18,7 @@
 #include FT_FREETYPE_H
 
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
@@ -644,9 +645,9 @@ void cFlatBaseRender::ButtonsSet(const char *Red, const char *Green, const char 
 
     m_ButtonsDrawn = false;
 
-    const char *ButtonText[] {Red, Green, Yellow, Blue};                                        // ButtonText
-    const tColor ButtonColor[] {clrButtonRed, clrButtonGreen, clrButtonYellow, clrButtonBlue};  // ButtonColor
-    const int ColorKey[] {Setup.ColorKey0, Setup.ColorKey1, Setup.ColorKey2, Setup.ColorKey3};  // ColorKey
+    const std::array<const char *, 4> ButtonText {Red, Green, Yellow, Blue};
+    const std::array<tColor, 4> ButtonColor {clrButtonRed, clrButtonGreen, clrButtonYellow, clrButtonBlue};
+    const std::array<int, 4> ColorKey {Setup.ColorKey0, Setup.ColorKey1, Setup.ColorKey2, Setup.ColorKey3};
 
     int ButtonWidth {(m_ButtonsWidth - m_MarginItem3) / 4 - Config.decorBorderButtonSize * 2};
     int x {0};
@@ -710,15 +711,16 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
 
     if (!MessagePixmap || !MessageIconPixmap || !Text) return;
 
-    static const struct {
+    struct MessageSetting {
         tColor color;
         const char *icon;
-    } MessageSettings[] {
-        {Theme.Color(clrMessageStatus), "message_status"},    // mtStatus = 0
-        {Theme.Color(clrMessageInfo), "message_info"},        // mtInfo
-        {Theme.Color(clrMessageWarning), "message_warning"},  // mtWarning
-        {Theme.Color(clrMessageError), "message_error"}       // mtError
     };
+    static const std::array<MessageSetting, 4> MessageSettings {{
+        {Theme.Color(clrMessageStatus), "message_status"},  // Status message (mtStatus = 0)
+        {Theme.Color(clrMessageInfo), "message_info"},
+        {Theme.Color(clrMessageWarning), "message_warning"},
+        {Theme.Color(clrMessageError), "message_error"}
+    }};
 
     const int TypeIndex {static_cast<int>(Type)};
     const tColor Col {MessageSettings[TypeIndex].color};
@@ -1746,19 +1748,19 @@ cString cFlatBaseRender::ReadAndExtractData(const cString &FilePath) const {
     const int fd {open(*FilePath, O_RDONLY)};
     if (fd < 0) return "";
 
-    char buf[256];
-    const ssize_t n {read(fd, buf, sizeof(buf) - 1)};
+    std::array<char, 256> buf {};
+    const ssize_t n {read(fd, buf.data(), buf.size() - 1)};
     close(fd);
     if (n <= 0) return "";
 
-    buf[n] = '\0';  // Ensure null-termination
+    buf[static_cast<std::size_t>(n)] = '\0';  // Ensure null-termination
 
     // Cut at line endings
-    char *end {buf};
+    char *end {buf.data()};
     while (*end && *end != '\n' && *end != '\r') ++end;
     *end = '\0';
 
-    return cString(buf);
+    return cString(buf.data());
 }
 
 // --- Disk read batching and stat cache for weather widget and main menu widget
