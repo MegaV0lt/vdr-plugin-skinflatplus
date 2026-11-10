@@ -2279,9 +2279,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             // The recording object is locked in the calling function, so we can safely access the channel name here
             Text.Append(cString::sprintf("%s: %s\n", trVDR("Channel"), RecInfo->ChannelName()));
 
-            const cEvent *Event {RecInfo->GetEvent()};
-            if (Event) {
-                InsertGenreInfo(Event, Text);  // Add genre info
+            if (const cEvent *Event {RecInfo->GetEvent()}) {
+                InsertGenreInfo(Event, Text);  // Add genre info (Starts with '\n')
 
                 if (Event->Contents(0)) Text.Append('\n');
 
@@ -2295,8 +2294,8 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             InsertTSErrors(RecInfo, Text);  // Add TS Error information
 #endif
 
-            const cComponents *Components {RecInfo->Components()};
-            if (Components) InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
+            if (const cComponents *Components {RecInfo->Components()})
+                InsertComponents(Components, Text, true);  // Get info for audio/video and subtitle
 
             if (RecInfo->Aux()) InsertAuxInfos(RecInfo, Text, true);  // Insert aux infos with info line
         }  // if Config.RecordingAdditionalInfoShow
