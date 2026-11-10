@@ -494,7 +494,7 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2023-09-15: Version 0.7.0
 - [fix] Fix wrongly named variables
-- [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+- [add] From SkinElchiHD - Avoid triggering index generation for recordings with empty/missing index
 - [add] Add some 'dooutput' checks
 - [add] Add PixmapFill with null check
 - [add] Log unknown card system

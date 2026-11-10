@@ -621,7 +621,7 @@ void InsertCutLengthSize(const cRecording *Recording, cString &Text) {  // NOLIN
         return;
     }
 
-    // From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+    // From SkinElchiHD - Avoid triggering index generation for recordings with empty/missing index
     if (Recording->NumFrames() > 0) {
         HasMarks = Marks.Load(RecordingFileName, FramesPerSecond, IsPesRecording) && Marks.Count();
         index = std::make_unique<cIndexFile>(RecordingFileName, false, IsPesRecording);  // Assign unique ptr object

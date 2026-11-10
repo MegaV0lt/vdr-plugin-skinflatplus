@@ -2265,7 +2265,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
             Text.Append(RecInfo->Description());
         }
 
-        // Lent from skinelchi
+        // Lent from SkinElchi
         if (Config.RecordingAdditionalInfoShow) {
             if (Text[0] != '\0') Text.Append("\n\n");
             /* {
