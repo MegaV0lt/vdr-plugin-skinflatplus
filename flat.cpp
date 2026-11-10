@@ -433,16 +433,16 @@ void InsertComponents(const cComponents *Components, cString &Text, bool NewLine
         switch (p->stream) {
         case sc_video_MPEG2:
             (p->description) ? ossVideo << p->description << " (MPEG2)"
-                             : ossVideo << ": MPEG2";
+                             : ossVideo << "MPEG2";
             break;
         case sc_video_H264_AVC:
             (p->description) ? ossVideo << p->description << " (H.264)"
-                             : ossVideo << ": H.264";
+                             : ossVideo << "H.264";
             break;
         case sc_video_H265_HEVC:  // Might be not always correct because stream_content_ext (must be 0x0) is
                                   // not available in tComponent
             (p->description) ? ossVideo << p->description << " (H.265)"
-                             : ossVideo << ": H.265";
+                             : ossVideo << "H.265";
             break;
         case sc_audio_MP2:
         case sc_audio_AC3:
