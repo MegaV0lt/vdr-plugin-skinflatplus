@@ -1878,6 +1878,8 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
  * @param Fsk           A string specifying the FSK icon to be loaded and drawn.
  * @param GenreIcons    A vector of genre icon names to be loaded and drawn. The vector is sorted
  *                      and duplicates are removed before drawing.
+ * @return              The x-coordinate of the left edge after drawing the icons, which can be used
+ *                      for further layout calculations.
  */
 int cFlatDisplayMenu::DrawContentHeadFskGenre(const cString &Fsk, std::vector<std::string> &GenreIcons) {
     const int IconHeight {static_cast<int>((m_chHeight - m_MarginItem2) * Config.EpgFskGenreIconSize * 100.0)};
