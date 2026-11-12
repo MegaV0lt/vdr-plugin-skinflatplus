@@ -710,6 +710,7 @@ void cFlatDisplayReplay::SetJump(const char *Jump) {
 void cFlatDisplayReplay::ResolutionAspectDraw() {
 #ifdef DEBUGFUNCSCALL
     dsyslog("flatPlus: cFlatDisplayReplay::ResolutionAspectDraw()");
+    cTimeMs Timer;  // Set Timer
 #endif
 
     if (m_ModeOnly || !IconsPixmap || m_ScreenWidth <= 0 || m_ScreenHeight <= 0) return;
@@ -718,6 +719,11 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
     const int ImageTop {(Config.PlaybackShowEndTime > 0) ? m_FontHeight2 : m_FontHeight};  // Top of bottom line
 
     int left {m_OsdWidth - Config.decorBorderReplaySize * 2};
+
+    // Workaround for overlapping icons. Create a blank image with the same size as the space between icons
+    static cImage BlankImage(cSize(m_MarginItem2, m_FontSmlHeight));
+    BlankImage.Clear();  // Clears the image data by setting all pixels to be fully transparent
+
     cImage *img {nullptr};
     cString IconName {""};
     if (Config.RecordingResolutionAspectShow) {  // Show Aspect (16:9)
@@ -727,7 +733,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
-            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), BlankImage);  // Draw blank image to avoid overlapping icons
         }
 
         IconName = *GetScreenResolutionIcon(m_ScreenWidth, m_ScreenHeight);  // Show Resolution (1920x1080)
@@ -736,7 +742,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
-            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), BlankImage);  // Draw blank image to avoid overlapping icons
         }
     }
 
@@ -747,7 +753,7 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
-            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), BlankImage);  // Draw blank image to avoid overlapping icons
         }
     }
 
@@ -758,9 +764,12 @@ void cFlatDisplayReplay::ResolutionAspectDraw() {
             left -= img->Width();
             IconsPixmap->DrawImage(cPoint(left, ImageTop), *img);
             left -= m_MarginItem2;
-            IconsPixmap->DrawRectangle(cRect(left, ImageTop, m_MarginItem2, m_FontSmlHeight), Theme.Color(clrReplayBg));
+            IconsPixmap->DrawImage(cPoint(left, ImageTop), BlankImage);  // Draw blank image to avoid overlapping icons
         }
     }
+#ifdef DEBUGFUNCSCALL
+    if (Timer.Elapsed() > 1) dsyslog("   ResolutionAspectDraw() took %ld ms", Timer.Elapsed());
+#endif
 }
 
 void cFlatDisplayReplay::SetMessage(eMessageType Type, const char *Text) {
