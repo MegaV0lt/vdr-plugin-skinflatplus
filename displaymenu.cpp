@@ -2228,8 +2228,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     const sDecorBorder ContentBorder {m_cLeft,
                                       m_cTop,
                                       m_cWidth,
-                                      (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
-                                                                                 : ComplexContent.ContentHeight(false),
+                                      ComplexContent.ContentHeight((Config.MenuContentFullSize || Scrollable)),
                                       Config.decorBorderMenuContentSize,
                                       Config.decorBorderMenuContentType,
                                       Config.decorBorderMenuContentFg,
