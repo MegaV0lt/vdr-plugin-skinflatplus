@@ -2372,8 +2372,7 @@ void cFlatDisplayMenu::DrawItemExtraRecording(const cRecording *Recording, const
     const sDecorBorder ib {m_cLeft,
                            m_cTop,
                            m_cWidth,
-                           (Config.MenuContentFullSize) ? ComplexContent.ContentHeight(true)
-                                                        : ComplexContent.ContentHeight(false),
+                           ComplexContent.ContentHeight((Config.MenuContentFullSize)),
                            Config.decorBorderMenuContentSize,
                            Config.decorBorderMenuContentType,
                            Config.decorBorderMenuContentFg,
