@@ -1082,7 +1082,7 @@ bool cFlatDisplayMenu::SetItemTimer(const cTimer *Timer, int Index, bool Current
 
     if (!m_IsScrolling) ItemBorderInsertUnique(ib);
 
-    if (Config.MenuTimerView == 3 && Current) {  // flatPlus short + EPG
+    if (Current && Config.MenuTimerView == 3) {  // flatPlus short + EPG
         const cEvent *Event {Timer->Event()};
         DrawItemExtraEvent(Event, tr("timer not enabled"));
     }
@@ -1456,7 +1456,7 @@ bool cFlatDisplayMenu::SetItemEvent(const cEvent *Event, int Index, bool Current
 
     if (!m_IsScrolling) ItemBorderInsertUnique(ib);
 
-    if (Config.MenuEventView == 3 && Current) DrawItemExtraEvent(Event, "");
+    if (Current && Config.MenuEventView == 3) DrawItemExtraEvent(Event, "");
 
     return true;
 }
@@ -1587,7 +1587,7 @@ bool cFlatDisplayMenu::SetItemRecording(const cRecording *Recording, int Index, 
 
     // Update counts when Level, MenuCategory changes or m_UpdateRecCounts is true.
     // m_UpdateRecCounts is set to true when menu category is set to mcRecording or mcRecordingDel. This is a workaround
-    // to update counts weh a recording got deleted.
+    // to update counts when a recording got deleted.
     static eMenuCategory LastMenuCategory {mcUnknown};
     if (Config.MenuRecordingShowCount && (m_LastItemRecordingLevel != Level ||
         m_MenuCategory != LastMenuCategory || m_UpdateRecCounts)) {
