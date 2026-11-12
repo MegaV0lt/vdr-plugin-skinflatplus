@@ -1946,7 +1946,7 @@ int cFlatDisplayMenu::AddExtraInfo(const char *Title, const cString &Text, cComp
                                cRect(m_MarginItem, ContentTop, m_cWidth - m_MarginItem2, m_cHeight - m_MarginItem2),
                                ColorMenuFontInfo, ColorMenuBg, m_FontMedium);
 
-    return ContentTop;
+    return ContentTop;  //* Return the height without the text!
 }
 
 void cFlatDisplayMenu::SetEvent(const cEvent *Event) {
@@ -2011,8 +2011,8 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
             Text.Append(cString::sprintf("\n%s: %s", tr("FSK"), *Fsk));
         }
 
-        const cComponents *Components {Event->Components()};
-        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
+        if (const cComponents *Components {Event->Components()})
+            InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
     }  // EpgAdditionalInfoShow
 
     // Draw FSK and genre icons and get the left position for the title
