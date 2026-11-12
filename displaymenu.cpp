@@ -2654,7 +2654,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         // Add series information if available
         if (SeriesInfo[0] != '\0') AddExtraInfo(tr("Series information"), SeriesInfo, ComplexContent);
 #ifdef DEBUGEPGTIME
-        dsyslog("flatPlus: DrawRecordingInfo() Epgtext time @ %ld ms", Timer.Elapsed());
+        dsyslog("flatPlus: DrawRecordingInfo() Epg text time @ %ld ms", Timer.Elapsed());
 #endif
 
         // Add actors if available
@@ -2769,9 +2769,7 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
     const sDecorBorder RecordingBorder {m_cLeft,
                                         m_cTop,
                                         m_cWidth,
-                                        (Config.MenuContentFullSize || Scrollable)
-                                            ? ComplexContent.ContentHeight(true)
-                                            : ComplexContent.ContentHeight(false),
+                                        ComplexContent.ContentHeight((Config.MenuContentFullSize || Scrollable)),
                                         Config.decorBorderMenuContentSize,
                                         Config.decorBorderMenuContentType,
                                         Config.decorBorderMenuContentFg,
