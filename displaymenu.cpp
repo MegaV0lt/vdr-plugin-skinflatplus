@@ -2075,7 +2075,7 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
     cImage *img {nullptr};
     int ContentTop {0};
     int MediaWidth {0};
-    const int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
+    int MediaHeight {m_cHeight - m_MarginItem2 - m_FontHeight - m_LineMargin};  // Leave space for title
     bool FirstRun {true};
     bool Scrollable {false};
 
@@ -2113,6 +2113,16 @@ void cFlatDisplayMenu::DrawEventInfo(const cEvent *Event) {
         MediaWidth = m_cWidth / 2 - m_MarginItem2;
         if (MediaPath[0] != '\0') {
             img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);
+            //* Make portrait smaller than poster or banner to prevent wasting of space
+            if (img) {
+                const int Aspect {img->Width() / img->Height()};
+                if (Aspect > 1 && Aspect < 4) {                        //* Portrait (For example 1920x1080)
+                    dsyslog("flatPlus: DrawEventInfo() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
+                             img->Width(), img->Height(), Aspect);
+                    MediaHeight *= (2.0 / 3.0);                                    // Size * 0,666 = 2/3
+                    img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
+                }
+            }
             if (img) {  // Insert image with floating text
                 ComplexContent.AddImageWithFloatedText(
                     img, CIP_Right, *Text, m_MarginItem,
@@ -2616,8 +2626,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
             if (img) {
                 const int Aspect {img->Width() / img->Height()};
                 if (Aspect > 1 && Aspect < 4) {                        //* Portrait (For example 1920x1080)
-                    // dsyslog("flatPlus: SetRecording() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
-                    //         img->Width(), img->Height(), Aspect);
+                    dsyslog("flatPlus: DrawRecordingInfo() Portrait image %dx%d (%d) found! Setting to 2/3 size.",
+                             img->Width(), img->Height(), Aspect);
                     MediaHeight *= (2.0 / 3.0);                                    // Size * 0,666 = 2/3
                     img = ImgLoader.GetFile(*MediaPath, MediaWidth, MediaHeight);  // Reload portrait with new size
                 }
