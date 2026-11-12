@@ -733,7 +733,7 @@ bool cFlatDisplayMenu::SetItemChannel(const cChannel *Channel, int Index, bool C
 
     if (!m_IsScrolling) ItemBorderInsertUnique(ib);
 
-    if (Config.MenuChannelView == 4 && Current) DrawItemExtraEvent(Event, "");
+    if (Current && Config.MenuChannelView == 4) DrawItemExtraEvent(Event, "");
 
     return true;
 }
