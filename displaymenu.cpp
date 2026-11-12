@@ -2552,8 +2552,8 @@ void cFlatDisplayMenu::DrawRecordingInfo(const cRecording *Recording) {
         InsertTSErrors(RecInfo, RecAdditional);
 #endif
 
-        const cComponents *Components {RecInfo->Components()};
-        if (Components) InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
+        if (const cComponents *Components {RecInfo->Components()})
+            InsertComponents(Components, TextAdditional);  // Get info for audio/video and subtitle
 
         if (RecInfo->Aux()) InsertAuxInfos(RecInfo, RecAdditional, false);  // Insert aux infos without info line
     }  // if Config.RecordingAdditionalInfoShow
