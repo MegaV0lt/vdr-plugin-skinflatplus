@@ -2833,8 +2833,7 @@ void cFlatDisplayMenu::SetText(const char *Text, bool FixedFont) {
     const sDecorBorder ib {.Left = Left,
                            .Top = Top,
                            .Width = Width,
-                           .Height = (Config.MenuContentFullSize || Scrollable) ? ComplexContent.ContentHeight(true)
-                                                                                : ComplexContent.ContentHeight(false),
+                           .Height = ComplexContent.ContentHeight((Config.MenuContentFullSize || Scrollable)),
                            .Size = Left,
                            .Type = Config.decorBorderMenuContentType,
                            .ColorFg = Config.decorBorderMenuContentFg,
