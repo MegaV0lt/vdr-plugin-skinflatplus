@@ -181,8 +181,8 @@ inline static unsigned int shift_clamp(int x) {
     // This is a branchless version of:
     // x = (x + 2^21) >> 22;
     // return std::clamp(x, 0, 255);
-    static constexpr int kShiftAmount = 22;
-    static constexpr int kRounding = 1 << (kShiftAmount - 1);  // 2^21
+    static constexpr int kShiftAmount {22};  // 22
+    static constexpr int kRounding {1 << (kShiftAmount - 1)};  // 2^21
     x = (x + kRounding) >> kShiftAmount;
 
     // Branchless [0,255] clamp for signed int (Common C idiom, fast)
@@ -243,22 +243,22 @@ void ImageScaler::NextSourceLine() {
         // Unroll 4 pixels at a time for speed
         for (; i + 3 < m_dst_width; i += 4) {
             // Calculate four pixels at a time using direct component math to avoid temporary objects.
-            const int c00 = src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3;
-            const int c01 = src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3;
-            const int c02 = src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3;
-            const int c03 = src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3;
-            const int c10 = src[4][0] * h0 + src[5][0] * h1 + src[6][0] * h2 + src[7][0] * h3;
-            const int c11 = src[4][1] * h0 + src[5][1] * h1 + src[6][1] * h2 + src[7][1] * h3;
-            const int c12 = src[4][2] * h0 + src[5][2] * h1 + src[6][2] * h2 + src[7][2] * h3;
-            const int c13 = src[4][3] * h0 + src[5][3] * h1 + src[6][3] * h2 + src[7][3] * h3;
-            const int c20 = src[8][0] * h0 + src[9][0] * h1 + src[10][0] * h2 + src[11][0] * h3;
-            const int c21 = src[8][1] * h0 + src[9][1] * h1 + src[10][1] * h2 + src[11][1] * h3;
-            const int c22 = src[8][2] * h0 + src[9][2] * h1 + src[10][2] * h2 + src[11][2] * h3;
-            const int c23 = src[8][3] * h0 + src[9][3] * h1 + src[10][3] * h2 + src[11][3] * h3;
-            const int c30 = src[12][0] * h0 + src[13][0] * h1 + src[14][0] * h2 + src[15][0] * h3;
-            const int c31 = src[12][1] * h0 + src[13][1] * h1 + src[14][1] * h2 + src[15][1] * h3;
-            const int c32 = src[12][2] * h0 + src[13][2] * h1 + src[14][2] * h2 + src[15][2] * h3;
-            const int c33 = src[12][3] * h0 + src[13][3] * h1 + src[14][3] * h2 + src[15][3] * h3;
+            const int c00 {src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3};
+            const int c01 {src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3};
+            const int c02 {src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3};
+            const int c03 {src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3};
+            const int c10 {src[4][0] * h0 + src[5][0] * h1 + src[6][0] * h2 + src[7][0] * h3};
+            const int c11 {src[4][1] * h0 + src[5][1] * h1 + src[6][1] * h2 + src[7][1] * h3};
+            const int c12 {src[4][2] * h0 + src[5][2] * h1 + src[6][2] * h2 + src[7][2] * h3};
+            const int c13 {src[4][3] * h0 + src[5][3] * h1 + src[6][3] * h2 + src[7][3] * h3};
+            const int c20 {src[8][0] * h0 + src[9][0] * h1 + src[10][0] * h2 + src[11][0] * h3};
+            const int c21 {src[8][1] * h0 + src[9][1] * h1 + src[10][1] * h2 + src[11][1] * h3};
+            const int c22 {src[8][2] * h0 + src[9][2] * h1 + src[10][2] * h2 + src[11][2] * h3};
+            const int c23 {src[8][3] * h0 + src[9][3] * h1 + src[10][3] * h2 + src[11][3] * h3};
+            const int c30 {src[12][0] * h0 + src[13][0] * h1 + src[14][0] * h2 + src[15][0] * h3};
+            const int c31 {src[12][1] * h0 + src[13][1] * h1 + src[14][1] * h2 + src[15][1] * h3};
+            const int c32 {src[12][2] * h0 + src[13][2] * h1 + src[14][2] * h2 + src[15][2] * h3};
+            const int c33 {src[12][3] * h0 + src[13][3] * h1 + src[14][3] * h2 + src[15][3] * h3};
             dst[i] = PackPixel(c00, c01, c02, c03);
             dst[i+1] = PackPixel(c10, c11, c12, c13);
             dst[i+2] = PackPixel(c20, c21, c22, c23);
@@ -267,10 +267,10 @@ void ImageScaler::NextSourceLine() {
         }
         // If num pixels is not a multiple of 4, finish the remaining ones
         for (; i < m_dst_width; ++i) {
-            const int c0 = src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3;
-            const int c1 = src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3;
-            const int c2 = src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3;
-            const int c3 = src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3;
+            const int c0 {src[0][0] * h0 + src[1][0] * h1 + src[2][0] * h2 + src[3][0] * h3};
+            const int c1 {src[0][1] * h0 + src[1][1] * h1 + src[2][1] * h2 + src[3][1] * h3};
+            const int c2 {src[0][2] * h0 + src[1][2] * h1 + src[2][2] * h2 + src[3][2] * h3};
+            const int c3 {src[0][3] * h0 + src[1][3] * h1 + src[2][3] * h2 + src[3][3] * h3};
             dst[i] = PackPixel(c0, c1, c2, c3);
             src += 4;
         }

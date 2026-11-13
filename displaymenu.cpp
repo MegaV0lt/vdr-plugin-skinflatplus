@@ -2963,7 +2963,6 @@ cString cFlatDisplayMenu::MainMenuText(const cString &Text) const {
     return (i > 0) ? skipspace(text.substr(i).data()) : text.data();
 }
 
-
 /**
  * Returns the icon name for a menu entry.
  *
