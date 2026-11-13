@@ -47,9 +47,9 @@ cImage *cImageMagickWrapper::CreateImage(int width, int height, bool PreserveAsp
     }
 
     if (PreserveAspect) {
-        static constexpr uint16_t kScaleFactor {1000};
-        const uint32_t scale_w = kScaleFactor * width / w;
-        const uint32_t scale_h = kScaleFactor * height / h;
+        static constexpr int16_t kScaleFactor {1'000};
+        const uint32_t scale_w {kScaleFactor * width / w};
+        const uint32_t scale_h {kScaleFactor * height / h};
         if (scale_w > scale_h)
             width = w * height / h;
         else
@@ -130,7 +130,7 @@ cImage cImageMagickWrapper::CreateImageCopy() {
     cImage image(cSize(w, h));
     tColor *imgData = (tColor *)image.Data();
 #ifdef IMAGEMAGICK7
-    static constexpr uint64_t kScale16 = 1UL << 16;
+    static constexpr uint64_t kScale16 {1UL << 16};
     static constexpr uint64_t kQuantumScaleInt = (255UL * kScale16) / QuantumRange;
     for (int iy {0}, pixel {0}, pix {w * h}; iy < h; ++iy) {
         for (int ix {0}; ix < w; ++ix, ++pixel) {
