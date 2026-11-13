@@ -18,8 +18,8 @@
 class ImageScaler {
  public:
     struct Filter {
-        unsigned int m_offset;
-        std::array<int16_t, 4> m_coeff;
+        unsigned int m_offset {0};
+        std::array<int16_t, 4> m_coeff {};
     };
 
     ImageScaler();

@@ -712,8 +712,8 @@ void cFlatBaseRender::MessageSet(eMessageType Type, const char *Text) {
     if (!MessagePixmap || !MessageIconPixmap || !Text) return;
 
     struct MessageSetting {
-        tColor color;
-        const char *icon;
+        tColor color {clrTransparent};
+        const char *icon {nullptr};
     };
     static const std::array<MessageSetting, 4> MessageSettings {{
         {Theme.Color(clrMessageStatus), "message_status"},  // Status message (mtStatus = 0)

@@ -3400,8 +3400,8 @@ void cFlatDisplayMenu::DrawProgressBarFromText(const cRect &rec, const cRect &re
 
 // Static widget entry: position, pointer to enable flag, member function pointer
 struct WidgetEntry {
-    int position;
-    int *enableFlag;
+    int position {0};
+    int *enableFlag {nullptr};
     int (cFlatDisplayMenu::*drawFn)(int, int, int, int);
 };
 
@@ -3998,8 +3998,8 @@ int cFlatDisplayMenu::DrawMainMenuWidgetSystemInformation(int wLeft, int wWidth,
         // Using the trNOOP() macro, the actual translation is then done when such a text is used
         // https://github.com/vdr-projects/vdr/wiki/The-VDR-Plugin-System#internationalization
         struct ItemData {
-            const char *key;
-            const char *label;
+            const char *key {nullptr};
+            const char *label {nullptr};
         };
         const std::array<ItemData, 17> items {{
                    {"sys_version", trNOOP("System Version")},

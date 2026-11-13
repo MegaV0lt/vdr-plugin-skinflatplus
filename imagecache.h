@@ -48,7 +48,7 @@ class cImageCache {
     void PreLoadImage();
 
     struct ImageKey {
-        cString Name;
+        cString Name {""};
         int16_t Width {0};
         int16_t Height {0};
 

@@ -37,8 +37,6 @@ struct sActor {  // Actor information structure (Name, Role and Path)
 extern class cFlatConfig Config;
 extern class cImageCache ImgCache;
 
-// extern time_t m_RemoteTimersLastRefresh;
-
 class cFlatDisplayMenu;
 extern cTheme Theme;
 

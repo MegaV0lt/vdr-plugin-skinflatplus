@@ -73,8 +73,8 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    cString m_RecordingFileName;  // Recording file name: Looked up in SetRecording() under the Recordings lock
-    tChannelID m_EventChannelID;  // Channel ID: Looked up in SetEvent() under the Schedules lock
+    cString m_RecordingFileName {""};            // Recording file name: Set in SetRecording() under the Recordings lock
+    tChannelID m_EventChannelID {tChannelID()};  // Channel ID: Looked up in SetEvent() under the Schedules lock
     tEventID m_EventID {0};
 
     uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};
@@ -95,7 +95,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
     int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
-    std::vector<sDecorBorder> ItemsBorder;
+    std::vector<sDecorBorder> ItemsBorder {};
 
     bool m_IsScrolling {false};
     bool m_ShowEvent {false};
