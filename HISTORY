@@ -1,7 +1,7 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
 
-2026-xx-xx: Version 1.3.3
+2026-11-15: Version 1.3.3
 - [fix] Thanks to dnehring7 @ github for providing the following fixes:
         - Protect channel and menu list access with locks and avoid keeping cEvent pointers
           beyond SetEvents().
@@ -17,6 +17,8 @@ VDR Plugin 'skin flatPlus' Revision History
            suppress expected missing channel-logo messages during preloading.
 - [update] Justify event and recording descriptions without justifying additional information.
 - [update] Improve image cache logging and fix version extraction in the Makefile.
+- [update] Migrate source files to C++ extensions.
+- [update] Improve formatting and consistency in README.md.
 - [update] Some internal optimizations.
 
 2026-09-28: Version 1.3.2
