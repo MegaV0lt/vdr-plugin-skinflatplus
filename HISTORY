@@ -1,5 +1,26 @@
 VDR Plugin 'skin flatPlus' Revision History
 -------------------------------------------
+
+2026-11-15: Version 1.3.3
+- [fix] Thanks to dnehring7 @ github for providing the following fixes:
+        - Protect channel and menu list access with locks and avoid keeping cEvent pointers
+          beyond SetEvents().
+        - Track progress bar state per display and redraw it only when it changes.
+- [fix] Typo in DrawMainMenuWidgetSystemUpdates() that prevented display of system updates.
+        Thanks to gp2000 @ VDR-Portal.
+- [fix] Prevent overlapping format icons in replay mode.
+- [add] Show menu icons on more sub menus like Setup - OSD.
+- [add] Show PES Format icon if no other info can be found for old pes recordings.
+- [add] Log unknown stream types in InsertComponents().
+- [add] Show a vps symbol for timers and remote timers in timer list.
+- [update] Improve image cache lookup and replacement, allow zero-sized image requests, and
+           suppress expected missing channel-logo messages during preloading.
+- [update] Justify event and recording descriptions without justifying additional information.
+- [update] Improve image cache logging and fix version extraction in the Makefile.
+- [update] Migrate source files to C++ extensions.
+- [update] Improve formatting and consistency in README.md.
+- [update] Some internal optimizations.
+
 2026-09-28: Version 1.3.2
 - [fix] Trigger recording count update when a recording is deleted.
 - [update] Prefix provider name in channel list view when sorted by provider.
@@ -475,7 +496,7 @@ VDR Plugin 'skin flatPlus' Revision History
 
 2023-09-15: Version 0.7.0
 - [fix] Fix wrongly named variables
-- [add] From skinElchiHD - Avoid triggering index generation for recordings with empty/missing index
+- [add] From SkinElchiHD - Avoid triggering index generation for recordings with empty/missing index
 - [add] Add some 'dooutput' checks
 - [add] Add PixmapFill with null check
 - [add] Log unknown card system

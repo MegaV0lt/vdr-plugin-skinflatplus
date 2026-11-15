@@ -73,8 +73,9 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     eMenuCategory m_MenuCategory {mcUndefined};
 
-    const cRecording *m_Recording {nullptr};  // Current recording
-    const cEvent *m_Event {nullptr};          // Current event
+    cString m_RecordingFileName {""};            // Recording file name: Set in SetRecording() under the Recordings lock
+    tChannelID m_EventChannelID {tChannelID()};  // Channel ID: Looked up in SetEvent() under the Schedules lock
+    tEventID m_EventID {0};
 
     uint16_t m_LastTimerActiveCount {0}, m_LastTimerCount {0};
     cString m_LastTitle {""};
@@ -94,7 +95,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
     int m_ItemHeight {0}, m_ItemChannelHeight {0}, m_ItemTimerHeight {0};
     int m_ItemEventHeight {0}, m_ItemRecordingHeight {0};
 
-    std::vector<sDecorBorder> ItemsBorder;
+    std::vector<sDecorBorder> ItemsBorder {};
 
     bool m_IsScrolling {false};
     bool m_ShowEvent {false};
@@ -145,8 +146,7 @@ class cFlatDisplayMenu : public cFlatBaseRender, public cSkinDisplayMenu {
 
     time_t GetLastRecTimeFromFolder(const cRecording *Recording, int Level) const;
 
-    void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool CanScrollUp, bool CanScrollDown,
-                       bool IsContent = false);
+    void DrawScrollbar(int Total, int Offset, int Shown, int Top, int Height, bool IsContent = false);
     int ItemsHeight();
     bool CheckProgressBar(const char *text) const;
     void DrawProgressBarFromText(const cRect &rec, const cRect &recBg, const char *bar, tColor ColorFg,

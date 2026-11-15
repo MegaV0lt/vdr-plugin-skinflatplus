@@ -38,12 +38,8 @@ class cImageCache {
     void Clear();
     bool RemoveFromCache(const cString &Name);
 
-    int GetCacheCount() const {
-      return m_InsertIndex;
-    }
-
-    int GetIconCacheCount() const {
-      return m_InsertIconIndex;
+    int GetCacheCount(bool IconCache = false) const {
+      return IconCache ? m_InsertIconIndex : m_InsertIndex;
     }
 
     cImage *GetImage(const cString &Name, int Width, int Height, bool IsIcon = false) const;
@@ -52,7 +48,7 @@ class cImageCache {
     void PreLoadImage();
 
     struct ImageKey {
-        cString Name;
+        cString Name {""};
         int16_t Width {0};
         int16_t Height {0};
 
@@ -76,8 +72,8 @@ class cImageCache {
     std::vector<ImageData> IconCache;
 
     // O(1) lookup indexes for (Name, Width, Height)->slot
-    std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
-    std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
+    mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
+    mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
 
     std::size_t m_InsertIndex {0};      // Imagecache index
     std::size_t m_InsertIndexBase {0};  // Imagecache after first fill at start

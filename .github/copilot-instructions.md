@@ -3,15 +3,15 @@
 This file gives concise, actionable guidance for coding agents working on this VDR skin/plugin.
 
 **Big picture**:
-- The repo is a VDR skin/plugin (C/C++) centered around drawing OSD elements. Core rendering lives in `baserender.c`.
-- UI components are split across `displaymenu.c`, `displayreplay.c`, `displaychannel.c` (menu, replay, channel OSDs).
-- `flat.c` contains helper utilities including `CreatePixmap()` and other shared helpers.
-- `fontcache.c`, `imagecache.c`, and `imgloader.*` implement resource caching patterns used per OSD lifecycle.
+- The repo is a VDR skin/plugin (C++) centered around drawing OSD elements. Core rendering lives in `baserender.cpp`.
+- UI components are split across `displaymenu.cpp`, `displayreplay.cpp`, `displaychannel.cpp` (menu, replay, channel OSDs).
+- `flat.cpp` contains helper utilities including `CreatePixmap()` and other shared helpers.
+- `fontcache.cpp`, `imagecache.cpp`, and `imgloader.*` implement resource caching patterns used per OSD lifecycle.
 
 **Key patterns & constraints (must-read before edits)**
 - Pixmaps are OSD-specific: a `cPixmap` belongs to a single `cOsd` instance and becomes invalid when that OSD is destroyed. Never assume pixmaps survive across OSD destruction.
-- Resource creation should use the project helper `CreatePixmap(m_Osd, "Name", layer, view, draw)` from `flat.c` (do not call `m_Osd->CreatePixmap` directly).
-- Fonts are provided by the global `FontCache` (see `fontcache.c`) — use it instead of constructing fonts directly.
+- Resource creation should use the project helper `CreatePixmap(m_Osd, "Name", layer, view, draw)` from `flat.cpp` (do not call `m_Osd->CreatePixmap` directly).
+- Fonts are provided by the global `FontCache` (see `fontcache.cpp`) — use it instead of constructing fonts directly.
 - Image/icon loading uses `ImgLoader.LoadIcon()` and `ImgLoader.LoadLogo()` — always check for `nullptr` before use.
 
 **Pixmap lifecycle notes**
@@ -24,7 +24,7 @@ delete m_Osd; // safe after cache removal
 ```
 
 **Weather data flow**
-- Weather widget reads small files under `WIDGETOUTPUTPATH` like `weather.0.temp`, `weather.0.icon-act`, `weather.N.tempMax` etc. See `baserender.c` for reader functions. Cache at the data level (simple struct per widget) instead of caching pixmaps across OSDs.
+- Weather widget reads small files under `WIDGETOUTPUTPATH` like `weather.0.temp`, `weather.0.icon-act`, `weather.N.tempMax` etc. See `baserender.cpp` for reader functions. Cache at the data level (simple struct per widget) instead of caching pixmaps across OSDs.
 
 **Build and developer workflows**
 - The project contains a `Makefile` at repo root — standard build is `make` in the repo root. (Plugin packaging / install is controlled by that Makefile.)
@@ -36,10 +36,10 @@ delete m_Osd; // safe after cache removal
 - Avoid heavy global caches unless you explicitly track `cOsd*` ownership per entry. Prefer small per-widget in-memory caches for data (e.g., weather structs) and re-create pixmaps per OSD lifecycle.
 
 **Files to inspect for context / examples**
-- `baserender.c` — central renderer and many examples of safe pixmap/font/icon usage
-- `flat.c` — helpers including `CreatePixmap()` (use this for creating pixmaps)
-- `fontcache.c` — how fonts are cached (pattern to follow)
-- `displaymenu.c`, `displayreplay.c`, `displaychannel.c` — concrete uses of renderer helpers and defensive checks
+- `baserender.cpp` — central renderer and many examples of safe pixmap/font/icon usage
+- `flat.cpp` — helpers including `CreatePixmap()` (use this for creating pixmaps)
+- `fontcache.cpp` — how fonts are cached (pattern to follow)
+- `displaymenu.cpp`, `displayreplay.cpp`, `displaychannel.cpp` — concrete uses of renderer helpers and defensive checks
 
 **Common pitfalls to avoid**
 - Do not call `m_Osd->DestroyPixmap(p)` on a pixmap that is expected to remain in a cache shared elsewhere. If you add a cache, centralize destroy semantics in the cache and remove all other `DestroyPixmap` calls for cached items.
