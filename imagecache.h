@@ -12,9 +12,10 @@
 
 #include <cstring>
 #include <memory>  // For std::unique_ptr
+#include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>  // For std::vector
-#include <string_view>
 
 static constexpr std::size_t kMaxImageCache {1024};  // Image cache including two times 'kLogoPreCache'
 static constexpr std::size_t kMaxIconCache {512};    // Icon cache (Skin icons)
@@ -44,6 +45,14 @@ class cImageCache {
 
     cImage *GetImage(const cString &Name, int Width, int Height, bool IsIcon = false) const;
     void InsertImage(cImage *Image, const cString &Name, int Width, int Height, bool IsIcon = false);
+
+    // File-path resolution cache. Avoids repeated stat()/LastModifiedTime() disk access
+    // by caching which file path variant (or negative result) a lookup resolves to.
+    // 'Key' is a caller-built, namespaced composite string (see cImageLoader).
+    // Returns true on a cache hit and writes the resolved path to 'Out'.
+    // 'Out' may be empty, indicating a cached negative result (path does not exist).
+    bool ResolvePath(const std::string &Key, cString &Out) const;  // NOLINT (readability-convert-member-functions-to-static)
+    void CacheResolvedPath(const std::string &Key, const cString &Path);
 
     void PreLoadImage();
 
@@ -75,11 +84,21 @@ class cImageCache {
     mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
     mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
 
+    // O(1) lookup cache for resolved file paths. Value is the full path, or empty
+    // for a cached negative result (file does not exist).
+    mutable std::unordered_map<std::string, cString> m_PathCache;
+    // Snapshot of m_PathCache taken after PreLoadImage(). Kept when m_PathCache
+    // overflows, so preloaded entries survive (mirrors the image cache base index).
+    mutable std::unordered_map<std::string, cString> m_PathBaseCache;
+    static constexpr std::size_t kMaxPathCache {2048};  // Upper bound; reduced to base on overflow
+
     std::size_t m_InsertIndex {0};      // Imagecache index
     std::size_t m_InsertIndexBase {0};  // Imagecache after first fill at start
 
     std::size_t m_InsertIconIndex {0};      // Iconcache index
     std::size_t m_InsertIconIndexBase {0};  // Icon cache after first fill at start
+
+    std::size_t m_PathInsertIndexBase {0};  // Path cache entries present after preload (kept on overflow)
 
     void InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize, std::size_t BaseIndex,  // NOLINT
                          cImage *Image, const cString &Name, int Width, int Height);

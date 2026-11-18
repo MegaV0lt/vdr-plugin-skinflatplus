@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <string>
 
 #include "./flat.h"
 
@@ -20,9 +21,56 @@ using Magick::Geometry;
 // External declaration of global logo overwrite flag
 extern bool g_LogoBgOverwrite;
 
+namespace {
+
+// Composite, namespaced keys for the path resolution cache in cImageCache.
+// Prefixes ('L', 'I', 'P') prevent collisions between logos, icons and posters.
+// '\x1f' (unit separator) is used as a field delimiter.
+std::string LogoPathKey(const char *logo) {
+    std::string key {"L"};
+    key += *Config.LogoPath;
+    key += '\x1f';
+    key += logo;
+    return key;
+}
+
+std::string IconPathKey(const char *icon) {
+    std::string key {"I"};
+    key += *Config.IconPath;
+    key += '\x1f';
+    key += Setup.OSDTheme;
+    key += '\x1f';
+    key += icon;
+    return key;
+}
+
+std::string PosterPathKey(const cString &RecPath) {
+    std::string key {"P"};
+    key += std::to_string(Config.TVScraperSearchLocalPosters);
+    key += '\x1f';
+    key += *RecPath;
+    return key;
+}
+
+}  // namespace
+
 cImageLoader::cImageLoader() {}
 
 cImageLoader::~cImageLoader() {}
+
+// Cache lookup: GetImage -> LoadImage -> CreateImage -> InsertImage.
+cImage *cImageLoader::LoadAndScale(const cString &File, int width, int height, bool IsIcon) {
+    cImage *img {ImgCache.GetImage(File, width, height, IsIcon)};
+    if (img) return img;
+
+    if (!LoadImage(*File)) return nullptr;
+
+    img = CreateImage(width, height);
+    if (!img) return nullptr;
+
+    ImgCache.InsertImage(img, File, width, height, IsIcon);
+    return img;
+}
 
 /**
  * @brief Load a logo from a file and scale it to the given width and height.
@@ -45,10 +93,25 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
     cTimeMs Timer;  // Start timer
 #endif
 
+    const std::string Key {LogoPathKey(logo)};
+
+    // Fast path: reuse a previously resolved file path (avoids the variant loop/stat calls).
+    cString CachedFile {""};
+    if (ImgCache.ResolvePath(Key, CachedFile)) {
+#ifdef DEBUGIMAGELOADTIME
+        dsyslog("flatPlus: GetLogo() resolve cache HIT '%s' -> '%s'", logo, *CachedFile);
+#endif
+        if (isempty(*CachedFile)) return nullptr;  // Cached negative result
+        return LoadAndScale(CachedFile, width, height, false);
+    }
+
+#ifdef DEBUGIMAGELOADTIME
+    dsyslog("flatPlus: GetLogo() resolve cache MISS '%s'", logo);
+#endif
+
     // Plain logo without converting to lower including '/'
     cString File {cString::sprintf("%s/%s.%s", *Config.LogoPath, logo, *m_LogoExtension)};
     std::string LogoLower {""};
-    bool success {false};
     cImage *img {nullptr};
     for (int8_t i {0}; i < 3; ++i) {      // Run up to three times (0..2)
         if (i == 1) {                   // Second try (Plain logo not found)
@@ -61,6 +124,7 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
             if (LogoLower.find('/') == std::string::npos) {
                 isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded (no '/' in logo name)",
                         *Config.LogoPath, logo, *m_LogoExtension);
+                ImgCache.CacheResolvedPath(Key, cString(""));
                 return nullptr;
             }
 
@@ -68,39 +132,23 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
             File = cString::sprintf("%s/%s.%s", *Config.LogoPath, LogoLower.c_str(), *m_LogoExtension);
         }
 
-        img = ImgCache.GetImage(*File, width, height);  // Check if image is in imagecache
+        img = LoadAndScale(File, width, height, false);
 
 #ifdef DEBUGIMAGELOADTIME
         dsyslog("   search in cache #%d: %ld ms", i + 1, Timer.Elapsed());
         Timer.Set();  // Reset timer
 #endif
 
-        if (img) return img;  // Image found in imagecache
-
-        success = LoadImage(*File);  // Try to load image from disk
-        if (!success) {              // Image not found on disk
-            if (i == 2 && !Quiet)    // Third try and not found
-                isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
-                        *m_LogoExtension);
-            continue;
+        if (img) {  // Image found in imagecache or loaded from disk
+            ImgCache.CacheResolvedPath(Key, File);
+            return img;
         }
-
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("   load file from disk #%d: %ld ms", i + 1, Timer.Elapsed());
-        Timer.Set();  // Reset timer
-#endif
-
-        img = CreateImage(width, height);
-        if (!img) continue;
-
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("   scale logo #%d: %ld ms", i + 1, Timer.Elapsed());
-#endif
-
-        ImgCache.InsertImage(img, *File, width, height);  // Add image to imagecache
-        return img;  // Image loaded from disk
     }  // for
 
+    if (!Quiet)
+        isyslog("flatPlus: cImageLoader::GetLogo() %s/%s.%s could not be loaded", *Config.LogoPath, logo,
+                *m_LogoExtension);
+    ImgCache.CacheResolvedPath(Key, cString(""));
     return nullptr;  // No image; so return nullptr
 }
 
@@ -119,71 +167,55 @@ cImage* cImageLoader::GetLogo(const char *logo, int width, int height, bool Quie
 cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
     if (width <= 0 || height <= 0 || isempty(cIcon)) return nullptr;
 
-    cString File {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon, *m_LogoExtension)};
+    const std::string Key {IconPathKey(cIcon)};
+
+    // Fast path: reuse a previously resolved file path (avoids the theme/default probing).
+    cString CachedFile {""};
+    if (ImgCache.ResolvePath(Key, CachedFile)) {
+#ifdef DEBUGIMAGELOADTIME
+        dsyslog("flatPlus: GetIcon() resolve cache HIT '%s' -> '%s'", cIcon, *CachedFile);
+#endif
+        if (isempty(*CachedFile)) return nullptr;  // Cached negative result
+        return LoadAndScale(CachedFile, width, height, true);
+    }
 
 #ifdef DEBUGIMAGELOADTIME
-    dsyslog("flatPlus: cImageLoader::GetIcon() '%s'", *File);
-    cTimeMs Timer;  // Start timer
+    dsyslog("flatPlus: GetIcon() resolve cache MISS '%s'", cIcon);
 #endif
 
-    cImage *img {ImgCache.GetImage(*File, width, height, true)};  // Check if image is in imagecache
+    const cString ThemeFile {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, Setup.OSDTheme, cIcon,
+                                              *m_LogoExtension)};
+    const cString DefaultFile {cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon,
+                                                *m_LogoExtension)};
 
-#ifdef DEBUGIMAGELOADTIME
-    dsyslog("   search in cache: %d ms", Timer.Elapsed());
-    Timer.Set();  // Reset timer
-#endif
-
-    if (img) return img;
-
-    bool success {LoadImage(*File)};
-
-#ifdef DEBUGIMAGELOADTIME
-    dsyslog("   load file from disk: %d ms", Timer.Elapsed());
-#endif
-
-    if (!success) {  // Search for logo in default folder
-        File = cString::sprintf("%s/%s/%s.%s", *Config.IconPath, "default", cIcon, *m_LogoExtension);
-
+    // Try theme-specific path first, then fall back to 'default'.
+    for (const cString &File : {ThemeFile, DefaultFile}) {
 #ifdef DEBUGIMAGELOADTIME
         dsyslog("flatPlus: cImageLoader::GetIcon() '%s'", *File);
-        Timer.Set();  // Reset timer
 #endif
+        cImage *img {ImgCache.GetImage(File, width, height, true)};
+        if (img) {
+            ImgCache.CacheResolvedPath(Key, File);
+            return img;
+        }
 
-        img = ImgCache.GetImage(*File, width, height, true);  // Check if image is in imagecache
+        if (!LoadImage(*File)) continue;  // Not found, try next candidate
 
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("   search in cache: %d ms", Timer.Elapsed());
-        Timer.Set();  // Reset timer
-#endif
-
-        if (img) return img;
-
-        success = LoadImage(*File);
-
-#ifdef DEBUGIMAGELOADTIME
-        dsyslog("   load file from disk: %d ms", Timer.Elapsed());
-        Timer.Set();  // Reset timer
-#endif
-
-        if (!success) {
-            isyslog("flatPlus: cImageLoader::GetIcon() '%s' could not be loaded", *File);
+        img = CreateImage(width, height);
+        if (!img) {
+            dsyslog("flatPlus: cImageLoader::GetIcon() '%s' 'CreateImage' failed", *File);
+            ImgCache.CacheResolvedPath(Key, File);
             return nullptr;
         }
+
+        ImgCache.InsertImage(img, File, width, height, true);
+        ImgCache.CacheResolvedPath(Key, File);
+        return img;
     }
 
-    img = CreateImage(width, height);
-
-#ifdef DEBUGIMAGELOADTIME
-    dsyslog("   scale logo: %d ms", Timer.Elapsed());
-#endif
-
-    if (!img) {
-        dsyslog("flatPlus: cImageLoader::GetIcon() '%s' 'CreateImage' failed", *File);
-        return nullptr;
-    }
-
-    ImgCache.InsertImage(img, *File, width, height, true);  // Add image to iconcache
-    return img;
+    isyslog("flatPlus: cImageLoader::GetIcon() '%s' could not be loaded", *DefaultFile);
+    ImgCache.CacheResolvedPath(Key, cString(""));
+    return nullptr;
 }
 
 cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
@@ -268,14 +300,36 @@ bool cImageLoader::SearchRecordingPoster(const cString &RecPath, cString &found)
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster()");
 #endif
 
+    const std::string Key {PosterPathKey(RecPath)};
+
+    // Fast path: reuse a previously resolved poster path (avoids up to 12 stat calls).
+    cString CachedFound {""};
+    if (ImgCache.ResolvePath(Key, CachedFound)) {
+#ifdef DEBUGIMAGELOADTIME
+        dsyslog("flatPlus: SearchRecordingPoster() resolve cache HIT '%s' -> '%s'", *RecPath, *CachedFound);
+#endif
+        if (isempty(*CachedFound)) {
+            dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found for %s", *RecPath);
+            return false;
+        }
+        found = CachedFound;
+        return true;
+    }
+
+#ifdef DEBUGIMAGELOADTIME
+    dsyslog("flatPlus: SearchRecordingPoster() resolve cache MISS '%s'", *RecPath);
+#endif
+
     static constexpr std::array<const char *, 4> Images {"banner.jpg", "poster.jpg", "fanart.jpg", "cover_vdr.jpg"};
     for (const char* const &Image : Images) {
         if (CheckImageExistence(RecPath, Image, found)) {
+            ImgCache.CacheResolvedPath(Key, found);
             return true;
         }
     }
 
     dsyslog("flatPlus: cImageLoader::SearchRecordingPoster() No image found for %s", *RecPath);
+    ImgCache.CacheResolvedPath(Key, cString(""));
     return false;
 }
 

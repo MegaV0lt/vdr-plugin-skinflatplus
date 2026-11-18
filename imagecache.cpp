@@ -52,9 +52,31 @@ void cImageCache::Clear() {
 
     m_ImageIndex.clear();
     m_IconIndex.clear();
+    m_PathCache.clear();
+    m_PathBaseCache.clear();
 
     m_InsertIndex = 0;
     m_InsertIconIndex = 0;
+    m_PathInsertIndexBase = 0;
+}
+
+bool cImageCache::ResolvePath(const std::string &Key, cString &Out) const {
+    const auto it {m_PathCache.find(Key)};
+    if (it == m_PathCache.end()) return false;
+
+    Out = it->second;
+    return true;
+}
+
+void cImageCache::CacheResolvedPath(const std::string &Key, const cString &Path) {
+    if (m_PathCache.size() >= kMaxPathCache) {
+        // Keep the entries computed after preloading (see PreLoadImage) and drop the rest,
+        // mirroring how the image cache preserves its preloaded base on overflow.
+        dsyslog("flatPlus: cImageCache::CacheResolvedPath() cache full (%ld), keeping %ld pre loaded path entries",
+                m_PathCache.size(), m_PathInsertIndexBase);
+        m_PathCache = m_PathBaseCache;
+    }
+    m_PathCache[Key] = Path;
 }
 
 static std::string_view BaseNameFromCacheName(std::string_view full) {
@@ -81,7 +103,8 @@ cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
 
     // Fallback to linear search if not found in index
 #ifdef DEBUGFUNCSCALL
-    dsyslog("flatPlus: GetImage() Not found in index, performing linear search for %s (%dx%d)", *Name, Width, Height);
+    dsyslog("flatPlus: cImageCache::GetImage() Not found in index, performing linear search for %s (%dx%d)", *Name,
+            Width, Height);
 #endif
     const auto &cache {IsIcon ? IconCache : ImageCache};
     for (std::size_t slot {0}; slot < cache.size(); ++slot) {
@@ -89,7 +112,6 @@ cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
         if (data.Image && data.Width == Width && data.Height == Height &&
             std::strcmp(*data.Name, *Name) == 0) {
             // Cache the result in the index for future O(1) lookups
-            const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 #ifdef DEBUGFUNCSCALL
             dsyslog("flatPlus: GetImage() Found in linear search, caching index for %s (%dx%d) at slot %ld", *Name,
                     Width, Height, slot);
@@ -175,6 +197,17 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         removedAny = true;
     }
 
+    // Invalidate logo path resolution entries so a re-added logo is re-probed on disk
+    // instead of being served from a stale (possibly negative) cache entry. This is
+    // intentionally broad (all 'L' entries): RLFC is a rare admin command and may be
+    // used precisely to force a refresh when a logo file was added/replaced on disk.
+    for (auto it {m_PathCache.begin()}; it != m_PathCache.end();) {
+        if (!it->first.empty() && it->first.front() == 'L')
+            it = m_PathCache.erase(it);
+        else
+            ++it;
+    }
+
     return removedAny;
 }
 
@@ -185,7 +218,8 @@ void cImageCache::PreLoadImage() {
     cTimeMs Timer;
 
     // Only one OSD may be open at a time, so scope each object to close its OSD before the next one
-    // Called first. Also used to determine if 'logo_background' should be loaded from logo path or theme path
+    // Called first. DisplayChannel.PreLoadImages() is also used to determine if 'logo_background' should be loaded from
+    // logo or theme path
     { cFlatDisplayChannel DisplayChannel(false); DisplayChannel.PreLoadImages(); }
     { cFlatDisplayMenu Display_Menu; Display_Menu.PreLoadImages(); }
     { cFlatDisplayReplay DisplayReplay(false); DisplayReplay.PreLoadImages(); }
@@ -194,6 +228,11 @@ void cImageCache::PreLoadImage() {
     m_InsertIndexBase = GetCacheCount();
     m_InsertIconIndexBase = GetCacheCount(true);
 
+    // Snapshot the path resolution cache so preloaded entries are preserved on overflow.
+    m_PathBaseCache = m_PathCache;
+    m_PathInsertIndexBase = m_PathCache.size();
+
     dsyslog("flatPlus: Imagecache pre loaded %ld images and %ld icons", m_InsertIndexBase, m_InsertIconIndexBase);
+    dsyslog("flatPlus: Imagecache pre loaded %ld path cache entries", m_PathInsertIndexBase);
     dsyslog("flatPlus: Imagecache pre load images and icons time: %ld ms", Timer.Elapsed());
 }

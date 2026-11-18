@@ -10,7 +10,6 @@
 #define X_DISPLAY_MISSING
 
 #include <vdr/osd.h>
-#include <vdr/skins.h>
 #include <vdr/tools.h>
 
 #include <string>
@@ -39,4 +38,8 @@ class cImageLoader : public cImageMagickWrapper {
     const cString m_LogoExtension {"png"};
     void ToLowerCase(std::string &str);  // NOLINT
     bool CheckImageExistence(const cString &RecPath, const cString &Image, cString &found) const;  // NOLINT
+
+    // Cache lookup helpers: GetImage -> LoadImage -> CreateImage -> InsertImage.
+    // Returns nullptr if the file is not found or scaling failed.
+    cImage *LoadAndScale(const cString &File, int width, int height, bool IsIcon);
 };
