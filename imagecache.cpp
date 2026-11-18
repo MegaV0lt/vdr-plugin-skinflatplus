@@ -87,9 +87,9 @@ static std::string_view BaseNameFromCacheName(std::string_view full) {
 cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool IsIcon) const {
     const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
 
-    auto &idx = IsIcon ? m_IconIndex : m_ImageIndex;
-    const auto it {idx.find(key)};
-    if (it != idx.end()) {
+    auto &index = IsIcon ? m_IconIndex : m_ImageIndex;
+    const auto it {index.find(key)};
+    if (it != index.end()) {
         const std::size_t slot {it->second};
         const auto &cache {IsIcon ? IconCache : ImageCache};
         if (slot < cache.size()) {
@@ -113,11 +113,11 @@ cImage *cImageCache::GetImage(const cString &Name, int Width, int Height, bool I
             std::strcmp(*data.Name, *Name) == 0) {
             // Cache the result in the index for future O(1) lookups
 #ifdef DEBUGFUNCSCALL
-            dsyslog("flatPlus: GetImage() Found in linear search, caching index for %s (%dx%d) at slot %ld", *Name,
-                    Width, Height, slot);
+            dsyslog(
+                "flatPlus: cImageCache::GetImage() Found in linear search, caching index for %s (%dx%d) at slot %ld",
+                *Name, Width, Height, slot);
 #endif
-            // (IsIcon) ? m_IconIndex[key] = slot : m_ImageIndex[key] = slot;
-            idx[key] = slot;
+            index[key] = slot;
             return data.Image.get();
         }
     }
@@ -197,10 +197,9 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
         removedAny = true;
     }
 
-    // Invalidate logo path resolution entries so a re-added logo is re-probed on disk
-    // instead of being served from a stale (possibly negative) cache entry. This is
-    // intentionally broad (all 'L' entries): RLFC is a rare admin command and may be
-    // used precisely to force a refresh when a logo file was added/replaced on disk.
+    // Invalidate logo path resolution entries so a re-added logo is re-probed on disk instead of being served from a
+    // stale (possibly negative) cache entry. This is intentionally broad (all 'L' entries): RLFC is a rare admin
+    // command and may be used precisely to force a refresh when a logo file was added/replaced on disk.
     for (auto it {m_PathCache.begin()}; it != m_PathCache.end();) {
         if (!it->first.empty() && it->first.front() == 'L')
             it = m_PathCache.erase(it);
@@ -212,14 +211,14 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
 }
 
 // Preload images and icons
-// This function is called at startup to load images and icons into the cache
-// to speed up the display of the menu and other components.
+// This function is called at startup to load images and icons into the cache to speed up the display of the menu and
+// other components.
 void cImageCache::PreLoadImage() {
     cTimeMs Timer;
 
-    // Only one OSD may be open at a time, so scope each object to close its OSD before the next one
-    // Called first. DisplayChannel.PreLoadImages() is also used to determine if 'logo_background' should be loaded from
-    // logo or theme path
+    // Only one OSD may be open at a time, so scope each object to close its OSD before the next one is called.
+    // DisplayChannel.PreLoadImages() is also used to determine if 'logo_background' should be loaded from logo or theme
+    // path
     { cFlatDisplayChannel DisplayChannel(false); DisplayChannel.PreLoadImages(); }
     { cFlatDisplayMenu Display_Menu; Display_Menu.PreLoadImages(); }
     { cFlatDisplayReplay DisplayReplay(false); DisplayReplay.PreLoadImages(); }

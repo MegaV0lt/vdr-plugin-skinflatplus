@@ -46,7 +46,7 @@ std::string IconPathKey(const char *icon) {
 
 std::string PosterPathKey(const cString &RecPath) {
     std::string key {"P"};
-    key += std::to_string(Config.TVScraperSearchLocalPosters);
+    key += *itoa(Config.TVScraperSearchLocalPosters);
     key += '\x1f';
     key += *RecPath;
     return key;
@@ -219,6 +219,10 @@ cImage* cImageLoader::GetIcon(const char *cIcon, int width, int height) {
 }
 
 cImage* cImageLoader::GetFile(const char *cFile, int width, int height) {
+    // 'cFile' is already a resolved full path (e.g. from SearchRecordingPoster() or the actor
+    // thumb path). There is no path-variant probing here, so the path resolution cache does not
+    // apply: The positive case is covered by the image cache (ImgCache.GetImage() below), and
+    // negatives are prevented upstream (SearchRecordingPoster() caches its misses).
     if (width <= 0 || height <= 0 || isempty(cFile)) return nullptr;
 
     const cString File {cFile};
