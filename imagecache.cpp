@@ -166,6 +166,11 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
 void cImageCache::InsertIntoCache(ImageData *Cache, std::size_t &InsertIndex, const std::size_t MaxSize,
                                    std::size_t BaseIndex, cImage *Image, const cString &Name, int Width,
                                    int Height) {
+#ifdef DEBUGFUNCSCALL
+    dsyslog("flatPlus: cImageCache::InsertIntoCache() Inserting %s (%dx%d) at slot %ld", *Name, Width, Height,
+            InsertIndex);
+#endif
+
     Cache[InsertIndex].Image = std::unique_ptr<cImage>(Image);
     Cache[InsertIndex].Name = Name;
     Cache[InsertIndex].Width = Width;
