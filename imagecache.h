@@ -58,8 +58,8 @@ class cImageCache {
 
     struct ImageKey {
         cString Name {""};
-        int16_t Width {0};
-        int16_t Height {0};
+        int16_t Width {-1};  // -1 marks an empty (unused) reverse-index slot
+        int16_t Height {-1};
 
         bool operator==(const ImageKey &other) const {
             return Width == other.Width && Height == other.Height && std::strcmp(*Name, *other.Name) == 0;
@@ -83,6 +83,11 @@ class cImageCache {
     // O(1) lookup indexes for (Name, Width, Height)->slot
     mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_ImageIndex;
     mutable std::unordered_map<ImageKey, std::size_t, ImageKeyHash> m_IconIndex;
+
+    // Reverse index: slot -> ImageKey. Allows O(1) invalidation of stale slot mappings
+    // when a slot is overwritten, instead of a linear scan of the index map.
+    std::vector<ImageKey> m_ReverseImageIndex;
+    std::vector<ImageKey> m_ReverseIconIndex;
 
     // O(1) lookup cache for resolved file paths. Value is the full path, or empty
     // for a cached negative result (file does not exist).

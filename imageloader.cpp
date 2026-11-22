@@ -27,7 +27,7 @@ namespace {
 // Prefixes ('L', 'I', 'P') prevent collisions between logos, icons and posters.
 // '\x1f' (unit separator) is used as a field delimiter.
 std::string LogoPathKey(const char *logo) {
-    std::string key {"L"};
+    std::string key {'L'};
     key += *Config.LogoPath;
     key += '\x1f';
     key += logo;
@@ -35,7 +35,7 @@ std::string LogoPathKey(const char *logo) {
 }
 
 std::string IconPathKey(const char *icon) {
-    std::string key {"I"};
+    std::string key {'I'};
     key += *Config.IconPath;
     key += '\x1f';
     key += Setup.OSDTheme;
@@ -45,7 +45,7 @@ std::string IconPathKey(const char *icon) {
 }
 
 std::string PosterPathKey(const cString &RecPath) {
-    std::string key {"P"};
+    std::string key {'P'};
     key += *itoa(Config.TVScraperSearchLocalPosters);
     key += '\x1f';
     key += *RecPath;

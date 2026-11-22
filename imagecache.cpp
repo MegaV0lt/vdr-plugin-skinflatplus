@@ -17,7 +17,8 @@
 
 cImageCache::cImageCache()
     : ImageCache(kMaxImageCache),  // Initialize vector with fixed size
-      IconCache(kMaxIconCache) {}
+      IconCache(kMaxIconCache), m_ReverseImageIndex(kMaxImageCache),  // Reverse index: slot -> ImageKey
+      m_ReverseIconIndex(kMaxIconCache) {}
 
 cImageCache::~cImageCache() = default;
 
@@ -54,6 +55,9 @@ void cImageCache::Clear() {
     m_IconIndex.clear();
     m_PathCache.clear();
     m_PathBaseCache.clear();
+
+    m_ReverseImageIndex.assign(kMaxImageCache, ImageKey {});
+    m_ReverseIconIndex.assign(kMaxIconCache, ImageKey {});
 
     m_InsertIndex = 0;
     m_InsertIconIndex = 0;
@@ -129,29 +133,32 @@ void cImageCache::InsertImage(cImage *Image, const cString &Name, int Width, int
     if (!Image) return;
 
     if (IsIcon) {
-        // Remove any previous mapping that points to the slot we are about to overwrite.
         const std::size_t slot {m_InsertIconIndex};
-        for (auto it {m_IconIndex.begin()}; it != m_IconIndex.end();) {
-            (it->second == slot) ? it = m_IconIndex.erase(it)
-                                 : ++it;
-        }
+
+        // Remove any previous mapping that points to the slot we are about to overwrite.
+        // O(1) via the reverse index instead of a linear scan of m_IconIndex.
+        const ImageKey &oldKey {m_ReverseIconIndex[slot]};
+        if (oldKey.Width != -1) { m_IconIndex.erase(oldKey); }
 
         InsertIntoCache(IconCache.data(), m_InsertIconIndex, kMaxIconCache, m_InsertIconIndexBase, Image, Name,
                          Width, Height);
 
         const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
+        m_ReverseIconIndex[slot] = key;
         m_IconIndex[key] = slot;
     } else {
         const std::size_t slot {m_InsertIndex};
-        for (auto it {m_ImageIndex.begin()}; it != m_ImageIndex.end();) {
-            (it->second == slot) ? it = m_ImageIndex.erase(it)
-                                 : ++it;
-        }
+
+        // Remove any previous mapping that points to the slot we are about to overwrite.
+        // O(1) via the reverse index instead of a linear scan of m_ImageIndex.
+        const ImageKey &oldKey {m_ReverseImageIndex[slot]};
+        if (oldKey.Width != -1) { m_ImageIndex.erase(oldKey); }
 
         InsertIntoCache(ImageCache.data(), m_InsertIndex, kMaxImageCache, m_InsertIndexBase, Image, Name, Width,
                          Height);
 
         const ImageKey key {Name, static_cast<int16_t>(Width), static_cast<int16_t>(Height)};
+        m_ReverseImageIndex[slot] = key;
         m_ImageIndex[key] = slot;
     }
 }
