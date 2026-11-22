@@ -194,6 +194,7 @@ bool cImageCache::RemoveFromCache(const cString &Name) {
 
         const ImageKey key {data.Name, data.Width, data.Height};
         m_ImageIndex.erase(key);
+        m_ReverseImageIndex[slot] = ImageKey {};
 
         dsyslog("flatPlus: RemoveFromCache: %s", *data.Name);
         data.Image.reset();
